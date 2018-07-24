@@ -40,6 +40,7 @@ import {
   ContainerXS,
   Content,
   DeviceIcon,
+  EditIcon,
   ErrorMessage,
   FacebookIcon,
   FileIcon,
@@ -52,7 +53,7 @@ import {
   H3,
   H4,
   HangupIcon,
-  Header,
+  HeaderMenu,
   Heading,
   ICON_NAME,
   ImageIcon,
@@ -69,6 +70,7 @@ import {
   Loading,
   Logo,
   MenuItem,
+  MenuLink,
   MenuModal,
   MessageIcon,
   Modal,
@@ -159,14 +161,21 @@ class Demo extends React.PureComponent {
             </MenuItem>
           </MenuModal>
         )}
-        <Header>
-          <Logo width={72} />
-          <Loading />
-          <Loading progress={0.33} />
-          <Loading progress={0.66} />
-          <Logo scale="3" hover />
-        </Header>
+        <HeaderMenu logoElement={<Logo width={72} />}>
+          <MenuLink href="#" color={COLOR.GREEN} button>
+            test1
+          </MenuLink>
+          <MenuLink href="#">test2</MenuLink>
+          <MenuLink href="#">test3</MenuLink>
+        </HeaderMenu>
+
         <Content>
+          <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
+            <Logo scale={3} />
+            <Loading />
+            <Loading progress={0.33} />
+            <Loading progress={0.66} />
+          </Container>
           <Container>
             <H1>Icons</H1>
             <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
@@ -194,6 +203,7 @@ class Demo extends React.PureComponent {
               <TeamIcon />
               <TimedIcon height={32} />
               <WireIcon width={32} />
+              <EditIcon />
             </Container>
             <Line />
             <H1>Brand Icons</H1>
