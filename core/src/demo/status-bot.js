@@ -35,8 +35,9 @@ const logger = logdown('@wireapp/core/StatusBot', {
 });
 
 const CONVERSATION_ARGUMENT_INDEX = 2;
-const conversationId = process.argv[CONVERSATION_ARGUMENT_INDEX];
-if (!conversationId) {
+const conversations = process.argv[CONVERSATION_ARGUMENT_INDEX];
+const conversationIds = conversations ? conversations.trim().split(',') : [];
+if (conversationIds.length === 0) {
   logger.error(`Conversation ID is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".`);
   process.exit(1);
 }
@@ -71,7 +72,7 @@ if (!message) {
 
     const text = message || `I am posting from ${name} v${version} (Build #${process.env.TRAVIS_BUILD_NUMBER}). 🌞`;
     const payload = account.service.conversation.createText(text);
-    await account.service.conversation.send(conversationId, payload);
+    conversationIds.forEach(async conversationId => await account.service.conversation.send(conversationId, payload));
   } catch (error) {
     logger.error('Error:', error.stack);
   }
