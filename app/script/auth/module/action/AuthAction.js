@@ -83,7 +83,7 @@ function handleSSOLogin(code) {
             return resolve();
           }
           case 'AUTH_ERROR': {
-            ssoWindow.close();
+            // ssoWindow.close();
             return reject(new Error(`Authentication error: "${JSON.stringify(event.data.payload)}"`));
           }
           default: {
