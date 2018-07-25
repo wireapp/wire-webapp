@@ -112,7 +112,8 @@ function handleSSOLogin(code) {
     );
 
     timerId = window.setInterval(() => {
-      if (!ssoWindow) {
+      console.error('Checking for closed child window', ssoWindow);
+      if (!ssoWindow || ssoWindow.closed) {
         window.removeEventListener('message', onReceiveChildWindowMessage);
         window.removeEventListener('unload', onParentWindowClose);
         clearInterval(timerId);
