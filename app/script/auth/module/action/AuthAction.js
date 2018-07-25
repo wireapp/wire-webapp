@@ -79,7 +79,7 @@ function handleSSOLogin(code) {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
-            ssoWindow.close();
+            // ssoWindow.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
