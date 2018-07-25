@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/filesystem": "0.0.28",
-    "@types/node": "10.5.2",
+    "@types/node": "10.5.3",
     "bro-fs": "0.4.0",
     "dexie": "2.0.4",
     "fs-extra": "7.0.0"
