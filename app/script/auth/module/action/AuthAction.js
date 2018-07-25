@@ -79,11 +79,11 @@ function handleSSOLogin(code) {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
-            // ssoWindow.close();
+            ssoWindow.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
-            // ssoWindow.close();
+            ssoWindow.close();
             return reject(new Error(`Authentication error: "${JSON.stringify(event.data.payload)}"`));
           }
           default: {
