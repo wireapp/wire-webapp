@@ -26,6 +26,7 @@ export const REGISTER_FLOW = {
 
 export const getAccessToken = state => state.authState.accesstoken;
 export const isAuthenticated = state => state.authState.isAuthenticated;
+export const isAuthWindowOpen = state => state.authState.isAuthWindowOpen;
 export const isFetching = state => state.authState.fetching;
 export const getError = state => state.authState.error;
 export const getCurrentFlow = state => state.authState.currentFlow;

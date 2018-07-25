@@ -30,6 +30,8 @@ import {
   InputSubmitCombo,
   ErrorMessage,
   ICON_NAME,
+  Modal,
+  Logo,
   Form,
   Input,
   H1,
@@ -191,10 +193,21 @@ class SingleSignOn extends React.PureComponent {
     const {
       intl: {formatMessage: _},
       loginError,
+      isAuthWindowOpen,
     } = this.props;
     const {persist, code, validInputs, validationErrors, clipboardError} = this.state;
     return (
       <Page>
+        {isAuthWindowOpen && (
+          <Modal>
+            <Container centerText style={{maxWidth: '300px'}}>
+              <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
+                <Logo height={30} />
+              </div>
+              {`If you don't see the OKTA Single Sign On window, continue your Company Log in from here.`}
+            </Container>
+          </Modal>
+        )}
         <Container centerText verticalCenter style={{width: '100%'}}>
           <AppAlreadyOpen />
           <Columns>
@@ -244,6 +257,7 @@ class SingleSignOn extends React.PureComponent {
                         }
                         innerRef={node => (this.inputs.code = node)}
                         markInvalid={!validInputs.code}
+                        placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
                         value={code}
                         autoComplete="section-login sso-code"
                         maxLength="1024"
@@ -301,6 +315,7 @@ export default withRouter(
       state => ({
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
+        isAuthWindowOpen: AuthSelector.isAuthWindowOpen(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),

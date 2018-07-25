@@ -40,6 +40,7 @@ export const initialState = {
   error: null,
   fetched: false,
   fetching: false,
+  isAuthWindowOpen: false,
   isAuthenticated: false,
 };
 
@@ -138,6 +139,9 @@ export default function reducer(state = initialState, action) {
     }
     case AuthActionCreator.GET_INVITATION_FROM_CODE_SUCCESS: {
       return {...state, account: {...state.account, email: action.payload.email, name: action.payload.name}};
+    }
+    case AuthActionCreator.LOGIN_AUTH_WINDOW_STATE_UPDATE: {
+      return {...state, isAuthWindowOpen: action.payload.isOpen};
     }
     default: {
       return state;

@@ -70,10 +70,11 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
-function handleSSOLogin(code) {
+function handleSSOLogin(code, dispatch) {
   return new Promise((resolve, reject) => {
     let ssoWindow = undefined;
     let timerId = undefined;
+
     const onReceiveChildWindowMessage = event => {
       if (event.origin === BACKEND.rest) {
         const eventType = event.data && event.data.type;
@@ -99,7 +100,7 @@ function handleSSOLogin(code) {
 
     ssoWindow = window.open(
       `${BACKEND.rest}/sso/initiate-login/${code}`,
-      '_blank',
+      'WIRE_SSO',
       `
         location=no,
         menubar=no,
@@ -110,6 +111,7 @@ function handleSSOLogin(code) {
         height=500,
       `
     );
+    dispatch(AuthActionCreator.updateAuthWindowState(true));
 
     timerId = window.setInterval(() => {
       console.error('Checking for closed child window', ssoWindow);
@@ -117,6 +119,7 @@ function handleSSOLogin(code) {
         window.removeEventListener('message', onReceiveChildWindowMessage);
         window.removeEventListener('unload', onParentWindowClose);
         clearInterval(timerId);
+        dispatch(AuthActionCreator.updateAuthWindowState(false));
         reject(new Error('Aborted by user'));
       }
     }, 1000);
@@ -133,7 +136,7 @@ export function doLoginSSO({code, clientType}) {
   return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startLogin());
     return Promise.resolve()
-      .then(() => handleSSOLogin(code))
+      .then(() => handleSSOLogin(code, dispatch))
       .then(() => apiClient.init(clientType))
       .then(() => core.init())
       .then(() => persistAuthData(clientType, core, dispatch))

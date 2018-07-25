@@ -568,6 +568,10 @@ export const ssoLoginStrings = defineMessages({
     id: 'ssoLogin.pasteButton',
     defaultMessage: 'Paste code',
   },
+  codeInputPlaceholder: {
+    id: 'ssoLogin.codeInputPlaceholder',
+    defaultMessage: 'SSO Code',
+  },
 });
 
 export const logoutReasonStrings = defineMessages({
