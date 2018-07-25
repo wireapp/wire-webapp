@@ -349,6 +349,7 @@ z.string.de.conversationAssetUploading = 'Hochladen…';
 z.string.de.conversationAssetDownloading = 'Herunterladen…';
 z.string.de.conversationAssetUploadFailed = 'Hochladen fehlgeschlagen';
 z.string.de.conversationPlaybackError = 'Konnte nicht abgespielt werden';
+z.string.de.conversationContextMenuCopy = 'Kopieren';
 z.string.de.conversationContextMenuEdit = 'Bearbeiten';
 z.string.de.conversationContextMenuDelete = 'Für mich löschen…';
 z.string.de.conversationContextMenuDeleteEveryone = 'Für alle löschen…';

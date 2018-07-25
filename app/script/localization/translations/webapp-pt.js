@@ -262,6 +262,7 @@ z.string.pt.conversationMissedMessages = 'Não usou este dispositivo durante alg
 z.string.pt.conversationAssetDownloading = 'A descarregar…';
 z.string.pt.conversationAssetUploadFailed = 'O carregamento falhou';
 z.string.pt.conversationPlaybackError = 'Incapaz de reproduzir';
+z.string.pt.conversationContextMenuCopy = 'Copiar';
 z.string.pt.conversationContextMenuEdit = 'Editar';
 z.string.pt.conversationContextMenuDelete = 'Eliminar para mim';
 z.string.pt.conversationContextMenuDeleteEveryone = 'Eliminar para todos';

@@ -255,6 +255,7 @@ z.string.it.conversationMissedMessages = 'È da un po’ di tempo che non utiliz
 z.string.it.conversationAssetDownloading = 'Download in corso…';
 z.string.it.conversationAssetUploadFailed = 'Caricamento fallito';
 z.string.it.conversationPlaybackError = 'Impossibile riprodurre';
+z.string.it.conversationContextMenuCopy = 'Copia';
 z.string.it.conversationContextMenuEdit = 'Modifica';
 z.string.it.conversationContextMenuDelete = 'Elimina per me';
 z.string.it.conversationContextMenuDeleteEveryone = 'Elimina per tutti';

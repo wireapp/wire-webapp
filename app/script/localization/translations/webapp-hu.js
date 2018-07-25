@@ -327,6 +327,7 @@ z.string.hu.conversationAssetUploading = 'Feltöltés…';
 z.string.hu.conversationAssetDownloading = 'Letöltés…';
 z.string.hu.conversationAssetUploadFailed = 'A feltöltés sikertelen';
 z.string.hu.conversationPlaybackError = 'Nem lehet lejátszani';
+z.string.hu.conversationContextMenuCopy = 'Másolás';
 z.string.hu.conversationContextMenuEdit = 'Szerkesztés';
 z.string.hu.conversationContextMenuDelete = 'Törlés nálam';
 z.string.hu.conversationContextMenuDeleteEveryone = 'Törlés mindenkinél';

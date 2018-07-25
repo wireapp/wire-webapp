@@ -262,6 +262,7 @@ z.string.tr.conversationMissedMessages = 'Bir süredir bu cihazı kullanmıyorsu
 z.string.tr.conversationAssetDownloading = 'İndiriliyor…';
 z.string.tr.conversationAssetUploadFailed = 'Karşıya Yükleme Başarısız';
 z.string.tr.conversationPlaybackError = 'Oynatılamıyor';
+z.string.tr.conversationContextMenuCopy = 'Kopyala';
 z.string.tr.conversationContextMenuEdit = 'Düzenle';
 z.string.tr.conversationContextMenuDelete = 'Benim için sil';
 z.string.tr.conversationContextMenuDeleteEveryone = 'Herkes için sil';

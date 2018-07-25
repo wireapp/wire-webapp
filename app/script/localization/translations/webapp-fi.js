@@ -261,6 +261,7 @@ z.string.fi.conversationMissedMessages = 'Et ole käyttänyt tätä laitetta pit
 z.string.fi.conversationAssetDownloading = 'Ladataan…';
 z.string.fi.conversationAssetUploadFailed = 'Lähetys epäonnistui';
 z.string.fi.conversationPlaybackError = 'Toisto epäonnistui';
+z.string.fi.conversationContextMenuCopy = 'Kopioi';
 z.string.fi.conversationContextMenuEdit = 'Muokkaa';
 z.string.fi.conversationContextMenuDelete = 'Poista minulta';
 z.string.fi.conversationContextMenuDeleteEveryone = 'Poista kaikilta';

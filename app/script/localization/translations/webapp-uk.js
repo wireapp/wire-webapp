@@ -350,6 +350,7 @@ z.string.uk.conversationAssetUploading = 'Завантаження…';
 z.string.uk.conversationAssetDownloading = 'Скачування…';
 z.string.uk.conversationAssetUploadFailed = 'Не вдалося завантажити';
 z.string.uk.conversationPlaybackError = 'Неможливо відтворити';
+z.string.uk.conversationContextMenuCopy = 'Скопіювати';
 z.string.uk.conversationContextMenuEdit = 'Редагувати';
 z.string.uk.conversationContextMenuDelete = 'Видалити для мене…';
 z.string.uk.conversationContextMenuDeleteEveryone = 'Видалити для всіх…';

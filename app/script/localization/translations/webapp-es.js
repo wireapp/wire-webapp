@@ -325,6 +325,7 @@ z.string.es.conversationAssetUploading = 'Cargando...';
 z.string.es.conversationAssetDownloading = 'Descargando…';
 z.string.es.conversationAssetUploadFailed = 'Error al subir la información';
 z.string.es.conversationPlaybackError = 'Incapaz de reproducir';
+z.string.es.conversationContextMenuCopy = 'Copiar';
 z.string.es.conversationContextMenuEdit = 'Editar';
 z.string.es.conversationContextMenuDelete = 'Eliminar para mí';
 z.string.es.conversationContextMenuDeleteEveryone = 'Eliminar para todos';

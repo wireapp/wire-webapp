@@ -252,6 +252,7 @@ z.string.sl.conversationMissedMessages = 'Te naprave nekaj časa niste uporablja
 z.string.sl.conversationAssetDownloading = 'Prenašanje…';
 z.string.sl.conversationAssetUploadFailed = 'Nalaganje ni uspelo';
 z.string.sl.conversationPlaybackError = 'Ni možno predvajati';
+z.string.sl.conversationContextMenuCopy = 'Kopiraj';
 z.string.sl.conversationContextMenuEdit = 'Uredi';
 z.string.sl.conversationContextMenuDelete = 'Izbriši zame';
 z.string.sl.conversationContextMenuDeleteEveryone = 'Izbriši za vse';

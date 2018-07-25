@@ -259,6 +259,7 @@ z.string.cs.conversationMissedMessages = 'Toto zařízení jste nějakou dobu ne
 z.string.cs.conversationAssetDownloading = 'Stahování…';
 z.string.cs.conversationAssetUploadFailed = 'Nahrání selhalo';
 z.string.cs.conversationPlaybackError = 'Nelze přehrát';
+z.string.cs.conversationContextMenuCopy = 'Vložit';
 z.string.cs.conversationContextMenuEdit = 'Upravit';
 z.string.cs.conversationContextMenuDelete = 'Odstranit pro mě';
 z.string.cs.conversationContextMenuDeleteEveryone = 'Odstranit pro všechny';

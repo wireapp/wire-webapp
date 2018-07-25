@@ -241,6 +241,7 @@ z.string.hr.conversationMissedMessages = 'Niste upotrebljavali ovaj uređaj neko
 z.string.hr.conversationAssetDownloading = 'Preuzimanje…';
 z.string.hr.conversationAssetUploadFailed = 'Prijenos neuspješan';
 z.string.hr.conversationPlaybackError = 'Reprodukcija neuspješna';
+z.string.hr.conversationContextMenuCopy = 'Kopiraj';
 z.string.hr.conversationContextMenuEdit = 'Promjeni';
 z.string.hr.conversationContextMenuDelete = 'Brisanje poruke za mene';
 z.string.hr.conversationContextMenuDeleteEveryone = 'Brisanje poruke za sve sudionike';

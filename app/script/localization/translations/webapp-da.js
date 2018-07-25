@@ -312,6 +312,7 @@ z.string.da.conversationAssetUploading = 'Uploader…';
 z.string.da.conversationAssetDownloading = 'Downloader…';
 z.string.da.conversationAssetUploadFailed = 'Upload Mislykkedes';
 z.string.da.conversationPlaybackError = 'Ikke i stand til at afspille';
+z.string.da.conversationContextMenuCopy = 'Kopiér';
 z.string.da.conversationContextMenuEdit = 'Redigér';
 z.string.da.conversationContextMenuDelete = 'Slet for mig';
 z.string.da.conversationContextMenuDeleteEveryone = 'Slet for alle';

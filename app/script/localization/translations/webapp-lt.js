@@ -350,6 +350,7 @@ z.string.lt.conversationAssetUploading = 'Įkeliama…';
 z.string.lt.conversationAssetDownloading = 'Atsiunčiama…';
 z.string.lt.conversationAssetUploadFailed = 'Įkėlimas nepavyko';
 z.string.lt.conversationPlaybackError = 'Nepavyko atkurti';
+z.string.lt.conversationContextMenuCopy = 'Kopijuoti';
 z.string.lt.conversationContextMenuEdit = 'Taisyti';
 z.string.lt.conversationContextMenuDelete = 'Ištrinti man';
 z.string.lt.conversationContextMenuDeleteEveryone = 'Ištrinti visiems';

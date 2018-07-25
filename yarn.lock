@@ -511,15 +511,15 @@
     "@webassemblyjs/wast-parser" "1.5.13"
     long "^3.2.0"
 
-"@wireapp/api-client@1.9.8":
-  version "1.9.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.9.8.tgz#020feff2cc90ddeed3156172757f476da72384d5"
+"@wireapp/api-client@1.9.14":
+  version "1.9.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.9.14.tgz#ba1ac8df7ef130dd10bbfc7d1f017f5559242afd"
   dependencies:
     "@types/node" "10.5.2"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.59"
-    "@wireapp/store-engine" "0.11.46"
+    "@wireapp/priority-queue" "0.1.60"
+    "@wireapp/store-engine" "0.11.48"
     axios "0.18.0"
     html5-websocket "2.0.3"
     logdown "3.2.3"
@@ -527,58 +527,58 @@
     spark-md5 "3.0.0"
     tough-cookie "2.4.3"
 
-"@wireapp/cbor@3.0.61":
-  version "3.0.61"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.61.tgz#5f9628cb4da75df7415fa4629c9b1dd37aa2c954"
+"@wireapp/cbor@3.0.62":
+  version "3.0.62"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.62.tgz#73144aef3db75a666e6cda5448026532ecb94b61"
 
-"@wireapp/core@3.13.10":
-  version "3.13.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.13.10.tgz#554072ea95029e4476090223c70d219097f118db"
+"@wireapp/core@3.14.4":
+  version "3.14.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.14.4.tgz#36bb58776afcc27fad045d31ee06a6269cc19c11"
   dependencies:
     "@types/node" "10.5.2"
-    "@wireapp/api-client" "1.9.8"
-    "@wireapp/cryptobox" "8.6.1"
+    "@wireapp/api-client" "1.9.14"
+    "@wireapp/cryptobox" "8.6.5"
     "@wireapp/protocol-messaging" "1.20.1"
-    "@wireapp/store-engine" "0.11.46"
-    bazinga64 "5.2.13"
+    "@wireapp/store-engine" "0.11.48"
+    bazinga64 "5.2.14"
     logdown "3.2.3"
     protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.6.1":
-  version "8.6.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.1.tgz#ca04c8ef28e7084868835230f61225ae48ab4fb4"
+"@wireapp/cryptobox@8.6.5":
+  version "8.6.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.5.tgz#11cb69b0dcc228497335f60d377d9dd148d036aa"
   dependencies:
     "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.2"
-    "@wireapp/lru-cache" "2.1.36"
-    "@wireapp/priority-queue" "0.1.59"
-    "@wireapp/proteus" "7.3.1"
-    "@wireapp/store-engine" "0.11.46"
-    bazinga64 "5.2.13"
+    "@wireapp/lru-cache" "2.1.38"
+    "@wireapp/priority-queue" "0.1.60"
+    "@wireapp/proteus" "7.3.4"
+    "@wireapp/store-engine" "0.11.48"
+    bazinga64 "5.2.14"
     dexie "2.0.4"
     fs-extra "7.0.0"
     logdown "3.2.3"
 
-"@wireapp/lru-cache@2.1.36":
-  version "2.1.36"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.36.tgz#70cb0f334c15ea709e97944cb463c35ae93831e2"
+"@wireapp/lru-cache@2.1.38":
+  version "2.1.38"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.38.tgz#16892a5aca598af0ddf60b15c4f593f7d85c73c4"
 
-"@wireapp/priority-queue@0.1.59":
-  version "0.1.59"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.59.tgz#d699dbdd40e32d230add252c3cfd750e431f90c9"
+"@wireapp/priority-queue@0.1.60":
+  version "0.1.60"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.60.tgz#62838ab54724d5821b92e47330e6a97f416b61ec"
   dependencies:
     "@types/node" "10.5.2"
     pure-uuid "1.5.3"
 
-"@wireapp/proteus@7.3.1":
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.3.1.tgz#f39583deba99677c98f32032c06ffa938eae0bc8"
+"@wireapp/proteus@7.3.4":
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.3.4.tgz#9d34e5eab2556a83e6df551f0a3fe48605b5e468"
   dependencies:
     "@types/chai" "4.1.4"
     "@types/ed2curve" "0.2.2"
     "@types/node" "10.5.2"
-    "@wireapp/cbor" "3.0.61"
+    "@wireapp/cbor" "3.0.62"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
@@ -588,9 +588,9 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.8.0.tgz#9e5e339787b55f9193b6d7d3d7658b28aa827b0a"
+"@wireapp/react-ui-kit@1.8.3":
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.8.3.tgz#dec4708ba4f3d1a6980500bdedc88f2a09b84e90"
   dependencies:
     bazinga64 "5.2.13"
     color "3.0.0"
@@ -600,9 +600,9 @@
     styled-components "3.3.3"
     styled-normalize "8.0.0"
 
-"@wireapp/store-engine@0.11.46":
-  version "0.11.46"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.46.tgz#93f6992d3b6dc51781c7df7150170f1e6e2fe5c9"
+"@wireapp/store-engine@0.11.48":
+  version "0.11.48"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.48.tgz#56dc222180563e76353949f1f13b5da103cf4c46"
   dependencies:
     "@types/filesystem" "0.0.28"
     "@types/node" "10.5.2"
@@ -1004,15 +1004,15 @@ atob@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.1.tgz#ae2d5a729477f289d60dd7f96a6314a22dd6c22a"
 
-autoprefixer@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.0.0.tgz#fce072cb3c9c61374bf6fb7d1906f630afdb2889"
+autoprefixer@9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.0.1.tgz#b5b74aba3fa60b4f1403729e46a6a1246f16818f"
   dependencies:
     browserslist "^4.0.1"
     caniuse-lite "^1.0.30000865"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
-    postcss "^7.0.0"
+    postcss "^7.0.1"
     postcss-value-parser "^3.2.3"
 
 autoprefixer@^6.0.0:
@@ -1726,6 +1726,10 @@ batch@0.6.1:
 bazinga64@5.2.13:
   version "5.2.13"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.13.tgz#98abf2dfa656ea7fd795f57e4abd2fd3651ed0f5"
+
+bazinga64@5.2.14:
+  version "5.2.14"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.14.tgz#45d9e993ecc2d6b0ce78ca534d54bb1c0162141d"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2610,9 +2614,9 @@ concat-stream@^1.5.0:
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
 
-concurrently@3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-3.6.0.tgz#c25e34b156a9d5bd4f256a0d85f6192438ae481f"
+concurrently@3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-3.6.1.tgz#2f95baec5c4051294dfbb55b57a3b98a3e2b45ec"
   dependencies:
     chalk "^2.4.1"
     commander "2.6.0"
@@ -3733,9 +3737,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.1.0.tgz#2ed611f1ce163c0fb99e1e0cda5af8f662dff645"
+eslint@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.2.0.tgz#3901ae249195d473e633c4acbc370068b1c964dc"
   dependencies:
     ajv "^6.5.0"
     babel-code-frame "^6.26.0"
@@ -3753,7 +3757,7 @@ eslint@5.1.0:
     functional-red-black-tree "^1.0.1"
     glob "^7.1.2"
     globals "^11.7.0"
-    ignore "^3.3.3"
+    ignore "^4.0.2"
     imurmurhash "^0.1.4"
     inquirer "^5.2.0"
     is-resolvable "^1.1.0"
@@ -5220,6 +5224,10 @@ ignore@^3.3.3, ignore@^3.3.5:
   version "3.3.8"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.8.tgz#3f8e9c35d38708a3a7e0e9abb6c73e7ee7707b2b"
 
+ignore@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.2.tgz#0a8dd228947ec78c2d7f736b1642a9f7317c1905"
+
 iltorb@^1.0.13:
   version "1.3.10"
   resolved "https://registry.yarnpkg.com/iltorb/-/iltorb-1.3.10.tgz#a0d9e4e7d52bf510741442236cbe0cc4230fc9f8"
@@ -6431,9 +6439,13 @@ loglevelnext@^1.0.1:
     es6-symbol "^3.1.1"
     object.assign "^4.1.0"
 
-lolex@^2.3.2, lolex@^2.4.2:
+lolex@^2.3.2:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/lolex/-/lolex-2.6.0.tgz#cf9166f3c9dece3cdeb5d6b01fce50f14a1203e3"
+
+lolex@^2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/lolex/-/lolex-2.7.1.tgz#e40a8c4d1f14b536aa03e42a537c7adbaf0c20be"
 
 long@4.0.0, long@^4.0.0:
   version "4.0.0"
@@ -6949,9 +6961,9 @@ nice-try@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.4.tgz#d93962f6c52f2c1558c0fbda6d512819f1efe1c4"
 
-nise@^1.3.3:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/nise/-/nise-1.3.3.tgz#c17a850066a8a1dfeb37f921da02441afc4a82ba"
+nise@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/nise/-/nise-1.4.2.tgz#a9a3800e3994994af9e452333d549d60f72b8e8c"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     just-extend "^1.1.27"
@@ -8376,6 +8388,14 @@ postcss@^7.0.0:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
+postcss@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.1.tgz#db20ca4fc90aa56809674eea75864148c66b67fa"
+  dependencies:
+    chalk "^2.4.1"
+    source-map "^0.6.1"
+    supports-color "^5.4.0"
+
 prebuild-install@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-2.3.0.tgz#19481247df728b854ab57b187ce234211311b485"
@@ -9641,16 +9661,16 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@6.1.3:
-  version "6.1.3"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-6.1.3.tgz#98e7d716b7b11f7f1200e9c997e74f50ae094660"
+sinon@6.1.4:
+  version "6.1.4"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-6.1.4.tgz#b67f7a7b7fe2496042b54a5c2f425e2d699927a2"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     "@sinonjs/samsam" "^2.0.0"
     diff "^3.5.0"
     lodash.get "^4.4.2"
-    lolex "^2.4.2"
-    nise "^1.3.3"
+    lolex "^2.7.1"
+    nise "^1.4.2"
     supports-color "^5.4.0"
     type-detect "^4.0.8"
 
@@ -9759,9 +9779,9 @@ socket.io@2.0.4:
     socket.io-client "2.0.4"
     socket.io-parser "~3.1.1"
 
-sockjs-client@1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.1.4.tgz#5babe386b775e4cf14e7520911452654016c8b12"
+sockjs-client@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.1.5.tgz#1bb7c0f7222c40f42adf14f4442cbd1269771a83"
   dependencies:
     debug "^2.6.6"
     eventsource "0.1.6"
@@ -11052,9 +11072,9 @@ webpack-dev-middleware@3.1.3:
     url-join "^4.0.0"
     webpack-log "^1.0.1"
 
-webpack-dev-server@3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-3.1.4.tgz#9a08d13c4addd1e3b6d8ace116e86715094ad5b4"
+webpack-dev-server@3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-3.1.5.tgz#87477252e1ac6789303fb8cd3e585fa5d508a401"
   dependencies:
     ansi-html "0.0.7"
     array-includes "^3.0.3"
@@ -11077,7 +11097,7 @@ webpack-dev-server@3.1.4:
     selfsigned "^1.9.1"
     serve-index "^1.7.2"
     sockjs "0.3.19"
-    sockjs-client "1.1.4"
+    sockjs-client "1.1.5"
     spdy "^3.4.1"
     strip-ansi "^3.0.0"
     supports-color "^5.1.0"
@@ -11101,9 +11121,9 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack@4.16.1:
-  version "4.16.1"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.16.1.tgz#2c4b89ea648125c3e67bcca6adf49ce2c14b2d31"
+webpack@4.16.2:
+  version "4.16.2"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.16.2.tgz#c3e0e771adc94582e0543dd18d7436066051e885"
   dependencies:
     "@webassemblyjs/ast" "1.5.13"
     "@webassemblyjs/helper-module-context" "1.5.13"
