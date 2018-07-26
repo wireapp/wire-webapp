@@ -17,23 +17,11 @@
  *
  */
 
-import {ANIMATION, DURATION, EASE} from '../Identity/motions';
+import {OverlayBackground, OverlayWrapper} from './Overlay';
 import {CloseIcon} from '../Icon';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-
-const ModalWrapper = styled.div`
-  position: fixed;
-  display: flex;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 24px;
-  z-index: 9997;
-  overflow-y: auto;
-`;
 
 const ModalBody = styled.div`
   ${props =>
@@ -88,21 +76,14 @@ const ModalContent = styled.div`
   overflow-y: auto;
 `;
 
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  height: 100vh;
-  width: 100vw;
+const ModalBackground = styled(OverlayBackground)`
   background: rgba(50, 54, 57, 0.4);
-  z-index: 9998;
-  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW} ${EASE.QUART};
 `;
 
 const noop = () => {};
 
-const Modal = ({children, fullscreen, onClose, onBackgroundClick}) => (
-  <ModalWrapper>
+const Modal = ({children, fullscreen, onClose, onBackgroundClick, ...props}) => (
+  <OverlayWrapper {...props}>
     <ModalBody fullscreen={fullscreen}>
       <ModalContent>{children}</ModalContent>
       {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="modal-close" />}
@@ -113,7 +94,7 @@ const Modal = ({children, fullscreen, onClose, onBackgroundClick}) => (
         data-uie-name="modal-background"
       />
     )}
-  </ModalWrapper>
+  </OverlayWrapper>
 );
 
 Modal.propTypes = {

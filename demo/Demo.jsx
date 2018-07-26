@@ -78,6 +78,7 @@ import {
   MuteIcon,
   Muted,
   OptionsIcon,
+  Overlay,
   Paragraph,
   PingIcon,
   PlaneIcon,
@@ -107,6 +108,7 @@ class Demo extends React.PureComponent {
     isFullscreenModalOpen: false,
     isMenuModalOpen: false,
     isModalOpen: false,
+    isOverlayOpen: false,
   };
 
   closeMenuModal = () => this.setState({isMenuModalOpen: false});
@@ -141,6 +143,12 @@ class Demo extends React.PureComponent {
           <Modal fullscreen onClose={() => this.setState({isFullscreenModalOpen: false})}>
             <H1>Fullscreen Modal</H1>
           </Modal>
+        )}
+        {this.state.isOverlayOpen && (
+          <Overlay>
+            <H1>Overlay</H1>
+            <Button onClick={() => this.setState({isOverlayOpen: false})}>Close</Button>
+          </Overlay>
         )}
         {this.state.isMenuModalOpen && (
           <MenuModal data-uie-name="should-be-there" onBackgroundClick={this.closeMenuModal}>
@@ -445,6 +453,12 @@ class Demo extends React.PureComponent {
               <Column>MenuModal</Column>
               <Column>
                 <Button onClick={() => this.setState({isMenuModalOpen: true})}>Open</Button>
+              </Column>
+            </Columns>
+            <Columns>
+              <Column>Overlay</Column>
+              <Column>
+                <Button onClick={() => this.setState({isOverlayOpen: true})}>Open</Button>
               </Column>
             </Columns>
 

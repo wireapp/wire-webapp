@@ -18,3 +18,4 @@
  */
 
 export * from './Modal';
+export {Overlay} from './Overlay';

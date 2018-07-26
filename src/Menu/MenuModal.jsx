@@ -18,21 +18,14 @@
  */
 
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
+import {OverlayBackground, OverlayWrapper} from '../Modal/Overlay';
 import {COLOR} from '../Identity/';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-const MenuModalWrapper = styled.div`
-  position: fixed;
-  display: flex;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+const MenuModalWrapper = styled(OverlayWrapper)`
   padding: 0;
-  z-index: 9997;
-  overflow-y: auto;
 `;
 
 const MenuModalBody = styled.div`
@@ -78,15 +71,8 @@ const MenuItemContent = styled.li`
   list-style-type: none;
 `;
 
-const MenuModalBackground = styled.div`
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  height: 100vh;
-  width: 100vw;
+const MenuModalBackground = styled(OverlayBackground)`
   background: rgba(50, 54, 57, 0.4);
-  z-index: 9998;
-  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW} ${EASE.EXPONENTIAL};
 `;
 
 const noop = () => {};
