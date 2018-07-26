@@ -468,11 +468,7 @@ z.main.App = class App {
    * @returns {z.entity.User} Checked user entity
    */
   _checkUserInformation(userEntity) {
-    const hasEmailAddress = userEntity.email();
-    const hasPhoneNumber = userEntity.phone();
-    const isActivatedUser = hasEmailAddress || hasPhoneNumber;
-
-    if (isActivatedUser) {
+    if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.set_default_picture();
       }
@@ -492,15 +488,11 @@ z.main.App = class App {
     return this.repository.user.getSelf().then(userEntity => {
       this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
-      const hasEmailAddress = userEntity.email();
-      const hasPhoneNumber = userEntity.phone();
-      const isActivatedUser = hasEmailAddress || hasPhoneNumber;
-
-      if (!isActivatedUser) {
-        this.logger.info('User does not have an activated identity and seems to be wireless');
+      if (!userEntity.hasActivatedIdentity()) {
+        this.logger.info('User does not have an activated identity and seems to be a temporary guest');
 
         if (!userEntity.isTemporaryGuest()) {
-          this.logger.info('User does not have an activated identity');
+          throw new Error('User does not have an activated identity');
         }
       }
 
