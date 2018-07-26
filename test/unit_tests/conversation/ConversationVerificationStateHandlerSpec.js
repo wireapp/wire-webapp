@@ -41,6 +41,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     test_factory
       .exposeConversationActors()
       .then(_conversation_repository => {
+        spyOn(amplify, 'publish').and.returnValue(undefined);
         conversation_repository = _conversation_repository;
         state_handler = new z.conversation.ConversationVerificationStateHandler(conversation_repository);
 

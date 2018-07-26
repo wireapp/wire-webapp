@@ -20,7 +20,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {conversationJoinStrings} from '../../strings';
-import {H2, H3, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
+import {H2, H3, ContainerXS} from '@wireapp/react-ui-kit';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 
@@ -35,11 +35,7 @@ class ConversationJoinInvalid extends React.PureComponent {
       <WirelessUnsupportedBrowser>
         <WirelessContainer>
           <ContainerXS style={{margin: 'auto 0'}}>
-            <H2
-              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-              color={COLOR.GRAY}
-              data-uie-name="status-invalid-headline"
-            >
+            <H2 style={{marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
               <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
             </H2>
             <H3 style={{marginTop: '10px'}} data-uie-name="status-invalid-text">

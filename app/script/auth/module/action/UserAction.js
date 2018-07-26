@@ -18,7 +18,6 @@
  */
 
 import * as UserActionCreator from './creator/UserActionCreator';
-import BackendError from './BackendError';
 import {currentLanguage} from '../../localeConfig';
 
 export function doActivateAccount(code, key) {
@@ -30,7 +29,7 @@ export function doActivateAccount(code, key) {
       .then(activationResponse => dispatch(UserActionCreator.successfulAccountActivation(activationResponse)))
       .catch(error => {
         dispatch(UserActionCreator.failedAccountActivation(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -44,7 +43,7 @@ export function doSendActivationCode(email) {
       .then(activationResponse => dispatch(UserActionCreator.successfulSendActivationCode(activationResponse)))
       .catch(error => {
         dispatch(UserActionCreator.failedSendActivationCode(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }

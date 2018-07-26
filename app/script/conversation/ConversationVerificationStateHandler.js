@@ -143,11 +143,24 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       const userIdsInConversation = conversationEntity.participating_user_ids().concat(conversationEntity.self.id);
       userIds = _.intersection(userIds, userIdsInConversation);
 
-      if (userIds.length) {
-        const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, this.timeOffset);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, event);
-        return true;
+      /**
+       * TEMPORARY DEBUGGING FIX:
+       * We have seen conversations in a degraded state without an unverified device in there.
+       * Previously the code would hide this fact, not create a system message and then fail when it tried to prompt
+       * the user to grant subsequent message sending - essentially blocking the conversation.
+       *
+       * As we are unsure of the trigger of the degradation we temporarly throw an error to get to the bottom of this.
+       * The conversation is also reset to the verified state to ensure we can continue to send messages.
+       */
+      if (!userIds.length) {
+        conversationEntity.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+        throw new Error('Conversation degraded without affected users');
       }
+
+      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, this.timeOffset);
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event);
+
+      return true;
     }
   }
 
@@ -179,6 +192,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     const isVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
     if (isVerified && !conversationEntity.is_verified()) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
+      this.logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
       return true;
     }
 
@@ -201,6 +215,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
     if (conversationEntity.is_verified()) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+      this.logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
       return true;
     }
 

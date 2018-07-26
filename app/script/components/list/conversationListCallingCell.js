@@ -93,7 +93,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
 
-    this.shouldUpdateScrollbar = ko.computed(() => this.callParticipants()).extend({notify: 'always', rateLimit: 500});
+    this.shouldUpdateScrollbar = ko
+      .pureComputed(() => this.callParticipants() && this.showParticipants())
+      .extend({notify: 'always'});
   }
 
   onEndCall() {
@@ -121,6 +123,10 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
   onParticipantsClick() {
     this.showParticipants(!this.showParticipants());
+
+    // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
+    // Once there is a new solution to this, this needs to go.
+    z.util.afterRender(() => window.dispatchEvent(new Event('resize')));
   }
 
   onRejectCall() {

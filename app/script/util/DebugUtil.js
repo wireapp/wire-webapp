@@ -283,7 +283,7 @@ z.util.DebugUtil = class DebugUtil {
       })
       .then(events => {
         this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
-        events.forEach(event => this.eventRepository._processEvent(event, z.event.EventRepository.SOURCE.STREAM));
+        events.forEach(event => this.eventRepository.processEvent(event, z.event.EventRepository.SOURCE.STREAM));
       });
   }
 };

@@ -17,8 +17,6 @@
  *
  */
 
-import BackendError from '../BackendError';
-
 export const CONSENT_GET_START = 'CONSENT_GET_START';
 export const CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS';
 export const CONSENT_GET_FAILED = 'CONSENT_GET_FAILED';
@@ -46,7 +44,7 @@ export const successfulSetHandle = selfUser => ({
 });
 
 export const failedSetHandle = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: HANDLE_SET_FAILED,
 });
 
@@ -61,7 +59,7 @@ export const successfulFetchSelf = selfUser => ({
 });
 
 export const failedFetchSelf = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: SELF_FETCH_FAILED,
 });
 
@@ -76,7 +74,7 @@ export const successfulGetConsents = consents => ({
 });
 
 export const failedGetConsents = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CONSENT_GET_FAILED,
 });
 
@@ -91,6 +89,6 @@ export const successfulSetConsent = consent => ({
 });
 
 export const failedSetConsent = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CONSENT_SET_FAILED,
 });

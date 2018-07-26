@@ -65,7 +65,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
         } else {
           dispatch(AuthActionCreator.failedLogin(error));
         }
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -243,7 +243,7 @@ export function doRegisterTeam(registration) {
         } else {
           dispatch(AuthActionCreator.failedRegisterTeam(error));
         }
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -280,7 +280,7 @@ export function doRegisterPersonal(registration) {
         } else {
           dispatch(AuthActionCreator.failedRegisterPersonal(error));
         }
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -316,7 +316,7 @@ export function doRegisterWireless(registrationData, options = {shouldInitialize
         } else {
           dispatch(AuthActionCreator.failedRegisterWireless(error));
         }
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -405,7 +405,7 @@ export function getInvitationFromCode(invitationCode) {
       .then(invitation => dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation)))
       .catch(error => {
         dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }

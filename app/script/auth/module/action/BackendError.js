@@ -21,27 +21,9 @@ export default class BackendError extends Error {
   constructor(params) {
     super();
     this.name = this.constructor.name;
-    this.stack = new Error().stack;
     this.code = params.code;
     this.label = params.label;
     this.message = params.message;
-  }
-
-  is = label => {
-    return this.label === label;
-  };
-
-  static handle(error) {
-    if (error.response) {
-      return new BackendError(error.response.data);
-    }
-    if (error.request && Object.keys(error.request).length === 0) {
-      return new BackendError({
-        code: 503,
-        message: error.message,
-      });
-    }
-    return error;
   }
 
   static AUTH_ERRORS = {

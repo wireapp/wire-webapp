@@ -17,8 +17,6 @@
  *
  */
 
-import BackendError from '../BackendError';
-
 export const CLIENTS_FETCH_START = 'CLIENTS_FETCH_START';
 export const CLIENTS_FETCH_SUCCESS = 'CLIENTS_FETCH_SUCCESS';
 export const CLIENTS_FETCH_FAILED = 'CLIENTS_FETCH_FAILED';
@@ -43,7 +41,7 @@ export const successfulGetAllClients = clients => ({
 });
 
 export const failedGetAllClients = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CLIENTS_FETCH_FAILED,
 });
 
@@ -58,7 +56,7 @@ export const successfulRemoveClient = deletedClientId => ({
 });
 
 export const failedRemoveClient = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CLIENT_REMOVE_FAILED,
 });
 
@@ -73,7 +71,7 @@ export const successfulInitializeClient = creationStatus => ({
 });
 
 export const failedInitializeClient = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CLIENT_INIT_FAILED,
 });
 

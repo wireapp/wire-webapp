@@ -17,7 +17,6 @@
  *
  */
 
-import BackendError from './BackendError';
 import * as ConversationActionCreator from './creator/ConversationActionCreator';
 
 export function doCheckConversationCode(key, code, uri) {
@@ -29,7 +28,7 @@ export function doCheckConversationCode(key, code, uri) {
       .then(() => dispatch(ConversationActionCreator.successfulConversationCodeCheck()))
       .catch(error => {
         dispatch(ConversationActionCreator.failedConversationCodeCheck(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -46,7 +45,7 @@ export function doJoinConversationByCode(key, code, uri) {
       })
       .catch(error => {
         dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }

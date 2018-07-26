@@ -17,27 +17,29 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import StoreEngine from '@wireapp/store-engine';
-import {BACKEND} from './Environment';
+'use strict';
 
-export const configureClient = () => {
-  return new APIClient({
-    schemaCallback: db => {
-      const databaseSchemata = window.z.storage.StorageSchemata.SCHEMATA;
-      databaseSchemata.forEach(({schema, upgrade, version}) => {
-        if (upgrade) {
-          return db
-            .version(version)
-            .stores(schema)
-            .upgrade(transaction => upgrade(transaction, db));
-        }
-        db.version(version).stores(schema);
-      });
-    },
-    store: new StoreEngine.IndexedDBEngine(),
-    urls: BACKEND,
-  });
+window.z = window.z || {};
+window.z.components = z.components || {};
+
+z.components.CopyToClipboard = class CopyToClipboard {
+  constructor(params) {
+    this.text = params.text;
+  }
+
+  onClick(viewModel, event) {
+    if (window.getSelection) {
+      const selectionRange = document.createRange();
+      selectionRange.selectNode(event.currentTarget);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(selectionRange);
+    }
+  }
 };
 
-export default configureClient;
+ko.components.register('copy-to-clipboard', {
+  template: `
+    <div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>
+  `,
+  viewModel: z.components.CopyToClipboard,
+});

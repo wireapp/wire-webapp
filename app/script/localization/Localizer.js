@@ -98,10 +98,6 @@ z.l10n = (() => {
      * @param {string|Object} [substitute] - data to fill all the placeholder with
      * @returns {string} - string with substituted placeholders
      */
-    text(value, substitute) {
-      let string = ko.unwrap(value);
-      string = replaceSubstitute(string, /{{(.+?)}}/g, substitute);
-      return z.util.SanitizationUtil.escapeString(string);
-    },
+    text: (value, substitute) => replaceSubstitute(ko.unwrap(value), /{{(.+?)}}/g, substitute),
   };
 })();

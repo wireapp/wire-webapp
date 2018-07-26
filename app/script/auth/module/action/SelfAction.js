@@ -18,7 +18,6 @@
  */
 
 import * as SelfActionCreator from './creator/SelfActionCreator';
-import BackendError from './BackendError';
 import {APP_NAME} from '../../config';
 
 export function fetchSelf() {
@@ -36,7 +35,7 @@ export function fetchSelf() {
       .then(selfUser => dispatch(SelfActionCreator.successfulFetchSelf(selfUser)))
       .catch(error => {
         dispatch(SelfActionCreator.failedFetchSelf(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -50,7 +49,7 @@ export function setHandle(handle) {
       .then(result => dispatch(SelfActionCreator.successfulSetHandle(result)))
       .catch(error => {
         dispatch(SelfActionCreator.failedSetHandle(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -63,7 +62,7 @@ export function doGetConsents() {
       .then(({results}) => dispatch(SelfActionCreator.successfulGetConsents(results)))
       .catch(error => {
         dispatch(SelfActionCreator.failedGetConsents(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -81,7 +80,7 @@ export function doSetConsent(consentType, value) {
       .then(() => dispatch(SelfActionCreator.successfulSetConsent(consent)))
       .catch(error => {
         dispatch(SelfActionCreator.failedSetConsent(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }

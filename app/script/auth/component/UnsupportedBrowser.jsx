@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, H2, H3, Text, Container, ContainerXS, COLOR, Loading, Logo} from '@wireapp/react-ui-kit';
+import {H1, H2, H3, Text, Container, ContainerXS, Loading, Logo} from '@wireapp/react-ui-kit';
 import {unsupportedStrings} from '../../strings';
 import WirelessContainer from '../component/WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
@@ -48,7 +48,7 @@ export const UnsupportedBrowser = ({
     return (
       <WirelessContainer>
         <Container verticalCenter>
-          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+          <H2 style={{marginBottom: '10px', marginTop: '0'}}>
             <FormattedHTMLMessage {...unsupportedStrings.headlineBrowser} />
           </H2>
           <H3 style={{marginBottom: '10px'}}>
