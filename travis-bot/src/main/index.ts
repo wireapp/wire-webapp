@@ -47,7 +47,7 @@ export interface MessageData {
     hash: string;
     message: string;
   };
-  conversationIds?: Array<string>;
+  conversationIds?: string[];
 }
 
 class TravisBot {

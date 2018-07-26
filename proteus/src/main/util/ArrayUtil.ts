@@ -21,7 +21,7 @@ import ProteusError from '../errors/ProteusError';
 
 /** Concatenates array buffers (usually 8-bit unsigned). */
 const ArrayUtil = {
-  assert_is_not_zeros(array: Array<number> | Uint8Array): void {
+  assert_is_not_zeros(array: number[] | Uint8Array): void {
     let only_zeroes = true;
     for (const val in array) {
       if (parseInt(val) > 0) {
@@ -35,7 +35,7 @@ const ArrayUtil = {
     }
   },
 
-  concatenate_array_buffers(buffers: Array<Uint8Array>): Uint8Array {
+  concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
     return buffers.reduce(
       (accumulator: Uint8Array, bytes: Uint8Array): Uint8Array => {
         const buffer = new Uint8Array(accumulator.byteLength + bytes.byteLength);

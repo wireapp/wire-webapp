@@ -90,7 +90,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {
-    const promises: Array<Promise<T>> = [];
+    const promises: Promise<T>[] = [];
 
     Object.keys(localStorage).forEach((key: string) => {
       const prefix: string = `${this.storeName}@${tableName}@`;
@@ -104,7 +104,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   }
 
   public readAllPrimaryKeys(tableName: string): Promise<string[]> {
-    const primaryKeys: Array<string> = [];
+    const primaryKeys: string[] = [];
 
     Object.keys(localStorage).forEach((primaryKey: string) => {
       const prefix: string = `${this.storeName}@${tableName}@`;

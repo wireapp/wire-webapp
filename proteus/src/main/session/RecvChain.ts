@@ -33,7 +33,7 @@ import MessageKeys from './MessageKeys';
 
 class RecvChain {
   chain_key: ChainKey;
-  message_keys: Array<MessageKeys>;
+  message_keys: MessageKeys[];
   ratchet_key: PublicKey;
   static MAX_COUNTER_GAP = 1000;
 
@@ -77,7 +77,7 @@ class RecvChain {
     return mk.decrypt(msg.cipher_text);
   }
 
-  stage_message_keys(msg: CipherMessage): [ChainKey, MessageKeys, Array<MessageKeys>] {
+  stage_message_keys(msg: CipherMessage): [ChainKey, MessageKeys, MessageKeys[]] {
     const num = msg.counter - this.chain_key.idx;
     if (num > RecvChain.MAX_COUNTER_GAP) {
       if (this.chain_key.idx === 0) {
@@ -92,7 +92,7 @@ class RecvChain {
       );
     }
 
-    const keys: Array<MessageKeys> = [];
+    const keys: MessageKeys[] = [];
     let chk = this.chain_key;
 
     for (let index = 0; index <= num - 1; index++) {
@@ -104,7 +104,7 @@ class RecvChain {
     return [chk, mk, keys];
   }
 
-  commit_message_keys(keys: Array<MessageKeys>): void {
+  commit_message_keys(keys: MessageKeys[]): void {
     if (keys.length > RecvChain.MAX_COUNTER_GAP) {
       throw new ProteusError(
         `Number of message keys (${keys.length}) exceed message chain counter gap (${RecvChain.MAX_COUNTER_GAP}).`,
@@ -128,7 +128,7 @@ class RecvChain {
     }
   }
 
-  encode(encoder: CBOR.Encoder): Array<CBOR.Encoder> {
+  encode(encoder: CBOR.Encoder): CBOR.Encoder[] {
     encoder.object(3);
     encoder.u8(0);
     this.chain_key.encode(encoder);

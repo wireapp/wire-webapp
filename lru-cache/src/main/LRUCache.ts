@@ -63,7 +63,7 @@ class LRUCache<T> {
     return undefined;
   }
 
-  public getAll(): Array<{[id: string]: T}> {
+  public getAll(): {[id: string]: T}[] {
     return Object.keys(this.map).map(id => {
       const node = this.map[id];
       return {
@@ -72,8 +72,8 @@ class LRUCache<T> {
     });
   }
 
-  public keys(): Array<string> {
-    const keys: Array<string> = [];
+  public keys(): string[] {
+    const keys: string[] = [];
     let entry = this.head;
 
     while (entry) {

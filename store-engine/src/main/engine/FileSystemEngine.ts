@@ -115,7 +115,7 @@ export default class FileSystemEngine implements CRUDEngine {
 
   async deleteAll(tableName: string): Promise<boolean> {
     const primaryKeys = await this.readAllPrimaryKeys(tableName);
-    const promises: Array<Promise<string>> = [];
+    const promises: Promise<string>[] = [];
 
     for (const primaryKey of primaryKeys) {
       promises.push(this.delete(tableName, primaryKey));
@@ -143,7 +143,7 @@ export default class FileSystemEngine implements CRUDEngine {
 
   async readAll<T>(tableName: string): Promise<T[]> {
     const primaryKeys = await this.readAllPrimaryKeys(tableName);
-    const promises: Array<Promise<T>> = [];
+    const promises: Promise<T>[] = [];
 
     for (const primaryKey of primaryKeys) {
       promises.push(this.read(tableName, primaryKey));

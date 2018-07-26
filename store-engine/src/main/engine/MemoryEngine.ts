@@ -73,7 +73,7 @@ export default class MemoryEngine implements CRUDEngine {
 
   public readAll<T>(tableName: string): Promise<T[]> {
     this.prepareTable(tableName);
-    const promises: Array<Promise<T>> = [];
+    const promises: Promise<T>[] = [];
 
     for (const primaryKey of Object.keys(this.stores[this.storeName][tableName])) {
       promises.push(this.read(tableName, primaryKey));

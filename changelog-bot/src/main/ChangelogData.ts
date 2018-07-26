@@ -1,6 +1,6 @@
 interface ChangelogData {
   content: string;
-  conversationIds?: Array<string>;
+  conversationIds?: string[];
   repoSlug: string;
 }
 

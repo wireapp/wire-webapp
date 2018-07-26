@@ -202,7 +202,7 @@ class Decoder {
     throw new DecodeError(DecodeError.INVALID_TYPE);
   }
 
-  private _type_info_with_assert(expected: number | Array<number>): [Type, number] {
+  private _type_info_with_assert(expected: number | number[]): [Type, number] {
     const [type, minor] = this._read_type_info();
 
     if (!Array.isArray(expected)) {

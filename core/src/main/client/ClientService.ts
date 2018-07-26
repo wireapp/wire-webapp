@@ -102,7 +102,7 @@ export default class ClientService {
       throw new Error(`Can't register client of type "${ClientType.NONE}"`);
     }
 
-    const serializedPreKeys: Array<PreKey> = await this.cryptographyService.createCryptobox();
+    const serializedPreKeys: PreKey[] = await this.cryptographyService.createCryptobox();
 
     let newClient: NewClient;
     if (this.cryptographyService.cryptobox.lastResortPreKey) {

@@ -33,7 +33,7 @@ export default class PriorityQueue {
     retryDelay: 1000,
   };
   public isPending: boolean = false;
-  private queue: Array<Item> = [];
+  private queue: Item[] = [];
 
   constructor(config?: Config) {
     this.config = {...this.config, ...config};
@@ -67,7 +67,7 @@ export default class PriorityQueue {
     this.queue = [];
   }
 
-  public get all(): Array<Item> {
+  public get all(): Item[] {
     return this.queue;
   }
 

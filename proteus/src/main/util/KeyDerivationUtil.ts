@@ -32,7 +32,7 @@ const KeyDerivationUtil = {
    */
   hkdf(
     salt: Uint8Array | string,
-    input: Uint8Array | string | Array<number> | Array<ArrayBuffer>,
+    input: Uint8Array | string | number[] | ArrayBuffer[],
     info: Uint8Array | string,
     length: number
   ): Uint8Array {

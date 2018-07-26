@@ -35,15 +35,15 @@ export default class TransientStore extends EventEmitter {
     super();
   }
 
-  public init(tableName: string): Promise<Array<TransientBundle>> {
+  public init(tableName: string): Promise<TransientBundle[]> {
     this.tableName = tableName;
 
-    const cacheKeys: Array<string> = [];
+    const cacheKeys: string[] = [];
 
     return this.engine
       .readAllPrimaryKeys(this.tableName)
-      .then((primaryKeys: Array<string>) => {
-        const readBundles: Array<Promise<TransientBundle>> = [];
+      .then((primaryKeys: string[]) => {
+        const readBundles: Promise<TransientBundle>[] = [];
 
         primaryKeys.forEach((primaryKey: string) => {
           const cacheKey: string = this.constructCacheKey(primaryKey);
@@ -53,7 +53,7 @@ export default class TransientStore extends EventEmitter {
 
         return Promise.all(readBundles);
       })
-      .then((bundles: Array<TransientBundle>) => {
+      .then((bundles: TransientBundle[]) => {
         for (const index in bundles) {
           const bundle = bundles[index];
           const cacheKey = cacheKeys[index];

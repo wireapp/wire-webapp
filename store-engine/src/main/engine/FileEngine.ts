@@ -150,12 +150,12 @@ export default class FileEngine implements CRUDEngine {
   readAll<T>(tableName: string): Promise<T[]> {
     return this.resolvePath(tableName).then(directory => {
       return new Promise<T[]>((resolve, reject) => {
-        fs.readdir(directory, (error: NodeJS.ErrnoException, files: Array<string>) => {
+        fs.readdir(directory, (error: NodeJS.ErrnoException, files: string[]) => {
           if (error) {
             reject(error);
           } else {
             const recordNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
-            const promises: Array<Promise<T>> = recordNames.map(primaryKey => this.read(tableName, primaryKey));
+            const promises: Promise<T>[] = recordNames.map(primaryKey => this.read(tableName, primaryKey));
             Promise.all(promises).then((records: T[]) => resolve(records));
           }
         });
@@ -166,7 +166,7 @@ export default class FileEngine implements CRUDEngine {
   readAllPrimaryKeys(tableName: string): Promise<string[]> {
     return this.resolvePath(tableName).then(directory => {
       return new Promise<string[]>(resolve => {
-        fs.readdir(directory, (error: NodeJS.ErrnoException, files: Array<string>) => {
+        fs.readdir(directory, (error: NodeJS.ErrnoException, files: string[]) => {
           if (error) {
             if (error.code === 'ENOENT') {
               resolve([]);

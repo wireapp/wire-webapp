@@ -55,7 +55,7 @@ export class Session {
 
   counter = 0;
   local_identity: IdentityKeyPair;
-  pending_prekey: Array<number | PublicKey> | null;
+  pending_prekey: (number | PublicKey)[] | null;
   remote_identity: IdentityKey;
   session_states: IntermediateSessionState;
   session_tag: SessionTag;

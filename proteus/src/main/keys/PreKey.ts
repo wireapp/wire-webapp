@@ -69,7 +69,7 @@ class PreKey {
     return PreKey.new(PreKey.MAX_PREKEY_ID);
   }
 
-  static async generate_prekeys(start: number, size: number): Promise<Array<PreKey>> {
+  static async generate_prekeys(start: number, size: number): Promise<PreKey[]> {
     this.validate_pre_key_id(start);
     this.validate_pre_key_id(size);
 

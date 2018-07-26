@@ -33,7 +33,7 @@ class DerivedSecrets {
     this.mac_key = new MacKey(new Uint8Array([]));
   }
 
-  static kdf(input: Uint8Array | Array<ArrayBuffer>, salt: Uint8Array, info: string): DerivedSecrets {
+  static kdf(input: Uint8Array | ArrayBuffer[], salt: Uint8Array, info: string): DerivedSecrets {
     const byte_length = 64;
 
     const output_key_material = KeyDerivationUtil.hkdf(salt, input, info, byte_length);
@@ -53,7 +53,7 @@ class DerivedSecrets {
    * @param input Initial key material (usually the Master Key) in byte array format
    * @param info Key Derivation Data
    */
-  static kdf_without_salt(input: Uint8Array | Array<ArrayBuffer>, info: string): DerivedSecrets {
+  static kdf_without_salt(input: Uint8Array | ArrayBuffer[], info: string): DerivedSecrets {
     return this.kdf(input, new Uint8Array(0), info);
   }
 }
