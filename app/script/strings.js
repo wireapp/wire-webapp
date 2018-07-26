@@ -479,13 +479,57 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage:
       'This email address is already in use. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
   },
-  [BackendError.LABEL.NO_SSO_CODE]: {
+  [BackendError.LABEL.SSO_FORBIDDEN]: {
+    id: 'BackendError.LABEL.SSO_FORBIDDEN',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 8).',
+  },
+  [BackendError.LABEL.SSO_INSUFFICIENT_PERMISSIONS]: {
+    id: 'BackendError.LABEL.SSO_INSUFFICIENT_PERMISSIONS',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 10).',
+  },
+  [BackendError.LABEL.SSO_INVALID_FAILURE_REDIRECT]: {
+    id: 'BackendError.LABEL.SSO_INVALID_FAILURE_REDIRECT',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 3).',
+  },
+  [BackendError.LABEL.SSO_INVALID_SUCCESS_REDIRECT]: {
+    id: 'BackendError.LABEL.SSO_INVALID_SUCCESS_REDIRECT',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 2).',
+  },
+  [BackendError.LABEL.SSO_INVALID_UPSTREAM]: {
+    id: 'BackendError.LABEL.SSO_INVALID_UPSTREAM',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 5).',
+  },
+  [BackendError.LABEL.SSO_INVALID_USERNAME]: {
+    id: 'BackendError.LABEL.SSO_INVALID_USERNAME',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 4).',
+  },
+  [BackendError.LABEL.SSO_NO_MATCHING_AUTH]: {
+    id: 'BackendError.LABEL.SSO_NO_MATCHING_AUTH',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 9).',
+  },
+  [BackendError.LABEL.SSO_NO_SSO_CODE]: {
     id: 'BackendError.LABEL.NO_SSO_CODE',
     defaultMessage: 'No SSO access code detected',
   },
+  [BackendError.LABEL.SSO_NOT_FOUND]: {
+    id: 'BackendError.LABEL.SSO_NOT_FOUND',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 7).',
+  },
+  [BackendError.LABEL.SSO_SERVER_ERROR]: {
+    id: 'BackendError.LABEL.SSO_SERVER_ERROR',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 6).',
+  },
+  [BackendError.LABEL.SSO_UNSUPPORTED_SAML]: {
+    id: 'BackendError.LABEL.SSO_UNSUPPORTED_SAML',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 1).',
+  },
+  [BackendError.LABEL.SSO_GENERIC_ERROR]: {
+    id: 'BackendError.LABEL.SSO_GENERIC_ERROR',
+    defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 0).',
+  },
   unexpected: {
     id: 'BackendError.unexpected',
-    defaultMessage: 'Unexpected error ({code} {message})',
+    defaultMessage: 'Unexpected error',
   },
 });
 
@@ -516,7 +560,7 @@ export const validationErrorStrings = defineMessages({
   },
   unexpected: {
     id: 'BackendError.unexpected',
-    defaultMessage: 'Unexpected error ({code} {message})',
+    defaultMessage: 'Unexpected error',
   },
 });
 

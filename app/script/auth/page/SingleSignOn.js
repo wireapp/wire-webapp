@@ -167,7 +167,7 @@ class SingleSignOn extends React.PureComponent {
             this.setState({code});
           } else if (shouldEmitError) {
             const error = new Error();
-            error.label = 'no-sso-code-found';
+            error.label = BackendError.SSO_ERRORS.SSO_NO_SSO_CODE;
             throw error;
           }
         })

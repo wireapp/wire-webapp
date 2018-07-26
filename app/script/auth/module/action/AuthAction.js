@@ -85,16 +85,19 @@ function handleSSOLogin(code, dispatch) {
           }
           case 'AUTH_ERROR': {
             ssoWindow.close();
-            return reject(new Error(`Authentication error: "${JSON.stringify(event.data.payload)}"`));
+            console.error(`Authentication error: "${JSON.stringify(event.data.payload)}"`);
+            return reject(new BackendError({label: event.data.payload.label}));
           }
           default: {
             ssoWindow.close();
-            return reject(new Error(`Unmatched event type: "${JSON.stringify(event)}"`));
+            console.error(`Unmatched event type: "${JSON.stringify(event)}"`);
+            return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
           }
         }
       }
       ssoWindow.close();
-      return reject(new Error(`Received event "${JSON.stringify(event)}" doesn't match origin "${BACKEND.rest}"`));
+      console.error(`Received event "${JSON.stringify(event)}" doesn't match origin "${BACKEND.rest}"`);
+      return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
     };
     window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
 
@@ -120,13 +123,15 @@ function handleSSOLogin(code, dispatch) {
         window.removeEventListener('unload', onParentWindowClose);
         clearInterval(timerId);
         dispatch(AuthActionCreator.updateAuthWindowState(false));
-        reject(new Error('Aborted by user'));
+        console.error('Aborted by user');
+        reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
       }
     }, 1000);
 
     const onParentWindowClose = () => {
       ssoWindow.close();
-      reject(new Error('Aborted by user'));
+      console.error('Aborted by user');
+      reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
     };
     window.addEventListener('unload', onParentWindowClose);
   });
