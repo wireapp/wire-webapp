@@ -53,7 +53,6 @@ z.main.App = class App {
     this.logger = new z.util.Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
     this.telemetry = new z.telemetry.app_init.AppInitTelemetry();
-    this.update_source = undefined;
     this.window_handler = new z.ui.WindowHandler().init();
 
     this.service = this._setupServices();
@@ -716,25 +715,21 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
-    this.logger.info(`Refresh to update from source '${this.update_source}' started`);
+    this.logger.info(`Refresh to update started`);
     if (z.util.Environment.desktop) {
-      amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
+      // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
+      return amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, z.lifecycle.UPDATE_SOURCE.WEBAPP);
     }
 
-    const isWebappSource = this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP;
-    if (isWebappSource) {
-      window.location.reload(true);
-      window.focus();
-    }
+    window.location.reload(true);
+    window.focus();
   }
 
   /**
    * Notify about found update
-   * @param {z.lifecycle.UPDATE_SOURCE} update_source - Update source
    * @returns {undefined} No return value
    */
-  update(update_source) {
-    this.update_source = update_source;
+  update() {
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
