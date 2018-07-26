@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-      <a name="1.9.1"></a>
+  <a name="1.10.0"></a>
+# [1.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.9.1...@wireapp/react-ui-kit@1.10.0) (2018-07-26)
+
+
+### Features
+
+* **react-ui-kit:** Overlay component ([#887](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/887)) ([08ac67c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/08ac67c))
+
+
+
+
+  <a name="1.9.1"></a>
 ## [1.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.9.0...@wireapp/react-ui-kit@1.9.1) (2018-07-24)
 
 
@@ -14,7 +25,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-      <a name="1.9.0"></a>
+<a name="1.9.0"></a>
 # [1.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.8.4...@wireapp/react-ui-kit@1.9.0) (2018-07-24)
 
 
