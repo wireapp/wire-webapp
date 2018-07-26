@@ -531,13 +531,13 @@
   version "3.0.62"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.62.tgz#73144aef3db75a666e6cda5448026532ecb94b61"
 
-"@wireapp/core@3.14.4":
-  version "3.14.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.14.4.tgz#36bb58776afcc27fad045d31ee06a6269cc19c11"
+"@wireapp/core@3.14.5":
+  version "3.14.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.14.5.tgz#1f72ca94860ac8adc365841b07c746af09503633"
   dependencies:
     "@types/node" "10.5.2"
     "@wireapp/api-client" "1.9.14"
-    "@wireapp/cryptobox" "8.6.5"
+    "@wireapp/cryptobox" "8.6.6"
     "@wireapp/protocol-messaging" "1.20.1"
     "@wireapp/store-engine" "0.11.48"
     bazinga64 "5.2.14"
@@ -545,13 +545,13 @@
     protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.6.5":
-  version "8.6.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.5.tgz#11cb69b0dcc228497335f60d377d9dd148d036aa"
+"@wireapp/cryptobox@8.6.6":
+  version "8.6.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.6.tgz#1e401859e49d03d65d18f12730ff7c7b4c7149d7"
   dependencies:
     "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.2"
-    "@wireapp/lru-cache" "2.1.38"
+    "@wireapp/lru-cache" "2.1.39"
     "@wireapp/priority-queue" "0.1.60"
     "@wireapp/proteus" "7.3.4"
     "@wireapp/store-engine" "0.11.48"
@@ -560,9 +560,9 @@
     fs-extra "7.0.0"
     logdown "3.2.3"
 
-"@wireapp/lru-cache@2.1.38":
-  version "2.1.38"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.38.tgz#16892a5aca598af0ddf60b15c4f593f7d85c73c4"
+"@wireapp/lru-cache@2.1.39":
+  version "2.1.39"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.39.tgz#f1a1a30ba94ac461dbeb0f65125a2da28c042a44"
 
 "@wireapp/priority-queue@0.1.60":
   version "0.1.60"
@@ -588,11 +588,11 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@1.8.3":
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.8.3.tgz#dec4708ba4f3d1a6980500bdedc88f2a09b84e90"
+"@wireapp/react-ui-kit@1.9.1":
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.9.1.tgz#2c5814a329ee50d3c224e561d12418ebffebd29f"
   dependencies:
-    bazinga64 "5.2.13"
+    bazinga64 "5.2.14"
     color "3.0.0"
     react "16.4.1"
     react-dom "16.4.1"
@@ -1722,10 +1722,6 @@ basic-auth@~2.0.0:
 batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
-
-bazinga64@5.2.13:
-  version "5.2.13"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.13.tgz#98abf2dfa656ea7fd795f57e4abd2fd3651ed0f5"
 
 bazinga64@5.2.14:
   version "5.2.14"
@@ -2993,9 +2989,9 @@ cssnano-util-same-parent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/cssnano-util-same-parent/-/cssnano-util-same-parent-4.0.0.tgz#d2a3de1039aa98bc4ec25001fa050330c2a16dac"
 
-cssnano@4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.0.3.tgz#b694d626906bf1844f573465ecc166b2240b8699"
+cssnano@4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.0.4.tgz#8a397b5e307e06fd7e361bf11344b1cff8749a86"
   dependencies:
     cosmiconfig "^5.0.0"
     cssnano-preset-default "^4.0.0"
@@ -6027,9 +6023,9 @@ karma-sourcemap-loader@0.3.7:
   dependencies:
     graceful-fs "^4.1.2"
 
-karma@2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/karma/-/karma-2.0.4.tgz#b399785f57e9bab1d3c4384db33fef4dec8ae349"
+karma@2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/karma/-/karma-2.0.5.tgz#3710c7a2e71b1c439313f283846d88e04e4f918c"
   dependencies:
     bluebird "^3.3.0"
     body-parser "^1.16.1"
@@ -8781,9 +8777,9 @@ react-dom@16.4.1:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-hot-loader@4.3.3:
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.3.3.tgz#37409a3341c7787563d0972007ba02521f82f5d5"
+react-hot-loader@4.3.4:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.3.4.tgz#4f9bdd55bb20d77a6ae8931fa1c187e5f0ce6279"
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"

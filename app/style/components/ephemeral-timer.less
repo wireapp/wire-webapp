@@ -23,11 +23,13 @@
 .ephemeral-timer {
   &__background {
     fill: fade(@graphite, 16%);
+    stroke: @graphite;
+    stroke-width: 1px;
   }
 
   &__dial {
     animation-name: dial-animation;
-    animation-timing-function: linear;
+    animation-timing-function: steps(40);
     fill: none;
     stroke: @graphite;
     stroke-dasharray: @strokelength;
