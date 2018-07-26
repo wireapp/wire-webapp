@@ -52,6 +52,6 @@ z.util.LocalizerUtil = {
       firstNames.push(additionalNames);
     }
 
-    return z.util.SanitizationUtil.escapeString(firstNames.join(', '));
+    return firstNames.join(', ');
   },
 };

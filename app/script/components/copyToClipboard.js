@@ -20,32 +20,26 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.components = z.components || {};
 
-z.assets.AssetURLCache = (() => {
-  const _lruCache = new LRUCache.LRUCache(100);
+z.components.CopyToClipboard = class CopyToClipboard {
+  constructor(params) {
+    this.text = params.text;
+  }
 
-  const _getUrl = identifier => _lruCache.get(identifier);
-
-  const _setUrl = (identifier, url) => {
-    const isExistingUrl = _getUrl(identifier);
-
-    if (isExistingUrl) {
-      window.URL.revokeObjectURL(url);
-      return isExistingUrl;
+  onClick(viewModel, event) {
+    if (window.getSelection) {
+      const selectionRange = document.createRange();
+      selectionRange.selectNode(event.currentTarget);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(selectionRange);
     }
+  }
+};
 
-    const outdatedUrl = _lruCache.set(identifier, url);
-
-    if (outdatedUrl != null) {
-      window.URL.revokeObjectURL(outdatedUrl);
-    }
-
-    return url;
-  };
-
-  return {
-    getUrl: _getUrl,
-    setUrl: _setUrl,
-  };
-})();
+ko.components.register('copy-to-clipboard', {
+  template: `
+    <div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>
+  `,
+  viewModel: z.components.CopyToClipboard,
+});

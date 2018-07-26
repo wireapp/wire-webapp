@@ -570,6 +570,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
 
+    if (message_et.has_asset_text()) {
+      entries.push({
+        click: () => message_et.copy(),
+        label: z.l10n.text(z.string.conversationContextMenuCopy),
+      });
+    }
+
     if (message_et.is_deletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), message_et),

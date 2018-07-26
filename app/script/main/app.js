@@ -126,6 +126,7 @@ z.main.App = class App {
       this.service.asset,
       repositories.client,
       repositories.cryptography,
+      repositories.event,
       repositories.giphy,
       repositories.links,
       repositories.team,

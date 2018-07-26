@@ -62,7 +62,8 @@ z.util.Environment = (() => {
   };
 
   const _getVersion = () => {
-    const [majorVersion] = window.platform.version.split('.');
+    const browserVersion = window.platform.version || '';
+    const [majorVersion] = browserVersion.split('.');
     return window.parseInt(majorVersion, 10);
   };
 
@@ -74,7 +75,7 @@ z.util.Environment = (() => {
   const _isOpera = () => window.platform.name === BROWSER_NAME.OPERA;
 
   const _isMac = () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH);
-  const _isWindows = () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS);
+  const _isWindows = () => window.platform.os.family && window.platform.os.family.includes(PLATFORM_NAME.WINDOWS);
 
   const isInternal = () => window.location.hostname === APP_ENV.INTERNAL;
   const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
@@ -95,6 +96,8 @@ z.util.Environment = (() => {
 
     return _isEdge() ? false : _isChrome() || _isFirefox() || _isOpera();
   };
+
+  const _supportsClipboard = () => !!navigator.clipboard;
   const _supportsIndexedDb = () => {
     try {
       return !!window.indexedDB;
@@ -136,6 +139,7 @@ z.util.Environment = (() => {
       supports: {
         audioOutputSelection: _supportsAudioOutputSelection(),
         calling: _supportsCalling(),
+        clipboard: _supportsClipboard(),
         indexedDb: _supportsIndexedDb(),
         mediaDevices: _supportsMediaDevices(),
         mediaPermissions: _supportsMediaPermissions(),

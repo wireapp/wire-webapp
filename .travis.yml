@@ -46,8 +46,6 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 before_deploy:
-  - yarn global add @wireapp/changelog-bot@latest
-  - yarn global add @wireapp/travis-bot@latest
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn run deploy-travis-dev; fi
   - if [ "$TRAVIS_BRANCH" == "edge" ]; then yarn run deploy-travis-staging; fi
   - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn run deploy-travis-staging; fi
@@ -120,8 +118,10 @@ deploy:
       branch: prod
 
 after_deploy:
+  - yarn global add @wireapp/travis-bot@latest
   - wire-travis-bot "fa0daf62-d5dc-48d2-aa92-ad2e0adeff4c"
   - |
     if [ "${TRAVIS_BRANCH}" == "staging" ] && [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_EVENT_TYPE}" == "push" ]; then
+      yarn global add @wireapp/changelog-bot@latest
       wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "a720ce02-c44c-4981-936c-609380884231"
     fi

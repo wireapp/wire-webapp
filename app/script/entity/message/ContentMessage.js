@@ -80,6 +80,10 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     this.assets.push(asset_et);
   }
 
+  copy() {
+    z.util.ClipboardUtil.copyText(this.get_first_asset().text);
+  }
+
   /**
    * Get the first asset attached to the message.
    * @returns {z.entity.Asset} The first asset attached to the message

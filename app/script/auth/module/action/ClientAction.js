@@ -36,7 +36,7 @@ export function doGetAllClients() {
       })
       .catch(error => {
         dispatch(ClientActionCreator.failedGetAllClients(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -49,7 +49,7 @@ export function doRemoveClient(clientId, password) {
       .then(clients => dispatch(ClientActionCreator.successfulRemoveClient(clientId)))
       .catch(error => {
         dispatch(ClientActionCreator.failedRemoveClient(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
@@ -73,7 +73,7 @@ export function doInitializeClient(clientType, password) {
       })
       .catch(error => {
         dispatch(ClientActionCreator.failedInitializeClient(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }

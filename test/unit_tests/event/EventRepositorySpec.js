@@ -359,7 +359,7 @@ describe('Event Repository', () => {
     });
   });
 
-  describe('_processEvent', () => {
+  describe('processEvent', () => {
     it('processes OTR events', done => {
       const text = 'Hello, this is a test!';
       const ownClientId = 'f180a823bf0d1204';
@@ -382,7 +382,7 @@ describe('Event Repository', () => {
             type: 'conversation.otr-message-add',
           };
           const source = z.event.EventRepository.SOURCE.STREAM;
-          return TestFactory.event_repository._processEvent(event, source);
+          return TestFactory.event_repository.processEvent(event, source);
         })
         .then(messagePayload => {
           expect(messagePayload.data.content).toBe(text);

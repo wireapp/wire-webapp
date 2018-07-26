@@ -17,35 +17,10 @@
  *
  */
 
-'use strict';
+copy-to-clipboard {
+  display: block;
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-z.assets.AssetURLCache = (() => {
-  const _lruCache = new LRUCache.LRUCache(100);
-
-  const _getUrl = identifier => _lruCache.get(identifier);
-
-  const _setUrl = (identifier, url) => {
-    const isExistingUrl = _getUrl(identifier);
-
-    if (isExistingUrl) {
-      window.URL.revokeObjectURL(url);
-      return isExistingUrl;
-    }
-
-    const outdatedUrl = _lruCache.set(identifier, url);
-
-    if (outdatedUrl != null) {
-      window.URL.revokeObjectURL(outdatedUrl);
-    }
-
-    return url;
-  };
-
-  return {
-    getUrl: _getUrl,
-    setUrl: _setUrl,
-  };
-})();
+  .copy-to-clipboard {
+    word-break: break-all;
+  }
+}

@@ -513,7 +513,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @param {Object} event - Event payload to be injected
    * @param {z.event.EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
-   * @returns {undefined} No return value
+   * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
     if (!event) {
@@ -529,8 +529,9 @@ z.event.EventRepository = class EventRepository {
     const inSelfConversation = conversationId === this.userRepository.self().id;
     if (!inSelfConversation) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
-      this._handleEvent(event, source);
+      return this._handleEvent(event, source);
     }
+    return Promise.resolve(event);
   }
 
   /**
@@ -578,20 +579,26 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handleEvent(event, source) {
-    return this._handleEventValidation(event, source).then(validatedEvent =>
-      this._processEvent(validatedEvent, source)
-    );
+    return this._handleEventValidation(event, source)
+      .then(validatedEvent => this.processEvent(validatedEvent, source))
+      .catch(error => {
+        const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
+        if (!isIgnoredError) {
+          throw error;
+        }
+
+        return event;
+      });
   }
 
   /**
    * Decrypts, saves and distributes an event received from the backend.
    *
-   * @private
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
-  _processEvent(event, source) {
+  processEvent(event, source) {
     const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
     const mapEvent = isEncryptedEvent
       ? this.cryptographyRepository.handleEncryptedEvent(event)
@@ -599,18 +606,10 @@ z.event.EventRepository = class EventRepository {
 
     return mapEvent
       .then(mappedEvent => {
-        const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
-        return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
+        const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
+        return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
-      .then(savedEvent => this._handleEventDistribution(savedEvent, source))
-      .catch(error => {
-        const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
-        if (!isIgnoredError) {
-          throw error;
-        }
-
-        return true;
-      });
+      .then(savedEvent => this._handleEventDistribution(savedEvent, source));
   }
 
   /**
@@ -648,7 +647,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const {conversation: conversationId, id: eventId} = event;
+    const {conversation: conversationId, data: mappedData} = event;
+    const eventId = (mappedData && mappedData.replacing_message_id) || event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -659,8 +659,8 @@ z.event.EventRepository = class EventRepository {
         return this.conversationService.save_event(event);
       }
 
-      const {data: mappedData, from: mappedFrom, type: mappedType} = event;
-      const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
+      const {from: mappedFrom, type: mappedType} = event;
+      const {from: storedFrom, type: storedType} = storedEvent;
 
       const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
 
@@ -673,33 +673,83 @@ z.event.EventRepository = class EventRepository {
 
       const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
       const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !mappedData.previews.length;
+      const isLegitMessageReplacement = mappedData.previews.length || mappedData.replacing_message_id;
+      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
       if (userReusedId) {
         this.logger.warn(`${logMessage} ID previously used by same user`, event);
         const errorMessage = 'Event validation failed: ID reused by same user';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
-      const updatingLinkPreview = !!storedData.previews.length;
-      if (updatingLinkPreview) {
-        this.logger.warn(`${logMessage} ID of link preview reused`, event);
-        const errorMessage = 'Event validation failed: ID of link preview reused';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      return this._handleDuplicateEvents(storedEvent, event);
+    });
+  }
+
+  _handleDuplicateEvents(originalEvent, newEvent) {
+    const newData = newEvent.data;
+    const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
+    let updates;
+
+    /*
+     * The only two valid cases for a duplicate event are:
+     *  - a link preview has been received (the text message already being in DB) ;
+     *  - a message has been updated
+     */
+    const isMessageEdit = !!(newData && newData.replacing_message_id);
+    const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
+
+    switch (true) {
+      case isMessageEdit: {
+        updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
+        break;
       }
 
-      const textContentMatches = mappedData.content === storedData.content;
-      if (!textContentMatches) {
-        this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
-        const errorMessage = 'Event validation failed: ID of link preview reused';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      case isLinkPreviewUpdate: {
+        // case of a link preview
+        updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
+        break;
       }
 
-      // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-      event.server_time = event.time;
-      event.time = storedEvent.time;
-      event.primary_key = storedEvent.primary_key;
-      event.category = z.message.MessageCategorization.categoryFromEvent(event);
-      return this.conversationService.update_event(event);
+      default: {
+        this.logger.error(`Unhandled ID duplication '${originalEvent.id}' by event '${newEvent.type}'`, newEvent);
+        const errorMessage = 'Event validation failed: Unhandled event duplicate';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+    }
+    const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
+    return this.conversationService.update_event(identifiedUpdates);
+  }
+
+  _getUpdatesForMessageEdit(originalEvent, newEvent) {
+    return Object.assign({}, newEvent, {
+      edited_time: newEvent.time,
+      time: originalEvent.time,
+      version: 1,
+    });
+  }
+
+  _getUpdatesForLinkPreview(originalEvent, newEvent) {
+    const newData = newEvent.data;
+    const originalData = originalEvent.data;
+    const updatingLinkPreview = !!originalData.previews.length;
+    if (updatingLinkPreview) {
+      this.logger.warn(`ID of link preview reused`, newEvent);
+      const errorMessage = 'Event validation failed: ID of link preview reused';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    if (!textContentMatches) {
+      this.logger.warn(`Text content for link preview not matching`, newEvent);
+      const errorMessage = 'Event validation failed: ID of link preview reused';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    return Object.assign({}, newEvent, {
+      category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+      server_time: newEvent.time,
+      time: originalEvent.time,
+      version: originalEvent.version,
     });
   }
 
@@ -718,7 +768,7 @@ z.event.EventRepository = class EventRepository {
       const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(eventType);
       if (isIgnoredEvent) {
         this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-        const errorMessage = 'Event validation failed: Type ignored';
+        const errorMessage = 'Event ignored: Type ignored';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 

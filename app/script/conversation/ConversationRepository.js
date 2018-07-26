@@ -50,6 +50,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {ClientRepository} client_repository - Repository for client interactions
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
+   * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {TeamRepository} team_repository - Repository for teams
@@ -60,11 +61,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     asset_service,
     client_repository,
     cryptography_repository,
+    eventRepository,
     giphy_repository,
     link_repository,
     team_repository,
     user_repository
   ) {
+    this.eventRepository = eventRepository;
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -477,7 +480,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
-    amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, eventSource);
+    this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -1127,7 +1130,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(response => {
         const event = response ? response.event : undefined;
         if (event) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
         }
 
@@ -1150,7 +1153,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
@@ -1257,7 +1260,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? response.event
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
-      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1275,7 +1278,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? response
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
-      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1290,7 +1293,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   renameConversation(conversation_et, name) {
     return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
       if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
       }
     });
@@ -1310,7 +1313,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
       .then(response => {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1375,7 +1378,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .forEach(conversationEntity => {
           const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, leaveEvent);
+          this.eventRepository.injectEvent(leaveEvent);
         });
     });
   }
@@ -2155,14 +2158,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
       })
-      .then(message_mapped => {
-        if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {
-          return this.conversation_service.save_event(message_mapped);
-        }
-
-        return message_mapped;
-      })
-      .then(message_stored => {
+      .then(mappedEvent => {
         const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
@@ -2171,16 +2167,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this._handleConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        return mappedEvent;
+      })
+      .then(mappedEvent => {
+        const injectEventPromise = this.eventRepository.injectEvent(mappedEvent);
+        const messageSentPromise = this.send_generic_message_to_conversation(conversation_et.id, generic_message);
 
-        return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
-          .then(payload => {
-            this._trackContributed(conversation_et, generic_message);
+        /**
+         * We will, in parallel, inject events to the repo (where they will be processed and saved in DB)
+         * and send the actual message to the backend.
+         * When both those actions are done, we can update our local event and say that is has been sent.
+         */
+        return Promise.all([injectEventPromise, messageSentPromise]).then(([event, sentPayload]) => {
+          this._trackContributed(conversation_et, generic_message);
 
-            const backend_iso_date = sync_timestamp ? payload.time : '';
-            return this._updateMessageAsSent(conversation_et, message_stored, backend_iso_date);
-          })
-          .then(() => message_stored);
+          const backend_iso_date = sync_timestamp ? sentPayload.time : '';
+          return this._updateMessageAsSent(conversation_et, event, backend_iso_date).then(() => event);
+        });
       });
   }
 
@@ -2741,9 +2744,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.GROUP_CREATION:
         return this._onGroupCreation(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        return this._on_message_add(conversationEntity, eventJson);
-
       case z.event.Client.CONVERSATION.MESSAGE_DELETE:
         return this._onMessageDeleted(conversationEntity, eventJson);
 
@@ -2761,6 +2761,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case z.event.Client.CONVERSATION.KNOCK:
       case z.event.Client.CONVERSATION.LOCATION:
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.VERIFICATION:
@@ -2883,7 +2884,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
         const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
+        this.eventRepository.injectEvent(missed_event);
       });
   }
 
@@ -3173,32 +3174,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
-  }
-
-  /**
-   * A text message received in a conversation.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-add'
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _on_message_add(conversation_et, event_json) {
-    return Promise.resolve()
-      .then(() => {
-        const event_data = event_json.data;
-
-        if (event_data.replacing_message_id) {
-          return this._update_edited_message(conversation_et, event_json);
-        }
-
-        return event_json;
-      })
-      .then(updated_event_json => {
-        if (updated_event_json) {
-          return this._addEventToConversation(conversation_et, updated_event_json);
-        }
-      });
   }
 
   /**
@@ -3615,7 +3590,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
     const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, deleteEvent);
+    this.eventRepository.injectEvent(deleteEvent);
   }
 
   //##############################################################################
@@ -3673,38 +3648,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     message_et.status(z.message.StatusType.SENT);
 
     return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, event_json);
-  }
-
-  /**
-   * Update edited message with timestamp from the original message and delete original.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation of edited message
-   * @param {JSON} event_json - Edit message event
-   * @returns {Promise} Resolves with the updated event_json
-   */
-  _update_edited_message(conversation_et, event_json) {
-    const {data: event_data, from, id, time} = event_json;
-
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.replacing_message_id).then(
-      original_message_et => {
-        const from_original_user = from === original_message_et.from;
-        if (!from_original_user) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
-        }
-
-        if (!original_message_et.timestamp()) {
-          throw new TypeError('Missing timestamp');
-        }
-
-        event_json.edited_time = time;
-        event_json.time = new Date(original_message_et.timestamp()).toISOString();
-        this._delete_message_by_id(conversation_et, id);
-        this._delete_message_by_id(conversation_et, event_data.replacing_message_id);
-        this.conversation_service.save_event(event_json);
-        return event_json;
-      }
-    );
   }
 
   //##############################################################################
