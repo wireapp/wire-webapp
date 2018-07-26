@@ -18,43 +18,41 @@
  */
 
 import {COLOR} from '../Identity';
-import {Input} from './Input';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
 const StyledContainerSelect = styled.div`
-  /* appearance */
-  /* positioning */
   display: flex;
-  margin-top: 3px;
   overflow: hidden;
   position: relative;
+  border-radius: 4px;
+  background: ${props => (props.disabled ? COLOR.GRAY_LIGHTEN_92 : COLOR.WHITE)};
+  height: 56px;
+  align-items: center;
+  margin: 0 0 16px;
 
   svg {
     pointer-events: none;
     position: absolute;
     right: 8px;
-    top: 22px;
   }
 `;
 
-const StyledSelect = Input.withComponent('select').extend`
-  /* appearance */
-  background: ${COLOR.GRAY_LIGHTEN_92};
+const StyledSelect = styled.select`
+  height: 100%;
   background-image: none;
+  background: transparent;
+  padding: 0 20px 0 12px;
   border: none;
   box-shadow: none;
   color: ${COLOR.GRAY_DARKEN_48};
   font-weight: 300;
+  width: 100%;
   overflow: hidden;
+  outline: none;
   -moz-appearance: none;
   -webkit-appearance: none;
-
-  /* positioning */
-  margin-top: 3px;
-  padding: 0 20px 0 12px;
-  width: 100%;
 
   &:focus {
     /* appearance */
@@ -76,22 +74,23 @@ const ArrowDown = () => (
   </svg>
 );
 
-const Select = ({children, ...props}) => {
+const Select = ({children, disabled, ...props}) => {
   return (
-    <StyledContainerSelect>
-      <StyledSelect {...props}>{children}</StyledSelect>
+    <StyledContainerSelect disabled={disabled} {...props}>
+      <StyledSelect disabled={disabled}>{children}</StyledSelect>
       <ArrowDown />
     </StyledContainerSelect>
   );
 };
 
 Select.propTypes = {
-  ...Input.propTypes,
   children: PropTypes.node,
+  disabled: PropTypes.bool,
 };
 
 Select.defaultProps = {
   children: null,
+  disabled: false,
 };
 
 export {Select};
