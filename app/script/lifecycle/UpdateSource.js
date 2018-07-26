@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.lifecycle = z.lifecycle || {};
 
 z.lifecycle.UPDATE_SOURCE = {
-  DESKTOP: 'desktop',
   WEBAPP: 'webapp',
 };
 
