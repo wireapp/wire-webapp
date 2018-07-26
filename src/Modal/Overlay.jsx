@@ -62,7 +62,7 @@ const OverlayBackground = styled.div`
   left: 0px;
   height: 100vh;
   width: 100vw;
-  background: rgba(50, 54, 57, 0.4);
+  background: rgba(0, 0, 0, 0.88);
   z-index: 9998;
   animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW} ${EASE.QUART};
 `;
