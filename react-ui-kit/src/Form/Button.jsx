@@ -32,6 +32,7 @@ const Button = Text.withComponent('button').extend`
   display: inline-block;
   text-decoration: none;
   margin-bottom: 16px;
+  touch-action: manipulation;
   ${defaultTransition}
 
   /* positioning */
