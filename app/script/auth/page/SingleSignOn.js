@@ -30,7 +30,8 @@ import {
   InputSubmitCombo,
   ErrorMessage,
   ICON_NAME,
-  Modal,
+  Overlay,
+  Text,
   Logo,
   Form,
   Input,
@@ -199,14 +200,31 @@ class SingleSignOn extends React.PureComponent {
     return (
       <Page>
         {isAuthWindowOpen && (
-          <Modal>
-            <Container centerText style={{maxWidth: '300px'}}>
+          <Overlay>
+            <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
               <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
-                <Logo height={30} />
+                <Logo height={24} color={COLOR.WHITE} />
               </div>
-              {`If you don't see the OKTA Single Sign On window, continue your Company Log in from here.`}
+              <Text style={{fontSize: '14px', fontWeight: '400', marginTop: '32px'}} color={COLOR.WHITE}>
+                {`If you don't see the OKTA Single Sign On window, continue your Company Log in from here.`}
+              </Text>
+              <Link
+                block
+                center
+                style={{
+                  color: COLOR.WHITE,
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  marginTop: '24px',
+                  textDecoration: 'underline',
+                  textTransform: 'none',
+                }}
+                onClick={() => {}}
+              >
+                {'Click to continue'}
+              </Link>
             </Container>
-          </Modal>
+          </Overlay>
         )}
         <Container centerText verticalCenter style={{width: '100%'}}>
           <AppAlreadyOpen />
