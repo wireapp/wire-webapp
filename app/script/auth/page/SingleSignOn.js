@@ -154,6 +154,8 @@ class SingleSignOn extends React.PureComponent {
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
+  focusChildWindow = () => this.props.authWindowRef && this.props.authWindowRef.focus();
+
   extractSSOLink = (event, shouldEmitError = true) => {
     if (event) {
       event.preventDefault();
@@ -219,7 +221,7 @@ class SingleSignOn extends React.PureComponent {
                   textDecoration: 'underline',
                   textTransform: 'none',
                 }}
-                onClick={() => {}}
+                onClick={this.focusChildWindow}
               >
                 {'Click to continue'}
               </Link>
@@ -331,6 +333,7 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
+        authWindowRef: AuthSelector.getAuthWindowRef(state),
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isAuthWindowOpen: AuthSelector.isAuthWindowOpen(state),

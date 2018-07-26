@@ -115,6 +115,7 @@ function handleSSOLogin(code, dispatch) {
       `
     );
     dispatch(AuthActionCreator.updateAuthWindowState(true));
+    dispatch(AuthActionCreator.setAuthWindowRef(ssoWindow));
 
     timerId = window.setInterval(() => {
       console.error('Checking for closed child window', ssoWindow);
@@ -123,6 +124,7 @@ function handleSSOLogin(code, dispatch) {
         window.removeEventListener('unload', onParentWindowClose);
         clearInterval(timerId);
         dispatch(AuthActionCreator.updateAuthWindowState(false));
+        dispatch(AuthActionCreator.setAuthWindowRef(null));
         console.error('Aborted by user');
         reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
       }
