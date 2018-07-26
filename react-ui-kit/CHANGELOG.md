@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-      <a name="1.10.1"></a>
+  <a name="1.10.2"></a>
+## [1.10.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.1...@wireapp/react-ui-kit@1.10.2) (2018-07-26)
+
+
+### Bug Fixes
+
+* button behaviour, select element style ([#891](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/891)) ([b422515](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b422515))
+
+
+
+
+  <a name="1.10.1"></a>
 ## [1.10.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.0...@wireapp/react-ui-kit@1.10.1) (2018-07-26)
 
 
@@ -14,7 +25,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-      <a name="1.10.0"></a>
+<a name="1.10.0"></a>
 # [1.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.9.1...@wireapp/react-ui-kit@1.10.0) (2018-07-26)
 
 
