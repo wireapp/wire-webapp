@@ -43,10 +43,6 @@ export const cookiePolicyStrings = defineMessages({
 });
 
 export const indexStrings = defineMessages({
-  claim: {
-    id: 'index.claim',
-    defaultMessage: 'Secure messaging for everyone.',
-  },
   createAccountForPersonalUse: {
     id: 'index.createAccountForPersonalUse',
     defaultMessage: 'For personal use',

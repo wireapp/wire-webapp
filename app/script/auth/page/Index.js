@@ -22,7 +22,6 @@ import React, {Component} from 'react';
 import {ROUTE} from '../route';
 import {
   Link,
-  Paragraph,
   Text,
   Bold,
   ProfileIcon,
@@ -60,7 +59,6 @@ class Index extends Component {
       <Page>
         <ContainerXS centerText verticalCenter>
           <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-          <Paragraph center>{_(indexStrings.claim)}</Paragraph>
           <Columns style={{margin: '70px auto'}}>
             <Column>
               <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
