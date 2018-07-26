@@ -124,6 +124,7 @@ function handleSSOLogin(code, dispatch) {
         window.removeEventListener('unload', onParentWindowClose);
         clearInterval(timerId);
         dispatch(AuthActionCreator.updateAuthWindowState(false));
+        dispatch(AuthActionCreator.setAuthWindowRef(null));
         console.error('Aborted by user');
         reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
       }
