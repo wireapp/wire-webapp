@@ -36,6 +36,7 @@ export const initialState = {
     phone_code: null,
     team: null,
   },
+  authWindowRef: null,
   currentFlow: null,
   error: null,
   fetched: false,
@@ -142,6 +143,9 @@ export default function reducer(state = initialState, action) {
     }
     case AuthActionCreator.LOGIN_AUTH_WINDOW_STATE_UPDATE: {
       return {...state, isAuthWindowOpen: action.payload.isOpen};
+    }
+    case AuthActionCreator.LOGIN_SET_AUTH_WINDOW: {
+      return {...state, authWindowRef: action.payload.authWindowRef};
     }
     default: {
       return state;

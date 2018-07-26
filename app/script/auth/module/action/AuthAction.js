@@ -115,6 +115,7 @@ function handleSSOLogin(code, dispatch) {
       `
     );
     dispatch(AuthActionCreator.updateAuthWindowState(true));
+    dispatch(AuthActionCreator.setAuthWindowRef(ssoWindow));
 
     timerId = window.setInterval(() => {
       console.error('Checking for closed child window', ssoWindow);
