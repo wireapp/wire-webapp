@@ -70,7 +70,28 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
+function calculateChildPosition(childHeight, childWidth) {
+  const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+  const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+  const hasInnerMeasurements = window.innerHeight && window.innerWidth;
+
+  const parentHeight = hasInnerMeasurements
+    ? window.innerHeight
+    : document.documentElement.clientHeight || window.screen.height;
+  const parentWidth = hasInnerMeasurements
+    ? window.innerWidth
+    : document.documentElement.clientWidth || window.screen.width;
+
+  const left = parentWidth / 2 - childWidth / 2 + screenLeft;
+  const top = parentHeight / 2 - childHeight / 2 + screenTop;
+  return {left, top};
+}
+
 function handleSSOLogin(code, dispatch) {
+  const POPUP_HEIGHT = 520;
+  const POPUP_WIDTH = 480;
+
   return new Promise((resolve, reject) => {
     let ssoWindow = undefined;
     let timerId = undefined;
@@ -101,19 +122,27 @@ function handleSSOLogin(code, dispatch) {
     };
     window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
 
+    const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
+
     ssoWindow = window.open(
       `${BACKEND.rest}/sso/initiate-login/${code}`,
       'WIRE_SSO',
       `
+        height=${POPUP_HEIGHT},
+        left=${childPosition.left}
         location=no,
         menubar=no,
         resizable=no,
         status=no,
         toolbar=no,
-        width=500,
-        height=500,
+        top=${childPosition.top},
+        width=${POPUP_WIDTH}
       `
     );
+
+    if (ssoWindow) {
+      ssoWindow.focus();
+    }
     dispatch(AuthActionCreator.updateAuthWindowState(true));
 
     timerId = window.setInterval(() => {

@@ -206,7 +206,7 @@ class SingleSignOn extends React.PureComponent {
                 <Logo height={24} color={COLOR.WHITE} />
               </div>
               <Text style={{fontSize: '14px', fontWeight: '400', marginTop: '32px'}} color={COLOR.WHITE}>
-                {`If you don't see the OKTA Single Sign On window, continue your Company Log in from here.`}
+                {`If you don't see the Single Sign On window, continue your Company Log in from here.`}
               </Text>
               <Link
                 block
