@@ -19,7 +19,7 @@
 
 import {getURLParameter} from './util/urlUtil';
 import {QUERY_KEY} from './route';
-import APIClient from '@wireapp/api-client';
+import {APIClient} from '@wireapp/api-client';
 
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
