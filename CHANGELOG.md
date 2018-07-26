@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.15.0"></a>
+# [3.15.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.14.5...@wireapp/core@3.15.0) (2018-07-26)
+
+
+### Features
+
+* **core:** Status bot can report to multiple chats [skip ci] ([4b99184](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/4b99184))
+
+
+
+
 <a name="3.14.5"></a>
 ## [3.14.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.14.4...@wireapp/core@3.14.5) (2018-07-24)
 
