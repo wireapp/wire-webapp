@@ -11,7 +11,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "rimraf": "2.6.2",
     "typescript": "2.9.2",
-    "webpack": "4.16.2",
+    "webpack": "4.16.3",
     "webpack-cli": "3.1.0"
   },
   "description": "Collection of common components that are used across Wire web applications.",
