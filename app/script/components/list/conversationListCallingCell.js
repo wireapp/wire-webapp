@@ -95,7 +95,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.callParticipants() && this.showParticipants())
-      .extend({notify: 'always'});
+      .extend({notify: 'always', rateLimit: 100});
   }
 
   onEndCall() {
