@@ -103,8 +103,6 @@ function handleSSOLogin(code, dispatch) {
       window.removeEventListener('message', onReceiveChildWindowMessage);
       window.removeEventListener('unload', onParentWindowClose);
       dispatch(AuthActionCreator.updateAuthWindowState(false));
-      dispatch(AuthActionCreator.setAuthWindowRef(null));
-      ssoWindow = undefined;
     };
 
     onReceiveChildWindowMessage = event => {
