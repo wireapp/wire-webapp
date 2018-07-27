@@ -31,6 +31,7 @@ const StyledContainerSelect = styled.div`
   height: 56px;
   align-items: center;
   margin: 0 0 16px;
+  width: 100%;
 
   svg {
     pointer-events: none;
@@ -74,10 +75,12 @@ const ArrowDown = () => (
   </svg>
 );
 
-const Select = ({children, disabled, ...props}) => {
+const Select = ({children, disabled, innerStyle, ...props}) => {
   return (
     <StyledContainerSelect disabled={disabled} {...props}>
-      <StyledSelect disabled={disabled}>{children}</StyledSelect>
+      <StyledSelect disabled={disabled} style={innerStyle}>
+        {children}
+      </StyledSelect>
       <ArrowDown />
     </StyledContainerSelect>
   );
@@ -86,11 +89,13 @@ const Select = ({children, disabled, ...props}) => {
 Select.propTypes = {
   children: PropTypes.node,
   disabled: PropTypes.bool,
+  innerStyle: PropTypes.object,
 };
 
 Select.defaultProps = {
   children: null,
   disabled: false,
+  innerStyle: {},
 };
 
 export {Select};
