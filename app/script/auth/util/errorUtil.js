@@ -27,6 +27,7 @@ export function parseError(error) {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
       return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
     }
+    console.error('Unexpected error: ', error, JSON.stringify(error));
     return <FormattedHTMLMessage {...errorHandlerStrings.unexpected} values={error} />;
   }
 }
