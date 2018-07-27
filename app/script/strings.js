@@ -612,6 +612,14 @@ export const ssoLoginStrings = defineMessages({
     id: 'ssoLogin.codeInputPlaceholder',
     defaultMessage: 'SSO Code',
   },
+  overlayDescription: {
+    id: 'ssoLogin.overlayDescription',
+    defaultMessage: "If you don't see the Single Sign On window, continue your Company Log in from here.",
+  },
+  overlayFocusLink: {
+    id: 'ssoLogin.overlayFocusLink',
+    defaultMessage: 'Click to continue',
+  },
 });
 
 export const logoutReasonStrings = defineMessages({
