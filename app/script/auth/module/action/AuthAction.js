@@ -186,7 +186,7 @@ export function doLoginSSO({code, clientType}) {
         } else {
           dispatch(AuthActionCreator.failedLogin(error));
         }
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }
