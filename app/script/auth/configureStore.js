@@ -72,7 +72,7 @@ const createMiddleware = thunkArguments => {
       })
     );
   }
-  const composeEnhancers = process.env.NODE_ENV !== 'production' ? composeWithDevTools : compose;
+  const composeEnhancers = true || process.env.NODE_ENV !== 'production' ? composeWithDevTools : compose;
   return composeEnhancers(applyMiddleware(...middlewares));
 };
 
