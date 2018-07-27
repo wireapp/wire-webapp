@@ -95,28 +95,43 @@ function handleSSOLogin(code, dispatch) {
   return new Promise((resolve, reject) => {
     let ssoWindow = undefined;
     let timerId = undefined;
+    let onReceiveChildWindowMessage = undefined;
+    let onParentWindowClose = undefined;
 
-    const onReceiveChildWindowMessage = event => {
+    const onChildWindowClose = () => {
+      clearInterval(timerId);
+      window.removeEventListener('message', onReceiveChildWindowMessage);
+      window.removeEventListener('unload', onParentWindowClose);
+      dispatch(AuthActionCreator.updateAuthWindowState(false));
+      dispatch(AuthActionCreator.setAuthWindowRef(null));
+      ssoWindow = undefined;
+    };
+
+    onReceiveChildWindowMessage = event => {
       if (event.origin === BACKEND.rest) {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
-            // ssoWindow.close();
+            onChildWindowClose();
+            ssoWindow.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
-            // ssoWindow.close();
+            onChildWindowClose();
+            ssoWindow.close();
             console.error(`Authentication error: "${JSON.stringify(event.data.payload)}"`);
             return reject(new BackendError({label: event.data.payload.label}));
           }
           default: {
-            // ssoWindow.close();
+            onChildWindowClose();
+            ssoWindow.close();
             console.error(`Unmatched event type: "${JSON.stringify(event)}"`);
             return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
           }
         }
       }
-      // ssoWindow.close();
+      onChildWindowClose();
+      ssoWindow.close();
       console.error(
         `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${BACKEND.rest}"`
       );
@@ -148,17 +163,13 @@ function handleSSOLogin(code, dispatch) {
     timerId = window.setInterval(() => {
       console.error('Checking for closed child window', ssoWindow);
       if (!ssoWindow || ssoWindow.closed) {
-        window.removeEventListener('message', onReceiveChildWindowMessage);
-        window.removeEventListener('unload', onParentWindowClose);
-        clearInterval(timerId);
-        dispatch(AuthActionCreator.updateAuthWindowState(false));
-        dispatch(AuthActionCreator.setAuthWindowRef(null));
+        onChildWindowClose();
         console.error('Aborted by user');
         reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
       }
     }, 1000);
 
-    const onParentWindowClose = () => {
+    onParentWindowClose = () => {
       ssoWindow.close();
       console.error('Aborted by user');
       reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
