@@ -23,10 +23,11 @@
 
 describe('z.viewModel.WindowTitleViewModel', () => {
   const suffix = z.l10n.text(z.string.wire);
-  const test_factory = new TestFactory();
+  let test_factory = undefined;
   let title_view_model = undefined;
 
   beforeEach(done => {
+    test_factory = new TestFactory();
     test_factory
       .exposeConversationActors()
       .then(conversationRepository => {
@@ -179,7 +180,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('shows the number of connection requests when viewing the inbox', () => {
+    it('shows the number of connection requests when viewing the inbox', done => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
@@ -192,29 +193,26 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.userRepository.users.push(user_et);
 
       let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
-      let waiting_people = title_view_model.userRepository.connect_requests().length;
-
-      let expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
+      let expectedWaitingPeople = '1';
+      let expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
 
-      // Test multiple connect request messages
+      // Test multiple connect request messages and observe the title change
+      title_view_model.userRepository.connect_requests.subscribe(() => {
+        expectedWaitingPeople = '2';
+        message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
+        expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+        expect(window.document.title).toBe(expected_title);
+        done();
+      });
+
       const another_user_et = new z.entity.User(z.util.createRandomUuid());
       another_user_et.connection(pending_connection);
-
       title_view_model.userRepository.users.push(another_user_et);
-      waiting_people = title_view_model.userRepository.connect_requests().length;
-
-      message = z.l10n.text(z.string.conversationsConnectionRequestMany, waiting_people);
-
-      expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
-      title_view_model.initiateTitleUpdates();
-      expect(window.document.title).toBe(expected_title);
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {
-      spyOn(TestFactory.user_repository, 'connect_requests').and.returnValue([]);
-
       const message = new z.entity.ContentMessage();
       message.id = z.util.createRandomUuid();
       message.timestamp(Date.now());
