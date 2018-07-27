@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
+  static get TITLE_DEBOUNCE() {
+    return 250;
+  }
+
   constructor(mainViewModel, repositories) {
     this.initiateTitleUpdates = this.initiateTitleUpdates.bind(this);
 
@@ -123,7 +127,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
         window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
       }
-    }).extend({rateLimit: 250});
+    }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   }
 
   setUpdateState(handlingNotifications) {

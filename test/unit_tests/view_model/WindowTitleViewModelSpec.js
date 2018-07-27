@@ -47,7 +47,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       .catch(done.fail);
   });
 
-  fdescribe('initiateTitleUpdates', () => {
+  describe('initiateTitleUpdates', () => {
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
       title_view_model.initiateTitleUpdates();
@@ -180,7 +180,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('shows the number of connection requests when viewing the inbox', done => {
+    fit('shows the number of connection requests when viewing the inbox', done => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
@@ -200,11 +200,13 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       // Test multiple connect request messages and observe the title change
       title_view_model.userRepository.connect_requests.subscribe(() => {
-        expectedWaitingPeople = '2';
-        message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
-        expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
-        expect(window.document.title).toBe(expected_title);
-        done();
+        window.setTimeout(() => {
+          expectedWaitingPeople = '2';
+          message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
+          expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+          expect(window.document.title).toBe(expected_title);
+          done();
+        }, z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
       });
 
       const another_user_et = new z.entity.User(z.util.createRandomUuid());
@@ -212,7 +214,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.userRepository.users.push(another_user_et);
     });
 
-    it("publishes the badge count (for Wire's wrapper)", done => {
+    fit("publishes the badge count (for Wire's wrapper)", done => {
       const message = new z.entity.ContentMessage();
       message.id = z.util.createRandomUuid();
       message.timestamp(Date.now());
