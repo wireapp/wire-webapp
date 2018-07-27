@@ -29,7 +29,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
   beforeEach(done => {
     test_factory
       .exposeConversationActors()
-      .then(conversation_repository => {
+      .then(conversationRepository => {
         title_view_model = new z.viewModel.WindowTitleViewModel(
           {
             content: {
@@ -37,7 +37,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
             },
           },
           {
-            conversation: conversation_repository,
+            conversation: conversationRepository,
             user: TestFactory.user_repository,
           }
         );
@@ -46,7 +46,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       .catch(done.fail);
   });
 
-  describe('initiateTitleUpdates', () => {
+  fdescribe('initiateTitleUpdates', () => {
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
       title_view_model.initiateTitleUpdates();
@@ -213,6 +213,8 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {
+      spyOn(TestFactory.user_repository, 'connect_requests').and.returnValue([]);
+
       const message = new z.entity.ContentMessage();
       message.id = z.util.createRandomUuid();
       message.timestamp(Date.now());
@@ -222,13 +224,13 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversation);
-      title_view_model.conversationRepository.active_conversation(conversation);
-
-      amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count => {
-        expect(badge_count).toBe(1);
+      amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
+        expect(badgeCount).toBe(1);
         done();
       });
+
+      title_view_model.conversationRepository.conversations_unarchived.push(conversation);
+      title_view_model.conversationRepository.active_conversation(conversation);
 
       title_view_model.initiateTitleUpdates();
     });
