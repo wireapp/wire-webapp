@@ -180,7 +180,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
     });
 
-    fit('shows the number of connection requests when viewing the inbox', done => {
+    it('shows the number of connection requests when viewing the inbox', done => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
@@ -214,7 +214,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.userRepository.users.push(another_user_et);
     });
 
-    fit("publishes the badge count (for Wire's wrapper)", done => {
+    it("publishes the badge count (for Wire's wrapper)", done => {
       const message = new z.entity.ContentMessage();
       message.id = z.util.createRandomUuid();
       message.timestamp(Date.now());
