@@ -116,7 +116,7 @@ function handleSSOLogin(code, dispatch) {
           }
         }
       }
-      ssoWindow.close();
+      // ssoWindow.close();
       console.error(`Received event "${JSON.stringify(event)}" doesn't match origin "${BACKEND.rest}"`);
       return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
     };
