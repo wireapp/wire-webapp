@@ -342,30 +342,43 @@ class Login extends React.PureComponent {
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
-                    <Link
-                      center
-                      style={{marginTop: '36px'}}
-                      onClick={this.forgotPassword}
-                      data-uie-name="go-forgot-password"
-                    >
-                      {_(loginStrings.forgotPassword)}
-                    </Link>
                   </Form>
                 </div>
-                <Columns style={{marginTop: '36px'}}>
-                  {Environment.isInternalEnvironment() && (
+                {Environment.isInternalEnvironment() ? (
+                  <div style={{marginTop: '36px'}}>
+                    <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
+                      {_(loginStrings.forgotPassword)}
+                    </Link>
+                    <Columns style={{marginTop: '36px'}}>
+                      <Column>
+                        <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
+                          {_(loginStrings.ssoLogin)}
+                        </Link>
+                      </Column>
+                      <Column>
+                        <Link
+                          href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search}
+                          data-uie-name="go-sign-in-phone"
+                        >
+                          {_(loginStrings.phoneLogin)}
+                        </Link>
+                      </Column>
+                    </Columns>
+                  </div>
+                ) : (
+                  <Columns>
                     <Column>
-                      <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
-                        {_(loginStrings.ssoLogin)}
+                      <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
+                        {_(loginStrings.forgotPassword)}
                       </Link>
                     </Column>
-                  )}
-                  <Column>
-                    <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
-                      {_(loginStrings.phoneLogin)}
-                    </Link>
-                  </Column>
-                </Columns>
+                    <Column>
+                      <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
+                        {_(loginStrings.phoneLogin)}
+                      </Link>
+                    </Column>
+                  </Columns>
+                )}
               </ContainerXS>
             </Column>
             <Column />
