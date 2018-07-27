@@ -142,9 +142,6 @@ function handleSSOLogin(code, dispatch) {
       `
     );
 
-    if (ssoWindow) {
-      ssoWindow.focus();
-    }
     dispatch(AuthActionCreator.updateAuthWindowState(true));
     dispatch(AuthActionCreator.setAuthWindowRef(ssoWindow));
 
