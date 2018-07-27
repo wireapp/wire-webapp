@@ -101,16 +101,16 @@ function handleSSOLogin(code, dispatch) {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
-            ssoWindow.close();
+            // ssoWindow.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
-            ssoWindow.close();
+            // ssoWindow.close();
             console.error(`Authentication error: "${JSON.stringify(event.data.payload)}"`);
             return reject(new BackendError({label: event.data.payload.label}));
           }
           default: {
-            ssoWindow.close();
+            // ssoWindow.close();
             console.error(`Unmatched event type: "${JSON.stringify(event)}"`);
             return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
           }
