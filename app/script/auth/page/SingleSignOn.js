@@ -207,7 +207,11 @@ class SingleSignOn extends React.PureComponent {
               <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
                 <Logo height={24} color={COLOR.WHITE} />
               </div>
-              <Text style={{fontSize: '14px', fontWeight: '400', marginTop: '32px'}} color={COLOR.WHITE}>
+              <Text
+                style={{fontSize: '14px', fontWeight: '400', marginTop: '32px'}}
+                color={COLOR.WHITE}
+                data-uie-name="status-overlay-description"
+              >
                 {_(ssoLoginStrings.overlayDescription)}
               </Text>
               <Link
@@ -222,6 +226,7 @@ class SingleSignOn extends React.PureComponent {
                   textTransform: 'none',
                 }}
                 onClick={this.focusChildWindow}
+                data-uie-name="do-focus-child-window"
               >
                 {_(ssoLoginStrings.overlayFocusLink)}
               </Link>
