@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.15.6"></a>
+## [3.15.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.15.5...@wireapp/core@3.15.6) (2018-07-30)
+
+
+### Bug Fixes
+
+* **core:** Receive images ([#897](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/897)) ([0d5dc6b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0d5dc6b))
+
+
+
+
 <a name="3.15.5"></a>
 ## [3.15.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.15.4...@wireapp/core@3.15.5) (2018-07-30)
 
