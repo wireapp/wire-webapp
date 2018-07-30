@@ -92,6 +92,7 @@ class SingleSignOn extends React.PureComponent {
 
   handleSubmit = event => {
     event.preventDefault();
+    this.props.resetError();
     if (this.props.isFetching) {
       return;
     }
@@ -113,6 +114,7 @@ class SingleSignOn extends React.PureComponent {
           throw errors[0];
         }
       })
+      .then(() => this.props.validateSSOCode(this.stripPrefix(this.state.code)))
       .then(() =>
         this.props.doLoginSSO({
           clientType: this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,

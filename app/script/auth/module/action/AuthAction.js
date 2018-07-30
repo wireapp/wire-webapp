@@ -198,6 +198,28 @@ export function doLoginSSO({code, clientType}) {
   };
 }
 
+export function validateSSOCode(code) {
+  return function(dispatch, getState, {apiClient}) {
+    return apiClient.auth.api.headInitiateLogin(code).catch(error => {
+      let mappedError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+      if (error && error.response) {
+        switch (error.response.status) {
+          case 404: {
+            mappedError = new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+            break;
+          }
+          case 500: {
+            mappedError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+            break;
+          }
+        }
+      }
+      dispatch(AuthActionCreator.failedLogin(mappedError));
+      throw mappedError;
+    });
+  };
+}
+
 function persistAuthData(clientType, core, dispatch) {
   const persist = clientType === ClientType.PERMANENT;
   const accessToken = core.apiClient.accessTokenStore.accessToken;
