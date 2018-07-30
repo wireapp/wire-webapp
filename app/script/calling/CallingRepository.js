@@ -1576,7 +1576,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the updated calling config
    */
   _getConfigFromBackend() {
-    return this.callingService.getConfigV2().then(callingConfig => {
+    return this.callingService.getConfig().then(callingConfig => {
       if (callingConfig) {
         this._clearConfigTimeout();
 
