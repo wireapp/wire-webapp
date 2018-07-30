@@ -54,8 +54,7 @@
   "unsupported.subheadIndexedDb": "Wire'ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.",
   "conversationJoin.unsupportedJoinHeadline": "",
   "conversationJoin.headline": "",
-  "conversationJoin.unsupportedJoinSubhead":
-    "<p>Bu tarayıcı desteklenmemektedir</p><b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> veya <b style=\"font-weight: 600\">Microsoft Edge</b>‘in son sürümünü indirin",
+  "conversationJoin.unsupportedJoinSubhead": "<p>Bu tarayıcı desteklenmemektedir</p><b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> veya <b style=\"font-weight: 600\">Microsoft Edge</b>‘in son sürümünü indirin",
   "conversationJoin.unsupportedJoinMobileSubhead": "",
   "conversationJoin.subhead": "",
   "conversationJoin.existentAccountHeadline": "",

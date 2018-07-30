@@ -47,8 +47,7 @@
   "acceptNewsModal.declineButton": "",
   "acceptNewsModal.confirmButton": "Accepter",
   "unsupported.headlineBrowser": "Ce navigateur n'est pas supporté.",
-  "unsupported.subheadBrowser":
-    "Télécharger la dernière version de <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b style=\"font-weight: 600\"> ou <b style=\"font-weight: 600\">Microsoft Edge.</b>",
+  "unsupported.subheadBrowser": "Télécharger la dernière version de <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b style=\"font-weight: 600\"> ou <b style=\"font-weight: 600\">Microsoft Edge.</b>",
   "unsupported.headlineCookies": "",
   "unsupported.subheadCookies": "Autorisez les cookies pour vous connecter à Wire.",
   "unsupported.headlineIndexedDb": "",
@@ -101,8 +100,7 @@
   "BackendError.LABEL.NO_TEAM_MEMBER": "",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
-  "BackendError.LABEL.EMAIL_EXISTS":
-    "Cette adresse e-mail est déjà utilisée. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">En savoir plus</a>",
+  "BackendError.LABEL.EMAIL_EXISTS": "Cette adresse e-mail est déjà utilisée. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">En savoir plus</a>",
   "BackendError.unexpected": "Erreur inattendue ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Saisissez un nom composé d’au moins 2 caractères",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Saisissez un nom composé d’au moins 2 caractères",
