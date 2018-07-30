@@ -36,10 +36,11 @@ const MenuContent = styled(Content)`
   ${props =>
     props.open &&
     `
-  position: fixed;        
+  position: fixed;
   width: 100%;
   z-index: 10000;
-  left: 0;`};
+  left: 0;
+  padding: 0;`};
 `;
 
 const MenuItems = styled.div`
