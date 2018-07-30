@@ -552,7 +552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Array of message entities
    */
   searchInConversation(conversationEntity, query) {
-    if (!query.length) {
+    if (!conversationEntity || !query.length) {
       return Promise.resolve({});
     }
 
