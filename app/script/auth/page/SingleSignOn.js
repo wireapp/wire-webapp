@@ -63,14 +63,17 @@ import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter} from 'react-router';
 import {UUID_REGEX} from '../util/stringUtil';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {BACKEND} from '../Environment';
 
 class SingleSignOn extends React.PureComponent {
   static SSO_CODE_PREFIX = 'wire-';
 
+  ssoWindow = undefined;
   inputs = {};
   state = {
     clipboardError: null,
     code: '',
+    isOverlayOpen: false,
     persist: true,
     validInputs: {
       code: true,
@@ -88,6 +91,116 @@ class SingleSignOn extends React.PureComponent {
 
   componentWillUnmount = () => {
     this.props.resetError();
+  };
+
+  calculateChildPosition = (childHeight, childWidth) => {
+    const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+    const hasInnerMeasurements = window.innerHeight && window.innerWidth;
+
+    const parentHeight = hasInnerMeasurements
+      ? window.innerHeight
+      : document.documentElement.clientHeight || window.screen.height;
+    const parentWidth = hasInnerMeasurements
+      ? window.innerWidth
+      : document.documentElement.clientWidth || window.screen.width;
+
+    const left = parentWidth / 2 - childWidth / 2 + screenLeft;
+    const top = parentHeight / 2 - childHeight / 2 + screenTop;
+    return {left, top};
+  };
+
+  handleSSOWindow = code => {
+    const POPUP_HEIGHT = 520;
+    const POPUP_WIDTH = 480;
+
+    return new Promise((resolve, reject) => {
+      let timerId = undefined;
+      let onReceiveChildWindowMessage = undefined;
+      let onParentWindowClose = undefined;
+
+      const onChildWindowClose = () => {
+        clearInterval(timerId);
+        window.removeEventListener('message', onReceiveChildWindowMessage);
+        window.removeEventListener('unload', onParentWindowClose);
+        this.setState({isOverlayOpen: false});
+      };
+
+      onReceiveChildWindowMessage = event => {
+        const isExpectedOrigin = event.origin === BACKEND.rest;
+        if (!isExpectedOrigin) {
+          onChildWindowClose();
+          this.ssoWindow.close();
+          console.error(
+            `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${
+              BACKEND.rest
+            }"`
+          );
+          return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+        }
+
+        const eventType = event.data && event.data.type;
+        switch (eventType) {
+          case 'AUTH_SUCCESS': {
+            onChildWindowClose();
+            this.ssoWindow.close();
+            return resolve();
+          }
+          case 'AUTH_ERROR': {
+            onChildWindowClose();
+            this.ssoWindow.close();
+            console.error(`Authentication error: "${JSON.stringify(event.data.payload)}"`);
+            return reject(new BackendError({label: event.data.payload.label}));
+          }
+          default: {
+            onChildWindowClose();
+            this.ssoWindow.close();
+            console.error(`Unmatched event type: "${JSON.stringify(event)}"`);
+            return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+          }
+        }
+      };
+      window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
+
+      const childPosition = this.calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
+
+      this.ssoWindow = window.open(
+        `${BACKEND.rest}/sso/initiate-login/${code}`,
+        'WIRE_SSO',
+        `
+          height=${POPUP_HEIGHT},
+          left=${childPosition.left}
+          location=no,
+          menubar=no,
+          resizable=no,
+          status=no,
+          toolbar=no,
+          top=${childPosition.top},
+          width=${POPUP_WIDTH}
+        `
+      );
+
+      this.setState({isOverlayOpen: true});
+
+      if (this.ssoWindow) {
+        timerId = window.setInterval(() => {
+          console.error('Checking for closed child window', this.ssoWindow);
+          if (this.ssoWindow && this.ssoWindow.closed) {
+            onChildWindowClose();
+            console.error('Aborted by user');
+            reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+          }
+        }, 1000);
+
+        onParentWindowClose = () => {
+          this.ssoWindow.close();
+          console.error('Aborted by user');
+          reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+        };
+        window.addEventListener('unload', onParentWindowClose);
+      }
+    });
   };
 
   handleSubmit = event => {
@@ -117,10 +230,10 @@ class SingleSignOn extends React.PureComponent {
           return this.props.validateSSOCode(this.stripPrefix(this.state.code));
         }
       })
+      .then(() => this.handleSSOWindow(this.stripPrefix(this.state.code)))
       .then(() =>
-        this.props.doLoginSSO({
+        this.props.doFinalizeSSOLogin({
           clientType: this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
-          code: this.stripPrefix(this.state.code),
         })
       )
       .then(this.navigateChooseHandleOrWebapp)
@@ -158,7 +271,7 @@ class SingleSignOn extends React.PureComponent {
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
-  focusChildWindow = () => this.props.authWindowRef && this.props.authWindowRef.focus();
+  focusChildWindow = () => this.ssoWindow && this.ssoWindow.focus();
 
   extractSSOLink = (event, shouldEmitError = true) => {
     if (event) {
@@ -200,12 +313,11 @@ class SingleSignOn extends React.PureComponent {
     const {
       intl: {formatMessage: _},
       loginError,
-      isAuthWindowOpen,
     } = this.props;
-    const {persist, code, validInputs, validationErrors, clipboardError} = this.state;
+    const {persist, code, isOverlayOpen, validInputs, validationErrors, clipboardError} = this.state;
     return (
       <Page>
-        {isAuthWindowOpen && (
+        {isOverlayOpen && (
           <Overlay>
             <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
               <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
@@ -342,10 +454,8 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
-        authWindowRef: AuthSelector.getAuthWindowRef(state),
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        isAuthWindowOpen: AuthSelector.isAuthWindowOpen(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),

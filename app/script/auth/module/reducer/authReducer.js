@@ -36,12 +36,10 @@ export const initialState = {
     phone_code: null,
     team: null,
   },
-  authWindowRef: null,
   currentFlow: null,
   error: null,
   fetched: false,
   fetching: false,
-  isAuthWindowOpen: false,
   isAuthenticated: false,
 };
 

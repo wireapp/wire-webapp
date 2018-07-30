@@ -28,7 +28,6 @@ import * as CookieAction from './CookieAction';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
-import {BACKEND} from '../../Environment';
 
 export const doLogin = loginData => {
   const onBeforeLogin = dispatch => dispatch(doSilentLogout());
@@ -70,122 +69,10 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
-function calculateChildPosition(childHeight, childWidth) {
-  const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
-
-  const hasInnerMeasurements = window.innerHeight && window.innerWidth;
-
-  const parentHeight = hasInnerMeasurements
-    ? window.innerHeight
-    : document.documentElement.clientHeight || window.screen.height;
-  const parentWidth = hasInnerMeasurements
-    ? window.innerWidth
-    : document.documentElement.clientWidth || window.screen.width;
-
-  const left = parentWidth / 2 - childWidth / 2 + screenLeft;
-  const top = parentHeight / 2 - childHeight / 2 + screenTop;
-  return {left, top};
-}
-
-function handleSSOLogin(code, dispatch) {
-  const POPUP_HEIGHT = 520;
-  const POPUP_WIDTH = 480;
-
-  return new Promise((resolve, reject) => {
-    let ssoWindow = undefined;
-    let timerId = undefined;
-    let onReceiveChildWindowMessage = undefined;
-    let onParentWindowClose = undefined;
-
-    const onChildWindowClose = () => {
-      clearInterval(timerId);
-      window.removeEventListener('message', onReceiveChildWindowMessage);
-      window.removeEventListener('unload', onParentWindowClose);
-      dispatch(AuthActionCreator.updateAuthWindowState(false));
-    };
-
-    onReceiveChildWindowMessage = event => {
-      const isExpectedOrigin = event.origin === BACKEND.rest;
-      if (!isExpectedOrigin) {
-        onChildWindowClose();
-        ssoWindow.close();
-        console.error(
-          `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${
-            BACKEND.rest
-          }"`
-        );
-        return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
-      }
-
-      const eventType = event.data && event.data.type;
-      switch (eventType) {
-        case 'AUTH_SUCCESS': {
-          onChildWindowClose();
-          ssoWindow.close();
-          return resolve();
-        }
-        case 'AUTH_ERROR': {
-          onChildWindowClose();
-          ssoWindow.close();
-          console.error(`Authentication error: "${JSON.stringify(event.data.payload)}"`);
-          return reject(new BackendError({label: event.data.payload.label}));
-        }
-        default: {
-          onChildWindowClose();
-          ssoWindow.close();
-          console.error(`Unmatched event type: "${JSON.stringify(event)}"`);
-          return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
-        }
-      }
-    };
-    window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
-
-    const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
-
-    ssoWindow = window.open(
-      `${BACKEND.rest}/sso/initiate-login/${code}`,
-      'WIRE_SSO',
-      `
-        height=${POPUP_HEIGHT},
-        left=${childPosition.left}
-        location=no,
-        menubar=no,
-        resizable=no,
-        status=no,
-        toolbar=no,
-        top=${childPosition.top},
-        width=${POPUP_WIDTH}
-      `
-    );
-
-    dispatch(AuthActionCreator.updateAuthWindowState(true));
-
-    if (ssoWindow) {
-      timerId = window.setInterval(() => {
-        console.error('Checking for closed child window', ssoWindow);
-        if (ssoWindow && ssoWindow.closed) {
-          onChildWindowClose();
-          console.error('Aborted by user');
-          reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
-        }
-      }, 1000);
-
-      onParentWindowClose = () => {
-        ssoWindow.close();
-        console.error('Aborted by user');
-        reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
-      };
-      window.addEventListener('unload', onParentWindowClose);
-    }
-  });
-}
-
-export function doLoginSSO({code, clientType}) {
+export function doFinalizeSSOLogin({clientType}) {
   return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startLogin());
     return Promise.resolve()
-      .then(() => handleSSOLogin(code, dispatch))
       .then(() => apiClient.init(clientType))
       .then(() => core.init())
       .then(() => persistAuthData(clientType, core, dispatch))
