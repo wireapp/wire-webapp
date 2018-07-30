@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-  <a name="1.10.4"></a>
+      <a name="1.10.5"></a>
+## [1.10.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.4...@wireapp/react-ui-kit@1.10.5) (2018-07-30)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Remove padding from header menu ([#898](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/898)) ([9147d1a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/9147d1a))
+
+
+
+
+      <a name="1.10.4"></a>
 ## [1.10.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.3...@wireapp/react-ui-kit@1.10.4) (2018-07-30)
 
 
@@ -11,7 +22,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
 
-  <a name="1.10.3"></a>
+<a name="1.10.3"></a>
 ## [1.10.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.2...@wireapp/react-ui-kit@1.10.3) (2018-07-27)
 
 
