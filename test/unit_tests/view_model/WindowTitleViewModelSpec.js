@@ -48,6 +48,9 @@ describe('z.viewModel.WindowTitleViewModel', () => {
   });
 
   describe('initiateTitleUpdates', () => {
+    beforeEach(() => jasmine.clock().install());
+    afterEach(() => jasmine.clock().uninstall());
+
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
       title_view_model.initiateTitleUpdates();
@@ -200,18 +203,18 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       // Test multiple connect request messages and observe the title change
       title_view_model.userRepository.connect_requests.subscribe(() => {
-        window.setTimeout(() => {
-          expectedWaitingPeople = '2';
-          message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
-          expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
-          expect(window.document.title).toBe(expected_title);
-          done();
-        }, z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
+        jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
+        expectedWaitingPeople = '2';
+        message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
+        expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+        expect(window.document.title).toBe(expected_title);
+        done();
       });
 
       const another_user_et = new z.entity.User(z.util.createRandomUuid());
       another_user_et.connection(pending_connection);
       title_view_model.userRepository.users.push(another_user_et);
+      jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {
