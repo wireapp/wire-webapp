@@ -567,12 +567,13 @@ export default class ConversationService {
     return this.apiClient.conversation.api.getConversationsByIds(conversationId);
   }
 
-  public async getImage({assetId, otrKey, sha256, assetToken}: RemoteData): Promise<Buffer> {
+  public async getImage({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
     const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
+
     return AssetCryptography.decryptAsset({
       cipherText: Buffer.from(encryptedBuffer),
-      keyBytes: Buffer.from(otrKey.buffer),
-      sha256: Buffer.from(sha256.buffer),
+      keyBytes: Buffer.from(otrKey),
+      sha256: Buffer.from(sha256),
     });
   }
 

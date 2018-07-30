@@ -22,28 +22,28 @@ import {EncryptedAsset} from '../../cryptography/root';
 
 // https://github.com/wireapp/generic-message-proto/blob/v1.20.0/proto/messages.proto#L201
 interface AssetContent {
-  uploaded?: RemoteData;
   abortReason?: number;
   original?: Original;
   preview?: Preview;
+  uploaded?: RemoteData;
 }
 
 interface RemoteData {
   assetId: string;
+  assetToken?: string;
   otrKey: Uint8Array | Buffer;
   sha256: Uint8Array | Buffer;
-  assetToken?: string;
 }
 
 interface Original {
-  mimeType: string;
-  size: number;
-  name?: string;
-  source?: string;
+  audio?: AudioMetaData;
   caption?: string;
   image?: ImageMetaData;
+  mimeType: string;
+  name?: string;
+  size: number;
+  source?: string;
   video?: VideoMetaData;
-  audio?: AudioMetaData;
 }
 
 interface ImageMetaData {
