@@ -592,9 +592,9 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@1.10.2":
-  version "1.10.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.10.2.tgz#e7fe70b1d03ae8adb1f117c7968197de98b28d70"
+"@wireapp/react-ui-kit@1.10.3":
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.10.3.tgz#63a9e97f0707e18edfd73b5b0899c2f9ebb7d3f9"
   dependencies:
     bazinga64 "5.2.15"
     color "3.0.0"
