@@ -515,9 +515,9 @@
     "@webassemblyjs/wast-parser" "1.5.13"
     long "^3.2.0"
 
-"@wireapp/api-client@1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.10.0.tgz#f9352bb424c7afef8d3ede5275ea52870b8df6b3"
+"@wireapp/api-client@1.10.3":
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.10.3.tgz#e1cd0a5ea26dab3b79aeacf7972994c7a88a84cc"
   dependencies:
     "@types/node" "10.5.4"
     "@types/spark-md5" "3.0.0"
@@ -535,23 +535,23 @@
   version "3.0.64"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.64.tgz#6ee9c33d57a26b44db1d0a1ded11d53f2fe2a800"
 
-"@wireapp/core@3.15.4":
-  version "3.15.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.15.4.tgz#e9168e0461279806d69337328a263ec7ded447e5"
+"@wireapp/core@3.15.7":
+  version "3.15.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.15.7.tgz#0c7a95e58f4cb2a4ac41d49f82f428c76060b5ec"
   dependencies:
     "@types/node" "10.5.4"
-    "@wireapp/api-client" "1.10.0"
-    "@wireapp/cryptobox" "8.6.8"
+    "@wireapp/api-client" "1.10.3"
+    "@wireapp/cryptobox" "8.6.9"
     "@wireapp/protocol-messaging" "1.20.1"
     "@wireapp/store-engine" "0.11.50"
-    bazinga64 "5.2.16"
+    bazinga64 "5.2.17"
     logdown "3.2.3"
     protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.6.8":
-  version "8.6.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.8.tgz#91e25f8e9023cb7c14ebf9df273959fb78070aea"
+"@wireapp/cryptobox@8.6.9":
+  version "8.6.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.9.tgz#73c6b6d0610d015320e7328693b7ef0c092e325f"
   dependencies:
     "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.4"
@@ -559,7 +559,7 @@
     "@wireapp/priority-queue" "0.1.62"
     "@wireapp/proteus" "7.3.6"
     "@wireapp/store-engine" "0.11.50"
-    bazinga64 "5.2.16"
+    bazinga64 "5.2.17"
     dexie "2.0.4"
     fs-extra "7.0.0"
     logdown "3.2.3"
@@ -1719,6 +1719,10 @@ batch@0.6.1:
 bazinga64@5.2.16:
   version "5.2.16"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.16.tgz#d81649561911a1ad9bce64a95e40367105eac1c9"
+
+bazinga64@5.2.17:
+  version "5.2.17"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.17.tgz#04c8357c51f083ee466055fdf408d66a302f9ff5"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
