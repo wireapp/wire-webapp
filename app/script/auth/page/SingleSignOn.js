@@ -114,7 +114,7 @@ class SingleSignOn extends React.PureComponent {
           throw errors[0];
         }
         if (isDesktopApp()) {
-          this.props.validateSSOCode(this.stripPrefix(this.state.code));
+          return this.props.validateSSOCode(this.stripPrefix(this.state.code));
         }
       })
       .then(() =>
