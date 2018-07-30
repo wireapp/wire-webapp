@@ -616,10 +616,11 @@ class Demo extends React.PureComponent {
                       textAlign: 'center',
                     }}
                   >
-                    {colorKey}
-                    ({Color(COLOR[colorKey])
+                    {colorKey}(
+                    {Color(COLOR[colorKey])
                       .hex()
-                      .toString()})
+                      .toString()}
+                    )
                   </div>
                 </div>
               ))}
