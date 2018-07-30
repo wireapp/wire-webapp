@@ -17,7 +17,7 @@
  *
  */
 
-const {isValidKey, isValidToken} = require('@wireapp/api-client/dist/commonjs/asset/AssetUtil');
+const {isValidAssetId, isValidToken} = require('@wireapp/api-client/dist/commonjs/asset/AssetUtil');
 
 describe('"isValidToken"', () => {
   it('should return true if token is valid', () => {
@@ -34,12 +34,12 @@ describe('"isValidToken"', () => {
 
 describe('"isValidKey"', () => {
   it('should return true if key is valid', () => {
-    expect(isValidKey('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff')).toBeTruthy();
+    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff')).toBeTruthy();
   });
 
   it('should return false if key is not valid', () => {
-    expect(isValidKey('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff!')).toBeFalsy();
-    expect(isValidKey('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff.')).toBeFalsy();
-    expect(isValidKey('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ffö')).toBeFalsy();
+    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff!')).toBeFalsy();
+    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff.')).toBeFalsy();
+    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ffö')).toBeFalsy();
   });
 });
