@@ -647,7 +647,15 @@ z.event.EventRepository = class EventRepository {
    */
   _handleEventSaving(event, source) {
     const {conversation: conversationId, data: mappedData} = event;
-    const eventId = (mappedData && mappedData.replacing_message_id) || event.id;
+    /*
+     * We can detect an edit event if the event has a replacing_message_id and
+     * no preview yet.
+     * This way, we avoid collisions with link preview of edited messages which have
+     * replacing_message_id and a non empty array of previews.
+     */
+    const hasLinkPreview = mappedData && mappedData.previews && !!mappedData.previews.length;
+    const isEditEvent = mappedData && !hasLinkPreview && mappedData.replacing_message_id;
+    const eventId = isEditEvent ? mappedData.replacing_message_id : event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -698,14 +706,14 @@ z.event.EventRepository = class EventRepository {
     const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
 
     switch (true) {
-      case isMessageEdit: {
-        updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
-        break;
-      }
-
       case isLinkPreviewUpdate: {
         // case of a link preview
         updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
+        break;
+      }
+
+      case isMessageEdit: {
+        updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
         break;
       }
 
