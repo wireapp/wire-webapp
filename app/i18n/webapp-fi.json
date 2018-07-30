@@ -100,8 +100,7 @@
   "BackendError.LABEL.NO_TEAM_MEMBER": "",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
-  "BackendError.LABEL.EMAIL_EXISTS":
-    "Sähköpostiosoite jonka annoit on jo käytössä. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lue lisää</a>",
+  "BackendError.LABEL.EMAIL_EXISTS": "Sähköpostiosoite jonka annoit on jo käytössä. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lue lisää</a>",
   "BackendError.unexpected": "Odottamaton virhe ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Kirjoita nimi, jossa on vähintään 2 merkkiä",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Kirjoita nimi, jossa on vähintään 2 merkkiä",

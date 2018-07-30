@@ -1,8 +1,7 @@
 {
   "footer.wireLink": "wire.com",
   "footer.copy": "© Wire Swiss GmbH",
-  "cookiePolicyStrings.bannerText":
-    "Me kasutame küpsiseid, personaliseerimaks sinu kogemust meie veebisaidil. Veebisaiti kasutades nõustud küpsiste kasutusega.<br/>Täpsem informatsioon küpsiste kohta on leitav meie <b>privaatsuspoliitikas</b>.",
+  "cookiePolicyStrings.bannerText": "Me kasutame küpsiseid, personaliseerimaks sinu kogemust meie veebisaidil. Veebisaiti kasutades nõustud küpsiste kasutusega.<br/>Täpsem informatsioon küpsiste kohta on leitav meie <b>privaatsuspoliitikas</b>.",
   "index.claim": "Turvaline sõnumside kõigile.",
   "index.createAccountForPersonalUse": "Isiklikuks kasutuseks",
   "index.createAccountForOrganizations": "Organisatsioonidele",
@@ -48,16 +47,14 @@
   "acceptNewsModal.declineButton": "Tänan, ei",
   "acceptNewsModal.confirmButton": "Nõustu",
   "unsupported.headlineBrowser": "Seda brauserit ei toetata.",
-  "unsupported.subheadBrowser":
-    "Laadi alla viimane versioon brauserist <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b style=\"font-weight: 600\"> või <b style=\"font-weight: 600\">Microsoft Edge.</b>",
+  "unsupported.subheadBrowser": "Laadi alla viimane versioon brauserist <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b style=\"font-weight: 600\"> või <b style=\"font-weight: 600\">Microsoft Edge.</b>",
   "unsupported.headlineCookies": "Luba küpsised",
   "unsupported.subheadCookies": "Wire’i sisselogimiseks luba küpsised.",
   "unsupported.headlineIndexedDb": "Sa oled privaatrežiimis",
   "unsupported.subheadIndexedDb": "Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.",
   "conversationJoin.unsupportedJoinHeadline": "Sind kutsuti <br />liituma <b style=\"color: black;\">Wire'i külalistetoaga.</b>",
   "conversationJoin.headline": "Sind kutsuti <br />liituma <b style=\"color: black;\">Wire'i külalistetoaga.</b>",
-  "conversationJoin.unsupportedJoinSubhead":
-    "<p>See brauser ei ole toetatud.</p>Laadi alla <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> või <b style=\"font-weight: 600\">Microsoft Edge</b> brauseri versioon.",
+  "conversationJoin.unsupportedJoinSubhead": "<p>See brauser ei ole toetatud.</p>Laadi alla <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> või <b style=\"font-weight: 600\">Microsoft Edge</b> brauseri versioon.",
   "conversationJoin.unsupportedJoinMobileSubhead": "Ava see link oma arvutis.",
   "conversationJoin.subhead": "Krüptitud gruppide vaheline sõnumside ja kõned. <br />Konto pole vajalik.",
   "conversationJoin.existentAccountHeadline": "{name}, sind kutsuti <br />liituma <b style=\"color: black;\">Wire'i külalistetoaga.</b>",
@@ -83,8 +80,7 @@
   "BackendError.LABEL.INVALID_CODE": "Palun sisesta kehtiv kood",
   "BackendError.LABEL.INVALID_EMAIL": "See e-posti aadress on sobimatu",
   "BackendError.LABEL.INVALID_PHONE": "See telefoninumber on sobimatu",
-  "BackendError.LABEL.KEY_EXISTS":
-    "Sisestatud e-posti aadress on juba registreeritud. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lisateave</a>",
+  "BackendError.LABEL.KEY_EXISTS": "Sisestatud e-posti aadress on juba registreeritud. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lisateave</a>",
   "BackendError.LABEL.ALREADY_INVITED": "See e-posti aadress on juba kutsutud",
   "BackendError.LABEL.PENDING_ACTIVATION": "Sisestatud e-posti aadress on juba kutsutud. Palun kontrolli oma postkasti",
   "BackendError.LABEL.PENDING_LOGIN": "",
