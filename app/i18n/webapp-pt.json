@@ -100,8 +100,7 @@
   "BackendError.LABEL.NO_TEAM_MEMBER": "",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
-  "BackendError.LABEL.EMAIL_EXISTS":
-    "Este endereço de email já está em uso. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\"> Saiba mais</a>",
+  "BackendError.LABEL.EMAIL_EXISTS": "Este endereço de email já está em uso. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\"> Saiba mais</a>",
   "BackendError.unexpected": "Erro inesperado ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introduza um nome com pelo menos 2 caracteres",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Introduza um nome com pelo menos 2 caracteres",

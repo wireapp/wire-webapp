@@ -1,8 +1,7 @@
 {
   "footer.wireLink": "wire.com",
   "footer.copy": "© Wire Swiss GmbH",
-  "cookiePolicyStrings.bannerText":
-    "Мы используем файлы cookie для персонализации вашего опыта на нашем веб-сайте.\nПродолжая использовать веб-сайт, вы соглашаетесь на использование файлов cookie.<br/>Дополнительную информацию о файлах cookie можно найти в нашей<b>политике конфиденциальности</b>.",
+  "cookiePolicyStrings.bannerText": "Мы используем файлы cookie для персонализации вашего опыта на нашем веб-сайте.\nПродолжая использовать веб-сайт, вы соглашаетесь на использование файлов cookie.<br/>Дополнительную информацию о файлах cookie можно найти в нашей<b>политике конфиденциальности</b>.",
   "index.claim": "Безопасный обмен сообщениями для всех.",
   "index.createAccountForPersonalUse": "Для личного пользования",
   "index.createAccountForOrganizations": "Для организаций",
@@ -48,16 +47,14 @@
   "acceptNewsModal.declineButton": "Нет, спасибо",
   "acceptNewsModal.confirmButton": "Принять",
   "unsupported.headlineBrowser": "Этот браузер не поддерживается.",
-  "unsupported.subheadBrowser":
-    "Загрузите последнюю версию <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b style=\"font-weight: 600\"> или <b style=\"font-weight: 600\">Microsoft Edge.</b>",
+  "unsupported.subheadBrowser": "Загрузите последнюю версию <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b style=\"font-weight: 600\"> или <b style=\"font-weight: 600\">Microsoft Edge.</b>",
   "unsupported.headlineCookies": "Включить cookie",
   "unsupported.subheadCookies": "Включите файлы cookie, чтобы войти в Wire.",
   "unsupported.headlineIndexedDb": "Вы в приватном режиме",
   "unsupported.subheadIndexedDb": "Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.",
   "conversationJoin.unsupportedJoinHeadline": "Вас приглашают <br />присоединиться к <b style=\"color: black;\">гостевой комнате Wire.</b>",
   "conversationJoin.headline": "Вас приглашают <br />присоединиться к <b style=\"color: black;\">гостевой комнате Wire.</b>",
-  "conversationJoin.unsupportedJoinSubhead":
-    "<p>Этот браузер не поддерживается.</p>Загрузите последнюю версию<b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> или <b style=\"font-weight: 600\">Microsoft Edge.</b>",
+  "conversationJoin.unsupportedJoinSubhead": "<p>Этот браузер не поддерживается.</p>Загрузите последнюю версию<b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> или <b style=\"font-weight: 600\">Microsoft Edge.</b>",
   "conversationJoin.unsupportedJoinMobileSubhead": "Откройте эту ссылку на своем компьютере.",
   "conversationJoin.subhead": "Зашифрованные групповые сообщения и совместные звонки. <br />Учетная запись не нужна.",
   "conversationJoin.existentAccountHeadline": "{name}, вас приглашают <br />присоединиться к <b style=\"color: black;\">гостевой комнате Wire.</b>",
@@ -83,8 +80,7 @@
   "BackendError.LABEL.INVALID_CODE": "Пожалуйста, введите правильный код",
   "BackendError.LABEL.INVALID_EMAIL": "Недопустимый адрес email",
   "BackendError.LABEL.INVALID_PHONE": "Недопустимый номер телефона",
-  "BackendError.LABEL.KEY_EXISTS":
-    "Указанный вами адрес email уже зарегистрирован.<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Подробнее</a>",
+  "BackendError.LABEL.KEY_EXISTS": "Указанный вами адрес email уже зарегистрирован.<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Подробнее</a>",
   "BackendError.LABEL.ALREADY_INVITED": "Этот адрес email уже был приглашен ранее",
   "BackendError.LABEL.PENDING_ACTIVATION": "Указанный вами адрес email уже приглашен. Пожалуйста, проверьте вашу электронную почту",
   "BackendError.LABEL.PENDING_LOGIN": "BackendError.LABEL.PENDING_LOGIN",

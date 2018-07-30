@@ -100,8 +100,7 @@
   "BackendError.LABEL.NO_TEAM_MEMBER": "",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
-  "BackendError.LABEL.EMAIL_EXISTS":
-    "Adresa de e-mail este deja folosită. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Află mai multe</a>",
+  "BackendError.LABEL.EMAIL_EXISTS": "Adresa de e-mail este deja folosită. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Află mai multe</a>",
   "BackendError.unexpected": "Eroare neașteptată ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introdu un nume de cel puțin 2 caractere",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Introdu un nume de cel puțin 2 caractere",
