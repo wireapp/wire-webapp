@@ -19,6 +19,8 @@
 
 import {
   AddPeopleIcon,
+  AndroidIcon,
+  AppleIcon,
   ArrowIcon,
   AttachmentIcon,
   AudioVideoIcon,
@@ -31,6 +33,7 @@ import {
   CamIcon,
   Checkbox,
   CheckboxLabel,
+  ChromeIcon,
   CodeInput,
   Column,
   Columns,
@@ -67,12 +70,14 @@ import {
   Line,
   Link,
   LinkedInIcon,
+  LinuxIcon,
   Loading,
   Logo,
   MenuItem,
   MenuLink,
   MenuModal,
   MessageIcon,
+  MicrosoftIcon,
   Modal,
   MoreIcon,
   MuteIcon,
@@ -186,7 +191,9 @@ class Demo extends React.PureComponent {
           </Container>
           <Container>
             <H1>Icons</H1>
-            <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
+            <Container
+              style={{alignItems: 'center', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'}}
+            >
               <AddPeopleIcon height={32} />
               <ArrowIcon direction="up" height={32} />
               <AttachmentIcon height={32} />
@@ -194,6 +201,7 @@ class Demo extends React.PureComponent {
               <CallIcon height={32} />
               <CamIcon width={32} />
               <DeviceIcon height={32} />
+              <EditIcon />
               <FileIcon height={32} />
               <GifIcon width={32} />
               <HangupIcon width={32} />
@@ -211,15 +219,19 @@ class Demo extends React.PureComponent {
               <TeamIcon />
               <TimedIcon height={32} />
               <WireIcon width={32} />
-              <EditIcon />
             </Container>
             <Line />
             <H1>Brand Icons</H1>
             <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
-              <FacebookIcon width={32} />
-              <GitHubIcon width={32} />
-              <LinkedInIcon width={32} />
-              <TwitterIcon width={32} />
+              <AndroidIcon width={48} />
+              <AppleIcon width={48} />
+              <ChromeIcon width={48} />
+              <FacebookIcon width={48} />
+              <GitHubIcon width={48} />
+              <LinkedInIcon width={48} />
+              <LinuxIcon width={48} />
+              <MicrosoftIcon width={48} />
+              <TwitterIcon width={48} />
             </Container>
             <Line />
             <H1>Layout</H1>
