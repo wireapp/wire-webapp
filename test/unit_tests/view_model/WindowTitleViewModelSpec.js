@@ -23,13 +23,14 @@
 
 describe('z.viewModel.WindowTitleViewModel', () => {
   const suffix = z.l10n.text(z.string.wire);
-  const test_factory = new TestFactory();
+  let test_factory = undefined;
   let title_view_model = undefined;
 
   beforeEach(done => {
+    test_factory = new TestFactory();
     test_factory
       .exposeConversationActors()
-      .then(conversation_repository => {
+      .then(conversationRepository => {
         title_view_model = new z.viewModel.WindowTitleViewModel(
           {
             content: {
@@ -37,7 +38,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
             },
           },
           {
-            conversation: conversation_repository,
+            conversation: conversationRepository,
             user: TestFactory.user_repository,
           }
         );
@@ -47,6 +48,9 @@ describe('z.viewModel.WindowTitleViewModel', () => {
   });
 
   describe('initiateTitleUpdates', () => {
+    beforeEach(() => jasmine.clock().install());
+    afterEach(() => jasmine.clock().uninstall());
+
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
       title_view_model.initiateTitleUpdates();
@@ -179,7 +183,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('shows the number of connection requests when viewing the inbox', () => {
+    it('shows the number of connection requests when viewing the inbox', done => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
@@ -192,24 +196,25 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.userRepository.users.push(user_et);
 
       let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
-      let waiting_people = title_view_model.userRepository.connect_requests().length;
-
-      let expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
+      let expectedWaitingPeople = '1';
+      let expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
 
-      // Test multiple connect request messages
+      // Test multiple connect request messages and observe the title change
+      title_view_model.userRepository.connect_requests.subscribe(() => {
+        jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
+        expectedWaitingPeople = '2';
+        message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
+        expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+        expect(window.document.title).toBe(expected_title);
+        done();
+      });
+
       const another_user_et = new z.entity.User(z.util.createRandomUuid());
       another_user_et.connection(pending_connection);
-
       title_view_model.userRepository.users.push(another_user_et);
-      waiting_people = title_view_model.userRepository.connect_requests().length;
-
-      message = z.l10n.text(z.string.conversationsConnectionRequestMany, waiting_people);
-
-      expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
-      title_view_model.initiateTitleUpdates();
-      expect(window.document.title).toBe(expected_title);
+      jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {
@@ -222,13 +227,13 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversation);
-      title_view_model.conversationRepository.active_conversation(conversation);
-
-      amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count => {
-        expect(badge_count).toBe(1);
+      amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
+        expect(badgeCount).toBe(1);
         done();
       });
+
+      title_view_model.conversationRepository.conversations_unarchived.push(conversation);
+      title_view_model.conversationRepository.active_conversation(conversation);
 
       title_view_model.initiateTitleUpdates();
     });
