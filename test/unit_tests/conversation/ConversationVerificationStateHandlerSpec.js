@@ -97,7 +97,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(false);
       user_b.devices.push(new_client_b);
 
-      state_handler.onClientAdd(user_b.id);
+      state_handler.onClientAdded(user_b.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_ab.is_verified()).toBeFalsy();
@@ -112,7 +112,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(true);
       user_b.devices.push(new_client_b);
 
-      state_handler.onClientAdd(user_b.id);
+      state_handler.onClientAdded(user_b.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_ab.is_verified()).toBeTruthy();
       expect(z.conversation.EventBuilder.buildAllVerified).not.toHaveBeenCalled();
@@ -131,7 +131,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       new_client.meta.isVerified(false);
       user_self.devices.push(new_client);
 
-      state_handler.onClientAdd(user_self.id);
+      state_handler.onClientAdded(user_self.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
@@ -159,7 +159,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       new_client.meta.isVerified(false);
       user_self.devices.push(new_client);
 
-      state_handler.onClientAdd(user_self.id);
+      state_handler.onClientAdded(user_self.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
