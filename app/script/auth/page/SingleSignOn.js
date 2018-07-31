@@ -135,9 +135,7 @@ class SingleSignOn extends React.PureComponent {
           return reject(
             new BackendError({
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${
-                BACKEND.rest
-              }"`,
+              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${BACKEND.rest}"`,
             })
           );
         }
