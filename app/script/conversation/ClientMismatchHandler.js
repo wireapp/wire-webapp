@@ -112,7 +112,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         return Promise.all(this._mapRecipients(recipients, _addMissingClient));
       })
       .then(() => {
-        this.conversationRepository.verification_state_handler.onClientAdd(Object.keys(recipients));
+        this.conversationRepository.verification_state_handler.onClientsAdded(Object.keys(recipients));
         return payload;
       });
   }
