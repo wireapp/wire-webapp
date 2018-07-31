@@ -34,10 +34,10 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     this.dispose = this.dispose.bind(this);
     this.onClick = this.onClick.bind(this);
 
-    this.messageEntnty = ko.unwrap(params.message);
+    this.messageEntity = ko.unwrap(params.message);
     this.header = params.header || false;
 
-    const [firstPreview] = this.messageEntnty.get_first_asset().previews();
+    const [firstPreview] = this.messageEntity.get_first_asset().previews();
     this.preview = firstPreview;
     this.element = componentInfo.element;
 
@@ -45,13 +45,13 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     this.isTweet = isTypeTweet && z.util.ValidationUtil.urls.isTweet(this.preview.url);
     this.author = this.isTweet ? this.preview.meta_data.author.substring(0, 20) : '';
 
-    if (!this.messageEntnty.is_expired()) {
+    if (!this.messageEntity.is_expired()) {
       this.element.addEventListener('click', this.onClick);
     }
   }
 
   onClick() {
-    if (!this.messageEntnty.is_expired()) {
+    if (!this.messageEntity.is_expired()) {
       z.util.SanitizationUtil.safeWindowOpen(this.preview.url);
     }
   }
