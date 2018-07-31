@@ -649,16 +649,20 @@ z.event.EventRepository = class EventRepository {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
-    /*
-     * first check if a message that should be replaced exists in DB
-     */
+    //first check if a message that should be replaced exists in DB
     const findEventToReplacePromise = mappedData.replacing_message_id
       ? this.conversationService.load_event_from_db(mappedData.replacing_message_id)
       : Promise.resolve(undefined);
 
     return findEventToReplacePromise.then(eventToReplace => {
+      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+      if (!eventToReplace && mappedData.replacing_message_id && !hasLinkPreview) {
+        const errorMessage = 'Event validation failed: edit event is missing original event';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+
       const handleEvent = newEvent => {
-        // check for duplicates if the event has an id
+        // check for duplicates (same id)
         const loadPromise = newEvent.id
           ? this.conversationService.load_event_from_db(conversationId, newEvent.id)
           : Promise.resolve();
@@ -670,26 +674,22 @@ z.event.EventRepository = class EventRepository {
           return this.conversationService.save_event(newEvent);
         });
       };
-      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-      if (!eventToReplace && mappedData.replacing_message_id && !hasLinkPreview) {
-        const errorMessage = 'Event validation failed: edit event is missing original event';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-      return eventToReplace ? this._handleReplacement(eventToReplace, event) : handleEvent(event);
+
+      return eventToReplace ? this._handleEventReplacement(eventToReplace, event) : handleEvent(event);
     });
   }
 
   _handleEventReplacement(originalEvent, newEvent) {
+    const newData = newEvent.data || {};
     const logMessage = `Ignored '${newEvent.type}' (${newEvent.id}) in '${newEvent.conversation}' from '${
       newEvent.from
     }':'`;
-    if (originalEvent.data.from !== newEvent.from) {
+    if (originalEvent.data.from !== newData.from) {
       this.logger.warn(`${logMessage} ID previously used by user '${newEvent.from}'`, newEvent);
       const errorMessage = 'Event validation failed: ID reused by other user';
       throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
     }
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
-    const newData = newEvent.data;
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
     let updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);

@@ -561,7 +561,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('ignores edit message with missing associated initial message', done => {
+    it('ignores edit message with missing associated original message', done => {
       const linkPreviewEvent = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
       spyOn(TestFactory.event_repository.conversationService, 'update_event').and.returnValue(Promise.resolve());
