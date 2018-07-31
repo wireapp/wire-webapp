@@ -17,8 +17,6 @@
  *
  */
 
-const logdown = require('logdown');
-const pkg = require('../../package.json');
 import {APIClient} from '@wireapp/api-client';
 import {LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
@@ -28,10 +26,13 @@ import {
   RegisteredClient,
 } from '@wireapp/api-client/dist/commonjs/client/index';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import * as logdown from 'logdown';
 import {CryptographyService} from '../cryptography/root';
 import ClientBackendRepository from './ClientBackendRepository';
 import ClientDatabaseRepository from './ClientDatabaseRepository';
 import {ClientInfo} from './root';
+
+const pkg = require('../../package.json');
 
 export interface MetaClient extends RegisteredClient {
   meta: {
@@ -41,7 +42,7 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export default class ClientService {
-  private readonly logger: any = logdown('@wireapp/core/client/ClientService', {
+  private readonly logger = logdown('@wireapp/core/client/ClientService', {
     logger: console,
     markdown: false,
   });

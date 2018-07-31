@@ -21,14 +21,13 @@ import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as EventEmitter from 'events';
+import * as logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
 import {BackendErrorMapper, ConnectionState, ContentType, NetworkError} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
-const logdown = require('logdown');
-
 class HttpClient extends EventEmitter {
-  private readonly logger: any = logdown('@wireapp/api-client/http/HttpClient', {
+  private readonly logger = logdown('@wireapp/api-client/http/HttpClient', {
     logger: console,
     markdown: false,
   });

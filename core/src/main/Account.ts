@@ -50,12 +50,12 @@ import {CryptographyService} from './cryptography/root';
 import {NotificationService} from './notification/root';
 import {SelfService} from './self/root';
 
-const logdown = require('logdown');
 import {APIClient} from '@wireapp/api-client';
 import * as EventEmitter from 'events';
+import * as logdown from 'logdown';
 
 class Account extends EventEmitter {
-  private readonly logger: any = logdown('@wireapp/core/Account', {
+  private readonly logger = logdown('@wireapp/core/Account', {
     logger: console,
     markdown: false,
   });

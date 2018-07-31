@@ -17,12 +17,12 @@
  *
  */
 
-const logdown = require('logdown');
 import * as EventEmitter from 'events';
+import * as logdown from 'logdown';
 import {AccessTokenData} from '../auth';
 
 class AccessTokenStore extends EventEmitter {
-  private readonly logger: any = logdown('@wireapp/api-client/AccessTokenStore', {
+  private readonly logger = logdown('@wireapp/api-client/AccessTokenStore', {
     logger: console,
     markdown: false,
   });

@@ -23,6 +23,7 @@ import {keys as ProteusKeys, message as ProteusMessage, session as ProteusSessio
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Decoder, Encoder} from 'bazinga64';
 import * as EventEmitter from 'events';
+import * as logdown from 'logdown';
 import CryptoboxSession from './CryptoboxSession';
 import DecryptionError from './DecryptionError';
 import {CryptoboxError} from './error/root';
@@ -31,7 +32,6 @@ import {SerializedCryptobox} from './SerializedCryptobox';
 import {CryptoboxCRUDStore} from './store/root';
 
 const DEFAULT_CAPACITY = 1000;
-const logdown = require('logdown');
 const {version}: {version: string} = require('../../package.json');
 
 class Cryptobox extends EventEmitter {
@@ -41,7 +41,7 @@ class Cryptobox extends EventEmitter {
   };
 
   private cachedSessions: LRUCache<CryptoboxSession>;
-  private readonly logger: any = logdown('@wireapp/cryptobox/Cryptobox', {
+  private readonly logger = logdown('@wireapp/cryptobox/Cryptobox', {
     logger: console,
     markdown: false,
   });
