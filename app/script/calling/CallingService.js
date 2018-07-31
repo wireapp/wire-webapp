@@ -39,7 +39,7 @@ z.calling.CallingService = class CallingService {
     return this.client.send_request({
       cache: false,
       type: 'GET',
-      url: this.client.create_url('/calls/config/v2'),
+      url: this.client.create_url('/calls/config'),
     });
   }
 };
