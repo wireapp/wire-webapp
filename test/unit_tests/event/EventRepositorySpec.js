@@ -560,6 +560,23 @@ describe('Event Repository', () => {
         })
         .catch(done.fail);
     });
+
+    it('ignores edit message with missing associated initial message', done => {
+      const linkPreviewEvent = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.returnValue(Promise.resolve());
+
+      linkPreviewEvent.data.replacing_message_id = 'initial_message_id';
+
+      TestFactory.event_repository
+        ._handleEventSaving(linkPreviewEvent)
+        .then(() => done.fail('Should have thrown an error'))
+        .catch(error => {
+          expect(TestFactory.event_repository.conversationService.update_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+          done();
+        });
+    });
   });
 
   describe('_handleEventValidation', () => {
