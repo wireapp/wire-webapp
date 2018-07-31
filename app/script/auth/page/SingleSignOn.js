@@ -87,8 +87,6 @@ class SingleSignOn extends React.PureComponent {
     }
   };
 
-  componentWillReceiveProps = nextProps => {};
-
   componentWillUnmount = () => {
     this.props.resetError();
   };
@@ -114,6 +112,7 @@ class SingleSignOn extends React.PureComponent {
   handleSSOWindow = code => {
     const POPUP_HEIGHT = 520;
     const POPUP_WIDTH = 480;
+    const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
 
     return new Promise((resolve, reject) => {
       let timerId = undefined;
@@ -197,7 +196,7 @@ class SingleSignOn extends React.PureComponent {
             onChildWindowClose();
             reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
           }
-        }, 1000);
+        }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
 
         onParentWindowClose = () => {
           this.ssoWindow.close();
@@ -301,7 +300,7 @@ class SingleSignOn extends React.PureComponent {
     }
   };
 
-  readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
+  readFromClipboard = () => navigator.clipboard.readText();
 
   containsSSOCode = text => text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
