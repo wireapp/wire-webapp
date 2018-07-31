@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.16.4"></a>
+## [3.16.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.16.3...@wireapp/core@3.16.4) (2018-07-31)
+
+
+### Bug Fixes
+
+* **core:** Set correct conversation id on incoming messages ([#915](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/915)) ([d4662b7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d4662b7))
+
+
+
+
 <a name="3.16.3"></a>
 ## [3.16.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.16.2...@wireapp/core@3.16.3) (2018-07-31)
 
