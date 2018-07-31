@@ -656,17 +656,19 @@ z.event.EventRepository = class EventRepository {
 
     return findEventToReplacePromise.then(eventToReplace => {
       const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-      if (!eventToReplace && mappedData.replacing_message_id && !hasLinkPreview) {
+      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+      if (isReplacementWithoutOriginal && !hasLinkPreview) {
+        // the only valid case of a replacement with no original message is when an edited message gets a link preview
         this._throwValidationError('Edit event without original event');
       }
 
       const handleEvent = newEvent => {
         // check for duplicates (same id)
-        const loadPromise = newEvent.id
+        const loadEventPromise = newEvent.id
           ? this.conversationService.load_event_from_db(conversationId, newEvent.id)
           : Promise.resolve();
 
-        return loadPromise.then(storedEvent => {
+        return loadEventPromise.then(storedEvent => {
           if (storedEvent) {
             return this._handleLinkPreviewUpdate(storedEvent, newEvent);
           }
