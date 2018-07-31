@@ -646,84 +646,92 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const {conversation: conversationId, data: mappedData} = event;
+    const conversationId = event.conversation;
+    const mappedData = event.data || {};
+
     /*
-     * We can detect an edit event if the event has a replacing_message_id and
-     * no preview yet.
-     * This way, we avoid collisions with link preview of edited messages which have
-     * replacing_message_id and a non empty array of previews.
+     * first check if a message that should be replaced exists in DB
      */
-    const hasLinkPreview = mappedData && mappedData.previews && !!mappedData.previews.length;
-    const isEditEvent = mappedData && !hasLinkPreview && mappedData.replacing_message_id;
-    const eventId = isEditEvent ? mappedData.replacing_message_id : event.id;
+    const findEventToReplacePromise = mappedData.replacing_message_id
+      ? this.conversationService.load_event_from_db(mappedData.replacing_message_id)
+      : Promise.resolve(undefined);
 
-    const loadPromise = eventId
-      ? this.conversationService.load_event_from_db(conversationId, eventId)
-      : Promise.resolve();
+    return findEventToReplacePromise.then(eventToReplace => {
+      const handleEvent = newEvent => {
+        // check for duplicates if the event has an id
+        const loadPromise = newEvent.id
+          ? this.conversationService.load_event_from_db(conversationId, newEvent.id)
+          : Promise.resolve();
 
-    return loadPromise.then(storedEvent => {
-      if (!storedEvent) {
-        return this.conversationService.save_event(event);
-      }
-
-      const {from: mappedFrom, type: mappedType} = event;
-      const {from: storedFrom, type: storedType} = storedEvent;
-
-      const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
-
-      const fromDifferentUsers = storedFrom !== mappedFrom;
-      if (fromDifferentUsers) {
-        this.logger.warn(`${logMessage} ID previously used by user '${storedFrom}'`, event);
-        const errorMessage = 'Event validation failed: ID reused by other user';
+        return loadPromise.then(storedEvent => {
+          if (storedEvent) {
+            return this._handleLinkPreviewUpdate(storedEvent, newEvent);
+          }
+          return this.conversationService.save_event(newEvent);
+        });
+      };
+      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+      if (!eventToReplace && mappedData.replacing_message_id && !hasLinkPreview) {
+        const errorMessage = 'Event validation failed: edit event is missing original event';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
-
-      const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const isLegitMessageReplacement = mappedData.previews.length || mappedData.replacing_message_id;
-      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
-      if (userReusedId) {
-        this.logger.warn(`${logMessage} ID previously used by same user`, event);
-        const errorMessage = 'Event validation failed: ID reused by same user';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      return this._handleDuplicateEvents(storedEvent, event);
+      return eventToReplace ? this._handleReplacement(eventToReplace, event) : handleEvent(event);
     });
   }
 
-  _handleDuplicateEvents(originalEvent, newEvent) {
-    const newData = newEvent.data;
+  _handleEventReplacement(originalEvent, newEvent) {
+    const logMessage = `Ignored '${newEvent.type}' (${newEvent.id}) in '${newEvent.conversation}' from '${
+      newEvent.from
+    }':'`;
+    if (originalEvent.data.from !== newEvent.from) {
+      this.logger.warn(`${logMessage} ID previously used by user '${newEvent.from}'`, newEvent);
+      const errorMessage = 'Event validation failed: ID reused by other user';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
-    let updates;
+    const newData = newEvent.data;
+    const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
-    /*
-     * The only two valid cases for a duplicate event are:
-     *  - a link preview has been received (the text message already being in DB) ;
-     *  - a message has been updated
-     */
-    const isMessageEdit = !!(newData && newData.replacing_message_id);
-    const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
+    let updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
 
-    switch (true) {
-      case isLinkPreviewUpdate: {
-        // case of a link preview
-        updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
-        break;
-      }
-
-      case isMessageEdit: {
-        updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
-        break;
-      }
-
-      default: {
-        this.logger.error(`Unhandled ID duplication '${originalEvent.id}' by event '${newEvent.type}'`, newEvent);
-        const errorMessage = 'Event validation failed: Unhandled event duplicate';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
+    if (!isLinkPreviewEdit) {
+      updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
+    return this.conversationService.update_event(identifiedUpdates);
+  }
+
+  _handleLinkPreviewUpdate(originalEvent, newEvent) {
+    const newData = newEvent.data;
+    const originalData = originalEvent.data;
+    const logMessage = `Ignored '${newEvent.type}' (${newEvent.id}) in '${newEvent.conversation}' from '${
+      newEvent.from
+    }':'`;
+    if (originalEvent.from !== newEvent.from) {
+      this.logger.warn(`${logMessage} ID previously used by user '${newEvent.from}'`, newEvent);
+      const errorMessage = 'Event validation failed: ID reused by other user';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    if (!textContentMatches) {
+      this.logger.warn(`Text content for link preview not matching`, newEvent);
+      const errorMessage = 'Event validation failed: ID of link preview reused';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    const mappedIsMessageAdd = newEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
+    const storedIsMessageAdd = originalEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
+    const isLegitMessageReplacement = newData.previews.length || newData.replacing_message_id;
+    const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
+    if (userReusedId) {
+      this.logger.warn(`${logMessage} ID previously used by same user`, event);
+      const errorMessage = 'Event validation failed: ID reused by same user';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
+    const identifiedUpdates = Object.assign({}, {primary_key: originalEvent.primary_key}, updates);
     return this.conversationService.update_event(identifiedUpdates);
   }
 
