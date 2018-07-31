@@ -657,8 +657,7 @@ z.event.EventRepository = class EventRepository {
     return findEventToReplacePromise.then(eventToReplace => {
       const hasLinkPreview = mappedData.previews && mappedData.previews.length;
       if (!eventToReplace && mappedData.replacing_message_id && !hasLinkPreview) {
-        const errorMessage = 'Event validation failed: edit event is missing original event';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+        this._throwValidationError('Edit event without original event');
       }
 
       const handleEvent = newEvent => {
@@ -681,13 +680,10 @@ z.event.EventRepository = class EventRepository {
 
   _handleEventReplacement(originalEvent, newEvent) {
     const newData = newEvent.data || {};
-    const logMessage = `Ignored '${newEvent.type}' (${newEvent.id}) in '${newEvent.conversation}' from '${
-      newEvent.from
-    }':'`;
     if (originalEvent.data.from !== newData.from) {
-      this.logger.warn(`${logMessage} ID previously used by user '${newEvent.from}'`, newEvent);
-      const errorMessage = 'Event validation failed: ID reused by other user';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      const logMessage = `ID previously used by user '${newEvent.from}'`;
+      const errorMessage = 'ID reused by other user';
+      this._throwValidationError(errorMessage, logMessage);
     }
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
@@ -704,20 +700,17 @@ z.event.EventRepository = class EventRepository {
   _handleLinkPreviewUpdate(originalEvent, newEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
-    const logMessage = `Ignored '${newEvent.type}' (${newEvent.id}) in '${newEvent.conversation}' from '${
-      newEvent.from
-    }':'`;
     if (originalEvent.from !== newEvent.from) {
-      this.logger.warn(`${logMessage} ID previously used by user '${newEvent.from}'`, newEvent);
-      const errorMessage = 'Event validation failed: ID reused by other user';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      const logMessage = `ID previously used by user '${newEvent.from}'`;
+      const errorMessage = 'ID reused by other user';
+      this._throwValidationError(errorMessage, logMessage);
     }
 
     const textContentMatches = !newData.previews.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      this.logger.warn(`Text content for link preview not matching`, newEvent);
-      const errorMessage = 'Event validation failed: ID of link preview reused';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      const errorMessage = 'ID of link preview reused';
+      const logMessage = 'Text content for link preview not matching';
+      this._throwValidationError(errorMessage, logMessage);
     }
 
     const mappedIsMessageAdd = newEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
@@ -725,9 +718,7 @@ z.event.EventRepository = class EventRepository {
     const isLegitMessageReplacement = newData.previews.length || newData.replacing_message_id;
     const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
     if (userReusedId) {
-      this.logger.warn(`${logMessage} ID previously used by same user`, event);
-      const errorMessage = 'Event validation failed: ID reused by same user';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      this._throwValidationError('ID reused by same user');
     }
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
@@ -748,16 +739,14 @@ z.event.EventRepository = class EventRepository {
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
     if (updatingLinkPreview) {
-      this.logger.warn(`ID of link preview reused`, newEvent);
-      const errorMessage = 'Event validation failed: ID of link preview reused';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      this._throwValidationError('ID of link preview reused');
     }
 
     const textContentMatches = !newData.previews.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      this.logger.warn(`Text content for link preview not matching`, newEvent);
-      const errorMessage = 'Event validation failed: ID of link preview reused';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      const logMessage = 'Text content for link preview not matching';
+      const errorMessage = 'ID of link preview reused';
+      this._throwValidationError(errorMessage, logMessage);
     }
 
     return Object.assign({}, newEvent, {
@@ -766,6 +755,13 @@ z.event.EventRepository = class EventRepository {
       time: originalEvent.time,
       version: originalEvent.version,
     });
+  }
+
+  _throwValidationError(errorMessage, logMessage) {
+    const baseLogMessage = `Ignored '${event.type}' (${event.id}) in '${event.conversation}' from '${event.from}':'`;
+    const baseErrorMessage = 'Event validation failed:';
+    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
+    throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
   }
 
   /**
