@@ -188,15 +188,13 @@ class SingleSignOn extends React.PureComponent {
           console.error('Checking for closed child window', this.ssoWindow);
           if (this.ssoWindow && this.ssoWindow.closed) {
             onChildWindowClose();
-            console.error('Aborted by user');
-            reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+            reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
           }
         }, 1000);
 
         onParentWindowClose = () => {
           this.ssoWindow.close();
-          console.error('Aborted by user');
-          reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+          reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
         };
         window.addEventListener('unload', onParentWindowClose);
       }
@@ -257,6 +255,9 @@ class SingleSignOn extends React.PureComponent {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             this.props.resetError();
             return this.props.history.push(ROUTE.CLIENTS);
+          }
+          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
+            return;
           }
           default: {
             throw error;

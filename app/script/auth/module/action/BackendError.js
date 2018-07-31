@@ -98,6 +98,7 @@ export default class BackendError extends Error {
     SSO_NOT_FOUND: 'not-found',
     SSO_SERVER_ERROR: 'server-error',
     SSO_UNSUPPORTED_SAML: 'server-error-unsupported-saml',
+    SSO_USER_CANCELLED_ERROR: 'user-cancelled-sso-error', // Synthetic error label
   };
 
   static get LABEL() {
