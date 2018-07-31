@@ -9,13 +9,5 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "es5",
-  "useTabs": false,
-  "overrides": [
-    {
-      "files": ["*.json", "app/script/localization/webapp.js", "app/script/localization/translations/*.js"],
-      "options": {
-        "printWidth": 200
-      }
-    }
-  ]
+  "useTabs": false
 }

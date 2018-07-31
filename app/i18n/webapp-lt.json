@@ -1,8 +1,7 @@
 {
   "footer.wireLink": "wire.com",
   "footer.copy": "© Wire Swiss GmbH",
-  "cookiePolicyStrings.bannerText":
-    "Naudojame slapukus suasmeninti patirtį mūsų svetainėje. Naršydami svetainę sutinkate su slapukų naudojimu.<br />Daugiau informacijos apie slapukus galite rasti <b>privatumo politikoje</b>.",
+  "cookiePolicyStrings.bannerText": "Naudojame slapukus suasmeninti patirtį mūsų svetainėje. Naršydami svetainę sutinkate su slapukų naudojimu.<br />Daugiau informacijos apie slapukus galite rasti <b>privatumo politikoje</b>.",
   "index.claim": "Saugus bendravimas visiems.",
   "index.createAccountForPersonalUse": "Asmeniniam naudojimui",
   "index.createAccountForOrganizations": "Organizacijoms",
@@ -48,16 +47,14 @@
   "acceptNewsModal.declineButton": "Ne, dėkui",
   "acceptNewsModal.confirmButton": "Priimti",
   "unsupported.headlineBrowser": "Naršyklė nepalaikoma.",
-  "unsupported.subheadBrowser":
-    "Atsisiųskite naujausią <b style=\"font-weight: 600\">„Google Chrome“, „Mozilla Firefox“, „Opera“</b style=\"font-weight: 600\"> arba <b style=\"font-weight: 600\">„Microsoft Edge“.</b>",
+  "unsupported.subheadBrowser": "Atsisiųskite naujausią <b style=\"font-weight: 600\">„Google Chrome“, „Mozilla Firefox“, „Opera“</b style=\"font-weight: 600\"> arba <b style=\"font-weight: 600\">„Microsoft Edge“.</b>",
   "unsupported.headlineCookies": "Aktyvuoti slapukus",
   "unsupported.subheadCookies": "Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.",
   "unsupported.headlineIndexedDb": "Esate privačiame režime",
   "unsupported.subheadIndexedDb": "Norint rodyti žinutes, Wire reikia prieigos prie jūsų vietinės saugyklos. Vietinė saugykla nėra prieinama privačioje veiksenoje.",
   "conversationJoin.unsupportedJoinHeadline": "Jus pakvietė<br />prisijungti prie <b style=\"color: black;\">„Wire“ svečių kambario.</b>",
   "conversationJoin.headline": "Jus pakvietė<br />prisijungti prie <b style=\"color: black;\">„Wire“ svečių kambario.</b>",
-  "conversationJoin.unsupportedJoinSubhead":
-    "<p>Naršyklė nepalaikoma.</p>Atsisiųskite naujausią <b style=\"font-weight: 600\">„Google Chrome“, „Mozilla Firefox“, „Opera“</b> arba <b style=\"font-weight: 600\">„Microsoft Edge“.</b>",
+  "conversationJoin.unsupportedJoinSubhead": "<p>Naršyklė nepalaikoma.</p>Atsisiųskite naujausią <b style=\"font-weight: 600\">„Google Chrome“, „Mozilla Firefox“, „Opera“</b> arba <b style=\"font-weight: 600\">„Microsoft Edge“.</b>",
   "conversationJoin.unsupportedJoinMobileSubhead": "Atverkite šią nuorodą kompiuteryje.",
   "conversationJoin.subhead": "Šifruoti grupiniai susirašinėjimai ir konferenciniai pokalbiai.<br />Paskyra nebūtina.",
   "conversationJoin.existentAccountHeadline": "{name}, jus pakvietė<br />prisijungti prie <b style=\"color: black;\">„Wire“ svečių kambario.</b>",
@@ -83,8 +80,7 @@
   "BackendError.LABEL.INVALID_CODE": "Įrašykite teisingą kodą",
   "BackendError.LABEL.INVALID_EMAIL": "Šis el. pašto adresas yra neteingas",
   "BackendError.LABEL.INVALID_PHONE": "Šis telefono numeris yra neteisingas",
-  "BackendError.LABEL.KEY_EXISTS":
-    "Šis el. pašto adresas jau užregistruotas. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Sužinokite daugiau</a>",
+  "BackendError.LABEL.KEY_EXISTS": "Šis el. pašto adresas jau užregistruotas. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Sužinokite daugiau</a>",
   "BackendError.LABEL.ALREADY_INVITED": "Šis el. paštas jau yra pakviestas",
   "BackendError.LABEL.PENDING_ACTIVATION": "Pateiktas el. pašto adresas jau pakviestas. Patikrinkite el. pašto dežutę",
   "BackendError.LABEL.PENDING_LOGIN": "BackendError.LABEL.PENDING_LOGIN",
@@ -104,8 +100,7 @@
   "BackendError.LABEL.NO_TEAM_MEMBER": "Nepavyko rasti komandos nario",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "Komanda pasiekė didžiausią narių skaičių",
   "BackendError.LABEL.SUSPENDED": "Šiai paskyrai nebeleidžiama prisijungti",
-  "BackendError.LABEL.EMAIL_EXISTS":
-    "Šis el. pašto adresas jau užregistruotas. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Sužinokite daugiau</a>",
+  "BackendError.LABEL.EMAIL_EXISTS": "Šis el. pašto adresas jau užregistruotas. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Sužinokite daugiau</a>",
   "BackendError.unexpected": "Netikėta klaida ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Įveskite bent 2 simbolių vardą",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Įveskite bent 2 simbolių vardą",

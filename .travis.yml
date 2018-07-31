@@ -118,8 +118,6 @@ deploy:
       branch: prod
 
 after_deploy:
-  - yarn global add @wireapp/travis-bot@latest
-  - wire-travis-bot "fa0daf62-d5dc-48d2-aa92-ad2e0adeff4c"
   - |
     if [ "${TRAVIS_BRANCH}" == "staging" ] && [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_EVENT_TYPE}" == "push" ]; then
       yarn global add @wireapp/changelog-bot@latest
