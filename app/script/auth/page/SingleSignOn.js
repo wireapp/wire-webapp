@@ -87,8 +87,6 @@ class SingleSignOn extends React.PureComponent {
     }
   };
 
-  componentWillReceiveProps = nextProps => {};
-
   componentWillUnmount = () => {
     this.props.resetError();
   };
@@ -114,6 +112,7 @@ class SingleSignOn extends React.PureComponent {
   handleSSOWindow = code => {
     const POPUP_HEIGHT = 520;
     const POPUP_WIDTH = 480;
+    const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
 
     return new Promise((resolve, reject) => {
       let timerId = undefined;
@@ -135,9 +134,7 @@ class SingleSignOn extends React.PureComponent {
           return reject(
             new BackendError({
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${
-                BACKEND.rest
-              }"`,
+              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${BACKEND.rest}"`,
             })
           );
         }
@@ -199,7 +196,7 @@ class SingleSignOn extends React.PureComponent {
             onChildWindowClose();
             reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
           }
-        }, 1000);
+        }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
 
         onParentWindowClose = () => {
           this.ssoWindow.close();
@@ -238,11 +235,10 @@ class SingleSignOn extends React.PureComponent {
         }
       })
       .then(() => this.handleSSOWindow(this.stripPrefix(this.state.code)))
-      .then(() =>
-        this.props.doFinalizeSSOLogin({
-          clientType: this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
-        })
-      )
+      .then(() => {
+        const clientType = this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+        return this.props.doFinalizeSSOLogin({clientType});
+      })
       .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
@@ -304,17 +300,16 @@ class SingleSignOn extends React.PureComponent {
     }
   };
 
-  readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
+  readFromClipboard = () => navigator.clipboard.readText();
 
   containsSSOCode = text => text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
   isSSOCode = text => text && new RegExp(`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
 
   extractCode = text => {
-    if (this.containsSSOCode(text)) {
-      return text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0];
-    }
-    return '';
+    return this.containsSSOCode(text)
+      ? text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
+      : '';
   };
 
   stripPrefix = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');

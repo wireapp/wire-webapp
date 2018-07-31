@@ -28,15 +28,20 @@ export const PRODUCTION = 'PRODUCTION';
 export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 export function getEnvironmentFromQuery() {
-  const isProductionHost = window.location.hostname.endsWith('wire.com');
-  const isLocalHost = isLocalhost();
   switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
-    case 'staging':
+    case 'staging': {
       return STAGING;
-    case 'prod':
+    }
+    case 'prod': {
       return PRODUCTION;
-    default:
-      return isProductionHost ? PRODUCTION : isLocalHost ? LOCAL : STAGING;
+    }
+    default: {
+      const isProductionHost = window.location.hostname.endsWith('wire.com');
+      if (isProductionHost) {
+        return PRODUCTION;
+      }
+      return isLocalhost() ? LOCAL : STAGING;
+    }
   }
 }
 

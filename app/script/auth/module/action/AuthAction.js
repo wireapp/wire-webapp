@@ -93,20 +93,18 @@ export function doFinalizeSSOLogin({clientType}) {
 
 export function validateSSOCode(code) {
   return function(dispatch, getState, {apiClient}) {
-    return apiClient.auth.api.headInitiateLogin(code).catch(error => {
-      let mappedError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
-      if (error && error.response) {
-        switch (error.response.status) {
-          case 404: {
-            mappedError = new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
-            break;
-          }
-          case 500: {
-            mappedError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
-            break;
-          }
-        }
+    const mapError = error => {
+      const statusCode = error && error.response && error.response.status;
+      if (statusCode === 404) {
+        return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
       }
+      if (statusCode >= 500) {
+        return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+      }
+      return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+    };
+    return apiClient.auth.api.headInitiateLogin(code).catch(error => {
+      const mappedError = mapError(error);
       dispatch(AuthActionCreator.failedLogin(mappedError));
       throw mappedError;
     });
