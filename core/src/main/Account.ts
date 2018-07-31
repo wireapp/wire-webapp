@@ -65,8 +65,10 @@ class Account extends EventEmitter {
     CLIENT_ACTION: 'Account.INCOMING.CLIENT_ACTION',
     CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
     CONNECTION: 'Account.INCOMING.CONNECTION',
+    CONVERSATION_RENAME: 'Account.INCOMING.CONVERSATION_RENAME',
     DELETED: 'Account.INCOMING.DELETED',
     HIDDEN: 'Account.INCOMING.HIDDEN',
+    MEMBER_JOIN: 'Account.INCOMING.MEMBER_JOIN',
     MESSAGE_TIMER_UPDATE: 'Account.INCOMING.MESSAGE_TIMER_UPDATE',
     PING: 'Account.INCOMING.PING',
     REACTION: 'Account.INCOMING.REACTION',
@@ -372,7 +374,12 @@ class Account extends EventEmitter {
   private async handleEvent(event: IncomingEvent): Promise<PayloadBundleIncoming | IncomingEvent | void> {
     this.logger.log('handleEvent', event.type);
     const ENCRYPTED_EVENTS = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
-    const META_EVENTS = [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE, CONVERSATION_EVENT.TYPING];
+    const META_EVENTS = [
+      CONVERSATION_EVENT.MEMBER_JOIN,
+      CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
+      CONVERSATION_EVENT.RENAME,
+      CONVERSATION_EVENT.TYPING,
+    ];
     const USER_EVENTS = [USER_EVENT.CONNECTION];
 
     if (ENCRYPTED_EVENTS.includes(event.type as CONVERSATION_EVENT)) {
@@ -429,6 +436,12 @@ class Account extends EventEmitter {
             this.emit(Account.INCOMING.MESSAGE_TIMER_UPDATE, event);
             break;
           }
+          case CONVERSATION_EVENT.MEMBER_JOIN:
+            this.emit(Account.INCOMING.MEMBER_JOIN, event);
+            break;
+          case CONVERSATION_EVENT.RENAME:
+            this.emit(Account.INCOMING.CONVERSATION_RENAME, event);
+            break;
           case CONVERSATION_EVENT.TYPING: {
             this.emit(Account.INCOMING.TYPING, event);
             break;
