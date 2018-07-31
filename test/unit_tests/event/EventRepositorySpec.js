@@ -577,6 +577,34 @@ describe('Event Repository', () => {
           done();
         });
     });
+
+    it('updates edited messages', done => {
+      const originalMessage = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(originalMessage)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.callFake(updates => updates);
+
+      const initial_time = event.time;
+      const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
+      originalMessage.primary_key = 12;
+      event.id = z.util.createRandomUuid();
+      event.data.content = 'new content';
+      event.data.replacing_message_id = originalMessage.id;
+      event.time = changed_time;
+
+      TestFactory.event_repository
+        ._handleEventSaving(event)
+        .then(updatedEvent => {
+          expect(updatedEvent.time).toEqual(initial_time);
+          expect(updatedEvent.time).not.toEqual(changed_time);
+          expect(updatedEvent.data.content).toEqual('new content');
+          expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+          done();
+        })
+        .catch(done.fail);
+    });
   });
 
   describe('_handleEventValidation', () => {
