@@ -29,8 +29,6 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     this.timeOffset = this.conversationRepository.timeOffset;
     this.logger = new z.util.Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
 
-    this.selfUser = this.conversationRepository.selfUser;
-
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENTS_UPDATED, this.onClientsUpdated.bind(this));
@@ -184,7 +182,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       .filtered_conversations()
       .map(conversationEntity => {
         if (!conversationEntity.removed_from_conversation()) {
-          const userIdsInConversation = conversationEntity.participating_user_ids().concat(this.selfUser().id);
+          const selfUserId = this.conversationRepository.selfUser().id;
+          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
           const matchingUserIds = _.intersection(userIdsInConversation, userIds);
 
           if (!!matchingUserIds.length) {
