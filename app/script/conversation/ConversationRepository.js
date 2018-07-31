@@ -2170,15 +2170,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return mappedEvent;
       })
       .then(mappedEvent => {
-        const injectEventPromise = this.eventRepository.injectEvent(mappedEvent);
-        const messageSentPromise = this.send_generic_message_to_conversation(conversation_et.id, generic_message);
+        const injectThenSend = this.eventRepository.injectEvent(mappedEvent).then(injectedEvent => {
+          return this.send_generic_message_to_conversation(conversation_et.id, generic_message).then(sentPayload => {
+            return {
+              event: injectedEvent,
+              sentPayload,
+            };
+          });
+        });
 
         /**
          * We will, in parallel, inject events to the repo (where they will be processed and saved in DB)
          * and send the actual message to the backend.
          * When both those actions are done, we can update our local event and say that is has been sent.
          */
-        return Promise.all([injectEventPromise, messageSentPromise]).then(([event, sentPayload]) => {
+        return injectThenSend.then(({event, sentPayload}) => {
           this._trackContributed(conversation_et, generic_message);
 
           const backend_iso_date = sync_timestamp ? sentPayload.time : '';
