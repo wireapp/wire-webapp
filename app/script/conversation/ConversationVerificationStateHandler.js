@@ -183,10 +183,10 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       .map(conversationEntity => {
         if (!conversationEntity.removed_from_conversation()) {
           const userIdsInConversation = conversationEntity.participating_user_ids().concat(conversationEntity.self.id);
-          userIds = _.intersection(userIdsInConversation, userIds);
+          const matchingUserIds = _.intersection(userIdsInConversation, userIds);
 
-          if (!!userIds.length) {
-            return {conversationEntity, userIds};
+          if (!!matchingUserIds.length) {
+            return {conversationEntity, userIds: matchingUserIds};
           }
         }
       })
@@ -208,8 +208,9 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     }
 
     // Explicit Boolean check to prevent state changes on undefined
-    const isVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
-    if (isVerified && conversationEntity.is_verified() === false) {
+    const isStateVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
+    const isConversationUnverified = conversationEntity.is_verified() === false;
+    if (isStateVerified && isConversationUnverified) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
       this.logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
       return true;
@@ -227,13 +228,14 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   _willChangeToVerified(conversationEntity) {
     const state = conversationEntity.verification_state();
-    const isVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
-    if (isVerified) {
+    const isStateVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
+    if (isStateVerified) {
       return false;
     }
 
     // Explicit Boolean check to prevent state changes on undefined
-    if (conversationEntity.is_verified() === true) {
+    const isConversationVerified = conversationEntity.is_verified() === true;
+    if (isConversationVerified) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
       this.logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
       return true;
