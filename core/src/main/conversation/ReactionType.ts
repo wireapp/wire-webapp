@@ -17,12 +17,9 @@
  *
  */
 
-export * from './AssetContent';
-export * from './ClientActionContent';
-export * from './ConfirmationContent';
-export * from './DeletedContent';
-export * from './EditedTextContent';
-export * from './HiddenContent';
-export * from './ImageContent';
-export * from './ReactionContent';
-export * from './TextContent';
+enum ReactionType {
+  LIKE = '❤️',
+  NONE = '',
+}
+
+export {ReactionType};

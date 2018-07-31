@@ -38,7 +38,7 @@ import * as Long from 'long';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
 import {ConnectionService} from './connection/root';
-import {AssetContent, DeletedContent, HiddenContent, TextContent} from './conversation/content/';
+import {AssetContent, DeletedContent, HiddenContent, ReactionContent, TextContent} from './conversation/content/';
 import {
   AssetService,
   ConversationService,
@@ -69,6 +69,7 @@ class Account extends EventEmitter {
     HIDDEN: 'Account.INCOMING.HIDDEN',
     MESSAGE_TIMER_UPDATE: 'Account.INCOMING.MESSAGE_TIMER_UPDATE',
     PING: 'Account.INCOMING.PING',
+    REACTION: 'Account.INCOMING.REACTION',
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
     TYPING: 'Account.INCOMING.TYPING',
   };
@@ -337,6 +338,22 @@ class Account extends EventEmitter {
           type: genericMessage.content,
         };
       }
+      case GenericMessageType.REACTION: {
+        const content: ReactionContent = {
+          originalMessageId: genericMessage.reaction.messageId,
+          type: genericMessage.reaction.emoji,
+        };
+        return {
+          content,
+          conversation: event.conversation,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: genericMessage.content,
+        };
+      }
       default: {
         this.logger.warn(`Unhandled event type "${genericMessage.content}": ${JSON.stringify(genericMessage)}`);
         return {
@@ -392,6 +409,9 @@ class Account extends EventEmitter {
             break;
           case GenericMessageType.KNOCK:
             this.emit(Account.INCOMING.PING, data);
+            break;
+          case GenericMessageType.REACTION:
+            this.emit(Account.INCOMING.REACTION, data);
             break;
           case GenericMessageType.TEXT:
             this.emit(Account.INCOMING.TEXT_MESSAGE, data);

@@ -37,6 +37,7 @@ import {
   PayloadBundleOutgoing,
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
+  ReactionType,
 } from '../conversation/root';
 
 import {
@@ -49,6 +50,7 @@ import {
   MessageDelete,
   MessageEdit,
   MessageHide,
+  Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
 import {
@@ -57,6 +59,7 @@ import {
   EditedTextContent,
   ImageAssetContent,
   ImageContent,
+  ReactionContent,
   RemoteData,
   TextContent,
 } from '../conversation/content/';
@@ -298,6 +301,32 @@ export default class ConversationService {
     };
   }
 
+  private async sendReaction(
+    conversationId: string,
+    payloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
+    const reactionContent = payloadBundle.content as ReactionContent;
+
+    const reaction = Reaction.create({
+      emoji: reactionContent.type,
+      messageId: reactionContent.originalMessageId,
+    });
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.REACTION]: reaction,
+      messageId: payloadBundle.id,
+    });
+
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
+
+    return {
+      ...payloadBundle,
+      conversation: conversationId,
+      messageTimer: 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
+  }
+
   private async sendSessionReset(
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
@@ -418,6 +447,23 @@ export default class ConversationService {
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
       type: GenericMessageType.ASSET,
+    };
+  }
+
+  public createReaction(
+    originalMessageId: string,
+    type: ReactionType,
+    messageId: string = ConversationService.createId()
+  ): PayloadBundleOutgoingUnsent {
+    const content: ReactionContent = {originalMessageId, type};
+
+    return {
+      content,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
+      type: GenericMessageType.REACTION,
     };
   }
 
@@ -618,6 +664,8 @@ export default class ConversationService {
         return this.sendEditedText(conversationId, payloadBundle);
       case GenericMessageType.KNOCK:
         return this.sendPing(conversationId, payloadBundle);
+      case GenericMessageType.REACTION:
+        return this.sendReaction(conversationId, payloadBundle);
       case GenericMessageType.TEXT:
         return this.sendText(conversationId, payloadBundle);
       default:

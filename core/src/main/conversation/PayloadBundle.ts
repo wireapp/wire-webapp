@@ -28,6 +28,7 @@ import {
   HiddenContent,
   ImageAssetContent,
   ImageContent,
+  ReactionContent,
   TextContent,
 } from '../conversation/content/';
 
@@ -60,6 +61,7 @@ interface PayloadBundle {
     | HiddenContent
     | ImageAssetContent
     | ImageContent
+    | ReactionContent
     | TextContent;
   from: string;
   id: string;
