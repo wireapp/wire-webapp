@@ -30,7 +30,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 256,
+        MAX_SIZE: 300,
       },
     };
   }
