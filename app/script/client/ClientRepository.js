@@ -503,11 +503,7 @@ z.client.ClientRepository = class ClientRepository {
   getClientsByUserId(userId) {
     return this.clientService
       .getClientsByUserId(userId)
-      .then(clients => this._updateClientsForUser(userId, clients))
-      .then(clientEntities => {
-        amplify.publish(z.event.WebApp.CLIENT.UPDATE, userId, clientEntities);
-        return clientEntities;
-      });
+      .then(clientsData => this._updateClientsByUserId(userId, clientsData));
   }
 
   getClientByUserIdFromDb(requestedUserId) {
@@ -520,14 +516,13 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   /**
-   * Retrieves meta information about all other clients of the self user.
-   * @returns {Promise} Resolves with all clients except the current one.
+   * Retrieves meta information about all other locally known clients of the self user.
+   * @returns {Promise} Resolves with all locally known clients except the current one
    */
   getClientsForSelf() {
-    this.logger.info(`Retrieving all clients for the self user '${this.selfUser().id}'`);
-    return this.clientService
-      .getClients()
-      .then(response => this._updateClientsForUser(this.selfUser().id, response))
+    this.logger.info(`Retrieving all clients of the self user from database`);
+    return this.getClientByUserIdFromDb(this.selfUser().id)
+      .then(clientsData => this.clientMapper.mapClients(clientsData, true))
       .then(clientEntities => {
         clientEntities.forEach(clientEntity => this.selfUser().add_client(clientEntity));
         return this.selfUser().devices();
@@ -546,21 +541,46 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   /**
+   * Update clients of the self user.
+   * @returns {Promise} Resolves when the clients have been updated
+   */
+  updateClientsForSelf() {
+    return this.clientService
+      .getClients()
+      .then(clientsData => this._updateClientsByUserId(this.selfUser().id, clientsData));
+  }
+
+  /**
+   * Update clients of a user with the given backend data.
+   *
+   * @private
+   * @param {string} userId - ID of user whose clients are updated
+   * @param {Object} clientsData - Clients data from backend
+   * @returns {Promise} Resolves when the clients have been updated
+   */
+  _updateClientsByUserId(userId, clientsData) {
+    return this._updateClientsForUser(userId, clientsData).then(clientEntities => {
+      amplify.publish(z.event.WebApp.CLIENT.UPDATE, userId, clientEntities);
+      return clientEntities;
+    });
+  }
+
+  /**
    * Match backend client response with locally stored ones.
    * @note This function matches clients retrieved from the backend with the data stored in the local database.
    *   Clients will then be updated with the backend payload in the database and mapped into entities.
    *
    * @private
    * @param {string} userId - ID of user to update clients for
-   * @param {Object} clients - Payload from the backend
+   * @param {Object} clientsData - Payload from the backend
    * @returns {Promise<Array<z.client.Client>>} Resolves with the client entities
    */
-  _updateClientsForUser(userId, clients) {
+  _updateClientsForUser(userId, clientsData) {
     const clientsFromBackend = {};
     const clientsStoredInDb = [];
     const isSelfUser = userId === this.selfUser().id;
 
-    for (const client of clients) {
+    for (const client of clientsData) {
       clientsFromBackend[client.id] = client;
     }
 
