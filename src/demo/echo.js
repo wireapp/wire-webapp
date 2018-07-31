@@ -19,11 +19,12 @@ logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
 const {APIClient} = require('@wireapp/api-client');
-const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const fs = require('fs');
 const {promisify} = require('util');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
-const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
+const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/');
+const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
 
 (async () => {
   const login = {
@@ -90,6 +91,14 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   });
 
+  account.on(Account.INCOMING.REACTION, async data => {
+    const {conversation: conversationId, from, content} = data;
+    logger.log(`Reaction in "${conversationId}" from "${from}": "${content.emoji}".`);
+
+    const reactionPayload = account.service.conversation.createReaction(content.originalMessageId, content.emoji);
+    await account.service.conversation.send(conversationId, reactionPayload);
+  });
+
   account.on(Account.INCOMING.TYPING, async data => {
     const {
       conversation: conversationId,
@@ -99,7 +108,7 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
 
     logger.log(`Typing in "${conversationId}" from "${from}".`, data);
 
-    if (status === 'started') {
+    if (status === CONVERSATION_TYPING.STARTED) {
       await account.service.conversation.sendTypingStart(conversationId);
     } else {
       await account.service.conversation.sendTypingStop(conversationId);

@@ -30,6 +30,7 @@ import {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
 } from './PayloadBundle';
+import {ReactionType} from './ReactionType';
 
 export {
   AssetService,
@@ -43,4 +44,5 @@ export {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
   MessageTimer,
+  ReactionType,
 };
