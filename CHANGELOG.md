@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.16.0"></a>
+# [3.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.15.8...@wireapp/core@3.16.0) (2018-07-31)
+
+
+### Features
+
+* **core:** Send and receive reactions ([#909](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/909)) ([a1e51f6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/a1e51f6))
+
+
+
+
 <a name="3.15.8"></a>
 ## [3.15.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.15.7...@wireapp/core@3.15.8) (2018-07-31)
 
