@@ -17,8 +17,8 @@
  *
  */
 
-const logdown = require('logdown');
 import {AxiosResponse} from 'axios';
+import * as logdown from 'logdown';
 import {AssetAPI} from './asset/';
 import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData} from './auth';
 import {AccessTokenStore} from './auth/';
@@ -41,7 +41,7 @@ import {UserAPI} from './user/';
 const {version}: {version: string} = require('../../package.json');
 
 class APIClient {
-  private readonly logger: any = logdown('@wireapp/api-client/Client', {
+  private readonly logger = logdown('@wireapp/api-client/Client', {
     logger: console,
     markdown: false,
   });
