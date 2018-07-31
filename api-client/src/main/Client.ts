@@ -46,7 +46,7 @@ class APIClient {
     markdown: false,
   });
 
-  private readonly STORE_NAME_PREFIX: string = 'wire';
+  private readonly STORE_NAME_PREFIX = 'wire';
   // APIs
   public asset: {api: AssetAPI};
   public auth: {api: AuthAPI};
