@@ -659,7 +659,7 @@ z.event.EventRepository = class EventRepository {
       const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
       if (isReplacementWithoutOriginal && !hasLinkPreview) {
         // the only valid case of a replacement with no original message is when an edited message gets a link preview
-        this._throwValidationError('Edit event without original event');
+        this._throwValidationError(event, 'Edit event without original event');
       }
 
       const handleEvent = newEvent => {
@@ -685,14 +685,14 @@ z.event.EventRepository = class EventRepository {
     if (originalEvent.data.from !== newData.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
-      this._throwValidationError(errorMessage, logMessage);
+      this._throwValidationError(newEvent, errorMessage, logMessage);
     }
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
     let updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
 
-    if (!isLinkPreviewEdit) {
+    if (isLinkPreviewEdit) {
       updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
@@ -705,14 +705,14 @@ z.event.EventRepository = class EventRepository {
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
-      this._throwValidationError(errorMessage, logMessage);
+      this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     const textContentMatches = !newData.previews.length || newData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
-      this._throwValidationError(errorMessage, logMessage);
+      this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     const mappedIsMessageAdd = newEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
@@ -720,7 +720,7 @@ z.event.EventRepository = class EventRepository {
     const isLegitMessageReplacement = newData.previews.length || newData.replacing_message_id;
     const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
     if (userReusedId) {
-      this._throwValidationError('ID reused by same user');
+      this._throwValidationError(newEvent, 'ID reused by same user');
     }
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
@@ -741,14 +741,14 @@ z.event.EventRepository = class EventRepository {
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
     if (updatingLinkPreview) {
-      this._throwValidationError('ID of link preview reused');
+      this._throwValidationError(newEvent, 'ID of link preview reused');
     }
 
     const textContentMatches = !newData.previews.length || newData.content === originalData.content;
     if (!textContentMatches) {
       const logMessage = 'Text content for link preview not matching';
       const errorMessage = 'ID of link preview reused';
-      this._throwValidationError(errorMessage, logMessage);
+      this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     return Object.assign({}, newEvent, {
@@ -759,7 +759,7 @@ z.event.EventRepository = class EventRepository {
     });
   }
 
-  _throwValidationError(errorMessage, logMessage) {
+  _throwValidationError(event, errorMessage, logMessage) {
     const baseLogMessage = `Ignored '${event.type}' (${event.id}) in '${event.conversation}' from '${event.from}':'`;
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);

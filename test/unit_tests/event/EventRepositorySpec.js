@@ -578,7 +578,7 @@ describe('Event Repository', () => {
         });
     });
 
-    it('updates link preview on edited messages', done => {
+    it('updates edited messages when link preview arrives', done => {
       const replacingId = 'old-replaced-message-id';
       const storedEvent = Object.assign({}, event, {
         data: Object.assign({}, event.data, {
@@ -588,7 +588,7 @@ describe('Event Repository', () => {
       const linkPreviewEvent = Object.assign({}, event);
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.callFake(
         (conversationId, messageId) => {
-          return messageId === 'initial_message_id' ? Promise.resolve() : Promise.resolve(storedEvent);
+          return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
         }
       );
       spyOn(TestFactory.event_repository.conversationService, 'update_event').and.callFake(ev => ev);
@@ -630,6 +630,32 @@ describe('Event Repository', () => {
           expect(updatedEvent.data.content).toEqual('new content');
           expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
           expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('updates link preview when edited', done => {
+      const replacingId = 'replaced-message-id';
+      const storedEvent = Object.assign({}, event, {
+        data: Object.assign({}, event.data, {
+          previews: ['preview'],
+        }),
+      });
+      const editEvent = Object.assign({}, event);
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(storedEvent)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.callFake(ev => ev);
+
+      editEvent.data.replacing_message_id = replacingId;
+
+      TestFactory.event_repository
+        ._handleEventSaving(editEvent)
+        .then(updatedEvent => {
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+          expect(updatedEvent.data.previews.length).toEqual(0);
           done();
         })
         .catch(done.fail);
