@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-  <a name="1.10.6"></a>
+      <a name="1.11.0"></a>
+# [1.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.6...@wireapp/react-ui-kit@1.11.0) (2018-07-31)
+
+
+### Features
+
+* **react-ui-kit:** Add Platform specific icons ([#900](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/900)) ([0651bd5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0651bd5))
+
+
+
+
+      <a name="1.10.6"></a>
 ## [1.10.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.5...@wireapp/react-ui-kit@1.10.6) (2018-07-30)
 
 
@@ -11,7 +22,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
 
-  <a name="1.10.5"></a>
+<a name="1.10.5"></a>
 ## [1.10.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.4...@wireapp/react-ui-kit@1.10.5) (2018-07-30)
 
 
