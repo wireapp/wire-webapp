@@ -236,11 +236,10 @@ class SingleSignOn extends React.PureComponent {
         }
       })
       .then(() => this.handleSSOWindow(this.stripPrefix(this.state.code)))
-      .then(() =>
-        this.props.doFinalizeSSOLogin({
-          clientType: this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
-        })
-      )
+      .then(() => {
+        const clientType = this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+        return this.props.doFinalizeSSOLogin({clientType});
+      })
       .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
@@ -309,10 +308,9 @@ class SingleSignOn extends React.PureComponent {
   isSSOCode = text => text && new RegExp(`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
 
   extractCode = text => {
-    if (this.containsSSOCode(text)) {
-      return text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0];
-    }
-    return '';
+    return this.containsSSOCode(text)
+      ? text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
+      : '';
   };
 
   stripPrefix = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');
