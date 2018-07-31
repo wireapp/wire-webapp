@@ -207,6 +207,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       return false;
     }
 
+    // Explicit Boolean check to prevent state changes on undefined
     const isVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
     if (isVerified && conversationEntity.is_verified() === false) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
@@ -231,6 +232,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       return false;
     }
 
+    // Explicit Boolean check to prevent state changes on undefined
     if (conversationEntity.is_verified() === true) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
       this.logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
