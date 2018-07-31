@@ -132,12 +132,14 @@ class SingleSignOn extends React.PureComponent {
         if (!isExpectedOrigin) {
           onChildWindowClose();
           this.ssoWindow.close();
-          console.error(
-            `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${
-              BACKEND.rest
-            }"`
+          return reject(
+            new BackendError({
+              label: BackendError.LABEL.SSO_GENERIC_ERROR,
+              message: `Received event "${JSON.stringify(event)}" with origin "${event.origin}" doesn't match origin "${
+                BACKEND.rest
+              }"`,
+            })
           );
-          return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
         }
 
         const eventType = event.data && event.data.type;
@@ -150,14 +152,22 @@ class SingleSignOn extends React.PureComponent {
           case 'AUTH_ERROR': {
             onChildWindowClose();
             this.ssoWindow.close();
-            console.error(`Authentication error: "${JSON.stringify(event.data.payload)}"`);
-            return reject(new BackendError({label: event.data.payload.label}));
+            return reject(
+              new BackendError({
+                label: event.data.payload.label,
+                message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
+              })
+            );
           }
           default: {
             onChildWindowClose();
             this.ssoWindow.close();
-            console.error(`Unmatched event type: "${JSON.stringify(event)}"`);
-            return reject(new BackendError({label: BackendError.LABEL.SSO_GENERIC_ERROR}));
+            return reject(
+              new BackendError({
+                label: BackendError.LABEL.SSO_GENERIC_ERROR,
+                message: `Unmatched event type: "${JSON.stringify(event)}"`,
+              })
+            );
           }
         }
       };
@@ -185,7 +195,6 @@ class SingleSignOn extends React.PureComponent {
 
       if (this.ssoWindow) {
         timerId = window.setInterval(() => {
-          console.error('Checking for closed child window', this.ssoWindow);
           if (this.ssoWindow && this.ssoWindow.closed) {
             onChildWindowClose();
             reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
