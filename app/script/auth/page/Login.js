@@ -344,7 +344,7 @@ class Login extends React.PureComponent {
                     )}
                   </Form>
                 </div>
-                {Environment.isInternalEnvironment() ? (
+                {Environment.isInternalEnvironment() && !isDesktopApp() ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
