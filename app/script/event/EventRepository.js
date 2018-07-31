@@ -651,8 +651,8 @@ z.event.EventRepository = class EventRepository {
 
     //first check if a message that should be replaced exists in DB
     const findEventToReplacePromise = mappedData.replacing_message_id
-      ? this.conversationService.load_event_from_db(mappedData.replacing_message_id)
-      : Promise.resolve(undefined);
+      ? this.conversationService.load_event_from_db(conversationId, mappedData.replacing_message_id)
+      : Promise.resolve();
 
     return findEventToReplacePromise.then(eventToReplace => {
       const hasLinkPreview = mappedData.previews && mappedData.previews.length;
