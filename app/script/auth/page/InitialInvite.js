@@ -32,6 +32,7 @@ import {
   Input,
   RoundIconButton,
   Form,
+  Muted,
   ButtonLink,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
@@ -110,7 +111,7 @@ class InitialInvite extends React.PureComponent {
         >
           <div>
             <H1 center>{_(inviteStrings.headline)}</H1>
-            <Text>{_(inviteStrings.subhead)}</Text>
+            <Muted>{_(inviteStrings.subhead)}</Muted>
           </div>
           <div style={{margin: '18px 0', minHeight: 220}}>
             {invites.map(({email}) => this.renderEmail(email))}

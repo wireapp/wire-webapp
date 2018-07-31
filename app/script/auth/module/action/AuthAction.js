@@ -69,6 +69,48 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
+export function doFinalizeSSOLogin({clientType}) {
+  return function(dispatch, getState, {apiClient, core}) {
+    dispatch(AuthActionCreator.startLogin());
+    return Promise.resolve()
+      .then(() => apiClient.init(clientType))
+      .then(() => core.init())
+      .then(() => persistAuthData(clientType, core, dispatch))
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
+      .then(() => dispatch(AuthActionCreator.successfulLogin()))
+      .catch(error => {
+        if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+          dispatch(AuthActionCreator.successfulLogin());
+        } else {
+          dispatch(AuthActionCreator.failedLogin(error));
+        }
+        throw error;
+      });
+  };
+}
+
+export function validateSSOCode(code) {
+  return function(dispatch, getState, {apiClient}) {
+    const mapError = error => {
+      const statusCode = error && error.response && error.response.status;
+      if (statusCode === 404) {
+        return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+      }
+      if (statusCode >= 500) {
+        return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+      }
+      return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+    };
+    return apiClient.auth.api.headInitiateLogin(code).catch(error => {
+      const mappedError = mapError(error);
+      dispatch(AuthActionCreator.failedLogin(mappedError));
+      throw mappedError;
+    });
+  };
+}
+
 function persistAuthData(clientType, core, dispatch) {
   const persist = clientType === ClientType.PERMANENT;
   const accessToken = core.apiClient.accessTokenStore.accessToken;

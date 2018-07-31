@@ -23,6 +23,7 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 import React from 'react';
 
 export function parseError(error) {
+  console.error('Unexpected error: ', error, JSON.stringify(error));
   if (error) {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
       return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
@@ -32,6 +33,7 @@ export function parseError(error) {
 }
 
 export function parseValidationErrors(errors) {
+  console.error('Unexpected validation errors: ', errors, JSON.stringify(errors));
   const errorMessages = [].concat(errors || []);
   return errorMessages.map(error => (
     <ErrorMessage data-uie-name="error-message" key={error.label}>

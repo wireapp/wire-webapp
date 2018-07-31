@@ -63,6 +63,7 @@ const ROUTE = {
   INVITE: '/invite',
   LOGIN: '/login',
   PERSONAL_INVITE: '/personalinvite',
+  SSO: '/sso',
   VERIFY: '/verify',
 };
 

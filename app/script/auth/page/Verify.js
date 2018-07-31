@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Text, Link, ContainerXS, CodeInput, ErrorMessage} from '@wireapp/react-ui-kit';
+import {H1, Muted, Link, ContainerXS, CodeInput, ErrorMessage} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
@@ -74,9 +74,9 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
       >
         <div>
           <H1 center>{_(verifyStrings.headline)}</H1>
-          <Text data-uie-name="label-with-email">
+          <Muted data-uie-name="label-with-email">
             <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
-          </Text>
+          </Muted>
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
           <ErrorMessage data-uie-name="error-message">{parseError(authError)}</ErrorMessage>
         </div>
