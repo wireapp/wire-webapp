@@ -370,7 +370,7 @@ class Account extends EventEmitter {
   }
 
   private async handleEvent(event: IncomingEvent): Promise<PayloadBundleIncoming | IncomingEvent | void> {
-    this.logger.info('handleEvent', event.type);
+    this.logger.log('handleEvent', event.type);
     const ENCRYPTED_EVENTS = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
     const META_EVENTS = [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE, CONVERSATION_EVENT.TYPING];
     const USER_EVENTS = [USER_EVENT.CONNECTION];
