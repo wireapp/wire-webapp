@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.10.4"></a>
+## [1.10.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.10.3...@wireapp/api-client@1.10.4) (2018-07-31)
+
+
+### Bug Fixes
+
+* **api-client:** Always store the cookie ([#901](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/901)) ([fca88c4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/fca88c4))
+
+
+
+
 <a name="1.10.3"></a>
 ## [1.10.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.10.2...@wireapp/api-client@1.10.3) (2018-07-31)
 
