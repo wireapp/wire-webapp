@@ -313,7 +313,7 @@ class Account extends EventEmitter {
         };
         return {
           content,
-          conversation: event.from,
+          conversation: event.conversation,
           from: event.from,
           id: genericMessage.messageId,
           messageTimer: 0,
@@ -331,7 +331,7 @@ class Account extends EventEmitter {
         };
         return {
           content,
-          conversation: event.from,
+          conversation: event.conversation,
           from: event.from,
           id: genericMessage.messageId,
           messageTimer: 0,
