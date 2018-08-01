@@ -30,7 +30,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 256,
+        MAX_SIZE: 300,
       },
     };
   }
@@ -552,7 +552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Array of message entities
    */
   searchInConversation(conversationEntity, query) {
-    if (!query.length) {
+    if (!conversationEntity || !query.length) {
       return Promise.resolve({});
     }
 

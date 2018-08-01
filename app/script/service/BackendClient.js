@@ -364,13 +364,14 @@ z.service.BackendClient = class BackendClient {
 
             default: {
               if (!BackendClient.IGNORED_BACKEND_ERRORS.includes(status_code)) {
-                const request_id = wire_request ? wire_request.request_id : undefined;
-                const custom_data = {
+                const requestId = wire_request ? wire_request.request_id : undefined;
+                const customData = {
                   endpoint: config.url,
-                  request_id: request_id,
+                  method: config.type,
+                  requestId: requestId,
                 };
 
-                Raygun.send(new Error(`Server request failed: ${status_code}`), custom_data);
+                Raygun.send(new Error(`Server request failed: ${status_code}`), customData);
               }
             }
           }

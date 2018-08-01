@@ -542,38 +542,38 @@
   version "3.0.64"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.64.tgz#6ee9c33d57a26b44db1d0a1ded11d53f2fe2a800"
 
-"@wireapp/core@3.15.7":
-  version "3.15.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.15.7.tgz#0c7a95e58f4cb2a4ac41d49f82f428c76060b5ec"
+"@wireapp/core@3.16.1":
+  version "3.16.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.16.1.tgz#4bbb5c3d5660338185b1c742425bd16137e1f855"
   dependencies:
     "@types/node" "10.5.4"
     "@wireapp/api-client" "1.10.3"
-    "@wireapp/cryptobox" "8.6.9"
+    "@wireapp/cryptobox" "8.6.10"
     "@wireapp/protocol-messaging" "1.20.1"
-    "@wireapp/store-engine" "0.11.50"
-    bazinga64 "5.2.17"
+    "@wireapp/store-engine" "0.11.51"
+    bazinga64 "5.2.18"
     logdown "3.2.3"
     protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.6.9":
-  version "8.6.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.9.tgz#73c6b6d0610d015320e7328693b7ef0c092e325f"
+"@wireapp/cryptobox@8.6.10":
+  version "8.6.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.10.tgz#f0512fa4bfad65a5b632d388511a0555800b3f18"
   dependencies:
     "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.4"
-    "@wireapp/lru-cache" "2.1.41"
-    "@wireapp/priority-queue" "0.1.62"
-    "@wireapp/proteus" "7.3.6"
-    "@wireapp/store-engine" "0.11.50"
-    bazinga64 "5.2.17"
+    "@wireapp/lru-cache" "2.1.42"
+    "@wireapp/priority-queue" "0.1.63"
+    "@wireapp/proteus" "7.3.7"
+    "@wireapp/store-engine" "0.11.51"
+    bazinga64 "5.2.18"
     dexie "2.0.4"
     fs-extra "7.0.0"
     logdown "3.2.3"
 
-"@wireapp/lru-cache@2.1.41":
-  version "2.1.41"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.41.tgz#126ef5174e5f24bc71e6aa281f060afa5d1ebc1c"
+"@wireapp/lru-cache@2.1.42":
+  version "2.1.42"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.42.tgz#cab8badd5eaf703a73911a927c9079833d19c8f4"
 
 "@wireapp/priority-queue@0.1.62":
   version "0.1.62"
@@ -582,9 +582,16 @@
     "@types/node" "10.5.4"
     pure-uuid "1.5.3"
 
-"@wireapp/proteus@7.3.6":
-  version "7.3.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.3.6.tgz#b7236f1bd350d65777012a99e607680b0dbe9c0e"
+"@wireapp/priority-queue@0.1.63":
+  version "0.1.63"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.63.tgz#05849885f7308f11fb9594ef0526623c77d76aac"
+  dependencies:
+    "@types/node" "10.5.4"
+    pure-uuid "1.5.3"
+
+"@wireapp/proteus@7.3.7":
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.3.7.tgz#bf96f700a5bae22835f748e2e038efa5b457e30e"
   dependencies:
     "@types/chai" "4.1.4"
     "@types/ed2curve" "0.2.2"
@@ -614,6 +621,16 @@
 "@wireapp/store-engine@0.11.50":
   version "0.11.50"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.50.tgz#d3e23c6e04abf83e5839753ae50f1de4c71c7e0b"
+  dependencies:
+    "@types/filesystem" "0.0.28"
+    "@types/node" "10.5.4"
+    bro-fs "0.4.0"
+    dexie "2.0.4"
+    fs-extra "7.0.0"
+
+"@wireapp/store-engine@0.11.51":
+  version "0.11.51"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.51.tgz#227065080daaa041927e12117014d26be16d1cc6"
   dependencies:
     "@types/filesystem" "0.0.28"
     "@types/node" "10.5.4"
@@ -1015,15 +1032,15 @@ atob@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.1.tgz#ae2d5a729477f289d60dd7f96a6314a22dd6c22a"
 
-autoprefixer@9.0.1, autoprefixer@^9.0.0:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.0.1.tgz#b5b74aba3fa60b4f1403729e46a6a1246f16818f"
+autoprefixer@9.0.2, autoprefixer@^9.0.0:
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.0.2.tgz#c41947aa155038b3614414dbc58b4e70908af6e0"
   dependencies:
     browserslist "^4.0.1"
     caniuse-lite "^1.0.30000865"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
-    postcss "^7.0.1"
+    postcss "^7.0.2"
     postcss-value-parser "^3.2.3"
 
 autoprefixer@^6.0.0:
@@ -1726,6 +1743,10 @@ batch@0.6.1:
 bazinga64@5.2.17:
   version "5.2.17"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.17.tgz#04c8357c51f083ee466055fdf408d66a302f9ff5"
+
+bazinga64@5.2.18:
+  version "5.2.18"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2978,9 +2999,9 @@ cssnano-util-same-parent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/cssnano-util-same-parent/-/cssnano-util-same-parent-4.0.0.tgz#d2a3de1039aa98bc4ec25001fa050330c2a16dac"
 
-cssnano@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.0.4.tgz#8a397b5e307e06fd7e361bf11344b1cff8749a86"
+cssnano@4.0.5:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.0.5.tgz#8789b5fdbe7be05d8a0f7e45c4c789ebe712f5aa"
   dependencies:
     cosmiconfig "^5.0.0"
     cssnano-preset-default "^4.0.0"
@@ -8367,9 +8388,9 @@ postcss@^7.0.0:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postcss@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.1.tgz#db20ca4fc90aa56809674eea75864148c66b67fa"
+postcss@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.2.tgz#7b5a109de356804e27f95a960bef0e4d5bc9bb18"
   dependencies:
     chalk "^2.4.1"
     source-map "^0.6.1"

@@ -62,6 +62,7 @@ z.entity.User = class User {
     this.id = id;
     this.is_me = false;
     this.isBot = false;
+    this.isSingleSignOn = false;
 
     this.joaatHash = -1;
 
@@ -209,6 +210,10 @@ z.entity.User = class User {
     }
 
     return true;
+  }
+
+  hasActivatedIdentity() {
+    return this.email() || this.phone() || this.isSingleSignOn;
   }
 
   remove_client(client_id) {

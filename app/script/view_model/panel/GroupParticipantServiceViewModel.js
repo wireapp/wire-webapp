@@ -38,7 +38,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     this.isAddMode = ko.observable(false);
 
     this.selectedIsInConversation = ko.pureComputed(() => {
-      if (this.isVisible()) {
+      if (this.isVisible() && this.activeConversation()) {
         const participatingUserIds = this.activeConversation().participating_user_ids();
         return participatingUserIds.some(id => this.selectedParticipant().id === id);
       }

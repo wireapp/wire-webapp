@@ -44,7 +44,7 @@ z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
   }
 
   getEntityId() {
-    return this.activeConversation().id;
+    return this.activeConversation() ? this.activeConversation().id : false;
   }
 
   shouldSkipTransition() {

@@ -98,30 +98,32 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation() && this.activeConversation().firstUserEntity();
     });
     this.isSingleUserMode = ko.pureComputed(() => {
-      if (this.activeConversation()) {
-        return this.activeConversation().is_one2one() || this.activeConversation().is_request();
-      }
+      return this.activeConversation()
+        ? this.activeConversation().is_one2one() || this.activeConversation().is_request()
+        : false;
     });
-    this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
+    this.userName = ko.pureComputed(() => {
+      return this.firstParticipant() ? this.firstParticipant().username() : '';
+    });
 
     this.isGuest = ko.pureComputed(() => {
       return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isGuest();
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
-      return this.activeConversation() ? this.activeConversation().isActiveParticipant() : false;
+      return this.activeConversation() && this.activeConversation().isActiveParticipant();
     });
 
     this.isNameEditable = ko.pureComputed(() => {
-      if (this.activeConversation()) {
-        return this.activeConversation().is_group() && this.activeConversation().isActiveParticipant();
-      }
+      return this.activeConversation()
+        ? this.activeConversation().is_group() && this.activeConversation().isActiveParticipant()
+        : false;
     });
 
     this.isVerified = ko.pureComputed(() => {
-      if (this.activeConversation()) {
-        return this.activeConversation().verification_state() === z.conversation.ConversationVerificationState.VERIFIED;
-      }
+      return this.activeConversation()
+        ? this.activeConversation().verification_state() === z.conversation.ConversationVerificationState.VERIFIED
+        : false;
     });
 
     this.isEditingName = ko.observable(false);
@@ -141,24 +143,30 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
       }
     });
-    this.showActionCreateGroup = ko.pureComputed(() => this.activeConversation().is_one2one());
-    this.showActionCancelRequest = ko.pureComputed(() => this.activeConversation().is_request());
+    this.showActionCreateGroup = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().is_one2one();
+    });
+    this.showActionCancelRequest = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().is_request();
+    });
     this.showActionClear = ko.pureComputed(() => {
-      return (
-        this.activeConversation() && !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
-      );
+      return this.activeConversation()
+        ? !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
+        : false;
     });
     this.showActionLeave = ko.pureComputed(() => {
-      return (
-        this.activeConversation() &&
-        this.activeConversation().is_group() &&
-        !this.activeConversation().removed_from_conversation()
-      );
+      return this.activeConversation()
+        ? this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation()
+        : false;
     });
 
-    this.showActionGuestOptions = ko.pureComputed(() => this.activeConversation().inTeam());
+    this.showActionGuestOptions = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().inTeam();
+    });
     this.showActionTimedMessages = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_group() && !this.activeConversation().isGuest();
+      return this.activeConversation()
+        ? this.activeConversation().is_group() && !this.activeConversation().isGuest()
+        : false;
     });
     this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
 
