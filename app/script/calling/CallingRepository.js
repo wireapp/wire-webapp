@@ -284,7 +284,14 @@ z.calling.CallingRepository = class CallingRepository {
       this.getCallById(conversationId)
         .then(callEntity => callEntity.verifySessionId(callMessageEntity))
         .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
-        .then(callEntity => callEntity.deactivateCall(callMessageEntity, terminationReason))
+        .then(callEntity => {
+          const fromSelf = userId === this.selfUserId();
+          return callEntity.deactivateCall(callMessageEntity, fromSelf, terminationReason).then(wasDeleted => {
+            if (!wasDeleted) {
+              callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
+            }
+          });
+        })
         .catch(error => {
           const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
           if (!isNotFound) {

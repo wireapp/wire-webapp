@@ -230,42 +230,48 @@ z.calling.entities.CallEntity = class CallEntity {
    * Deactivate the call.
    *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message for deactivation
+   * @param {boolean} fromSelf - Deactivation triggered by self user change
    * @param {z.calling.enum.TERMINATION_REASON} [terminationReason=z.calling.enum.TERMINATION_REASON.SELF_USER] - Call termination reason
-   * @returns {undefined} No return value
+   * @returns {Promise<boolean>} Resolves with a boolean whether the call was deleted
    */
-  deactivateCall(callMessageEntity, terminationReason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    const everyoneLeft = this.participants().length <= 1;
-    const onGroupCheck = terminationReason === z.calling.enum.TERMINATION_REASON.GROUP_CHECK;
-
+  deactivateCall(callMessageEntity, fromSelf, terminationReason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
     this._clearTimeouts();
 
-    if (everyoneLeft || onGroupCheck) {
-      const reason = !this.wasConnected
-        ? z.calling.enum.TERMINATION_REASON.MISSED
-        : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const everyoneLeft = this.participants().length <= 0 + fromSelf ? 1 : 0;
+    const onGroupCheck = terminationReason === z.calling.enum.TERMINATION_REASON.GROUP_CHECK;
 
-      if (onGroupCheck && !everyoneLeft) {
-        const userIds = this.participants().map(participantEntity => participantEntity.id);
-        this.callLogger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
-      }
-
+    const shouldDeleteCall = everyoneLeft || onGroupCheck;
+    if (shouldDeleteCall) {
       this.terminationReason = terminationReason;
-      const eventSource = onGroupCheck
-        ? z.event.EventRepository.SOURCE.INJECTED
-        : z.event.EventRepository.SOURCE.WEB_SOCKET;
-
-      callMessageEntity.userId = this.creatingUser.id;
-      this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
-
-      return this.callingRepository.deleteCall(this.id);
+      return this._deleteCall(callMessageEntity, everyoneLeft, onGroupCheck).then(() => true);
     }
 
     if (this.isGroup) {
-      this.state(z.calling.enum.CALL_STATE.REJECTED);
       this.scheduleGroupCheck();
     }
 
     this.callingRepository.mediaStreamHandler.resetMediaStream();
+    return Promise.resolve(false);
+  }
+
+  _deleteCall(callMessageEntity, everyoneLeft, onGroupCheck) {
+    const reason = !this.wasConnected
+      ? z.calling.enum.TERMINATION_REASON.MISSED
+      : z.calling.enum.TERMINATION_REASON.COMPLETED;
+
+    if (onGroupCheck && !everyoneLeft) {
+      const userIds = this.participants().map(participantEntity => participantEntity.id);
+      this.callLogger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
+    }
+
+    const eventSource = onGroupCheck
+      ? z.event.EventRepository.SOURCE.INJECTED
+      : z.event.EventRepository.SOURCE.WEB_SOCKET;
+
+    callMessageEntity.userId = this.creatingUser.id;
+    this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
+
+    return this.callingRepository.deleteCall(this.id);
   }
 
   /**
@@ -356,7 +362,12 @@ z.calling.entities.CallEntity = class CallEntity {
         }
 
         this.setSelfState(false, terminationReason);
-        this.deactivateCall(callMessageEntity, terminationReason);
+        return this.deactivateCall(callMessageEntity, true, terminationReason);
+      })
+      .then(wasDeleted => {
+        if (!wasDeleted) {
+          this.state(z.calling.enum.CALL_STATE.REJECTED);
+        }
       });
   }
 
@@ -371,7 +382,7 @@ z.calling.entities.CallEntity = class CallEntity {
     if (!this.participants().length) {
       return this.selfClientJoined()
         ? this.leaveCall(terminationReason)
-        : this.deactivateCall(callMessageEntity, terminationReason);
+        : this.deactivateCall(callMessageEntity, false, terminationReason);
     }
   }
 
@@ -502,7 +513,7 @@ z.calling.entities.CallEntity = class CallEntity {
     );
     const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
 
-    this.deactivateCall(callMessageEntity, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
+    this.deactivateCall(callMessageEntity, false, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
   }
 
   /**
