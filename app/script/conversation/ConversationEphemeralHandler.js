@@ -103,10 +103,13 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
 
       case z.message.EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
-        this.conversationService.update_message_in_db(messageEntity, {
+
+        const changes = {
           ephemeral_expires: messageEntity.ephemeral_expires(),
           ephemeral_started: messageEntity.ephemeral_started(),
-        });
+        };
+
+        this.conversationService.updateMessageInDb(messageEntity, changes);
         break;
       }
 
@@ -149,13 +152,15 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
-    this.conversationService.update_message_in_db(messageEntity, {
+    const changes = {
       data: {
         content_type: assetEntity.file_type,
         meta: {},
       },
       ephemeral_expires: true,
-    });
+    };
+
+    this.conversationService.updateMessageInDb(messageEntity, changes);
     this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
@@ -163,7 +168,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
-    this.conversationService.update_message_in_db(messageEntity, {
+    const changes = {
       data: {
         info: {
           height: assetEntity.height,
@@ -172,7 +177,9 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
         },
       },
       ephemeral_expires: true,
-    });
+    };
+
+    this.conversationService.updateMessageInDb(messageEntity, changes);
     this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
@@ -203,14 +210,15 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
-
-    this.conversationService.update_message_in_db(messageEntity, {
+    const changes = {
       data: {
         content: obfuscatedAsset.text,
         previews: obfuscatedPreviews,
       },
       ephemeral_expires: true,
-    });
+    };
+
+    this.conversationService.updateMessageInDb(messageEntity, changes);
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 
