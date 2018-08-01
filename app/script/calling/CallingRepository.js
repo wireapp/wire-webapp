@@ -295,7 +295,6 @@ z.calling.CallingRepository = class CallingRepository {
         .catch(error => {
           const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
           if (!isNotFound) {
-            this.injectDeactivateEvent(callMessageEntity, source);
             throw error;
           }
         });
