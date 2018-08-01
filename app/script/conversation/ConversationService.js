@@ -737,7 +737,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {string} conversationId - ID of conversation
    * @returns {Promise} Resolves when the message was updated in database
    */
-  updateMessageInDbByVersion(messageEntity, changes = {}, conversationId) {
+  sequentiallyUpdateMessageInDb(messageEntity, changes = {}, conversationId) {
     return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
       const hasChanges = !!Object.keys(changes).length;
       if (!hasChanges) {
