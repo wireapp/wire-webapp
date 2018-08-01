@@ -711,10 +711,9 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @param {Message} messageEntity - Message event to update in the database
    * @param {Object} [changes={}] - Changes to update message with
-   * @param {string} conversationId - ID of conversation
    * @returns {Promise} Resolves when the message was updated in database
    */
-  updateMessageInDb(messageEntity, changes = {}, conversationId) {
+  updateMessageInDb(messageEntity, changes = {}) {
     return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
       const hasChanges = !!Object.keys(changes).length;
       if (!hasChanges) {
@@ -752,26 +751,26 @@ z.conversation.ConversationService = class ConversationService {
 
       return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
         return this.load_event_from_db(conversationId, messageEntity.id).then(record => {
-          let customData;
+          if (!record) {
+            throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+          }
 
-          if (record) {
-            const databaseVersion = record.version || 1;
+          const databaseVersion = record.version || 1;
 
-            const isSequentialUpdate = changes.version === databaseVersion + 1;
-            if (isSequentialUpdate) {
-              return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
-            }
-
-            customData = {
-              databaseVersion: databaseVersion,
-              updateVersion: changes.version,
-            };
+          const isSequentialUpdate = changes.version === databaseVersion + 1;
+          if (isSequentialUpdate) {
+            return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
           }
 
           const logMessage = 'Failed sequential database update';
-          this.logger.error(logMessage, customData);
+          const logObject = {
+            databaseVersion: databaseVersion,
+            updateVersion: changes.version,
+          };
 
-          Raygun.send(new Error(logMessage), customData);
+          this.logger.error(logMessage, logObject);
+
+          Raygun.send(new Error(logMessage), logObject);
           throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
         });
       });

@@ -3316,6 +3316,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _onReaction(conversationEntity, eventJson) {
+    const conversationId = conversationEntity.id;
     const eventData = eventJson.data;
     const messageId = eventData.message_id;
 
@@ -3324,26 +3325,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!messageEntity || !messageEntity.is_content()) {
           const type = messageEntity ? messageEntity.type : 'unknown';
 
-          const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
+          const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
           this.logger.error(log, messageEntity);
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_TYPE);
         }
 
         const changes = messageEntity.update_reactions(eventJson);
         if (changes) {
-          const log = `Updating reactions of message '${messageId}' in conversation '${conversationEntity.id}'`;
+          const log = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
           this.logger.debug(log, {changes, event: eventJson});
 
-          return this._updateMessageUserEntities(messageEntity).then(updatedMessageEntity => {
-            this.conversation_service.updateMessageInDbByVersion(updatedMessageEntity, changes, conversationEntity.id);
-            return this._prepareReactionNotification(conversationEntity, updatedMessageEntity, eventJson);
+          return this._updateMessageUserEntities(messageEntity).then(changedMessageEntity => {
+            this.conversation_service.sequentiallyUpdateMessageInDb(changedMessageEntity, changes, conversationId);
+            return this._prepareReactionNotification(conversationEntity, changedMessageEntity, eventJson);
           });
         }
       })
       .catch(error => {
         const isNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isNotFound) {
-          const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
+          const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
           this.logger.error(log, {error, event: eventJson});
           throw error;
         }
