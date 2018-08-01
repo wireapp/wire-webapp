@@ -362,6 +362,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Check if group call should continue after participant left.
+   *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Last member leaving call
    * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for call participant to leave
    * @returns {undefined} No return value

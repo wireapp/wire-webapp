@@ -2310,8 +2310,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
   _sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption = false) {
-    const messageType = genericMessage.content;
-    this.logger.info(`Sending '${messageType}' message to conversation '${conversationId}'`, payload);
+    const {content: messageType, message_id: messageId} = genericMessage;
+    const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
+    this.logger.info(logMessage, payload);
 
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)

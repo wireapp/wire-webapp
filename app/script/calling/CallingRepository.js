@@ -704,6 +704,7 @@ z.calling.CallingRepository = class CallingRepository {
             callMessageEntity.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
           }
 
+          this._logMessage(true, callMessageEntity);
           return this.conversationRepository.send_e_call(
             conversationEntity,
             callMessageEntity,
@@ -711,8 +712,7 @@ z.calling.CallingRepository = class CallingRepository {
             preconditionOption
           );
         });
-      })
-      .then(() => this._logMessage(true, callMessageEntity));
+      });
   }
 
   /**
