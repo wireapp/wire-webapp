@@ -26,6 +26,7 @@ import styled from 'styled-components';
 
 const MenuModalWrapper = styled(OverlayWrapper)`
   padding: 0;
+  overflow-y: hidden;
 `;
 
 const MenuModalBody = styled.div`
