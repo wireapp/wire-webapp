@@ -287,7 +287,7 @@ z.calling.CallingRepository = class CallingRepository {
         .then(callEntity => {
           const fromSelf = userId === this.selfUserId();
           return callEntity.deactivateCall(callMessageEntity, fromSelf, terminationReason).then(wasDeleted => {
-            if (!wasDeleted) {
+            if (!wasDeleted && fromSelf) {
               callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
             }
           });
