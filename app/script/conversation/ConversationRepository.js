@@ -2209,7 +2209,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         this.checkMessageTimer(messageEntity);
         if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
-          return this.conversation_service.update_message_in_db(messageEntity, changes);
+          return this.conversation_service.updateMessageInDb(messageEntity, changes);
         }
       })
       .catch(error => {
@@ -2749,7 +2749,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._on1to1Creation(conversationEntity, eventJson);
 
       case z.event.Client.CONVERSATION.REACTION:
-        return this._on_reaction(conversationEntity, eventJson);
+        return this._onReaction(conversationEntity, eventJson);
 
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
@@ -2938,7 +2938,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const was_updated = message_et.update_status(event_data.status);
 
         if (was_updated) {
-          return this.conversation_service.update_message_in_db(message_et, {status: message_et.status()});
+          const changes = {status: message_et.status()};
+          return this.conversation_service.updateMessageInDb(message_et, changes);
         }
       })
       .catch(error => {
@@ -3310,44 +3311,41 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Someone reacted to a message.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity that a message was reacted upon in
-   * @param {Object} event_json - JSON data of 'conversation.reaction' event
+   * @param {Conversation} conversationEntity - Conversation entity that a message was reacted upon in
+   * @param {Object} eventJson - JSON data of 'conversation.reaction' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_reaction(conversation_et, event_json) {
-    const event_data = event_json.data;
+  _onReaction(conversationEntity, eventJson) {
+    const conversationId = conversationEntity.id;
+    const eventData = eventJson.data;
+    const messageId = eventData.message_id;
 
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then(message_et => {
-        if (!message_et || !message_et.is_content()) {
-          const type = message_et ? message_et.type : 'unknown';
+    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+      .then(messageEntity => {
+        if (!messageEntity || !messageEntity.is_content()) {
+          const type = messageEntity ? messageEntity.type : 'unknown';
 
-          this.logger.error(
-            `Message '${event_data.message_id}' in conversation '${conversation_et.id}' is of reactable type '${type}'`,
-            message_et
-          );
+          const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
+          this.logger.error(log, messageEntity);
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_TYPE);
         }
 
-        const changes = message_et.update_reactions(event_json);
+        const changes = messageEntity.update_reactions(eventJson);
         if (changes) {
-          this.logger.debug(
-            `Updating reactions to message '${event_data.message_id}' in conversation '${conversation_et.id}'`,
-            event_json
-          );
+          const log = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
+          this.logger.debug(log, {changes, event: eventJson});
 
-          return this._updateMessageUserEntities(message_et).then(updated_message_et => {
-            this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
-            return this._prepareReactionNotification(conversation_et, updated_message_et, event_json);
+          return this._updateMessageUserEntities(messageEntity).then(changedMessageEntity => {
+            this.conversation_service.sequentiallyUpdateMessageInDb(changedMessageEntity, changes, conversationId);
+            return this._prepareReactionNotification(conversationEntity, changedMessageEntity, eventJson);
           });
         }
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.error(
-            `Failed to handle reaction to message '${event_data.message_id}' in conversation '${conversation_et.id}'`,
-            {error, event: event_json}
-          );
+        const isNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (!isNotFound) {
+          const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
+          this.logger.error(log, {error, event: eventJson});
           throw error;
         }
       });
