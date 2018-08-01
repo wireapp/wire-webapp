@@ -56,7 +56,7 @@
   "conversationJoin.unsupportedJoinSubhead": "<p>Dieser Browser wird nicht unterstützt.</p>Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
   "conversationJoin.unsupportedJoinMobileSubhead": "Öffne diesen Link auf deinem Computer.",
   "conversationJoin.subhead": "Verschlüsselte Gruppenkommunikation und Telefonkonferenzen. <br />Ein Benutzerkonto ist nicht erforderlich.",
-  "conversationJoin.existentAccountHeadline": "Du bist in einen <b style=\"color: black;\">Wire Gästebereich</b> <br />eingeladen.",
+  "conversationJoin.existentAccountHeadline": "{name}, du bist in einen <b style=\"color: black;\">Wire Gästebereich</b> <br />eingeladen.",
   "conversationJoin.subheadExistentAccount": "In Gästebereichen kannst du Unterhaltungen mit Personen außerhalb deines Teams führen.",
   "conversationJoin.buttonExistentAccountOpen": "Öffne Wire",
   "conversationJoin.existentAccountJoinWithoutLink": "Nimm an der Unterhaltung",
