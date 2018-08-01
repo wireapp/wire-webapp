@@ -2148,48 +2148,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
-  _send_and_inject_generic_message(conversation_et, generic_message, sync_timestamp = true) {
+  _send_and_inject_generic_message(conversationEntity, genericMessage, syncTimestamp = true) {
     return Promise.resolve()
       .then(() => {
-        if (conversation_et.removed_from_conversation()) {
+        if (conversationEntity.removed_from_conversation()) {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
-        return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
+        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, this.timeOffset);
+        return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
         const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
-        const shouldPlayPingAudio = isPing(generic_message) || isEphemeralPing(generic_message);
+        const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
         if (shouldPlayPingAudio) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
         return mappedEvent;
       })
-      .then(mappedEvent => {
-        const injectThenSend = this.eventRepository.injectEvent(mappedEvent).then(injectedEvent => {
-          return this.send_generic_message_to_conversation(conversation_et.id, generic_message).then(sentPayload => {
-            return {
-              event: injectedEvent,
-              sentPayload,
-            };
-          });
+      .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent))
+      .then(injectedEvent => {
+        return this.send_generic_message_to_conversation(conversationEntity.id, genericMessage).then(sentPayload => {
+          return {event: injectedEvent, sentPayload};
         });
-
-        /**
-         * We will, in parallel, inject events to the repo (where they will be processed and saved in DB)
-         * and send the actual message to the backend.
-         * When both those actions are done, we can update our local event and say that is has been sent.
-         */
-        return injectThenSend.then(({event, sentPayload}) => {
-          this._trackContributed(conversation_et, generic_message);
-
-          const backend_iso_date = sync_timestamp ? sentPayload.time : '';
-          return this._updateMessageAsSent(conversation_et, event, backend_iso_date).then(() => event);
-        });
+      })
+      .then(({event, sentPayload}) => {
+        this._trackContributed(conversationEntity, genericMessage);
+        const backendIsoDate = syncTimestamp ? sentPayload.time : '';
+        return this._updateMessageAsSent(conversationEntity, event, backendIsoDate).then(() => event);
       });
   }
 
