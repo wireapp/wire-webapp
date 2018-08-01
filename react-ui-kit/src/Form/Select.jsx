@@ -18,84 +18,36 @@
  */
 
 import {COLOR} from '../Identity';
-import PropTypes from 'prop-types';
-import React from 'react';
+import {Input} from './Input';
 import styled from 'styled-components';
 
-const StyledContainerSelect = styled.div`
-  display: flex;
-  overflow: hidden;
-  position: relative;
-  border-radius: 4px;
-  background: ${props => (props.disabled ? COLOR.GRAY_LIGHTEN_92 : COLOR.WHITE)};
-  height: 56px;
-  align-items: center;
-  margin: 0 0 16px;
-  width: 100%;
-
-  svg {
-    pointer-events: none;
-    position: absolute;
-    right: 8px;
-  }
+const ArrowDown = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+    <path fill="${COLOR.TEXT}" fillRule="evenodd" d="M0 2h8L4 7" />
+  </svg>
 `;
 
-const StyledSelect = styled.select`
-  height: 100%;
-  background-image: none;
-  background: transparent;
-  padding: 0 20px 0 12px;
-  border: none;
-  box-shadow: none;
-  color: ${COLOR.GRAY_DARKEN_48};
-  font-weight: 300;
-  width: 100%;
-  overflow: hidden;
-  outline: none;
+const Select = styled(Input.withComponent('select'))`
+  background-color: ${props => (props.disabled ? COLOR.GRAY_LIGHTEN_92 : COLOR.WHITE)};
+  ${props =>
+    !props.disabled &&
+    `
+    background-image: url('data:image/svg+xml;utf8,${ArrowDown}');
+    background-repeat: no-repeat;
+    background-position: center right 16px;
+  `};
+  padding-right: 32px;
   -moz-appearance: none;
   -webkit-appearance: none;
 
-  &:focus {
-    /* appearance */
-    outline: none;
+  &:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
   }
+
   &:disabled {
-    /* appearance */
     color: ${COLOR.GRAY};
-    + svg {
-      /* appearance */
-      display: none;
-    }
   }
 `;
-
-const ArrowDown = () => (
-  <svg width="8" height="8" viewBox="0 0 8 8">
-    <path fill={COLOR.GRAY_DARKEN_48} fillRule="evenodd" d="M0 2h8L4 7" />
-  </svg>
-);
-
-const Select = ({children, disabled, innerStyle, ...props}) => {
-  return (
-    <StyledContainerSelect disabled={disabled} {...props}>
-      <StyledSelect disabled={disabled} style={innerStyle}>
-        {children}
-      </StyledSelect>
-      <ArrowDown />
-    </StyledContainerSelect>
-  );
-};
-
-Select.propTypes = {
-  children: PropTypes.node,
-  disabled: PropTypes.bool,
-  innerStyle: PropTypes.object,
-};
-
-Select.defaultProps = {
-  children: null,
-  disabled: false,
-  innerStyle: {},
-};
 
 export {Select};
