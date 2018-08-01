@@ -65,6 +65,7 @@ import {
   InputSubmitCombo,
   Label,
   LabelLink,
+  Large,
   Lead,
   LeaveIcon,
   Line,
@@ -545,6 +546,12 @@ class Demo extends React.PureComponent {
               <Column>Uppercase text</Column>
               <Column>
                 <Uppercase>upper case</Uppercase>
+              </Column>
+            </Columns>
+            <Columns>
+              <Column>Large text</Column>
+              <Column>
+                <Large>Large text</Large>
               </Column>
             </Columns>
             <Line />
