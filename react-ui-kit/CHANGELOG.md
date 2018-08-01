@@ -3,7 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-  <a name="1.12.2"></a>
+      <a name="2.0.0"></a>
+# [2.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.12.2...@wireapp/react-ui-kit@2.0.0) (2018-08-01)
+
+
+### Code Refactoring
+
+* **react-ui-kit:** better Select element ([#920](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/920)) ([4ebdb0c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/4ebdb0c))
+
+
+### BREAKING CHANGES
+
+* **react-ui-kit:** Select element no longer needs a separate innerStyle. It is a single component now which directly receives all props.
+
+
+
+
+      <a name="1.12.2"></a>
 ## [1.12.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.12.1...@wireapp/react-ui-kit@1.12.2) (2018-08-01)
 
 
@@ -14,7 +30,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-  <a name="1.12.1"></a>
+<a name="1.12.1"></a>
 ## [1.12.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.12.0...@wireapp/react-ui-kit@1.12.1) (2018-08-01)
 
 
