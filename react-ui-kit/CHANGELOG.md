@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-      <a name="1.11.0"></a>
+  <a name="1.12.0"></a>
+# [1.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.11.0...@wireapp/react-ui-kit@1.12.0) (2018-08-01)
+
+
+### Features
+
+* **react-ui-kit:** Large text ([#905](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/905)) ([051a1a3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/051a1a3))
+
+
+
+
+  <a name="1.11.0"></a>
 # [1.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.6...@wireapp/react-ui-kit@1.11.0) (2018-07-31)
 
 
@@ -14,7 +25,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-      <a name="1.10.6"></a>
+<a name="1.10.6"></a>
 ## [1.10.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.10.5...@wireapp/react-ui-kit@1.10.6) (2018-07-30)
 
 
