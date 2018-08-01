@@ -709,42 +709,71 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Update a message in the database.
    *
-   * @param {Message} message_et - Message event to update in the database
+   * @param {Message} messageEntity - Message event to update in the database
    * @param {Object} [changes={}] - Changes to update message with
-   * @param {string} conversation_id - ID of conversation
    * @returns {Promise} Resolves when the message was updated in database
    */
-  update_message_in_db(message_et, changes = {}, conversation_id) {
-    return Promise.resolve(message_et.primary_key).then(primary_key => {
-      if (Object.keys(changes).length) {
-        if (changes.version) {
-          return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-            return this.load_event_from_db(conversation_id, message_et.id).then(record => {
-              let custom_data;
-
-              if (record) {
-                const database_version = record.version || 1;
-
-                if (changes.version === database_version + 1) {
-                  return this.storageService.update(this.EVENT_STORE_NAME, primary_key, changes);
-                }
-
-                custom_data = {
-                  database_version: database_version,
-                  update_version: changes.version,
-                };
-              }
-
-              Raygun.send('Failed sequential database update', custom_data);
-              throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
-            });
-          });
-        }
-
-        return this.storageService.update(this.EVENT_STORE_NAME, primary_key, changes);
+  updateMessageInDb(messageEntity, changes = {}) {
+    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
+      const hasChanges = !!Object.keys(changes).length;
+      if (!hasChanges) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
       }
 
-      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+      const hasVersionedChanges = !!changes.version;
+      if (hasVersionedChanges) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+      }
+
+      return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
+    });
+  }
+
+  /**
+   * Update a message in the database.
+   *
+   * @param {Message} messageEntity - Message event to update in the database
+   * @param {Object} [changes={}] - Changes to update message with
+   * @param {string} conversationId - ID of conversation
+   * @returns {Promise} Resolves when the message was updated in database
+   */
+  sequentiallyUpdateMessageInDb(messageEntity, changes = {}, conversationId) {
+    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
+      const hasChanges = !!Object.keys(changes).length;
+      if (!hasChanges) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+      }
+
+      const hasVersionedChanges = !!changes.version;
+      if (!hasVersionedChanges) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+      }
+
+      return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
+        return this.load_event_from_db(conversationId, messageEntity.id).then(record => {
+          if (!record) {
+            throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+          }
+
+          const databaseVersion = record.version || 1;
+
+          const isSequentialUpdate = changes.version === databaseVersion + 1;
+          if (isSequentialUpdate) {
+            return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
+          }
+
+          const logMessage = 'Failed sequential database update';
+          const logObject = {
+            databaseVersion: databaseVersion,
+            updateVersion: changes.version,
+          };
+
+          this.logger.error(logMessage, logObject);
+
+          Raygun.send(new Error(logMessage), logObject);
+          throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+        });
+      });
     });
   }
 };

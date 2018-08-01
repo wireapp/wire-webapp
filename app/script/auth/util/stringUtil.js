@@ -17,7 +17,7 @@
  *
  */
 
-export const UUID_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
+export const UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}';
 
 export function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
