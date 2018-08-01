@@ -75,7 +75,7 @@ ko.components.register('link-preview-asset', {
 
       <div class="link-preview-info">
         <!-- ko if: header -->
-          <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
+          <asset-header class="link-preview-info-header" params="message: messageEntity"></asset-header>
         <!-- /ko -->
         <!-- ko if: isTweet -->
           <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
