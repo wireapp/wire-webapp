@@ -316,8 +316,8 @@ class SingleSignOn extends React.PureComponent {
   stripPrefix = code =>
     code &&
     code
-      .toLowerCase()
       .trim()
+      .toLowerCase()
       .replace(SingleSignOn.SSO_CODE_PREFIX, '');
 
   render() {
