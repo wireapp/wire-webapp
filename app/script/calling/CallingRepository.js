@@ -1153,6 +1153,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _initiatePreJoinCall(callEntity) {
+    this.callLogger.info(`Joining call in conversation '${callEntity.id}'`, callEntity);
     callEntity.setSelfState(true);
     return callEntity;
   }
@@ -1166,13 +1167,10 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the call entity
    */
   _initiateMediaStream(callEntity, mediaType) {
-    const conversationId = callEntity.id;
-    this.callLogger.info(`Joining call in conversation '${conversationId}'`, callEntity);
-
     return this.mediaStreamHandler.localMediaStream()
       ? Promise.resolve(callEntity)
       : this.mediaStreamHandler
-          .initiateMediaStream(conversationId, mediaType, callEntity.isGroup)
+          .initiateMediaStream(callEntity.id, mediaType, callEntity.isGroup)
           .then(() => callEntity);
   }
 
