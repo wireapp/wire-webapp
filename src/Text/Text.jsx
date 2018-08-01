@@ -70,5 +70,6 @@ const Bold = defaultProps({bold: true})(Text);
 const Small = defaultProps({fontSize: '12px'})(Text);
 const Muted = defaultProps({muted: true})(Text);
 const Uppercase = defaultProps({textTransfrom: 'uppercase'})(Text);
+const Large = defaultProps({fontSize: '72px', light: true})(Text);
 
-export {Bold, Muted, Small, Text, Uppercase};
+export {Bold, Muted, Small, Text, Uppercase, Large};
