@@ -71,10 +71,10 @@ class SingleSignOn extends React.PureComponent {
   ssoWindow = undefined;
   inputs = {};
   state = {
-    clipboardError: null,
     code: '',
     isOverlayOpen: false,
     persist: true,
+    ssoError: null,
     validInputs: {
       code: true,
     },
@@ -265,6 +265,7 @@ class SingleSignOn extends React.PureComponent {
             return;
           }
           default: {
+            this.setState({ssoError: error});
             throw error;
           }
         }
@@ -296,7 +297,7 @@ class SingleSignOn extends React.PureComponent {
             throw error;
           }
         })
-        .catch(error => this.setState({clipboardError: error}));
+        .catch(error => this.setState({ssoError: error}));
     }
   };
 
@@ -319,7 +320,7 @@ class SingleSignOn extends React.PureComponent {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {persist, code, isOverlayOpen, validInputs, validationErrors, clipboardError} = this.state;
+    const {persist, code, isOverlayOpen, validInputs, validationErrors, ssoError} = this.state;
     return (
       <Page>
         {isOverlayOpen && (
@@ -427,8 +428,8 @@ class SingleSignOn extends React.PureComponent {
                       parseValidationErrors(validationErrors)
                     ) : loginError ? (
                       <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                    ) : clipboardError ? (
-                      <ErrorMessage data-uie-name="error-message">{parseError(clipboardError)}</ErrorMessage>
+                    ) : ssoError ? (
+                      <ErrorMessage data-uie-name="error-message">{parseError(ssoError)}</ErrorMessage>
                     ) : (
                       <span style={{marginBottom: '4px'}}>&nbsp;</span>
                     )}
