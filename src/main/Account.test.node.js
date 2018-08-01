@@ -17,18 +17,20 @@
  *
  */
 
+const nock = require('nock');
 const {Account} = require('@wireapp/core');
+const {PayloadBundleState} = require('@wireapp/core/dist/conversation/root');
+const {APIClient} = require('@wireapp/api-client');
 const {AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
+const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {ClientAPI, ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
+const {CONVERSATION_EVENT, USER_EVENT} = require('@wireapp/api-client/dist/commonjs/event');
 const {ConversationAPI} = require('@wireapp/api-client/dist/commonjs/conversation/');
+const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notification/');
-const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {ValidationUtil} = require('@wireapp/commons');
-const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
-const {APIClient} = require('@wireapp/api-client');
-const nock = require('nock');
 
 const BASE_URL = 'mock-backend.wire.com';
 const BASE_URL_HTTPS = `https://${BASE_URL}`;
@@ -105,6 +107,30 @@ describe('Account', () => {
       .reply(StatusCode.OK, [{id: CLIENT_ID}]);
   });
 
+  describe('"createText"', () => {
+    it('creates a text payload', async done => {
+      const account = await createAccount();
+      expect(account.apiClient.context).toBeUndefined();
+
+      await account.init();
+
+      await account.login({
+        clientType: ClientType.TEMPORARY,
+        email: 'hello@example.com',
+        password: 'my-secret',
+      });
+
+      expect(account.apiClient.context.userId).toBeDefined();
+
+      const text = 'FIFA World Cup';
+      const payload = account.service.conversation.createText(text);
+
+      expect(payload.timestamp).toBeGreaterThan(0);
+
+      done();
+    });
+  });
+
   describe('"init"', () => {
     it('initializes the Protocol buffers', async done => {
       const account = new Account();
@@ -121,6 +147,134 @@ describe('Account', () => {
 
       expect(message.content).toBe('text');
       done();
+    });
+  });
+
+  describe('"mapConversationEvent"', () => {
+    it('maps "conversation.message-timer-update" events', () => {
+      const event = {
+        conversation: 'ed5e4cd5-85ab-4d9e-be59-4e1c0324a9d4',
+        data: {
+          message_timer: 2419200000,
+        },
+        from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+        time: '2018-08-01T09:40:25.481Z',
+        type: 'conversation.message-timer-update',
+      };
+
+      const account = new Account();
+      const incomingEvent = account.mapConversationEvent(event);
+
+      expect(incomingEvent.content).toBe(event.data);
+      expect(incomingEvent.conversation).toBe(event.conversation);
+      expect(incomingEvent.from).toBe(event.from);
+      expect(typeof incomingEvent.id).toBe('string');
+      expect(incomingEvent.messageTimer).toBe(0);
+      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
+      expect(incomingEvent.type).toBe(CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE);
+    });
+
+    it('maps "conversation.member-join" events', () => {
+      const event = {
+        conversation: '87591650-8676-430f-985f-dec8583f58cb',
+        data: {
+          user_ids: [
+            'e023c681-7e51-43dd-a5d8-0f821e70a9c0',
+            'b8a09877-7b73-4636-a664-95b2bda193b0',
+            '5b068afd-1ef2-4860-9fbb-9c3c70a22f97',
+          ],
+        },
+        from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+        time: '2018-07-12T09:43:34.442Z',
+        type: 'conversation.member-join',
+      };
+
+      const account = new Account();
+      const incomingEvent = account.mapConversationEvent(event);
+
+      expect(incomingEvent.content).toBe(event.data);
+      expect(incomingEvent.conversation).toBe(event.conversation);
+      expect(incomingEvent.from).toBe(event.from);
+      expect(typeof incomingEvent.id).toBe('string');
+      expect(incomingEvent.messageTimer).toBe(0);
+      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
+      expect(incomingEvent.type).toBe(CONVERSATION_EVENT.MEMBER_JOIN);
+    });
+
+    it('maps "conversation.rename" events', () => {
+      const event = {
+        conversation: 'ed5e4cd5-85ab-4d9e-be59-4e1c0324a9d4',
+        data: {
+          name: 'Tiny Timed Messages',
+        },
+        from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+        time: '2018-08-01T12:01:21.629Z',
+        type: 'conversation.rename',
+      };
+
+      const account = new Account();
+      const incomingEvent = account.mapConversationEvent(event);
+
+      expect(incomingEvent.content).toBe(event.data);
+      expect(incomingEvent.conversation).toBe(event.conversation);
+      expect(incomingEvent.from).toBe(event.from);
+      expect(typeof incomingEvent.id).toBe('string');
+      expect(incomingEvent.messageTimer).toBe(0);
+      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
+      expect(incomingEvent.type).toBe(CONVERSATION_EVENT.RENAME);
+    });
+
+    it('maps "conversation.typing" events', () => {
+      const event = {
+        conversation: '508f14b9-ef4c-405d-bba9-5c4300cc1cbf',
+        data: {status: 'started'},
+        from: '16d71f22-0f7b-425e-b4b3-5e288700ac1f',
+        time: '2018-08-01T12:10:42.422Z',
+        type: 'conversation.typing',
+      };
+
+      const account = new Account();
+      const incomingEvent = account.mapConversationEvent(event);
+
+      expect(incomingEvent.content).toBe(event.data);
+      expect(incomingEvent.conversation).toBe(event.conversation);
+      expect(incomingEvent.from).toBe(event.from);
+      expect(typeof incomingEvent.id).toBe('string');
+      expect(incomingEvent.messageTimer).toBe(0);
+      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
+      expect(incomingEvent.type).toBe(CONVERSATION_EVENT.TYPING);
+    });
+  });
+
+  describe('"mapUserEvent"', () => {
+    it('maps "user.connection" events', () => {
+      const event = {
+        connection: {
+          conversation: '19dbbc18-5e22-41dc-acce-0d9d983c1a60',
+          from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+          last_update: '2018-07-06T09:38:52.286Z',
+          message: ' ',
+          status: 'sent',
+          to: 'e023c681-7e51-43dd-a5d8-0f821e70a9c0',
+        },
+        type: 'user.connection',
+      };
+
+      const account = new Account();
+      const incomingEvent = account.mapUserEvent(event);
+
+      expect(incomingEvent.content).toBe(event.connection);
+      expect(incomingEvent.conversation).toBe(event.connection.conversation);
+      expect(incomingEvent.from).toBe(event.connection.from);
+      expect(typeof incomingEvent.id).toBe('string');
+      expect(incomingEvent.messageTimer).toBe(0);
+      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.timestamp).toBe(new Date(event.connection.last_update).getTime());
+      expect(incomingEvent.type).toBe(USER_EVENT.CONNECTION);
     });
   });
 
@@ -171,30 +325,6 @@ describe('Account', () => {
 
         done();
       }
-    });
-  });
-
-  describe('"createText"', () => {
-    it('creates a text payload.', async done => {
-      const account = await createAccount();
-      expect(account.apiClient.context).toBeUndefined();
-
-      await account.init();
-
-      await account.login({
-        clientType: ClientType.TEMPORARY,
-        email: 'hello@example.com',
-        password: 'my-secret',
-      });
-
-      expect(account.apiClient.context.userId).toBeDefined();
-
-      const text = 'FIFA World Cup';
-      const payload = account.service.conversation.createText(text);
-
-      expect(payload.timestamp).toBeGreaterThan(0);
-
-      done();
     });
   });
 });

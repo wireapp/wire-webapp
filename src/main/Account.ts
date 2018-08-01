@@ -51,6 +51,7 @@ import {NotificationService} from './notification/root';
 import {SelfService} from './self/root';
 
 import {APIClient} from '@wireapp/api-client';
+import {UserConnectionEvent} from '@wireapp/api-client/dist/commonjs/event';
 import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 
@@ -371,7 +372,36 @@ class Account extends EventEmitter {
     }
   }
 
-  private async handleEvent(event: IncomingEvent): Promise<PayloadBundleIncoming | IncomingEvent | void> {
+  private mapConversationEvent(event: ConversationEvent): PayloadBundleIncoming {
+    return {
+      content: event.data,
+      conversation: event.conversation,
+      from: event.from,
+      id: ConversationService.createId(),
+      messageTimer: 0,
+      state: PayloadBundleState.INCOMING,
+      timestamp: new Date(event.time).getTime(),
+      type: event.type,
+    };
+  }
+
+  private mapUserEvent(event: UserEvent): PayloadBundleIncoming | void {
+    if (event.type === USER_EVENT.CONNECTION) {
+      const connectionEvent = event as UserConnectionEvent;
+      return {
+        content: connectionEvent.connection,
+        conversation: connectionEvent.connection.conversation,
+        from: connectionEvent.connection.from,
+        id: ConversationService.createId(),
+        messageTimer: 0,
+        state: PayloadBundleState.INCOMING,
+        timestamp: new Date(connectionEvent.connection.last_update).getTime(),
+        type: USER_EVENT.CONNECTION,
+      };
+    }
+  }
+
+  private async handleEvent(event: IncomingEvent): Promise<PayloadBundleIncoming | void> {
     this.logger.log('handleEvent', event.type);
     const ENCRYPTED_EVENTS = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
     const META_EVENTS = [
@@ -387,9 +417,9 @@ class Account extends EventEmitter {
     } else if (META_EVENTS.includes(event.type as CONVERSATION_EVENT)) {
       const {conversation, from} = event as ConversationEvent;
       const metaEvent = {...event, from, conversation};
-      return metaEvent as ConversationEvent;
+      return this.mapConversationEvent(metaEvent as ConversationEvent);
     } else if (USER_EVENTS.includes(event.type as USER_EVENT)) {
-      return event as UserEvent;
+      return this.mapUserEvent(event as UserEvent);
     }
   }
 
@@ -427,7 +457,7 @@ class Account extends EventEmitter {
             const {
               data: {message_timer},
               conversation,
-            } = data as ConversationMessageTimerUpdateEvent;
+            } = event as ConversationMessageTimerUpdateEvent;
             const expireAfterMillis = Number(message_timer);
             this.logger.log(
               `Received "${expireAfterMillis}" ms timer on conversation level for conversation "${conversation}".`
