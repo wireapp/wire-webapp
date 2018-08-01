@@ -67,6 +67,7 @@ import {BACKEND} from '../Environment';
 
 class SingleSignOn extends React.PureComponent {
   static SSO_CODE_PREFIX = 'wire-';
+  static SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
   ssoWindow = undefined;
   inputs = {};
@@ -413,7 +414,7 @@ class SingleSignOn extends React.PureComponent {
                         value={code}
                         autoComplete="section-login sso-code"
                         maxLength="1024"
-                        pattern={`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`}
+                        pattern={`${SingleSignOn.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
                         autoFocus
                         type="text"
                         required
