@@ -18,6 +18,7 @@
  */
 
 import {OverlayBackground, OverlayWrapper} from './Overlay';
+import {COLOR} from '../Identity';
 import {CloseIcon} from '../Icon';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -49,7 +50,7 @@ const ModalBody = styled.div`
       }
       `};
   align-items: center;
-  background-color: #fff;
+  background-color: ${COLOR.GRAY_LIGHTEN_88};
   display: flex;
   flex-direction: column;
   padding: 12px 24px;
