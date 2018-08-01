@@ -522,18 +522,18 @@
     "@webassemblyjs/wast-parser" "1.5.13"
     long "^3.2.0"
 
-"@wireapp/api-client@1.10.3":
-  version "1.10.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.10.3.tgz#e1cd0a5ea26dab3b79aeacf7972994c7a88a84cc"
+"@wireapp/api-client@1.10.5":
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.10.5.tgz#210f5d6c63f2bee3ce12e1c6a1d2210676e42fe9"
   dependencies:
     "@types/node" "10.5.4"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.62"
-    "@wireapp/store-engine" "0.11.50"
+    "@wireapp/priority-queue" "0.1.63"
+    "@wireapp/store-engine" "0.11.51"
     axios "0.18.0"
     html5-websocket "2.0.3"
-    logdown "3.2.3"
+    logdown "3.2.7"
     reconnecting-websocket "3.2.2"
     spark-md5 "3.0.0"
     tough-cookie "2.4.3"
@@ -542,23 +542,23 @@
   version "3.0.64"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.64.tgz#6ee9c33d57a26b44db1d0a1ded11d53f2fe2a800"
 
-"@wireapp/core@3.16.1":
-  version "3.16.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.16.1.tgz#4bbb5c3d5660338185b1c742425bd16137e1f855"
+"@wireapp/core@3.16.4":
+  version "3.16.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.16.4.tgz#a7de4d63ccb6ad5dfab65adb3fbb76480692df95"
   dependencies:
     "@types/node" "10.5.4"
-    "@wireapp/api-client" "1.10.3"
-    "@wireapp/cryptobox" "8.6.10"
+    "@wireapp/api-client" "1.10.5"
+    "@wireapp/cryptobox" "8.6.11"
     "@wireapp/protocol-messaging" "1.20.1"
     "@wireapp/store-engine" "0.11.51"
     bazinga64 "5.2.18"
-    logdown "3.2.3"
+    logdown "3.2.7"
     protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.6.10":
-  version "8.6.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.10.tgz#f0512fa4bfad65a5b632d388511a0555800b3f18"
+"@wireapp/cryptobox@8.6.11":
+  version "8.6.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.11.tgz#d7480df8ab535136894613a9fc34a064f5c918a2"
   dependencies:
     "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.4"
@@ -569,18 +569,11 @@
     bazinga64 "5.2.18"
     dexie "2.0.4"
     fs-extra "7.0.0"
-    logdown "3.2.3"
+    logdown "3.2.7"
 
 "@wireapp/lru-cache@2.1.42":
   version "2.1.42"
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.42.tgz#cab8badd5eaf703a73911a927c9079833d19c8f4"
-
-"@wireapp/priority-queue@0.1.62":
-  version "0.1.62"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.62.tgz#4fd1a6209b4c82cdd244bc69ada0c0d0c5e45430"
-  dependencies:
-    "@types/node" "10.5.4"
-    pure-uuid "1.5.3"
 
 "@wireapp/priority-queue@0.1.63":
   version "0.1.63"
@@ -617,16 +610,6 @@
     recompose "0.28.0"
     styled-components "3.3.3"
     styled-normalize "8.0.0"
-
-"@wireapp/store-engine@0.11.50":
-  version "0.11.50"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.50.tgz#d3e23c6e04abf83e5839753ae50f1de4c71c7e0b"
-  dependencies:
-    "@types/filesystem" "0.0.28"
-    "@types/node" "10.5.4"
-    bro-fs "0.4.0"
-    dexie "2.0.4"
-    fs-extra "7.0.0"
 
 "@wireapp/store-engine@0.11.51":
   version "0.11.51"
@@ -6416,9 +6399,9 @@ log4js@^2.5.3:
     redis "^2.7.1"
     slack-node "~0.2.0"
 
-logdown@3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/logdown/-/logdown-3.2.3.tgz#b033901259057a419cb09a41baa3e98b5be57b3c"
+logdown@3.2.7:
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/logdown/-/logdown-3.2.7.tgz#4dd24375bf5b757064f65aeb8c3459ae66cde1b9"
   dependencies:
     chalk "^2.3.0"
 
