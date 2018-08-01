@@ -243,7 +243,8 @@ z.calling.entities.CallEntity = class CallEntity {
     const shouldDeleteCall = everyoneLeft || onGroupCheck;
     if (shouldDeleteCall) {
       this.terminationReason = terminationReason;
-      return this._deleteCall(callMessageEntity, everyoneLeft, onGroupCheck).then(() => true);
+      this._deleteCall(callMessageEntity, everyoneLeft, onGroupCheck);
+      return Promise.resolve(true);
     }
 
     if (this.isGroup) {
