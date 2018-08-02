@@ -23,9 +23,10 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
-  constructor(conversationRepository, cryptographyRepository, userRepository) {
+  constructor(conversationRepository, cryptographyRepository, eventRepository, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
+    this.eventRepository = eventRepository;
     this.userRepository = userRepository;
 
     this.logger = new z.util.Logger('z.conversation.ClientMismatchHandler', z.config.LOGGER.OPTIONS);
@@ -157,7 +158,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
             const timeOffset = this.conversationRepository.timeOffset;
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
 
-            amplify.publish(z.event.WebApp.EVENT.INJECT, event);
+            this.eventRepository.injectEvent(event);
           }
 
           delete payload.recipients[userId];
