@@ -392,7 +392,7 @@ describe('Event Repository', () => {
     });
   });
 
-  describe('_handleEventSaving', () => {
+  describe('processEvent', () => {
     let event = undefined;
     let previously_stored_event = undefined;
 
@@ -418,7 +418,7 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(() => {
           expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
           done();
@@ -434,7 +434,7 @@ describe('Event Repository', () => {
       );
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
@@ -470,7 +470,7 @@ describe('Event Repository', () => {
       );
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
@@ -487,7 +487,7 @@ describe('Event Repository', () => {
       );
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
@@ -505,7 +505,7 @@ describe('Event Repository', () => {
       );
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
@@ -525,7 +525,7 @@ describe('Event Repository', () => {
       event.data.content = 'Ipsum loren';
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
@@ -550,7 +550,7 @@ describe('Event Repository', () => {
       event.time = changed_time;
 
       TestFactory.event_repository
-        ._handleEventSaving(event)
+        .processEvent(event)
         .then(saved_event => {
           expect(saved_event.time).toEqual(initial_time);
           expect(saved_event.time).not.toEqual(changed_time);
@@ -659,6 +659,20 @@ describe('Event Repository', () => {
           done();
         })
         .catch(done.fail);
+    });
+
+    it('saves a conversation.asset-add event', done => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
+
+      TestFactory.event_repository.processEvent(assetAddEvent).then(savedEvent => {
+        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
+        done();
+      });
     });
   });
 
