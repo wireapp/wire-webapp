@@ -447,6 +447,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
     this.peerConnection.close();
+    this.peerConnection = undefined;
 
     const logMessage = {
       data: {
