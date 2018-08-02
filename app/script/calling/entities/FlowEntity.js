@@ -417,38 +417,45 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _closePeerConnection() {
-    const peerConnection = this.peerConnection;
-    if (!peerConnection) {
-      return;
-    }
+    const peerConnectionInActiveState =
+      this.peerConnection && this.peerConnection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
 
-    peerConnection.oniceconnectionstatechange = () => {
-      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
-    };
-
-    peerConnection.onsignalingstatechange = () => {
-      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
-      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-    };
-
-    const isSignalingStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
-    if (!isSignalingStateClosed) {
-      const connectionMediaStreamTracks = peerConnection.getReceivers
-        ? peerConnection.getReceivers().map(receiver => receiver.track)
-        : peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
-
-      amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
-      peerConnection.close();
-
+    if (!peerConnectionInActiveState) {
       const logMessage = {
         data: {
           default: [this.remoteUser.name()],
           obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
         },
-        message: `Closing PeerConnection '{0}' successful`,
+        message: `PeerConnection with '{0}' was previously closed`,
       };
       this.callLogger.info(logMessage);
+      return;
     }
+
+    this.peerConnection.oniceconnectionstatechange = () => {
+      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    };
+
+    this.peerConnection.onsignalingstatechange = () => {
+      const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
+      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
+    };
+
+    const connectionMediaStreamTracks = this.peerConnection.getReceivers
+      ? this.peerConnection.getReceivers().map(receiver => receiver.track)
+      : this.peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
+
+    amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
+    this.peerConnection.close();
+
+    const logMessage = {
+      data: {
+        default: [this.remoteUser.name()],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Closing PeerConnection with '{0}' successful`,
+    };
+    this.callLogger.info(logMessage);
   }
 
   /**
