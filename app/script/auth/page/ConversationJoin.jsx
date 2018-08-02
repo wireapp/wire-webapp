@@ -19,7 +19,7 @@
 
 import {
   H2,
-  H3,
+  Text,
   Link,
   Small,
   Form,
@@ -194,7 +194,7 @@ class ConversationJoin extends Component {
             <FormattedHTMLMessage {...conversationJoinStrings.headline} />
           )}
         </H2>
-        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
+        <Text style={{fontSize: '16px', marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</Text>
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
@@ -226,9 +226,9 @@ class ConversationJoin extends Component {
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
-        <H3 style={{marginTop: '10px'}}>
+        <Text style={{fontSize: '16px', marginTop: '10px'}}>
           <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
-        </H3>
+        </Text>
         <Form style={{marginTop: 30}}>
           <InputSubmitCombo>
             <Input
@@ -291,9 +291,9 @@ class ConversationJoin extends Component {
         >
           <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
         </H2>
-        <H3 style={{marginTop: '10px'}} data-uie-name="status-full-text">
+        <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
           {_(conversationJoinStrings.fullConversationSubhead)}
-        </H3>
+        </Text>
       </ContainerXS>
     );
   };
