@@ -486,16 +486,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
-      this.callLogger.debug(
-        {
-          data: {
-            default: [this.remoteUser.name(), this.isAnswer()],
-            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id), this.isAnswer()],
-          },
-          message: `PeerConnection with '{0}' created - isAnswer '{1}'`,
+      const logMessage = {
+        data: {
+          default: [this.remoteUser.name(), this.isAnswer()],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id), this.isAnswer()],
         },
-        pcConfiguration
-      );
+        message: `PeerConnection with '{0}' created - isAnswer '{1}'`,
+      };
+      this.callLogger.debug(logMessage, pcConfiguration);
 
       this.peerConnection.onaddstream = this._onAddStream.bind(this);
       this.peerConnection.ontrack = this._onTrack.bind(this);
