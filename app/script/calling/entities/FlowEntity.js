@@ -431,8 +431,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.callLogger.log(this.callLogger.levels.OFF, logMessage);
     };
 
-    const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
-    if (!isStateClosed) {
+    const isSignalingStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+    if (!isSignalingStateClosed) {
       const connectionMediaStreamTracks = peerConnection.getReceivers
         ? peerConnection.getReceivers().map(receiver => receiver.track)
         : peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
@@ -1393,9 +1393,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
         return this._removeMediaStreamTracks(mediaStream);
       }
 
-      const signalingStateNotClosed = this.peerConnection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
       const supportsRemoveStream = typeof this.peerConnection.removeStream === 'function';
-      if (signalingStateNotClosed && supportsRemoveStream) {
+      if (!isSignalingStateClosed && supportsRemoveStream) {
         this.peerConnection.removeStream(mediaStream);
         this.callLogger.debug(`Removed local '${mediaStream.type}' MediaStream from PeerConnection`, {
           audioTracks: mediaStream.getAudioTracks(),
