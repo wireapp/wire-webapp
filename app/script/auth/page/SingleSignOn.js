@@ -67,14 +67,15 @@ import {BACKEND} from '../Environment';
 
 class SingleSignOn extends React.PureComponent {
   static SSO_CODE_PREFIX = 'wire-';
+  static SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
   ssoWindow = undefined;
   inputs = {};
   state = {
-    clipboardError: null,
     code: '',
     isOverlayOpen: false,
     persist: true,
+    ssoError: null,
     validInputs: {
       code: true,
     },
@@ -265,6 +266,7 @@ class SingleSignOn extends React.PureComponent {
             return;
           }
           default: {
+            this.setState({ssoError: error});
             throw error;
           }
         }
@@ -296,7 +298,7 @@ class SingleSignOn extends React.PureComponent {
             throw error;
           }
         })
-        .catch(error => this.setState({clipboardError: error}));
+        .catch(error => this.setState({ssoError: error}));
     }
   };
 
@@ -312,14 +314,19 @@ class SingleSignOn extends React.PureComponent {
       : '';
   };
 
-  stripPrefix = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');
+  stripPrefix = code =>
+    code &&
+    code
+      .trim()
+      .toLowerCase()
+      .replace(SingleSignOn.SSO_CODE_PREFIX, '');
 
   render() {
     const {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {persist, code, isOverlayOpen, validInputs, validationErrors, clipboardError} = this.state;
+    const {persist, code, isOverlayOpen, validInputs, validationErrors, ssoError} = this.state;
     return (
       <Page>
         {isOverlayOpen && (
@@ -407,7 +414,7 @@ class SingleSignOn extends React.PureComponent {
                         value={code}
                         autoComplete="section-login sso-code"
                         maxLength="1024"
-                        pattern={`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`}
+                        pattern={`${SingleSignOn.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
                         autoFocus
                         type="text"
                         required
@@ -427,8 +434,8 @@ class SingleSignOn extends React.PureComponent {
                       parseValidationErrors(validationErrors)
                     ) : loginError ? (
                       <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                    ) : clipboardError ? (
-                      <ErrorMessage data-uie-name="error-message">{parseError(clipboardError)}</ErrorMessage>
+                    ) : ssoError ? (
+                      <ErrorMessage data-uie-name="error-message">{parseError(ssoError)}</ErrorMessage>
                     ) : (
                       <span style={{marginBottom: '4px'}}>&nbsp;</span>
                     )}

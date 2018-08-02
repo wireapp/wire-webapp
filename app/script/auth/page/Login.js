@@ -70,6 +70,7 @@ class Login extends React.PureComponent {
     conversationCode: null,
     conversationKey: null,
     email: '',
+    hideSSOLogin: false,
     isValidLink: true,
     logoutReason: null,
     password: '',
@@ -115,6 +116,8 @@ class Login extends React.PureComponent {
           }));
         });
     }
+
+    this.setState((state, props) => ({hideSSOLogin: URLUtil.hasURLParameter(QUERY_KEY.HIDE_SSO)}));
   };
 
   componentDidMount = () => {
@@ -244,7 +247,16 @@ class Login extends React.PureComponent {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
+    const {
+      logoutReason,
+      isValidLink,
+      hideSSOLogin,
+      email,
+      password,
+      persist,
+      validInputs,
+      validationErrors,
+    } = this.state;
     return (
       <Page>
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -344,7 +356,7 @@ class Login extends React.PureComponent {
                     )}
                   </Form>
                 </div>
-                {Environment.isInternalEnvironment() && !isDesktopApp() ? (
+                {Environment.isInternalEnvironment() && !isDesktopApp() && !hideSSOLogin ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
