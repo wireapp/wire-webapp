@@ -149,6 +149,7 @@ z.main.App = class App {
       this.service.calling,
       repositories.client,
       repositories.conversation,
+      repositories.event,
       repositories.media,
       repositories.user
     );

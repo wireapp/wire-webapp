@@ -136,7 +136,6 @@ z.event.EventRepository = class EventRepository {
     this.lastEventDate = ko.observable();
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.injectEvent.bind(this));
   }
 
   //##############################################################################

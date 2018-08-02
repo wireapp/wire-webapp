@@ -23,8 +23,9 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationVerificationStateHandler = class ConversationVerificationStateHandler {
-  constructor(conversationRepository) {
+  constructor(conversationRepository, eventRepository) {
     this.conversationRepository = conversationRepository;
+    this.eventRepository = eventRepository;
     this.timeOffset = this.conversationRepository.timeOffset;
     this.logger = new z.util.Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
 
@@ -123,7 +124,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   _checkChangeToVerified(conversationEntity) {
     if (this._willChangeToVerified(conversationEntity)) {
       const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, this.timeOffset);
-      amplify.publish(z.event.WebApp.EVENT.INJECT, allVerifiedEvent);
+      this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
   }
@@ -158,7 +159,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       }
 
       const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, this.timeOffset);
-      amplify.publish(z.event.WebApp.EVENT.INJECT, event);
+      this.eventRepository.injectEvent(event);
 
       return true;
     }

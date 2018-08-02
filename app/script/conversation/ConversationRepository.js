@@ -80,10 +80,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
     this.event_mapper = new z.conversation.EventMapper();
-    this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(this);
+    this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
+      this,
+      this.eventRepository
+    );
     this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
       this,
       this.cryptography_repository,
+      this.eventRepository,
       this.user_repository
     );
 

@@ -126,7 +126,6 @@ z.event.WebApp = {
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update_last_call_status',
   },
   EVENT: {
-    INJECT: 'wire.webapp.event.inject',
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling',
     UPDATE_TIME_OFFSET: 'wire.webapp.event.update_time_offset',
   },
