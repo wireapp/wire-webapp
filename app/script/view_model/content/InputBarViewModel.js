@@ -402,11 +402,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    * @returns {undefined} No return value
    */
   uploadFiles(files) {
+    const uploadLimit = this.selfUser().inTeam()
+      ? z.config.MAXIMUM_ASSET_FILE_SIZE_TEAM
+      : z.config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
     if (!this._isHittingUploadLimit(files)) {
       for (const file of Array.from(files)) {
-        const isTooLarge = file.size > z.config.MAXIMUM_ASSET_FILE_SIZE;
+        const isTooLarge = file.size > uploadLimit;
         if (isTooLarge) {
-          const fileSize = z.util.formatBytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const fileSize = z.util.formatBytes(uploadLimit);
           const options = {
             text: {
               message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
