@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-  <a name="2.0.1"></a>
+      <a name="2.1.0"></a>
+# [2.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.0.1...@wireapp/react-ui-kit@2.1.0) (2018-08-02)
+
+
+### Features
+
+* **react-ui-kit:** add Pill Component, minor fix to Colors, Header fix ([#925](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/925)) ([63f07aa](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/63f07aa))
+
+
+
+
+      <a name="2.0.1"></a>
 ## [2.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.0.0...@wireapp/react-ui-kit@2.0.1) (2018-08-01)
 
 
@@ -11,7 +22,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
 
-  <a name="2.0.0"></a>
+<a name="2.0.0"></a>
 # [2.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.12.2...@wireapp/react-ui-kit@2.0.0) (2018-08-01)
 
 
