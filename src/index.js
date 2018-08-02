@@ -22,10 +22,10 @@ import setGlobalStyles from './globalStyles';
 setGlobalStyles();
 
 export * from './Form';
-export * from './Layout';
-export * from './Modal';
-export * from './Menu';
-export * from './Identity';
 export * from './Icon';
-export * from './Progress';
+export * from './Identity';
+export * from './Layout';
+export * from './Menu';
+export * from './Misc';
+export * from './Modal';
 export * from './Text';

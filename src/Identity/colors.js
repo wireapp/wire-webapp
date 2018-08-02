@@ -35,7 +35,7 @@ function tint(color, percentage) {
 
 function opaque(color, percentage) {
   return Color(color)
-    .fade(percentage)
+    .fade(1 - percentage)
     .toString();
 }
 
@@ -103,7 +103,7 @@ const COMPONENT_COLOR = {
   LINK: DARK_COLOR.GRAY_DARKEN_72,
   TEXT: DARK_COLOR.GRAY_DARKEN_72,
   ICON: DARK_COLOR.GRAY_DARKEN_72,
-  DISABLED: opaque(DARK_COLOR.GRAY_DARKEN_32, 0.84),
+  DISABLED: opaque(DARK_COLOR.GRAY_DARKEN_32, 0.16),
 };
 
 export const COLOR = {
