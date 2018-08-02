@@ -20,7 +20,7 @@
 import {ConnectionStatus} from '../connection/';
 
 interface Connection {
-  conversation?: string;
+  conversation: string;
   from: string;
   last_update: string;
   message?: string;
