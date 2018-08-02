@@ -52,7 +52,7 @@ window.z.config = {
   MAXIMUM_ASSET_FILE_SIZE_PERSONAL: 25 * 1024 * 1024,
 
   // 100 megabyte upload limit for organizations
-  MAXIMUM_ASSET_FILE_SIZE_TEAM: 25 * 1024 * 1024,
+  MAXIMUM_ASSET_FILE_SIZE_TEAM: 100 * 1024 * 1024,
 
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
