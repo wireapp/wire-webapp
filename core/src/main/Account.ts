@@ -242,9 +242,7 @@ class Account extends EventEmitter {
       .then(() => this);
   }
 
-  private async decodeGenericMessage(
-    otrMessage: ConversationOtrMessageAddEvent
-  ): Promise<PayloadBundleIncoming | undefined> {
+  private async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<PayloadBundleIncoming> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
@@ -271,7 +269,7 @@ class Account extends EventEmitter {
         return this.mapGenericMessage(genericMessage, otrMessage);
       }
     } else {
-      return undefined;
+      throw decryptedMessage.error;
     }
   }
 
