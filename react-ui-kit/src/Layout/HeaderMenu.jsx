@@ -144,15 +144,15 @@ class HeaderMenu extends React.PureComponent {
 
   render() {
     const {isOpen} = this.state;
-    const {children, logoElement = null} = this.props;
+    const {children, logoElement = null, ...props} = this.props;
     return (
-      <MenuWrapper>
+      <MenuWrapper {...props} data-uie-name="element-header-menu">
         <MenuContent open={isOpen}>
           <MenuLogo onClick={this.closeMenu}>{logoElement}</MenuLogo>
           <MenuItems onClick={this.closeMenu} open={isOpen}>
             {children}
           </MenuItems>
-          <MenuOpenButton onClick={this.toggleMenu} open={isOpen}>
+          <MenuOpenButton onClick={this.toggleMenu} open={isOpen} data-uie-name="do-toggle-header-menu">
             <div />
             <div />
             <div />
