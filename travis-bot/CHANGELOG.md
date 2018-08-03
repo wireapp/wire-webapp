@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.127"></a>
+## [1.0.127](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@1.0.126...@wireapp/travis-bot@1.0.127) (2018-08-03)
+
+
+
+
+**Note:** Version bump only for package @wireapp/travis-bot
+
 <a name="1.0.126"></a>
 ## [1.0.126](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@1.0.125...@wireapp/travis-bot@1.0.126) (2018-08-03)
 
