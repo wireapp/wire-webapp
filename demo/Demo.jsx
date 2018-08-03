@@ -107,6 +107,7 @@ import {
   WireIcon,
 } from '@wireapp/react-ui-kit';
 import Color from 'color';
+import Helmet from 'react-helmet';
 import React from 'react';
 
 let shakebox = null;
@@ -142,6 +143,15 @@ class Demo extends React.PureComponent {
 
     return (
       <StyledApp>
+        <Helmet
+          meta={[
+            {
+              content: 'width=device-width, initial-scale=1, user-scalable=no',
+              name: 'viewport',
+            },
+          ]}
+        />
+
         {this.state.isModalOpen && (
           <Modal onClose={() => this.setState({isModalOpen: false})}>
             <Text>Normal Modal</Text>
