@@ -22,6 +22,7 @@ export * from './ClientActionContent';
 export * from './ConfirmationContent';
 export * from './DeletedContent';
 export * from './EditedTextContent';
+export * from './FileContent';
 export * from './HiddenContent';
 export * from './ImageContent';
 export * from './ReactionContent';

@@ -20,13 +20,16 @@
 import {ClientActionType, GenericMessageType} from '../conversation/root';
 
 import {Connection} from '@wireapp/api-client/dist/commonjs/connection';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event/';
 import {
   AssetContent,
   ClientActionContent,
   ConfirmationContent,
   DeletedContent,
   EditedTextContent,
+  FileAssetAbortContent,
+  FileAssetContent,
+  FileAssetMetaDataContent,
   HiddenContent,
   ImageAssetContent,
   ImageContent,
@@ -41,7 +44,7 @@ enum PayloadBundleState {
 }
 
 type PayloadBundleIncoming = PayloadBundle & {
-  conversation: string;
+  conversation?: string;
   messageTimer: number;
   state: PayloadBundleState.INCOMING;
 };
@@ -61,6 +64,9 @@ interface PayloadBundle {
     | Connection
     | DeletedContent
     | EditedTextContent
+    | FileAssetContent
+    | FileAssetMetaDataContent
+    | FileAssetAbortContent
     | HiddenContent
     | ImageAssetContent
     | ImageContent

@@ -1,9 +1,9 @@
 //@ts-check
 
-process.on('uncaughtException', error =>
+process.on('uncaughtException', (/** @type {any} */ error) =>
   logger.error(`Uncaught exception "${error.constructor.name}" (${error.code}): ${error.message}`, error)
 );
-process.on('unhandledRejection', error =>
+process.on('unhandledRejection', (/** @type {any} */ error) =>
   logger.error(`Uncaught rejection "${error.constructor.name}" (${error.code}): ${error.message}`, error)
 );
 
@@ -19,12 +19,12 @@ logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
 const {APIClient} = require('@wireapp/api-client');
-const fs = require('fs');
-const {promisify} = require('util');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/');
 const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
+
+const assetOriginalCache = {};
 
 (async () => {
   const login = {
@@ -63,20 +63,98 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
   });
 
   account.on(Account.INCOMING.ASSET, async data => {
+    const {conversation: conversationId, from, content, id: messageId, messageTimer} = data;
+    logger.log(
+      `Asset "${messageId}" in "${conversationId}" from "${from}":`,
+      data.content,
+      messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
+    );
+
+    const cacheOriginal = assetOriginalCache[messageId];
+    if (!cacheOriginal) {
+      throw new Error(`Uploaded data for message ID "${messageId} was received before the metadata."`);
+    }
+
+    const fileBuffer = await account.service.conversation.getAsset(content.uploaded);
+
+    const fileMetaDataPayload = await account.service.conversation.createFileMetadata({
+      length: fileBuffer.length,
+      name: cacheOriginal.name,
+      type: cacheOriginal.mimeType,
+    });
+    await account.service.conversation.send(conversationId, fileMetaDataPayload);
+
+    try {
+      const filePayload = await account.service.conversation.createFileData({data: fileBuffer}, fileMetaDataPayload.id);
+      await account.service.conversation.send(conversationId, filePayload);
+
+      delete assetOriginalCache[data.messageId];
+    } catch (error) {
+      console.error(`Error while sending asset: "${error.stack}"`);
+      const fileAbortPayload = await account.service.conversation.createFileAbort(0, fileMetaDataPayload.id);
+      await account.service.conversation.send(conversationId, fileAbortPayload);
+    }
+  });
+
+  account.on(Account.INCOMING.ASSET_META, data => {
+    const {conversation: conversationId, from, content, id: messageId, messageTimer} = data;
+    logger.log(
+      `Asset metadata "${messageId}" in "${conversationId}" from "${from}":`,
+      data.content,
+      messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
+    );
+
+    assetOriginalCache[messageId] = content.original;
+  });
+
+  account.on(Account.INCOMING.ASSET_ABORT, async data => {
+    const {conversation: conversationId, from, content, id: messageId, messageTimer} = data;
+    logger.log(
+      `Asset "${messageId}" not uploaded (reason: "${content.abortReason}") in "${conversationId}" from "${from}":`,
+      data,
+      messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
+    );
+
+    const cacheOriginal = assetOriginalCache[messageId];
+    if (!cacheOriginal) {
+      throw new Error(`Abort message for message ID "${messageId} was received before the metadata."`);
+    }
+
+    const fileMetaDataPayload = await account.service.conversation.createFileMetadata({
+      length: 0,
+      name: cacheOriginal.name,
+      type: cacheOriginal.mimeType,
+    });
+    await account.service.conversation.send(conversationId, fileMetaDataPayload);
+
+    const fileAbortPayload = await account.service.conversation.createFileAbort(0, fileMetaDataPayload.id);
+    await account.service.conversation.send(conversationId, fileAbortPayload);
+
+    delete assetOriginalCache[data.messageId];
+  });
+
+  account.on(Account.INCOMING.IMAGE, async data => {
     const {
-      conversation,
+      conversation: conversationId,
       from,
       content: {uploaded, original},
+      id: messageId,
       messageTimer,
     } = data;
     logger.log(
-      `Asset in "${conversation}" from "${from}":`,
-      original,
+      `Image "${messageId}" in "${conversationId}" from "${from}":`,
+      data,
       messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
     );
-    const fileType = original.mimeType.replace(/[^\/]+\//g, '');
-    const image = await account.service.conversation.getImage(uploaded);
-    await promisify(fs.writeFile)(path.join('.', `received_image.${fileType}`), image);
+
+    const imageBuffer = await account.service.conversation.getAsset(uploaded);
+    const imagePayload = await account.service.conversation.createImage({
+      data: imageBuffer,
+      height: original.image.height,
+      type: original.mimeType,
+      width: original.image.width,
+    });
+    await account.service.conversation.send(conversationId, imagePayload);
   });
 
   account.on(Account.INCOMING.PING, async data => {
@@ -142,8 +220,8 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
     const name = await account.service.self.getName();
 
     logger.log('Name', name);
-    logger.log('User ID', account.service.self.apiClient.context.userId);
-    logger.log('Client ID', account.service.self.apiClient.context.clientId);
+    logger.log('User ID', account.apiClient.context.userId);
+    logger.log('Client ID', account.apiClient.context.clientId);
     logger.log('Listening for messages ...');
   } catch (error) {
     logger.error(error);

@@ -19,22 +19,19 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/commonjs/asset/AssetRetentionPolicy';
-import {ImageContent} from '../conversation/content/';
+import {FileContent, ImageContent} from '../conversation/content/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {EncryptedAsset} from '../cryptography/root';
+import {EncryptedAssetUploaded} from '../cryptography/root';
 
 export interface AssetOptions {
   public: boolean;
   retention: AssetRetentionPolicy;
 }
 
-export default class AssetService {
+class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
-  private async postAsset(
-    buffer: Buffer,
-    options?: AssetOptions
-  ): Promise<EncryptedAsset & {key: string; token: string}> {
+  private async postAsset(buffer: Buffer, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
     const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset(buffer);
     const {key, token} = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options);
 
@@ -47,10 +44,13 @@ export default class AssetService {
     };
   }
 
-  public uploadImageAsset(
-    image: ImageContent,
-    options?: AssetOptions
-  ): Promise<EncryptedAsset & {key: string; token: string}> {
+  public uploadImageAsset(image: ImageContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
     return this.postAsset(image.data, options);
   }
+
+  public uploadFileAsset(file: FileContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
+    return this.postAsset(file.data, options);
+  }
 }
+
+export {AssetService};

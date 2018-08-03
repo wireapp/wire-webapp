@@ -63,12 +63,15 @@ class Account extends EventEmitter {
 
   public static readonly INCOMING = {
     ASSET: 'Account.INCOMING.ASSET',
+    ASSET_ABORT: 'Account.INCOMING.ASSET_ABORT',
+    ASSET_META: 'Account.INCOMING.ASSET_META',
     CLIENT_ACTION: 'Account.INCOMING.CLIENT_ACTION',
     CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
     CONNECTION: 'Account.INCOMING.CONNECTION',
     CONVERSATION_RENAME: 'Account.INCOMING.CONVERSATION_RENAME',
     DELETED: 'Account.INCOMING.DELETED',
     HIDDEN: 'Account.INCOMING.HIDDEN',
+    IMAGE: 'Account.INCOMING.IMAGE',
     MEMBER_JOIN: 'Account.INCOMING.MEMBER_JOIN',
     MESSAGE_TIMER_UPDATE: 'Account.INCOMING.MESSAGE_TIMER_UPDATE',
     PING: 'Account.INCOMING.PING',
@@ -322,10 +325,14 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.ASSET: {
+        const {uploaded, original} = genericMessage.asset;
+        const isImage = !!uploaded && !!uploaded.assetId && !!original && !!original.image;
+
         const content: AssetContent = {
-          abortReason: genericMessage.asset.not_uploaded,
+          abortReason: genericMessage.asset.notUploaded,
           original: genericMessage.asset.original,
           preview: genericMessage.asset.preview,
+          status: genericMessage.asset.status,
           uploaded: genericMessage.asset.uploaded,
         };
         return {
@@ -336,7 +343,7 @@ class Account extends EventEmitter {
           messageTimer: 0,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
-          type: genericMessage.content,
+          type: isImage ? GenericMessageType.IMAGE : genericMessage.content,
         };
       }
       case GenericMessageType.REACTION: {
@@ -427,8 +434,22 @@ class Account extends EventEmitter {
       const data = await this.handleEvent(event);
       if (data) {
         switch (data.type) {
-          case GenericMessageType.ASSET:
-            this.emit(Account.INCOMING.ASSET, data);
+          case GenericMessageType.ASSET: {
+            const assetContent = data.content as AssetContent;
+            const isMetaData = !!assetContent && !!assetContent.original && !assetContent.uploaded;
+            const isAbort = !!assetContent.abortReason || (!assetContent.original && !assetContent.uploaded);
+
+            if (isMetaData) {
+              this.emit(Account.INCOMING.ASSET_META, data);
+            } else if (isAbort) {
+              this.emit(Account.INCOMING.ASSET_ABORT, data);
+            } else {
+              this.emit(Account.INCOMING.ASSET, data);
+            }
+            break;
+          }
+          case GenericMessageType.IMAGE:
+            this.emit(Account.INCOMING.IMAGE, data);
             break;
           case GenericMessageType.CLIENT_ACTION:
             this.emit(Account.INCOMING.CLIENT_ACTION, data);
