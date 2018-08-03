@@ -21,83 +21,55 @@
 
 import Color from 'color';
 
-function shade(color, percentage) {
+const steps = [];
+const percent = 100;
+
+for (let index = 8; index < percent; index += 8) {
+  steps.push(index);
+}
+
+function shade(color, amount = 0.08) {
   return Color(color)
-    .mix(Color(BASE_COLOR.BLACK), percentage)
+    .mix(Color(BLACK), amount)
     .toString();
 }
 
-function tint(color, percentage) {
+function tint(color, amount) {
   return Color(color)
-    .mix(Color(BASE_COLOR.WHITE), percentage)
+    .mix(Color(WHITE), amount)
     .toString();
 }
 
-function opaque(color, percentage) {
+function opaque(color, amount) {
   return Color(color)
-    .fade(1 - percentage)
-    .toString();
+    .fade(1 - amount)
+    .toString(2);
 }
+
+const BLACK = '#000';
+const WHITE = '#fff';
 
 const BASE_COLOR = {
-  BLACK: '#000',
   BLUE: '#2391d3',
   GRAY: '#bac8d1',
   GREEN: '#00c800',
   ORANGE: '#ff8900',
   RED: '#fb0807',
-  WHITE: '#fff',
   YELLOW: '#febf02',
 };
 
-const DARK_COLOR = {
-  BLUE_DARKEN_8: shade(BASE_COLOR.BLUE, 0.08),
-  BLUE_DARKEN_48: shade(BASE_COLOR.BLUE, 0.48),
-  BLUE_DARKEN_72: shade(BASE_COLOR.BLUE, 0.72),
-  BLUE_DARKEN_88: shade(BASE_COLOR.BLUE, 0.88),
-  GRAY_DARKEN_24: shade(BASE_COLOR.GRAY, 0.24),
-  GRAY_DARKEN_32: shade(BASE_COLOR.GRAY, 0.32),
-  GRAY_DARKEN_72: shade(BASE_COLOR.GRAY, 0.72),
-  GREEN_DARKEN_8: shade(BASE_COLOR.GREEN, 0.08),
-  GREEN_DARKEN_48: shade(BASE_COLOR.GREEN, 0.48),
-  GREEN_DARKEN_72: shade(BASE_COLOR.GREEN, 0.72),
-  GREEN_DARKEN_88: shade(BASE_COLOR.GREEN, 0.88),
-  ORANGE_DARKEN_8: shade(BASE_COLOR.ORANGE, 0.08),
-  ORANGE_DARKEN_48: shade(BASE_COLOR.ORANGE, 0.48),
-  ORANGE_DARKEN_72: shade(BASE_COLOR.ORANGE, 0.72),
-  ORANGE_DARKEN_88: shade(BASE_COLOR.ORANGE, 0.88),
-  RED_DARKEN_8: shade(BASE_COLOR.RED, 0.08),
-  RED_DARKEN_48: shade(BASE_COLOR.RED, 0.48),
-  RED_DARKEN_72: shade(BASE_COLOR.RED, 0.72),
-  RED_DARKEN_88: shade(BASE_COLOR.RED, 0.88),
-  YELLOW_DARKEN_8: shade(BASE_COLOR.YELLOW, 0.08),
-  YELLOW_DARKEN_48: shade(BASE_COLOR.YELLOW, 0.48),
-  YELLOW_DARKEN_72: shade(BASE_COLOR.YELLOW, 0.72),
-  YELLOW_DARKEN_88: shade(BASE_COLOR.YELLOW, 0.88),
-};
+const DARK_COLOR = {};
+const LIGHT_COLOR = {};
+const OPAQUE_COLOR = {};
 
-const LIGHT_COLOR = {
-  GRAY_LIGHTEN_24: tint(BASE_COLOR.GRAY, 0.24),
-  GRAY_LIGHTEN_48: tint(BASE_COLOR.GRAY, 0.48),
-  GRAY_LIGHTEN_72: tint(BASE_COLOR.GRAY, 0.72),
-  GRAY_LIGHTEN_88: tint(BASE_COLOR.GRAY, 0.88),
-  GRAY_LIGHTEN_92: tint(BASE_COLOR.GRAY, 0.92),
-};
-
-const OPAQUE_COLOR = {
-  BLUE_OPAQUE_16: opaque(BASE_COLOR.BLUE, 0.16),
-  BLUE_OPAQUE_24: opaque(BASE_COLOR.BLUE, 0.24),
-  GRAY_OPAQUE_16: opaque(BASE_COLOR.GRAY, 0.16),
-  GRAY_OPAQUE_24: opaque(BASE_COLOR.GRAY, 0.24),
-  GREEN_OPAQUE_16: opaque(BASE_COLOR.GREEN, 0.16),
-  GREEN_OPAQUE_24: opaque(BASE_COLOR.GREEN, 0.24),
-  ORANGE_OPAQUE_16: opaque(BASE_COLOR.ORANGE, 0.16),
-  ORANGE_OPAQUE_24: opaque(BASE_COLOR.ORANGE, 0.24),
-  RED_OPAQUE_16: opaque(BASE_COLOR.RED, 0.16),
-  RED_OPAQUE_24: opaque(BASE_COLOR.RED, 0.24),
-  YELLOW_OPAQUE_16: opaque(BASE_COLOR.YELLOW, 0.16),
-  YELLOW_OPAQUE_24: opaque(BASE_COLOR.YELLOW, 0.24),
-};
+Object.entries(BASE_COLOR).forEach(([key, value]) => {
+  steps.forEach(step => {
+    const amount = step / percent;
+    DARK_COLOR[`${key}_DARKEN_${step}`] = shade(value, amount);
+    LIGHT_COLOR[`${key}_LIGHTEN_${step}`] = tint(value, amount);
+    OPAQUE_COLOR[`${key}_OPAQUE_${step}`] = opaque(value, amount);
+  });
+});
 
 const COMPONENT_COLOR = {
   LINK: DARK_COLOR.GRAY_DARKEN_72,
@@ -112,5 +84,7 @@ export const COLOR = {
   ...LIGHT_COLOR,
   ...OPAQUE_COLOR,
   ...COMPONENT_COLOR,
+  BLACK,
+  WHITE,
   shade,
 };

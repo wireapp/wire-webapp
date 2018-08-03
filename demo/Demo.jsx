@@ -109,8 +109,50 @@ import {
 import Color from 'color';
 import Helmet from 'react-helmet';
 import React from 'react';
+import styled from 'styled-components';
 
 let shakebox = null;
+
+const ColorElement = styled.div.attrs({
+  'data-text': props => `${props.name}
+${props.value}${
+    props.alpha
+      ? `
+α: ${props.alpha}`
+      : ''
+  }`,
+  style: ({color}) => ({backgroundColor: color}),
+})`
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  border: 1px solid black;
+  position: relative;
+  display: inline-block;
+  &::after {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    content: attr(data-text);
+    color: #fff
+    font-size: 10px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    opacity: 0;
+    transform: scale(1.2);
+    text-shadow: #000 0 0 2px;
+    text-align: center;
+    white-space: pre-wrap;
+    z-index:1;
+  }
+  &:hover::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
 
 class Demo extends React.PureComponent {
   state = {
@@ -121,6 +163,54 @@ class Demo extends React.PureComponent {
   };
 
   closeMenuModal = () => this.setState({isMenuModalOpen: false});
+
+  renderColorSection() {
+    const baseColors = ['BLUE', 'GRAY', 'GREEN', 'ORANGE', 'RED', 'YELLOW'];
+    const additionalColors = ['WHITE', 'BLACK', 'LINK', 'TEXT', 'ICON', 'DISABLED'];
+    const allColors = [...baseColors, ...additionalColors];
+    const steps = [];
+    const percent = 100;
+    const stepSize = 8;
+    for (let index = stepSize; index < percent; index += stepSize) {
+      steps.push(index);
+    }
+
+    return (
+      <Container>
+        <H2>Base Colors </H2>
+        {allColors.map(this.renderColor)}
+        <H2>Darken</H2>
+        {baseColors.map(color => (
+          <Container key={color}>{steps.map(step => this.renderColor(`${color}_DARKEN_${step}`))}</Container>
+        ))}
+        <H2>Lighten</H2>
+        {baseColors.map(color => (
+          <Container key={color}>{steps.map(step => this.renderColor(`${color}_LIGHTEN_${step}`))}</Container>
+        ))}
+        <H2>Opaque</H2>
+        {baseColors.map(color => (
+          <Container
+            key={color}
+            style={{
+              backgroundImage:
+                "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAL0lEQVQ4T2N88ODBfwY8QEFBgRGfPOOoAQzDIQzwxTFIjlA0400kowZAgnfwByIAPbI9Ca+UKQsAAAAASUVORK5CYII=')",
+            }}
+          >
+            {steps.map(step => this.renderColor(`${color}_OPAQUE_${step}`))}
+          </Container>
+        ))}
+      </Container>
+    );
+  }
+
+  renderColor(name) {
+    const color = Color(COLOR[name]);
+    const value = color.hex().toString();
+    const digits = 2;
+    const alpha = color.alpha() < 1 ? color.alpha().toFixed(digits) : 0;
+
+    return <ColorElement key={name} name={name} color={COLOR[name]} value={value} alpha={alpha} />;
+  }
 
   render() {
     const ColumnsStyle = {
@@ -625,45 +715,7 @@ class Demo extends React.PureComponent {
             <LabelLink block>LabelLink</LabelLink>
             <Line />
             <H1>Colors</H1>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'space-around',
-              }}
-            >
-              {Object.keys(COLOR).map((colorKey, index) => (
-                <div
-                  key={colorKey}
-                  style={{
-                    backgroundColor: COLOR[colorKey],
-                    borderRadius: '12px',
-                    height: '96px',
-                    margin: '8px',
-                    width: '192px',
-                  }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: COLOR.WHITE,
-                      border: `1px solid ${Color(COLOR[colorKey])
-                        .hex()
-                        .toString()}`,
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      padding: '4px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {colorKey}(
-                    {Color(COLOR[colorKey])
-                      .hex()
-                      .toString()}
-                    )
-                  </div>
-                </div>
-              ))}
-            </div>
+            {this.renderColorSection()}
           </Container>
         </Content>
         <Footer>Footer</Footer>
