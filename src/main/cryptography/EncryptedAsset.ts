@@ -24,4 +24,9 @@ interface EncryptedAsset {
   sha256: Buffer;
 }
 
-export {EncryptedAsset};
+interface EncryptedAssetUploaded extends EncryptedAsset {
+  key: string;
+  token: string;
+}
+
+export {EncryptedAsset, EncryptedAssetUploaded};

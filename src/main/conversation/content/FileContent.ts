@@ -17,25 +17,14 @@
  *
  */
 
-enum GenericMessageType {
-  ASSET = 'asset',
-  ASSET_ABORT = 'assetAbort',
-  ASSET_META = 'assetMeta',
-  AVAILABILITY = 'availability',
-  CALLING = 'calling',
-  CLEARED = 'cleared',
-  CLIENT_ACTION = 'clientAction',
-  CONFIRMATION = 'confirmation',
-  DELETED = 'deleted',
-  EDITED = 'edited',
-  EPHEMERAL = 'ephemeral',
-  HIDDEN = 'hidden',
-  IMAGE = 'image',
-  KNOCK = 'knock',
-  LAST_READ = 'lastRead',
-  LOCATION = 'location',
-  REACTION = 'reaction',
-  TEXT = 'text',
+interface FileContent {
+  data: Buffer;
 }
 
-export {GenericMessageType};
+interface FileMetaDataContent {
+  name: string;
+  length: number;
+  type: string;
+}
+
+export {FileContent, FileMetaDataContent};

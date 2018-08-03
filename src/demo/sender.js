@@ -9,8 +9,10 @@ process.on('unhandledRejection', error =>
 );
 
 const logdown = require('logdown');
+const fs = require('fs');
 const path = require('path');
 const TimeUnits = require('./TimeUnits');
+const {promisify} = require('util');
 require('dotenv').config({path: path.join(__dirname, 'sender.env')});
 
 const logger = logdown('@wireapp/core/demo/sender.js', {
@@ -46,8 +48,8 @@ const {FileEngine} = require('@wireapp/store-engine');
   const name = await account.service.self.getName();
 
   logger.log('Name', name);
-  logger.log('User ID', account.service.self.apiClient.context.userId);
-  logger.log('Client ID', account.service.self.apiClient.context.clientId);
+  logger.log('User ID', account.apiClient.context.userId);
+  logger.log('Client ID', account.apiClient.context.clientId);
 
   async function sendAndDeleteMessage() {
     const deleteTextPayload = account.service.conversation.createText('Delete me!');
@@ -60,7 +62,7 @@ const {FileEngine} = require('@wireapp/store-engine');
   }
 
   async function sendConversationLevelTimer(timeInMillis = TimeUnits.ONE_YEAR_IN_MILLIS) {
-    await account.service.conversation.apiClient.conversation.api.putConversationMessageTimer(CONVERSATION_ID, {
+    await account.apiClient.conversation.api.putConversationMessageTimer(CONVERSATION_ID, {
       message_timer: timeInMillis,
     });
   }
@@ -93,7 +95,33 @@ const {FileEngine} = require('@wireapp/store-engine');
     }, 2000);
   }
 
-  const methods = [sendAndDeleteMessage, sendEphemeralText, sendPing, sendText, sendAndEdit];
+  async function sendImage() {
+    const data = await promisify(fs.readFile)(path.join(__dirname, 'wire_logo.png'));
+    const image = {
+      data,
+      height: 244,
+      type: 'image/png',
+      width: 500,
+    };
+    const imagePayload = await account.service.conversation.createImage(image);
+    await account.service.conversation.send(CONVERSATION_ID, imagePayload);
+  }
+
+  async function sendFile() {
+    const filename = 'wire_logo.png';
+    const data = await promisify(fs.readFile)(path.join(__dirname, filename));
+    const metadataPayload = await account.service.conversation.createFileMetadata({
+      length: data.length,
+      name: filename,
+      type: 'image/png',
+    });
+    await account.service.conversation.send(CONVERSATION_ID, metadataPayload);
+
+    const filePayload = await account.service.conversation.createFileData({data}, metadataPayload.id);
+    await account.service.conversation.send(CONVERSATION_ID, filePayload);
+  }
+
+  const methods = [sendAndDeleteMessage, sendEphemeralText, sendPing, sendText, sendAndEdit, sendFile, sendImage];
 
   const timeoutInMillis = 2000;
   setInterval(() => {
