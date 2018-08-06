@@ -148,9 +148,9 @@
   dependencies:
     libsodium "0.7.3"
 
-"@bower_components/linkifyjs@nfrasser/linkify-shim#2.1.5":
+"@bower_components/linkifyjs@nfrasser/linkify-shim#2.1.6":
   version "0.0.0"
-  resolved "https://codeload.github.com/nfrasser/linkify-shim/tar.gz/67ecf680a10e3ed029e4bfd62e8217e27326a6ae"
+  resolved "https://codeload.github.com/nfrasser/linkify-shim/tar.gz/a6caa8d338d07551c842f4f6f71a1015948542bb"
 
 "@bower_components/long@dcodeIO/Long.js#*":
   version "3.2.0"
