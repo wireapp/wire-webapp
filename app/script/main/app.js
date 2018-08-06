@@ -261,16 +261,14 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
-        return this.repository.client.getValidLocalClient();
+        return this._initiateLocalClient();
       })
-      .then(clientObservable => {
+      .then(clientEntity => {
         this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientObservable().type);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        this.repository.cryptography.currentClient = clientObservable;
-        this.repository.event.currentClient = clientObservable;
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
@@ -496,6 +494,18 @@ z.main.App = class App {
         .then(() => this.repository.client.init(userEntity))
         .then(() => this.repository.properties.init(userEntity))
         .then(() => this._checkUserInformation(userEntity));
+    });
+  }
+
+  /**
+   * Initiate the current client of the self user.
+   * @returns {Promise<z.client.Client>} Resolves with the local client entity
+   */
+  _initiateLocalClient() {
+    return this.repository.client.getValidLocalClient().then(clientObservable => {
+      this.repository.cryptography.currentClient = clientObservable;
+      this.repository.event.currentClient = clientObservable;
+      return clientObservable();
     });
   }
 
