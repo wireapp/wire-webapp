@@ -262,7 +262,7 @@ z.main.App = class App {
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
-      .then(([selfUserEntity]) => {
+      .then(() => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         return this.repository.client.getValidLocalClient();
