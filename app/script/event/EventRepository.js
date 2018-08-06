@@ -669,10 +669,9 @@ z.event.EventRepository = class EventRepository {
           : Promise.resolve();
 
         return loadEventPromise.then(storedEvent => {
-          if (storedEvent) {
-            return this._handleLinkPreviewUpdate(storedEvent, newEvent);
-          }
-          return this.conversationService.save_event(newEvent);
+          return storedEvent
+            ? this._handleLinkPreviewUpdate(storedEvent, newEvent)
+            : this.conversationService.save_event(newEvent);
         });
       };
 
