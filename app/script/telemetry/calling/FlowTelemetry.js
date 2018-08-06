@@ -88,7 +88,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         signaling_state: this.peer_connection.signalingState,
       };
 
-      const isSignalingStateClosed = this.signalingState() === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
       if (!isSignalingStateClosed) {
         if (this.peer_connection.localDescription) {
           $.extend(report.rtc_peer_connection, {
