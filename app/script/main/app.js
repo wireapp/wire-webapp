@@ -53,7 +53,7 @@ z.main.App = class App {
     this.logger = new z.util.Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
     this.telemetry = new z.telemetry.app_init.AppInitTelemetry();
-    this.window_handler = new z.ui.WindowHandler().init();
+    this.windowHandler = new z.ui.WindowHandler().init();
 
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
@@ -104,7 +104,7 @@ z.main.App = class App {
     );
     repositories.event = new z.event.EventRepository(
       this.service.notification,
-      this.service.web_socket,
+      this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
       repositories.user
@@ -113,7 +113,7 @@ z.main.App = class App {
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(
       this.service.connect,
-      this.service.connect_google,
+      this.service.connectGoogle,
       repositories.properties
     );
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
@@ -153,7 +153,7 @@ z.main.App = class App {
       repositories.media,
       repositories.user
     );
-    repositories.event_tracker = new z.tracking.EventTrackingRepository(
+    repositories.eventTracker = new z.tracking.EventTrackingRepository(
       repositories.conversation,
       repositories.team,
       repositories.user
@@ -187,7 +187,7 @@ z.main.App = class App {
       calling: new z.calling.CallingService(this.auth.client),
       client: new z.client.ClientService(this.auth.client, storageService),
       connect: new z.connect.ConnectService(this.auth.client),
-      connect_google: new z.connect.ConnectGoogleService(this.auth.client),
+      connectGoogle: new z.connect.ConnectGoogleService(this.auth.client),
       conversation: z.util.Environment.browser.edge
         ? new z.conversation.ConversationServiceNoCompound(this.auth.client, storageService)
         : new z.conversation.ConversationService(this.auth.client, storageService),
@@ -202,7 +202,7 @@ z.main.App = class App {
       storage: storageService,
       team: new z.team.TeamService(this.auth.client),
       user: new z.user.UserService(this.auth.client, storageService),
-      web_socket: new z.event.WebSocketService(this.auth.client),
+      webSocket: new z.event.WebSocketService(this.auth.client),
     };
   }
 
@@ -211,11 +211,7 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return z.util.Environment.frontend.isProduction()
-      ? {}
-      : {
-          debug: new z.util.DebugUtil(this.repository),
-        };
+    return z.util.Environment.frontend.isProduction() ? {} : {debug: new z.util.DebugUtil(this.repository)};
   }
 
   /**
@@ -284,18 +280,18 @@ z.main.App = class App {
 
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
-      .then(([conversation_ets, connection_ets]) => {
+      .then(([conversationEntities, connectionEntities]) => {
         this.view.loading.updateProgress(25, z.string.initReceivedUserData);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS,
-          conversation_ets.length,
+          conversationEntities.length,
           50
         );
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS,
-          connection_ets.length,
+          connectionEntities.length,
           50
         );
 
@@ -306,15 +302,15 @@ z.main.App = class App {
       })
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initializeFromStream())
-      .then(notifications_count => {
+      .then(notificationsCount => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS,
-          notifications_count,
+          notificationsCount,
           100
         );
 
-        this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
+        this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
@@ -323,13 +319,13 @@ z.main.App = class App {
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
       })
-      .then(client_ets => {
+      .then(clientEntities => {
         this.view.loading.updateProgress(99);
 
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, clientEntities.length);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
 
-        this.repository.user.self().devices(client_ets);
+        this.repository.user.self().devices(clientEntities);
         this.logger.info('App pre-loading completed');
         return this._handleUrlParams();
       })
@@ -530,9 +526,8 @@ z.main.App = class App {
    */
   _isReload() {
     const isReload = z.util.isSameLocation(document.referrer, window.location.href);
-    this.logger.debug(
-      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
-    );
+    const log = `App reload: '${isReload}', Referrer: '${document.referrer}', Location: '${window.location.href}'`;
+    this.logger.debug(log);
     return isReload;
   }
 
