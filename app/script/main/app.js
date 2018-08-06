@@ -267,14 +267,14 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         return this.repository.client.getValidLocalClient();
       })
-      .then(client_observable => {
+      .then(clientObservable => {
         this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientObservable().type);
 
-        this.repository.cryptography.currentClient = client_observable;
-        this.repository.event.currentClient = client_observable;
+        this.repository.cryptography.currentClient = clientObservable;
+        this.repository.event.currentClient = clientObservable;
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
