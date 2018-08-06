@@ -710,11 +710,7 @@ z.user.UserRepository = class UserRepository {
       .get_own_user()
       .then(response => this.user_mapper.map_self_user_from_object(response))
       .then(userEntity => {
-        const promises = [
-          this.save_user(userEntity, true),
-          this.getMarketingConsent(),
-          this.client_repository.getClientsForSelf(),
-        ];
+        const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
         return Promise.all(promises).then(() => userEntity);
       })
       .catch(error => {

@@ -51,7 +51,9 @@ z.client.ClientRepository = class ClientRepository {
 
   init(selfUser) {
     this.selfUser(selfUser);
-    this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
+    return this.getClientsForSelf().then(() => {
+      this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
+    });
   }
 
   //##############################################################################
