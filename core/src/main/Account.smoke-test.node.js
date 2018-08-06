@@ -22,7 +22,7 @@
 require('dotenv').config();
 
 const AccountHelper = require('./test/AccountHelper');
-const {Account} = require('@wireapp/core');
+const {PayloadBundleType} = require('@wireapp/core/dist/conversation/root');
 const {ValidationUtil} = require('@wireapp/commons');
 const {UnconnectedUserError} = require('@wireapp/api-client/dist/commonjs/user/');
 const logdown = require('logdown');
@@ -127,7 +127,7 @@ describe('Account', () => {
     done();
   });
 
-  describe('Message Sending', () => {
+  describe('"Message Sending"', () => {
     beforeAll(async done => {
       if (CAN_RUN) {
         expect(ValidationUtil.isUUIDv4(alice.apiClient.context.userId)).toBe(true);
@@ -152,8 +152,8 @@ describe('Account', () => {
 
       const message = 'Hello, Bob!';
 
-      bob.on(Account.INCOMING.TEXT_MESSAGE, async data => {
-        expect(data.content.text).toBe(message);
+      bob.on(PayloadBundleType.TEXT, async payload => {
+        expect(payload.content.text).toBe(message);
         done();
       });
 

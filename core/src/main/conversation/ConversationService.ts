@@ -39,6 +39,7 @@ import {
   PayloadBundleOutgoing,
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
+  PayloadBundleType,
   ReactionType,
 } from '../conversation/root';
 
@@ -75,6 +76,7 @@ import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
 import {APIClient} from '@wireapp/api-client';
+
 const UUID = require('pure-uuid');
 
 class ConversationService {
@@ -556,7 +558,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.EDITED,
+      type: PayloadBundleType.MESSAGE_EDIT,
     };
   }
 
@@ -574,7 +576,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.ASSET,
+      type: PayloadBundleType.ASSET,
     };
   }
 
@@ -592,7 +594,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.ASSET_META,
+      type: PayloadBundleType.ASSET_META,
     };
   }
 
@@ -607,7 +609,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.ASSET_ABORT,
+      type: PayloadBundleType.ASSET_ABORT,
     };
   }
 
@@ -632,7 +634,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.IMAGE,
+      type: PayloadBundleType.ASSET_IMAGE,
     };
   }
 
@@ -649,7 +651,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.REACTION,
+      type: PayloadBundleType.REACTION,
     };
   }
 
@@ -662,7 +664,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.TEXT,
+      type: PayloadBundleType.TEXT,
     };
   }
 
@@ -677,7 +679,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.CONFIRMATION,
+      type: PayloadBundleType.CONFIRMATION,
     };
   }
 
@@ -687,7 +689,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.KNOCK,
+      type: PayloadBundleType.PING,
     };
   }
 
@@ -701,7 +703,7 @@ class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
-      type: GenericMessageType.CLIENT_ACTION,
+      type: PayloadBundleType.CLIENT_ACTION,
     };
   }
 
@@ -729,7 +731,7 @@ class ConversationService {
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
-      type: GenericMessageType.HIDDEN,
+      type: PayloadBundleType.MESSAGE_HIDE,
     };
   }
 
@@ -757,7 +759,7 @@ class ConversationService {
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
-      type: GenericMessageType.DELETED,
+      type: PayloadBundleType.MESSAGE_DELETE,
     };
   }
 
@@ -827,15 +829,15 @@ class ConversationService {
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     switch (payloadBundle.type) {
-      case GenericMessageType.ASSET:
+      case PayloadBundleType.ASSET:
         return this.sendFileData(conversationId, payloadBundle);
-      case GenericMessageType.ASSET_ABORT:
+      case PayloadBundleType.ASSET_ABORT:
         return this.sendFileAbort(conversationId, payloadBundle);
-      case GenericMessageType.ASSET_META:
+      case PayloadBundleType.ASSET_META:
         return this.sendFileMetaData(conversationId, payloadBundle);
-      case GenericMessageType.IMAGE:
+      case PayloadBundleType.ASSET_IMAGE:
         return this.sendImage(conversationId, payloadBundle);
-      case GenericMessageType.CLIENT_ACTION: {
+      case PayloadBundleType.CLIENT_ACTION: {
         if (payloadBundle.content === ClientAction.RESET_SESSION) {
           return this.sendSessionReset(conversationId, payloadBundle);
         }
@@ -843,15 +845,15 @@ class ConversationService {
           `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`
         );
       }
-      case GenericMessageType.CONFIRMATION:
+      case PayloadBundleType.CONFIRMATION:
         return this.sendConfirmation(conversationId, payloadBundle);
-      case GenericMessageType.EDITED:
+      case PayloadBundleType.MESSAGE_EDIT:
         return this.sendEditedText(conversationId, payloadBundle);
-      case GenericMessageType.KNOCK:
+      case PayloadBundleType.PING:
         return this.sendPing(conversationId, payloadBundle);
-      case GenericMessageType.REACTION:
+      case PayloadBundleType.REACTION:
         return this.sendReaction(conversationId, payloadBundle);
-      case GenericMessageType.TEXT:
+      case PayloadBundleType.TEXT:
         return this.sendText(conversationId, payloadBundle);
       default:
         throw new Error(`No send method implemented for "${payloadBundle.type}".`);
