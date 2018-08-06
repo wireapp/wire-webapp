@@ -266,16 +266,15 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     return constraintsPromise
-      .then(streamConstraints => {
-        return this.requestMediaStream(mediaType, streamConstraints).then(mediaStreamInfo => {
-          if (!this.mediaStreamInUse()) {
-            this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
-            return this._releaseMediaStream(mediaStreamInfo.stream);
-          }
+      .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
+      .then(mediaStreamInfo => {
+        if (!this.mediaStreamInUse()) {
+          this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
+          return this._releaseMediaStream(mediaStreamInfo.stream);
+        }
 
-          this._setSelfStreamState(mediaType);
-          this.changeMediaStream(mediaStreamInfo);
-        });
+        this._setSelfStreamState(mediaType);
+        this.changeMediaStream(mediaStreamInfo);
       })
       .catch(error => {
         const isMediaTypeScreen = mediaType === z.media.MediaType.SCREEN;
