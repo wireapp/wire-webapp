@@ -535,7 +535,7 @@ describe('Event Repository', () => {
         });
     });
 
-    it('saves a text message with link preview with an ID previously used by the same user for a plain text message', done => {
+    it('saves a text message with link preview with an ID previously used by the same user for a plain text message', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(previously_stored_event)
@@ -549,16 +549,12 @@ describe('Event Repository', () => {
       event.data.previews.push(1);
       event.time = changed_time;
 
-      TestFactory.event_repository
-        .processEvent(event)
-        .then(saved_event => {
-          expect(saved_event.time).toEqual(initial_time);
-          expect(saved_event.time).not.toEqual(changed_time);
-          expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
-          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository.processEvent(event).then(saved_event => {
+        expect(saved_event.time).toEqual(initial_time);
+        expect(saved_event.time).not.toEqual(changed_time);
+        expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
+        expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+      });
     });
 
     it('ignores edit message with missing associated original message', done => {
@@ -578,7 +574,7 @@ describe('Event Repository', () => {
         });
     });
 
-    it('updates edited messages when link preview arrives', done => {
+    it('updates edited messages when link preview arrives', () => {
       const replacingId = 'old-replaced-message-id';
       const storedEvent = Object.assign({}, event, {
         data: Object.assign({}, event.data, {
@@ -596,18 +592,14 @@ describe('Event Repository', () => {
       linkPreviewEvent.data.replacing_message_id = replacingId;
       linkPreviewEvent.data.previews = ['preview'];
 
-      TestFactory.event_repository
-        ._handleEventSaving(linkPreviewEvent)
-        .then(updatedEvent => {
-          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          expect(updatedEvent.data.previews[0]).toEqual('preview');
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEventSaving(linkPreviewEvent).then(updatedEvent => {
+        expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+        expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+        expect(updatedEvent.data.previews[0]).toEqual('preview');
+      });
     });
 
-    it('updates edited messages', done => {
+    it('updates edited messages', () => {
       const originalMessage = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(originalMessage)
@@ -622,20 +614,16 @@ describe('Event Repository', () => {
       event.data.replacing_message_id = originalMessage.id;
       event.time = changed_time;
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(updatedEvent => {
-          expect(updatedEvent.time).toEqual(initial_time);
-          expect(updatedEvent.time).not.toEqual(changed_time);
-          expect(updatedEvent.data.content).toEqual('new content');
-          expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
-          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEventSaving(event).then(updatedEvent => {
+        expect(updatedEvent.time).toEqual(initial_time);
+        expect(updatedEvent.time).not.toEqual(changed_time);
+        expect(updatedEvent.data.content).toEqual('new content');
+        expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
+        expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+      });
     });
 
-    it('updates link preview when edited', done => {
+    it('updates link preview when edited', () => {
       const replacingId = 'replaced-message-id';
       const storedEvent = Object.assign({}, event, {
         data: Object.assign({}, event.data, {
@@ -650,28 +638,23 @@ describe('Event Repository', () => {
 
       editEvent.data.replacing_message_id = replacingId;
 
-      TestFactory.event_repository
-        ._handleEventSaving(editEvent)
-        .then(updatedEvent => {
-          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          expect(updatedEvent.data.previews.length).toEqual(0);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEventSaving(editEvent).then(updatedEvent => {
+        expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+        expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+        expect(updatedEvent.data.previews.length).toEqual(0);
+      });
     });
 
-    it('saves a conversation.asset-add event', done => {
+    it('saves a conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
 
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
 
-      TestFactory.event_repository.processEvent(assetAddEvent).then(savedEvent => {
+      return TestFactory.event_repository.processEvent(assetAddEvent).then(savedEvent => {
         expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
         expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-        done();
       });
     });
   });
