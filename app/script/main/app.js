@@ -261,7 +261,7 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
-        return this._initiateLocalClient();
+        return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
         this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
@@ -501,12 +501,15 @@ z.main.App = class App {
    * Initiate the current client of the self user.
    * @returns {Promise<z.client.Client>} Resolves with the local client entity
    */
-  _initiateLocalClient() {
-    return this.repository.client.getValidLocalClient().then(clientObservable => {
-      this.repository.cryptography.currentClient = clientObservable;
-      this.repository.event.currentClient = clientObservable;
-      return clientObservable();
-    });
+  _initiateSelfUserClients() {
+    return this.repository.client
+      .getValidLocalClient()
+      .then(clientObservable => {
+        this.repository.cryptography.currentClient = clientObservable;
+        this.repository.event.currentClient = clientObservable;
+        return this.repository.client.getClientsForSelf();
+      })
+      .then(() => this.repository.client.currentClient());
   }
 
   /**
