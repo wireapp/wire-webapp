@@ -175,7 +175,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    *
    * @private
    * @param {Array<string>} userIds - Multiple user IDs (can include self user ID)
-   * @returns {Array<z.entity.Conversation>} Array of conversation entities
+   * @returns {Array<Object>} Array of objects containing the conversation entities and matching user IDs
    */
   _getActiveConversationsWithUsers(userIds) {
     return this.conversationRepository
@@ -191,7 +191,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
           }
         }
       })
-      .filter(activeConversationInfo => activeConversationInfo);
+      .filter(activeConversationInfo => !!activeConversationInfo);
   }
 
   /**
