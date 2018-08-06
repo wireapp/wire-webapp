@@ -260,13 +260,11 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._getUserSelf(), z.util.protobuf.loadProtos(protoFile)]);
+        return Promise.all([this._intiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(([selfUserEntity]) => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
-        this.repository.client.init(selfUserEntity);
-        this.repository.properties.init(selfUserEntity);
         return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
@@ -482,10 +480,10 @@ z.main.App = class App {
   }
 
   /**
-   * Get the self user from the backend.
+   * Initiate the self user by getting it from the backend.
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
-  _getUserSelf() {
+  _initiateSelfUser() {
     return this.repository.user.getSelf().then(userEntity => {
       this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
@@ -497,7 +495,11 @@ z.main.App = class App {
         }
       }
 
-      return this.service.storage.init(userEntity.id).then(() => this._checkUserInformation(userEntity));
+      return this.service.storage
+        .init(userEntity.id)
+        .then(() => this.repository.client.init(userEntity))
+        .then(() => this.repository.properties.init(userEntity))
+        .then(() => this._checkUserInformation(userEntity));
     });
   }
 
