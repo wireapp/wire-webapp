@@ -88,18 +88,21 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         signaling_state: this.peer_connection.signalingState,
       };
 
-      if (this.peer_connection.localDescription) {
-        $.extend(report.rtc_peer_connection, {
-          local_SDP: this.peer_connection.localDescription.sdp,
-          local_SDP_type: this.peer_connection.localDescription.type,
-        });
-      }
+      const isSignalingStateClosed = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      if (!isSignalingStateClosed) {
+        if (this.peer_connection.localDescription) {
+          $.extend(report.rtc_peer_connection, {
+            local_SDP: this.peer_connection.localDescription.sdp,
+            local_SDP_type: this.peer_connection.localDescription.type,
+          });
+        }
 
-      if (this.peer_connection.remoteDescription) {
-        $.extend(report.rtc_peer_connection, {
-          remote_SDP: this.peer_connection.remoteDescription.sdp,
-          remote_SDP_type: this.peer_connection.remoteDescription.type,
-        });
+        if (this.peer_connection.remoteDescription) {
+          $.extend(report.rtc_peer_connection, {
+            remote_SDP: this.peer_connection.remoteDescription.sdp,
+            remote_SDP_type: this.peer_connection.remoteDescription.type,
+          });
+        }
       }
     }
 
