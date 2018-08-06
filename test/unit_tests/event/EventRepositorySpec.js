@@ -657,6 +657,25 @@ describe('Event Repository', () => {
         expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
       });
     });
+
+    it('handles conversation.asset-add event cancelation', () => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+      const assetCancelEvent = Object.assign({}, assetAddEvent, {
+        data: {reason: 0, status: 'upload-failed'},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(assetAddEvent)
+      );
+
+      return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
+        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('_handleEventValidation', () => {

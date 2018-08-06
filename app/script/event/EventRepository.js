@@ -707,7 +707,8 @@ z.event.EventRepository = class EventRepository {
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    const textContentMatches =
+      (newData.previews && !newData.previews.length) || newData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
