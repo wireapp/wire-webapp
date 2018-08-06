@@ -29,7 +29,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     this.timeOffset = this.conversationRepository.timeOffset;
     this.logger = new z.util.Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
 
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENTS_UPDATED, this.onClientsUpdated.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged.bind(this));
@@ -41,35 +41,43 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {undefined} No return value
    */
   onClientVerificationChanged(userId) {
-    this._getActiveConversations().forEach(conversationEntity => {
+    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this._checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
-        this._checkChangeToDegraded(conversationEntity, [userId], z.message.VerificationMessageType.UNVERIFIED);
+        this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.UNVERIFIED);
       }
     });
   }
 
   /**
-   * Self user other participants added clients.
-   * @param {string|Array<string>} userIds - One or multiple user IDs (Can include self user ID)
+   * Self user or other participant added clients.
+   * @param {string} userId - ID of user that added client (can be self user ID)
    * @returns {undefined} No return value
    */
-  onClientAdd(userIds) {
-    if (_.isString(userIds)) {
-      userIds = [userIds];
-    }
+  onClientAdded(userId) {
+    this.onClientsAdded([userId]);
+  }
 
-    this._getActiveConversations().forEach(conversationEntity => {
-      this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.NEW_DEVICE);
+  /**
+   * Multiple participants added clients.
+   * @param {Array<string>} userIds - Multiple user IDs (can include self user ID)
+   * @returns {undefined} No return value
+   */
+  onClientsAdded(userIds) {
+    this._getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
+      this._checkChangeToDegraded(conversationEntity, matchingUserIds, z.message.VerificationMessageType.NEW_DEVICE);
     });
   }
 
   /**
    * Self user removed a client or other participants deleted clients.
+   * @param {string} userId - ID of user that added client (can be self user ID)
    * @returns {undefined} No return value
    */
-  onClientRemoved() {
-    this._getActiveConversations().forEach(conversationEntity => this._checkChangeToVerified(conversationEntity));
+  onClientRemoved(userId) {
+    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
+      this._checkChangeToVerified(conversationEntity);
+    });
   }
 
   /**
@@ -87,16 +95,16 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {undefined} No return value
    */
   onClientsUpdated(userId) {
-    this._getActiveConversations().forEach(conversationEntity => {
+    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this._checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
-        this._checkChangeToDegraded(conversationEntity, [userId], z.message.VerificationMessageType.NEW_DEVICE);
+        this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.NEW_DEVICE);
       }
     });
   }
 
   /**
-   * New member(s) joined the conversation
+   * New member(s) joined the conversation.
    * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
    * @param {Array<string>} userIds - IDs of added members
    * @returns {undefined} No return value
@@ -106,7 +114,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   }
 
   /**
-   * Member(s) left the conversation
+   * Member(s) left the conversation.
    * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
    * @returns {undefined} No return value
    */
@@ -115,7 +123,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   }
 
   /**
-   * Change that could verify conversation
+   * Change that could verify conversation.
    *
    * @private
    * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
@@ -130,7 +138,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   }
 
   /**
-   * Change that could degrade conversation
+   * Change that could degrade conversation.
    *
    * @private
    * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
@@ -141,9 +149,6 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   _checkChangeToDegraded(conversationEntity, userIds, type) {
     const isConversationDegraded = this._willChangeToDegraded(conversationEntity);
     if (isConversationDegraded) {
-      const userIdsInConversation = conversationEntity.participating_user_ids().concat(conversationEntity.self.id);
-      userIds = _.intersection(userIds, userIdsInConversation);
-
       /**
        * TEMPORARY DEBUGGING FIX:
        * We have seen conversations in a degraded state without an unverified device in there.
@@ -166,18 +171,31 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   }
 
   /**
-   * Get all conversation where self user is active
+   * Get all conversation where self user and the given users are active.
+   *
    * @private
-   * @returns {Array<z.entity.Conversation>} Array of conversation entities
+   * @param {Array<string>} userIds - Multiple user IDs (can include self user ID)
+   * @returns {Array<Object>} Array of objects containing the conversation entities and matching user IDs
    */
-  _getActiveConversations() {
+  _getActiveConversationsWithUsers(userIds) {
     return this.conversationRepository
       .filtered_conversations()
-      .filter(conversationEntity => !conversationEntity.removed_from_conversation());
+      .map(conversationEntity => {
+        if (!conversationEntity.removed_from_conversation()) {
+          const selfUserId = this.conversationRepository.selfUser().id;
+          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
+          const matchingUserIds = _.intersection(userIdsInConversation, userIds);
+
+          if (!!matchingUserIds.length) {
+            return {conversationEntity, userIds: matchingUserIds};
+          }
+        }
+      })
+      .filter(activeConversationInfo => !!activeConversationInfo);
   }
 
   /**
-   * Check whether to degrade conversation and set corresponding state
+   * Check whether to degrade conversation and set corresponding state.
    *
    * @private
    * @param {z.entity.Conversation} conversationEntity - Conversation entity to evaluate
@@ -190,8 +208,10 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       return false;
     }
 
-    const isVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
-    if (isVerified && !conversationEntity.is_verified()) {
+    // Explicit Boolean check to prevent state changes on undefined
+    const isStateVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
+    const isConversationUnverified = conversationEntity.is_verified() === false;
+    if (isStateVerified && isConversationUnverified) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
       this.logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
       return true;
@@ -209,12 +229,14 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   _willChangeToVerified(conversationEntity) {
     const state = conversationEntity.verification_state();
-    const isVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
-    if (isVerified) {
+    const isStateVerified = state === z.conversation.ConversationVerificationState.VERIFIED;
+    if (isStateVerified) {
       return false;
     }
 
-    if (conversationEntity.is_verified()) {
+    // Explicit Boolean check to prevent state changes on undefined
+    const isConversationVerified = conversationEntity.is_verified() === true;
+    if (isConversationVerified) {
       conversationEntity.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
       this.logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
       return true;

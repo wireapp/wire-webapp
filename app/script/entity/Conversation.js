@@ -105,10 +105,14 @@ z.entity.Conversation = class Conversation {
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_muted = this.muted_state;
     this.is_verified = ko.pureComputed(() => {
-      if (this.self && (this.participating_user_ets().length || !this.participating_user_ids().length)) {
-        const all_users = [this.self].concat(this.participating_user_ets());
-        return all_users.every(user_et => user_et.is_verified());
+      const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
+      const isInitialized = this.self && hasMappedUsers;
+      if (!isInitialized) {
+        return undefined;
       }
+
+      const allUserEntities = [this.self].concat(this.participating_user_ets());
+      return allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
