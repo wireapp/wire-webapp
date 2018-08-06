@@ -260,7 +260,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._intiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
+        return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(([selfUserEntity]) => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
