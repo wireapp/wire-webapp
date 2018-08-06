@@ -265,7 +265,6 @@ z.main.App = class App {
       })
       .then(clientEntity => {
         this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
-
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
@@ -274,8 +273,8 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-        this.repository.event.connectWebSocket();
 
+        this.repository.event.connectWebSocket();
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversationEntities, connectionEntities]) => {
