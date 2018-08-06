@@ -652,8 +652,8 @@ describe('Event Repository', () => {
 
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
 
-      return TestFactory.event_repository.processEvent(assetAddEvent).then(savedEvent => {
-        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+      return TestFactory.event_repository.processEvent(assetAddEvent).then(updatedEvent => {
+        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
         expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
       });
     });
@@ -675,6 +675,42 @@ describe('Event Repository', () => {
         expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
         expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
       });
+    });
+
+    it('handles conversation.asset-add state update events', () => {
+      const initialAssetEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+
+      const handledStatusUpdates = [
+        z.assets.AssetTransferState.DOWNLOADING,
+        z.assets.AssetTransferState.UPLOADED,
+        z.assets.AssetTransferState.UPLOADING,
+      ];
+
+      const updateStatusEvents = handledStatusUpdates.map(status => {
+        return Object.assign({}, initialAssetEvent, {
+          data: {reason: 0, status},
+          time: '2017-09-06T09:43:36.528Z',
+        });
+      });
+
+      spyOn(TestFactory.conversation_service, 'update_event').and.callFake(eventToUpdate =>
+        Promise.resolve(eventToUpdate)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(initialAssetEvent)
+      );
+
+      const promises = updateStatusEvents.map(updateStatusEvent => {
+        return TestFactory.event_repository.processEvent(updateStatusEvent).then(updatedEvent => {
+          expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+          expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+        });
+      });
+
+      return Promise.all(promises);
     });
   });
 

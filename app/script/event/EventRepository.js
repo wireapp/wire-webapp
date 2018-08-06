@@ -670,7 +670,7 @@ z.event.EventRepository = class EventRepository {
 
         return loadEventPromise.then(storedEvent => {
           return storedEvent
-            ? this._handleLinkPreviewUpdate(storedEvent, newEvent)
+            ? this._handleDuplicatedEvent(storedEvent, newEvent)
             : this.conversationService.save_event(newEvent);
         });
       };
@@ -696,6 +696,38 @@ z.event.EventRepository = class EventRepository {
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
     return this.conversationService.update_event(identifiedUpdates);
+  }
+
+  _handleDuplicatedEvent(originalEvent, newEvent) {
+    switch (newEvent.type) {
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._handleLinkPreviewUpdate(originalEvent, newEvent);
+
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        return this._handleAssetUpdate(originalEvent, newEvent);
+
+      default:
+        this._throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
+    }
+  }
+
+  _handleAssetUpdate(originalEvent, newEvent) {
+    switch (newEvent.data.status) {
+      case z.assets.AssetTransferState.DOWNLOADING:
+      case z.assets.AssetTransferState.UPLOADED:
+      case z.assets.AssetTransferState.UPLOADING: {
+        const updatedEvent = Object.assign({}, originalEvent, {
+          data: newEvent.data,
+        });
+        return this.conversationService.update_event(updatedEvent);
+      }
+
+      case z.assets.AssetTransferState.UPLOAD_CANCELED:
+      case z.assets.AssetTransferState.UPLOAD_FAILED:
+        return newEvent;
+      default:
+        return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+    }
   }
 
   _handleLinkPreviewUpdate(originalEvent, newEvent) {
