@@ -261,11 +261,10 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
-        return this._initiateLocalClient();
+        return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
         this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
-
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
@@ -274,8 +273,8 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-        this.repository.event.connectWebSocket();
 
+        this.repository.event.connectWebSocket();
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversationEntities, connectionEntities]) => {
@@ -501,12 +500,15 @@ z.main.App = class App {
    * Initiate the current client of the self user.
    * @returns {Promise<z.client.Client>} Resolves with the local client entity
    */
-  _initiateLocalClient() {
-    return this.repository.client.getValidLocalClient().then(clientObservable => {
-      this.repository.cryptography.currentClient = clientObservable;
-      this.repository.event.currentClient = clientObservable;
-      return clientObservable();
-    });
+  _initiateSelfUserClients() {
+    return this.repository.client
+      .getValidLocalClient()
+      .then(clientObservable => {
+        this.repository.cryptography.currentClient = clientObservable;
+        this.repository.event.currentClient = clientObservable;
+        return this.repository.client.getClientsForSelf();
+      })
+      .then(() => this.repository.client.currentClient());
   }
 
   /**
