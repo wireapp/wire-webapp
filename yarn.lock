@@ -235,12 +235,12 @@
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
 
-"@bower_components/webrtc-adapter@webrtc/adapter#6.2.1":
-  version "6.2.1"
-  resolved "https://codeload.github.com/webrtc/adapter/tar.gz/8f273c991a8b3b211d82b2ace4d8470da4e3946d"
+"@bower_components/webrtc-adapter@webrtc/adapter#6.3.2":
+  version "6.3.2"
+  resolved "https://codeload.github.com/webrtc/adapter/tar.gz/5713ffd408ac613fe353c901b0a20fad26be2a0b"
   dependencies:
     rtcpeerconnection-shim "^1.2.10"
-    sdp "^2.7.0"
+    sdp "^2.8.0"
 
 "@bower_components/wire-audio-files@wireapp/wire-audio-files#1.1.1":
   version "1.1.1"
@@ -9498,9 +9498,13 @@ sdp-transform@2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.4.1.tgz#3d1aa89045ea4fb20f688dd1e64934224b5d791a"
 
-sdp@^2.6.0, sdp@^2.7.0:
+sdp@^2.6.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.7.0.tgz#02b64ea0c29d73179afa19794e466b123b1b29f3"
+
+sdp@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.8.0.tgz#8d914a733b1c19b6d8fd36ba6cd2dfbfbd668b8a"
 
 select-hose@^2.0.0:
   version "2.0.0"
