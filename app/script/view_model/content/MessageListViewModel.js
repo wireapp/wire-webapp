@@ -319,15 +319,19 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _pull_messages() {
-    if (!this.conversation().is_pending() && this.conversation().hasAdditionalMessages()) {
-      const inner_container = $('.messages-wrap').children()[0];
-      const old_list_height = inner_container.scrollHeight;
+    const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
+    const [messagesContainer] = $('.messages-wrap').children();
+
+    if (shouldPullMessages && messagesContainer) {
+      const initialListHeight = messagesContainer.scrollHeight;
 
       this.capture_scrolling_event = false;
       this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
-        const new_list_height = inner_container.scrollHeight;
-        $('.messages-wrap').scrollTop(new_list_height - old_list_height);
-        this.capture_scrolling_event = true;
+        if (messagesContainer) {
+          const newListHeight = messagesContainer.scrollHeight;
+          $('.messages-wrap').scrollTop(newListHeight - initialListHeight);
+          this.capture_scrolling_event = true;
+        }
       });
     }
   }

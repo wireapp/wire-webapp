@@ -155,7 +155,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     return this._checkMediaSupport()
       .then(mediaType => {
         return this.constraintsHandler
-          .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput)
+          .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput())
           .then(streamConstraints => this.streamHandler.requestMediaStream(mediaType, streamConstraints));
       })
       .then(mediaStreamInfo => {

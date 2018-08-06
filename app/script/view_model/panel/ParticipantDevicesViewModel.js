@@ -66,6 +66,10 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
 
     this.detailMessage = ko.pureComputed(() => {
+      if (!this.userEntity()) {
+        return '';
+      }
+
       const text = z.l10n.text(z.string.participantDevicesDetailHeadline, {user: this.userEntity().first_name()});
 
       const textWithHtmlTags = /\{\{[^\}]+\}\}[^\{]+\{\{[^\}]+\}\}/;
@@ -83,15 +87,17 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {
-      return z.l10n.text(z.string.participantDevicesHeadline, this.userEntity().first_name());
+      return this.userEntity() ? z.l10n.text(z.string.participantDevicesHeadline, this.userEntity().first_name()) : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
-      return z.l10n.text(z.string.participantDevicesOutdatedClientMessage, this.userEntity().first_name());
+      return this.userEntity()
+        ? z.l10n.text(z.string.participantDevicesOutdatedClientMessage, this.userEntity().first_name())
+        : '';
     });
 
     this.isVisible.subscribe(isVisible => {
-      if (isVisible) {
+      if (isVisible && this.userEntity()) {
         const userId = this.userEntity().id;
 
         this.clientRepository

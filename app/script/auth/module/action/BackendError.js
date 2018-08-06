@@ -85,6 +85,22 @@ export default class BackendError extends Error {
     EXPIRED_CARD: 'expired_card',
   };
 
+  static SSO_ERRORS = {
+    SSO_FORBIDDEN: 'forbidden',
+    SSO_GENERIC_ERROR: 'generic-sso-error', // Synthetic error label
+    SSO_INSUFFICIENT_PERMISSIONS: 'insufficient-permissions',
+    SSO_INVALID_FAILURE_REDIRECT: 'bad-failure-redirect',
+    SSO_INVALID_SUCCESS_REDIRECT: 'bad-success-redirect',
+    SSO_INVALID_UPSTREAM: 'bad-upstream',
+    SSO_INVALID_USERNAME: 'bad-username',
+    SSO_NO_MATCHING_AUTH: 'no-matching-auth-req',
+    SSO_NO_SSO_CODE: 'no-sso-code-found', // Synthetic error label
+    SSO_NOT_FOUND: 'not-found',
+    SSO_SERVER_ERROR: 'server-error',
+    SSO_UNSUPPORTED_SAML: 'server-error-unsupported-saml',
+    SSO_USER_CANCELLED_ERROR: 'user-cancelled-sso-error', // Synthetic error label
+  };
+
   static get LABEL() {
     return {
       ...BackendError.AUTH_ERRORS,
@@ -95,6 +111,7 @@ export default class BackendError extends Error {
       ...BackendError.TEAM_ERRORS,
       ...BackendError.TEAM_INVITE_ERRORS,
       ...BackendError.PAYMENT_ERRORS,
+      ...BackendError.SSO_ERRORS,
     };
   }
 }

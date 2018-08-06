@@ -284,11 +284,17 @@ z.calling.CallingRepository = class CallingRepository {
       this.getCallById(conversationId)
         .then(callEntity => callEntity.verifySessionId(callMessageEntity))
         .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
-        .then(callEntity => callEntity.deactivateCall(callMessageEntity, terminationReason))
+        .then(callEntity => {
+          const fromSelf = userId === this.selfUserId();
+          return callEntity.deactivateCall(callMessageEntity, fromSelf, terminationReason).then(wasDeleted => {
+            if (!wasDeleted && fromSelf) {
+              callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
+            }
+          });
+        })
         .catch(error => {
           const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
           if (!isNotFound) {
-            this.injectDeactivateEvent(callMessageEntity, source);
             throw error;
           }
         });
@@ -704,6 +710,7 @@ z.calling.CallingRepository = class CallingRepository {
             callMessageEntity.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
           }
 
+          this._logMessage(true, callMessageEntity);
           return this.conversationRepository.send_e_call(
             conversationEntity,
             callMessageEntity,
@@ -711,8 +718,7 @@ z.calling.CallingRepository = class CallingRepository {
             preconditionOption
           );
         });
-      })
-      .then(() => this._logMessage(true, callMessageEntity));
+      });
   }
 
   /**
@@ -1153,6 +1159,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _initiatePreJoinCall(callEntity) {
+    this.callLogger.info(`Joining call in conversation '${callEntity.id}'`, callEntity);
     callEntity.setSelfState(true);
     return callEntity;
   }
@@ -1166,13 +1173,10 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the call entity
    */
   _initiateMediaStream(callEntity, mediaType) {
-    const conversationId = callEntity.id;
-    this.callLogger.info(`Joining call in conversation '${conversationId}'`, callEntity);
-
     return this.mediaStreamHandler.localMediaStream()
       ? Promise.resolve(callEntity)
       : this.mediaStreamHandler
-          .initiateMediaStream(conversationId, mediaType, callEntity.isGroup)
+          .initiateMediaStream(callEntity.id, mediaType, callEntity.isGroup)
           .then(() => callEntity);
   }
 

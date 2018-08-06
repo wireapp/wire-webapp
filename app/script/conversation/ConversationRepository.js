@@ -30,7 +30,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 256,
+        MAX_SIZE: 300,
       },
     };
   }
@@ -552,7 +552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Array of message entities
    */
   searchInConversation(conversationEntity, query) {
-    if (!query.length) {
+    if (!conversationEntity || !query.length) {
       return Promise.resolve({});
     }
 
@@ -2148,42 +2148,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
-  _send_and_inject_generic_message(conversation_et, generic_message, sync_timestamp = true) {
+  _send_and_inject_generic_message(conversationEntity, genericMessage, syncTimestamp = true) {
     return Promise.resolve()
       .then(() => {
-        if (conversation_et.removed_from_conversation()) {
+        if (conversationEntity.removed_from_conversation()) {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
-        return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
+        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, this.timeOffset);
+        return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
         const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
-        const shouldPlayPingAudio = isPing(generic_message) || isEphemeralPing(generic_message);
+        const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
         if (shouldPlayPingAudio) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
         return mappedEvent;
       })
-      .then(mappedEvent => {
-        const injectEventPromise = this.eventRepository.injectEvent(mappedEvent);
-        const messageSentPromise = this.send_generic_message_to_conversation(conversation_et.id, generic_message);
-
-        /**
-         * We will, in parallel, inject events to the repo (where they will be processed and saved in DB)
-         * and send the actual message to the backend.
-         * When both those actions are done, we can update our local event and say that is has been sent.
-         */
-        return Promise.all([injectEventPromise, messageSentPromise]).then(([event, sentPayload]) => {
-          this._trackContributed(conversation_et, generic_message);
-
-          const backend_iso_date = sync_timestamp ? sentPayload.time : '';
-          return this._updateMessageAsSent(conversation_et, event, backend_iso_date).then(() => event);
+      .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent))
+      .then(injectedEvent => {
+        return this.send_generic_message_to_conversation(conversationEntity.id, genericMessage).then(sentPayload => {
+          return {event: injectedEvent, sentPayload};
         });
+      })
+      .then(({event, sentPayload}) => {
+        this._trackContributed(conversationEntity, genericMessage);
+        const backendIsoDate = syncTimestamp ? sentPayload.time : '';
+        return this._updateMessageAsSent(conversationEntity, event, backendIsoDate).then(() => event);
       });
   }
 
@@ -2214,7 +2209,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         this.checkMessageTimer(messageEntity);
         if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
-          return this.conversation_service.update_message_in_db(messageEntity, changes);
+          return this.conversation_service.updateMessageInDb(messageEntity, changes);
         }
       })
       .catch(error => {
@@ -2315,8 +2310,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
   _sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption = false) {
-    const messageType = genericMessage.content;
-    this.logger.info(`Sending '${messageType}' message to conversation '${conversationId}'`, payload);
+    const {content: messageType, message_id: messageId} = genericMessage;
+    const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
+    this.logger.info(logMessage, payload);
 
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)
@@ -2754,7 +2750,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._on1to1Creation(conversationEntity, eventJson);
 
       case z.event.Client.CONVERSATION.REACTION:
-        return this._on_reaction(conversationEntity, eventJson);
+        return this._onReaction(conversationEntity, eventJson);
 
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
@@ -2943,7 +2939,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const was_updated = message_et.update_status(event_data.status);
 
         if (was_updated) {
-          return this.conversation_service.update_message_in_db(message_et, {status: message_et.status()});
+          const changes = {status: message_et.status()};
+          return this.conversation_service.updateMessageInDb(message_et, changes);
         }
       })
       .catch(error => {
@@ -3315,44 +3312,41 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Someone reacted to a message.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity that a message was reacted upon in
-   * @param {Object} event_json - JSON data of 'conversation.reaction' event
+   * @param {Conversation} conversationEntity - Conversation entity that a message was reacted upon in
+   * @param {Object} eventJson - JSON data of 'conversation.reaction' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_reaction(conversation_et, event_json) {
-    const event_data = event_json.data;
+  _onReaction(conversationEntity, eventJson) {
+    const conversationId = conversationEntity.id;
+    const eventData = eventJson.data;
+    const messageId = eventData.message_id;
 
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then(message_et => {
-        if (!message_et || !message_et.is_content()) {
-          const type = message_et ? message_et.type : 'unknown';
+    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+      .then(messageEntity => {
+        if (!messageEntity || !messageEntity.is_content()) {
+          const type = messageEntity ? messageEntity.type : 'unknown';
 
-          this.logger.error(
-            `Message '${event_data.message_id}' in conversation '${conversation_et.id}' is of reactable type '${type}'`,
-            message_et
-          );
+          const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
+          this.logger.error(log, messageEntity);
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_TYPE);
         }
 
-        const changes = message_et.update_reactions(event_json);
+        const changes = messageEntity.update_reactions(eventJson);
         if (changes) {
-          this.logger.debug(
-            `Updating reactions to message '${event_data.message_id}' in conversation '${conversation_et.id}'`,
-            event_json
-          );
+          const log = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
+          this.logger.debug(log, {changes, event: eventJson});
 
-          return this._updateMessageUserEntities(message_et).then(updated_message_et => {
-            this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
-            return this._prepareReactionNotification(conversation_et, updated_message_et, event_json);
+          return this._updateMessageUserEntities(messageEntity).then(changedMessageEntity => {
+            this.conversation_service.sequentiallyUpdateMessageInDb(changedMessageEntity, changes, conversationId);
+            return this._prepareReactionNotification(conversationEntity, changedMessageEntity, eventJson);
           });
         }
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.error(
-            `Failed to handle reaction to message '${event_data.message_id}' in conversation '${conversation_et.id}'`,
-            {error, event: event_json}
-          );
+        const isNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (!isNotFound) {
+          const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
+          this.logger.error(log, {error, event: eventJson});
           throw error;
         }
       });

@@ -90,7 +90,7 @@ describe('ConversationServiceNoCompound', () => {
     });
   });
 
-  describe('update_message_in_db', () => {
+  describe('updateMessageInDb', () => {
     // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"};
@@ -100,14 +100,14 @@ describe('ConversationServiceNoCompound', () => {
       event.time = new Date().toISOString();
       event.primary_key = 1337;
       conversation_service
-        .update_message_in_db(event, {time: event.time})
+        .updateMessageInDb(event, {time: event.time})
         .then(done)
         .catch(done.fail);
     });
 
     it('fails if changes are not specified', done => {
       conversation_service
-        .update_message_in_db(event, undefined)
+        .updateMessageInDb(event, undefined)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.conversation.ConversationError));

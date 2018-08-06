@@ -839,9 +839,15 @@ z.event.EventRepository = class EventRepository {
       return true;
     }
 
-    const message = `Ignored outdated '${type}' event in conversation '${conversationId}'`;
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    this.logger.info(`${message} - Event: '${thresholdTimestamp}', Local: '${correctedTimestamp}'`, logObject);
+    const eventIsoDate = new Date(time).toISOString();
+    const logMessage = `Ignored outdated '${type}' event (${eventIsoDate}) in conversation '${conversationId}'`;
+    const logObject = {
+      eventJson: JSON.stringify(event),
+      eventObject: event,
+      eventTime: eventIsoDate,
+      localTime: new Date(correctedTimestamp).toISOString(),
+    };
+    this.logger.info(logMessage, logObject);
     throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
   }
 };

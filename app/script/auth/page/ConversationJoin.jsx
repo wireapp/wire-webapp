@@ -19,7 +19,7 @@
 
 import {
   H2,
-  H3,
+  Text,
   Link,
   Small,
   Form,
@@ -30,6 +30,7 @@ import {
   RoundIconButton,
   ErrorMessage,
   ContainerXS,
+  COLOR,
 } from '@wireapp/react-ui-kit';
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
@@ -179,7 +180,11 @@ class ConversationJoin extends Component {
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
-        <H2 style={{marginBottom: '10px', marginTop: '0'}} data-uie-name="status-join-headline">
+        <H2
+          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+          color={COLOR.GRAY}
+          data-uie-name="status-join-headline"
+        >
           {selfName ? (
             <FormattedHTMLMessage
               {...conversationJoinStrings.existentAccountHeadline}
@@ -189,7 +194,7 @@ class ConversationJoin extends Component {
             <FormattedHTMLMessage {...conversationJoinStrings.headline} />
           )}
         </H2>
-        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
+        <Text style={{fontSize: '16px', marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</Text>
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
@@ -218,12 +223,12 @@ class ConversationJoin extends Component {
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
-        <H2 style={{marginBottom: '10px', marginTop: '0'}}>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
-        <H3 style={{marginTop: '10px'}}>
+        <Text style={{fontSize: '16px', marginTop: '10px'}}>
           <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
-        </H3>
+        </Text>
         <Form style={{marginTop: 30}}>
           <InputSubmitCombo>
             <Input
@@ -279,12 +284,16 @@ class ConversationJoin extends Component {
     } = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <H2 style={{marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
+        <H2
+          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+          color={COLOR.GRAY}
+          data-uie-name="status-full-headline"
+        >
           <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
         </H2>
-        <H3 style={{marginTop: '10px'}} data-uie-name="status-full-text">
+        <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
           {_(conversationJoinStrings.fullConversationSubhead)}
-        </H3>
+        </Text>
       </ContainerXS>
     );
   };
