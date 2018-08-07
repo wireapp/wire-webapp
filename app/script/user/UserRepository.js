@@ -671,7 +671,7 @@ z.user.UserRepository = class UserRepository {
         const new_user_ets = _.flatten(resolve_array);
 
         if (this.isTeam()) {
-          this.map_guest_status(new_user_ets);
+          this.mapGuestStatus(new_user_ets);
         }
 
         return this.save_users(new_user_ets);
@@ -881,7 +881,7 @@ z.user.UserRepository = class UserRepository {
       )
       .then(userEntity => {
         if (this.isTeam()) {
-          this.map_guest_status([userEntity]);
+          this.mapGuestStatus([userEntity]);
         }
       });
   }
@@ -1057,7 +1057,7 @@ z.user.UserRepository = class UserRepository {
     return z.util.loadUrlBlob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
-  map_guest_status(userEntities = this.users()) {
+  mapGuestStatus(userEntities = this.users()) {
     userEntities.forEach(userEntity => {
       if (!userEntity.is_me) {
         const isTeamMember = this.teamMembers().some(teamMember => teamMember.id === userEntity.id);
