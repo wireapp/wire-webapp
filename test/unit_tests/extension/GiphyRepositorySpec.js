@@ -36,7 +36,6 @@ describe('Giphy Repository', () => {
     server = sinon.fakeServer.create();
 
     client = new z.service.BackendClient(urls);
-    client.logger.level = client.logger.levels.OFF;
 
     giphy_service = new z.extension.GiphyService(client);
     giphy_repository = new z.extension.GiphyRepository(giphy_service);
