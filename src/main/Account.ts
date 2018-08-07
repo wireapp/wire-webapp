@@ -38,7 +38,14 @@ import * as Long from 'long';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
 import {ConnectionService} from './connection/root';
-import {AssetContent, DeletedContent, HiddenContent, ReactionContent, TextContent} from './conversation/content/';
+import {
+  AssetContent,
+  DeletedContent,
+  EditedTextContent,
+  HiddenContent,
+  ReactionContent,
+  TextContent,
+} from './conversation/content/';
 import {
   AssetService,
   ConversationService,
@@ -289,6 +296,22 @@ class Account extends EventEmitter {
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_DELETE,
+        };
+      }
+      case GenericMessageType.EDITED: {
+        const content: EditedTextContent = {
+          originalMessageId: genericMessage.edited.replacingMessageId,
+          text: genericMessage.edited.text.content,
+        };
+        return {
+          content,
+          conversation: event.conversation,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: PayloadBundleType.MESSAGE_EDIT,
         };
       }
       case GenericMessageType.HIDDEN: {

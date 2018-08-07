@@ -26,6 +26,7 @@ const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/'
 const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
 
 const assetOriginalCache = {};
+const messageEchoCache = {};
 
 (async () => {
   const login = {
@@ -53,6 +54,7 @@ const assetOriginalCache = {};
     await account.service.conversation.send(conversationId, confirmationPayload);
 
     const textPayload = account.service.conversation.createText(content.text);
+    messageEchoCache[messageId] = textPayload.id;
     account.service.conversation.messageTimer.setConversationLevelTimer(conversationId, messageTimer);
     await account.service.conversation.send(conversationId, textPayload);
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
@@ -178,7 +180,7 @@ const assetOriginalCache = {};
     await account.service.conversation.send(conversationId, reactionPayload);
   });
 
-  account.on(Account.INCOMING.TYPING, async data => {
+  account.on(PayloadBundleType.TYPING, async data => {
     const {
       conversation: conversationId,
       from,
@@ -195,8 +197,25 @@ const assetOriginalCache = {};
   });
 
   account.on(PayloadBundleType.MESSAGE_DELETE, async data => {
-    const {conversation: conversationId, id: messageId, from} = data;
-    logger.log(`Deleted message "${messageId}" in "${conversationId}" by "${from}".`, data);
+    const {conversation: conversationId, id: messageId, content, from} = data;
+    logger.log(`Deleted message "${messageId}" in "${conversationId}" by "${from}".`, content);
+
+    await account.service.conversation.deleteMessageEveryone(
+      conversationId,
+      messageEchoCache[content.originalMessageId]
+    );
+    delete messageEchoCache[messageId];
+  });
+
+  account.on(PayloadBundleType.MESSAGE_EDIT, async data => {
+    const {conversation: conversationId, id: messageId, content, from} = data;
+    logger.log(`Edited message "${messageId}" in "${conversationId}" by "${from}".`, content);
+
+    const editedPayload = account.service.conversation.createEditedText(
+      content.text,
+      messageEchoCache[content.originalMessageId]
+    );
+    await account.service.conversation.send(conversationId, editedPayload);
   });
 
   account.on(PayloadBundleType.MESSAGE_HIDE, async data => {
