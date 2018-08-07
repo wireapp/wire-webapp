@@ -368,7 +368,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
           selfClientJoined: this.callEntity.selfClientJoined(),
           state: this.callEntity.state(),
         };
-        Raygun.send(new Error(''), customData);
+        Raygun.send(new Error('Media Stream missing when negotiation call'), customData);
 
         throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
       }
