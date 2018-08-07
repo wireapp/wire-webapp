@@ -25,7 +25,6 @@ const {APIClient} = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 const logdown = require('logdown');
 const {Account} = require('@wireapp/core');
-const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 const {name, version} = require('../../package.json');
@@ -66,7 +65,7 @@ if (!message) {
     const engine = new MemoryEngine();
     await engine.init('');
 
-    const apiClient = new APIClient(new Config(engine, APIClient.BACKEND.PRODUCTION));
+    const apiClient = new APIClient({store: engine, urls: APIClient.BACKEND.PRODUCTION});
     const account = new Account(apiClient);
     await account.login(login);
 

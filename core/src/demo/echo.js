@@ -20,7 +20,6 @@ logger.state.isEnabled = true;
 const {Account} = require('@wireapp/core');
 const {PayloadBundleType} = require('@wireapp/core/dist/conversation/root');
 const {APIClient} = require('@wireapp/api-client');
-const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/');
 const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
@@ -39,7 +38,7 @@ const messageEchoCache = {};
   const engine = new MemoryEngine();
   await engine.init('receiver');
 
-  const apiClient = new APIClient(new Config(engine, backend));
+  const apiClient = new APIClient({store: engine, urls: backend});
   const account = new Account(apiClient);
 
   account.on(PayloadBundleType.TEXT, async data => {

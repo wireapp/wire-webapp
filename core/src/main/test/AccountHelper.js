@@ -1,7 +1,6 @@
 const StoreHelper = require('./StoreHelper');
 const {Account} = require('@wireapp/core');
 const {APIClient} = require('@wireapp/api-client');
-const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 
 module.exports = {
@@ -13,7 +12,7 @@ module.exports = {
     };
     const backend = APIClient.BACKEND.STAGING;
     const engine = await StoreHelper.createMemoryEngine(email);
-    const apiClient = new APIClient(new Config(engine, backend));
+    const apiClient = new APIClient({store: engine, urls: backend});
     const account = new Account(apiClient);
     await account.login(login);
     await account.listen();

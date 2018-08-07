@@ -21,7 +21,6 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {Account} from '@wireapp/core';
 import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/root';
@@ -56,7 +55,7 @@ const conversationID = program.conversation || process.env.WIRE_CONVERSATION_ID;
 const directory = path.join(os.homedir(), '.wire-cli', loginData.email);
 const storeEngine = new FileEngine(directory);
 storeEngine.init('', {fileExtension: '.json'}).then(() => {
-  const apiClient: APIClient = new APIClient(new Config(storeEngine, APIClient.BACKEND.PRODUCTION));
+  const apiClient: APIClient = new APIClient({store: storeEngine, urls: APIClient.BACKEND.PRODUCTION});
 
   const account = new Account(apiClient);
 

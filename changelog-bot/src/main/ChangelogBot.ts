@@ -19,7 +19,6 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
-import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {Account} from '@wireapp/core';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {exec} from 'child_process';
@@ -48,7 +47,7 @@ class ChangelogBot {
     const engine = new MemoryEngine();
     await engine.init('');
 
-    const client = new APIClient(new Config(engine, APIClient.BACKEND.PRODUCTION));
+    const client = new APIClient({store: engine, urls: APIClient.BACKEND.PRODUCTION});
 
     const account = new Account(client);
     await account.login(this.loginData);

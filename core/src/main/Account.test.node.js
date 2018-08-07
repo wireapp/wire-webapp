@@ -24,7 +24,6 @@ const {APIClient} = require('@wireapp/api-client');
 const {AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {ClientAPI, ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
-const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {ConversationAPI} = require('@wireapp/api-client/dist/commonjs/conversation/');
 const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
 const {MemoryEngine} = require('@wireapp/store-engine');
@@ -43,8 +42,7 @@ async function createAccount(storageName = `test-${Date.now()}`) {
   const storeEngine = new MemoryEngine();
   await storeEngine.init(storageName);
 
-  const config = new Config(storeEngine, MOCK_BACKEND);
-  const apiClient = new APIClient(config);
+  const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
   return new Account(apiClient);
 }
 
@@ -282,8 +280,7 @@ describe('Account', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('account.test');
 
-      const config = new Config(storeEngine, MOCK_BACKEND);
-      const apiClient = new APIClient(config);
+      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
       await account.init();
@@ -304,8 +301,7 @@ describe('Account', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('account.test');
 
-      const config = new Config(storeEngine, MOCK_BACKEND);
-      const apiClient = new APIClient(config);
+      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
       await account.init();

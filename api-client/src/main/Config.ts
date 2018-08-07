@@ -17,22 +17,19 @@
  *
  */
 
-import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {Dexie} from 'dexie';
-import {Backend} from './env';
 
 type SchemaCallbackFunction = (db: Dexie) => void;
 
-class Config {
-  constructor(
-    public store: CRUDEngine = new MemoryEngine(),
-    public urls: {
-      name: string;
-      rest: string;
-      ws: string;
-    } = Backend.PRODUCTION,
-    public schemaCallback?: SchemaCallbackFunction
-  ) {}
+interface Config {
+  store: CRUDEngine;
+  urls: {
+    name: string;
+    rest: string;
+    ws: string;
+  };
+  schemaCallback?: SchemaCallbackFunction;
 }
 
 export {Config, SchemaCallbackFunction};
