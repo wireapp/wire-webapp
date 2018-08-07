@@ -65,7 +65,7 @@ ko.components.register('link-preview-asset', {
   template: `
     <!-- ko ifnot: messageEntity.is_expired() -->
       <div class="link-preview-image-container">
-        <!-- ko ifnot: preview.image_resource() -->
+        <!-- ko if: !preview || !preview.image_resource() -->
           <div class="link-preview-image-placeholder icon-link"></div>
         <!-- /ko -->
         <!-- ko if: preview.image_resource() -->
