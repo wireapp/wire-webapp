@@ -103,7 +103,10 @@ class HttpClient extends EventEmitter {
     }
 
     return axios
-      .request(config)
+      .request({
+        ...config,
+        maxContentLength: 104857600, // 100 Megabytes
+      })
       .then((response: AxiosResponse) => {
         this.updateConnectionState(ConnectionState.CONNECTED);
         return response;
