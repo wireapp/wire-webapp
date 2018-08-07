@@ -17,22 +17,22 @@
  *
  */
 
+import * as fs from 'bro-fs';
 import CRUDEngine from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
 import {RecordAlreadyExistsError, RecordNotFoundError, UnsupportedError} from './error';
 import {RecordTypeError} from './error/';
-const fs = require('bro-fs');
 
-export type FileSystemEngineOptions = {
+export interface FileSystemEngineOptions {
   fileExtension: string;
-  type: number;
   size: number;
-};
+  type: number;
+}
 
 const TEN_MEGABYTES = 1024 * 1024 * 10;
 
 export default class FileSystemEngine implements CRUDEngine {
-  public storeName: string = '';
+  public storeName = '';
 
   private config: FileSystemEngineOptions = {
     fileExtension: '.dat',
@@ -49,7 +49,7 @@ export default class FileSystemEngine implements CRUDEngine {
     }
   }
 
-  public async init(storeName: string = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
+  public async init(storeName = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
     await this.isSupported();
     this.config = {...this.config, ...options};
     this.storeName = storeName;
@@ -69,23 +69,20 @@ export default class FileSystemEngine implements CRUDEngine {
 
   async append(tableName: string, primaryKey: string, additions: string): Promise<string> {
     const filePath = this.createFilePath(tableName, primaryKey);
-    return this.read(tableName, primaryKey)
-      .then((record: any) => {
-        if (typeof record === 'string') {
-          record += additions;
-        } else {
-          const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-          throw new RecordTypeError(message);
-        }
-        return record;
-      })
-      .then((updatedRecord: any) => fs.writeFile(filePath, updatedRecord))
-      .then(() => primaryKey);
+    const record = await this.read(tableName, primaryKey);
+
+    if (typeof record === 'string') {
+      await fs.writeFile(filePath, record + additions);
+      return primaryKey;
+    } else {
+      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+      throw new RecordTypeError(message);
+    }
   }
 
   async create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
-      const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+      const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
       throw new RecordTypeError(message);
     }
 
@@ -93,14 +90,14 @@ export default class FileSystemEngine implements CRUDEngine {
     const isExistent = await fs.exists(filePath);
 
     if (isExistent) {
-      const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+      const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
       throw new RecordAlreadyExistsError(message);
     } else {
-      let data;
+      let data: string;
       try {
         data = JSON.stringify(entity);
       } catch (error) {
-        data = entity;
+        data = entity.toString();
       }
       await fs.writeFile(filePath, data);
       return primaryKey;
@@ -121,23 +118,28 @@ export default class FileSystemEngine implements CRUDEngine {
       promises.push(this.delete(tableName, primaryKey));
     }
 
-    return Promise.all(promises)
-      .then(() => true)
-      .catch(() => false);
+    try {
+      await Promise.all(promises);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   async read<T>(tableName: string, primaryKey: string): Promise<T> {
     const filePath = this.createFilePath(tableName, primaryKey);
+    let data: string;
     try {
-      const data = await fs.readFile(filePath, {type: 'Text'});
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        return data;
-      }
+      data = await fs.readFile(filePath, {type: 'Text'});
     } catch (error) {
-      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       throw new RecordNotFoundError(message);
+    }
+
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      return data as any;
     }
   }
 

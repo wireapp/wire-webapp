@@ -25,7 +25,7 @@ import TransientBundle from './TransientBundle';
 
 export default class TransientStore extends EventEmitter {
   private readonly bundles: {[index: string]: TransientBundle} = {};
-  private tableName: string = '';
+  private tableName = '';
 
   public static TOPIC = {
     EXPIRED: 'expired',

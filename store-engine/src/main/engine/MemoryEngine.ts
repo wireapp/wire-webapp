@@ -2,7 +2,7 @@ import CRUDEngine from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class MemoryEngine implements CRUDEngine {
-  public storeName: string = '';
+  public storeName = '';
   private readonly stores: {[index: string]: {[index: string]: any}} = {};
 
   public async isSupported(): Promise<void> {
@@ -31,7 +31,7 @@ export default class MemoryEngine implements CRUDEngine {
       const record = this.stores[this.storeName][tableName][primaryKey];
 
       if (record) {
-        const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+        const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
         const error = new RecordAlreadyExistsError(message);
         return Promise.reject(error);
       }
@@ -40,7 +40,7 @@ export default class MemoryEngine implements CRUDEngine {
       return Promise.resolve(primaryKey);
     }
 
-    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+    const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
     return Promise.reject(new RecordTypeError(message));
   }
 
@@ -66,7 +66,7 @@ export default class MemoryEngine implements CRUDEngine {
     if (record) {
       return Promise.resolve(record);
     } else {
-      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       return Promise.reject(new RecordNotFoundError(message));
     }
   }
@@ -117,7 +117,7 @@ export default class MemoryEngine implements CRUDEngine {
       if (typeof record === 'string') {
         record += additions;
       } else {
-        const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+        const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
         throw new RecordTypeError(message);
       }
       this.stores[this.storeName][tableName][primaryKey] = record;

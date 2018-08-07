@@ -11,13 +11,13 @@ import {
 } from './error';
 
 export default class FileEngine implements CRUDEngine {
-  public storeName: string = '';
+  public storeName = '';
   private options: {fileExtension: string} = {
     fileExtension: '.dat',
   };
   private static readonly path = path;
 
-  constructor(private readonly baseDirectory: string = './') {}
+  constructor(private readonly baseDirectory = './') {}
 
   public async isSupported(): Promise<void> {
     if (isBrowser()) {
@@ -26,7 +26,7 @@ export default class FileEngine implements CRUDEngine {
     }
   }
 
-  public async init(storeName: string = '', options: {fileExtension: string}): Promise<any> {
+  public async init(storeName = '', options: {fileExtension: string}): Promise<any> {
     await this.isSupported();
 
     FileEngine.enforcePathRestrictions(this.baseDirectory, storeName);
@@ -58,7 +58,7 @@ export default class FileEngine implements CRUDEngine {
     return unsafePath;
   }
 
-  private resolvePath(tableName: string, primaryKey: string = ''): Promise<string> {
+  private resolvePath(tableName: string, primaryKey = ''): Promise<string> {
     return new Promise((resolve, reject) => {
       const tableNamePath = FileEngine.enforcePathRestrictions(this.storeName, tableName);
       const primaryKeyPath = FileEngine.enforcePathRestrictions(
@@ -90,7 +90,7 @@ export default class FileEngine implements CRUDEngine {
                     .then(() => resolve(primaryKey))
                     .catch((error: Error) => reject(error));
                 } else if (error.code === 'EEXIST') {
-                  const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+                  const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
                   reject(new RecordAlreadyExistsError(message));
                 } else {
                   reject(error);
@@ -102,7 +102,7 @@ export default class FileEngine implements CRUDEngine {
           })
           .catch(reject);
       } else {
-        const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+        const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
         reject(new RecordTypeError(message));
       }
     });
@@ -126,10 +126,10 @@ export default class FileEngine implements CRUDEngine {
   read<T>(tableName: string, primaryKey: string): Promise<T> {
     return this.resolvePath(tableName, primaryKey).then(file => {
       return new Promise<T>((resolve, reject) => {
-        fs.readFile(file, {encoding: 'utf8', flag: 'r'}, (error: any, data: any) => {
+        fs.readFile(file, {encoding: 'utf8', flag: 'r'}, (error, data: any) => {
           if (error) {
             if (error.code === 'ENOENT') {
-              const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+              const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
               reject(new RecordNotFoundError(message));
             } else {
               reject(error);
@@ -189,7 +189,7 @@ export default class FileEngine implements CRUDEngine {
           if (typeof record === 'string') {
             record += additions;
           } else {
-            const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+            const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
             throw new RecordTypeError(message);
           }
           return record;

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@types/bro-fs": "0.4.1",
     "@types/filesystem": "0.0.28",
     "@types/node": "10.5.7",
     "bro-fs": "0.4.0",

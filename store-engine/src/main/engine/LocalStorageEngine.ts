@@ -3,7 +3,7 @@ import {isBrowser} from './EnvironmentUtil';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error';
 
 export default class LocalStorageEngine implements CRUDEngine {
-  public storeName: string = '';
+  public storeName = '';
 
   public async isSupported(): Promise<void> {
     if (!isBrowser() || !window.localStorage) {
@@ -37,7 +37,7 @@ export default class LocalStorageEngine implements CRUDEngine {
         })
         .then(record => {
           if (record) {
-            const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+            const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
             throw new RecordAlreadyExistsError(message);
           } else {
             if (typeof record === 'string') {
@@ -49,7 +49,7 @@ export default class LocalStorageEngine implements CRUDEngine {
           }
         });
     }
-    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+    const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
     return Promise.reject(new RecordTypeError(message));
   }
 
@@ -64,7 +64,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   public deleteAll(tableName: string): Promise<boolean> {
     return Promise.resolve().then(() => {
       Object.keys(localStorage).forEach((key: string) => {
-        const prefix: string = `${this.storeName}@${tableName}@`;
+        const prefix = `${this.storeName}@${tableName}@`;
         if (key.startsWith(prefix)) {
           localStorage.removeItem(key);
         }
@@ -75,7 +75,7 @@ export default class LocalStorageEngine implements CRUDEngine {
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
     return Promise.resolve().then(() => {
-      const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
+      const key = `${this.storeName}@${tableName}@${primaryKey}`;
       const record = window.localStorage.getItem(key);
       if (record) {
         try {
@@ -84,7 +84,7 @@ export default class LocalStorageEngine implements CRUDEngine {
           return record;
         }
       }
-      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       throw new RecordNotFoundError(message);
     });
   }
@@ -93,7 +93,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     const promises: Promise<T>[] = [];
 
     Object.keys(localStorage).forEach((key: string) => {
-      const prefix: string = `${this.storeName}@${tableName}@`;
+      const prefix = `${this.storeName}@${tableName}@`;
       if (key.startsWith(prefix)) {
         const primaryKey = key.replace(prefix, '');
         promises.push(this.read(tableName, primaryKey));
@@ -107,7 +107,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     const primaryKeys: string[] = [];
 
     Object.keys(localStorage).forEach((primaryKey: string) => {
-      const prefix: string = `${this.storeName}@${tableName}@`;
+      const prefix = `${this.storeName}@${tableName}@`;
       if (primaryKey.startsWith(prefix)) {
         primaryKeys.push(primaryKey.replace(prefix, ''));
       }
@@ -148,7 +148,7 @@ export default class LocalStorageEngine implements CRUDEngine {
       if (typeof record === 'string') {
         record += additions;
       } else {
-        const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+        const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
         throw new RecordTypeError(message);
       }
 

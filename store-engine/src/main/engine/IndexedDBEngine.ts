@@ -11,7 +11,7 @@ export interface DexieInstance extends Dexie {
 
 export default class IndexedDBEngine implements CRUDEngine {
   private db?: DexieInstance;
-  public storeName: string = '';
+  public storeName = '';
 
   private canUseIndexedDB(): Promise<void> {
     const platform = typeof global === 'undefined' ? window : global;
@@ -67,14 +67,14 @@ export default class IndexedDBEngine implements CRUDEngine {
     if (entity) {
       return this.db![tableName].add(entity, primaryKey).catch((error: Dexie.DexieError) => {
         if (error instanceof Dexie.ConstraintError) {
-          const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+          const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
           throw new RecordAlreadyExistsError(message);
         } else {
           throw error;
         }
       });
     }
-    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+    const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
     return Promise.reject(new RecordTypeError(message));
   }
 
@@ -93,7 +93,7 @@ export default class IndexedDBEngine implements CRUDEngine {
       if (record) {
         return record;
       }
-      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       throw new RecordNotFoundError(message);
     });
   }
@@ -109,7 +109,7 @@ export default class IndexedDBEngine implements CRUDEngine {
   public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.db![tableName].update(primaryKey, changes).then((updatedRecords: number) => {
       if (updatedRecords === 0) {
-        const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+        const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
         throw new RecordNotFoundError(message);
       }
       return primaryKey;
@@ -125,7 +125,7 @@ export default class IndexedDBEngine implements CRUDEngine {
       if (typeof record === 'string') {
         record += additions;
       } else {
-        const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+        const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
         throw new RecordTypeError(message);
       }
       return this.updateOrCreate(tableName, primaryKey, record);
