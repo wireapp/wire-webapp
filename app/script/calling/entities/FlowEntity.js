@@ -363,7 +363,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         const customData = {
           hadMediaStream,
           hasMediaStream: !!mediaStream,
-          isAnser: this.isAnswer(),
+          isAnswer: this.isAnswer(),
           isGroup: this.callEntity.isGroup,
           selfClientJoined: this.callEntity.selfClientJoined(),
           state: this.callEntity.state(),
