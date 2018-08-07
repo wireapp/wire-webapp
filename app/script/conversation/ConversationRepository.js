@@ -2736,7 +2736,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._onRename(conversationEntity, eventJson);
 
       case z.event.Client.CONVERSATION.ASSET_ADD:
-        return this._on_asset_add(conversationEntity, eventJson);
+        return this._onAssetAdd(conversationEntity, eventJson);
 
       case z.event.Client.CONVERSATION.CONFIRMATION:
         return this._on_confirmation(conversationEntity, eventJson);
@@ -3185,7 +3185,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Object} event - JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_asset_add(conversationEntity, event) {
+  _onAssetAdd(conversationEntity, event) {
     const eventData = event.data;
     const fromSelf = event.from === this.selfUser().id;
     const isFailedUpload = eventData.status === z.assets.AssetTransferState.UPLOAD_FAILED;
