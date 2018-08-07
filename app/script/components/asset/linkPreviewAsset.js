@@ -77,16 +77,18 @@ ko.components.register('link-preview-asset', {
         <!-- ko if: header -->
           <asset-header class="link-preview-info-header" params="message: messageEntity"></asset-header>
         <!-- /ko -->
-        <!-- ko if: isTweet -->
-          <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
-          <div class="link-preview-info-link text-graphite" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
-            <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
-            <span data-bind="l10n_text: z.string.conversationTweetAuthor"></span>
-          </div>
-        <!-- /ko -->
-        <!-- ko ifnot: isTweet -->
-          <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
-          <div class="link-preview-info-link text-graphite ellipsis" data-bind="text: z.util.URLUtil.getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
+        <!-- ko if: preview -->
+          <!-- ko if: isTweet -->
+            <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
+            <div class="link-preview-info-link text-graphite" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
+              <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
+              <span data-bind="l10n_text: z.string.conversationTweetAuthor"></span>
+            </div>
+          <!-- /ko -->
+          <!-- ko ifnot: isTweet -->
+            <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
+            <div class="link-preview-info-link text-graphite ellipsis" data-bind="text: z.util.URLUtil.getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
+          <!-- /ko -->
         <!-- /ko -->
       </div>
     <!-- /ko -->
