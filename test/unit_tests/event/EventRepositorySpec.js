@@ -658,25 +658,73 @@ describe('Event Repository', () => {
       });
     });
 
-    it('handles conversation.asset-add event cancelation', () => {
+    it('deletes cancelled conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
       const assetCancelEvent = Object.assign({}, assetAddEvent, {
-        data: {reason: 0, status: 'upload-failed'},
+        data: {reason: z.assets.AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       });
 
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(assetAddEvent)
       );
+      spyOn(TestFactory.event_repository.conversationService, 'delete_message_from_db').and.returnValue(
+        Promise.resolve()
+      );
 
       return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
         expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
-        expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
+        expect(TestFactory.event_repository.conversationService.delete_message_from_db).toHaveBeenCalled();
       });
     });
 
+    it('deletes remote failed upload for conversation.asset-add event', () => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+      const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
+        data: {reason: z.assets.AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(assetAddEvent)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'delete_message_from_db').and.returnValue(
+        Promise.resolve()
+      );
+
+      return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
+        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_repository.conversationService.delete_message_from_db).toHaveBeenCalled();
+      });
+    });
+
+    fit('updates local failed upload for conversation.asset-add event', () => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+      const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
+        data: {reason: z.assets.AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
+
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(assetAddEvent)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'update_asset_as_failed_in_db').and.returnValue(
+        Promise.resolve(assetUploadFailedEvent)
+      );
+
+      return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
+        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_repository.conversationService.update_asset_as_failed_in_db).toHaveBeenCalled();
+      });
+    });
     it('handles conversation.asset-add state update events', () => {
       const initialAssetEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
