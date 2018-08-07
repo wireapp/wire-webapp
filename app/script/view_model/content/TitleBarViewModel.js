@@ -57,7 +57,13 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
     });
 
-    this.hasGuests = ko.pureComputed(() =>
+    this.hasBot = ko.pureComputed(() =>
+      this.conversationEntity()
+        .participating_user_ets()
+        .some(userEntity => userEntity.isBot)
+    );
+
+    this.hasGuest = ko.pureComputed(() =>
       this.conversationEntity()
         .participating_user_ets()
         .some(userEntity => userEntity.isGuest())
