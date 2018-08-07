@@ -121,7 +121,11 @@ const {FileEngine} = require('@wireapp/store-engine');
     await account.service.conversation.send(CONVERSATION_ID, filePayload);
   }
 
-  const methods = [sendAndDeleteMessage, sendEphemeralText, sendPing, sendText, sendAndEdit, sendFile, sendImage];
+  async function clearConversation() {
+    await account.service.conversation.clearConversation(CONVERSATION_ID);
+  }
+
+  const methods = [sendAndDeleteMessage, sendAndEdit, sendEphemeralText, sendFile, sendImage, sendPing, sendText];
 
   const timeoutInMillis = 2000;
   setInterval(() => {

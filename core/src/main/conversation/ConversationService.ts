@@ -45,6 +45,7 @@ import {
 
 import {
   Asset,
+  Cleared,
   ClientAction,
   Confirmation,
   Ephemeral,
@@ -572,6 +573,41 @@ class ConversationService {
     const estimatedPayloadInBytes = clientCount * messageInBytes;
 
     return estimatedPayloadInBytes > EXTERNAL_MESSAGE_THRESHOLD_BYTES;
+  }
+
+  public async clearConversation(
+    conversationId: string,
+    timestamp: number | Date = new Date()
+  ): Promise<PayloadBundleOutgoing> {
+    const messageId = new UUID(4).format();
+
+    if (timestamp instanceof Date) {
+      timestamp = timestamp.getTime();
+    }
+
+    const clearedMessage = Cleared.create({
+      clearedTimestamp: timestamp,
+      conversationId,
+    });
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.CLEARED]: clearedMessage,
+      messageId,
+    });
+
+    const {id: selfConversationId} = await this.getSelfConversation();
+
+    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
+
+    return {
+      conversation: conversationId,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      state: PayloadBundleState.OUTGOING_SENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.CLEARED,
+    };
   }
 
   public createEditedText(
