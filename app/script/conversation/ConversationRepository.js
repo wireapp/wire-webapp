@@ -3181,15 +3181,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * An asset received in a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.asset-add'
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} event - JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_asset_add(conversation_et, event_json) {
-    return this._addEventToConversation(conversation_et, event_json).then(({messageEntity}) => {
+  _on_asset_add(conversationEntity, event) {
+    const eventData = event.data;
+    const fromSelf = event.from === this.selfUser().id;
+    const isFailedUpload = eventData.status === z.assets.AssetTransferState.UPLOAD_FAILED;
+    const uploadFailed = eventData.reason === z.assets.AssetUploadFailedReason.FAILED;
+    if (isFailedUpload && (!fromSelf || !uploadFailed)) {
+      return conversationEntity.remove_message_by_id(event.id);
+    }
+    return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
       const first_asset = messageEntity.get_first_asset();
       if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-        return {conversationEntity: conversation_et, messageEntity};
+        return {conversationEntity, messageEntity};
       }
     });
   }

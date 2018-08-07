@@ -690,7 +690,7 @@ describe('Event Repository', () => {
 
       const updateStatusEvents = handledStatusUpdates.map(status => {
         return Object.assign({}, initialAssetEvent, {
-          data: {reason: 0, status},
+          data: {status},
           time: '2017-09-06T09:43:36.528Z',
         });
       });

@@ -712,19 +712,26 @@ z.event.EventRepository = class EventRepository {
   }
 
   _handleAssetUpdate(originalEvent, newEvent) {
-    switch (newEvent.data.status) {
+    const newData = newEvent.data;
+    switch (newData.status) {
       case z.assets.AssetTransferState.DOWNLOADING:
       case z.assets.AssetTransferState.UPLOADED:
       case z.assets.AssetTransferState.UPLOADING: {
-        const updatedEvent = Object.assign({}, originalEvent, {
-          data: newEvent.data,
-        });
+        const updatedData = Object.assign({}, originalEvent.data, newData);
+        const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
         return this.conversationService.update_event(updatedEvent);
       }
 
-      case z.assets.AssetTransferState.UPLOAD_CANCELED:
       case z.assets.AssetTransferState.UPLOAD_FAILED:
-        return newEvent;
+        // case of both failed or canceled upload
+        const fromSelf = newEvent.from === this.userRepository.self().id;
+        const uploadFailed = newEvent.data.reason === z.assets.AssetUploadFailedReason.FAILED;
+        if (fromSelf && uploadFailed) {
+          // we only want to keep the message if it was sent by the user and the upload failed for some reason
+          return this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
+        }
+        // in all the other cases (cancelation or receiving failed upload) we just delete the event
+        return this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent);
       default:
         return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
     }
