@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.1.0"></a>
+# [5.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.0.3...@wireapp/core@5.1.0) (2018-08-07)
+
+
+### Features
+
+* **core:** Emit edited messages (WEBFOUND-18) ([#944](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/944)) ([c36e66a](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/c36e66a))
+* **core:** Send and receive locations (WEBFOUND-21) ([#951](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/951)) ([fc0b137](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/fc0b137))
+
+
+
+
 <a name="5.0.3"></a>
 ## [5.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.0.2...@wireapp/core@5.0.3) (2018-08-07)
 
