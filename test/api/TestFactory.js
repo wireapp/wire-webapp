@@ -28,7 +28,7 @@
  */
 window.TestFactory = function(logger_level) {
   if (!logger_level) {
-    logger_level = z.util.Logger.prototype.levels.ERROR;
+    logger_level = z.util.Logger.prototype.levels.OFF;
   }
 
   this.settings = {
