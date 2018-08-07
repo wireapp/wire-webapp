@@ -40,7 +40,7 @@ const {FileEngine} = require('@wireapp/store-engine');
   const backend = process.env.WIRE_BACKEND === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION;
   const engine = new FileEngine(path.join(__dirname, '.tmp', 'sender'));
   await engine.init(undefined, {fileExtension: '.json'});
-  const apiClient = new APIClient(new Config(engine, backend));
+  const apiClient = new APIClient({store: engine, urls: backend});
   const account = new Account(apiClient);
   await account.login(login);
   await account.listen();
