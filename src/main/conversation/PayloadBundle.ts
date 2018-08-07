@@ -87,6 +87,7 @@ enum PayloadBundleType {
   ASSET_META = 'PayloadBundleType.ASSET_META',
   AVAILABILITY = 'PayloadBundleType.AVAILABILITY',
   CALL = 'PayloadBundleType.CALL',
+  CLEARED = 'PayloadBundleType.CLEARED',
   CLIENT_ACTION = 'PayloadBundleType.CLIENT_ACTION',
   CONFIRMATION = 'PayloadBundleType.CONFIRMATION',
   CONNECTION_REQUEST = 'PayloadBundleType.CONNECTION_REQUEST',
