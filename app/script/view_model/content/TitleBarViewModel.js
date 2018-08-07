@@ -57,17 +57,25 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
     });
 
-    this.hasBot = ko.pureComputed(() =>
-      this.conversationEntity()
-        .participating_user_ets()
-        .some(userEntity => userEntity.isBot)
-    );
+    this.isGroupInTeam = ko.pureComputed(() => {
+      return this.conversationEntity().is_group() && this.conversationEntity().inTeam();
+    });
 
-    this.hasGuest = ko.pureComputed(() =>
-      this.conversationEntity()
-        .participating_user_ets()
-        .some(userEntity => userEntity.isGuest())
-    );
+    this.hasBot = ko.pureComputed(() => {
+      if (this.isGroupInTeam()) {
+        return this.conversationEntity()
+          .participating_user_ets()
+          .some(userEntity => userEntity.isBot);
+      }
+    });
+
+    this.hasGuest = ko.pureComputed(() => {
+      if (this.isGroupInTeam()) {
+        return this.conversationEntity()
+          .participating_user_ets()
+          .some(userEntity => userEntity.isGuest());
+      }
+    });
 
     this.hasOngoingCall = ko.computed(() => {
       return this.hasCall() && this.joinedCall() ? this.joinedCall().isOngoing() : false;
