@@ -21,18 +21,6 @@
 
 'use strict';
 
-const proxyLogger = loggerLevel => {
-  const LoggerClass = z.util.Logger;
-  class LoggerProxy extends LoggerClass {
-    constructor(name, options) {
-      options.level = loggerLevel;
-      options.domains = {};
-      super(`fake-${name}`, options);
-    }
-  }
-  z.util.Logger = LoggerProxy;
-};
-
 /**
  * @param {function} [logger_level] - A function returning the logger level.
  * @returns {Window.TestFactory} A TestFactory instance.
@@ -40,7 +28,7 @@ const proxyLogger = loggerLevel => {
  */
 window.TestFactory = function(logger_level) {
   if (!logger_level) {
-    logger_level = z.util.Logger.prototype.levels.OFF;
+    logger_level = z.util.Logger.prototype.levels.ERROR;
   }
 
   this.settings = {
@@ -49,14 +37,16 @@ window.TestFactory = function(logger_level) {
       restUrl: 'http://localhost',
       websocket_url: 'wss://localhost',
     },
-    logging_level: logger_level,
   };
+
+  const initialLoggerOptions = z.config.LOGGER.OPTIONS;
+  Object.keys(initialLoggerOptions.domains).forEach(domain => {
+    initialLoggerOptions.domains[domain] = logger_level;
+  });
+  initialLoggerOptions.level = logger_level;
 
   this.client = new z.service.BackendClient(this.settings.connection);
   this.logger = new z.util.Logger('TestFactory', z.config.LOGGER.OPTIONS);
-  this.logger.level = logger_level;
-
-  proxyLogger(logger_level);
 
   return this;
 };
