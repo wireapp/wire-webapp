@@ -17,8 +17,10 @@
  *
  */
 
+import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {AxiosResponse} from 'axios';
 import * as logdown from 'logdown';
+
 import {AssetAPI} from './asset/';
 import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData} from './auth';
 import {AccessTokenStore} from './auth/';
@@ -39,6 +41,11 @@ import {User} from './user';
 import {UserAPI} from './user/';
 
 const {version}: {version: string} = require('../../package.json');
+
+const defaultConfig: Config = {
+  store: new MemoryEngine(),
+  urls: Backend.PRODUCTION,
+};
 
 class APIClient {
   private readonly logger = logdown('@wireapp/api-client/Client', {
@@ -74,12 +81,13 @@ class APIClient {
   private readonly accessTokenStore: AccessTokenStore;
   public context?: Context;
   public transport: {http: HttpClient; ws: WebSocketClient};
+  public config: Config;
 
   public static BACKEND = Backend;
   public static VERSION = version;
 
-  constructor(public config: Config = new Config()) {
-    this.config = new Config(config.store, config.urls, config.schemaCallback);
+  constructor(config?: Config) {
+    this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
 
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
