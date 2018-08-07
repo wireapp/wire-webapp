@@ -55,5 +55,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "5.1.0"
+  "version": "5.1.1"
 }
