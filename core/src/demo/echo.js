@@ -160,15 +160,35 @@ const messageEchoCache = {};
     await account.service.conversation.send(conversationId, imagePayload);
   });
 
+  account.on(PayloadBundleType.LOCATION, async data => {
+    const {conversation: conversationId, from, messageTimer} = data;
+    logger.log(
+      `Location in "${conversationId}" from "${from}":`,
+      data.content,
+      messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
+    );
+
+    const locationPayload = account.service.conversation.createLocation({
+      latitude: 52.5069313,
+      longitude: 13.1445635,
+      name: 'Berlin',
+      zoom: 10,
+    });
+    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
+    await account.service.conversation.send(conversationId, locationPayload);
+    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
+  });
+
   account.on(PayloadBundleType.PING, async data => {
     const {conversation: conversationId, from, messageTimer} = data;
     logger.log(
       `Ping in "${conversationId}" from "${from}".`,
       messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
     );
-    const payload = account.service.conversation.createPing();
+
+    const pingPayload = account.service.conversation.createPing();
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
-    await account.service.conversation.send(conversationId, payload);
+    await account.service.conversation.send(conversationId, pingPayload);
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   });
 

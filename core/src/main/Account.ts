@@ -43,6 +43,7 @@ import {
   DeletedContent,
   EditedTextContent,
   HiddenContent,
+  LocationContent,
   ReactionContent,
   TextContent,
 } from './conversation/content/';
@@ -330,6 +331,24 @@ class Account extends EventEmitter {
           type: PayloadBundleType.MESSAGE_HIDE,
         };
       }
+      case GenericMessageType.LOCATION: {
+        const content: LocationContent = {
+          latitude: genericMessage.location.latitude,
+          longitude: genericMessage.location.longitude,
+          name: genericMessage.location.name,
+          zoom: genericMessage.location.zoom,
+        };
+        return {
+          content,
+          conversation: event.conversation,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: PayloadBundleType.LOCATION,
+        };
+      }
       case GenericMessageType.ASSET: {
         const {uploaded, original} = genericMessage.asset;
         const isImage = !!uploaded && !!uploaded.assetId && !!original && !!original.image;
@@ -455,11 +474,12 @@ class Account extends EventEmitter {
       const data = await this.handleEvent(event);
       if (data) {
         switch (data.type) {
+          case PayloadBundleType.ASSET_IMAGE:
           case PayloadBundleType.CLIENT_ACTION:
           case PayloadBundleType.CONFIRMATION:
+          case PayloadBundleType.LOCATION:
           case PayloadBundleType.MESSAGE_DELETE:
           case PayloadBundleType.MESSAGE_HIDE:
-          case PayloadBundleType.ASSET_IMAGE:
           case PayloadBundleType.PING:
           case PayloadBundleType.REACTION:
           case PayloadBundleType.TEXT:
