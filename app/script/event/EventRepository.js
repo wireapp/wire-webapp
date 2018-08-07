@@ -714,9 +714,7 @@ z.event.EventRepository = class EventRepository {
   _handleAssetUpdate(originalEvent, newEvent) {
     const newData = newEvent.data;
     switch (newData.status) {
-      case z.assets.AssetTransferState.DOWNLOADING:
-      case z.assets.AssetTransferState.UPLOADED:
-      case z.assets.AssetTransferState.UPLOADING: {
+      case z.assets.AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
         return this.conversationService.update_event(updatedEvent);
