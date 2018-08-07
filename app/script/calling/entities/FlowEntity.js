@@ -356,8 +356,20 @@ z.calling.entities.FlowEntity = class FlowEntity {
     };
     this.callLogger.info(logMessage);
 
+    const hadMediaStream = !!mediaStream;
     this._createPeerConnection().then(() => {
       if (!mediaStream) {
+        // @todo Remove report after debugging purpose achieved
+        const customData = {
+          hadMediaStream,
+          hasMediaStream: !!mediaStream,
+          isAnswer: this.isAnswer(),
+          isGroup: this.callEntity.isGroup,
+          selfClientJoined: this.callEntity.selfClientJoined(),
+          state: this.callEntity.state(),
+        };
+        Raygun.send(new Error('Media Stream missing when negotiation call'), customData);
+
         throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
       }
 
