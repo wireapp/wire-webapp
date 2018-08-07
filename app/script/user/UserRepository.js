@@ -1060,7 +1060,7 @@ z.user.UserRepository = class UserRepository {
   map_guest_status(userEntities = this.users()) {
     userEntities.forEach(userEntity => {
       if (!userEntity.is_me) {
-        const isTeamMember = !!this.teamMembers().find(teamMember => teamMember.id === userEntity.id);
+        const isTeamMember = this.teamMembers().some(teamMember => teamMember.id === userEntity.id);
         const isGuest = !userEntity.isBot && !isTeamMember;
         userEntity.isGuest(isGuest);
         userEntity.isTeamMember(isTeamMember);
