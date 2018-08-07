@@ -56,8 +56,7 @@ logger.log(chalk`{bold wire-changelog-bot v${version}}`);
 TRAVIS_ENV_VARS.forEach(envVar => {
   if (!process.env[envVar]) {
     logger.error(
-      chalk`{bold Error:} Travis environment variable "${envVar}" is not set.` +
-        '\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables'
+      chalk`{bold Error:} Travis environment variable "${envVar}" is not set.\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables`
     );
     process.exit(1);
   }

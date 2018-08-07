@@ -100,7 +100,7 @@ const start = async (): Promise<TravisBot> => {
   return bot;
 };
 
-logger.log(setBold(`wire-travis-bot v${version}`) + '\n');
+logger.log(setBold(`wire-travis-bot v${version}\n`));
 
 const SECOND_ARGUMENT = 2;
 
@@ -123,8 +123,9 @@ switch (process.argv[SECOND_ARGUMENT]) {
 travisEnvVars.forEach(envVar => {
   if (!process.env[envVar]) {
     console.error(
-      `${setBold('Error:')} Travis environment variable "${envVar}" is not set.\n` +
-        'Read more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables'
+      `${setBold(
+        'Error:'
+      )} Travis environment variable "${envVar}" is not set.\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables`
     );
     process.exit(1);
   }

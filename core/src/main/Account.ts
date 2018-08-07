@@ -480,13 +480,11 @@ class Account extends EventEmitter {
             break;
         }
       } else {
+        const conversationEvent = event as ConversationEvent;
         this.logger.log(
-          `Received unsupported event "${event.type}"` + (event as ConversationEvent).conversation
-            ? `in conversation "${(event as ConversationEvent).conversation}"`
-            : '' + (event as ConversationEvent).from
-              ? `from user "${(event as ConversationEvent).from}"`
-              : '' + '.',
-          event
+          `Received unsupported event "${event.type}" in conversation "${conversationEvent.conversation}" from user "${
+            conversationEvent.from
+          }".`
         );
       }
     }

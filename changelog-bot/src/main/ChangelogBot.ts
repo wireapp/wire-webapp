@@ -99,7 +99,7 @@ class ChangelogBot {
         styledChangelog = styledChangelog.substr(0, indexOfLastDash);
       }
 
-      styledChangelog += '\n' + omittedMessage;
+      styledChangelog += `\n${omittedMessage}`;
     }
 
     return styledChangelog;

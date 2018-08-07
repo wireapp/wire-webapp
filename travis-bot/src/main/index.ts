@@ -65,12 +65,9 @@ class TravisBot {
     let msg = `**${repositoryName}: Build '${buildNumber}' finished on '${branch}' branch.**\n`;
 
     if (changelog) {
-      msg += `\n**Changelog:** \n\n` + changelog;
+      msg += `\n**Changelog:** \n\n${changelog}`;
     } else {
-      msg +=
-        `- Last commit from: ${author}\n` +
-        `- Last commit message: ${message}\n` +
-        `- https://github.com/${repositoryName}/commit/${hash}`;
+      msg += `- Last commit from: ${author}\n- Last commit message: ${message}\n- https://github.com/${repositoryName}/commit/${hash}`;
     }
 
     return msg;
@@ -133,7 +130,7 @@ class TravisBot {
         styledChangelog = styledChangelog.substr(0, indexOfLastDash);
       }
 
-      styledChangelog += '\n' + omittedMessage;
+      styledChangelog += `\n${omittedMessage}`;
     }
 
     return styledChangelog;
