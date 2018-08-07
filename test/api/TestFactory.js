@@ -435,6 +435,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
         TestFactory.calling_service,
         TestFactory.client_repository,
         TestFactory.conversation_repository,
+        TestFactory.event_repository,
         TestFactory.media_repository,
         TestFactory.user_repository
       );

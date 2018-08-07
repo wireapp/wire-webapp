@@ -560,6 +560,106 @@ describe('Event Repository', () => {
         })
         .catch(done.fail);
     });
+
+    it('ignores edit message with missing associated original message', done => {
+      const linkPreviewEvent = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.returnValue(Promise.resolve());
+
+      linkPreviewEvent.data.replacing_message_id = 'initial_message_id';
+
+      TestFactory.event_repository
+        ._handleEventSaving(linkPreviewEvent)
+        .then(() => done.fail('Should have thrown an error'))
+        .catch(error => {
+          expect(TestFactory.event_repository.conversationService.update_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+          done();
+        });
+    });
+
+    it('updates edited messages when link preview arrives', done => {
+      const replacingId = 'old-replaced-message-id';
+      const storedEvent = Object.assign({}, event, {
+        data: Object.assign({}, event.data, {
+          replacing_message_id: replacingId,
+        }),
+      });
+      const linkPreviewEvent = Object.assign({}, event);
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.callFake(
+        (conversationId, messageId) => {
+          return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
+        }
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.callFake(ev => ev);
+
+      linkPreviewEvent.data.replacing_message_id = replacingId;
+      linkPreviewEvent.data.previews = ['preview'];
+
+      TestFactory.event_repository
+        ._handleEventSaving(linkPreviewEvent)
+        .then(updatedEvent => {
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+          expect(updatedEvent.data.previews[0]).toEqual('preview');
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('updates edited messages', done => {
+      const originalMessage = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(originalMessage)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.callFake(updates => updates);
+
+      const initial_time = event.time;
+      const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
+      originalMessage.primary_key = 12;
+      event.id = z.util.createRandomUuid();
+      event.data.content = 'new content';
+      event.data.replacing_message_id = originalMessage.id;
+      event.time = changed_time;
+
+      TestFactory.event_repository
+        ._handleEventSaving(event)
+        .then(updatedEvent => {
+          expect(updatedEvent.time).toEqual(initial_time);
+          expect(updatedEvent.time).not.toEqual(changed_time);
+          expect(updatedEvent.data.content).toEqual('new content');
+          expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('updates link preview when edited', done => {
+      const replacingId = 'replaced-message-id';
+      const storedEvent = Object.assign({}, event, {
+        data: Object.assign({}, event.data, {
+          previews: ['preview'],
+        }),
+      });
+      const editEvent = Object.assign({}, event);
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(storedEvent)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.callFake(ev => ev);
+
+      editEvent.data.replacing_message_id = replacingId;
+
+      TestFactory.event_repository
+        ._handleEventSaving(editEvent)
+        .then(updatedEvent => {
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
+          expect(updatedEvent.data.previews.length).toEqual(0);
+          done();
+        })
+        .catch(done.fail);
+    });
   });
 
   describe('_handleEventValidation', () => {

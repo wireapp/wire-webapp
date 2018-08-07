@@ -54,15 +54,24 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {CallingService} callingService -  Backend REST API calling service implementation
    * @param {ClientRepository} clientRepository - Repository for client interactions
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
+   * @param {EventRepository} eventRepository -  Repository that handles events
    * @param {MediaRepository} mediaRepository -  Repository for media interactions
    * @param {UserRepository} userRepository -  Repository for all user and connection interactions
    */
-  constructor(callingService, clientRepository, conversationRepository, mediaRepository, userRepository) {
+  constructor(
+    callingService,
+    clientRepository,
+    conversationRepository,
+    eventRepository,
+    mediaRepository,
+    userRepository
+  ) {
     this.getConfig = this.getConfig.bind(this);
 
     this.callingService = callingService;
     this.clientRepository = clientRepository;
     this.conversationRepository = conversationRepository;
+    this.eventRepository = eventRepository;
     this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
 
@@ -1432,7 +1441,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   injectActivateEvent(callMessageEntity, source) {
     const event = z.conversation.EventBuilder.buildVoiceChannelActivate(callMessageEntity);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, event, source);
+    this.eventRepository.injectEvent(event, source);
   }
 
   /**
@@ -1444,7 +1453,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
     const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, this.timeOffset);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, event, source);
+    this.eventRepository.injectEvent(event, source);
   }
 
   /**

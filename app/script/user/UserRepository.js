@@ -708,11 +708,11 @@ z.user.UserRepository = class UserRepository {
   getSelf() {
     return this.user_service
       .get_own_user()
-      .then(response => {
-        const userEntity = this.user_mapper.map_self_user_from_object(response);
-        return Promise.all([this.save_user(userEntity, true), this.getMarketingConsent()]);
+      .then(response => this.user_mapper.map_self_user_from_object(response))
+      .then(userEntity => {
+        const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
+        return Promise.all(promises).then(() => userEntity);
       })
-      .then(([userEntity]) => userEntity)
       .catch(error => {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;

@@ -417,38 +417,46 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _closePeerConnection() {
-    const peerConnection = this.peerConnection;
-    if (!peerConnection) {
-      return;
-    }
+    const peerConnectionInActiveState =
+      this.peerConnection && this.peerConnection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
 
-    peerConnection.oniceconnectionstatechange = () => {
-      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
-    };
-
-    peerConnection.onsignalingstatechange = () => {
-      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
-      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-    };
-
-    const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
-    if (!isStateClosed) {
-      const connectionMediaStreamTracks = peerConnection.getReceivers
-        ? peerConnection.getReceivers().map(receiver => receiver.track)
-        : peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
-
-      amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
-      peerConnection.close();
-
+    if (!peerConnectionInActiveState) {
       const logMessage = {
         data: {
           default: [this.remoteUser.name()],
           obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
         },
-        message: `Closing PeerConnection '{0}' successful`,
+        message: `PeerConnection with '{0}' was previously closed`,
       };
       this.callLogger.info(logMessage);
+      return;
     }
+
+    this.peerConnection.oniceconnectionstatechange = () => {
+      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    };
+
+    this.peerConnection.onsignalingstatechange = () => {
+      const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
+      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
+    };
+
+    const connectionMediaStreamTracks = this.peerConnection.getReceivers
+      ? this.peerConnection.getReceivers().map(receiver => receiver.track)
+      : this.peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
+
+    amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
+    this.peerConnection.close();
+    this.peerConnection = undefined;
+
+    const logMessage = {
+      data: {
+        default: [this.remoteUser.name()],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Closing PeerConnection with '{0}' successful`,
+    };
+    this.callLogger.info(logMessage);
   }
 
   /**
@@ -479,16 +487,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
-      this.callLogger.debug(
-        {
-          data: {
-            default: [this.remoteUser.name(), this.isAnswer()],
-            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id), this.isAnswer()],
-          },
-          message: `PeerConnection with '{0}' created - isAnswer '{1}'`,
+      const logMessage = {
+        data: {
+          default: [this.remoteUser.name(), this.isAnswer()],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id), this.isAnswer()],
         },
-        pcConfiguration
-      );
+        message: `PeerConnection with '{0}' created - isAnswer '{1}'`,
+      };
+      this.callLogger.debug(logMessage, pcConfiguration);
 
       this.peerConnection.onaddstream = this._onAddStream.bind(this);
       this.peerConnection.ontrack = this._onTrack.bind(this);
@@ -1393,9 +1399,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
         return this._removeMediaStreamTracks(mediaStream);
       }
 
-      const signalingStateNotClosed = this.peerConnection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
       const supportsRemoveStream = typeof this.peerConnection.removeStream === 'function';
-      if (signalingStateNotClosed && supportsRemoveStream) {
+      if (!isSignalingStateClosed && supportsRemoveStream) {
         this.peerConnection.removeStream(mediaStream);
         this.callLogger.debug(`Removed local '${mediaStream.type}' MediaStream from PeerConnection`, {
           audioTracks: mediaStream.getAudioTracks(),
