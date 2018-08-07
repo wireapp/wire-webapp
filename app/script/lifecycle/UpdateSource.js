@@ -26,6 +26,6 @@ z.lifecycle.UPDATE_SOURCE = {
   WEBAPP: 'webapp',
 };
 
-// Add backward compatibility until update of wrapper >3.1
+// @todo Added for wrapper backwards compatibility. Remove after uptake of version > 3.1.
 window.z.announce = z.announce || {};
 z.announce.UPDATE_SOURCE = z.lifecycle.UPDATE_SOURCE;
