@@ -603,7 +603,7 @@ class ConversationService {
       conversation: conversationId,
       from: this.apiClient.context!.userId,
       id: messageId,
-      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      messageTimer: 0,
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
       type: PayloadBundleType.CLEARED,
