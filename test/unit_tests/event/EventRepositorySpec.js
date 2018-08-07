@@ -702,7 +702,7 @@ describe('Event Repository', () => {
       });
     });
 
-    fit('updates local failed upload for conversation.asset-add event', () => {
+    it('updates local failed upload for conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
@@ -712,7 +712,6 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
-
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(assetAddEvent)
       );
@@ -725,6 +724,7 @@ describe('Event Repository', () => {
         expect(TestFactory.event_repository.conversationService.update_asset_as_failed_in_db).toHaveBeenCalled();
       });
     });
+
     it('handles conversation.asset-add state update events', () => {
       const initialAssetEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,

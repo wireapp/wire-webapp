@@ -722,7 +722,7 @@ z.event.EventRepository = class EventRepository {
         return this.conversationService.update_event(updatedEvent);
       }
 
-      case z.assets.AssetTransferState.UPLOAD_FAILED:
+      case z.assets.AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
         const fromSelf = newEvent.from === this.userRepository.self().id;
         const uploadFailed = newEvent.data.reason === z.assets.AssetUploadFailedReason.FAILED;
@@ -732,6 +732,7 @@ z.event.EventRepository = class EventRepository {
         }
         // in all the other cases (cancelation or receiving failed upload) we just delete the event
         return this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent);
+      }
       default:
         return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
     }
