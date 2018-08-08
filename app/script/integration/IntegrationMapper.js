@@ -27,7 +27,7 @@ z.integration.IntegrationMapper = (() => {
     return _updateProviderFromObject(providerData);
   };
 
-  const _mapServicesFromArray = servicesData => {
+  const _mapServicesFromArray = (servicesData = []) => {
     return servicesData
       .filter(serviceData => serviceData.enabled)
       .map(serviceData => _updateServiceFromObject(serviceData));

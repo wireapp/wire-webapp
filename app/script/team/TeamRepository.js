@@ -96,6 +96,12 @@ z.team.TeamRepository = class TeamRepository {
     });
   }
 
+  getWhitelistedServices(teamId, size, prefix) {
+    return this.teamService.getWhitelistedServices(teamId, size, prefix).then(servicesData => {
+      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
+    });
+  }
+
   /**
    * Listener for incoming team events.
    *

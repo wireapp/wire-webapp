@@ -133,9 +133,9 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   getProviderById(providerId) {
-    return this.integrationService.getProvider(providerId).then(response => {
-      if (response) {
-        return z.integration.IntegrationMapper.mapProviderFromObject(response);
+    return this.integrationService.getProvider(providerId).then(providerData => {
+      if (providerData) {
+        return z.integration.IntegrationMapper.mapProviderFromObject(providerData);
       }
     });
   }
@@ -147,9 +147,9 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   getServiceById(providerId, serviceId) {
-    return this.integrationService.getService(providerId, serviceId).then(service => {
-      if (service) {
-        return z.integration.IntegrationMapper.mapServiceFromObject(service);
+    return this.integrationService.getService(providerId, serviceId).then(serviceData => {
+      if (serviceData) {
+        return z.integration.IntegrationMapper.mapServiceFromObject(serviceData);
       }
     });
   }
@@ -157,20 +157,14 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   getServices(tags, start) {
     const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.INTEGRATION];
 
-    return this.integrationService.getServices(tagsArray.join(','), start).then(({services}) => {
-      if (services.length) {
-        return z.integration.IntegrationMapper.mapServicesFromArray(services);
-      }
-      return [];
+    return this.integrationService.getServices(tagsArray.join(','), start).then(({servicesData}) => {
+      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
   getServicesByProvider(providerId) {
-    return this.integrationService.getProviderServices(providerId).then(services => {
-      if (services.length) {
-        return z.integration.IntegrationMapper.mapServicesFromArray(services);
-      }
-      return [];
+    return this.integrationService.getProviderServices(providerId).then(servicesData => {
+      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
@@ -196,11 +190,15 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   searchForServices(query, queryObservable) {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
-    this.getServices(null, normalizedQuery)
-      .then(servicesEntities => {
+    this.teamRepository
+      .getWhitelistedServices(this.teamRepository.team().id, 20, normalizedQuery)
+      .then(serviceEntities => {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
-          this.services(servicesEntities);
+          serviceEntities.sort((serviceA, serviceB) => {
+            return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
+          });
+          this.services(serviceEntities);
         }
       })
       .catch(error => this.logger.error(`Error searching for services: ${error.message}`, error));
