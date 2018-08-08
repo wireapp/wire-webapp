@@ -129,7 +129,7 @@
     "sinon": "6.1.4",
     "stylelint": "9.4.0",
     "stylelint-config-idiomatic-order": "5.0.0",
-    "stylelint-config-prettier": "3.3.0",
+    "stylelint-config-prettier": "4.0.0",
     "uglify-js": "3.4.6",
     "uglifyjs-webpack-plugin": "1.2.7",
     "webpack": "4.16.5",
