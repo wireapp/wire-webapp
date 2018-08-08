@@ -356,8 +356,20 @@ z.calling.entities.FlowEntity = class FlowEntity {
     };
     this.callLogger.info(logMessage);
 
+    const hadMediaStream = !!mediaStream;
     this._createPeerConnection().then(() => {
       if (!mediaStream) {
+        // @todo Remove report after debugging purpose achieved
+        const customData = {
+          hadMediaStream,
+          hasMediaStream: !!mediaStream,
+          isAnswer: this.isAnswer(),
+          isGroup: this.callEntity.isGroup,
+          selfClientJoined: this.callEntity.selfClientJoined(),
+          state: this.callEntity.state(),
+        };
+        Raygun.send(new Error('Media Stream missing when negotiation call'), customData);
+
         throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
       }
 
@@ -436,8 +448,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
     };
 
-    this.peerConnection.onsignalingstatechange = () => {
-      const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
+    this.peerConnection.onsignalingstatechange = event => {
+      const peerConnection = event.target;
+      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
       this.callLogger.log(this.callLogger.levels.OFF, logMessage);
     };
 
@@ -563,15 +576,17 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onIceConnectionStateChange(event) {
-    if (this.peerConnection && this.callEntity.isActiveState()) {
+    if (this.callEntity.isActiveState()) {
+      const peerConnection = event.target;
+
       this.callLogger.info('State changed - ICE connection', event);
-      const connectionMessage = `ICE connection state: ${this.peerConnection.iceConnectionState}`;
+      const connectionMessage = `ICE connection state: ${peerConnection.iceConnectionState}`;
       this.callLogger.log(this.callLogger.levels.LEVEL_1, connectionMessage);
-      const gatheringMessage = `ICE gathering state: ${this.peerConnection.iceGatheringState}`;
+      const gatheringMessage = `ICE gathering state: ${peerConnection.iceGatheringState}`;
       this.callLogger.log(this.callLogger.levels.LEVEL_1, gatheringMessage);
 
-      this.gatheringState(this.peerConnection.iceGatheringState);
-      this.connectionState(this.peerConnection.iceConnectionState);
+      this.gatheringState(peerConnection.iceGatheringState);
+      this.connectionState(peerConnection.iceConnectionState);
     }
   }
 
@@ -594,8 +609,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onSignalingStateChange(event) {
-    this.callLogger.info(`State changed - signaling state: ${this.peerConnection.signalingState}`, event);
-    this.signalingState(this.peerConnection.signalingState);
+    const peerConnection = event.target;
+    this.callLogger.info(`State changed - signaling state: ${peerConnection.signalingState}`, event);
+    this.signalingState(peerConnection.signalingState);
   }
 
   /**

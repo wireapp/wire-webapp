@@ -238,8 +238,12 @@ z.util.base64ToBlob = base64 => {
  */
 
 z.util.downloadBlob = (blob, filename, mimeType) => {
-  const url = window.URL.createObjectURL(blob);
-  return z.util.downloadFile(url, filename, mimeType);
+  if (blob) {
+    const url = window.URL.createObjectURL(blob);
+    return z.util.downloadFile(url, filename, mimeType);
+  }
+
+  throw new Error('Failed to download blob: Resource not provided');
 };
 
 z.util.downloadText = (text, filename = 'default.txt') => {

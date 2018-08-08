@@ -42,12 +42,13 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
 
   /**
    * Loads and decrypts otr asset as initiates download
-   * @param {string} file_name - File name
+   * @param {string} filename - Filename
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
-  download(file_name) {
+  download(filename) {
     return this.resource()
       .load()
-      .then(blob => z.util.downloadBlob(blob, file_name));
+      .then(blob => z.util.downloadBlob(blob, filename))
+      .catch(error => this.logger.error('Failed to download image', error));
   }
 };
