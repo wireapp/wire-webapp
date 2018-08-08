@@ -24,18 +24,14 @@
 describe('z.tracking.EventTrackingRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeEach(done => {
-    test_factory
-      .exposeTrackingActors()
-      .then(() => {
-        TestFactory.tracking_repository._is_domain_allowed_for_tracking = () => true;
-        done();
-      })
-      .catch(done.fail);
+  beforeEach(() => {
+    return test_factory.exposeTrackingActors().then(() => {
+      TestFactory.tracking_repository._is_domain_allowed_for_tracking = () => true;
+    });
   });
 
   describe('Initialization', () => {
-    it('enables error reporting, user tracking and subscribes to tracking events', done => {
+    it('enables error reporting, user tracking and subscribes to tracking events', () => {
       expect(TestFactory.tracking_repository.mixpanel).toBeUndefined();
       spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
@@ -45,46 +41,56 @@ describe('z.tracking.EventTrackingRepository', () => {
       const privacyPreference = properties.settings.privacy.improve_wire;
       expect(privacyPreference).toBeFalsy();
 
-      TestFactory.tracking_repository.init(true).then(() => {
+      const mixpanelMock = {
+        register: jasmine.createSpy('register'),
+        track: jasmine.createSpy('track'),
+      };
+      TestFactory.tracking_repository.mixpanel = mixpanelMock;
+      return TestFactory.tracking_repository.init(true).then(() => {
         expect(TestFactory.tracking_repository.mixpanel).toBeDefined();
         expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
         expect(TestFactory.tracking_repository._init_tracking).toHaveBeenCalled();
         expect(TestFactory.tracking_repository._subscribe_to_tracking_events).toHaveBeenCalled();
-        done();
       });
     });
 
-    it('allows changing initial tracking properties', done => {
-      TestFactory.tracking_repository._track_event = jasmine.createSpy('_track_event');
-
+    it('allows changing initial tracking properties', () => {
+      const mixpanelMock = {
+        register: jasmine.createSpy('register'),
+        track: jasmine.createSpy('track'),
+      };
       expect(TestFactory.tracking_repository.is_error_reporting_activated).toBe(false);
       expect(TestFactory.tracking_repository.is_user_analytics_activated).toBe(false);
 
-      TestFactory.tracking_repository.init(true).then(() => {
+      TestFactory.tracking_repository.mixpanel = mixpanelMock;
+      return TestFactory.tracking_repository.init(true).then(() => {
         expect(TestFactory.tracking_repository.is_error_reporting_activated).toBe(true);
         expect(TestFactory.tracking_repository.is_user_analytics_activated).toBe(true);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
-        expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(1);
+        expect(mixpanelMock.track).toHaveBeenCalledTimes(1);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_another_event');
-        expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(2);
+        expect(mixpanelMock.track).toHaveBeenCalledTimes(2);
 
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, false);
-        expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(3);
+        expect(mixpanelMock.track).toHaveBeenCalledTimes(3);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_not_tracking');
-        expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(3);
-        done();
+        expect(mixpanelMock.track).toHaveBeenCalledTimes(3);
       });
     });
   });
 
   describe('User Tracking', () => {
-    beforeEach(done => {
-      TestFactory.tracking_repository.init(true).then(() => {
+    beforeEach(() => {
+      const mixpanelMock = {
+        register: jasmine.createSpy('register'),
+        track: jasmine.createSpy('track'),
+      };
+      TestFactory.tracking_repository.mixpanel = mixpanelMock;
+      return TestFactory.tracking_repository.init(true).then(() => {
         TestFactory.tracking_repository._track_event = jasmine.createSpy('_track_event');
-        done();
       });
     });
 
@@ -107,10 +113,14 @@ describe('z.tracking.EventTrackingRepository', () => {
   });
 
   describe('Error Tracking', () => {
-    beforeEach(done => {
-      TestFactory.tracking_repository.init(true).then(() => {
+    beforeEach(() => {
+      const mixpanelMock = {
+        register: jasmine.createSpy('register'),
+        track: jasmine.createSpy('track'),
+      };
+      TestFactory.tracking_repository.mixpanel = mixpanelMock;
+      return TestFactory.tracking_repository.init(true).then(() => {
         jasmine.clock().install();
-        done();
       });
     });
 
