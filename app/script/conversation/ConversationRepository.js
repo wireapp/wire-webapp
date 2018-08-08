@@ -2736,7 +2736,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._onRename(conversationEntity, eventJson);
 
       case z.event.Client.CONVERSATION.ASSET_ADD:
-        return this._on_asset_add(conversationEntity, eventJson);
+        return this._onAssetAdd(conversationEntity, eventJson);
 
       case z.event.Client.CONVERSATION.CONFIRMATION:
         return this._on_confirmation(conversationEntity, eventJson);
@@ -3181,58 +3181,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * An asset received in a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.asset-add'
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} event - JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_asset_add(conversation_et, event_json) {
-    const {data: event_data, id: event_id} = event_json;
+  _onAssetAdd(conversationEntity, event) {
+    const fromSelf = event.from === this.selfUser().id;
 
-    return this.conversation_service
-      .load_event_from_db(conversation_et.id, event_id)
-      .then(stored_event => {
-        if (stored_event) {
-          // Ignore redundant event
-          if (_.isEqual(stored_event, event_json)) {
-            return;
-          }
+    const isRemoteFailure = !fromSelf && event.data.status === z.assets.AssetTransferState.UPLOAD_FAILED;
+    const isLocalCancel = fromSelf && event.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
 
-          if (event_data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
-            const from_self = event_json.from === this.selfUser().id;
-            const upload_failed = event_data.reason === z.assets.AssetUploadFailedReason.FAILED;
+    if (isRemoteFailure || isLocalCancel) {
+      return conversationEntity.remove_message_by_id(event.id);
+    }
 
-            if (from_self && upload_failed) {
-              return this.conversation_service.update_asset_as_failed_in_db(
-                stored_event.primary_key,
-                event_data.reason
-              );
-            }
-
-            return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
-          }
-
-          // only event data is relevant for updating
-          const updated_event = $.extend(true, stored_event, {
-            data: event_data,
-          });
-
-          return this.conversation_service.update_event(updated_event);
-        }
-
-        return this.conversation_service.save_event(event_json);
-      })
-      .then(event => {
-        if (event) {
-          conversation_et.remove_message_by_id(event_json.id);
-
-          return this._addEventToConversation(conversation_et, event).then(({messageEntity}) => {
-            const first_asset = messageEntity.get_first_asset();
-            if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-              return {conversationEntity: conversation_et, messageEntity};
-            }
-          });
-        }
-      });
+    return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
+      const firstAsset = messageEntity.get_first_asset();
+      if (firstAsset.is_image() || firstAsset.status() === z.assets.AssetTransferState.UPLOADED) {
+        return {conversationEntity, messageEntity};
+      }
+    });
   }
 
   /**

@@ -217,6 +217,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
   this.logger.info('- exposeEventActors');
   return Promise.resolve()
     .then(() => this.exposeCryptographyActors())
+    .then(() => this.exposeUserActors())
     .then(() => {
       this.logger.info('✓ exposedCryptographyActors');
 
@@ -234,7 +235,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        undefined
+        TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
 

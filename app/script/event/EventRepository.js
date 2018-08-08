@@ -670,7 +670,7 @@ z.event.EventRepository = class EventRepository {
 
         return loadEventPromise.then(storedEvent => {
           return storedEvent
-            ? this._handleLinkPreviewUpdate(storedEvent, newEvent)
+            ? this._handleDuplicatedEvent(storedEvent, newEvent)
             : this.conversationService.save_event(newEvent);
         });
       };
@@ -698,8 +698,52 @@ z.event.EventRepository = class EventRepository {
     return this.conversationService.update_event(identifiedUpdates);
   }
 
+  _handleDuplicatedEvent(originalEvent, newEvent) {
+    switch (newEvent.type) {
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        return this._handleAssetUpdate(originalEvent, newEvent);
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._handleLinkPreviewUpdate(originalEvent, newEvent);
+
+      default:
+        this._throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
+    }
+  }
+
+  _handleAssetUpdate(originalEvent, newEvent) {
+    const newEventData = newEvent.data;
+    // the preview status is not sent by the client so we fake a 'preview' status in order to cleany handle it in the switch statement
+    const ASSET_PREVIEW = 'preview';
+    const isPreviewEvent = !newEventData.status && newEventData.preview_key;
+    const status = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+
+    switch (status) {
+      case ASSET_PREVIEW:
+      case z.assets.AssetTransferState.UPLOADED: {
+        const updatedData = Object.assign({}, originalEvent.data, newEventData);
+        const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
+        return this.conversationService.update_event(updatedEvent);
+      }
+
+      case z.assets.AssetTransferState.UPLOAD_FAILED: {
+        // case of both failed or canceled upload
+        const fromOther = newEvent.from !== this.userRepository.self().id;
+        const selfCancel = !fromOther && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
+        const shouldDeleteEvent = fromOther || selfCancel;
+        return shouldDeleteEvent
+          ? this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent)
+          : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
+      }
+
+      default:
+        return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+    }
+  }
+
   _handleLinkPreviewUpdate(originalEvent, newEvent) {
-    const newData = newEvent.data;
+    const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
@@ -707,18 +751,21 @@ z.event.EventRepository = class EventRepository {
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
+    if (!containsLinkPreview) {
+      const errorMessage = 'Link preview event does not contain previews';
+      this._throwValidationError(newEvent, errorMessage);
+    }
+
+    const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const mappedIsMessageAdd = newEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-    const storedIsMessageAdd = originalEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-    const isLegitMessageReplacement = newData.previews.length || newData.replacing_message_id;
-    const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
-    if (userReusedId) {
+    const bothAreMessageAddType = newEvent.type === originalEvent.type;
+    if (!bothAreMessageAddType) {
       this._throwValidationError(newEvent, 'ID reused by same user');
     }
 
