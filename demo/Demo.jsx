@@ -437,7 +437,12 @@ class Demo extends React.PureComponent {
             <Columns>
               <Column>Link</Column>
               <Column>
-                <Link href="#">Link</Link>
+                <Link block href="#">
+                  Link
+                </Link>
+                <Link block color={COLOR.RED} href="#">
+                  Red Link
+                </Link>
               </Column>
             </Columns>
             <Columns>

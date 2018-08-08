@@ -33,6 +33,7 @@ const Link = ({color, component, ...props}) => {
     text-decoration: none;
     ${defaultTransition}
     cursor: pointer;
+    color: ${color};
 
     &:visited,
     &:link,
