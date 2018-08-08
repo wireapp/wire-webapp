@@ -659,25 +659,35 @@ describe('Event Repository', () => {
     });
 
     it('deletes cancelled conversation.asset-add event', () => {
-      const assetAddEvent = Object.assign({}, event, {
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
-      });
-      const assetCancelEvent = Object.assign({}, assetAddEvent, {
-        data: {reason: z.assets.AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
-        time: '2017-09-06T09:43:36.528Z',
+      const froms = [
+        // cancel from a remote user
+        'remote-user-id',
+        // cancel from the self user
+        TestFactory.event_repository.userRepository.self().id,
+      ];
+
+      const loadEventSpy = spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db');
+      const deleteEventSpy = spyOn(TestFactory.event_repository.conversationService, 'delete_message_from_db');
+      const testPromises = froms.map(from => {
+        const assetAddEvent = Object.assign({}, event, {
+          from,
+          type: z.event.Client.CONVERSATION.ASSET_ADD,
+        });
+        const assetCancelEvent = Object.assign({}, assetAddEvent, {
+          data: {reason: z.assets.AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+          time: '2017-09-06T09:43:36.528Z',
+        });
+
+        loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
+        deleteEventSpy.and.returnValue(Promise.resolve());
+
+        return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
+          expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+          expect(TestFactory.event_repository.conversationService.delete_message_from_db).toHaveBeenCalled();
+        });
       });
 
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(assetAddEvent)
-      );
-      spyOn(TestFactory.event_repository.conversationService, 'delete_message_from_db').and.returnValue(
-        Promise.resolve()
-      );
-
-      return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
-        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
-        expect(TestFactory.event_repository.conversationService.delete_message_from_db).toHaveBeenCalled();
-      });
+      return Promise.all(testPromises);
     });
 
     it('deletes remote failed upload for conversation.asset-add event', () => {

@@ -728,14 +728,13 @@ z.event.EventRepository = class EventRepository {
 
       case z.assets.AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
-        const fromSelf = newEvent.from === this.userRepository.self().id;
-        const uploadFailed = newEvent.data.reason === z.assets.AssetUploadFailedReason.FAILED;
-        if (fromSelf && uploadFailed) {
-          // we only want to keep the message if it was sent by the user and the upload failed for some reason
-          return this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
-        }
-        // in all the other cases (cancelation or receiving failed upload) we just delete the event
-        return this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent);
+        const fromRemote = newEvent.from !== this.userRepository.self().id;
+        const localCancel = !fromRemote && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
+        const shouldDeleteEvent = fromRemote || localCancel;
+        return shouldDeleteEvent
+          ? this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent)
+          : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
       }
 
       default:
