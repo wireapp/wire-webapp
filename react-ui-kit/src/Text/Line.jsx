@@ -18,12 +18,15 @@
  */
 
 import {COLOR} from '../Identity';
+import {GUTTER} from '../Layout/sizes';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Line = styled.hr`
   border: none;
   border-bottom: 1px solid ${props => props.color};
+  margin-top: ${GUTTER}px;
+  margin-bottom: ${GUTTER}px;
 `;
 
 Line.propTypes = {
@@ -31,7 +34,7 @@ Line.propTypes = {
 };
 
 Line.defaultProps = {
-  color: COLOR.GRAY_LIGHTEN_88,
+  color: COLOR.GRAY_LIGHTEN_72,
 };
 
 export {Line};
