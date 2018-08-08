@@ -191,13 +191,15 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     this.teamRepository
-      .getWhitelistedServices(this.teamRepository.team().id, 20, normalizedQuery)
+      .getWhitelistedServices(this.teamRepository.team().id, 20)
       .then(serviceEntities => {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
-          serviceEntities.sort((serviceA, serviceB) => {
-            return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
-          });
+          serviceEntities = serviceEntities
+            .filter(serviceEntity => serviceEntity.name.includes(normalizedQuery))
+            .sort((serviceA, serviceB) => {
+              return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
+            });
           this.services(serviceEntities);
         }
       })
