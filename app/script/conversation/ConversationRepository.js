@@ -3188,14 +3188,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onAssetAdd(conversationEntity, event) {
     const eventData = event.data;
     const fromSelf = event.from === this.selfUser().id;
-    const isFailedUpload = eventData.status === z.assets.AssetTransferState.UPLOAD_FAILED;
-    const uploadFailed = eventData.reason === z.assets.AssetUploadFailedReason.FAILED;
-    if (isFailedUpload && (!fromSelf || !uploadFailed)) {
+    const isRemoteFailure = !fromSelf && eventData.status === z.assets.AssetTransferState.UPLOAD_FAILED;
+    const isLocalCancel = fromSelf && eventData.reason === z.assets.AssetUploadFailedReason.FAILED;
+    const shouldRemoveFromConversation = isRemoteFailure || isLocalCancel;
+    if (shouldRemoveFromConversation) {
       return conversationEntity.remove_message_by_id(event.id);
     }
     return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
-      const first_asset = messageEntity.get_first_asset();
-      if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
+      const firstAsset = messageEntity.get_first_asset();
+      if (firstAsset.is_image() || firstAsset.status() === z.assets.AssetTransferState.UPLOADED) {
         return {conversationEntity, messageEntity};
       }
     });
