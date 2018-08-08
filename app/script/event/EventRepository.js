@@ -713,7 +713,13 @@ z.event.EventRepository = class EventRepository {
 
   _handleAssetUpdate(originalEvent, newEvent) {
     const newEventData = newEvent.data;
-    switch (newEventData.status) {
+    // the preview status is not sent by the client so we fake a 'preview' status in order to cleany handle it in the switch statement
+    const LOCAL_PREVIEW_STATUS = 'preview';
+    const isPreviewEvent = !newEventData.status && newEventData.preview_key;
+    const status = isPreviewEvent ? LOCAL_PREVIEW_STATUS : newEventData.status;
+
+    switch (status) {
+      case LOCAL_PREVIEW_STATUS:
       case z.assets.AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});

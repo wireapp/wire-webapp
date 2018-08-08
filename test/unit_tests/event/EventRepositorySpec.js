@@ -748,6 +748,30 @@ describe('Event Repository', () => {
         expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
       });
     });
+
+    it('updates video when preview is received', () => {
+      const initialAssetEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+
+      const AssetPreviewEvent = Object.assign({}, initialAssetEvent, {
+        data: {status: z.assets.AssetTransferState.UPLOADED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.conversation_service, 'update_event').and.callFake(eventToUpdate =>
+        Promise.resolve(eventToUpdate)
+      );
+      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
+        Promise.resolve(initialAssetEvent)
+      );
+
+      return TestFactory.event_repository.processEvent(AssetPreviewEvent).then(updatedEvent => {
+        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.data.preview_key).toEqual(AssetPreviewEvent.data.preview_key);
+        expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('_handleEventValidation', () => {
