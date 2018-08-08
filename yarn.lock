@@ -46,11 +46,10 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@babel/runtime@^7.0.0-beta.55":
-  version "7.0.0-beta.55"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.55.tgz#0bc33aa5a6ac0b012f37e25b9e6aaa2e489a916b"
+"@babel/runtime@7.0.0-beta.56":
+  version "7.0.0-beta.56"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.56.tgz#cda612dffd5b1719a7b8e91e3040bd6ae64de8b0"
   dependencies:
-    core-js "^2.5.7"
     regenerator-runtime "^0.12.0"
 
 "@babel/template@7.0.0-beta.44":
@@ -599,15 +598,15 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-2.2.2.tgz#b61630263095acf2cf7a6b84257736e21946dc3f"
+"@wireapp/react-ui-kit@2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-2.2.3.tgz#c7963c0cb76b1f66aca9e6c809bf437933d7b1a0"
   dependencies:
-    bazinga64 "5.2.19"
+    bazinga64 "5.2.20"
     color "3.0.0"
     react "16.4.2"
     react-dom "16.4.2"
-    recompose "0.28.1"
+    recompose "0.28.2"
     styled-components "3.3.3"
     styled-normalize "8.0.0"
 
@@ -1727,9 +1726,9 @@ bazinga64@5.2.18:
   version "5.2.18"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
 
-bazinga64@5.2.19:
-  version "5.2.19"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.19.tgz#3282019ee9b3b8bfd6980f8b8b86ac7fa9ce8e78"
+bazinga64@5.2.20:
+  version "5.2.20"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.20.tgz#58fd2f5b415223c127e101797dd8bf38a6475b61"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2707,10 +2706,6 @@ core-js@^2.2.0, core-js@^2.5.0:
 core-js@^2.4.0:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.6.tgz#0fe6d45bf3cac3ac364a9d72de7576f4eb221b9d"
-
-core-js@^2.5.7:
-  version "2.5.7"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
 
 core-js@~2.3.0:
   version "2.3.0"
@@ -8962,11 +8957,11 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-recompose@0.28.1:
-  version "0.28.1"
-  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.28.1.tgz#a70aa017f9421df59539b9e6033135b10eb09e4c"
+recompose@0.28.2:
+  version "0.28.2"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.28.2.tgz#19e679227bdf979e0d31b73ffe7ae38c9194f4a7"
   dependencies:
-    "@babel/runtime" "^7.0.0-beta.55"
+    "@babel/runtime" "7.0.0-beta.56"
     change-emitter "^0.1.2"
     fbjs "^0.8.1"
     hoist-non-react-statics "^2.3.1"
