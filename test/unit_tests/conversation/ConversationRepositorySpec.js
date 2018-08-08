@@ -567,7 +567,7 @@ describe('ConversationRepository', () => {
         });
       });
 
-      it('removes a file upload from the messages list of the sender when the upload gets canceled', done => {
+      it('removes a file upload from the messages list of the sender when the upload gets canceled', () => {
         const conversation_id = z.util.createRandomUuid();
         const message_id = z.util.createRandomUuid();
         const sending_user_id = TestFactory.user_repository.self().id;
@@ -577,7 +577,7 @@ describe('ConversationRepository', () => {
         // prettier-ignore
         const upload_cancel = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
 
-        TestFactory.conversation_repository
+        return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
@@ -594,9 +594,7 @@ describe('ConversationRepository', () => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
             expect(number_of_messages).toBe(0);
-            done();
-          })
-          .catch(done.fail);
+          });
       });
 
       it('removes a file upload from the messages list of the receiver when the upload gets canceled', done => {

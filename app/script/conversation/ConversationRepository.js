@@ -3189,7 +3189,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const eventData = event.data;
     const fromSelf = event.from === this.selfUser().id;
     const isRemoteFailure = !fromSelf && eventData.status === z.assets.AssetTransferState.UPLOAD_FAILED;
-    const isLocalCancel = fromSelf && eventData.reason === z.assets.AssetUploadFailedReason.FAILED;
+    const isLocalCancel = fromSelf && eventData.reason === z.assets.AssetUploadFailedReason.CANCELLED;
     const shouldRemoveFromConversation = isRemoteFailure || isLocalCancel;
     if (shouldRemoveFromConversation) {
       return conversationEntity.remove_message_by_id(event.id);

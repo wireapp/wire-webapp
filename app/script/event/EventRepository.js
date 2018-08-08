@@ -700,11 +700,11 @@ z.event.EventRepository = class EventRepository {
 
   _handleDuplicatedEvent(originalEvent, newEvent) {
     switch (newEvent.type) {
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        return this._handleLinkPreviewUpdate(originalEvent, newEvent);
-
       case z.event.Client.CONVERSATION.ASSET_ADD:
         return this._handleAssetUpdate(originalEvent, newEvent);
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._handleLinkPreviewUpdate(originalEvent, newEvent);
 
       default:
         this._throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
@@ -712,10 +712,10 @@ z.event.EventRepository = class EventRepository {
   }
 
   _handleAssetUpdate(originalEvent, newEvent) {
-    const newData = newEvent.data;
-    switch (newData.status) {
+    const newEventData = newEvent.data;
+    switch (newEventData.status) {
       case z.assets.AssetTransferState.UPLOADED: {
-        const updatedData = Object.assign({}, originalEvent.data, newData);
+        const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
         return this.conversationService.update_event(updatedEvent);
       }
@@ -731,13 +731,14 @@ z.event.EventRepository = class EventRepository {
         // in all the other cases (cancelation or receiving failed upload) we just delete the event
         return this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent);
       }
+
       default:
         return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
     }
   }
 
   _handleLinkPreviewUpdate(originalEvent, newEvent) {
-    const newData = newEvent.data;
+    const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
@@ -745,19 +746,21 @@ z.event.EventRepository = class EventRepository {
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const textContentMatches =
-      (newData.previews && !newData.previews.length) || newData.content === originalData.content;
+    const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
+    if (!containsLinkPreview) {
+      const errorMessage = 'Link preview event does not contain previews';
+      this._throwValidationError(newEvent, errorMessage);
+    }
+
+    const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const mappedIsMessageAdd = newEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-    const storedIsMessageAdd = originalEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-    const isLegitMessageReplacement = newData.previews.length || newData.replacing_message_id;
-    const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
-    if (userReusedId) {
+    const bothAreMessageAddType = newEvent.type === originalEvent.type;
+    if (!bothAreMessageAddType) {
       this._throwValidationError(newEvent, 'ID reused by same user');
     }
 
