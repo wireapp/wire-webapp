@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.3.11...@wireapp/commons@0.4.0) (2018-08-08)
+
+
+### Features
+
+* **commons:** Add runtime detection ([#961](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/961)) ([b4f7316](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/b4f7316))
+
+
+
+
 <a name="0.3.11"></a>
 ## [0.3.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.3.10...@wireapp/commons@0.3.11) (2018-08-07)
 

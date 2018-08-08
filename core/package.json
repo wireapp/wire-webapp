@@ -14,7 +14,7 @@
     "pure-uuid": "1.5.3"
   },
   "devDependencies": {
-    "@wireapp/commons": "0.3.11",
+    "@wireapp/commons": "0.4.0",
     "cross-env": "5.2.0",
     "dotenv": "6.0.0",
     "istanbul": "1.1.0-alpha.1",
@@ -55,5 +55,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "5.2.4"
+  "version": "5.2.5"
 }
