@@ -32,7 +32,6 @@ describe('z.service.BackendClient', () => {
 
   beforeEach(() => {
     backend_client = new z.service.BackendClient(urls);
-    backend_client.logger.level = backend_client.logger.levels.ERROR;
   });
 
   afterEach(() => {
