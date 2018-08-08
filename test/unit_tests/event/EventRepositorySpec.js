@@ -725,22 +725,14 @@ describe('Event Repository', () => {
       });
     });
 
-    it('handles conversation.asset-add state update events', () => {
+    it('handles conversation.asset-add state update event', () => {
       const initialAssetEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
 
-      const handledStatusUpdates = [
-        z.assets.AssetTransferState.DOWNLOADING,
-        z.assets.AssetTransferState.UPLOADED,
-        z.assets.AssetTransferState.UPLOADING,
-      ];
-
-      const updateStatusEvents = handledStatusUpdates.map(status => {
-        return Object.assign({}, initialAssetEvent, {
-          data: {status},
-          time: '2017-09-06T09:43:36.528Z',
-        });
+      const updateStatusEvent = Object.assign({}, initialAssetEvent, {
+        data: {status: z.assets.AssetTransferState.UPLOADED},
+        time: '2017-09-06T09:43:36.528Z',
       });
 
       spyOn(TestFactory.conversation_service, 'update_event').and.callFake(eventToUpdate =>
@@ -750,15 +742,11 @@ describe('Event Repository', () => {
         Promise.resolve(initialAssetEvent)
       );
 
-      const promises = updateStatusEvents.map(updateStatusEvent => {
-        return TestFactory.event_repository.processEvent(updateStatusEvent).then(updatedEvent => {
-          expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
-          expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
-          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
-        });
+      return TestFactory.event_repository.processEvent(updateStatusEvent).then(updatedEvent => {
+        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
+        expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
       });
-
-      return Promise.all(promises);
     });
   });
 
