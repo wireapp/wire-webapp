@@ -714,12 +714,12 @@ z.event.EventRepository = class EventRepository {
   _handleAssetUpdate(originalEvent, newEvent) {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleany handle it in the switch statement
-    const LOCAL_PREVIEW_STATUS = 'preview';
+    const ASSET_PREVIEW = 'preview';
     const isPreviewEvent = !newEventData.status && newEventData.preview_key;
-    const status = isPreviewEvent ? LOCAL_PREVIEW_STATUS : newEventData.status;
+    const status = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
 
     switch (status) {
-      case LOCAL_PREVIEW_STATUS:
+      case ASSET_PREVIEW:
       case z.assets.AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
@@ -728,10 +728,10 @@ z.event.EventRepository = class EventRepository {
 
       case z.assets.AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
-        const fromRemote = newEvent.from !== this.userRepository.self().id;
-        const localCancel = !fromRemote && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        const fromOther = newEvent.from !== this.userRepository.self().id;
+        const selfCancel = !fromOther && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
-        const shouldDeleteEvent = fromRemote || localCancel;
+        const shouldDeleteEvent = fromOther || selfCancel;
         return shouldDeleteEvent
           ? this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent)
           : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);

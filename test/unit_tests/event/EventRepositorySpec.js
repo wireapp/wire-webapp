@@ -660,8 +660,8 @@ describe('Event Repository', () => {
 
     it('deletes cancelled conversation.asset-add event', () => {
       const froms = [
-        // cancel from a remote user
-        'remote-user-id',
+        // cancel from an other user
+        'other-user-id',
         // cancel from the self user
         TestFactory.event_repository.userRepository.self().id,
       ];
@@ -690,7 +690,7 @@ describe('Event Repository', () => {
       return Promise.all(testPromises);
     });
 
-    it('deletes remote failed upload for conversation.asset-add event', () => {
+    it('deletes other user failed upload for conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
@@ -712,7 +712,7 @@ describe('Event Repository', () => {
       });
     });
 
-    it('updates local failed upload for conversation.asset-add event', () => {
+    it('updates self failed upload for conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
