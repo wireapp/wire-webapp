@@ -20,8 +20,9 @@
 import * as CommonConfig from './config/CommonConfig';
 import * as ArrayUtil from './util/ArrayUtil';
 import * as RandomUtil from './util/RandomUtil';
+import {Runtime} from './util/Runtime';
 import * as StringUtil from './util/StringUtil';
 import * as UrlUtil from './util/UrlUtil';
 import * as ValidationUtil from './util/ValidationUtil';
 
-export {ArrayUtil, CommonConfig, RandomUtil, StringUtil, UrlUtil, ValidationUtil};
+export {ArrayUtil, CommonConfig, RandomUtil, Runtime, StringUtil, UrlUtil, ValidationUtil};
