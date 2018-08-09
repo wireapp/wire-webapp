@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.2.5...@wireapp/core@5.3.0) (2018-08-09)
+
+
+### Features
+
+* **bot-api:** Add Bot API (WEBFOUND-13) ([#814](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/814)) ([01394ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/01394ee))
+
+
+
+
 <a name="5.2.5"></a>
 ## [5.2.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.2.4...@wireapp/core@5.2.5) (2018-08-08)
 
