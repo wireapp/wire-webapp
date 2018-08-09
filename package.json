@@ -107,7 +107,7 @@
     "husky": "0.14.3",
     "ip": "1.1.5",
     "jasmine-ajax": "3.4.0",
-    "jasmine-core": "3.1.0",
+    "jasmine-core": "3.2.0",
     "karma": "2.0.5",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.2",
