@@ -223,39 +223,6 @@
     height: 48px;
   }
 
-  .start-ui-service-conversations {
-    display: flex;
-    flex-basis: 336px;
-    flex-direction: column;
-    flex-grow: 1;
-    border-radius: 4px;
-
-    .start-ui-service-conversations-input {
-      margin: 8px 8px 0;
-    }
-
-    .start-ui-service-conversations-create {
-      display: flex;
-      height: 56px;
-      align-items: center;
-      cursor: pointer;
-
-      .icon-plus {
-        width: 60px;
-        text-align: center;
-      }
-
-      .start-ui-service-conversations-create-text {
-        font-size: 14px;
-        font-weight: 400;
-      }
-    }
-
-    .start-ui-service-conversations-list {
-      height: 296px;
-    }
-  }
-
   .start-ui-service-details {
     display: flex;
   }
@@ -294,8 +261,7 @@
   }
 
   &.start-ui-service-bubble.bubble-left-top,
-  &.start-ui-service-bubble.bubble-left,
-  &.start-ui-service-bubble-conversation-list.bubble-left-top {
+  &.start-ui-service-bubble.bubble-left {
     &::before {
       background-color: @app-bg;
     }

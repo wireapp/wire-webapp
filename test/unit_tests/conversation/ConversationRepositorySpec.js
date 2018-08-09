@@ -281,31 +281,29 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_1to1_conversation', () => {
+  describe('get1To1Conversation', () => {
     beforeEach(() => TestFactory.conversation_repository.conversations([]));
 
-    it('finds an existing 1:1 conversation within a team', done => {
+    it('finds an existing 1:1 conversation within a team', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const team_1to1_conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
+      const team1to1Conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const [new_conversation_et] = TestFactory.conversation_repository.conversation_mapper.map_conversations([
-        team_1to1_conversation,
-      ]);
-      TestFactory.conversation_repository.conversations.push(new_conversation_et);
+      const conversationMapper = TestFactory.conversation_repository.conversation_mapper;
+      const [newConversationEntity] = conversationMapper.map_conversations([team1to1Conversation]);
+      TestFactory.conversation_repository.conversations.push(newConversationEntity);
 
-      const team_id = team_1to1_conversation.team;
-      const team_member_id = team_1to1_conversation.members.others[0].id;
-      const user_et = new z.entity.User(team_member_id);
+      const teamId = team1to1Conversation.team;
+      const teamMemberId = team1to1Conversation.members.others[0].id;
+      const userEntity = new z.entity.User(teamMemberId);
+      userEntity.inTeam(true);
+      userEntity.isTeamMember(true);
+      userEntity.teamId = teamId;
 
-      TestFactory.conversation_repository
-        .get_1to1_conversation(user_et, team_id)
-        .then(found_conversation_et => {
-          expect(found_conversation_et).toBe(new_conversation_et);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.get1To1Conversation(userEntity).then(conversationEntity => {
+        expect(conversationEntity).toBe(newConversationEntity);
+      });
     });
   });
 

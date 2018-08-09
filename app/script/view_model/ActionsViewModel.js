@@ -174,7 +174,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   open1to1Conversation(userEntity) {
     if (userEntity) {
       return this.conversationRepository
-        .get_1to1_conversation(userEntity)
+        .get1To1Conversation(userEntity)
         .then(conversationEntity => this._openConversation(conversationEntity));
     }
   }
@@ -237,7 +237,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         action: () => {
           this.userRepository
             .unblockUser(userEntity, showConversation)
-            .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
+            .then(() => this.conversationRepository.get1To1Conversation(userEntity))
             .then(conversationEntity => {
               return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             });
