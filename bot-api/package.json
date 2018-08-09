@@ -27,5 +27,5 @@
     "test:node": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.2.0"
+  "version": "0.2.1"
 }
