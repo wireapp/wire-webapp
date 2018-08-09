@@ -197,8 +197,8 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         if (isCurrentQuery) {
           serviceEntities = serviceEntities
             .filter(serviceEntity => {
-              const normalizedName = serviceEntity.name.toLowerCase();
-              return normalizedName.includes(normalizedQuery);
+              const normalizedServiceName = serviceEntity.name.toLowerCase();
+              return normalizedServiceName.includes(normalizedQuery);
             })
             .sort((serviceA, serviceB) => {
               return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
