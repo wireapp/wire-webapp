@@ -953,6 +953,19 @@ class ConversationService {
   public setClientID(clientID: string) {
     this.clientID = clientID;
   }
+
+  public async toggleArchiveConversation(
+    conversationId: string,
+    newState: boolean,
+    archiveTimestamp: number | Date = new Date()
+  ): Promise<void> {
+    const payload = {
+      otr_archived: newState,
+      otr_archived_ref: new Date(archiveTimestamp).toISOString(),
+    };
+
+    await this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+  }
 }
 
 export {ConversationService};
