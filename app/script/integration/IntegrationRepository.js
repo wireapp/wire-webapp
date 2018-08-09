@@ -196,7 +196,10 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
           serviceEntities = serviceEntities
-            .filter(serviceEntity => serviceEntity.name.includes(normalizedQuery))
+            .filter(serviceEntity => {
+              const normalizedName = serviceEntity.name.toLowerCase();
+              return normalizedName.includes(normalizedQuery);
+            })
             .sort((serviceA, serviceB) => {
               return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
             });
