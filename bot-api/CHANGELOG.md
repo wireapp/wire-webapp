@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.5"></a>
+## [0.2.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@0.2.4...@wireapp/bot-api@0.2.5) (2018-08-09)
+
+
+### Bug Fixes
+
+* **bot-api:** Specify handler context ([#974](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/974)) ([8137c21](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/8137c21))
+
+
+
+
 <a name="0.2.4"></a>
 ## [0.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@0.2.3...@wireapp/bot-api@0.2.4) (2018-08-09)
 
