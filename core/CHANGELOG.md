@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.5.0"></a>
+# [5.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.4.2...@wireapp/core@5.5.0) (2018-08-09)
+
+
+### Features
+
+* **core:** Get clients ([#968](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/968)) ([ef014ae](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/ef014ae))
+
+
+
+
 <a name="5.4.2"></a>
 ## [5.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.4.1...@wireapp/core@5.4.2) (2018-08-09)
 
