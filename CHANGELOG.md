@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.4.2"></a>
+## [5.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.4.1...@wireapp/core@5.4.2) (2018-08-09)
+
+
+### Bug Fixes
+
+* **core:** Emit assets correctly (WEBFOUND-20) ([#973](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/973)) ([e4e4b8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e4e4b8a))
+
+
+
+
 <a name="5.4.1"></a>
 ## [5.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.4.0...@wireapp/core@5.4.1) (2018-08-09)
 
