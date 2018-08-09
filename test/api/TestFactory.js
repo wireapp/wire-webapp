@@ -134,9 +134,10 @@ window.TestFactory.prototype.exposeBackupActors = function() {
 
 /**
  *
+ * @param {boolean} mockCryptobox - do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
  * @returns {Promise<z.cryptography.CryptographyRepository>} The cryptography repository.
  */
-window.TestFactory.prototype.exposeCryptographyActors = function() {
+window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox = true) {
   this.logger.info('- exposeCryptographyActors');
   return Promise.resolve()
     .then(() => this.exposeStorageActors())
@@ -153,6 +154,9 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
       );
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
 
+      if (mockCryptobox) {
+        spyOn(TestFactory.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
+      }
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
     })
     .then(() => TestFactory.cryptography_repository);

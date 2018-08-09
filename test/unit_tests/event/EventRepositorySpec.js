@@ -365,8 +365,10 @@ describe('Event Repository', () => {
       const ownClientId = 'f180a823bf0d1204';
 
       TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: ownClientId}));
+      TestFactory.cryptography_repository.createCryptobox.and.callThrough();
 
       return Promise.resolve()
+        .then(() => TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db))
         .then(() => TestFactory.cryptography_repository.cryptobox.get_prekey())
         .then(async preKeyBundle => {
           const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
