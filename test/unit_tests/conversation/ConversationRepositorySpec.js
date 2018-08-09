@@ -281,7 +281,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_1to1_conversation', () => {
+  describe('get1to1Conversation', () => {
     beforeEach(() => TestFactory.conversation_repository.conversations([]));
 
     it('finds an existing 1:1 conversation within a team', done => {
@@ -300,7 +300,7 @@ describe('ConversationRepository', () => {
       const user_et = new z.entity.User(team_member_id);
 
       TestFactory.conversation_repository
-        .get_1to1_conversation(user_et, team_id)
+        .get1to1Conversation(user_et, team_id)
         .then(found_conversation_et => {
           expect(found_conversation_et).toBe(new_conversation_et);
           done();

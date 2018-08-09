@@ -708,8 +708,7 @@ z.string.searchInviteButtonGmail = 'From Gmail';
 z.string.searchInviteHeadline = 'Bring your friends';
 z.string.searchInviteShare = 'Share Contacts';
 
-z.string.searchServiceNewConversation = 'Create a new conversation';
-z.string.searchServiceConfirmButton = 'Add service';
+z.string.searchServiceConfirmButton = 'Open Conversation';
 
 // Search list: User list & service list components
 z.string.searchListEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';

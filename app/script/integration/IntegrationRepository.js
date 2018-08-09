@@ -86,7 +86,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     if (this.isTeam()) {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-          action: () => this.createConversationWithService(serviceEntity, 'url_param'),
+          action: () => this.create1to1ConversationWithService(serviceEntity, true, 'url_param'),
           preventClose: true,
           text: {
             action: z.l10n.text(z.string.modalConversationAddBotAction),
@@ -103,12 +103,13 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * Add bot to conversation.
    *
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
+   * @param {boolean} [showConversation=true] - Show newly created conversation
    * @param {string} [method] - Method used to trigger integration setup
-   * @returns {Promise} Resolves when integration was added to conversation
+   * @returns {Promise} Resolves when conversation with the integration was was created
    */
-  createConversationWithService(serviceEntity, method) {
+  create1to1ConversationWithService(serviceEntity, showConversation = true, method) {
     return this.conversationRepository
-      .createGroupConversation([], serviceEntity.name, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
+      .createGroupConversation([], undefined, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
         if (conversationEntity) {
           return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
@@ -117,9 +118,10 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .then(conversationEntity => {
-        if (conversationEntity) {
+        if (conversationEntity && showConversation) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         }
+        return conversationEntity;
       })
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
@@ -130,6 +132,41 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         });
         throw error;
       });
+  }
+
+  /**
+   * Get conversation with a service.
+   * @param {Service} serviceEntity - Service entity for whom to get the conversation
+   * @param {string} [method] - Method used to trigger integration setup
+   * @returns {Promise} Resolves with the conversation with requested service
+   */
+  get1to1ConversationWithService(serviceEntity, method) {
+    for (const conversationEntity of this.conversationRepository.conversations()) {
+      if (!conversationEntity.is_one2one()) {
+        // Disregard conversations that are not 1:1
+        continue;
+      }
+
+      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      if (!isActiveConversation) {
+        // Disregard coversations that self is no longer part of
+        continue;
+      }
+
+      const [userEntity] = conversationEntity.participating_user_ets();
+      if (!userEntity.isBot) {
+        // Disregard conversations with users instead of services
+        continue;
+      }
+
+      const {serviceId, providerId} = userEntity;
+      const withExpectedService = serviceEntity.id === serviceId && serviceEntity.providerId === providerId;
+      if (withExpectedService) {
+        return Promise.resolve(conversationEntity);
+      }
+    }
+
+    return this.create1to1ConversationWithService(serviceEntity, false, method);
   }
 
   getProviderById(providerId) {

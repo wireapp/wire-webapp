@@ -162,33 +162,12 @@
               </div>
             </div>
 
-            <!-- ko ifnot: showServiceConversationList() -->
-              <div class="start-ui-service-description" data-bind="text: userProfile().description" data-uie-name="status-service-description"></div>
-            <!-- /ko -->
+            <div class="start-ui-service-description" data-bind="text: userProfile().description" data-uie-name="status-service-description"></div>
           </div>
 
-          <!-- ko if: showServiceConversationList() -->
-            <div class="start-ui-service-conversations">
-              <user-input class="start-ui-service-conversations-input user-list-light" params="input: searchConversationInput, placeholder: z.string.searchServicePlaceholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
-              <div class="start-ui-service-conversation-list-wrapper">
-                <div class="start-ui-service-conversations-list" data-bind="antiscroll: shouldUpdateServiceScrollbar">
-                  <div class="start-ui-service-conversations-create" data-bind="click: clickToCreateServiceConversation" data-uie-name="do-create-conversation">
-                    <div class="icon-plus"></div>
-                    <div class="start-ui-service-conversations-create-text" data-bind="text: z.string.searchServiceNewConversation"></div>
-                  </div>
-                  <!-- ko foreach: serviceConversations() -->
-                    <conversation-list-cell params="conversation: $data" data-bind="click: $parent.clickToAddService" data-uie-name="item-conversation"></conversation-list-cell>
-                  <!-- /ko -->
-                </div>
-              </div>
-            </div>
-          <!-- /ko -->
-
-          <!-- ko ifnot: showServiceConversationList() -->
-            <div class="start-ui-service-footer">
-              <button class="start-ui-service-button" data-bind="click: clickOnAddService, l10n_text: z.string.searchServiceConfirmButton" data-uie-name="do-service-confirm"></button>
-            </div>
-          <!-- /ko -->
+          <div class="start-ui-service-footer">
+            <button class="start-ui-service-button" data-bind="click: clickToOpenService, l10n_text: z.string.searchServiceConfirmButton" data-uie-name="do-service-confirm"></button>
+          </div>
         </div>
       <!-- /ko -->
     </div>

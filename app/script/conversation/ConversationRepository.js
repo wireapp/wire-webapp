@@ -604,7 +604,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get_1to1_conversation(user_et).then(conversation_et =>
+    this.get1to1Conversation(user_et).then(conversation_et =>
       conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER)
     );
   }
@@ -825,36 +825,46 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get conversation with a user.
-   * @param {User} user_et - User entity for whom to get the conversation
-   * @param {string} [team_id] - Team ID in which the conversation should be searched
+   * @param {User} userEntity - User entity for whom to get the conversation
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get_1to1_conversation(user_et, team_id = this.team().id) {
-    for (const conversation_et of this.conversations()) {
-      const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
+  get1to1Conversation(userEntity) {
+    const inCurrentTeam = userEntity.inTeam() && userEntity.isTeamMember();
 
-      if (with_expected_user) {
-        if (team_id && user_et.isTeamMember()) {
-          const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.removed_from_conversation();
-          const in_team = team_id === conversation_et.team_id;
+    if (inCurrentTeam) {
+      for (const conversationEntity of this.conversations()) {
+        if (!conversationEntity.is_one2one()) {
+          // Disregard conversations that are not 1:1
+          continue;
+        }
 
-          if (active_1to1_conversation && in_team) {
-            return Promise.resolve(conversation_et);
-          }
-        } else if (conversation_et.is_one2one() || conversation_et.is_request()) {
-          return Promise.resolve(conversation_et);
+        const inTeam = userEntity.teamId === conversationEntity.team_id;
+        if (!inTeam) {
+          // Disregard conversations that are not in the team
+          continue;
+        }
+
+        const isActiveConversation = !conversationEntity.removed_from_conversation();
+        if (!isActiveConversation) {
+          // Disregard coversations that self is no longer part of
+          continue;
+        }
+
+        const [userId] = conversationEntity.participating_user_ids();
+        const withExpectedUser = userEntity.id === userId;
+        if (withExpectedUser) {
+          return Promise.resolve(conversationEntity);
         }
       }
+
+      return this.createGroupConversation([userEntity]);
     }
 
-    if (team_id) {
-      return this.createGroupConversation([user_et]);
-    }
-
-    return this.fetch_conversation_by_id(user_et.connection().conversation_id)
-      .then(conversation_et => {
-        conversation_et.connection(user_et.connection());
-        return this.updateParticipatingUserEntities(conversation_et);
+    const conversationId = userEntity.connection().conversation_id;
+    return this.get_conversation_by_id(conversationId)
+      .then(conversationEntity => {
+        conversationEntity.connection(userEntity.connection());
+        return this.updateParticipatingUserEntities(conversationEntity);
       })
       .catch(error => {
         const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
