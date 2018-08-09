@@ -17,25 +17,7 @@
  *
  */
 
-import {ClientActionType} from '../conversation/root';
-
-import {Connection} from '@wireapp/api-client/dist/commonjs/connection';
-import {
-  AssetContent,
-  ClientActionContent,
-  ConfirmationContent,
-  DeletedContent,
-  EditedTextContent,
-  FileAssetAbortContent,
-  FileAssetContent,
-  FileAssetMetaDataContent,
-  HiddenContent,
-  ImageAssetContent,
-  ImageContent,
-  LocationContent,
-  ReactionContent,
-  TextContent,
-} from '../conversation/content/';
+import {ConversationContent} from './content/ConversationContent';
 
 enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
@@ -56,23 +38,7 @@ type PayloadBundleOutgoing = PayloadBundle & {
 type PayloadBundleOutgoingUnsent = PayloadBundle & {state: PayloadBundleState.OUTGOING_UNSENT};
 
 interface PayloadBundle {
-  content?:
-    | AssetContent
-    | ClientActionContent
-    | ClientActionType
-    | ConfirmationContent
-    | Connection
-    | DeletedContent
-    | EditedTextContent
-    | FileAssetContent
-    | FileAssetMetaDataContent
-    | FileAssetAbortContent
-    | HiddenContent
-    | ImageAssetContent
-    | ImageContent
-    | LocationContent
-    | ReactionContent
-    | TextContent;
+  content?: ConversationContent;
   from: string;
   id: string;
   state: PayloadBundleState;
