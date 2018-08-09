@@ -140,33 +140,34 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * @param {string} [method] - Method used to trigger integration setup
    * @returns {Promise} Resolves with the conversation with requested service
    */
-  get1to1ConversationWithService(serviceEntity, method) {
-    for (const conversationEntity of this.conversationRepository.conversations()) {
+  get1To1ConversationWithService(serviceEntity, method) {
+    const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
       if (!conversationEntity.is_one2one()) {
         // Disregard conversations that are not 1:1
-        continue;
+        return false;
       }
 
       const isActiveConversation = !conversationEntity.removed_from_conversation();
       if (!isActiveConversation) {
         // Disregard coversations that self is no longer part of
-        continue;
+        return false;
       }
 
       const [userEntity] = conversationEntity.participating_user_ets();
       if (!userEntity.isBot) {
         // Disregard conversations with users instead of services
-        continue;
+        return false;
       }
 
       const {serviceId, providerId} = userEntity;
-      const withExpectedService = serviceEntity.id === serviceId && serviceEntity.providerId === providerId;
-      if (withExpectedService) {
-        return Promise.resolve(conversationEntity);
-      }
-    }
+      const isExpectedServiceId = serviceEntity.id === serviceId;
+      const isExpectedProviderId = serviceEntity.providerId === providerId;
+      return isExpectedServiceId && isExpectedProviderId;
+    });
 
-    return this.create1to1ConversationWithService(serviceEntity, false, method);
+    return matchingConversationEntity
+      ? Promise.resolve(matchingConversationEntity)
+      : this.create1to1ConversationWithService(serviceEntity, false, method);
   }
 
   getProviderById(providerId) {

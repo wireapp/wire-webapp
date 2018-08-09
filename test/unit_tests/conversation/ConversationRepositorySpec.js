@@ -281,7 +281,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get1to1Conversation', () => {
+  describe('get1To1Conversation', () => {
     beforeEach(() => TestFactory.conversation_repository.conversations([]));
 
     it('finds an existing 1:1 conversation within a team', () => {
@@ -301,7 +301,7 @@ describe('ConversationRepository', () => {
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
 
-      return TestFactory.conversation_repository.get1to1Conversation(userEntity).then(conversationEntity => {
+      return TestFactory.conversation_repository.get1To1Conversation(userEntity).then(conversationEntity => {
         expect(conversationEntity).toBe(newConversationEntity);
       });
     });

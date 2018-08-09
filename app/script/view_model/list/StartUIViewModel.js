@@ -294,7 +294,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     }
 
     this.integrationRepository
-      .get1to1ConversationWithService(this.userProfile(), 'start_ui')
+      .get1To1ConversationWithService(this.userProfile(), 'start_ui')
       .then(conversationEntity => {
         if (conversationEntity) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);

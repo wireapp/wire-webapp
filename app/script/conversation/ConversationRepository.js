@@ -604,7 +604,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get1to1Conversation(user_et).then(conversation_et =>
+    this.get1To1Conversation(user_et).then(conversation_et =>
       conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER)
     );
   }
@@ -828,36 +828,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {User} userEntity - User entity for whom to get the conversation
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get1to1Conversation(userEntity) {
+  get1To1Conversation(userEntity) {
     const inCurrentTeam = userEntity.inTeam() && userEntity.isTeamMember();
 
     if (inCurrentTeam) {
-      for (const conversationEntity of this.conversations()) {
+      const matchingConversationEntity = this.conversations().find(conversationEntity => {
         if (!conversationEntity.is_one2one()) {
           // Disregard conversations that are not 1:1
-          continue;
+          return false;
         }
 
         const inTeam = userEntity.teamId === conversationEntity.team_id;
         if (!inTeam) {
           // Disregard conversations that are not in the team
-          continue;
+          return false;
         }
 
         const isActiveConversation = !conversationEntity.removed_from_conversation();
         if (!isActiveConversation) {
           // Disregard coversations that self is no longer part of
-          continue;
+          return false;
         }
 
         const [userId] = conversationEntity.participating_user_ids();
-        const withExpectedUser = userEntity.id === userId;
-        if (withExpectedUser) {
-          return Promise.resolve(conversationEntity);
-        }
-      }
+        return userEntity.id === userId;
+      });
 
-      return this.createGroupConversation([userEntity]);
+      return matchingConversationEntity
+        ? Promise.resolve(matchingConversationEntity)
+        : this.createGroupConversation([userEntity]);
     }
 
     const conversationId = userEntity.connection().conversation_id;
