@@ -16,10 +16,17 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {UserAsset} from '../../user/';
 
-export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation';
-export {MemberAPI, MemberData, PermissionsData} from './member';
-export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team';
-export {PaymentAPI, PaymentData} from './payment';
-export {ServiceAPI, Service, ServiceWhitelistData} from './service';
-export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError} from './TeamError';
+interface Service {
+  id: string;
+  name: string;
+  provider: string;
+  summary: string;
+  description: string;
+  assets: UserAsset[];
+  tags: string[];
+  enabled: boolean;
+}
+
+export {Service};

@@ -17,9 +17,7 @@
  *
  */
 
-export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation';
-export {MemberAPI, MemberData, PermissionsData} from './member';
-export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team';
-export {PaymentAPI, PaymentData} from './payment';
-export {ServiceAPI, Service, ServiceWhitelistData} from './service';
-export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError} from './TeamError';
+export * from './ServiceAPI';
+export * from './Service';
+export * from './ServiceWhitelistData';
+export * from './Services';
