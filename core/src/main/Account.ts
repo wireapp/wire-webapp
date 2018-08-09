@@ -368,7 +368,7 @@ class Account extends EventEmitter {
           messageTimer: 0,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
-          type: isImage ? PayloadBundleType.ASSET_IMAGE : genericMessage.content,
+          type: isImage ? PayloadBundleType.ASSET_IMAGE : PayloadBundleType.ASSET,
         };
       }
       case GenericMessageType.REACTION: {
@@ -491,8 +491,10 @@ class Account extends EventEmitter {
             const isAbort = !!assetContent.abortReason || (!assetContent.original && !assetContent.uploaded);
 
             if (isMetaData) {
+              data.type = PayloadBundleType.ASSET_META;
               this.emit(PayloadBundleType.ASSET_META, data);
             } else if (isAbort) {
+              data.type = PayloadBundleType.ASSET_ABORT;
               this.emit(PayloadBundleType.ASSET_ABORT, data);
             } else {
               this.emit(PayloadBundleType.ASSET, data);
