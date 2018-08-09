@@ -64,6 +64,10 @@ export default class ClientService {
     return this.database.deleteLocalClient();
   }
 
+  public getClients(): Promise<RegisteredClient[]> {
+    return this.backend.getClients();
+  }
+
   public getLocalClient(): Promise<MetaClient> {
     this.logger.log('getLocalClient');
     return this.database.getLocalClient();
@@ -74,16 +78,11 @@ export default class ClientService {
     return this.database.createLocalClient(client);
   }
 
-  public synchronizeClients() {
+  public async synchronizeClients(): Promise<MetaClient[]> {
     this.logger.log('synchronizeClients');
-    return this.backend
-      .getClients()
-      .then((registeredClients: RegisteredClient[]) => {
-        return registeredClients.filter(client => client.id !== this.apiClient.context!.clientId);
-      })
-      .then((registeredClients: RegisteredClient[]) => {
-        return this.database.createClientList(this.apiClient.context!.userId, registeredClients);
-      });
+    const registeredClients = await this.backend.getClients();
+    const filteredClients = registeredClients.filter(client => client.id !== this.apiClient.context!.clientId);
+    return this.database.createClientList(this.apiClient.context!.userId, filteredClients);
   }
 
   // TODO: Split functionality into "create" and "register" client
