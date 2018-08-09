@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.11.0"></a>
+# [1.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.10.24...@wireapp/api-client@1.11.0) (2018-08-09)
+
+
+### Features
+
+* **api-client:** Service endpoints ([#969](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/969)) ([7cb5e3a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7cb5e3a))
+
+
+
+
 <a name="1.10.24"></a>
 ## [1.10.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.10.23...@wireapp/api-client@1.10.24) (2018-08-09)
 
