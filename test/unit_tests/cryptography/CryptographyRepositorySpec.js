@@ -27,7 +27,7 @@ describe('z.cryptography.CryptographyRepository', () => {
   beforeAll(done => {
     z.util.protobuf
       .loadProtos('ext/proto/generic-message-proto/messages.proto')
-      .then(() => test_factory.exposeCryptographyActors())
+      .then(() => test_factory.exposeCryptographyActors(false))
       .then(done)
       .catch(done.fail);
   });
