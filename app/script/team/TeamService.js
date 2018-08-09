@@ -70,4 +70,15 @@ z.team.TeamService = class TeamService {
       url: this.client.create_url(TeamService.URL.TEAMS),
     });
   }
+
+  getWhitelistedServices(teamId, size = 100, prefix) {
+    return this.client.send_request({
+      data: {
+        prefix,
+        size,
+      },
+      type: 'GET',
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/services/whitelisted`),
+    });
+  }
 };

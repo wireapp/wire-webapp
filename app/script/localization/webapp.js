@@ -401,7 +401,7 @@ z.string.guestRoomToggleInfo = 'Open this conversation to people outside your te
 z.string.guestRoomToggleInfoExtended = 'Open this conversation to people outside your team. You can always change it later.';
 
 z.string.guestRoomConversationBadge = 'Guests are present';
-z.string.guestRoomConversationBadgeBot = 'Bots are present';
+z.string.guestRoomConversationBadgeService = 'Services are present';
 
 z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
 z.string.guestRoomConversationButton = 'Invite people';
