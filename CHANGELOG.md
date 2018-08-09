@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.11.2"></a>
+## [1.11.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.11.1...@wireapp/api-client@1.11.2) (2018-08-09)
+
+
+### Bug Fixes
+
+* **api-client:** Expose ServiceAPI ([#972](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/972)) ([d71bb90](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d71bb90))
+
+
+
+
 <a name="1.11.1"></a>
 ## [1.11.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.11.0...@wireapp/api-client@1.11.1) (2018-08-09)
 
