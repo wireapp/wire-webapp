@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.11.1"></a>
+## [1.11.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.11.0...@wireapp/api-client@1.11.1) (2018-08-09)
+
+
+### Bug Fixes
+
+* **api-client:** Refresh access token (WEBFOUND-25) ([#967](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/967)) ([3d85b9d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3d85b9d))
+
+
+
+
 <a name="1.11.0"></a>
 # [1.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.10.24...@wireapp/api-client@1.11.0) (2018-08-09)
 
