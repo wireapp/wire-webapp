@@ -5819,9 +5819,9 @@ jasmine-ajax@3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/jasmine-ajax/-/jasmine-ajax-3.4.0.tgz#8dce36c0e3f16b9b900adb1f2ef83e0cd87c6755"
 
-jasmine-core@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.1.0.tgz#a4785e135d5df65024dfc9224953df585bd2766c"
+jasmine-core@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.2.0.tgz#e33657dd6bb7f3d8e05b55b63ead841218146374"
 
 jest-docblock@^21.0.0:
   version "21.2.0"
