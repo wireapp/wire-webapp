@@ -86,7 +86,13 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     if (this.isTeam()) {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-          action: () => this.create1to1ConversationWithService(serviceEntity, true, 'url_param'),
+          action: () => {
+            this.create1to1ConversationWithService(serviceEntity, 'url_param').then(conversationEntity => {
+              if (conversationEntity) {
+                amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+              }
+            });
+          },
           preventClose: true,
           text: {
             action: z.l10n.text(z.string.modalConversationAddBotAction),
@@ -103,11 +109,10 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * Add bot to conversation.
    *
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
-   * @param {boolean} [showConversation=true] - Show newly created conversation
    * @param {string} [method] - Method used to trigger integration setup
    * @returns {Promise} Resolves when conversation with the integration was was created
    */
-  create1to1ConversationWithService(serviceEntity, showConversation = true, method) {
+  create1to1ConversationWithService(serviceEntity, method) {
     return this.conversationRepository
       .createGroupConversation([], undefined, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
@@ -116,12 +121,6 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         }
 
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
-      })
-      .then(conversationEntity => {
-        if (conversationEntity && showConversation) {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-        }
-        return conversationEntity;
       })
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
@@ -167,7 +166,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     return matchingConversationEntity
       ? Promise.resolve(matchingConversationEntity)
-      : this.create1to1ConversationWithService(serviceEntity, false, method);
+      : this.create1to1ConversationWithService(serviceEntity, method);
   }
 
   getProviderById(providerId) {
