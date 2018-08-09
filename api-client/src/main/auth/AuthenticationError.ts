@@ -28,11 +28,7 @@ export class AuthenticationError extends BackendError {
 }
 
 export class LoginTooFrequentError extends AuthenticationError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
-    code: StatusCode = StatusCode.TOO_MANY_REQUESTS
-  ) {
+  constructor(message: string, label = BackendErrorLabel.CLIENT_ERROR, code = StatusCode.TOO_MANY_REQUESTS) {
     super(message, label, code);
     Object.setPrototypeOf(this, LoginTooFrequentError.prototype);
     this.name = 'LoginTooFrequentError';
@@ -40,11 +36,7 @@ export class LoginTooFrequentError extends AuthenticationError {
 }
 
 export class InvalidCredentialsError extends AuthenticationError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.INVALID_CREDENTIALS,
-    code: StatusCode = StatusCode.FORBIDDEN
-  ) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, InvalidCredentialsError.prototype);
     this.name = 'InvalidCredentialsError';
@@ -52,11 +44,7 @@ export class InvalidCredentialsError extends AuthenticationError {
 }
 
 export class SuspendedAccountError extends AuthenticationError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.SUSPENDED_ACCOUNT,
-    code: StatusCode = StatusCode.FORBIDDEN
-  ) {
+  constructor(message: string, label = BackendErrorLabel.SUSPENDED_ACCOUNT, code = StatusCode.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, SuspendedAccountError.prototype);
     this.name = 'SuspendedAccountError';
@@ -64,13 +52,17 @@ export class SuspendedAccountError extends AuthenticationError {
 }
 
 export class IdentifierExistsError extends AuthenticationError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.KEY_EXISTS,
-    code: StatusCode = StatusCode.CONFLICT
-  ) {
+  constructor(message: string, label = BackendErrorLabel.KEY_EXISTS, code = StatusCode.CONFLICT) {
     super(message, label, code);
     Object.setPrototypeOf(this, IdentifierExistsError.prototype);
     this.name = 'IdentifierExistsError';
+  }
+}
+
+export class TokenExpiredError extends AuthenticationError {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, TokenExpiredError.prototype);
+    this.name = 'TokenExpiredError';
   }
 }

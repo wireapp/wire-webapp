@@ -23,7 +23,7 @@ import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from
 import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
-import {BackendErrorMapper, ConnectionState, ContentType, NetworkError} from '../http/';
+import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 class HttpClient extends EventEmitter {
@@ -83,7 +83,7 @@ class HttpClient extends EventEmitter {
     return `${this.baseURL}${url}`;
   }
 
-  public _sendRequest(config: AxiosRequestConfig, tokenAsParam: boolean = false): AxiosPromise {
+  public _sendRequest(config: AxiosRequestConfig, tokenAsParam: boolean = false, retry = false): AxiosPromise {
     config.baseURL = this.baseURL;
 
     if (this.accessTokenStore.accessToken) {
@@ -114,7 +114,7 @@ class HttpClient extends EventEmitter {
       .catch(error => {
         // Map Axios errors
         const isNetworkError = !error.response && error.request && Object.keys(error.request).length === 0;
-        const isUnauthorized = error.response && error.response.status === 401;
+        const isForbidden = error.response && error.response.status === StatusCode.FORBIDDEN;
         const isBackendError =
           error.response &&
           error.response.data &&
@@ -129,8 +129,8 @@ class HttpClient extends EventEmitter {
           return Promise.reject(networkError);
         }
 
-        if (isUnauthorized) {
-          return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam));
+        if (isForbidden && this.accessTokenStore && this.accessTokenStore.accessToken && !retry) {
+          return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam, true));
         }
 
         if (isBackendError) {

@@ -160,12 +160,16 @@ describe('Client', () => {
         .catch(done.fail);
     });
 
-    it('refreshes an access token when it gets invalid', done => {
+    it('refreshes an access token when it becomes invalid', done => {
       nock(baseURL)
         .get(UserAPI.URL.USERS)
         .query({handles: 'webappbot'})
         .once()
-        .reply(401, undefined);
+        .reply(403, {
+          code: 403,
+          label: 'invalid-credentials',
+          message: 'Token expired',
+        });
 
       nock(baseURL)
         .get(UserAPI.URL.USERS)

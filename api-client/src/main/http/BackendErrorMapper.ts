@@ -18,7 +18,13 @@
  */
 
 import {BackendError, BackendErrorLabel, StatusCode} from '.';
-import {IdentifierExistsError, InvalidCredentialsError, LoginTooFrequentError, SuspendedAccountError} from '../auth';
+import {
+  IdentifierExistsError,
+  InvalidCredentialsError,
+  LoginTooFrequentError,
+  SuspendedAccountError,
+  TokenExpiredError,
+} from '../auth';
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation';
 import {InviteEmailInUseError} from '../team';
 import {InvalidInvitationCodeError} from '../team/index';
@@ -33,44 +39,45 @@ class BackendErrorMapper {
     };
   } {
     return {
-      [Number(StatusCode.BAD_REQUEST)]: {
-        [String(BackendErrorLabel.CLIENT_ERROR)]: {
+      [StatusCode.BAD_REQUEST]: {
+        [BackendErrorLabel.CLIENT_ERROR]: {
           ["[path] 'cnv' invalid: Failed reading: Invalid UUID"]: new ConversationIsUnknownError(
             'Conversation ID is unknown.'
           ),
           ["[path] 'usr' invalid: Failed reading: Invalid UUID"]: new UserIsUnknownError('User ID is unknown.'),
           ['Error in $: Failed reading: satisfy']: new BackendError('Wrong set of parameters.'),
         },
-        [String(BackendErrorLabel.INVALID_INVITATION_CODE)]: {
+        [BackendErrorLabel.INVALID_INVITATION_CODE]: {
           ['Invalid invitation code.']: new InvalidInvitationCodeError('Invalid invitation code.'),
         },
       },
-      [Number(StatusCode.FORBIDDEN)]: {
-        [String(BackendErrorLabel.INVALID_CREDENTIALS)]: {
+      [StatusCode.FORBIDDEN]: {
+        [BackendErrorLabel.INVALID_CREDENTIALS]: {
           ['Authentication failed.']: new InvalidCredentialsError(
             'Authentication failed because of invalid credentials.'
           ),
+          ['Token expired']: new TokenExpiredError('Authentication failed because the token is expired.'),
         },
-        [String(BackendErrorLabel.NOT_CONNECTED)]: {
+        [BackendErrorLabel.NOT_CONNECTED]: {
           ['Users are not connected']: new UnconnectedUserError('Users are not connected.'),
         },
-        [String(BackendErrorLabel.INVALID_OPERATION)]: {
+        [BackendErrorLabel.INVALID_OPERATION]: {
           ['invalid operation for 1:1 conversations']: new ConversationOperationError('Cannot leave 1:1 conversation.'),
         },
-        [String(BackendErrorLabel.SUSPENDED_ACCOUNT)]: {
+        [BackendErrorLabel.SUSPENDED_ACCOUNT]: {
           ['Account suspended.']: new SuspendedAccountError('Account suspended.'),
         },
       },
-      [Number(StatusCode.TOO_MANY_REQUESTS)]: {
-        [String(BackendErrorLabel.CLIENT_ERROR)]: {
+      [StatusCode.TOO_MANY_REQUESTS]: {
+        [BackendErrorLabel.CLIENT_ERROR]: {
           ['Logins too frequent']: new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
         },
       },
-      [Number(StatusCode.CONFLICT)]: {
-        [String(BackendErrorLabel.INVITE_EMAIL_EXISTS)]: {
+      [StatusCode.CONFLICT]: {
+        [BackendErrorLabel.INVITE_EMAIL_EXISTS]: {
           ['The given e-mail address is in use.']: new InviteEmailInUseError('The given e-mail address is in use.'),
         },
-        [String(BackendErrorLabel.KEY_EXISTS)]: {
+        [BackendErrorLabel.KEY_EXISTS]: {
           ['The given e-mail address or phone number is in use.']: new IdentifierExistsError(
             'The given e-mail address or phone number is in use.'
           ),
