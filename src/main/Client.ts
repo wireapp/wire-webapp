@@ -36,7 +36,7 @@ import {NotificationAPI} from './notification/';
 import {SelfAPI} from './self/';
 import {retrieveCookie} from './shims/node/cookie';
 import {WebSocketClient} from './tcp/';
-import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
+import {MemberAPI, PaymentAPI, ServiceAPI, TeamAPI, TeamInvitationAPI} from './team/';
 import {User} from './user';
 import {UserAPI} from './user/';
 
@@ -68,11 +68,13 @@ class APIClient {
     invitation: {api?: TeamInvitationAPI};
     member: {api?: MemberAPI};
     payment: {api?: PaymentAPI};
+    service: {api?: ServiceAPI};
     team: {api?: TeamAPI};
   } = {
     invitation: {api: undefined},
     member: {api: undefined},
     payment: {api: undefined},
+    service: {api: undefined},
     team: {api: undefined},
   };
   public user: {api: UserAPI};
@@ -134,6 +136,9 @@ class APIClient {
       },
       payment: {
         api: new PaymentAPI(this.transport.http),
+      },
+      service: {
+        api: new ServiceAPI(this.transport.http),
       },
       team: {
         api: new TeamAPI(this.transport.http),
