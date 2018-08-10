@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.5.0...@wireapp/commons@0.6.0) (2018-08-10)
+
+
+### Features
+
+* **commons:** Add array chunking ([#979](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/979)) ([53db959](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/53db959))
+
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.4.1...@wireapp/commons@0.5.0) (2018-08-10)
 
