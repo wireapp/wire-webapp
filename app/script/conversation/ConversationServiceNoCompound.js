@@ -26,8 +26,8 @@ window.z.conversation = z.conversation || {};
 // - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
 z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompound extends z.conversation
   .ConversationService {
-  constructor(client, storage_service) {
-    super(client, storage_service);
+  constructor(client, event_service, storage_service) {
+    super(client, event_service, storage_service);
   }
 
   /**

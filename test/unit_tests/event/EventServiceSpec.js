@@ -82,9 +82,53 @@ describe('z.event.EventService', () => {
     });
   });
 
+  describe('saveEvent', () => {
+    /* eslint-disable sort-keys*/
+    const newEvent = {
+      conversation: conversationId,
+      id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+      from: senderId,
+      time: '2016-08-04T13:27:58.993Z',
+      data: {content: 'Second message', previews: []},
+      type: 'conversation.message-add',
+    };
+    /* eslint-enable sort-keys*/
+
+    it('save event in the database', () => {
+      spyOn(TestFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
+
+      return TestFactory.event_service.saveEvent(newEvent).then(event => {
+        expect(event.category).toBeDefined();
+        expect(TestFactory.storage_service.save).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('updateEvent', () => {
+    /* eslint-disable sort-keys*/
+    const updatedEvent = {
+      conversation: conversationId,
+      id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+      from: senderId,
+      time: '2016-08-04T13:27:58.993Z',
+      data: {content: 'Second message', previews: []},
+      type: 'conversation.message-add',
+      primary_key: 12,
+    };
+    /* eslint-enable sort-keys*/
+
+    it('update event in the database', () => {
+      spyOn(TestFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
+
+      return TestFactory.event_service.updateEvent(updatedEvent).then(event => {
+        expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, event);
+      });
+    });
+  });
+
   describe('updateMessage', () => {
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const event = {
+    const MessageEntity = {
       conversation: conversationId,
       id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
       from: senderId,
@@ -97,9 +141,9 @@ describe('z.event.EventService', () => {
     it('updated event in the database', () => {
       spyOn(TestFactory.event_service, 'updateEvent').and.returnValue(Promise.resolve());
 
-      event.time = new Date().toISOString();
-      event.primary_key = 1337;
-      return TestFactory.event_service.updateMessage(event, {time: event.time}).then(() => {
+      MessageEntity.time = new Date().toISOString();
+      MessageEntity.primary_key = 1337;
+      return TestFactory.event_service.updateMessage(MessageEntity, {time: MessageEntity.time}).then(() => {
         expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
       });
     });

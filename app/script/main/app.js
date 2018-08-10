@@ -193,7 +193,7 @@ z.main.App = class App {
       connect: new z.connect.ConnectService(this.auth.client),
       connectGoogle: new z.connect.ConnectGoogleService(this.auth.client),
       conversation: z.util.Environment.browser.edge
-        ? new z.conversation.ConversationServiceNoCompound(this.auth.client, storageService)
+        ? new z.conversation.ConversationServiceNoCompound(this.auth.client, eventService, storageService)
         : new z.conversation.ConversationService(this.auth.client, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.auth.client),
       event: eventService,
