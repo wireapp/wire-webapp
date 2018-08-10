@@ -18,9 +18,9 @@
  */
 
 import {
+  CONVERSATION_TYPE,
   ClientMismatch,
   Conversation,
-  CONVERSATION_TYPE,
   NewConversation,
   NewOTRMessage,
   OTRRecipients,

@@ -20,7 +20,7 @@
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {HttpClient} from '../../http';
-import {Service, Services, ServiceWhitelistData} from './';
+import {Provider, Service, ServiceWhitelistData, Services} from './';
 
 class ServiceAPI {
   constructor(private readonly client: HttpClient) {}
@@ -58,6 +58,24 @@ class ServiceAPI {
         start: undefined,
       },
       url: `${ServiceAPI.URL.TEAMS}/${teamId}/${ServiceAPI.URL.SERVICES}/${ServiceAPI.URL.WHITELISTED}`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  public getProvider(providerId: string): Promise<Provider> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ServiceAPI.URL.PROVIDERS}/${providerId}`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  public getProviderServices(providerId: string): Promise<Services> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ServiceAPI.URL.PROVIDERS}/${providerId}/${ServiceAPI.URL.SERVICES}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
