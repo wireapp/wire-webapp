@@ -33,10 +33,12 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Construct a new Conversation Service.
    * @param {BackendClient} client - Client for the API calls
+   * @param {EventRepository} eventService - Service that handles events
    * @param {StorageService} storageService - Service for all storage interactions
    */
-  constructor(client, storageService) {
+  constructor(client, eventService, storageService) {
     this.client = client;
+    this.eventService = eventService;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
 
@@ -468,32 +470,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Load conversation event.
-   *
-   * @param {string} conversationId - ID of conversation
-   * @param {string} messageId - ID of message to retrieve
-   * @returns {Promise} Resolves with the stored record
-   */
-  load_event_from_db(conversationId, messageId) {
-    if (!conversationId || !messageId) {
-      this.logger.error(`Cannot get event '${messageId}' in conversation '${conversationId}' without IDs`);
-      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
-      return Promise.reject(error);
-    }
-
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('id')
-      .equals(messageId)
-      .filter(record => record.conversation === conversationId)
-      .first()
-      .catch(error => {
-        const logMessage = `Failed to get event '${messageId}' for conversation '${conversationId}': ${error.message}`;
-        this.logger.error(logMessage, error);
-        throw error;
-      });
-  }
-
-  /**
    * Get events with given category.
    *
    * @param {string} conversation_id - ID of conversation to add users to
@@ -589,25 +565,6 @@ z.conversation.ConversationService = class ConversationService {
       )
       .limit(limit)
       .toArray();
-  }
-
-  /**
-   * Save an unencrypted conversation event.
-   * @param {Object} event - JSON event to be stored
-   * @returns {Promise} Resolves with the stored record
-   */
-  save_event(event) {
-    event.category = z.message.MessageCategorization.categoryFromEvent(event);
-    return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
-  }
-
-  /**
-   * Update an unencrypted conversation event.
-   * @param {Object} event - JSON event to be stored
-   * @returns {Promise} Resolves with the updated record
-   */
-  update_event(event) {
-    return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
   }
 
   /**
@@ -711,29 +668,6 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @param {Message} messageEntity - Message event to update in the database
    * @param {Object} [changes={}] - Changes to update message with
-   * @returns {Promise} Resolves when the message was updated in database
-   */
-  updateMessageInDb(messageEntity, changes = {}) {
-    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
-      const hasChanges = !!Object.keys(changes).length;
-      if (!hasChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
-      }
-
-      const hasVersionedChanges = !!changes.version;
-      if (hasVersionedChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
-      }
-
-      return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
-    });
-  }
-
-  /**
-   * Update a message in the database.
-   *
-   * @param {Message} messageEntity - Message event to update in the database
-   * @param {Object} [changes={}] - Changes to update message with
    * @param {string} conversationId - ID of conversation
    * @returns {Promise} Resolves when the message was updated in database
    */
@@ -750,7 +684,7 @@ z.conversation.ConversationService = class ConversationService {
       }
 
       return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-        return this.load_event_from_db(conversationId, messageEntity.id).then(record => {
+        return this.eventService.loadEvent(conversationId, messageEntity.id).then(record => {
           if (!record) {
             throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
           }

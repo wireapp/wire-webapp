@@ -68,6 +68,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     user_repository
   ) {
     this.eventRepository = eventRepository;
+    this.eventService = eventRepository.eventService;
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -163,8 +164,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_mapper
     );
     this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
-      this.conversation_service,
       this.conversation_mapper,
+      this.eventService,
       {onMessageTimeout: this.handleMessageExpiration.bind(this)}
     );
   }
@@ -2222,7 +2223,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         this.checkMessageTimer(messageEntity);
         if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
-          return this.conversation_service.updateMessageInDb(messageEntity, changes);
+          return this.eventService.updateMessage(messageEntity, changes);
         }
       })
       .catch(error => {
@@ -2953,7 +2954,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         if (was_updated) {
           const changes = {status: message_et.status()};
-          return this.conversation_service.updateMessageInDb(message_et, changes);
+          return this.eventService.updateMessage(message_et, changes);
         }
       })
       .catch(error => {

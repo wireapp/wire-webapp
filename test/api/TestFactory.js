@@ -227,14 +227,18 @@ window.TestFactory.prototype.exposeEventActors = function() {
 
       TestFactory.web_socket_service = new z.event.WebSocketService(this.client, TestFactory.storage_service);
 
+      TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
+
       TestFactory.notification_service = new z.event.NotificationService(this.client, TestFactory.storage_service);
 
       TestFactory.conversation_service = new z.conversation.ConversationService(
         this.client,
+        TestFactory.event_service,
         TestFactory.storage_service
       );
 
       TestFactory.event_repository = new z.event.EventRepository(
+        TestFactory.event_service,
         TestFactory.notification_service,
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
@@ -353,6 +357,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 
       TestFactory.conversation_service = new z.conversation.ConversationService(
         this.client,
+        TestFactory.event_service,
         TestFactory.storage_service
       );
 

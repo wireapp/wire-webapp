@@ -54,13 +54,22 @@ z.event.EventRepository = class EventRepository {
   /**
    * Construct a new Event Repository.
    *
+   * @param {z.event.EventService} eventService - Service that handles interactions with events
    * @param {z.event.NotificationService} notificationService - Service handling the notification stream
    * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(notificationService, webSocketService, conversationService, cryptographyRepository, userRepository) {
+  constructor(
+    eventService,
+    notificationService,
+    webSocketService,
+    conversationService,
+    cryptographyRepository,
+    userRepository
+  ) {
+    this.eventService = eventService;
     this.notificationService = notificationService;
     this.webSocketService = webSocketService;
     this.conversationService = conversationService;
@@ -651,7 +660,7 @@ z.event.EventRepository = class EventRepository {
 
     //first check if a message that should be replaced exists in DB
     const findEventToReplacePromise = mappedData.replacing_message_id
-      ? this.conversationService.load_event_from_db(conversationId, mappedData.replacing_message_id)
+      ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();
 
     return findEventToReplacePromise.then(eventToReplace => {
@@ -665,13 +674,13 @@ z.event.EventRepository = class EventRepository {
       const handleEvent = newEvent => {
         // check for duplicates (same id)
         const loadEventPromise = newEvent.id
-          ? this.conversationService.load_event_from_db(conversationId, newEvent.id)
+          ? this.eventService.loadEvent(conversationId, newEvent.id)
           : Promise.resolve();
 
         return loadEventPromise.then(storedEvent => {
           return storedEvent
             ? this._handleDuplicatedEvent(storedEvent, newEvent)
-            : this.conversationService.save_event(newEvent);
+            : this.eventService.saveEvent(newEvent);
         });
       };
 
@@ -695,7 +704,7 @@ z.event.EventRepository = class EventRepository {
       updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
-    return this.conversationService.update_event(identifiedUpdates);
+    return this.eventService.updateEvent(identifiedUpdates);
   }
 
   _handleDuplicatedEvent(originalEvent, newEvent) {
@@ -723,7 +732,7 @@ z.event.EventRepository = class EventRepository {
       case z.assets.AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
-        return this.conversationService.update_event(updatedEvent);
+        return this.eventService.updateEvent(updatedEvent);
       }
 
       case z.assets.AssetTransferState.UPLOAD_FAILED: {
@@ -771,7 +780,7 @@ z.event.EventRepository = class EventRepository {
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
     const identifiedUpdates = Object.assign({}, {primary_key: originalEvent.primary_key}, updates);
-    return this.conversationService.update_event(identifiedUpdates);
+    return this.eventService.updateEvent(identifiedUpdates);
   }
 
   _getUpdatesForMessageEdit(originalEvent, newEvent) {
