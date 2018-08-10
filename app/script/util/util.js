@@ -495,7 +495,7 @@ z.util.bucketValues = (value, bucketLimits) => {
     return '0';
   }
 
-  for (let index = 0; index < bucketLimits.length; index++) {
+  for (let index = 0, length = bucketLimits.length; index < length; index++) {
     const limit = bucketLimits[index];
     if (value < limit + 1) {
       const previous_limit = bucketLimits[index - 1];
