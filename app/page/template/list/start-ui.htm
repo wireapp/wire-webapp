@@ -3,12 +3,12 @@
     <span class="left-list-header-text" data-bind="text: teamName" data-uie-name="status-team-name-search"></span>
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close"></span>
   </div>
-  <div id="start-ui-header" class="start-ui-header border-theme" data-bind="css: {'start-ui-header-integrations': enableIntegrations()}">
+  <div id="start-ui-header" class="start-ui-header border-theme" data-bind="css: {'start-ui-header-integrations': isTeam()}">
     <user-input class="start-ui-header-user-input"
                 params="input: searchInput, placeholder: z.string.searchPlaceholder, enter: handleSearchInput"
                 data-uie-name="enter-search">
     </user-input>
-    <!-- ko if: enableIntegrations() -->
+    <!-- ko if: isTeam() -->
       <div class="start-ui-list-tabs">
         <div class="start-ui-list-tab" data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, l10n_text: z.string.searchPeople" data-uie-name="do-add-people"></div>
         <div class="start-ui-list-tab" data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, l10n_text: z.string.searchServices" data-uie-name="do-add-services"></div>
