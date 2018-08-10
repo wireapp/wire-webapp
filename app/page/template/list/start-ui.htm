@@ -116,7 +116,7 @@
             <!-- /ko -->
             <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
           <!-- /ko -->
-          <!-- ko ifnot: services().length || isInitialServiceSearch() -->
+          <!-- ko if: !services().length && !isInitialServiceSearch() -->
             <div class="start-ui-no-services">
               <service-icon class="start-ui-no-services__icon"></service-icon>
               <div class="start-ui-no-services__info" data-bind="l10n_text: z.string.searchNoServices"></div>
