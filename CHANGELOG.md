@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.12.0"></a>
+# [1.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.11.2...@wireapp/api-client@1.12.0) (2018-08-10)
+
+
+### Features
+
+* Print time elapsed for each test ([#978](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/978)) ([a6de5f2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a6de5f2))
+
+
+
+
 <a name="1.11.2"></a>
 ## [1.11.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.11.1...@wireapp/api-client@1.11.2) (2018-08-09)
 
