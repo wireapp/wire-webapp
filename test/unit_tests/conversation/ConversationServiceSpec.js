@@ -29,88 +29,18 @@ describe('ConversationService', () => {
   const test_factory = new TestFactory();
   const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(storage_repository => {
-        const {client} = test_factory;
-        ({storageService: storage_service} = storage_repository);
-        conversation_service = new z.conversation.ConversationService(client, storage_service);
-        conversation_mapper = new z.conversation.ConversationMapper();
-        server = sinon.fakeServer.create();
-        done();
-      })
-      .catch(done.fail);
+  beforeAll(() => {
+    return test_factory.exposeConversationActors().then(storage_repository => {
+      conversation_service = TestFactory.conversation_service;
+      conversation_mapper = new z.conversation.ConversationMapper();
+      storage_service = TestFactory.storage_service;
+      server = sinon.fakeServer.create();
+    });
   });
 
   afterEach(() => {
     storage_service.clearStores();
     server.restore();
-  });
-
-  describe('load_preceding_events_from_db', () => {
-    const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
-
-    // prettier-ignore
-    /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const messages = [
-      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
-      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-    ];
-    /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-
-    beforeEach(done => {
-      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('returns mapped message_et if event with id is found', done => {
-      conversation_service
-        .load_event_from_db(conversation_id, '4af67f76-09f9-4831-b3a4-9df877b8c29a')
-        .then(message_et => {
-          expect(message_et).toEqual(messages[1]);
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('returns undefined if no event with id is found', done => {
-      conversation_service
-        .load_event_from_db(conversation_id, z.util.createRandomUuid())
-        .then(message_et => {
-          expect(message_et).not.toBeDefined();
-          done();
-        })
-        .catch(done.fail);
-    });
-  });
-
-  describe('updateMessageInDb', () => {
-    // prettier-ignore
-    /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"};
-    /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-
-    it('updated event in the database', done => {
-      event.time = new Date().toISOString();
-      event.primary_key = 1337;
-      conversation_service
-        .updateMessageInDb(event, {time: event.time})
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('fails if changes are not specified', done => {
-      conversation_service
-        .updateMessageInDb(event, undefined)
-        .then(done.fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-          expect(error.type).toBe(z.conversation.ConversationError.TYPE.NO_CHANGES);
-          done();
-        });
-    });
   });
 
   describe('load_preceding_events_from_db', () => {

@@ -88,7 +88,7 @@ z.event.EventService = class EventService {
    */
   updateMessage(messageEntity, updates) {
     return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
-      const hasChanges = !!Object.keys(updates).length;
+      const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
       }
