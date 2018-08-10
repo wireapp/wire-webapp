@@ -57,6 +57,10 @@ describe('z.event.EventService', () => {
       return Promise.all(events.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)));
     });
 
+    afterEach(() => {
+      TestFactory.storage_service.clearStores();
+    });
+
     it('throws an error if parameters are missing', () => {
       const eventService = TestFactory.event_service;
       const params = [[undefined, undefined], ['conv-id', undefined], [undefined, 'event-id']];
@@ -79,6 +83,91 @@ describe('z.event.EventService', () => {
       return TestFactory.event_service.loadEvent(conversationId, z.util.createRandomUuid()).then(messageEntity => {
         expect(messageEntity).not.toBeDefined();
       });
+    });
+  });
+
+  describe('loadPrecedingEvents', () => {
+    let messages = undefined;
+
+    beforeEach(() => {
+      const timestamp = 1479903546799;
+      messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
+        return {
+          conversation: conversationId,
+          time: new Date(timestamp + index).toISOString(),
+        };
+      });
+
+      return Promise.all(messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)));
+    });
+
+    afterEach(() => {
+      TestFactory.storage_service.clearStores();
+    });
+
+    it("doesn't load events for invalid conversation id", () => {
+      return TestFactory.event_service
+        .loadPrecedingEvents('invalid_id', new Date(30), new Date(1479903546808))
+        .then(events => {
+          expect(events.length).toBe(0);
+        });
+    });
+
+    it('loads all events', () => {
+      return TestFactory.event_service.loadPrecedingEvents(conversationId).then(events => {
+        expect(events.length).toBe(10);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
+        expect(events[9].time).toBe('2016-11-23T12:19:06.799Z');
+      });
+    });
+
+    it('loads all events with limit', () => {
+      return TestFactory.event_service.loadPrecedingEvents(conversationId, undefined, undefined, 5).then(events => {
+        expect(events.length).toBe(5);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
+        expect(events[4].time).toBe('2016-11-23T12:19:06.804Z');
+      });
+    });
+
+    it('loads events with lower bound', () => {
+      return TestFactory.event_service.loadPrecedingEvents(conversationId, new Date(1479903546805)).then(events => {
+        expect(events.length).toBe(4);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
+        expect(events[1].time).toBe('2016-11-23T12:19:06.807Z');
+        expect(events[2].time).toBe('2016-11-23T12:19:06.806Z');
+        expect(events[3].time).toBe('2016-11-23T12:19:06.805Z');
+      });
+    });
+
+    it('loads events with upper bound', () => {
+      return TestFactory.event_service
+        .loadPrecedingEvents(conversationId, undefined, new Date(1479903546803))
+        .then(events => {
+          expect(events.length).toBe(4);
+          expect(events[0].time).toBe('2016-11-23T12:19:06.802Z');
+          expect(events[1].time).toBe('2016-11-23T12:19:06.801Z');
+          expect(events[2].time).toBe('2016-11-23T12:19:06.800Z');
+          expect(events[3].time).toBe('2016-11-23T12:19:06.799Z');
+        });
+    });
+
+    it('loads events with upper and lower bound', () => {
+      return TestFactory.event_service
+        .loadPrecedingEvents(conversationId, new Date(1479903546806), new Date(1479903546807))
+        .then(events => {
+          expect(events.length).toBe(1);
+          expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
+        });
+    });
+
+    it('loads events with upper and lower bound and a fetch limit', () => {
+      return TestFactory.event_service
+        .loadPrecedingEvents(conversationId, new Date(1479903546800), new Date(1479903546807), 2)
+        .then(events => {
+          expect(events.length).toBe(2);
+          expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
+          expect(events[1].time).toBe('2016-11-23T12:19:06.805Z');
+        });
     });
   });
 
