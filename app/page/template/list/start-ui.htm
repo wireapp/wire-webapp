@@ -105,16 +105,26 @@
         <!-- /ko -->
 
         <!-- ko ifnot: peopleTabActive() -->
-          <!-- ko if: isTeamManager() -->
-            <ul class="start-ui-create-group left-list-items">
-              <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="go-create-group">
-                <service-icon class="left-column-icon"></service-icon>
-                <div class="center-column" data-bind="l10n_text: z.string.searchManageServices"></div>
-              </li>
-            </ul>
-            <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.searchServices"></span>
+          <!-- ko if: services().length -->
+            <!-- ko if: isTeamManager() -->
+              <ul class="start-ui-create-group left-list-items">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="go-create-group">
+                  <service-icon class="left-column-icon"></service-icon>
+                  <div class="center-column" data-bind="l10n_text: z.string.searchManageServices"></div>
+                </li>
+              </ul>
+            <!-- /ko -->
+            <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
           <!-- /ko -->
-          <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
+          <!-- ko ifnot: services().length || isInitialServiceSearch() -->
+            <div class="start-ui-no-services">
+              <service-icon class="start-ui-no-services__icon"></service-icon>
+              <div class="start-ui-no-services__info" data-bind="l10n_text: z.string.searchNoServices"></div>
+              <!-- ko if: isTeamManager() -->
+                <div class="start-ui-no-services__manage-button" data-bind="l10n_text: z.string.searchManageServices, click: clickToOpenTeamAdmin"></div>
+              <!-- /ko -->
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
     </div>

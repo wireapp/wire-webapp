@@ -694,6 +694,7 @@ z.string.searchPlaceholder = 'Search by name or username';
 z.string.searchServicePlaceholder = 'Search by name';
 z.string.searchServices = 'Services';
 z.string.searchManageServices = 'Manage Services';
+z.string.searchNoServices = 'Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet lorem ipsum dolor sit amet.';
 z.string.searchTeamGroups = 'Team conversations';
 z.string.searchTeamMembers = 'Team members';
 z.string.searchTopPeople = 'Top people';
