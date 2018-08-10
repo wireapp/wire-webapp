@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.2.21...bazinga64@5.3.0) (2018-08-10)
+
+
+### Features
+
+* Print time elapsed for each test ([#978](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/978)) ([a6de5f2](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/a6de5f2))
+
+
+
+
 <a name="5.2.21"></a>
 ## [5.2.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.2.20...bazinga64@5.2.21) (2018-08-09)
 

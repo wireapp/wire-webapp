@@ -3,7 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-      <a name="2.2.6"></a>
+  <a name="2.2.7"></a>
+## [2.2.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.6...@wireapp/react-ui-kit@2.2.7) (2018-08-10)
+
+
+
+
+**Note:** Version bump only for package @wireapp/react-ui-kit
+
+  <a name="2.2.6"></a>
 ## [2.2.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.5...@wireapp/react-ui-kit@2.2.6) (2018-08-09)
 
 
@@ -11,7 +19,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
 
-      <a name="2.2.5"></a>
+<a name="2.2.5"></a>
 ## [2.2.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.4...@wireapp/react-ui-kit@2.2.5) (2018-08-08)
 
 

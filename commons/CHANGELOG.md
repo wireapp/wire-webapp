@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.4.1...@wireapp/commons@0.5.0) (2018-08-10)
+
+
+### Features
+
+* Print time elapsed for each test ([#978](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/978)) ([a6de5f2](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/a6de5f2))
+
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.4.0...@wireapp/commons@0.4.1) (2018-08-09)
 
