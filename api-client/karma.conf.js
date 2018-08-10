@@ -46,7 +46,10 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors,
-    reporters: ['jasmine-diff', 'progress'],
+    reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
+    specReporter: {
+      showSpecTiming: true,
+    },
   });
 };

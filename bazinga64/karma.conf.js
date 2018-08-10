@@ -44,7 +44,10 @@ module.exports = function(config) {
     preprocessors: {
       '**/*.js': ['sourcemap'],
     },
-    reporters: ['jasmine-diff', 'progress'],
+    reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
+    specReporter: {
+      showSpecTiming: true,
+    },
   });
 };
