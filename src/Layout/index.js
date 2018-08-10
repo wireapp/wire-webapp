@@ -30,3 +30,4 @@ export * from './Header';
 export * from './HeaderMenu';
 export * from './Spacer';
 export * from './StyledApp';
+export * from './sizes';
