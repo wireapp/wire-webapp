@@ -470,21 +470,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Get events with given category.
-   *
-   * @param {string} conversation_id - ID of conversation to add users to
-   * @param {MessageCategory} category_min - Minimum message category
-   * @param {MessageCategory} [category_max=z.message.MessageCategory.LIKED] - Maximum message category
-   * @returns {Promise} Resolves with matching events
-   */
-  load_events_with_category_from_db(conversation_id, category_min, category_max = z.message.MessageCategory.LIKED) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+category]')
-      .between([conversation_id, category_min], [conversation_id, category_max], true, true)
-      .sortBy('time');
-  }
-
-  /**
    * Load conversation events by event type.
    * @param {Array<strings>} event_types - Array of event types to match
    * @returns {Promise} Resolves with the retrieved records
@@ -494,46 +479,6 @@ z.conversation.ConversationService = class ConversationService {
       .where('type')
       .anyOf(event_types)
       .sortBy('time');
-  }
-
-  /**
-   * Load conversation events starting from the upper bound going back in history
-   *  until either limit or lower bound is reached.
-   *
-   * @param {string} conversation_id - ID of conversation
-   * @param {Date} [lower_bound=new Date(0)] - Load from this date (included)
-   * @param {Date} [upper_bound=new Date()] - Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_preceding_events_from_db(
-    conversation_id,
-    lower_bound = new Date(0),
-    upper_bound = new Date(),
-    limit = Number.MAX_SAFE_INTEGER
-  ) {
-    if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
-      throw new Error(
-        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`
-      );
-    } else if (lower_bound.getTime() > upper_bound.getTime()) {
-      throw new Error(
-        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`
-      );
-    }
-
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+time]')
-      .between([conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false)
-      .reverse()
-      .limit(limit)
-      .toArray()
-      .catch(error => {
-        this.logger.error(
-          `Failed to load events for conversation '${conversation_id}' from database: '${error.message}'`
-        );
-        throw error;
-      });
   }
 
   /**

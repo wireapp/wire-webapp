@@ -429,8 +429,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       ? new Date(firstMessageEntity.timestamp())
       : new Date(conversationEntity.get_latest_timestamp(this.timeOffset) + 1);
 
-    return this.conversation_service
-      .load_preceding_events_from_db(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
+    return this.eventService
+      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
       .then(events => this._addPrecedingEventsToConversation(events, conversationEntity))
       .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
@@ -502,7 +502,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversation_et.is_pending(true);
 
     return Promise.all([
-      this.conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), message_date, padding),
+      this.eventService.loadPrecedingEvents(conversation_et.id, new Date(0), message_date, padding),
       this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true),
     ])
       .then(([older_events, newer_events]) =>
@@ -543,8 +543,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Array of message entities
    */
   get_events_for_category(conversationEntity, category = z.message.MessageCategory.NONE) {
-    return this.conversation_service
-      .load_events_with_category_from_db(conversationEntity.id, category)
+    return this.eventService
+      .loadEventsWithCategory(conversationEntity.id, category)
       .then(events => this.event_mapper.mapJsonEvents(events, conversationEntity))
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities));
   }
@@ -585,8 +585,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
 
-      return this.conversation_service
-        .load_preceding_events_from_db(conversation_et.id, lower_bound, upper_bound)
+      return this.eventService
+        .loadPrecedingEvents(conversation_et.id, lower_bound, upper_bound)
         .then(events => {
           if (events.length) {
             this._addEventsToConversation(events, conversation_et);

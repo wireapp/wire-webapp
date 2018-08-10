@@ -22,32 +22,23 @@
 'use strict';
 
 describe('ConversationServiceNoCompound', () => {
-  let conversation_service = null;
-  let server = null;
+  let eventService = null;
   let storage_service = null;
   const test_factory = new TestFactory();
   const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
 
   beforeAll(() => {
-    return test_factory.exposeEventActors().then(() => {
-      const {client} = test_factory;
+    return test_factory.exposeStorageActors().then(() => {
       storage_service = TestFactory.storage_service;
-      conversation_service = new z.conversation.ConversationServiceNoCompound(
-        client,
-        TestFactory.event_service,
-        storage_service
-      );
-
-      server = sinon.fakeServer.create();
+      eventService = new z.event.EventServiceNoCompound(storage_service);
     });
   });
 
   afterEach(() => {
-    server.restore();
     return storage_service.clearStores();
   });
 
-  describe('load_preceding_events_from_db', () => {
+  describe('loadPrecedingEvents', () => {
     const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     let messages = undefined;
 
@@ -64,16 +55,14 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it("doesn't load events for invalid conversation id", () => {
-      return conversation_service
-        .load_preceding_events_from_db('invalid_id', new Date(30), new Date(1479903546808))
-        .then(events => {
-          expect(events.length).toBe(0);
-        });
+      return eventService.loadPrecedingEvents('invalid_id', new Date(30), new Date(1479903546808)).then(events => {
+        expect(events.length).toBe(0);
+      });
     });
 
     it('loads all events', done => {
-      conversation_service
-        .load_preceding_events_from_db(conversation_id)
+      eventService
+        .loadPrecedingEvents(conversation_id)
         .then(events => {
           expect(events.length).toBe(10);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
@@ -84,8 +73,8 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads all events with limit', done => {
-      conversation_service
-        .load_preceding_events_from_db(conversation_id, undefined, undefined, 5)
+      eventService
+        .loadPrecedingEvents(conversation_id, undefined, undefined, 5)
         .then(events => {
           expect(events.length).toBe(5);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
@@ -96,8 +85,8 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads events with lower bound', done => {
-      conversation_service
-        .load_preceding_events_from_db(conversation_id, new Date(1479903546805))
+      eventService
+        .loadPrecedingEvents(conversation_id, new Date(1479903546805))
         .then(events => {
           expect(events.length).toBe(4);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
@@ -110,20 +99,18 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads events with upper bound', () => {
-      return conversation_service
-        .load_preceding_events_from_db(conversation_id, undefined, new Date(1479903546803))
-        .then(events => {
-          expect(events.length).toBe(4);
-          expect(events[0].time).toBe('2016-11-23T12:19:06.802Z');
-          expect(events[1].time).toBe('2016-11-23T12:19:06.801Z');
-          expect(events[2].time).toBe('2016-11-23T12:19:06.800Z');
-          expect(events[3].time).toBe('2016-11-23T12:19:06.799Z');
-        });
+      return eventService.loadPrecedingEvents(conversation_id, undefined, new Date(1479903546803)).then(events => {
+        expect(events.length).toBe(4);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.802Z');
+        expect(events[1].time).toBe('2016-11-23T12:19:06.801Z');
+        expect(events[2].time).toBe('2016-11-23T12:19:06.800Z');
+        expect(events[3].time).toBe('2016-11-23T12:19:06.799Z');
+      });
     });
 
     it('loads events with upper and lower bound', () => {
-      return conversation_service
-        .load_preceding_events_from_db(conversation_id, new Date(1479903546806), new Date(1479903546807))
+      return eventService
+        .loadPrecedingEvents(conversation_id, new Date(1479903546806), new Date(1479903546807))
         .then(events => {
           expect(events.length).toBe(1);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
@@ -131,8 +118,8 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads events with upper and lower bound and a fetch limit', () => {
-      return conversation_service
-        .load_preceding_events_from_db(conversation_id, new Date(1479903546800), new Date(1479903546807), 2)
+      return eventService
+        .loadPrecedingEvents(conversation_id, new Date(1479903546800), new Date(1479903546807), 2)
         .then(events => {
           expect(events.length).toBe(2);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
@@ -141,7 +128,7 @@ describe('ConversationServiceNoCompound', () => {
     });
   });
 
-  describe('load_events_with_category_from_db', () => {
+  describe('loadEventsWithCategory', () => {
     let events = undefined;
 
     beforeEach(() => {
@@ -157,12 +144,7 @@ describe('ConversationServiceNoCompound', () => {
 
     it('should return no entry matches the given category', done => {
       Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() =>
-          conversation_service.load_events_with_category_from_db(
-            events[0].conversation,
-            z.message.MessageCategory.IMAGE
-          )
-        )
+        .then(() => eventService.loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE))
         .then(result => {
           expect(result.length).toBe(0);
           done();
@@ -172,12 +154,7 @@ describe('ConversationServiceNoCompound', () => {
 
     it('should get images in the correct order', done => {
       Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() =>
-          conversation_service.load_events_with_category_from_db(
-            events[0].conversation,
-            z.message.MessageCategory.IMAGE
-          )
-        )
+        .then(() => eventService.loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE))
         .then(result => {
           expect(result.length).toBe(2);
           expect(result[0].id).toBe(events[1].id);

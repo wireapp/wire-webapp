@@ -61,6 +61,61 @@ z.event.EventService = class EventService {
   }
 
   /**
+   * Get events with given category.
+   *
+   * @param {string} conversationId - ID of conversation to add users to
+   * @param {MessageCategory} categoryMin - Minimum message category
+   * @param {MessageCategory} [categoryMax=z.message.MessageCategory.LIKED] - Maximum message category
+   * @returns {Promise} Resolves with matching events
+   */
+  loadEventsWithCategory(conversationId, categoryMin, categoryMax = z.message.MessageCategory.LIKED) {
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('[conversation+category]')
+      .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
+      .sortBy('time');
+  }
+
+  /**
+   * Load conversation events starting from the upper bound going back in history
+   *  until either limit or lower bound is reached.
+   *
+   * @param {string} conversationId - ID of conversation
+   * @param {Date} [lowerBound=new Date(0)] - Load from this date (included)
+   * @param {Date} [upperBound=new Date()] - Load until this date (excluded)
+   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
+   * @returns {Promise} Resolves with the retrieved records
+   */
+  loadPrecedingEvents(
+    conversationId,
+    lowerBound = new Date(0),
+    upperBound = new Date(),
+    limit = Number.MAX_SAFE_INTEGER
+  ) {
+    if (!_.isDate(lowerBound) || !_.isDate(upperBound)) {
+      throw new Error(
+        `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`
+      );
+    } else if (lowerBound.getTime() > upperBound.getTime()) {
+      throw new Error(
+        `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`
+      );
+    }
+
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('[conversation+time]')
+      .between([conversationId, lowerBound.toISOString()], [conversationId, upperBound.toISOString()], true, false)
+      .reverse()
+      .limit(limit)
+      .toArray()
+      .catch(error => {
+        this.logger.error(
+          `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`
+        );
+        throw error;
+      });
+  }
+
+  /**
    * Save an unencrypted conversation event.
    * @param {Object} event - JSON event to be stored
    * @returns {Promise} Resolves with the stored record
