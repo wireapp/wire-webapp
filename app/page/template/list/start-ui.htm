@@ -37,7 +37,7 @@
           <!-- ko ifnot: showSearchResults() -->
             <!-- ko if: showInviteMember() -->
               <ul class="start-ui-invite-people left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnInviteMember" data-uie-name="do-invite-member">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="do-invite-member">
                   <div class="left-column-icon icon-envelope"></div>
                   <div class="center-column" data-bind="l10n_text: z.string.searchMemberInvite"></div>
                 </li>
@@ -105,6 +105,15 @@
         <!-- /ko -->
 
         <!-- ko ifnot: peopleTabActive() -->
+          <!-- ko if: isTeamManager() -->
+            <ul class="start-ui-create-group left-list-items">
+              <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="go-create-group">
+                <service-icon class="left-column-icon"></service-icon>
+                <div class="center-column" data-bind="l10n_text: z.string.searchManageServices"></div>
+              </li>
+            </ul>
+            <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.searchServices"></span>
+          <!-- /ko -->
           <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
         <!-- /ko -->
       <!-- /ko -->
