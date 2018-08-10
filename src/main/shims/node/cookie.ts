@@ -21,7 +21,7 @@ import {error as StoreEngineError} from '@wireapp/store-engine';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Cookie as ToughCookie} from 'tough-cookie';
-import {AccessTokenData, AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Cookie} from '../../auth';
+import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, AccessTokenData, Cookie} from '../../auth';
 import {HttpClient} from '../../http';
 
 interface PersistedCookie {

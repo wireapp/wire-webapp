@@ -18,9 +18,9 @@
  */
 
 import {
-  Conversation,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  Conversation,
   ConversationMessageTimerUpdate,
 } from '../conversation';
 import {BackendEvent} from './BackendEvent';
