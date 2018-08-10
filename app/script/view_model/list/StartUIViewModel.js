@@ -190,9 +190,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.isInitialServiceSearch = ko.observable(true);
-    this.services.subscribe(() => {
-      this.isInitialServiceSearch(false);
-    });
+    this.services.subscribe(() => this.isInitialServiceSearch(false));
 
     this.userBubble = undefined;
     this.userBubbleLastId = undefined;
