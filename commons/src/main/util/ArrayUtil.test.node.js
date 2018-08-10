@@ -22,6 +22,45 @@
 const {ArrayUtil} = require('@wireapp/commons');
 
 describe('ArrayUtil', () => {
+  describe('"chunk"', () => {
+    const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    it('returns one chunk with all items included when the chunk size is even with the original array length.', () => {
+      const actual = ArrayUtil.chunk(array, array.length);
+      expect(actual.length).toBe(1);
+      expect(actual[0].length).toBe(array.length);
+      expect(actual[0][0]).toBe(array[0]);
+      expect(actual[0][9]).toBe(array[array.length - 1]);
+    });
+
+    it('clamps the chunk size when the chunk size is bigger than the original array length.', () => {
+      const actual = ArrayUtil.chunk(array, array.length + 1);
+      expect(actual.length).toBe(1);
+      expect(actual[0].length).toBe(array.length);
+      expect(actual[0][0]).toBe(array[0]);
+      expect(actual[0][9]).toBe(array[array.length - 1]);
+    });
+
+    it('returns multiple chunks.', () => {
+      const actual = ArrayUtil.chunk(array, 3);
+      expect(actual.length).toBe(4);
+      expect(actual[0].length).toBe(3);
+      expect(actual[1].length).toBe(3);
+      expect(actual[2].length).toBe(3);
+      expect(actual[3].length).toBe(1);
+    });
+
+    it('does not modify the original array.', () => {
+      const actual = ArrayUtil.chunk(array, 3);
+      expect(actual.length).toBe(4);
+      expect(actual[0].length).toBe(3);
+      expect(actual[1].length).toBe(3);
+      expect(actual[2].length).toBe(3);
+      expect(actual[3].length).toBe(1);
+      expect(array.length).toBe(10);
+    });
+  });
+
   describe('"getDifference"', () => {
     it('returns items which are different in the source array.', () => {
       const source = ['Tick', 'Trick', 'Track'];

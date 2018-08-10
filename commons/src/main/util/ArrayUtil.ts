@@ -17,15 +17,23 @@
  *
  */
 
-export function getDeduplicatedUnion(array1: (number | string)[], array2: (number | string)[]): (number | string)[] {
+export function chunk(array: any[], size: number): any[][] {
+  const chunks = [];
+  for (let index = 0, length = array.length; index < length; index += size) {
+    chunks.push(array.slice(index, index + size));
+  }
+  return chunks;
+}
+
+export function getDeduplicatedUnion(array1: any[], array2: any[]): any[] {
   return removeDuplicates(array1.concat(array2));
 }
 
-export function getDifference(array1: (number | string)[], array2: (number | string)[]): (number | string)[] {
+export function getDifference(array1: any[], array2: any[]): any[] {
   return array1.filter(value => !array2.includes(value));
 }
 
-export function getIntersection(array1: (number | string)[], array2: (number | string)[]): (number | string)[] {
+export function getIntersection(array1: any[], array2: any[]): any[] {
   return array1.filter(value => array2.includes(value));
 }
 
