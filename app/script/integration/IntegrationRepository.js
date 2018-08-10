@@ -153,6 +153,11 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       }
 
       const [userEntity] = conversationEntity.participating_user_ets();
+      if (!userEntity) {
+        // Disregard conversations with no user entities
+        return false;
+      }
+
       if (!userEntity.isBot) {
         // Disregard conversations with users instead of services
         return false;
