@@ -188,6 +188,8 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.serviceConversations = ko.observable([]);
 
+    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
+
     this.userBubble = undefined;
     this.userBubbleLastId = undefined;
 
@@ -200,6 +202,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       .extend({notify: 'always', rateLimit: 500});
 
     this._initSubscriptions();
+    this.clickOnManageServices = this.clickOnInviteMember;
   }
 
   _initSubscriptions() {
