@@ -54,7 +54,7 @@ z.util.ArrayUtil = {
       return undefined;
     }
 
-    for (let index = nextIndex; index <= array.length; index++) {
+    for (let index = nextIndex, length = array.length; index <= length; index++) {
       const nextItem = array[index];
       if (typeof filter !== 'function' || !!filter(nextItem)) {
         return nextItem;
