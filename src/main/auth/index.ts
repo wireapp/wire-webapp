@@ -17,11 +17,9 @@
  *
  */
 
-const AUTH_ACCESS_TOKEN_KEY = 'access-token';
-const AUTH_COOKIE_KEY = 'cookie';
-const AUTH_TABLE_NAME = 'authentication';
-
-export {AUTH_ACCESS_TOKEN_KEY, AUTH_COOKIE_KEY, AUTH_TABLE_NAME};
+export const AUTH_ACCESS_TOKEN_KEY = 'access-token';
+export const AUTH_COOKIE_KEY = 'cookie';
+export const AUTH_TABLE_NAME = 'authentication';
 
 export * from './AccessTokenData';
 export * from './AccessTokenStore';

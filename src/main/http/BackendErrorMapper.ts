@@ -22,6 +22,7 @@ import {
   IdentifierExistsError,
   InvalidCredentialsError,
   LoginTooFrequentError,
+  MissingCookieError,
   SuspendedAccountError,
   TokenExpiredError,
 } from '../auth';
@@ -57,6 +58,7 @@ class BackendErrorMapper {
             'Authentication failed because of invalid credentials.'
           ),
           ['Token expired']: new TokenExpiredError('Authentication failed because the token is expired.'),
+          ['Missing cookie']: new MissingCookieError('Authentication failed because the cookie is missing.'),
         },
         [BackendErrorLabel.NOT_CONNECTED]: {
           ['Users are not connected']: new UnconnectedUserError('Users are not connected.'),
