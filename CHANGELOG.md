@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.7.0"></a>
+# [5.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.6.2...@wireapp/core@5.7.0) (2018-08-10)
+
+
+### Features
+
+* **api-client:** Provider endpoints ([#980](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/980)) ([e5af8ce](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e5af8ce))
+
+
+
+
+
 <a name="5.6.2"></a>
 ## [5.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.6.1...@wireapp/core@5.6.2) (2018-08-10)
 
