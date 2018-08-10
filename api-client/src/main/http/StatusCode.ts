@@ -17,24 +17,24 @@
  *
  */
 
-class StatusCode {
-  public static readonly ACCEPTED: number = 202;
-  public static readonly BAD_GATEWAY: number = 502;
-  public static readonly BAD_REQUEST: number = 400;
-  public static readonly CONFLICT: number = 409;
-  public static readonly CONNECTIVITY_PROBLEM: number = 0;
-  public static readonly CREATED: number = 201;
-  public static readonly FORBIDDEN: number = 403;
-  public static readonly INTERNAL_SERVER_ERROR: number = 500;
-  public static readonly NO_CONTENT: number = 204;
-  public static readonly NOT_FOUND: number = 404;
-  public static readonly OK: number = 200;
-  public static readonly PRECONDITION_FAILED: number = 412;
-  public static readonly REQUEST_TIMEOUT: number = 408;
-  public static readonly REQUEST_TOO_LARGE: number = 413;
-  public static readonly TOO_MANY_REQUESTS: number = 429;
-  public static readonly UNAUTHORIZED: number = 401;
-  public static readonly UNKNOWN: number = -1;
+enum StatusCode {
+  ACCEPTED = 202,
+  BAD_GATEWAY = 502,
+  BAD_REQUEST = 400,
+  CONFLICT = 409,
+  CONNECTIVITY_PROBLEM = 0,
+  CREATED = 201,
+  FORBIDDEN = 403,
+  INTERNAL_SERVER_ERROR = 500,
+  NO_CONTENT = 204,
+  NOT_FOUND = 404,
+  OK = 200,
+  PRECONDITION_FAILED = 412,
+  REQUEST_TIMEOUT = 408,
+  REQUEST_TOO_LARGE = 413,
+  TOO_MANY_REQUESTS = 429,
+  UNAUTHORIZED = 401,
+  UNKNOWN = -1,
 }
 
 export {StatusCode};

@@ -66,3 +66,11 @@ export class TokenExpiredError extends AuthenticationError {
     this.name = 'TokenExpiredError';
   }
 }
+
+export class MissingCookieError extends AuthenticationError {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, MissingCookieError.prototype);
+    this.name = 'MissingCookieError';
+  }
+}
