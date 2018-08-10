@@ -60,42 +60,30 @@ describe('ConversationServiceNoCompound', () => {
       });
     });
 
-    it('loads all events', done => {
-      eventService
-        .loadPrecedingEvents(conversation_id)
-        .then(events => {
-          expect(events.length).toBe(10);
-          expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
-          expect(events[9].time).toBe('2016-11-23T12:19:06.799Z');
-          done();
-        })
-        .catch(done.fail);
+    it('loads all events', () => {
+      return eventService.loadPrecedingEvents(conversation_id).then(events => {
+        expect(events.length).toBe(10);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
+        expect(events[9].time).toBe('2016-11-23T12:19:06.799Z');
+      });
     });
 
-    it('loads all events with limit', done => {
-      eventService
-        .loadPrecedingEvents(conversation_id, undefined, undefined, 5)
-        .then(events => {
-          expect(events.length).toBe(5);
-          expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
-          expect(events[4].time).toBe('2016-11-23T12:19:06.804Z');
-          done();
-        })
-        .catch(done.fail);
+    it('loads all events with limit', () => {
+      return eventService.loadPrecedingEvents(conversation_id, undefined, undefined, 5).then(events => {
+        expect(events.length).toBe(5);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
+        expect(events[4].time).toBe('2016-11-23T12:19:06.804Z');
+      });
     });
 
-    it('loads events with lower bound', done => {
-      eventService
-        .loadPrecedingEvents(conversation_id, new Date(1479903546805))
-        .then(events => {
-          expect(events.length).toBe(4);
-          expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
-          expect(events[1].time).toBe('2016-11-23T12:19:06.807Z');
-          expect(events[2].time).toBe('2016-11-23T12:19:06.806Z');
-          expect(events[3].time).toBe('2016-11-23T12:19:06.805Z');
-          done();
-        })
-        .catch(done.fail);
+    it('loads events with lower bound', () => {
+      return eventService.loadPrecedingEvents(conversation_id, new Date(1479903546805)).then(events => {
+        expect(events.length).toBe(4);
+        expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
+        expect(events[1].time).toBe('2016-11-23T12:19:06.807Z');
+        expect(events[2].time).toBe('2016-11-23T12:19:06.806Z');
+        expect(events[3].time).toBe('2016-11-23T12:19:06.805Z');
+      });
     });
 
     it('loads events with upper bound', () => {
@@ -142,26 +130,22 @@ describe('ConversationServiceNoCompound', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     });
 
-    it('should return no entry matches the given category', done => {
-      Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
+    it('should return no entry matches the given category', () => {
+      return Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() => eventService.loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE))
         .then(result => {
           expect(result.length).toBe(0);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
 
-    it('should get images in the correct order', done => {
-      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
+    it('should get images in the correct order', () => {
+      return Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() => eventService.loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE))
         .then(result => {
           expect(result.length).toBe(2);
           expect(result[0].id).toBe(events[1].id);
           expect(result[1].id).toBe(events[2].id);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
   });
 });

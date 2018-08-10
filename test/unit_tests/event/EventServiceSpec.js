@@ -171,6 +171,65 @@ describe('z.event.EventService', () => {
     });
   });
 
+  describe('loadEventsWithCategory', () => {
+    /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+    const events = [
+      {
+        conversation: conversationId,
+        id: 'b6498d81-92e8-4da7-afd2-054239595da7',
+        from: senderId,
+        time: '2017-01-09T13:11:15.632Z',
+        data: {},
+        type: 'conversation.message-add',
+        category: 16,
+      },
+      {
+        conversation: conversationId,
+        id: 'da7930dd-4c30-4378-846d-b29e1452bdfb',
+        from: senderId,
+        time: '2017-01-09T13:37:31.941Z',
+        data: {},
+        type: 'conversation.asset-add',
+        category: 128,
+      },
+      {
+        conversation: conversationId,
+        id: 'da7930dd-4c30-4378-846d-b29e1452bdfa',
+        from: senderId,
+        time: '2017-01-09T13:47:31.941Z',
+        data: {},
+        category: 128,
+      },
+    ];
+    /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+
+    beforeEach(() => {
+      return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+    });
+
+    afterEach(() => {
+      TestFactory.storage_service.clearStores();
+    });
+
+    it('should return no entry matches the given category', () => {
+      return TestFactory.event_service
+        .loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.VIDEO)
+        .then(result => {
+          expect(result.length).toBe(0);
+        });
+    });
+
+    it('should get images in the correct order', () => {
+      return TestFactory.event_service
+        .loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE)
+        .then(result => {
+          expect(result.length).toBe(2);
+          expect(result[0].id).toBe(events[1].id);
+          expect(result[1].id).toBe(events[2].id);
+        });
+    });
+  });
+
   describe('saveEvent', () => {
     /* eslint-disable sort-keys*/
     const newEvent = {

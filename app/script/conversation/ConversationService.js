@@ -550,7 +550,7 @@ z.conversation.ConversationService = class ConversationService {
     const category_max =
       z.message.MessageCategory.TEXT | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
 
-    return this.load_events_with_category_from_db(conversation_id, category_min, category_max).then(events => {
+    return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
       return events.filter(({data: event_data}) => z.search.FullTextSearch.search(event_data.content, query));
     });
   }

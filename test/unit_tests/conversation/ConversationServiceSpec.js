@@ -126,7 +126,7 @@ describe('ConversationService', () => {
     it('deletes message with the given key', done => {
       conversation_service
         .delete_message_with_key_from_db(primary_keys[1])
-        .then(() => conversation_service.load_preceding_events_from_db(conversation_id))
+        .then(() => TestFactory.event_service.loadPrecedingEvents(conversation_id))
         .then(events => {
           expect(events.length).toBe(2);
           events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
@@ -138,56 +138,9 @@ describe('ConversationService', () => {
     it('does not delete the event if key is wrong', done => {
       conversation_service
         .delete_message_with_key_from_db('wrongKey')
-        .then(() => conversation_service.load_preceding_events_from_db(conversation_id))
+        .then(() => TestFactory.event_service.loadPrecedingEvents(conversation_id))
         .then(events => {
           expect(events.length).toBe(3);
-          done();
-        })
-        .catch(done.fail);
-    });
-  });
-
-  describe('load_events_with_category_from_db', () => {
-    let events = undefined;
-
-    beforeEach(() => {
-      // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      events = [
-        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b6498d81-92e8-4da7-afd2-054239595da7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:11:15.632Z","status":2,"data":{"content":"test","nonce":"b6498d81-92e8-4da7-afd2-054239595da7","previews":[]},"type":"conversation.message-add","category": 16},
-        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfb","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:37:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add","category": 128},
-        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:47:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add","category": 128},
-      ];
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-    });
-
-    it('should return no entry matches the given category', done => {
-      Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() =>
-          conversation_service.load_events_with_category_from_db(
-            events[0].conversation,
-            z.message.MessageCategory.IMAGE
-          )
-        )
-        .then(result => {
-          expect(result.length).toBe(0);
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('should get images in the correct order', done => {
-      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() =>
-          conversation_service.load_events_with_category_from_db(
-            events[0].conversation,
-            z.message.MessageCategory.IMAGE
-          )
-        )
-        .then(result => {
-          expect(result.length).toBe(2);
-          expect(result[0].id).toBe(events[1].id);
-          expect(result[1].id).toBe(events[2].id);
           done();
         })
         .catch(done.fail);
