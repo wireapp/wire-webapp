@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@0.2.103...@wireapp/changelog-bot@0.3.0) (2018-08-12)
+
+
+### Features
+
+* **changelog-bot:** Send custom message ([#986](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/986)) ([39d7f79](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/39d7f79))
+
+
+
+
+
 <a name="0.2.103"></a>
 ## [0.2.103](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@0.2.102...@wireapp/changelog-bot@0.2.103) (2018-08-10)
 
