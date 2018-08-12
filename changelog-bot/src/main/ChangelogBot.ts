@@ -41,7 +41,7 @@ class ChangelogBot {
     return `\n**Changelog for "${repoSlug}":**\n\n${content}\n`;
   }
 
-  async start(): Promise<void> {
+  async sendMessage(customMessage?: string): Promise<void> {
     let {conversationIds} = this.messageData;
 
     const engine = new MemoryEngine();
@@ -65,7 +65,7 @@ class ChangelogBot {
         }
         if (id) {
           logger.log(`Sending message to conversation ${id} ...`);
-          const textPayload = await account.service.conversation.createText(this.message);
+          const textPayload = await account.service.conversation.createText(customMessage || this.message);
           await account.service.conversation.send(id, textPayload);
         }
       })

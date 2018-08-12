@@ -39,7 +39,8 @@ program
   .version(version)
   .description(description)
   .option('-c, --conversations <conversationId,...>', 'The conversation IDs to write in')
-  .option('-e, --email <address>', 'Your email address')
+  .option('-e, --email <email>', 'Your email address')
+  .option('-m, --message <message>', 'Custom message')
   .option('-p, --password <password>', 'Your password')
   .parse(process.argv);
 
@@ -48,6 +49,7 @@ const TRAVIS_ENV_VARS = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_REPO_SLUG'];
 const parameters = {
   conversationIds: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
   email: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
+  message: program.message,
   password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
 };
 
