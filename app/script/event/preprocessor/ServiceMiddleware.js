@@ -27,33 +27,36 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   /**
    * Construct a new ServiceMiddleware.
    *
-   * @param {z.conversation.ConversationRepository} conversationRepository - Repository to handle conversation related tasks
+   * @param {z.conversation.UserRepository} userRepository - Repository to handle user related tasks
    */
-  constructor(conversationRepository) {
-    this.conversationRepository = conversationRepository;
+  constructor(userRepository) {
+    this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.event.preprocessor.ServiceMiddleware', z.config.LOGGER.OPTIONS);
   }
 
-  preprocessEvent(event) {
-    const HANDELED_EVENT_TYPES = [
-      z.event.Client.CONVERSATION.ONE2ONE_CREATION,
-      z.event.Client.CONVERSATION.GROUP_CREATION,
-      z.event.Backend.CONVERSATION.MEMBER_JOIN,
-    ];
+  processEvent(event) {
+    switch (event.type) {
+      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+      case z.event.Client.CONVERSATION.GROUP_CREATION:
+        return this._processConversationCreationEvent(event);
+      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+        return this._processMemberJoinEvent(event);
 
-    if (!HANDELED_EVENT_TYPES.includes(event.type)) {
-      return event;
+      default:
+        return Promise.resolve(event);
     }
+  }
 
+  _processMemberJoinEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
-      const hasBots = conversation.getNumberOfBots() > 0;
-      if (hasBots) {
-        return Object.assign({}, event, {
-          hasBots: true,
-        });
-      }
-      return event;
+    const userPromises = event.data.user_ids.map(userId => this.userRepository.get_user_by_id(userId));
+    return Promise.all(userPromises).then(userEntities => {
+      const hasBots = userEntities.some(userEntity => userEntity.isBot);
+      return !hasBots ? event : Object.assign({}, event, {hasBots: true});
     });
+  }
+
+  _processConversationCreationEvent(event) {
+    return event;
   }
 };
