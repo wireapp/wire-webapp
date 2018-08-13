@@ -85,8 +85,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
           stringId = this.hasService()
             ? z.string.guestRoomConversationBadgeGuestAndService
             : z.string.guestRoomConversationBadge;
-        }
-        if (this.hasService()) {
+        } else if (this.hasService()) {
           stringId = z.string.guestRoomConversationBadgeService;
         }
       }
