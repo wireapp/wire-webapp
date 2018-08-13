@@ -604,11 +604,11 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@2.2.6":
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-2.2.6.tgz#0882ef5fe4539ce67bd8b3f6d519fb42ead64499"
+"@wireapp/react-ui-kit@2.2.7":
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-2.2.7.tgz#c6970d46ab15c8c0942348fbb9d01a62b3853d8b"
   dependencies:
-    bazinga64 "5.2.21"
+    bazinga64 "5.3.0"
     color "3.0.0"
     react "16.4.2"
     react-dom "16.4.2"
@@ -1706,9 +1706,9 @@ bazinga64@5.2.18:
   version "5.2.18"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
 
-bazinga64@5.2.21:
-  version "5.2.21"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.21.tgz#6e552f3a9e7f1175d8a66ed7a9363c0a287ba267"
+bazinga64@5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.0.tgz#1c78c001dca44700f9df903357f10d126daa2c43"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
