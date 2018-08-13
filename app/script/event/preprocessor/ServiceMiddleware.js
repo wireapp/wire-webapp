@@ -49,14 +49,22 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
 
   _processMemberJoinEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    const userPromises = event.data.user_ids.map(userId => this.userRepository.get_user_by_id(userId));
-    return Promise.all(userPromises).then(userEntities => {
-      const hasBots = userEntities.some(userEntity => userEntity.isBot);
-      return !hasBots ? event : Object.assign({}, event, {hasBots: true});
+    return this._containsBots(event.data.user_ids).then(containsBots => {
+      return !containsBots ? event : Object.assign({}, event, {hasBots: true});
     });
   }
 
   _processConversationCreationEvent(event) {
-    return event;
+    this.logger.info(`Preprocessing event of type ${event.type}`);
+    return this._containsBots(event.data.userIds).then(containsBots => {
+      return !containsBots ? event : Object.assign({}, event, {hasBots: true});
+    });
+  }
+
+  _containsBots(userIds) {
+    const userPromises = userIds.map(userId => this.userRepository.get_user_by_id(userId));
+    return Promise.all(userPromises).then(userEntities => {
+      return userEntities.some(userEntity => userEntity.isBot);
+    });
   }
 };
