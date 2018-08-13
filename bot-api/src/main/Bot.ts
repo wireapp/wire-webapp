@@ -77,6 +77,7 @@ class Bot {
     this.account.on(PayloadBundleType.ASSET_META, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.AVAILABILITY, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.CALL, this.handlePayload.bind(this));
+    this.account.on(PayloadBundleType.CLEARED, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.CLIENT_ACTION, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.CONFIRMATION, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.CONNECTION_REQUEST, this.handlePayload.bind(this));
@@ -91,6 +92,9 @@ class Bot {
     this.account.on(PayloadBundleType.PING, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.REACTION, this.handlePayload.bind(this));
     this.account.on(PayloadBundleType.TEXT, this.handlePayload.bind(this));
+    this.account.on(PayloadBundleType.TIMER_UPDATE, this.handlePayload.bind(this));
+    this.account.on(PayloadBundleType.TYPING, this.handlePayload.bind(this));
+    this.account.on(PayloadBundleType.UNKNOWN, this.handlePayload.bind(this));
 
     await this.account.login(login);
     await this.account.listen();
