@@ -691,6 +691,9 @@ z.string.searchPlaceholder = 'Search by name or username';
 z.string.searchServicePlaceholder = 'Search by name';
 z.string.searchServices = 'Services';
 z.string.searchManageServices = 'Manage Services';
+z.string.searchNoServicesManager = 'Services are helpers that can improve your workflow.';
+z.string.searchNoServicesMember =
+  'Services are helpers that can improve your workflow. To add them to the team ask your administrator.';
 z.string.searchTeamGroups = 'Team conversations';
 z.string.searchTeamMembers = 'Team members';
 z.string.searchTopPeople = 'Top people';

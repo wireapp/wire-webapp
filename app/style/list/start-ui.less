@@ -311,3 +311,36 @@
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
+.start-ui-no-services {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &__icon {
+    opacity: 0.24;
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &__info {
+    max-width: 200px;
+    margin-top: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &__manage-button {
+    padding: 4px 16px;
+    margin-top: 16px;
+    background-color: rgba(255, 255, 255, 0.24);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
