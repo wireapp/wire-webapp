@@ -192,9 +192,9 @@
     glob "^5.0.10"
     yargs "^3.10.0"
 
-"@bower_components/raygun4js@MindscapeHQ/raygun4js#2.11.0":
-  version "2.11.0"
-  resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/954621ad542c3a7e349a21f511b815f664ee3d2e"
+"@bower_components/raygun4js@MindscapeHQ/raygun4js#2.11.1":
+  version "2.11.1"
+  resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/f845073c089cc6d8338ee078dffcda8e035511f4"
 
 "@bower_components/speakingurl@pid/speakingurl#v14.0.1":
   version "14.0.1"
