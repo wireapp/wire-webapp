@@ -63,14 +63,9 @@ describe('z.util.ArrayUtil', () => {
     const thirdItem = 'c';
     const unknownItem = 'd';
     const array = [firstItem, secondItem, thirdItem];
-    const filter = item => item !== secondItem;
 
     it('returns the second item when first item was given', () => {
       expect(z.util.ArrayUtil.getNextItem(array, firstItem)).toEqual(secondItem);
-    });
-
-    it('returns the third item when first item was given and filter skips the second item', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, firstItem, filter)).toEqual(thirdItem);
     });
 
     it('returns the second item when last item was given', () => {
