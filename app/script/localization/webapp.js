@@ -394,8 +394,7 @@ z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. 
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests and services';
 z.string.guestRoomToggleInfo = 'Open this conversation to services and people outside your team.';
-z.string.guestRoomToggleInfoExtended =
-  'Open this conversation to services and people outside your team. You can always change it later.';
+z.string.guestRoomToggleInfoExtended = 'Open this conversation to services and people outside your team. You can always change it later.';
 
 z.string.guestRoomConversationBadge = 'Guests are present';
 z.string.guestRoomConversationBadgeService = 'Services are present';
