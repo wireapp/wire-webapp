@@ -75,42 +75,18 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     });
   }
 
-  addServiceFromParam(providerId, serviceId) {
-    if (this.isTeam()) {
-      this.getServiceById(providerId, serviceId).then(serviceEntity => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.create1to1ConversationWithService(serviceEntity, 'url_param').then(conversationEntity => {
-              if (conversationEntity) {
-                amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-              }
-            });
-          },
-          preventClose: true,
-          text: {
-            action: z.l10n.text(z.string.modalConversationAddBotAction),
-            message: z.l10n.text(z.string.modalConversationAddBotMessage, serviceEntity.name),
-            title: z.l10n.text(z.string.modalConversationAddBotHeadline),
-          },
-          warning: false,
-        });
-      });
-    }
-  }
-
   /**
    * Add bot to conversation.
    *
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
-   * @param {string} [method] - Method used to trigger integration setup
    * @returns {Promise} Resolves when conversation with the integration was was created
    */
-  create1to1ConversationWithService(serviceEntity, method) {
+  create1to1ConversationWithService(serviceEntity) {
     return this.conversationRepository
       .createGroupConversation([], undefined, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
         if (conversationEntity) {
-          return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
+          return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);
         }
 
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
@@ -129,10 +105,9 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   /**
    * Get conversation with a service.
    * @param {Service} serviceEntity - Service entity for whom to get the conversation
-   * @param {string} [method] - Method used to trigger integration setup
    * @returns {Promise} Resolves with the conversation with requested service
    */
-  get1To1ConversationWithService(serviceEntity, method) {
+  get1To1ConversationWithService(serviceEntity) {
     const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
       if (!conversationEntity.is_one2one()) {
         // Disregard conversations that are not 1:1
@@ -159,7 +134,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     return matchingConversationEntity
       ? Promise.resolve(matchingConversationEntity)
-      : this.create1to1ConversationWithService(serviceEntity, method);
+      : this.create1to1ConversationWithService(serviceEntity);
   }
 
   getProviderById(providerId) {

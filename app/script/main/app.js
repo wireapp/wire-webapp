@@ -520,12 +520,7 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_SERVICE);
-    if (providerId && serviceId) {
-      this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
-      this.repository.integration.addServiceFromParam(providerId, serviceId);
-    }
+    // Currently no URL params to be handled
   }
 
   /**
