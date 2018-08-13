@@ -680,6 +680,7 @@ z.string.backupCancel = 'Cancel';
 z.string.backupTryAgain = 'Try Again';
 
 // Search
+z.string.searchAddServices = 'Add services';
 z.string.searchConnect = 'Connect';
 z.string.searchConnections = 'Connections';
 z.string.searchContacts = 'Contacts';
