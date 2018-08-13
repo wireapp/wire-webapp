@@ -26,7 +26,7 @@ const Text = styled.span`
   /* appearance */
   color: ${props => props.color};
   font-size: ${props => props.fontSize};
-  font-weight: ${props => (props.bold ? '600' : props.light ? '300' : '400')};
+  font-weight: ${props => (props.bold ? '600' : props.light ? '200' : '300')};
   opacity: ${props => (props.muted ? '0.56' : '1')};
   text-align: ${props => (props.center ? 'center' : 'left')};
   text-transform: ${props => props.textTransform};
