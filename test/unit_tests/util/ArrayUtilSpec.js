@@ -23,11 +23,7 @@
 
 describe('z.util.ArrayUtil', () => {
   describe('chunk', () => {
-    let array = null;
-
-    beforeEach(() => {
-      array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    });
+    const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     it('returns one chunk with all items when the size is bigger than the array', () => {
       const actual = z.util.ArrayUtil.chunk(array, 10);
