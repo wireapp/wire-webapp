@@ -432,15 +432,15 @@ class Account extends EventEmitter {
 
   private mapUserEvent(event: UserEvent): PayloadBundleIncoming | void {
     if (event.type === USER_EVENT.CONNECTION) {
-      const connectionEvent = event as UserConnectionEvent;
+      const {connection} = event as UserConnectionEvent;
       return {
-        content: connectionEvent.connection,
-        conversation: connectionEvent.connection.conversation,
-        from: connectionEvent.connection.from,
+        content: connection,
+        conversation: connection.conversation,
+        from: connection.from,
         id: ConversationService.createId(),
         messageTimer: 0,
         state: PayloadBundleState.INCOMING,
-        timestamp: new Date(connectionEvent.connection.last_update).getTime(),
+        timestamp: new Date(connection.last_update).getTime(),
         type: PayloadBundleType.CONNECTION_REQUEST,
       };
     }
@@ -477,6 +477,7 @@ class Account extends EventEmitter {
           case PayloadBundleType.ASSET_IMAGE:
           case PayloadBundleType.CLIENT_ACTION:
           case PayloadBundleType.CONFIRMATION:
+          case PayloadBundleType.CONNECTION_REQUEST:
           case PayloadBundleType.LOCATION:
           case PayloadBundleType.MESSAGE_DELETE:
           case PayloadBundleType.MESSAGE_HIDE:
@@ -517,7 +518,6 @@ class Account extends EventEmitter {
             this.emit(data.type, event);
             break;
           }
-          case PayloadBundleType.CONNECTION_REQUEST:
           case PayloadBundleType.CONVERSATION_RENAME:
           case PayloadBundleType.MEMBER_JOIN:
           case PayloadBundleType.TYPING:
