@@ -41,11 +41,12 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     return isTimerReset ? messageTimer : z.util.NumberUtil.clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
 
-  constructor(conversationService, conversationMapper, eventListeners) {
+  constructor(conversationMapper, eventService, eventListeners) {
     super();
 
     const defaultEventListeners = {onMessageTimeout: () => {}};
     this.eventListeners = Object.assign({}, defaultEventListeners, eventListeners);
+    this.eventService = eventService;
 
     this.setEventHandlingConfig({
       [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
@@ -54,7 +55,6 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.conversationService = conversationService;
     this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
     this.timedMessages = ko.observableArray([]);
@@ -109,7 +109,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
           ephemeral_started: messageEntity.ephemeral_started(),
         };
 
-        this.conversationService.updateMessageInDb(messageEntity, changes);
+        this.eventService.updateMessage(messageEntity, changes);
         break;
       }
 
@@ -160,7 +160,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     };
 
-    this.conversationService.updateMessageInDb(messageEntity, changes);
+    this.eventService.updateMessage(messageEntity, changes);
     this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
@@ -179,7 +179,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     };
 
-    this.conversationService.updateMessageInDb(messageEntity, changes);
+    this.eventService.updateMessage(messageEntity, changes);
     this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
@@ -218,7 +218,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     };
 
-    this.conversationService.updateMessageInDb(messageEntity, changes);
+    this.eventService.updateMessage(messageEntity, changes);
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 

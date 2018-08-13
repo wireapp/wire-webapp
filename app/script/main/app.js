@@ -106,6 +106,7 @@ z.main.App = class App {
       repositories.client
     );
     repositories.event = new z.event.EventRepository(
+      this.service.event,
       this.service.notification,
       this.service.webSocket,
       this.service.conversation,
@@ -182,6 +183,9 @@ z.main.App = class App {
    */
   _setupServices() {
     const storageService = new z.storage.StorageService();
+    const eventService = z.util.Environment.browser.edge
+      ? new z.event.EventServiceNoCompound(storageService)
+      : new z.event.EventService(storageService);
 
     return {
       asset: new z.assets.AssetService(this.auth.client),
@@ -191,10 +195,9 @@ z.main.App = class App {
       client: new z.client.ClientService(this.auth.client, storageService),
       connect: new z.connect.ConnectService(this.auth.client),
       connectGoogle: new z.connect.ConnectGoogleService(this.auth.client),
-      conversation: z.util.Environment.browser.edge
-        ? new z.conversation.ConversationServiceNoCompound(this.auth.client, storageService)
-        : new z.conversation.ConversationService(this.auth.client, storageService),
+      conversation: new z.conversation.ConversationService(this.auth.client, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.auth.client),
+      event: eventService,
       giphy: new z.extension.GiphyService(this.auth.client),
       integration: new z.integration.IntegrationService(this.auth.client),
       lifecycle: new z.lifecycle.LifecycleService(),
