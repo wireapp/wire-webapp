@@ -3611,12 +3611,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {id, key, otr_key, sha256, token} = event_json.data;
     const asset_et = message_et.get_first_asset();
 
-    let resource;
-    if (key) {
-      resource = z.assets.AssetRemoteData.v3(key, otr_key, sha256, token);
-    } else {
-      resource = z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
-    }
+    const resource = key
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
+      : z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
     asset_et.status(z.assets.AssetTransferState.UPLOADED);
