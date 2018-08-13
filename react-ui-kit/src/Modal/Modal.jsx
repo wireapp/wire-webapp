@@ -75,6 +75,7 @@ const ModalClose = styled(CloseIcon)`
 const ModalContent = styled.div`
   max-width: 100%;
   overflow-y: auto;
+  padding: 40px;
 `;
 
 const ModalBackground = styled(OverlayBackground)`
