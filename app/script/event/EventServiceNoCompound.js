@@ -55,13 +55,13 @@ z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.Ev
    */
   loadPrecedingEvents(conversationId, lowerBound = new Date(0), upperBound = new Date(), limit) {
     if (!_.isDate(lowerBound) || !_.isDate(upperBound)) {
-      throw new Error(
-        `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`
-      );
-    } else if (lowerBound.getTime() > upperBound.getTime()) {
-      throw new Error(
-        `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`
-      );
+      const errorMessage = `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`;
+      throw new Error(errorMessage);
+    }
+
+    if (lowerBound.getTime() > upperBound.getTime()) {
+      const errorMessage = `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`;
+      throw new Error(errorMessage);
     }
 
     lowerBound = lowerBound.getTime();

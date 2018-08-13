@@ -33,7 +33,7 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Construct a new Conversation Service.
    * @param {BackendClient} client - Client for the API calls
-   * @param {EventRepository} eventService - Service that handles events
+   * @param {EventService} eventService - Service that handles events
    * @param {StorageService} storageService - Service for all storage interactions
    */
   constructor(client, eventService, storageService) {

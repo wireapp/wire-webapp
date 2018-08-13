@@ -92,13 +92,13 @@ z.event.EventService = class EventService {
     limit = Number.MAX_SAFE_INTEGER
   ) {
     if (!_.isDate(lowerBound) || !_.isDate(upperBound)) {
-      throw new Error(
-        `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`
-      );
-    } else if (lowerBound.getTime() > upperBound.getTime()) {
-      throw new Error(
-        `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`
-      );
+      const errorMessage = `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`;
+      throw new Error(errorMessage);
+    }
+
+    if (lowerBound.getTime() > upperBound.getTime()) {
+      const errorMessage = `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`;
+      throw new Error(errorMessage);
     }
 
     return this.storageService.db[this.EVENT_STORE_NAME]
