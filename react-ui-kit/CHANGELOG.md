@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.2.10"></a>
+## [2.2.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.9...@wireapp/react-ui-kit@2.2.10) (2018-08-13)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust font weight ([#993](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/993)) ([63cba9a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/63cba9a))
+* **react-ui-kit:** Adjust modal paddings ([#992](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/992)) ([5373a49](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/5373a49))
+
+
+
+
+
 <a name="2.2.9"></a>
 ## [2.2.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.8...@wireapp/react-ui-kit@2.2.9) (2018-08-10)
 

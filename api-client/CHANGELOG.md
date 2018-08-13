@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.13.3"></a>
+## [1.13.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.13.2...@wireapp/api-client@1.13.3) (2018-08-13)
+
+**Note:** Version bump only for package @wireapp/api-client
+
+
+
+
+
 <a name="1.13.2"></a>
 ## [1.13.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.13.1...@wireapp/api-client@1.13.2) (2018-08-10)
 
