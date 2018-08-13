@@ -526,12 +526,6 @@ z.main.App = class App {
       this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
       this.repository.integration.addServiceFromParam(providerId, serviceId);
     }
-
-    const supportIntegrations = z.util.URLUtil.getParameter(z.auth.URLParameter.INTEGRATIONS);
-    if (_.isBoolean(supportIntegrations)) {
-      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
-      this.repository.integration.supportIntegrations(supportIntegrations);
-    }
   }
 
   /**

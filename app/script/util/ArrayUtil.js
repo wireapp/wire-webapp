@@ -35,7 +35,7 @@ z.util.ArrayUtil = {
     return array2.filter(element => !array1.includes(element));
   },
 
-  getNextItem: (array, currentItem, filter) => {
+  getNextItem: (array, currentItem) => {
     const currentIndex = array.indexOf(currentItem);
 
     // couldn't find the item
@@ -46,20 +46,11 @@ z.util.ArrayUtil = {
     const nextIndex = currentIndex + 1;
 
     // item is last item in the array
-    if (nextIndex === array.length && currentIndex > 0) {
-      return array[currentIndex - 1];
+    if (nextIndex === array.length) {
+      return currentIndex > 0 ? array[currentIndex - 1] : undefined;
     }
 
-    if (nextIndex >= array.length) {
-      return undefined;
-    }
-
-    for (let index = nextIndex; index <= array.length; index++) {
-      const nextItem = array[index];
-      if (typeof filter !== 'function' || !!filter(nextItem)) {
-        return nextItem;
-      }
-    }
+    return array[nextIndex];
   },
 
   /**

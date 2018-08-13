@@ -45,13 +45,6 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     this.isTeam = this.teamRepository.isTeam;
     this.services = ko.observableArray([]);
-
-    this.supportIntegrations = ko.observable();
-    this.enableIntegrations = ko.pureComputed(() => {
-      const isBoolean = _.isBoolean(this.supportIntegrations());
-      const isEnabled = isBoolean ? this.supportIntegrations() : !z.util.Environment.frontend.isProduction();
-      return this.isTeam() && isEnabled;
-    });
   }
 
   /**
@@ -153,6 +146,11 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       }
 
       const [userEntity] = conversationEntity.participating_user_ets();
+      if (!userEntity) {
+        // Disregard conversations with no user entities
+        return false;
+      }
+
       if (!userEntity.isBot) {
         // Disregard conversations with users instead of services
         return false;
