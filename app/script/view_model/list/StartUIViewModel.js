@@ -293,13 +293,11 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       this.userBubble.hide();
     }
 
-    this.integrationRepository
-      .get1To1ConversationWithService(this.userProfile(), 'start_ui')
-      .then(conversationEntity => {
-        if (conversationEntity) {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-        }
-      });
+    this.integrationRepository.get1To1ConversationWithService(this.userProfile()).then(conversationEntity => {
+      if (conversationEntity) {
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      }
+    });
   }
 
   handleSearchInput() {

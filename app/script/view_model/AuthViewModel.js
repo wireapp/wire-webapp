@@ -27,8 +27,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [
-        z.auth.URLParameter.BOT_PROVIDER,
-        z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
