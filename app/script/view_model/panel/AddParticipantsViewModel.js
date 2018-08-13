@@ -34,22 +34,16 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
 
   constructor(params) {
     super(params);
+
     this.conversationRepository = this.repositories.conversation;
     this.integrationRepository = this.repositories.integration;
     this.teamRepository = this.repositories.team;
     this.userRepository = this.repositories.user;
+
+    this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
+
     this.isTeam = this.teamRepository.isTeam;
-    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
     this.services = this.integrationRepository.services;
-    this.showIntegrations = ko.pureComputed(() => {
-      if (this.activeConversation()) {
-        const firstUserEntity = this.activeConversation().firstUserEntity();
-        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
-        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
-        const enableIntegrations = this.repositories.integration.enableIntegrations();
-        return enableIntegrations && allowIntegrations && !this.isTeamOnly();
-      }
-    });
     this.teamUsers = this.teamRepository.teamUsers;
     this.teamMembers = this.teamRepository.teamMembers;
 
@@ -57,6 +51,16 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.selectedContacts = ko.observableArray([]);
     this.selectedService = ko.observable();
     this.state = ko.observable(AddParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
+
+    this.showIntegrations = ko.pureComputed(() => {
+      if (this.activeConversation()) {
+        const firstUserEntity = this.activeConversation().firstUserEntity();
+        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
+        return this.isTeam() && allowIntegrations && !this.isTeamOnly();
+      }
+    });
 
     this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 

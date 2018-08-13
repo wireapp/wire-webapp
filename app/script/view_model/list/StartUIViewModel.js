@@ -116,8 +116,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       return contacts().length || groups().length || others().length;
     });
 
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
-
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showContacts = ko.pureComputed(() => this.contacts().length);
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());

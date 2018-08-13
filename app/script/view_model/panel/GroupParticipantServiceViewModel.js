@@ -27,9 +27,11 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   .BasePanelViewModel {
   constructor(params) {
     super(params);
+
     this.conversationRepository = this.repositories.conversation;
     this.integrationRepository = this.repositories.integration;
     this.userRepository = this.repositories.user;
+
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
 
     this.selectedParticipant = ko.observable(undefined);
@@ -47,7 +49,9 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     this.selfIsActiveParticipant = ko.pureComputed(() => {
       return this.isVisible() ? this.activeConversation().isActiveParticipant() : false;
     });
+
     this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
+
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedService() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});

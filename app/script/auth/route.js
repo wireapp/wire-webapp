@@ -26,7 +26,6 @@ const QUERY_KEY = {
   ENVIRONMENT: 'env',
   HIDE_SSO: 'hide_sso',
   IMMEDIATE_LOGIN: 'immediate_login',
-  INTEGRATIONS: 'integrations',
   JOIN_EXPIRES: 'expires_in',
   LANGUAGE: 'hl',
   LOCALE: 'hl',
@@ -39,7 +38,6 @@ const FORWARDED_QUERY_KEYS = [
   QUERY_KEY.BOT_PROVIDER,
   QUERY_KEY.BOT_SERVICE,
   QUERY_KEY.ENVIRONMENT,
-  QUERY_KEY.INTEGRATIONS,
   QUERY_KEY.LOCALE,
   QUERY_KEY.TRACKING,
 ];

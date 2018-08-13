@@ -27,6 +27,9 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
   .BasePanelViewModel {
   constructor(params) {
     super(params);
+
+    this.clickOnShowUser = this.clickOnShowUser.bind(this);
+
     this.participants = ko.pureComputed(() => {
       if (this.activeConversation()) {
         return this.activeConversation()
@@ -35,13 +38,14 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
       }
       return [];
     });
+
     this.highlightedUsers = ko.observable([]);
+
     this.searchInput = ko.observable('');
+
     this.shouldUpdateScrollbar = ko
       .computed(() => (this.participants() || this.searchInput()) && this.isVisible())
       .extend({notify: 'always', rateLimit: 500});
-
-    this.clickOnShowUser = this.clickOnShowUser.bind(this);
   }
 
   getElementId() {

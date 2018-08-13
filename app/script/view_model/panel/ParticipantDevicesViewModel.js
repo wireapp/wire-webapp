@@ -36,9 +36,11 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
   constructor(params) {
     super(params);
     this.clickOnDevice = this.clickOnDevice.bind(this);
+
     this.clientRepository = this.repositories.client;
     this.cryptographyRepository = this.repositories.cryptography;
     this.conversationRepository = this.repositories.conversation;
+
     this.logger = new z.util.Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
