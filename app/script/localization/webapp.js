@@ -192,10 +192,6 @@ z.string.modalConnectAcceptHeadline = 'Accept?';
 z.string.modalConnectAcceptMessage = 'This will connect you and open the conversation with {{user}}.';
 z.string.modalConnectAcceptSecondary = 'Ignore';
 
-z.string.modalConversationAddBotAction = 'Confirm';
-z.string.modalConversationAddBotHeadline = 'Add Service';
-z.string.modalConversationAddBotMessage = 'Are you sure you want to start a new conversation with {{name}}?';
-
 z.string.modalConversationClearAction = 'Delete';
 z.string.modalConversationClearHeadline = 'Delete content?';
 z.string.modalConversationClearMessage = 'This will clear the conversation history on all your devices.';
