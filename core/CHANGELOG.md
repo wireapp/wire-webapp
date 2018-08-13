@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.7.3"></a>
+## [5.7.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.2...@wireapp/core@5.7.3) (2018-08-13)
+
+
+### Bug Fixes
+
+* **core,bot-api:** Handle missing payload bundle types ([#990](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/990)) ([09f6f63](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/09f6f63))
+
+
+
+
+
 <a name="5.7.2"></a>
 ## [5.7.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.1...@wireapp/core@5.7.2) (2018-08-10)
 
