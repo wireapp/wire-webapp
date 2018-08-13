@@ -402,6 +402,7 @@ z.string.guestRoomToggleInfoExtended = 'Open this conversation to people outside
 
 z.string.guestRoomConversationBadge = 'Guests are present';
 z.string.guestRoomConversationBadgeService = 'Services are present';
+z.string.guestRoomConversationBadgeGuestAndService = 'Guests and services are present';
 
 z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
 z.string.guestRoomConversationButton = 'Invite people';
@@ -693,6 +694,7 @@ z.string.searchPeople = 'People';
 z.string.searchPlaceholder = 'Search by name or username';
 z.string.searchServicePlaceholder = 'Search by name';
 z.string.searchServices = 'Services';
+z.string.searchManageServices = 'Manage Services';
 z.string.searchTeamGroups = 'Team conversations';
 z.string.searchTeamMembers = 'Team members';
 z.string.searchTopPeople = 'Top people';
