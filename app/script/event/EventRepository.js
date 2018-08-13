@@ -144,7 +144,20 @@ z.event.EventRepository = class EventRepository {
     this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
+    this.eventProcessMiddlewares = [];
+
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
+  }
+
+  /**
+   * Will set an array of middlewares to run before the EventRepository actually processes the event.
+   * Middlewares are just functions with the following signature (Event) => Event.
+   *
+   * @param {Array<Function>} middlewares - middlewares to run when a new event is about to be processed
+   * @returns {void} - returns nothing
+   */
+  setEventProcessMiddlewares(middlewares) {
+    this.eventProcessMiddlewares = middlewares;
   }
 
   //##############################################################################
@@ -613,6 +626,12 @@ z.event.EventRepository = class EventRepository {
       : Promise.resolve(event);
 
     return mapEvent
+      .then(mappedEvent => {
+        return this.eventProcessMiddlewares.reduce(
+          (decoratedEvent, middleWare) => middleWare(decoratedEvent),
+          mappedEvent
+        );
+      })
       .then(mappedEvent => {
         const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;

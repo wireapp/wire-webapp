@@ -113,6 +113,7 @@ z.main.App = class App {
       repositories.cryptography,
       repositories.user
     );
+
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(
@@ -136,6 +137,9 @@ z.main.App = class App {
       repositories.user
     );
 
+    const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation);
+    const eventPreprocessors = [serviceMiddleware.preprocessEvent.bind(serviceMiddleware)];
+    repositories.event.setEventProcessMiddlewares(eventPreprocessors);
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
       repositories.client,
