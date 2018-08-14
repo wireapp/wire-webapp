@@ -53,12 +53,13 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * @returns {Promise} - Resolves with the entity
    */
   addProviderNameToParticipant(entity) {
-    return entity.providerName()
-      ? entity
-      : this.getProviderById(entity.providerId).then(providerEntity => {
+    const shouldUpdateProviderName = entity.isService && !entity.providerName();
+    return shouldUpdateProviderName
+      ? this.getProviderById(entity.providerId).then(providerEntity => {
           entity.providerName(providerEntity.name);
           return entity;
-        });
+        })
+      : entity;
   }
 
   /**
