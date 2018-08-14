@@ -25,8 +25,7 @@
         <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>
-        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
