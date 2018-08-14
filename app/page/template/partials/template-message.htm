@@ -228,8 +228,8 @@
           </div>
         <!-- /ko -->
       </div>
-      <!-- ko if: showServicesWarning -->
-        <span class="message-header-warning" data-bind="l10n_text: z.string.conversationServicesWarning "></span>
+      <!-- ko if: true || showServicesWarning -->
+        <div class="message-header-warning" data-bind="l10n_text: z.string.conversationServicesWarning "></div>
       <!-- /ko -->
     <!-- /ko -->
 
