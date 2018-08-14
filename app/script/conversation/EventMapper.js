@@ -293,24 +293,15 @@ z.conversation.EventMapper = class EventMapper {
    */
   _mapEventMemberJoin(event, conversationEntity) {
     const {data: eventData, from: sender} = event;
-    const hasService = eventData.has_service;
-    let userIds = eventData.user_ids;
+    const {has_service: hasService, user_ids: userIds} = eventData;
 
     const messageEntity = new z.entity.MemberMessage();
 
-    const one2oneConversationTypes = [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE];
-    const messageFromCreator = sender === conversationEntity.creator;
+    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+    messageEntity.visible(!isSingleModeConversation);
 
-    if (one2oneConversationTypes.includes(conversationEntity.type())) {
-      const singleUserAdded = userIds.length === 1;
-      const isAcceptedConnection = messageFromCreator && singleUserAdded;
-      if (isAcceptedConnection) {
-        messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-        userIds = conversationEntity.participating_user_ids();
-      } else {
-        messageEntity.visible(false);
-      }
-    } else {
+    if (conversationEntity.is_group()) {
+      const messageFromCreator = sender === conversationEntity.creator;
       const creatorIndex = userIds.indexOf(sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
@@ -318,13 +309,13 @@ z.conversation.EventMapper = class EventMapper {
         userIds.splice(creatorIndex, 1);
         messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
       }
-    }
 
-    if (hasService) {
-      messageEntity.showServicesWarning = true;
-    }
+      if (hasService) {
+        messageEntity.showServicesWarning = true;
+      }
 
-    messageEntity.userIds(userIds);
+      messageEntity.userIds(userIds);
+    }
 
     return messageEntity;
   }
