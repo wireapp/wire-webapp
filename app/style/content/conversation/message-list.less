@@ -189,11 +189,19 @@
   font-size: 8px;
 }
 
-.message-header-label-service {
-  margin-left: 4px;
-  color: fade(@graphite-dark, 40%);
-  font-size: 12px;
-  text-transform: uppercase;
+.message-header-icon-service {
+  display: inline-flex;
+  margin-top: -2px;
+  margin-left: 8px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: fade(@graphite-dark, 40%);
+    }
+  }
 }
 
 .message-header-line {
