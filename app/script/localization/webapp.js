@@ -301,7 +301,6 @@ z.string.conversationYouNominative = 'you';
 z.string.conversationYouDative = 'you';
 z.string.conversationYouAccusative = 'you';
 
-z.string.conversationBotUser = 'Bot';
 z.string.conversationConnectionAccepted = 'Connected';
 z.string.conversationConnectionBlocked = 'Blocked';
 z.string.conversationConnectionCancelRequest = 'Cancel connection request';
