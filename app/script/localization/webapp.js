@@ -232,7 +232,7 @@ z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or r
 
 z.string.modalConversationRemoveGuestsAction = 'Remove';
 z.string.modalConversationRemoveGuestsHeadline = 'Turn off access?';
-z.string.modalConversationRemoveGuestsMessage = 'Current guests and services will be removed from the conversation. New guests will not be allowed.';
+z.string.modalConversationRemoveGuestsMessage = 'Current guests and services will be removed from the conversation. New guests and services will not be allowed.';
 
 z.string.modalConversationRevokeLinkAction = 'Revoke link';
 z.string.modalConversationRevokeLinkHeadline = 'Revoke the link?';
