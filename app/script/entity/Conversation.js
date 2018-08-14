@@ -404,13 +404,9 @@ z.entity.Conversation = class Conversation {
 
   getNumberOfParticipants(countSelf = true, countServices = true) {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
+    const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    if (!countServices) {
-      const numberOfParticipants = this.participating_user_ets().filter(userEntity => !userEntity.isService).length;
-      return numberOfParticipants + adjustCountForSelf;
-    }
-
-    return this.participating_user_ids().length + adjustCountForSelf;
+    return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
   }
 
   getNumberOfClients() {
