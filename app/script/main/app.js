@@ -136,6 +136,8 @@ z.main.App = class App {
       repositories.user
     );
 
+    const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
+    repositories.event.setEventProcessMiddleware(serviceMiddleware.processEvent.bind(serviceMiddleware));
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
       repositories.client,
