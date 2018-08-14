@@ -81,7 +81,7 @@ async function connect(sender, receiver) {
   return conversationId;
 }
 
-beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000));
+beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000));
 
 describe('Account', () => {
   let alice;
