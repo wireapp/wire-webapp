@@ -34,27 +34,23 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
 
   describe('processEvent', () => {
     describe('conversation.member-join events', () => {
-      it('adds meta when bots are present in the event', () => {
+      it('adds meta when services are present in the event', () => {
         const event = {
           data: {
-            user_ids: ['not-a-bot', 'a-bot'],
+            user_ids: ['not-a-service', 'a-service'],
           },
           type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
         };
 
-        spyOn(TestFactory.user_repository, 'get_user_by_id').and.callFake(id => {
-          if (id === 'a-bot') {
-            return Promise.resolve({isBot: true});
-          }
-          return Promise.resolve({});
-        });
+        const userEntities = [{}, {isBot: true}];
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.has_service).toBe(true);
         });
       });
 
-      it('adds meta if I was added to a conversation including a bot', () => {
+      it('adds meta if I was added to a conversation including a service', () => {
         const event = {
           data: {
             user_ids: ['self-id'],
@@ -62,28 +58,28 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
         };
 
-        const conversation = new z.entity.Conversation();
-
         spyOn(TestFactory.user_repository, 'self').and.returnValue({id: 'self-id'});
+        const conversation = new z.entity.Conversation();
         spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
           Promise.resolve(conversation)
         );
-        spyOn(conversation, 'isWithBot').and.returnValue(true);
+        const userEntities = [{}, {isBot: true}];
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.has_service).toBe(true);
         });
       });
 
-      it('does not modify events not containing any bot', () => {
+      it('does not modify events not containing any service', () => {
         const event = {
           data: {
-            user_ids: ['not-a-bot', 'another-not-a-bot'],
+            user_ids: ['not-a-service', 'another-not-a-service'],
           },
           type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
         };
 
-        spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve({}));
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([{}, {}]));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.has_service).not.toBeDefined();
@@ -92,35 +88,32 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
     });
 
     describe('conversation.one2one-creation events', () => {
-      it('adds meta when bots are present in the event', () => {
+      it('adds meta when services are present in the event', () => {
         const event = {
           data: {
-            userIds: ['not-a-bot', 'a-bot'],
+            userIds: ['not-a-service', 'a-service'],
           },
           type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
         };
 
-        spyOn(TestFactory.user_repository, 'get_user_by_id').and.callFake(id => {
-          if (id === 'a-bot') {
-            return Promise.resolve({isBot: true});
-          }
-          return Promise.resolve({});
-        });
+        const userEntities = [{}, {isBot: true}];
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.has_service).toBe(true);
         });
       });
 
-      it('does not modify events not containing any bot', () => {
+      it('does not modify events not containing any service', () => {
         const event = {
           data: {
-            userIds: ['not-a-bot', 'another-not-a-bot'],
+            userIds: ['not-a-service', 'another-not-a-service'],
           },
           type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
         };
 
-        spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve({}));
+        const userEntities = [{}, {}];
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.has_service).not.toBeDefined();
