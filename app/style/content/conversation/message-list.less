@@ -106,8 +106,13 @@
   padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
+
   & > .message-body-actions {
     top: 6px;
+  }
+
+  + .message-services-warning {
+    margin-left: 72px;
   }
 }
 
@@ -152,13 +157,6 @@
     align-self: flex-start;
     margin-top: 12px;
   }
-}
-
-.message-header-warning {
-  margin-left: 72px;
-  color: @w-red;
-  font-size: 12px;
-  font-weight: @font-weight-regular;
 }
 
 .message-header-label-sender {
@@ -469,6 +467,12 @@
   width: 160px;
 }
 
+.message-services-warning {
+  color: @w-red;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+}
+
 // MEMBER MESSAGE
 .message-connected {
   display: flex;
@@ -476,6 +480,10 @@
   align-items: center;
   margin-top: 32px;
   margin-bottom: 48px;
+
+  .message-services-warning {
+    margin-top: 32px;
+  }
 }
 
 .message-connected-header {

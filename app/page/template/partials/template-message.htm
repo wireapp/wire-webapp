@@ -201,6 +201,9 @@
                         l10n_text: z.string.conversationConnectionCancelRequest"
              data-uie-name="do-cancel-request"></div>
       <!-- /ko -->
+      <!-- ko if: showServicesWarning -->
+        <div class="message-services-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
+      <!-- /ko -->
     </div>
   <!-- /ko -->
   <!-- ko ifnot: showLargeAvatar() -->
@@ -229,7 +232,7 @@
         <!-- /ko -->
       </div>
       <!-- ko if: showServicesWarning -->
-        <div class="message-header-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
+        <div class="message-services-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
       <!-- /ko -->
     <!-- /ko -->
 
