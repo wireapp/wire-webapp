@@ -43,7 +43,10 @@ const pillAnimation = keyframes`
     }
 `;
 
-const Pill = styled.span`
+const Pill = styled.span.attrs({
+  'data-uie-name': 'element-pill',
+  'data-uie-status': ({type}) => type,
+})`
   ${({type}) => {
     const backgroundColor = type ? backgroundColors[type] : 'transparent';
     const margin = type ? '12px 0 0 0' : '0 8px';
@@ -77,10 +80,13 @@ const Pill = styled.span`
 `;
 
 Pill.propTypes = {
+  active: PropTypes.boolean,
+  children: PropTypes.node,
   type: PropTypes.oneOf(Object.keys(PILL_TYPE)),
 };
 
 Pill.defaultProps = {
+  active: false,
   type: null,
 };
 
