@@ -64,8 +64,9 @@
             <!-- ko if: showActionAddParticipants() -->
               <div class="conversation-details__participant-options">
                 <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
-                  <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
+                  <plus-icon class="panel__action-item__icon"></plus-icon>
                   <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
+                  <disclose-icon></disclose-icon>
                 </div>
               </div>
               <!-- ko if: showSectionOptions() -->
