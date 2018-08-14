@@ -51,18 +51,19 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   _processMemberJoinEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
+    const {conversation: conversationId, data: eventData} = event;
     const selfUserId = this.userRepository.self().id;
-    const containsSelfUser = event.data.user_ids.includes(selfUserId);
-    if (containsSelfUser) {
-      return this.conversationRepository
-        .get_conversation_by_id(event.conversation)
-        .then(conversation => this._containsService(conversation.participating_user_ids()))
-        .then(hasService => (hasService ? this._decorateWithHasServiceFlag(event) : event));
-    }
+    const containsSelfUser = eventData.user_ids.includes(selfUserId);
 
-    return this._containsService(event.data.user_ids).then(hasService => {
-      return hasService ? this._decorateWithHasServiceFlag(event) : event;
-    });
+    const getUsersPromise = containsSelfUser
+      ? this.conversationRepository
+          .get_conversation_by_id(conversationId)
+          .then(conversationEntity => conversationEntity.participating_user_ids())
+      : Promise.resolve(eventData.user_ids);
+
+    return getUsersPromise
+      .then(userIds => this._containsService(userIds))
+      .then(hasService => (hasService ? this._decorateWithHasServiceFlag(event) : event));
   }
 
   _process1To1ConversationCreationEvent(event) {
