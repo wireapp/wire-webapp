@@ -59,7 +59,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
 
-    return this.conversationRepository.addSerice(conversationEntity, providerId, serviceId).then(event => {
+    return this.conversationRepository.addService(conversationEntity, providerId, serviceId).then(event => {
       if (event) {
         const attributes = {
           conversation_size: conversationEntity.getNumberOfParticipants(true, false),
