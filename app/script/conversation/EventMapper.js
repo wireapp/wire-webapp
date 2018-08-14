@@ -297,11 +297,11 @@ z.conversation.EventMapper = class EventMapper {
 
     const messageEntity = new z.entity.MemberMessage();
 
-    const messageFromCreator = sender === conversationEntity.creator;
     const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
-    if (isSingleModeConversation) {
-      messageEntity.visible(false);
-    } else {
+    messageEntity.visible(!isSingleModeConversation);
+
+    if (conversationEntity.is_group()) {
+      const messageFromCreator = sender === conversationEntity.creator;
       const creatorIndex = userIds.indexOf(sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
@@ -309,13 +309,13 @@ z.conversation.EventMapper = class EventMapper {
         userIds.splice(creatorIndex, 1);
         messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
       }
-    }
 
-    if (hasService) {
-      messageEntity.showServicesWarning = true;
-    }
+      if (hasService) {
+        messageEntity.showServicesWarning = true;
+      }
 
-    messageEntity.userIds(userIds);
+      messageEntity.userIds(userIds);
+    }
 
     return messageEntity;
   }
