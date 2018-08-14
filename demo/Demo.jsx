@@ -317,7 +317,7 @@ class Demo extends React.PureComponent {
               <CallIcon height={32} />
               <CamIcon width={32} />
               <DeviceIcon height={32} />
-              <EditIcon />
+              <EditIcon height={32} />
               <FileIcon height={32} />
               <GifIcon width={32} />
               <HangupIcon width={32} />
@@ -329,11 +329,11 @@ class Demo extends React.PureComponent {
               <OptionsIcon height={32} />
               <PingIcon height={32} />
               <PlaneIcon height={32} />
-              <ProfileIcon />
-              <ServicesIcon />
+              <ProfileIcon height={32} />
+              <ServicesIcon height={32} />
               <SettingsIcon height={32} />
               <SpeakerIcon height={32} />
-              <TeamIcon />
+              <TeamIcon height={32} />
               <TimedIcon height={32} />
               <WireIcon width={32} />
             </Container>
