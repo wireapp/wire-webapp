@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.7.10"></a>
+## [5.7.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.9...@wireapp/core@5.7.10) (2018-08-14)
+
+**Note:** Version bump only for package @wireapp/core
+
+
+
+
+
 <a name="5.7.9"></a>
 ## [5.7.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.8...@wireapp/core@5.7.9) (2018-08-14)
 
