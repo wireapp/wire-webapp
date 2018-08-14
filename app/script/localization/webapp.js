@@ -680,12 +680,12 @@ z.string.backupCancel = 'Cancel';
 z.string.backupTryAgain = 'Try Again';
 
 // Search
-z.string.searchAddServices = 'Add services';
 z.string.searchConnect = 'Connect';
 z.string.searchConnections = 'Connections';
 z.string.searchContacts = 'Contacts';
 z.string.searchCreateGroup = 'Create group';
 z.string.searchCreateGuestRoom = 'Create guest room';
+z.string.searchEnableServices = 'Enable services';
 z.string.searchGroups = 'Groups';
 z.string.searchPeople = 'People';
 z.string.searchPlaceholder = 'Search by name or username';
