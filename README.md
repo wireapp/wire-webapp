@@ -19,10 +19,3 @@ yarn
 ```bash
 yarn start
 ```
-
-### Release
-
-```bash
-npm version patch
-npm run release
-```
