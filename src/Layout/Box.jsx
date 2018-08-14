@@ -22,7 +22,7 @@ import styled from 'styled-components';
 
 const Box = styled.div`
   border: 2px solid ${COLOR.GRAY_LIGHTEN_72};
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 16px 32px;
 `;
 
