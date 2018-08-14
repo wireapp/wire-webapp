@@ -626,9 +626,7 @@ z.event.EventRepository = class EventRepository {
       : Promise.resolve(event);
 
     return mapEvent
-      .then(mappedEvent => {
-        return this.eventProcessMiddleware ? this.eventProcessMiddleware(mappedEvent) : mappedEvent;
-      })
+      .then(mappedEvent => (this.eventProcessMiddleware ? this.eventProcessMiddleware(mappedEvent) : mappedEvent))
       .then(mappedEvent => {
         const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;

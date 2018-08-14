@@ -27,10 +27,10 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   /**
    * Construct a new ServiceMiddleware.
    *
-   * @param {z.conversation.UserRepository} userRepository - Repository to handle user related tasks
    * @param {z.conversation.ConverationRepository} conversationRepository - Repository to handle conversation related tasks
+   * @param {z.conversation.UserRepository} userRepository - Repository to handle user related tasks
    */
-  constructor(userRepository, conversationRepository) {
+  constructor(conversationRepository, userRepository) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
     this.logger = new z.util.Logger('z.event.preprocessor.ServiceMiddleware', z.config.LOGGER.OPTIONS);
@@ -40,6 +40,7 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
     switch (event.type) {
       case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
         return this._process1To1ConversationCreationEvent(event);
+
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
         return this._processMemberJoinEvent(event);
 

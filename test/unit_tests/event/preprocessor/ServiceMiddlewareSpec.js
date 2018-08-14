@@ -26,8 +26,8 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(() => {
       serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(
-        TestFactory.user_repository,
-        TestFactory.conversation_repository
+        TestFactory.conversation_repository,
+        TestFactory.user_repository
       );
     });
   });
