@@ -343,7 +343,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   get_conversations() {
-    const remote_conversations_promise = this.conversation_service.get_all_conversations().catch(error => {
+    const remote_conversations_promise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
     });
 
