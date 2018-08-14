@@ -66,5 +66,42 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         });
       });
     });
+
+    describe('conversation.group-creation events', () => {
+      it('adds meta when bots are present in the event', () => {
+        const event = {
+          data: {
+            userIds: ['not-a-bot', 'a-bot'],
+          },
+          type: z.event.Client.CONVERSATION.GROUP_CREATION,
+        };
+
+        spyOn(TestFactory.user_repository, 'get_user_by_id').and.callFake(id => {
+          if (id === 'a-bot') {
+            return Promise.resolve({isBot: true});
+          }
+          return Promise.resolve({});
+        });
+
+        return serviceMiddleware.processEvent(event).then(decoratedEvent => {
+          expect(decoratedEvent.hasBots).toBe(true);
+        });
+      });
+
+      it('does not modify events not containing any bot', () => {
+        const event = {
+          data: {
+            userIds: ['not-a-bot', 'another-not-a-bot'],
+          },
+          type: z.event.Client.GROUP_CREATION,
+        };
+
+        spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve({}));
+
+        return serviceMiddleware.processEvent(event).then(decoratedEvent => {
+          expect(decoratedEvent.hasBots).not.toBeDefined();
+        });
+      });
+    });
   });
 });
