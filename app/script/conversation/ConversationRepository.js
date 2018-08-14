@@ -2999,7 +2999,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
-          this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
+          if (conversationEntity.participating_user_ids().length) {
+            this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
+          }
+
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
