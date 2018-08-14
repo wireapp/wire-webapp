@@ -28,17 +28,18 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
    * Construct a new ServiceMiddleware.
    *
    * @param {z.conversation.UserRepository} userRepository - Repository to handle user related tasks
+   * @param {z.conversation.ConverationRepository} conversationRepository - Repository to handle conversation related tasks
    */
-  constructor(userRepository) {
+  constructor(userRepository, conversationRepository) {
     this.userRepository = userRepository;
+    this.conversationRepository = conversationRepository;
     this.logger = new z.util.Logger('z.event.preprocessor.ServiceMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   processEvent(event) {
     switch (event.type) {
       case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
-      case z.event.Client.CONVERSATION.GROUP_CREATION:
-        return this._processConversationCreationEvent(event);
+        return this._process1To1ConversationCreationEvent(event);
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
         return this._processMemberJoinEvent(event);
 
@@ -49,21 +50,28 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
 
   _processMemberJoinEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    return this._containsBots(event.data.user_ids).then(containsBots => {
-      return !containsBots ? event : Object.assign({}, event, {hasBots: true});
+
+    if (event.data.user_ids.includes(this.userRepository.self().id)) {
+      return this.conversationRepository
+        .get_conversation_by_id(event.conversation)
+        .then(conversation => this._containsService(conversation.participating_user_ids()))
+        .then(hasService => (hasService ? Object.assign({}, event, {has_service: true}) : event));
+    }
+
+    return this._containsService(event.data.user_ids).then(containsBots => {
+      return containsBots ? Object.assign({}, event, {has_service: true}) : event;
     });
   }
 
-  _processConversationCreationEvent(event) {
+  _process1To1ConversationCreationEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    return this._containsBots(event.data.userIds).then(containsBots => {
-      return !containsBots ? event : Object.assign({}, event, {hasBots: true});
+    return this._containsService(event.data.userIds).then(containsBots => {
+      return !containsBots ? event : Object.assign({}, event, {has_service: true});
     });
   }
 
-  _containsBots(userIds) {
-    const userPromises = userIds.map(userId => this.userRepository.get_user_by_id(userId));
-    return Promise.all(userPromises).then(userEntities => {
+  _containsService(userIds) {
+    return this.userRepository.get_users_by_id(userIds).then(userEntities => {
       return userEntities.some(userEntity => userEntity.isBot);
     });
   }

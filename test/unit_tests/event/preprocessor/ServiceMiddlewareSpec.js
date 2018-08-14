@@ -24,8 +24,11 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
   let serviceMiddleware;
 
   beforeEach(() => {
-    return testFactory.exposeUserActors().then(() => {
-      serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(TestFactory.user_repository);
+    return testFactory.exposeConversationActors().then(() => {
+      serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(
+        TestFactory.user_repository,
+        TestFactory.conversation_repository
+      );
     });
   });
 
@@ -47,7 +50,28 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         });
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.hasBots).toBe(true);
+          expect(decoratedEvent.has_service).toBe(true);
+        });
+      });
+
+      it('adds meta if I was added to a conversation including a bot', () => {
+        const event = {
+          data: {
+            user_ids: ['self-id'],
+          },
+          type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
+        };
+
+        const conversation = new z.entity.Conversation();
+
+        spyOn(TestFactory.user_repository, 'self').and.returnValue({id: 'self-id'});
+        spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+          Promise.resolve(conversation)
+        );
+        spyOn(conversation, 'isWithBot').and.returnValue(true);
+
+        return serviceMiddleware.processEvent(event).then(decoratedEvent => {
+          expect(decoratedEvent.has_service).toBe(true);
         });
       });
 
@@ -62,18 +86,18 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve({}));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.hasBots).not.toBeDefined();
+          expect(decoratedEvent.has_service).not.toBeDefined();
         });
       });
     });
 
-    describe('conversation.group-creation events', () => {
+    describe('conversation.one2one-creation events', () => {
       it('adds meta when bots are present in the event', () => {
         const event = {
           data: {
             userIds: ['not-a-bot', 'a-bot'],
           },
-          type: z.event.Client.CONVERSATION.GROUP_CREATION,
+          type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
         };
 
         spyOn(TestFactory.user_repository, 'get_user_by_id').and.callFake(id => {
@@ -84,7 +108,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         });
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.hasBots).toBe(true);
+          expect(decoratedEvent.has_service).toBe(true);
         });
       });
 
@@ -93,13 +117,13 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           data: {
             userIds: ['not-a-bot', 'another-not-a-bot'],
           },
-          type: z.event.Client.GROUP_CREATION,
+          type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
         };
 
         spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve({}));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.hasBots).not.toBeDefined();
+          expect(decoratedEvent.has_service).not.toBeDefined();
         });
       });
     });
