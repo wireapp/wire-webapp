@@ -312,7 +312,7 @@
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
-.start-ui-no-services {
+.no-services {
   display: flex;
   height: 100%;
   flex-direction: column;
@@ -343,5 +343,9 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
+
+    &--alternate {
+      background-color: @seperator-color;
+    }
   }
 }
