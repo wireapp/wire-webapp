@@ -2905,8 +2905,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
-          const firstUserEntity = conversationEntity.firstUserEntity();
-          const isOutgoingRequest = firstUserEntity && firstUserEntity.is_outgoing_request();
+          const userEntity = conversationEntity.firstUserEntity();
+          const isOutgoingRequest = userEntity && userEntity.is_outgoing_request();
           if (isOutgoingRequest) {
             messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
           }

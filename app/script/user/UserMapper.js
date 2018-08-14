@@ -144,6 +144,7 @@ z.user.UserMapper = class UserMapper {
     if (service) {
       userEntity.isService = true;
       userEntity.providerId = service.provider;
+      userEntity.providerName = ko.observable('');
       userEntity.serviceId = service.id;
     }
 
