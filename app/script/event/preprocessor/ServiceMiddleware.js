@@ -51,7 +51,9 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   _processMemberJoinEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
-    if (event.data.user_ids.includes(this.userRepository.self().id)) {
+    const selfUserId = this.userRepository.self().id;
+    const containsSelfUser = event.data.user_ids.includes(selfUserId);
+    if (containsSelfUser) {
       return this.conversationRepository
         .get_conversation_by_id(event.conversation)
         .then(conversation => this._containsService(conversation.participating_user_ids()))
