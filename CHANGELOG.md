@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.2.11"></a>
+## [2.2.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.10...@wireapp/react-ui-kit@2.2.11) (2018-08-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust Box border-radius ([#991](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/991)) ([fb9d4b0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/fb9d4b0))
+
+
+
+
+
 <a name="2.2.10"></a>
 ## [2.2.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.9...@wireapp/react-ui-kit@2.2.10) (2018-08-13)
 
