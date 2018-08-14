@@ -77,9 +77,11 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
 
+    const eventService = new z.event.EventService(this.storageService);
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
+      eventService,
       this.notification_service,
       this.web_socket_service,
       undefined,
