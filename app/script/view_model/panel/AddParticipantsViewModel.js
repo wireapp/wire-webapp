@@ -58,7 +58,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
         const firstUserEntity = this.activeConversation().firstUserEntity();
         const hasBotUser = firstUserEntity && firstUserEntity.isBot;
         const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
-        return this.isTeam() && allowIntegrations && !this.isTeamOnly();
+        return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }
     });
 
