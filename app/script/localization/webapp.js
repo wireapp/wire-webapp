@@ -376,6 +376,7 @@ z.string.conversationLikesCaption = '{{number}} people';
 z.string.conversationSendPastedFile = 'Pasted image at {{date}}';
 z.string.conversationSomeone = 'Someone';
 z.string.conversationTweetAuthor = ' on Twitter';
+z.string.conversationServicesWarning = 'Services have access to the content of the conversation';
 
 // Group creation
 z.string.groupCreationPreferencesAction = 'Next';
