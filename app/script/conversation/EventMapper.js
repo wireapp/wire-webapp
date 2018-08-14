@@ -321,7 +321,7 @@ z.conversation.EventMapper = class EventMapper {
     }
 
     if (hasService) {
-      messageEntity.showServicesWarning(true);
+      messageEntity.showServicesWarning = true;
     }
 
     messageEntity.userIds(userIds);
