@@ -116,10 +116,6 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     return 'add-participants';
   }
 
-  shouldSkipTransition() {
-    return true;
-  }
-
   clickOnAddPeople() {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
   }
