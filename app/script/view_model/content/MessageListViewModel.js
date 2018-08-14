@@ -402,7 +402,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     const params = {entity: userEntity};
-    const panelId = userEntity.isBot
+    const panelId = userEntity.isService
       ? z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
       : z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
 

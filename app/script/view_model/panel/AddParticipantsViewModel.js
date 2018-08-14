@@ -56,7 +56,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.showIntegrations = ko.pureComputed(() => {
       if (this.activeConversation()) {
         const firstUserEntity = this.activeConversation().firstUserEntity();
-        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+        const hasBotUser = firstUserEntity && firstUserEntity.isService;
         const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
         return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }

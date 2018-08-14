@@ -272,10 +272,10 @@ z.conversation.ConversationService = class ConversationService {
   //##############################################################################
 
   /**
-   * Remove bot from conversation.
+   * Remove service from conversation.
    *
-   * @param {string} conversationId - ID of conversation to remove bot from
-   * @param {string} userId - ID of bot to be removed from the the conversation
+   * @param {string} conversationId - ID of conversation to remove service from
+   * @param {string} userId - ID of service to be removed from the the conversation
    * @returns {Promise} Resolves with the server response
    */
   deleteBots(conversationId, userId) {
@@ -304,11 +304,11 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Add a bot to an existing conversation.
+   * Add a service to an existing conversation.
    *
    * @param {string} conversationId - ID of conversation to add users to
-   * @param {string} providerId - ID of bot provider
-   * @param {string} serviceId - ID of service provider
+   * @param {string} providerId - ID of service provider
+   * @param {string} serviceId - ID of service
    * @returns {Promise} Resolves with the server response
    */
   postBots(conversationId, providerId, serviceId) {

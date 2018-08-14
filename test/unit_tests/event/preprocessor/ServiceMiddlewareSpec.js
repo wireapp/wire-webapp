@@ -42,7 +42,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
         };
 
-        const userEntities = [{}, {isBot: true}];
+        const userEntities = [{}, {isService: true}];
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
@@ -63,7 +63,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
           Promise.resolve(conversation)
         );
-        const userEntities = [{}, {isBot: true}];
+        const userEntities = [{}, {isService: true}];
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
@@ -96,7 +96,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
         };
 
-        const userEntities = [{}, {isBot: true}];
+        const userEntities = [{}, {isService: true}];
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {

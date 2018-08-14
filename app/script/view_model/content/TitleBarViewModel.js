@@ -65,7 +65,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       if (this.isGroupInTeam()) {
         return this.conversationEntity()
           .participating_user_ets()
-          .some(userEntity => userEntity.isBot);
+          .some(userEntity => userEntity.isService);
       }
     });
 

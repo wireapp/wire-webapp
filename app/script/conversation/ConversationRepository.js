@@ -1131,29 +1131,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   //##############################################################################
 
   /**
-   * Add a bot to an existing conversation.
-   *
-   * @param {Conversation} conversationEntity - Conversation to add bot to
-   * @param {string} providerId - ID of bot provider
-   * @param {string} serviceId - ID of service provider
-   * @returns {Promise} Resolves when bot was added
-   */
-  addBot(conversationEntity, providerId, serviceId) {
-    return this.conversation_service
-      .postBots(conversationEntity.id, providerId, serviceId)
-      .then(response => {
-        const event = response ? response.event : undefined;
-        if (event) {
-          this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
-          return this.eventRepository.injectEvent(response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        }
-
-        return event;
-      })
-      .catch(error => this._handleAddToConversationError(error, conversationEntity, [serviceId]));
-  }
-
-  /**
    * Add users to an existing conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to add users to
@@ -1171,6 +1148,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
+  }
+
+  /**
+   * Add a service to an existing conversation.
+   *
+   * @param {Conversation} conversationEntity - Conversation to add service to
+   * @param {string} providerId - ID of service provider
+   * @param {string} serviceId - ID of service
+   * @returns {Promise} Resolves when service was added
+   */
+  addService(conversationEntity, providerId, serviceId) {
+    return this.conversation_service
+      .postBots(conversationEntity.id, providerId, serviceId)
+      .then(response => {
+        const event = response ? response.event : undefined;
+        if (event) {
+          this.logger.debug(
+            `Successfully added service to conversation '${conversationEntity.display_name()}'`,
+            response
+          );
+          return this.eventRepository.injectEvent(response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+
+        return event;
+      })
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, [serviceId]));
   }
 
   _handleAddToConversationError(error, conversationEntity, userIds) {
@@ -1261,25 +1264,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Remove bot from conversation.
-   *
-   * @param {Conversation} conversationEntity - Conversation to remove bot from
-   * @param {z.entity.User} userId - ID of bot user to be removed from the conversation
-   * @returns {Promise} Resolves when bot was removed from the conversation
-   */
-  removeBot(conversationEntity, userId) {
-    return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
-      const hasResponse = response && response.event;
-      const event = hasResponse
-        ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
-
-      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-      return event;
-    });
-  }
-
-  /**
    * Remove member from conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to remove member from
@@ -1290,6 +1274,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
       const event = !!response
         ? response
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
+
+      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
+    });
+  }
+
+  /**
+   * Remove service from conversation.
+   *
+   * @param {Conversation} conversationEntity - Conversation to remove service from
+   * @param {z.entity.User} userId - ID of service user to be removed from the conversation
+   * @returns {Promise} Resolves when service was removed from the conversation
+   */
+  removeService(conversationEntity, userId) {
+    return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
+      const hasResponse = response && response.event;
+      const event = hasResponse
+        ? response.event
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -3697,7 +3700,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
-        with_service: conversationEntity.isWithBot(),
+        with_service: conversationEntity.isWithService(),
       };
 
       const isTeamConversation = !!conversationEntity.team_id;

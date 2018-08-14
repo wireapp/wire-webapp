@@ -142,7 +142,7 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (service) {
-      userEntity.isBot = true;
+      userEntity.isService = true;
       userEntity.providerId = service.provider;
       userEntity.serviceId = service.id;
     }
