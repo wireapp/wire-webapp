@@ -56,9 +56,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.verticallyCenterMessage = ko.pureComputed(() => {
-      const [messageEntity] = this.conversation().messages_visible();
-      if (messageEntity && messageEntity.is_member()) {
-        return this.conversation().messages_visible().length === 1 && messageEntity.isConnection();
+      if (this.conversation().messages_visible().length === 1) {
+        const [messageEntity] = this.conversation().messages_visible();
+        return messageEntity.is_member() && messageEntity.isConnection();
       }
     });
 
