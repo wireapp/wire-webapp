@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.3.0"></a>
+# [2.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.11...@wireapp/react-ui-kit@2.3.0) (2018-08-14)
+
+
+### Features
+
+* **react-ui-kit:** ServicesIcon ([#994](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/994)) ([d3705be](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d3705be))
+
+
+
+
+
 <a name="2.2.11"></a>
 ## [2.2.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.2.10...@wireapp/react-ui-kit@2.2.11) (2018-08-14)
 
