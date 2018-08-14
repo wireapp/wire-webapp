@@ -32,14 +32,14 @@
               <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
             <!-- /ko -->
             <!-- ko if: !services().length && !isInitialServiceSearch() -->
-              <div class="no-services">
-                <service-icon class="no-services__icon"></service-icon>
+              <div class="search__no-services">
+                <service-icon class="search__no-services__icon"></service-icon>
                 <!-- ko if: isTeamManager() -->
-                  <div class="no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
-                  <div class="no-services__manage-button no-services__manage-button--alternate" data-bind="l10n_text: z.string.addParticipantsManageServicesNoResults, click: clickToOpenTeamAdmin" data-uie-name="go-enable-services"></div>
+                  <div class="search__no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesManager" data-uie-name="label-search__no-services-enabled-manager"></div>
+                  <div class="search__no-services__manage-button search__no-services__manage-button--alternate" data-bind="l10n_text: z.string.addParticipantsManageServicesNoResults, click: clickToOpenTeamAdmin" data-uie-name="go-enable-services"></div>
                 <!-- /ko -->
                 <!-- ko ifnot: isTeamManager() -->
-                  <div class="no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesMember" data-uie-name="label-no-services-enabled"></div>
+                  <div class="search__no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesMember" data-uie-name="label-search__no-services-enabled"></div>
                 <!-- /ko -->
               </div>
             <!-- /ko -->
