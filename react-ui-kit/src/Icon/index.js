@@ -39,6 +39,7 @@ export * from './OptionsIcon';
 export * from './PingIcon';
 export * from './PlaneIcon';
 export * from './ProfileIcon';
+export * from './ServicesIcon';
 export * from './SettingsIcon';
 export * from './SpeakerIcon';
 export * from './TeamIcon';

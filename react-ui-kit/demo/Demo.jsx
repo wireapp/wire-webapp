@@ -93,6 +93,7 @@ import {
   ProfileIcon,
   RoundIconButton,
   Select,
+  ServicesIcon,
   SettingsIcon,
   ShakeBox,
   Small,
@@ -329,6 +330,7 @@ class Demo extends React.PureComponent {
               <PingIcon height={32} />
               <PlaneIcon height={32} />
               <ProfileIcon />
+              <ServicesIcon />
               <SettingsIcon height={32} />
               <SpeakerIcon height={32} />
               <TeamIcon />
