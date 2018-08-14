@@ -625,64 +625,57 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Get a user from the backend.
-   * @param {string} user_id - User ID
+   * @param {string} userId - User ID
    * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
    */
-  fetch_user_by_id(user_id) {
-    return this.fetch_users_by_id([user_id]).then(([user_et]) => {
-      if (user_et) {
-        return user_et;
-      }
-    });
+  fetchUserById(userId) {
+    return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
   }
 
   /**
    * Get users from the backend.
-   * @param {Array<string>} user_ids - User IDs
+   * @param {Array<string>} userIds - User IDs
    * @returns {Promise<Array<z.entity.User>>} Promise that resolves with an array of user entities
    */
-  fetch_users_by_id(user_ids = []) {
-    user_ids = user_ids.filter(user_id => user_id);
+  fetchUsersById(userIds = []) {
+    userIds = userIds.filter(userId => !!userId);
 
-    if (!user_ids.length) {
+    if (!userIds.length) {
       return Promise.resolve([]);
     }
 
-    const _get_users = user_id_chunk => {
+    const _getUsers = chunkOfUserIds => {
       return this.user_service
-        .get_users(user_id_chunk)
-        .then(response => {
-          if (response) {
-            return this.user_mapper.map_users_from_object(response);
-          }
-          return [];
-        })
+        .get_users(chunkOfUserIds)
+        .then(response => (response ? this.user_mapper.map_users_from_object(response) : []))
         .catch(error => {
-          if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+          if (isNotFound) {
             return [];
           }
           throw error;
         });
     };
 
-    const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
-    return Promise.all(user_id_chunks.map(user_id_chunk => _get_users(user_id_chunk)))
-      .then(resolve_array => {
-        const new_user_ets = _.flatten(resolve_array);
+    const chunksOfUserIds = z.util.ArrayUtil.chunk(userIds, z.config.MAXIMUM_USERS_PER_REQUEST);
+    return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
+      .then(resolveArray => {
+        const newUserEntities = _.flatten(resolveArray);
 
         if (this.isTeam()) {
-          this.mapGuestStatus(new_user_ets);
+          this.mapGuestStatus(newUserEntities);
         }
 
-        return this.save_users(new_user_ets);
+        return this.save_users(newUserEntities);
       })
-      .then(fetched_user_ets => {
+      .then(fetchedUserEntities => {
         // If there is a difference then we most likely have a case with a suspended user
-        if (user_ids.length !== fetched_user_ets.length) {
-          fetched_user_ets = this._add_suspended_users(user_ids, fetched_user_ets);
+        const isAllUserIds = userIds.length === fetchedUserEntities.length;
+        if (!isAllUserIds) {
+          fetchedUserEntities = this._add_suspended_users(userIds, fetchedUserEntities);
         }
 
-        return fetched_user_ets;
+        return fetchedUserEntities;
       });
   }
 
@@ -727,13 +720,15 @@ z.user.UserRepository = class UserRepository {
   get_user_by_id(user_id) {
     return this.findUserById(user_id)
       .catch(error => {
-        if (error.type === z.user.UserError.TYPE.USER_NOT_FOUND) {
-          return this.fetch_user_by_id(user_id);
+        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        if (isNotFound) {
+          return this.fetchUserById(user_id);
         }
         throw error;
       })
       .catch(error => {
-        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        if (!isNotFound) {
           this.logger.error(`Failed to get user '${user_id}': ${error.message}`, error);
         }
         throw error;
@@ -781,7 +776,7 @@ z.user.UserRepository = class UserRepository {
         return known_user_ets;
       }
 
-      return this.fetch_users_by_id(unknown_user_ids).then(user_ets => known_user_ets.concat(user_ets));
+      return this.fetchUsersById(unknown_user_ids).then(user_ets => known_user_ets.concat(user_ets));
     });
   }
 

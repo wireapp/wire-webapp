@@ -190,7 +190,12 @@
   <!-- ko if: showLargeAvatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: otherUser().name()'></span>
-      <span class="message-connected-username label-username" data-bind='text: otherUser().username()'></span>
+      <!-- ko if: otherUser().isService -->
+        <span class="message-connected-provider-name" data-bind='text: otherUser().providerName()'></span>
+      <!-- /ko -->
+      <!-- ko ifnot: otherUser().isService -->
+        <span class="message-connected-username label-username" data-bind='text: otherUser().username()'></span>
+      <!-- /ko -->
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': otherUser().is_outgoing_request()}"
                    params="participant: otherUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>

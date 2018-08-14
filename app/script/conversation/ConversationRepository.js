@@ -2904,16 +2904,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
-        if (conversationEntity && messageEntity) {
-          const firstUserEntity = conversationEntity.firstUserEntity();
-          const isOutgoingRequest = firstUserEntity && firstUserEntity.is_outgoing_request();
-          if (isOutgoingRequest) {
-            messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
-          }
-
-          conversationEntity.add_message(messageEntity);
+        const userEntity = messageEntity.otherUser();
+        const isOutgoingRequest = userEntity && userEntity.is_outgoing_request();
+        if (isOutgoingRequest) {
+          messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
         }
 
+        conversationEntity.add_message(messageEntity);
         return {conversationEntity};
       });
   }

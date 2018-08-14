@@ -256,7 +256,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       });
 
       if (this.userProfileIsService()) {
-        this.integrationRepository.getProviderNameForService(this.userProfile());
+        this.integrationRepository.addProviderNameToParticipant(this.userProfile());
       }
 
       this.userBubble.toggle();

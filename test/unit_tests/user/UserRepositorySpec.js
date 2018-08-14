@@ -143,13 +143,13 @@ describe('z.user.UserRepository', () => {
   });
 
   describe('users', () => {
-    describe('fetch_user_by_id', () => {
+    describe('fetchUserById', () => {
       it('should handle malformed input', done => {
         TestFactory.user_repository
-          .fetch_users_by_id()
+          .fetchUsersById()
           .then(response => {
             expect(response.length).toBe(0);
-            return TestFactory.user_repository.fetch_users_by_id([undefined, undefined, undefined]);
+            return TestFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
           })
           .then(response => {
             expect(response.length).toBe(0);

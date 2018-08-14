@@ -46,18 +46,19 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
-    this.userRepository = repositories.user;
+    this.integrationRepository = repositories.integration;
     this.locationRepository = repositories.location;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
 
     this.conversation = ko.observable(new z.entity.Conversation());
-    this.center_messages = ko.pureComputed(() => {
-      const [firstVisibleMessage] = this.conversation().messages_visible();
-      if (firstVisibleMessage && firstVisibleMessage.is_member()) {
-        return this.conversation().messages_visible().length === 1 && firstVisibleMessage.isConnection();
+    this.verticallyCenterMessage = ko.pureComputed(() => {
+      if (this.conversation().messages_visible().length === 1) {
+        const [messageEntity] = this.conversation().messages_visible();
+        return messageEntity.is_member() && messageEntity.isConnection();
       }
     });
 
@@ -533,6 +534,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   getInViewportCallback(messageEntity) {
     if (!messageEntity.is_ephemeral()) {
+      const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
+      if (this.conversation().is_one2one() && isCreationMessage) {
+        this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
+      }
       return null;
     }
 

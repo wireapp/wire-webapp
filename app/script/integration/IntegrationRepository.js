@@ -48,6 +48,20 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   /**
+   * Get provider name for entity.
+   * @param {ServiceEntity|User} entity - Service or user to add provider name to
+   * @returns {Promise} - Resolves with the entity
+   */
+  addProviderNameToParticipant(entity) {
+    return entity.providerName()
+      ? entity
+      : this.getProviderById(entity.providerId).then(providerEntity => {
+          entity.providerName(providerEntity.name);
+          return entity;
+        });
+  }
+
+  /**
    * Add a service to an existing conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to add service to
@@ -147,12 +161,6 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       if (providerData) {
         return z.integration.IntegrationMapper.mapProviderFromObject(providerData);
       }
-    });
-  }
-
-  getProviderNameForService(serviceEntity) {
-    return this.getProviderById(serviceEntity.providerId).then(providerEntity => {
-      serviceEntity.providerName(providerEntity.name);
     });
   }
 
