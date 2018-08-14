@@ -80,7 +80,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {string} conversation_id - Conversation ID to start from
    * @returns {Promise} Resolves with the conversation information
    */
-  get_conversations(limit = 100, conversation_id) {
+  getConversations(limit = 100, conversation_id) {
     return this.client.send_request({
       data: {
         size: limit,
@@ -96,24 +96,20 @@ z.conversation.ConversationService = class ConversationService {
    * @param {number} [limit=500] - Number of results to return (default 500, max 500)
    * @returns {Promise} Resolves with the conversation information
    */
-  get_all_conversations(limit = 500) {
-    let all_conversations = [];
+  getAllConversations(limit = 500) {
+    let allConversations = [];
 
-    const _get_conversations = conversation_id => {
-      return this.get_conversations(limit, conversation_id).then(({conversations, has_more}) => {
+    const _getConversations = conversationId => {
+      return this.getConversations(limit, conversationId).then(({conversations, has_more: hasMore}) => {
         if (conversations.length) {
-          all_conversations = all_conversations.concat(conversations);
+          allConversations = allConversations.concat(conversations);
         }
 
-        if (has_more) {
-          return _get_conversations(conversations.pop().id);
-        }
-
-        return all_conversations;
+        return hasMore ? _getConversations(conversations.pop().id) : allConversations;
       });
     };
 
-    return _get_conversations();
+    return _getConversations();
   }
 
   /**
@@ -272,10 +268,10 @@ z.conversation.ConversationService = class ConversationService {
   //##############################################################################
 
   /**
-   * Remove bot from conversation.
+   * Remove service from conversation.
    *
-   * @param {string} conversationId - ID of conversation to remove bot from
-   * @param {string} userId - ID of bot to be removed from the the conversation
+   * @param {string} conversationId - ID of conversation to remove service from
+   * @param {string} userId - ID of service to be removed from the the conversation
    * @returns {Promise} Resolves with the server response
    */
   deleteBots(conversationId, userId) {
@@ -304,11 +300,11 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Add a bot to an existing conversation.
+   * Add a service to an existing conversation.
    *
    * @param {string} conversationId - ID of conversation to add users to
-   * @param {string} providerId - ID of bot provider
-   * @param {string} serviceId - ID of service provider
+   * @param {string} providerId - ID of service provider
+   * @param {string} serviceId - ID of service
    * @returns {Promise} Resolves with the server response
    */
   postBots(conversationId, providerId, serviceId) {

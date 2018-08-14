@@ -48,24 +48,24 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   /**
-   * Add a bot to an existing conversation.
+   * Add a service to an existing conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to add bot to
+   * @param {Conversation} conversationEntity - Conversation to add service to
    * @param {z.integration.ServiceEntity} serviceEntity - Service to be added to conversation
    * @param {string} method - Method used to add service
-   * @returns {Promise} Resolves when bot was added
+   * @returns {Promise} Resolves when service was added
    */
   addService(conversationEntity, serviceEntity, method) {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
 
-    return this.conversationRepository.addBot(conversationEntity, providerId, serviceId).then(event => {
+    return this.conversationRepository.addService(conversationEntity, providerId, serviceId).then(event => {
       if (event) {
         const attributes = {
           conversation_size: conversationEntity.getNumberOfParticipants(true, false),
           method: method,
           service_id: serviceId,
-          services_size: conversationEntity.getNumberOfBots(),
+          services_size: conversationEntity.getNumberOfServices(),
         };
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
@@ -76,7 +76,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   /**
-   * Add bot to conversation.
+   * Add service to conversation.
    *
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
    * @returns {Promise} Resolves when conversation with the integration was was created
@@ -126,7 +126,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         return false;
       }
 
-      if (!userEntity.isBot) {
+      if (!userEntity.isService) {
         // Disregard conversations with users instead of services
         return false;
       }
@@ -182,13 +182,13 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * Remove service from conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to remove service from
-   * @param {z.entity.User} userEntity - Bot user to be removed from the conversation
-   * @returns {Promise} Resolves when bot was removed from the conversation
+   * @param {z.entity.User} userEntity - Service user to be removed from the conversation
+   * @returns {Promise} Resolves when service was removed from the conversation
    */
   removeService(conversationEntity, userEntity) {
     const {id: userId, serviceId} = userEntity;
 
-    return this.conversationRepository.removeBot(conversationEntity, userId).then(event => {
+    return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
         const attributes = {service_id: serviceId};
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);

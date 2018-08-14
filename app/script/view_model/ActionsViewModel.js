@@ -199,7 +199,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   removeFromConversation(conversationEntity, userEntity) {
     if (conversationEntity && userEntity) {
-      if (userEntity.isBot) {
+      if (userEntity.isService) {
         return this.integrationRepository.removeService(conversationEntity, userEntity);
       }
 

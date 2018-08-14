@@ -567,40 +567,28 @@ describe('Conversation', () => {
     });
   });
 
-  describe('is_with_bot', () =>
-    it('detects bot conversations by the username of the remote participant', () => {
-      const user_et = new z.entity.User(z.util.createRandomUuid());
+  describe('isWithService', () =>
+    it('detects conversations with services', () => {
+      const userEntity = new z.entity.User(z.util.createRandomUuid());
 
       conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
-      conversation_et.participating_user_ets.push(user_et);
-
-      user_et.username('ottothebot');
-      conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.isWithBot()).toBe(false);
+      conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.isWithBot()).toBe(true);
+      expect(conversation_et.isWithService()).toBe(false);
 
-      user_et.username('annathebot');
-      expect(conversation_et.isWithBot()).toBe(true);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
+      expect(conversation_et.isWithService()).toBe(false);
 
-      user_et.username(undefined);
-      expect(conversation_et.isWithBot()).toBe(false);
+      const secondUserEntity = new z.entity.User(z.util.createRandomUuid());
+      secondUserEntity.isService = true;
+      conversation_et.participating_user_ets.push(secondUserEntity);
 
-      user_et.username('');
-      expect(conversation_et.isWithBot()).toBe(false);
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.isWithService()).toBe(true);
 
-      user_et.username('bob');
-      expect(conversation_et.isWithBot()).toBe(false);
-
-      user_et.username('bobthebot');
-      expect(conversation_et.isWithBot()).toBe(false);
-
-      user_et.username('bot');
-      expect(conversation_et.isWithBot()).toBe(false);
-
-      user_et.username('wire');
-      expect(conversation_et.isWithBot()).toBe(false);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
+      expect(conversation_et.isWithService()).toBe(true);
     }));
 
   describe('messages_visible', () => {

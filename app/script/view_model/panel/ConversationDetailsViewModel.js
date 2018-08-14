@@ -69,7 +69,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         this.activeConversation()
           .participating_user_ets()
           .map(userEntity => {
-            if (userEntity.isBot) {
+            if (userEntity.isService) {
               return this.serviceParticipants.push(userEntity);
             }
             this.userParticipants.push(userEntity);

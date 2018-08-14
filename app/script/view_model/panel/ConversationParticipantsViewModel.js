@@ -34,7 +34,7 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
       if (this.activeConversation()) {
         return this.activeConversation()
           .participating_user_ets()
-          .filter(userEntity => !userEntity.isBot);
+          .filter(userEntity => !userEntity.isService);
       }
       return [];
     });

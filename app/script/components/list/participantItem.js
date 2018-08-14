@@ -25,8 +25,8 @@ window.z.components = z.components || {};
 z.components.ParticipantItem = class ParticipantItem {
   constructor(params) {
     this.participant = ko.unwrap(params.participant);
-    this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
-    this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
+    this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isService;
+    this.isUser = this.participant instanceof z.entity.User && !this.participant.isService;
     this.selfUser = window.wire.app.repository.user.self;
     this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
 
