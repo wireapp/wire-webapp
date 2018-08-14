@@ -43,14 +43,19 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.isTeam = this.teamRepository.isTeam;
+    this.selfUser = this.userRepository.self;
     this.services = this.integrationRepository.services;
     this.teamUsers = this.teamRepository.teamUsers;
     this.teamMembers = this.teamRepository.teamMembers;
 
+    this.isInitialServiceSearch = ko.observable(true);
     this.searchInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
     this.selectedService = ko.observable();
     this.state = ko.observable(AddParticipantsViewModel.STATE.ADD_PEOPLE);
+
+    this.services.subscribe(() => this.isInitialServiceSearch(false));
+
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
 
     this.showIntegrations = ko.pureComputed(() => {
@@ -61,6 +66,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
         return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }
     });
+    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
 
     this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 
@@ -136,11 +142,18 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.onGoBack();
   }
 
+  clickToOpenTeamAdmin() {
+    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+  }
+
   initView() {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
     this.selectedContacts.removeAll();
     this.selectedService(undefined);
     this.searchInput('');
+    this.isInitialServiceSearch(true);
   }
 
   searchServices(query) {
