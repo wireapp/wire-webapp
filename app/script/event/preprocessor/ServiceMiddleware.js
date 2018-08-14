@@ -55,18 +55,18 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
       return this.conversationRepository
         .get_conversation_by_id(event.conversation)
         .then(conversation => this._containsService(conversation.participating_user_ids()))
-        .then(hasService => (hasService ? Object.assign({}, event, {has_service: true}) : event));
+        .then(hasService => (hasService ? this._decorateWithHasServiceFlag(event) : event));
     }
 
-    return this._containsService(event.data.user_ids).then(containsBots => {
-      return containsBots ? Object.assign({}, event, {has_service: true}) : event;
+    return this._containsService(event.data.user_ids).then(hasService => {
+      return hasService ? this._decorateWithHasServiceFlag(event) : event;
     });
   }
 
   _process1To1ConversationCreationEvent(event) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    return this._containsService(event.data.userIds).then(containsBots => {
-      return !containsBots ? event : Object.assign({}, event, {has_service: true});
+    return this._containsService(event.data.userIds).then(hasService => {
+      return hasService ? this._decorateWithHasServiceFlag(event) : event;
     });
   }
 
@@ -74,5 +74,10 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
     return this.userRepository.get_users_by_id(userIds).then(userEntities => {
       return userEntities.some(userEntity => userEntity.isBot);
     });
+  }
+
+  _decorateWithHasServiceFlag(event) {
+    const updatedData = Object.assign({}, event.data, {has_service: true});
+    return Object.assign({}, event, {data: updatedData});
   }
 };

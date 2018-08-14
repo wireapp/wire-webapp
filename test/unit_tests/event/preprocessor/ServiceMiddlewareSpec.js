@@ -46,7 +46,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.has_service).toBe(true);
+          expect(decoratedEvent.data.has_service).toBe(true);
         });
       });
 
@@ -67,7 +67,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.has_service).toBe(true);
+          expect(decoratedEvent.data.has_service).toBe(true);
         });
       });
 
@@ -82,7 +82,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([{}, {}]));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.has_service).not.toBeDefined();
+          expect(decoratedEvent.data.has_service).not.toBeDefined();
         });
       });
     });
@@ -100,7 +100,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.has_service).toBe(true);
+          expect(decoratedEvent.data.has_service).toBe(true);
         });
       });
 
@@ -116,7 +116,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
-          expect(decoratedEvent.has_service).not.toBeDefined();
+          expect(decoratedEvent.data.has_service).not.toBeDefined();
         });
       });
     });
