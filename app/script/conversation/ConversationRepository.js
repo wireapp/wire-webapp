@@ -1164,10 +1164,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(response => {
         const event = response ? response.event : undefined;
         if (event) {
-          this.logger.debug(
-            `Successfully added service to conversation '${conversationEntity.display_name()}'`,
-            response
-          );
+          const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
+          this.logger.debug(logMessage, response);
           return this.eventRepository.injectEvent(response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         }
 
