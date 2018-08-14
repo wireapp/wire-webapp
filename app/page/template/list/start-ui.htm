@@ -120,11 +120,11 @@
             <div class="search__no-services">
               <service-icon class="search__no-services__icon"></service-icon>
               <!-- ko if: isTeamManager() -->
-                <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesManager" data-uie-name="label-search__no-services-enabled-manager"></div>
+                <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
                 <div class="search__no-services__manage-button" data-bind="l10n_text: z.string.searchManageServicesNoResults, click: clickToOpenTeamAdmin" data-uie-name="go-enable-services"></div>
               <!-- /ko -->
               <!-- ko ifnot: isTeamManager() -->
-                <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesMember" data-uie-name="label-search__no-services-enabled"></div>
+                <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesMember" data-uie-name="label-no-services-enabled"></div>
               <!-- /ko -->
             </div>
           <!-- /ko -->
