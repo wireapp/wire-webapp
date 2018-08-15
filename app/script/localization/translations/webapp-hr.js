@@ -181,6 +181,7 @@ z.string.hr.modalConversationRemoveAction = 'Ukloni';
 z.string.hr.modalConversationRemoveHeadline = 'Ukloniti?';
 z.string.hr.modalConversationRemoveMessage = '{{user}} neće moći slati ili primati poruke u ovom razgovoru.';
 
+z.string.hr.modalConversationRemoveGuestsAction = 'Ukloni';
 
 z.string.hr.modalConversationTooManyMembersHeadline = 'Puna kuća';
 

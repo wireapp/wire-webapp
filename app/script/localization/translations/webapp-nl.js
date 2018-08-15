@@ -161,10 +161,6 @@ z.string.nl.modalConnectAcceptHeadline = 'Accepteren?';
 z.string.nl.modalConnectAcceptMessage = 'Dit zal een verbinding met {{user}} maken en een gesprek openen.';
 z.string.nl.modalConnectAcceptSecondary = 'Negeer';
 
-z.string.nl.modalConversationAddBotAction = 'Bevestig';
-z.string.nl.modalConversationAddBotHeadline = 'Service toevoegen';
-z.string.nl.modalConversationAddBotMessage = 'Weet je zeker dat je een nieuw gesprek met {{name}} wil beginnen?';
-
 z.string.nl.modalConversationClearAction = 'Verwijderen';
 z.string.nl.modalConversationClearHeadline = 'Inhoud verwijderen?';
 z.string.nl.modalConversationClearOption = 'Ook het gesprek verlaten';
@@ -200,6 +196,7 @@ z.string.nl.modalConversationRemoveAction = 'Verwijderen';
 z.string.nl.modalConversationRemoveHeadline = 'Verwijder?';
 z.string.nl.modalConversationRemoveMessage = '{{user}} zal geen berichten kunnen versturen of ontvangen in dit gesprek.';
 
+z.string.nl.modalConversationRemoveGuestsAction = 'Verwijderen';
 
 z.string.nl.modalConversationTooManyMembersHeadline = 'Full house';
 
@@ -237,7 +234,6 @@ z.string.nl.conversationYouNominative = 'jij';
 z.string.nl.conversationYouDative = 'jij';
 z.string.nl.conversationYouAccusative = 'jij';
 
-z.string.nl.conversationBotUser = 'Bot';
 z.string.nl.conversationConnectionAccepted = 'Verbonden';
 z.string.nl.conversationConnectionBlocked = 'Geblokkeerd';
 z.string.nl.conversationConnectionCancelRequest = 'Stop verzoek tot connectie';
