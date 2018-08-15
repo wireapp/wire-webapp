@@ -210,15 +210,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
-    this.isSingleUserService = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
-    });
-
-    this.isSingleUserService.subscribe(isService => {
+    this.isServiceMode.subscribe(isService => {
       if (isService) {
-        this.integrationRepository
-          .getProviderById(this.firstParticipant().providerId)
-          .then(providerEntity => this.firstParticipant().providerName(providerEntity.name));
+        this.integrationRepository.addProviderNameToParticipant(this.firstParticipant());
       }
     });
   }

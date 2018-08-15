@@ -33,7 +33,7 @@
                 <div data-bind="text: activeConversation() && activeConversation().display_name()" data-uie-name="status-name"></div>
               </div>
             </div>
-            <!-- ko if: isSingleUserService() -->
+            <!-- ko if: isServiceMode() -->
               <div  class="conversation-details__provider-name" data-bind="text: firstParticipant().providerName()"></div>
             <!-- /ko -->
           <!-- /ko -->
