@@ -128,6 +128,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
+    this.isServiceMode = ko.pureComputed(() => {
+      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
+    });
+
     this.showActionAddParticipants = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().is_group();
     });
@@ -139,7 +143,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.showActionCreateGroup = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_one2one();
+      return this.activeConversation() && this.activeConversation().is_one2one() && !this.isServiceMode();
     });
 
     this.showActionCancelRequest = ko.pureComputed(() => {

@@ -39,7 +39,9 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
 
     this.isAddMode = ko.observable(false);
 
-    this.selectedIsInConversation = ko.pureComputed(() => {
+    this.conversationInTeam = ko.pureComputed(() => this.activeConversation() && this.activeConversation().inTeam());
+
+    this.selectedInConversation = ko.pureComputed(() => {
       if (this.isVisible() && this.activeConversation()) {
         const participatingUserIds = this.activeConversation().participating_user_ids();
         return participatingUserIds.some(id => this.selectedParticipant().id === id);
@@ -50,7 +52,9 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
       return this.isVisible() ? this.activeConversation().isActiveParticipant() : false;
     });
 
-    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
+    this.showActions = ko.pureComputed(() => {
+      return this.selfIsActiveParticipant() && this.selectedInConversation() && this.conversationInTeam();
+    });
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedService() && this.isVisible())
@@ -68,6 +72,10 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   clickOnAdd() {
     this.integrationRepository.addService(this.activeConversation(), this.selectedService(), 'conversation_details');
     this.onGoToRoot();
+  }
+
+  clickToOpen() {
+    this.actionsViewModel.open1to1ConversationWithService(this.selectedService());
   }
 
   clickToRemove() {
