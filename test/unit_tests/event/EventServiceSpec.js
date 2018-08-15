@@ -237,7 +237,6 @@ describe('z.event.EventService', () => {
       id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
       from: senderId,
       time: '2016-08-04T13:27:58.993Z',
-      data: {content: 'Second message', previews: []},
       type: 'conversation.message-add',
     };
     /* eslint-enable sort-keys*/
@@ -247,7 +246,7 @@ describe('z.event.EventService', () => {
 
       return TestFactory.event_service.saveEvent(newEvent).then(event => {
         expect(event.category).toBeDefined();
-        expect(TestFactory.storage_service.save).toHaveBeenCalled();
+        expect(TestFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, newEvent);
       });
     });
   });
