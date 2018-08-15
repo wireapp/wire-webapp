@@ -274,6 +274,68 @@ describe('z.event.EventService', () => {
     });
   });
 
+  describe('updateMessageSequentially', () => {
+    it('fails if changes do not contain version property', () => {
+      const messageEntity = {id: 'twelve', primary_key: 12};
+      const updates = {reactions: ['user-id']};
+      return TestFactory.event_service
+        .updateMessageSequentially(messageEntity, updates, conversationId)
+        .then(fail)
+        .catch(error => {
+          expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+        });
+    });
+
+    it('fails if version is not sequential', () => {
+      const messageEntity = {id: 'twelve', primary_key: 12};
+      const updates = {reactions: ['user-id'], version: 1};
+
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve({version: 2}));
+
+      return TestFactory.event_service
+        .updateMessageSequentially(messageEntity, updates, conversationId)
+        .then(fail)
+        .catch(error => {
+          expect(error.type).toBe(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+        });
+    });
+
+    it('fails if record is not found', () => {
+      const messageEntity = {id: 'twelve', primary_key: 12};
+      const updates = {reactions: ['user-id'], version: 2};
+
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(undefined));
+      spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
+
+      return TestFactory.event_service
+        .updateMessageSequentially(messageEntity, updates, conversationId)
+        .then(fail)
+        .catch(error => {
+          expect(error.type).toBe(z.storage.StorageError.TYPE.NOT_FOUND);
+        });
+    });
+
+    it('updates message in DB', () => {
+      const messageEntity = {id: 'twelve', primary_key: 12};
+      const updates = {reactions: ['user-id'], version: 2};
+
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve({version: 1}));
+      spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
+      spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
+
+      return TestFactory.event_service
+        .updateMessageSequentially(messageEntity, updates, conversationId)
+        .then(result => {
+          expect(TestFactory.storage_service.update).toHaveBeenCalledWith(
+            eventStoreName,
+            messageEntity.primary_key,
+            updates
+          );
+          expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
+        });
+    });
+  });
+
   describe('updateMessage', () => {
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const MessageEntity = {
