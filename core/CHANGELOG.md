@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.7.17"></a>
+## [5.7.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.16...@wireapp/core@5.7.17) (2018-08-15)
+
+
+### Bug Fixes
+
+* **core:** Emit edited messages ([#1008](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1008)) ([0b3e304](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0b3e304))
+
+
+
+
+
 <a name="5.7.16"></a>
 ## [5.7.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.15...@wireapp/core@5.7.16) (2018-08-15)
 
