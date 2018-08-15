@@ -171,6 +171,55 @@ describe('z.event.EventService', () => {
     });
   });
 
+  describe('loadFollowingEvents', () => {
+    let events = undefined;
+
+    beforeEach(() => {
+      const timestamp = new Date('2016-11-23T12:19:06.808Z').getTime();
+      events = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
+        return {
+          conversation: conversationId,
+          from: senderId,
+          time: new Date(timestamp + index).toISOString(),
+        };
+      });
+
+      return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+    });
+
+    afterEach(() => {
+      TestFactory.storage_service.clearStores();
+    });
+
+    it('fails if the upperbound is not a Date', () => {
+      try {
+        TestFactory.event_service.loadFollowingEvents(conversationId, 'not a date', 2, false);
+        fail('should have thrown');
+      } catch (error) {
+        expect(error.message).toContain("must be of type 'Date'");
+      }
+    });
+
+    it('loads all events matching parameters', () => {
+      const tests = [
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 1], expectedEvents: [events[0]]},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 2, false], expectedEvents: [events[1], events[2]]},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 3], expectedEvents: [events[0], events[1], events[2]]},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 1000], expectedEvents: events},
+        {args: [new Date('2016-11-23T12:19:06.816Z'), 1000], expectedEvents: [events[8], events[9]]},
+      ];
+      const eventService = TestFactory.event_service;
+
+      const testPromises = tests.map(({args, expectedEvents}) => {
+        return eventService.loadFollowingEvents(...[conversationId].concat(args)).then(_events => {
+          expect(_events).toEqual(expectedEvents);
+        });
+      });
+
+      return Promise.all(testPromises);
+    });
+  });
+
   describe('loadEventsWithCategory', () => {
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const events = [

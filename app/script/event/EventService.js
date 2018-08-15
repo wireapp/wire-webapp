@@ -115,6 +115,32 @@ z.event.EventService = class EventService {
   }
 
   /**
+   * Load conversation events starting from the upper bound to the present until the limit is reached.
+   *
+   * @param {string} conversationId - ID of conversation
+   * @param {Date} upperBound - Load until this date (excluded)
+   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
+   * @param {number} [includeUpperBound=true] - Should upper bound be part of the messages
+   * @returns {Promise} Resolves with the retrieved records
+   */
+  loadFollowingEvents(conversationId, upperBound, limit = Number.MAX_SAFE_INTEGER, includeUpperBound = true) {
+    if (!_.isDate(upperBound)) {
+      throw new Error(`Upper bound (${typeof upperBound}) must be of type 'Date'.`);
+    }
+
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('[conversation+time]')
+      .between(
+        [conversationId, upperBound.toISOString()],
+        [conversationId, new Date().toISOString()],
+        includeUpperBound,
+        true
+      )
+      .limit(limit)
+      .toArray();
+  }
+
+  /**
    * Save an unencrypted conversation event.
    * @param {Object} event - JSON event to be stored
    * @returns {Promise} Resolves with the stored record
