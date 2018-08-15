@@ -53,7 +53,6 @@ const ModalBody = styled.div`
   background-color: ${COLOR.GRAY_LIGHTEN_88};
   display: flex;
   flex-direction: column;
-  padding: 12px 24px;
   z-index: 9999;
   margin: auto;
   -webkit-transform: translate3d(0, 0, 0);
