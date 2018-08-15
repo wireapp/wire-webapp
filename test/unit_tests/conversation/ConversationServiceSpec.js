@@ -101,52 +101,6 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('delete_message_with_key_from_db', () => {
-    const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
-    let primary_keys = undefined;
-
-    // prettier-ignore
-    /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const messages = [
-      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
-      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-    ];
-    /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-
-    beforeEach(done => {
-      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
-        .then(ids => {
-          primary_keys = ids;
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('deletes message with the given key', done => {
-      conversation_service
-        .delete_message_with_key_from_db(primary_keys[1])
-        .then(() => TestFactory.event_service.loadPrecedingEvents(conversation_id))
-        .then(events => {
-          expect(events.length).toBe(2);
-          events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('does not delete the event if key is wrong', done => {
-      conversation_service
-        .delete_message_with_key_from_db('wrongKey')
-        .then(() => TestFactory.event_service.loadPrecedingEvents(conversation_id))
-        .then(events => {
-          expect(events.length).toBe(3);
-          done();
-        })
-        .catch(done.fail);
-    });
-  });
-
   describe('search_in_conversation', () => {
     let events = undefined;
 

@@ -392,31 +392,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Delete a message from a conversation. Duplicates are delete as well.
-   *
-   * @param {string} conversation_id - ID of conversation to remove message from
-   * @param {string} message_id - ID of the actual message
-   * @returns {Promise} Resolves with the number of deleted records
-   */
-  delete_message_from_db(conversation_id, message_id) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversation_id)
-      .and(record => record.id === message_id)
-      .delete();
-  }
-
-  /**
-   * Delete a message from a conversation with the given primary.
-   *
-   * @param {string} primary_key - ID of the actual message
-   * @returns {Promise} Resolves with the number of deleted records
-   */
-  delete_message_with_key_from_db(primary_key) {
-    return this.storageService.db[this.EVENT_STORE_NAME].delete(primary_key);
-  }
-
-  /**
    * Delete all message of a conversation.
    * @param {string} conversation_id - Delete messages for this conversation
    * @param {string} [iso_date] - Date in ISO string format as upper bound which messages should be removed

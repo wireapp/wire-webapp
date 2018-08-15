@@ -3523,7 +3523,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _delete_message(conversation_et, message_et) {
     conversation_et.remove_message_by_id(message_et.id);
-    return this.conversation_service.delete_message_with_key_from_db(message_et.primary_key);
+    return this.eventService.deleteEventWithKey(message_et.primary_key);
   }
 
   /**
@@ -3536,7 +3536,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _delete_message_by_id(conversation_et, message_id) {
     conversation_et.remove_message_by_id(message_id);
-    return this.conversation_service.delete_message_from_db(conversation_et.id, message_id);
+    return this.eventService.deleteEvent(conversation_et.id, message_id);
   }
 
   /**

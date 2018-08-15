@@ -121,7 +121,7 @@ describe('ConversationRepository', () => {
 
           spyOn(TestFactory.conversation_service, 'update_asset_as_uploaded_in_db');
           spyOn(TestFactory.conversation_service, 'update_asset_as_failed_in_db');
-          spyOn(TestFactory.conversation_service, 'delete_message_from_db');
+          spyOn(TestFactory.event_service, 'deleteEvent');
           done();
         })
         .catch(done.fail);

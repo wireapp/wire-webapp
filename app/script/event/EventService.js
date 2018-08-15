@@ -22,7 +22,6 @@
 window.z = window.z || {};
 window.z.event = z.event || {};
 
-// Conversation service for all conversation calls to the backend REST API.
 z.event.EventService = class EventService {
   /**
    * Construct a new Event Service.
@@ -175,6 +174,31 @@ z.event.EventService = class EventService {
         });
       });
     });
+  }
+
+  /**
+   * Delete an event from a conversation. Duplicates are delete as well.
+   *
+   * @param {string} conversationId - ID of conversation to remove message from
+   * @param {string} eventId - ID of the actual message
+   * @returns {Promise} Resolves with the number of deleted records
+   */
+  deleteEvent(conversationId, eventId) {
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('id')
+      .equals(eventId)
+      .and(record => record.conversation === conversationId)
+      .delete();
+  }
+
+  /**
+   * Delete an event from a conversation with the given primary.
+   *
+   * @param {string} primaryKey - ID of the actual message
+   * @returns {Promise} Resolves with the number of deleted records
+   */
+  deleteEventWithKey(primaryKey) {
+    return this.storageService.db[this.EVENT_STORE_NAME].delete(primaryKey);
   }
 
   /**
