@@ -32,7 +32,7 @@ const wirePath = (
 const Wire = IconHOC(wirePath, width, height);
 const Logo = styled(Wire)`
   path {
-    fill: ${COLOR.GRAY_DARKEN_48};
+    fill: ${({color}) => color || COLOR.GRAY_DARKEN_48};
     ${defaultTransition};
   }
   ${props =>

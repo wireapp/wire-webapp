@@ -31,6 +31,7 @@ import {
   COLOR,
   CallIcon,
   CamIcon,
+  CheckIcon,
   Checkbox,
   CheckboxLabel,
   ChromeIcon,
@@ -103,6 +104,7 @@ import {
   Text,
   TimedIcon,
   Title,
+  TrashIcon,
   TwitterIcon,
   Uppercase,
   WireIcon,
@@ -292,7 +294,7 @@ class Demo extends React.PureComponent {
 
         <Content>
           <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
-            <Logo scale={3} />
+            <Logo scale={3} color={COLOR.BLUE} />
             <Loading />
             <Loading progress={0.33} />
             <Loading progress={0.66} />
@@ -316,6 +318,7 @@ class Demo extends React.PureComponent {
               <AudioVideoIcon height={32} />
               <CallIcon height={32} />
               <CamIcon width={32} />
+              <CheckIcon width={32} />
               <DeviceIcon height={32} />
               <EditIcon height={32} />
               <FileIcon height={32} />
@@ -335,6 +338,7 @@ class Demo extends React.PureComponent {
               <SpeakerIcon height={32} />
               <TeamIcon height={32} />
               <TimedIcon height={32} />
+              <TrashIcon height={32} />
               <WireIcon width={32} />
             </Container>
             <Line />
