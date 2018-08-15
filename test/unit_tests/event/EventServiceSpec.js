@@ -321,6 +321,7 @@ describe('z.event.EventService', () => {
 
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve({version: 1}));
       spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
+      spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
 
       return TestFactory.event_service
         .updateMessageSequentially(messageEntity, updates, conversationId)
@@ -330,6 +331,7 @@ describe('z.event.EventService', () => {
             messageEntity.primary_key,
             updates
           );
+          expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
         });
     });
   });
