@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@wireapp/core": "5.7.15",
+    "@wireapp/core": "5.7.16",
     "pure-uuid": "1.5.3"
   },
   "devDependencies": {
@@ -27,5 +27,5 @@
     "test:node": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.2.25"
+  "version": "0.2.26"
 }
