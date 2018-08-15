@@ -427,18 +427,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Load conversation events by event type.
-   * @param {Array<strings>} event_types - Array of event types to match
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_events_with_types(event_types) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('type')
-      .anyOf(event_types)
-      .sortBy('time');
-  }
-
-  /**
    * Load conversation events starting from the upper bound to the present until the limit is reached
    *
    * @param {string} conversation_id - ID of conversation
