@@ -190,6 +190,7 @@ z.string.sl.modalConversationRemoveAction = 'Odstrani';
 z.string.sl.modalConversationRemoveHeadline = 'Odstrani?';
 z.string.sl.modalConversationRemoveMessage = '{{user}} ne bo mogel pošiljati ali prejeti sporočila v tem pogovoru.';
 
+z.string.sl.modalConversationRemoveGuestsAction = 'Odstrani';
 
 z.string.sl.modalConversationTooManyMembersHeadline = 'Polna hiša';
 

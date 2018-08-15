@@ -193,6 +193,7 @@ z.string.cs.modalConversationRemoveAction = 'Odstranit';
 z.string.cs.modalConversationRemoveHeadline = 'Odstranit?';
 z.string.cs.modalConversationRemoveMessage = '{{user}} nebude moci odesílat nebo přijímat zprávy v této konverzaci.';
 
+z.string.cs.modalConversationRemoveGuestsAction = 'Odstranit';
 
 z.string.cs.modalConversationTooManyMembersHeadline = 'Přeplněné kupé';
 

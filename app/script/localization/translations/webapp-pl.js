@@ -168,10 +168,6 @@ z.string.pl.modalConnectAcceptHeadline = 'Zaakceptować?';
 z.string.pl.modalConnectAcceptMessage = 'Ta akcja doda użytkownika {{user}} do listy kontaktów i rozpocznie rozmowę.';
 z.string.pl.modalConnectAcceptSecondary = 'Ignoruj';
 
-z.string.pl.modalConversationAddBotAction = 'Potwierdź';
-z.string.pl.modalConversationAddBotHeadline = 'Dodaj usługę';
-z.string.pl.modalConversationAddBotMessage = 'Czy na pewno chcesz zacząć rozmowę z {{name}}?';
-
 z.string.pl.modalConversationClearAction = 'Usuń';
 z.string.pl.modalConversationClearHeadline = 'Usunąć zawartość?';
 z.string.pl.modalConversationClearMessage = 'To wyczyści historię rozmowy na wszystkich Twoich urządzeniach.';
@@ -260,7 +256,6 @@ z.string.pl.conversationYouNominative = 'ty';
 z.string.pl.conversationYouDative = 'ty';
 z.string.pl.conversationYouAccusative = 'ty';
 
-z.string.pl.conversationBotUser = 'Bot';
 z.string.pl.conversationConnectionAccepted = 'Połączony';
 z.string.pl.conversationConnectionBlocked = 'Zablokowano';
 z.string.pl.conversationConnectionCancelRequest = 'Anuluj żądanie połączenia';

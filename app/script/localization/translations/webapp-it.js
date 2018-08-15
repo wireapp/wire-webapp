@@ -191,6 +191,7 @@ z.string.it.modalConversationRemoveAction = 'Rimuovi';
 z.string.it.modalConversationRemoveHeadline = 'Rimuovere?';
 z.string.it.modalConversationRemoveMessage = '{{user}} non sarà in grado di inviare o ricevere messaggi in questa conversazione.';
 
+z.string.it.modalConversationRemoveGuestsAction = 'Rimuovi';
 
 z.string.it.modalConversationTooManyMembersHeadline = 'Chiamata piena';
 

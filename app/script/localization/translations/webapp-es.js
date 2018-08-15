@@ -176,10 +176,6 @@ z.string.es.modalConnectAcceptHeadline = '¿Aceptar?';
 z.string.es.modalConnectAcceptMessage = 'Esto los conectará y abrirá la conversación con {{user}}.';
 z.string.es.modalConnectAcceptSecondary = 'Ignorar';
 
-z.string.es.modalConversationAddBotAction = 'Confirmar';
-z.string.es.modalConversationAddBotHeadline = 'Añadir Servicio';
-z.string.es.modalConversationAddBotMessage = '¿Usted desea iniciar una nueva llamada con {{name}}?';
-
 z.string.es.modalConversationClearAction = 'Eliminar';
 z.string.es.modalConversationClearHeadline = '¿Borrar contenido?';
 z.string.es.modalConversationClearMessage = 'Esto borrará el historial de conversaciones en todos sus dispositivos.';
@@ -286,7 +282,6 @@ z.string.es.conversationYouNominative = 'tú';
 z.string.es.conversationYouDative = 'tú';
 z.string.es.conversationYouAccusative = 'tú';
 
-z.string.es.conversationBotUser = 'Bot';
 z.string.es.conversationConnectionAccepted = 'Conectado';
 z.string.es.conversationConnectionBlocked = 'Bloqueado';
 z.string.es.conversationConnectionCancelRequest = 'Cancelar solicitud de conexión';

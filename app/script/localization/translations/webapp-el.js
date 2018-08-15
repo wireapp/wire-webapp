@@ -163,9 +163,6 @@ z.string.el.modalConnectAcceptHeadline = 'Αποδοχή;';
 z.string.el.modalConnectAcceptMessage = 'Αυτό θα σας συνδέσει και θα ανοίξει συνομιλία με {{user}}.';
 z.string.el.modalConnectAcceptSecondary = 'Αγνόηση';
 
-z.string.el.modalConversationAddBotAction = 'Επιβεβαίωση';
-z.string.el.modalConversationAddBotHeadline = 'Προσθήκη υπηρεσίας';
-
 z.string.el.modalConversationClearAction = 'Διαγραφή';
 z.string.el.modalConversationClearHeadline = 'Διαγραφή περιεχομένου;';
 z.string.el.modalConversationClearOption = 'Επίσης θα αποχωρήσετε από την συνομιλία';

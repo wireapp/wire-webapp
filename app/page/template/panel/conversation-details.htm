@@ -135,7 +135,7 @@
           <!-- /ko -->
         </div>
 
-        <!-- ko if: isSingleUserMode() -->
+        <!-- ko if: isSingleUserMode() && !isServiceMode() -->
           <div class="conversation-details__devices">
             <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
               <devices-icon class="panel__action-item__icon"></devices-icon>

@@ -35,7 +35,7 @@ z.string.et.authAccountSignInPhone = 'Telefoniga sisse logimine';
 z.string.et.authBlockedCookies = 'Wire’i sisselogimiseks luba küpsised.';
 z.string.et.authBlockedDatabase = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';
 z.string.et.authBlockedTabs = 'Wire on juba teisel kaardil avatud.';
-z.string.et.authBlockedTabsAction = 'Kasuta hoopis seda brauseritäbi';
+z.string.et.authBlockedTabsAction = 'Kasuta hoopis seda brauserisakki';
 
 z.string.et.authVerifyAccountAdd = 'Lisa';
 z.string.et.authVerifyAccountDetail = 'See võimaldab kasutada Wire’i mitmes seadmes.';
@@ -178,10 +178,6 @@ z.string.et.modalConnectAcceptHeadline = 'Nõustud?';
 z.string.et.modalConnectAcceptMessage = 'See ühendab teid ja avab vestluse kasutajaga {{user}}.';
 z.string.et.modalConnectAcceptSecondary = 'Ignoreeri';
 
-z.string.et.modalConversationAddBotAction = 'Kinnita';
-z.string.et.modalConversationAddBotHeadline = 'Lisa teenus';
-z.string.et.modalConversationAddBotMessage = 'Kas soovi kindlasti alustada uut vestlust kontaktiga {{name}}?';
-
 z.string.et.modalConversationClearAction = 'Kustuta';
 z.string.et.modalConversationClearHeadline = 'Kustuta sisu?';
 z.string.et.modalConversationClearMessage = 'See kustutab vestluse ajaloo kõigis seadmetes.';
@@ -288,7 +284,6 @@ z.string.et.conversationYouNominative = 'sina';
 z.string.et.conversationYouDative = 'sina';
 z.string.et.conversationYouAccusative = 'sina';
 
-z.string.et.conversationBotUser = 'Bot';
 z.string.et.conversationConnectionAccepted = 'Ühendatud';
 z.string.et.conversationConnectionBlocked = 'Blokeeritud';
 z.string.et.conversationConnectionCancelRequest = 'Tühista ühendussoov';
@@ -363,6 +358,7 @@ z.string.et.conversationLikesCaption = '{{number}} inimest';
 z.string.et.conversationSendPastedFile = 'Kleepis pildi kuupäeval {{date}}';
 z.string.et.conversationSomeone = 'Keegi';
 z.string.et.conversationTweetAuthor = ' Twitteris';
+z.string.et.conversationServicesWarning = 'Teenustel on ligipääs selle vestluse sisule';
 
 z.string.et.groupCreationPreferencesAction = 'Järgmine';
 z.string.et.groupCreationPreferencesErrorNameShort = 'Vähemalt 1 tähemärk';
@@ -382,6 +378,8 @@ z.string.et.guestRoomToggleInfo = 'Ava see vestlus meeskonnast väljas olevatele
 z.string.et.guestRoomToggleInfoExtended = 'Ava see vestlus meeskonnast väljas olevatele inimestele. Sa saad seda alati hiljem muuta.';
 
 z.string.et.guestRoomConversationBadge = 'Kohal on külalisi';
+z.string.et.guestRoomConversationBadgeService = 'Kohal on teenuseid';
+z.string.et.guestRoomConversationBadgeGuestAndService = 'Kohal on külalisi ja teenuseid';
 
 z.string.et.guestRoomConversationHead = 'Inimesed väljaspool sinu meeskonda saavad liituda selle vestlusega.';
 z.string.et.guestRoomConversationButton = 'Kutsu inimesi';
@@ -456,6 +454,10 @@ z.string.et.extensionsGiphyRandom = 'Juhuslik';
 z.string.et.addParticipantsConfirmLabel = 'Lisa';
 z.string.et.addParticipantsHeader = 'Lisa inimesi';
 z.string.et.addParticipantsHeaderWithCounter = 'Lisa inimesi ({{number}})';
+z.string.et.addParticipantsManageServices = 'Halda teenuseid';
+z.string.et.addParticipantsManageServicesNoResults = 'Halda teenuseid';
+z.string.et.addParticipantsNoServicesManager = 'Teenused on abistajad, mis võivad aidata sul töid teha.';
+z.string.et.addParticipantsNoServicesMember = 'Teenused on abistajad, mis võivad aidata sul töid teha. Nende lubamiseks küsi oma administraatorilt.';
 z.string.et.addParticipantsSearchPlaceholder = 'Otsi nime järgi';
 z.string.et.addParticipantsServiceConfirmButton = 'Lisa teenus';
 z.string.et.addParticipantsTabsPeople = 'Inimesed';
@@ -652,6 +654,10 @@ z.string.et.searchPeople = 'Inimesed';
 z.string.et.searchPlaceholder = 'Otsi nime või kasutajanime järgi';
 z.string.et.searchServicePlaceholder = 'Otsi nime järgi';
 z.string.et.searchServices = 'Teenused';
+z.string.et.searchManageServices = 'Halda teenuseid';
+z.string.et.searchManageServicesNoResults = 'Halda teenuseid';
+z.string.et.searchNoServicesManager = 'Teenused on abistajad, mis võivad aidata sul töid teha.';
+z.string.et.searchNoServicesMember = 'Teenused on abistajad, mis võivad aidata sul töid teha. Nende lubamiseks küsi oma administraatorilt.';
 z.string.et.searchTeamGroups = 'Meeskonnavestlused';
 z.string.et.searchTeamMembers = 'Meeskonnaliikmed';
 z.string.et.searchTopPeople = 'Lemmikinimesed';
@@ -667,7 +673,6 @@ z.string.et.searchInviteButtonGmail = 'Gmailist';
 z.string.et.searchInviteHeadline = 'Too oma sõbrad';
 z.string.et.searchInviteShare = 'Jaga kontakte';
 
-z.string.et.searchServiceNewConversation = 'Loo uus vestlus';
 z.string.et.searchServiceConfirmButton = 'Lisa teenus';
 
 z.string.et.searchListEveryoneParticipates = 'Kõik sinu\nkontaktid on juba\nselles vestluses.';

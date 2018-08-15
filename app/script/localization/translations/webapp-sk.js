@@ -194,6 +194,7 @@ z.string.sk.modalConversationRemoveAction = 'Odstrániť';
 z.string.sk.modalConversationRemoveHeadline = 'Odstrániť?';
 z.string.sk.modalConversationRemoveMessage = '{{user}} nebude môcť odosielať ani prijímať správy v tomto rozhovore.';
 
+z.string.sk.modalConversationRemoveGuestsAction = 'Odstrániť';
 
 z.string.sk.modalConversationTooManyMembersHeadline = 'Priveľa účastníkov';
 

@@ -158,8 +158,6 @@ z.string.fi.modalConnectAcceptHeadline = 'Hyväksy?';
 z.string.fi.modalConnectAcceptMessage = 'Tämä yhdistää teidät ja avaa keskustelun {{user}} kanssa.';
 z.string.fi.modalConnectAcceptSecondary = 'Hylkää';
 
-z.string.fi.modalConversationAddBotAction = 'Vahvista';
-
 z.string.fi.modalConversationClearAction = 'Poista';
 z.string.fi.modalConversationClearHeadline = 'Poista sisältö?';
 z.string.fi.modalConversationClearOption = 'Poistu myös keskustelusta';
@@ -195,6 +193,7 @@ z.string.fi.modalConversationRemoveAction = 'Poista';
 z.string.fi.modalConversationRemoveHeadline = 'Poista?';
 z.string.fi.modalConversationRemoveMessage = '{{user}} ei pysty lähettämään tai vastaanottamaan viestejä tässä keskustelussa.';
 
+z.string.fi.modalConversationRemoveGuestsAction = 'Poista';
 
 z.string.fi.modalConversationTooManyMembersHeadline = 'Kaikki puhelukanavat varattuja';
 
