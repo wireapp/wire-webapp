@@ -581,7 +581,7 @@ describe('Event Repository', () => {
       ];
 
       const loadEventSpy = spyOn(TestFactory.event_service, 'loadEvent');
-      const deleteEventSpy = spyOn(TestFactory.conversation_service, 'delete_message_from_db');
+      const deleteEventSpy = spyOn(TestFactory.event_service, 'deleteEvent');
       const testPromises = froms.map(from => {
         const assetAddEvent = Object.assign({}, event, {
           from,
@@ -597,7 +597,7 @@ describe('Event Repository', () => {
 
         return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
           expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
-          expect(TestFactory.conversation_service.delete_message_from_db).toHaveBeenCalled();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalled();
         });
       });
 
@@ -614,11 +614,11 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
-      spyOn(TestFactory.conversation_service, 'delete_message_from_db').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.event_service, 'deleteEvent').and.returnValue(Promise.resolve());
 
       return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
         expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
-        expect(TestFactory.conversation_service.delete_message_from_db).toHaveBeenCalled();
+        expect(TestFactory.event_service.deleteEvent).toHaveBeenCalled();
       });
     });
 

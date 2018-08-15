@@ -756,7 +756,7 @@ z.event.EventRepository = class EventRepository {
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
         const shouldDeleteEvent = fromOther || selfCancel;
         return shouldDeleteEvent
-          ? this.conversationService.delete_message_from_db(newEvent.conversation, newEvent.id).then(() => newEvent)
+          ? this.eventService.deleteEvent(newEvent.conversation, newEvent.id).then(() => newEvent)
           : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
       }
 

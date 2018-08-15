@@ -3523,7 +3523,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _delete_message(conversation_et, message_et) {
     conversation_et.remove_message_by_id(message_et.id);
-    return this.conversation_service.delete_message_with_key_from_db(message_et.primary_key);
+    return this.eventService.deleteEventByKey(message_et.primary_key);
   }
 
   /**
@@ -3536,7 +3536,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _delete_message_by_id(conversation_et, message_id) {
     conversation_et.remove_message_by_id(message_id);
-    return this.conversation_service.delete_message_from_db(conversation_et.id, message_id);
+    return this.eventService.deleteEvent(conversation_et.id, message_id);
   }
 
   /**
@@ -3552,7 +3552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
-    this.conversation_service.delete_messages_from_db(conversationEntity.id, iso_date);
+    this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 
   /**
