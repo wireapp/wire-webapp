@@ -295,11 +295,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       this.userBubble.hide();
     }
 
-    this.integrationRepository.get1To1ConversationWithService(this.userProfile()).then(conversationEntity => {
-      if (conversationEntity) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-      }
-    });
+    this.actionsViewModel.open1to1ConversationWithService(this.userProfile());
   }
 
   handleSearchInput() {

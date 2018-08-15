@@ -179,6 +179,14 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
   }
 
+  open1to1ConversationWithService(serviceEntity) {
+    if (serviceEntity) {
+      return this.integrationRepository
+        .get1To1ConversationWithService(serviceEntity)
+        .then(conversationEntity => this._openConversation(conversationEntity));
+    }
+  }
+
   openGroupConversation(conversationEntity) {
     if (conversationEntity) {
       return Promise.resolve().then(() => this._openConversation(conversationEntity));
@@ -186,15 +194,17 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   _openConversation(conversationEntity) {
-    if (conversationEntity.is_archived()) {
-      this.conversationRepository.unarchiveConversation(conversationEntity, true);
-    }
+    if (conversationEntity) {
+      if (conversationEntity.is_archived()) {
+        this.conversationRepository.unarchiveConversation(conversationEntity, true);
+      }
 
-    if (conversationEntity.is_cleared()) {
-      conversationEntity.cleared_timestamp(0);
-    }
+      if (conversationEntity.is_cleared()) {
+        conversationEntity.cleared_timestamp(0);
+      }
 
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    }
   }
 
   removeFromConversation(conversationEntity, userEntity) {
