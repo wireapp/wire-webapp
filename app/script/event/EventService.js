@@ -79,32 +79,19 @@ z.event.EventService = class EventService {
    *  until either limit or lower bound is reached.
    *
    * @param {string} conversationId - ID of conversation
-   * @param {Date} [lowerBound=new Date(0)] - Load from this date (included)
-   * @param {Date} [upperBound=new Date()] - Load until this date (excluded)
+   * @param {Date} [fromDate=new Date(0)] - Load from this date (included)
+   * @param {Date} [toDate=new Date()] - Load until this date (excluded)
    * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
    * @returns {Promise} Resolves with the retrieved records
    */
-  loadPrecedingEvents(
-    conversationId,
-    lowerBound = new Date(0),
-    upperBound = new Date(),
-    limit = Number.MAX_SAFE_INTEGER
-  ) {
-    if (!_.isDate(lowerBound) || !_.isDate(upperBound)) {
-      const errorMessage = `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`;
-      throw new Error(errorMessage);
-    }
+  loadPrecedingEvents(conversationId, fromDate = new Date(0), toDate = new Date(), limit = Number.MAX_SAFE_INTEGER) {
+    const includeParams = {
+      includeFrom: true,
+      includeTo: false,
+    };
 
-    if (lowerBound.getTime() > upperBound.getTime()) {
-      const errorMessage = `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`;
-      throw new Error(errorMessage);
-    }
-
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+time]')
-      .between([conversationId, lowerBound.toISOString()], [conversationId, upperBound.toISOString()], true, false)
+    return this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams)
       .reverse()
-      .limit(limit)
       .toArray()
       .catch(error => {
         this.logger.error(
@@ -118,26 +105,36 @@ z.event.EventService = class EventService {
    * Load conversation events starting from the upper bound to the present until the limit is reached.
    *
    * @param {string} conversationId - ID of conversation
-   * @param {Date} upperBound - Load until this date (excluded)
+   * @param {Date} fromDate - Load until this date (excluded)
    * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
-   * @param {number} [includeUpperBound=true] - Should upper bound be part of the messages
+   * @param {number} [includeFrom=true] - Should upper bound be part of the messages
    * @returns {Promise} Resolves with the retrieved records
    */
-  loadFollowingEvents(conversationId, upperBound, limit = Number.MAX_SAFE_INTEGER, includeUpperBound = true) {
-    if (!_.isDate(upperBound)) {
-      throw new Error(`Upper bound (${typeof upperBound}) must be of type 'Date'.`);
+  loadFollowingEvents(conversationId, fromDate, limit = Number.MAX_SAFE_INTEGER, includeFrom = true) {
+    const includeParams = {
+      includeFrom,
+      includeTo: true,
+    };
+
+    return this._loadEventsInDateRange(conversationId, fromDate, new Date(), limit, includeParams).toArray();
+  }
+
+  _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
+    const {includeFrom, includeTo} = includes;
+    if (!_.isDate(toDate) || !_.isDate(fromDate)) {
+      const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
+      throw new Error(errorMessage);
+    }
+
+    if (fromDate.getTime() > toDate.getTime()) {
+      const errorMessage = `Lower bound (${toDate.getTime()}) cannot be greater than upper bound (${fromDate.getTime()}).`;
+      throw new Error(errorMessage);
     }
 
     return this.storageService.db[this.EVENT_STORE_NAME]
       .where('[conversation+time]')
-      .between(
-        [conversationId, upperBound.toISOString()],
-        [conversationId, new Date().toISOString()],
-        includeUpperBound,
-        true
-      )
-      .limit(limit)
-      .toArray();
+      .between([conversationId, fromDate.toISOString()], [conversationId, toDate.toISOString()], includeFrom, includeTo)
+      .limit(limit);
   }
 
   /**
