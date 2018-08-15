@@ -165,10 +165,6 @@ z.string.fr.modalConnectAcceptHeadline = 'Accepter ?';
 z.string.fr.modalConnectAcceptMessage = 'Cela vous connectera et ouvrira la conversation avec {{user}}.';
 z.string.fr.modalConnectAcceptSecondary = 'Ignorer';
 
-z.string.fr.modalConversationAddBotAction = 'Confirmer';
-z.string.fr.modalConversationAddBotHeadline = 'Ajouter un service';
-z.string.fr.modalConversationAddBotMessage = 'Êtes-vous sûr de vouloir débuter une conversation avec {{name}} ?';
-
 z.string.fr.modalConversationClearAction = 'Supprimer';
 z.string.fr.modalConversationClearHeadline = 'Effacer le contenu ?';
 z.string.fr.modalConversationClearOption = 'Quitter aussi la conversation';
@@ -203,6 +199,8 @@ z.string.fr.modalConversationNotConnectedMessageMany = 'Une des personnes sélec
 z.string.fr.modalConversationRemoveAction = 'Exclure';
 z.string.fr.modalConversationRemoveHeadline = 'Exclure ?';
 z.string.fr.modalConversationRemoveMessage = '{{user}} ne pourra plus envoyer ou recevoir de messages dans cette conversation.';
+
+z.string.fr.modalConversationRemoveGuestsAction = 'Exclure';
 
 z.string.fr.modalConversationRevokeLinkAction = 'Révoquer le lien';
 z.string.fr.modalConversationRevokeLinkHeadline = 'Révoquer le lien ?';
@@ -249,7 +247,6 @@ z.string.fr.conversationYouNominative = 'vous';
 z.string.fr.conversationYouDative = 'vous';
 z.string.fr.conversationYouAccusative = 'vous';
 
-z.string.fr.conversationBotUser = 'Robot';
 z.string.fr.conversationConnectionAccepted = 'Connecté';
 z.string.fr.conversationConnectionBlocked = 'Bloqué';
 z.string.fr.conversationConnectionCancelRequest = 'Annuler la demande de connexion';
@@ -518,7 +515,6 @@ z.string.fr.searchInviteButtonGmail = 'Depuis Gmail';
 z.string.fr.searchInviteHeadline = 'Invitez vos amis';
 z.string.fr.searchInviteShare = 'Partagez vos contacts';
 
-z.string.fr.searchServiceNewConversation = 'Créer une nouvelle conversation';
 z.string.fr.searchServiceConfirmButton = 'Ajouter un service';
 
 z.string.fr.searchListEveryoneParticipates = 'Toutes les personnes\navec qui vous êtes connecté(e)\nsont déjà dans cette conversation.';

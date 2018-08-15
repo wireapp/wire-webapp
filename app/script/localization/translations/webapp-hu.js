@@ -180,10 +180,6 @@ z.string.hu.modalConnectAcceptHeadline = 'Elfogadod?';
 z.string.hu.modalConnectAcceptMessage = 'Ezzel csatlakozol és beszélgetést indítasz {{user}} partnerrel.';
 z.string.hu.modalConnectAcceptSecondary = 'Figyelmen kívül hagyás';
 
-z.string.hu.modalConversationAddBotAction = 'Megerősítés';
-z.string.hu.modalConversationAddBotHeadline = 'Új szolgáltatás';
-z.string.hu.modalConversationAddBotMessage = 'Biztos, hogy új beszélgetést szeretnél kezdeni {{name}} felhasználóval?';
-
 z.string.hu.modalConversationClearAction = 'Törlés';
 z.string.hu.modalConversationClearHeadline = 'Törlöd a tartalmat?';
 z.string.hu.modalConversationClearMessage = 'Ezzel törlöd a beszélgetés előzményét az összes eszközödről.';
@@ -290,7 +286,6 @@ z.string.hu.conversationYouNominative = 'te';
 z.string.hu.conversationYouDative = 'te';
 z.string.hu.conversationYouAccusative = 'te';
 
-z.string.hu.conversationBotUser = 'Bot';
 z.string.hu.conversationConnectionAccepted = 'Csatlakozva';
 z.string.hu.conversationConnectionBlocked = 'Letiltva';
 z.string.hu.conversationConnectionCancelRequest = 'Csatlakozási kérés visszavonása';
@@ -638,7 +633,6 @@ z.string.hu.searchInviteButtonGmail = 'Gmail-ből';
 z.string.hu.searchInviteHeadline = 'Hozd a barátaidat is';
 z.string.hu.searchInviteShare = 'Névjegyek megosztása';
 
-z.string.hu.searchServiceNewConversation = 'Új beszélgetés létrehozása';
 z.string.hu.searchServiceConfirmButton = 'Új szolgáltatás';
 
 z.string.hu.searchListEveryoneParticipates = 'Az összes partnered, \nakivel felvetted a kapcsolatot,\nmár ebben a beszélgetésben van.';

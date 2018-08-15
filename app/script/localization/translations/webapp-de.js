@@ -177,10 +177,6 @@ z.string.de.modalConnectAcceptHeadline = 'Annehmen?';
 z.string.de.modalConnectAcceptMessage = '{{user}} wird zu deinen Kontakten hinzugefügt und die Unterhaltung mit ihm geöffnet.';
 z.string.de.modalConnectAcceptSecondary = 'Ignorieren';
 
-z.string.de.modalConversationAddBotAction = 'Bestätigen';
-z.string.de.modalConversationAddBotHeadline = 'Dienst hinzufügen';
-z.string.de.modalConversationAddBotMessage = 'Willst du eine neue Unterhaltung mit {{name}} beginnen?';
-
 z.string.de.modalConversationClearAction = 'Löschen';
 z.string.de.modalConversationClearHeadline = 'Unterhaltungsverlauf löschen?';
 z.string.de.modalConversationClearMessage = 'Der Unterhaltungsverlauf wird auf allen deiner Geräte gelöscht.';
@@ -219,9 +215,9 @@ z.string.de.modalConversationRemoveAction = 'Entfernen';
 z.string.de.modalConversationRemoveHeadline = 'Entfernen?';
 z.string.de.modalConversationRemoveMessage = '{{user}} wird in dieser Unterhaltung keine Nachrichten schicken oder empfangen können.';
 
-z.string.de.modalConversationRemoveGuestsAction = 'Gäste entfernen';
-z.string.de.modalConversationRemoveGuestsHeadline = 'Gast-Zugang deaktivieren?';
-z.string.de.modalConversationRemoveGuestsMessage = 'Aktuelle Gäste werden aus der Unterhaltung entfernt. Neue Gäste können nicht hinzugefügt werden.';
+z.string.de.modalConversationRemoveGuestsAction = 'Entfernen';
+z.string.de.modalConversationRemoveGuestsHeadline = 'Zugang deaktivieren?';
+z.string.de.modalConversationRemoveGuestsMessage = 'Aktuelle Gäste und Dienste werden aus der Unterhaltung entfernt. Neue Gäste und Dienste können nicht hinzugefügt werden.';
 
 z.string.de.modalConversationRevokeLinkAction = 'Link widerrufen';
 z.string.de.modalConversationRevokeLinkHeadline = 'Link widerrufen?';
@@ -287,7 +283,6 @@ z.string.de.conversationYouNominative = 'du';
 z.string.de.conversationYouDative = 'dir';
 z.string.de.conversationYouAccusative = 'dich';
 
-z.string.de.conversationBotUser = 'Bot';
 z.string.de.conversationConnectionAccepted = 'Hinzugefügt';
 z.string.de.conversationConnectionBlocked = 'Blockiert';
 z.string.de.conversationConnectionCancelRequest = 'Kontaktanfrage abbrechen';
@@ -301,7 +296,7 @@ z.string.de.conversationDeviceUserDevices = ' ein Gerät von {{user}}';
 z.string.de.conversationDeviceNewDeviceOne = ' ein neues Gerät';
 z.string.de.conversationDeviceNewDeviceMany = ' neue Geräte';
 z.string.de.conversationDeviceNewPeopleJoined = 'Neue Personen beigetreten.';
-z.string.de.conversationDeviceNewPeopleJoinedVerify = ' Überprüfe Geräte';
+z.string.de.conversationDeviceNewPeopleJoinedVerify = 'Überprüfe Geräte';
 z.string.de.conversationJustNow = 'Gerade eben';
 z.string.de.conversationLocationLink = 'Zeige Standort';
 z.string.de.conversationCreated = '[bold]{{name}}[/bold] hat eine Unterhaltung mit {{users}} begonnen';
@@ -362,6 +357,7 @@ z.string.de.conversationLikesCaption = '{{number}} Personen';
 z.string.de.conversationSendPastedFile = 'Bild eingefügt am {{date}}';
 z.string.de.conversationSomeone = 'Jemand';
 z.string.de.conversationTweetAuthor = ' auf Twitter';
+z.string.de.conversationServicesWarning = 'Dienste haben Zugriff auf den Inhalt der Unterhaltung';
 
 z.string.de.groupCreationPreferencesAction = 'Weiter';
 z.string.de.groupCreationPreferencesErrorNameShort = 'Gib mindestens ein Zeichen ein';
@@ -376,11 +372,13 @@ z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 z.string.de.groupSizeInfo = 'Bis zu {{count}} Personen können an einer Unterhaltung teilnehmen. Videoanrufe funktionieren mit bis zu 3 anderen Personen und dir.';
 
 z.string.de.guestRoomConversationName = 'Gästebereich';
-z.string.de.guestRoomToggleName = 'Gäste zulassen';
-z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb des Teams.';
-z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb des Teams. Diese Einstellung kann später jederzeit geändert werden.';
+z.string.de.guestRoomToggleName = 'Gäste und Dienste zulassen';
+z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Dienste und Personen außerhalb des Teams.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Dienste und Personen außerhalb des Teams. Diese Einstellung kann später jederzeit geändert werden.';
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
+z.string.de.guestRoomConversationBadgeService = 'Dienste anwesend';
+z.string.de.guestRoomConversationBadgeGuestAndService = 'Gäste und Dienste anwesend';
 
 z.string.de.guestRoomConversationHead = 'Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.';
 z.string.de.guestRoomConversationButton = 'Personen einladen';
@@ -455,6 +453,10 @@ z.string.de.extensionsGiphyRandom = 'Zufällig';
 z.string.de.addParticipantsConfirmLabel = 'Hinzufügen';
 z.string.de.addParticipantsHeader = 'Personen hinzufügen';
 z.string.de.addParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
+z.string.de.addParticipantsManageServices = 'Dienste verwalten';
+z.string.de.addParticipantsManageServicesNoResults = 'Dienste verwalten';
+z.string.de.addParticipantsNoServicesManager = 'Dienste sind Helfer, die den Workflow verbessern können.';
+z.string.de.addParticipantsNoServicesMember = 'Dienste sind Helfer, die den Workflow verbessern können. Bitte an den Administrator wenden, um diese zu aktivieren.';
 z.string.de.addParticipantsSearchPlaceholder = 'Nach Namen suchen';
 z.string.de.addParticipantsServiceConfirmButton = 'Dienst hinzufügen';
 z.string.de.addParticipantsTabsPeople = 'Kontakte';
@@ -651,6 +653,10 @@ z.string.de.searchPeople = 'Kontakte';
 z.string.de.searchPlaceholder = 'Name oder Benutzername suchen';
 z.string.de.searchServicePlaceholder = 'Nach Namen suchen';
 z.string.de.searchServices = 'Dienste';
+z.string.de.searchManageServices = 'Dienste verwalten';
+z.string.de.searchManageServicesNoResults = 'Dienste verwalten';
+z.string.de.searchNoServicesManager = 'Dienste sind Helfer, die den Workflow verbessern können.';
+z.string.de.searchNoServicesMember = 'Dienste sind Helfer, die den Workflow verbessern können. Bitte an den Administrator wenden, um diese für das Team zu aktivieren.';
 z.string.de.searchTeamGroups = 'Team-Gruppen';
 z.string.de.searchTeamMembers = 'Team-Mitglieder';
 z.string.de.searchTopPeople = 'Top Kontakte';
@@ -666,7 +672,6 @@ z.string.de.searchInviteButtonGmail = 'Aus Gmail';
 z.string.de.searchInviteHeadline = 'Hole deine Freunde';
 z.string.de.searchInviteShare = 'Teile deine Kontakte';
 
-z.string.de.searchServiceNewConversation = 'Neue Unterhaltung beginnen';
 z.string.de.searchServiceConfirmButton = 'Dienst hinzufügen';
 
 z.string.de.searchListEveryoneParticipates = 'Alle deine Kontakte\nsind bereits in\ndieser Unterhaltung.';
