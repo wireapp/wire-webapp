@@ -202,6 +202,20 @@ z.event.EventService = class EventService {
   }
 
   /**
+   * Delete all events of a conversation.
+   * @param {string} conversationId - Delete events for this conversation
+   * @param {string} [iso_date] - Date in ISO string format as upper bound which events should be removed
+   * @returns {Promise} Resolves when the events was deleted
+   */
+  deleteEvents(conversationId, iso_date) {
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('conversation')
+      .equals(conversationId)
+      .filter(record => !iso_date || iso_date >= record.time)
+      .delete();
+  }
+
+  /**
    * Update a message entity in the database.
    *
    * @param {Message} messageEntity - Message event to update in the database.

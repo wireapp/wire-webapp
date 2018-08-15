@@ -3552,7 +3552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
-    this.conversation_service.delete_messages_from_db(conversationEntity.id, iso_date);
+    this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 
   /**

@@ -379,6 +379,45 @@ describe('z.event.EventService', () => {
     });
   });
 
+  describe('deleteEvents', () => {
+    const events = [
+      {conversation: conversationId, id: 'first', time: '2016-08-04T13:27:55.182Z'},
+      {conversation: conversationId, id: 'second', time: '2016-08-04T13:27:56.182Z'},
+      {conversation: conversationId, id: 'third', time: '2016-08-04T13:27:57.182Z'},
+      {conversation: 'other-conversation-id', id: 'first', time: '2016-08-04T13:27:55.182Z'},
+    ];
+
+    beforeEach(() => {
+      return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+    });
+
+    afterEach(() => {
+      TestFactory.storage_service.clearStores();
+    });
+
+    it('deletes all events from a conversation if no timestamp is given', () => {
+      const eventService = TestFactory.event_service;
+
+      return eventService
+        .deleteEvents(conversationId)
+        .then(() => eventService.loadPrecedingEvents(conversationId))
+        .then(newEvents => {
+          expect(newEvents.length).toBe(0);
+        });
+    });
+
+    it('deletes events according to the given timestamp', () => {
+      const eventService = TestFactory.event_service;
+
+      return eventService
+        .deleteEvents(conversationId, '2016-08-04T13:27:56.182Z')
+        .then(() => eventService.loadPrecedingEvents(conversationId))
+        .then(newEvents => {
+          expect(newEvents.length).toBe(1);
+        });
+    });
+  });
+
   describe('deleteEventWithKey', () => {
     let primary_keys = undefined;
 
