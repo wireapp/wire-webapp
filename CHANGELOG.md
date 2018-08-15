@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.13.12"></a>
+## [1.13.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.13.11...@wireapp/api-client@1.13.12) (2018-08-15)
+
+
+### Bug Fixes
+
+* **api-client:** Update Provider type ([#1007](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1007)) ([2f2c479](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2f2c479))
+
+
+
+
+
 <a name="1.13.11"></a>
 ## [1.13.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.13.10...@wireapp/api-client@1.13.11) (2018-08-15)
 
