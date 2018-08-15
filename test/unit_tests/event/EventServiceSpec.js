@@ -423,7 +423,7 @@ describe('z.event.EventService', () => {
     });
   });
 
-  describe('deleteEventWithKey', () => {
+  describe('deleteEventByKey', () => {
     let primary_keys = undefined;
 
     // prettier-ignore
@@ -449,7 +449,7 @@ describe('z.event.EventService', () => {
 
     it('deletes message with the given key', () => {
       return TestFactory.event_service
-        .deleteEventWithKey(primary_keys[1])
+        .deleteEventByKey(primary_keys[1])
         .then(() => TestFactory.event_service.loadPrecedingEvents(conversationId))
         .then(events => {
           expect(events.length).toBe(2);
@@ -459,7 +459,7 @@ describe('z.event.EventService', () => {
 
     it('does not delete the event if key is wrong', () => {
       return TestFactory.event_service
-        .deleteEventWithKey('wrongKey')
+        .deleteEventByKey('wrongKey')
         .then(() => TestFactory.event_service.loadPrecedingEvents(conversationId))
         .then(events => {
           expect(events.length).toBe(3);

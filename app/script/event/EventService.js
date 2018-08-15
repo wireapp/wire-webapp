@@ -197,21 +197,21 @@ z.event.EventService = class EventService {
    * @param {string} primaryKey - ID of the actual message
    * @returns {Promise} Resolves with the number of deleted records
    */
-  deleteEventWithKey(primaryKey) {
+  deleteEventByKey(primaryKey) {
     return this.storageService.db[this.EVENT_STORE_NAME].delete(primaryKey);
   }
 
   /**
    * Delete all events of a conversation.
    * @param {string} conversationId - Delete events for this conversation
-   * @param {string} [iso_date] - Date in ISO string format as upper bound which events should be removed
+   * @param {string} [isoDate] - Date in ISO string format as upper bound which events should be removed
    * @returns {Promise} Resolves when the events was deleted
    */
-  deleteEvents(conversationId, iso_date) {
+  deleteEvents(conversationId, isoDate) {
     return this.storageService.db[this.EVENT_STORE_NAME]
       .where('conversation')
       .equals(conversationId)
-      .filter(record => !iso_date || iso_date >= record.time)
+      .filter(record => !isoDate || isoDate >= record.time)
       .delete();
   }
 

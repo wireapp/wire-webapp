@@ -3523,7 +3523,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _delete_message(conversation_et, message_et) {
     conversation_et.remove_message_by_id(message_et.id);
-    return this.eventService.deleteEventWithKey(message_et.primary_key);
+    return this.eventService.deleteEventByKey(message_et.primary_key);
   }
 
   /**
