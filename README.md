@@ -13,7 +13,7 @@ Wire for Web's API client.
 ### Getting Started
 
 ```bash
-yarn install
+yarn
 yarn start
 ```
 
