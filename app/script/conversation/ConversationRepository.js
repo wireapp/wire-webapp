@@ -3320,7 +3320,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           this.logger.debug(log, {changes, event: eventJson});
 
           return this._updateMessageUserEntities(messageEntity).then(changedMessageEntity => {
-            this.conversation_service.sequentiallyUpdateMessageInDb(changedMessageEntity, changes, conversationId);
+            this.eventService.updateMessageSequentially(changedMessageEntity, changes, conversationId);
             return this._prepareReactionNotification(conversationEntity, changedMessageEntity, eventJson);
           });
         }

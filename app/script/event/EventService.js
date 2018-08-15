@@ -135,6 +135,49 @@ z.event.EventService = class EventService {
   }
 
   /**
+   * Update a message in the database and checks for non sequential updates.
+   *
+   * @param {Message} messageEntity - Message event to update in the database
+   * @param {Object} [changes={}] - Changes to update message with
+   * @param {string} conversationId - ID of conversation
+   * @returns {Promise} Resolves when the message was updated in database
+   */
+  updateMessageSequentially(messageEntity, changes = {}, conversationId) {
+    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
+      const hasVersionedChanges = !!changes.version;
+      if (!hasVersionedChanges) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+      }
+
+      return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
+        return this.loadEvent(conversationId, messageEntity.id).then(record => {
+          if (!record) {
+            throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+          }
+
+          const databaseVersion = record.version || 1;
+
+          const isSequentialUpdate = changes.version === databaseVersion + 1;
+          if (isSequentialUpdate) {
+            return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
+          }
+
+          const logMessage = 'Failed sequential database update';
+          const logObject = {
+            databaseVersion: databaseVersion,
+            updateVersion: changes.version,
+          };
+
+          this.logger.error(logMessage, logObject);
+
+          Raygun.send(new Error(logMessage), logObject);
+          throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+        });
+      });
+    });
+  }
+
+  /**
    * Update a message entity in the database.
    *
    * @param {Message} messageEntity - Message event to update in the database.
