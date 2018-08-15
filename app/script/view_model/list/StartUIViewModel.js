@@ -295,7 +295,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       this.userBubble.hide();
     }
 
-    this.actionsViewModel.get1To1ConversationWithService(this.userProfile());
+    this.actionsViewModel.open1to1ConversationWithService(this.userProfile());
   }
 
   handleSearchInput() {
