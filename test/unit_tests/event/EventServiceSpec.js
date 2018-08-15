@@ -336,12 +336,18 @@ describe('z.event.EventService', () => {
   });
 
   describe('deleteEvent', () => {
-    const events = [
+    const otherConversationId = 'other-conversation-id';
+
+    const mainConversationEvents = [
       {conversation: conversationId, id: 'first', time: '2016-08-04T13:27:55.182Z'},
       {conversation: conversationId, id: 'second', time: '2016-08-04T13:27:55.182Z'},
       {conversation: conversationId, id: 'third', time: '2016-08-04T13:27:55.182Z'},
-      {conversation: 'other-conversation-id', id: 'first', time: '2016-08-04T13:27:55.182Z'},
     ];
+    const otherConversationEvents = [
+      {conversation: otherConversationId, id: 'first', time: '2016-08-04T13:27:55.182Z'},
+      {conversation: otherConversationId, id: 'second', time: '2016-08-04T13:27:55.182Z'},
+    ];
+    const events = mainConversationEvents.concat(otherConversationEvents);
 
     beforeEach(() => {
       return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
@@ -358,7 +364,7 @@ describe('z.event.EventService', () => {
         .deleteEvent(conversationId, events[0].id)
         .then(() => eventService.loadPrecedingEvents(conversationId))
         .then(newEvents => {
-          expect(newEvents.length).toBe(2);
+          expect(newEvents.length).toBe(mainConversationEvents.length - 1);
         });
     });
 
@@ -369,11 +375,11 @@ describe('z.event.EventService', () => {
         .deleteEvent(conversationId, events[0].id)
         .then(() => eventService.loadPrecedingEvents(conversationId))
         .then(newEvents => {
-          expect(newEvents.length).toBe(2);
+          expect(newEvents.length).toBe(mainConversationEvents.length - 1);
         })
         .then(() => eventService.loadPrecedingEvents('other-conversation-id'))
-        .then(otherConversationEvents => {
-          expect(otherConversationEvents.length).toBe(1);
+        .then(otherEvents => {
+          expect(otherEvents.length).toBe(otherConversationEvents.length);
         });
     });
   });
