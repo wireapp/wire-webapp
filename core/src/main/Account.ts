@@ -480,6 +480,7 @@ class Account extends EventEmitter {
           case PayloadBundleType.CONNECTION_REQUEST:
           case PayloadBundleType.LOCATION:
           case PayloadBundleType.MESSAGE_DELETE:
+          case PayloadBundleType.MESSAGE_EDIT:
           case PayloadBundleType.MESSAGE_HIDE:
           case PayloadBundleType.PING:
           case PayloadBundleType.REACTION:
