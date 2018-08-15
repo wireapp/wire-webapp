@@ -105,15 +105,16 @@
     }
   }
 
-  &__user-name {
+  &__user-name,
+  &__provider-name {
     margin-top: 8px;
     font-size: 12px;
     font-weight: @font-weight-regular;
     text-align: center;
+  }
 
-    &::before {
-      content: '@';
-    }
+  &__user-name::before {
+    content: '@';
   }
 
   &__list-head {
