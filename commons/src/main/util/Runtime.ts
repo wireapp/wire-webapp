@@ -22,13 +22,34 @@ import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
 
 const UNKNOWN_PROPERTY = 'unknown';
 
+enum OperatingSystem {
+  ANDROID = 'OperatingSystem.ANDROID',
+  IOS = 'OperatingSystem.IOS',
+  LINUX = 'OperatingSystem.LINUX',
+  MAC = 'OperatingSystem.MAC',
+  WINDOWS = 'OperatingSystem.WINDOWS',
+}
+
 class Runtime {
   private static getPlatform(): Platform {
     return platform || {};
   }
 
-  public static getOSFamily(): string {
-    return Runtime.getOS().family.toLowerCase();
+  public static getOSFamily(): OperatingSystem {
+    const family = Runtime.getOS().family.toLowerCase();
+    if (family.includes('windows')) {
+      return OperatingSystem.WINDOWS;
+    }
+    if (family.includes('android')) {
+      return OperatingSystem.ANDROID;
+    }
+    if (family.includes('ios')) {
+      return OperatingSystem.IOS;
+    }
+    if (['os x', 'mac os'].includes(family)) {
+      return OperatingSystem.MAC;
+    }
+    return OperatingSystem.LINUX;
   }
 
   public static getBrowserName(): string {
@@ -109,15 +130,15 @@ class Runtime {
   }
 
   public static isMacOS(): boolean {
-    return ['os x', 'mac os'].includes(Runtime.getOSFamily());
+    return Runtime.getOSFamily() === OperatingSystem.MAC;
   }
 
   public static isWindows(): boolean {
-    return Runtime.getOSFamily().indexOf('windows') > -1;
+    return Runtime.getOSFamily() === OperatingSystem.WINDOWS;
   }
 
   public static isLinux(): boolean {
-    return !Runtime.isWindows() && !Runtime.isMacOS();
+    return Runtime.getOSFamily() === OperatingSystem.LINUX;
   }
 
   public static isMobileOS(): boolean {
@@ -125,12 +146,12 @@ class Runtime {
   }
 
   public static isAndroid(): boolean {
-    return Runtime.getOSFamily().indexOf('android') > -1;
+    return Runtime.getOSFamily() === OperatingSystem.ANDROID;
   }
 
   public static isIOS(): boolean {
-    return Runtime.getOSFamily().indexOf('ios') > -1;
+    return Runtime.getOSFamily() === OperatingSystem.IOS;
   }
 }
 
-export {Runtime};
+export {OperatingSystem, Runtime};
