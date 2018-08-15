@@ -57,7 +57,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedService() && this.isVisible())
+      .computed(() => this.selectedService() && this.selectedService().providerName() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
@@ -95,9 +95,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   _showService(entity) {
     if (entity instanceof z.integration.ServiceEntity) {
       this.selectedService(entity);
-      this.integrationRepository
-        .getProviderById(entity.providerId)
-        .then(providerEntity => this.selectedService().providerName(providerEntity.name));
+      this.integrationRepository.appProviderNameToParticipant(entity);
       return;
     }
 

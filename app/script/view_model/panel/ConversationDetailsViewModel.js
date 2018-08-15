@@ -39,6 +39,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.conversationRepository = this.repositories.conversation;
     this.teamRepository = this.repositories.team;
+    this.integrationRepository = this.repositories.integration;
 
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
@@ -208,6 +209,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.shouldUpdateScrollbar = ko
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
+
+    this.isServiceMode.subscribe(isService => {
+      if (isService) {
+        this.integrationRepository.addProviderNameToParticipant(this.firstParticipant());
+      }
+    });
   }
 
   getElementId() {
