@@ -92,7 +92,7 @@ z.event.EventService = class EventService {
 
     return this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams)
       .reverse()
-      .toArray()
+      .sortBy('time')
       .catch(error => {
         this.logger.error(
           `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`
@@ -116,7 +116,7 @@ z.event.EventService = class EventService {
       includeTo: true,
     };
 
-    return this._loadEventsInDateRange(conversationId, fromDate, new Date(), limit, includeParams).toArray();
+    return this._loadEventsInDateRange(conversationId, fromDate, new Date(), limit, includeParams).sortBy('time');
   }
 
   _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {

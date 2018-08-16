@@ -121,7 +121,7 @@ describe('ConversationServiceNoCompound', () => {
 
     beforeEach(() => {
       const timestamp = new Date('2016-11-23T12:19:06.808Z').getTime();
-      events = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
+      events = [0, 1, 2, 3, 4, 5, 7, 6, 8, 9].map(index => {
         return {
           conversation: conversationId,
           from: '123',
@@ -147,11 +147,17 @@ describe('ConversationServiceNoCompound', () => {
 
     it('loads all events matching parameters', () => {
       const tests = [
-        {args: [new Date('2016-11-23T12:19:06.808Z'), 1], expectedEvents: [events[0]]},
-        {args: [new Date('2016-11-23T12:19:06.808Z'), 2, false], expectedEvents: [events[1], events[2]]},
-        {args: [new Date('2016-11-23T12:19:06.808Z'), 3], expectedEvents: [events[0], events[1], events[2]]},
-        {args: [new Date('2016-11-23T12:19:06.808Z'), 1000], expectedEvents: events},
-        {args: [new Date('2016-11-23T12:19:06.816Z'), 1000], expectedEvents: [events[8], events[9]]},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 1], expectedEvents: events.slice(0, 1)},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 2, false], expectedEvents: events.slice(1, 3)},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 3], expectedEvents: events.slice(0, 3)},
+        {args: [new Date('2016-11-23T12:19:06.816Z'), 1000], expectedEvents: events.slice(8, 10)},
+        {
+          args: [new Date('2016-11-23T12:19:06.808Z'), 1000],
+          expectedEvents: events
+            .slice(0, 6)
+            .concat([events[7], events[6]])
+            .concat(events.slice(8)),
+        },
       ];
 
       const testPromises = tests.map(({args, expectedEvents}) => {
