@@ -103,17 +103,13 @@ describe('z.team.TeamRepository', () => {
     });
   });
 
-  xdescribe('getTeamMembers()', () => {
-    it('returns team member entities', done => {
-      team_repository
-        .getTeamMembers(team_metadata.id)
-        .then(entities => {
-          expect(entities.length).toEqual(team_members.members.length);
-          expect(entities[0].user).toEqual(team_members.members[0].user);
-          expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
-          done();
-        })
-        .catch(done.fail);
+  describe('getTeamMembers()', () => {
+    it('returns team member entities', () => {
+      return team_repository.getTeamMembers(team_metadata.id).then(entities => {
+        expect(entities.length).toEqual(team_members.members.length);
+        expect(entities[0].userId).toEqual(team_members.members[0].user);
+        expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
+      });
     });
   });
 });
