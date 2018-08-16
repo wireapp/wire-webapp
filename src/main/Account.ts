@@ -331,6 +331,17 @@ class Account extends EventEmitter {
           type: PayloadBundleType.MESSAGE_HIDE,
         };
       }
+      case GenericMessageType.KNOCK: {
+        return {
+          conversation: event.conversation,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: PayloadBundleType.PING,
+        };
+      }
       case GenericMessageType.LOCATION: {
         const content: LocationContent = {
           latitude: genericMessage.location.latitude,
