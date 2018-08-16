@@ -172,24 +172,21 @@ z.event.EventService = class EventService {
    */
   updateEventAsUploadSucceeded(primaryKey, event) {
     return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
-      if (record) {
-        const {data: assetData, time} = event;
-
-        record.data.id = assetData.id;
-        record.data.key = assetData.key;
-        record.data.otr_key = assetData.otr_key;
-        record.data.sha256 = assetData.sha256;
-        record.data.status = z.assets.AssetTransferState.UPLOADED;
-        record.data.token = assetData.token;
-        record.status = z.message.StatusType.SENT;
-        record.time = time;
-
-        return this.storageService
-          .update(this.EVENT_STORE_NAME, primaryKey, record)
-          .then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
+      if (!record) {
+        return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
       }
+      const {data: assetData, time} = event;
 
-      this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
+      record.data.id = assetData.id;
+      record.data.key = assetData.key;
+      record.data.otr_key = assetData.otr_key;
+      record.data.sha256 = assetData.sha256;
+      record.data.status = z.assets.AssetTransferState.UPLOADED;
+      record.data.token = assetData.token;
+      record.status = z.message.StatusType.SENT;
+      record.time = time;
+
+      return this.updateEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
     });
   }
 
@@ -202,17 +199,16 @@ z.event.EventService = class EventService {
    */
   updateEventAsUploadFailed(primaryKey, reason) {
     return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
-      if (record) {
-        record.data.reason = reason;
-        record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
-
-        return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, record).then(() => {
-          this.logger.info('Updated asset message_et (failed)', primaryKey);
-          return record;
-        });
+      if (!record) {
+        return this.logger.warn('Did not find message to update asset (failed)', primaryKey);
       }
+      record.data.reason = reason;
+      record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
 
-      this.logger.warn('Did not find message to update asset (failed)', primaryKey);
+      return this.updateEvent(record).then(() => {
+        this.logger.info('Updated asset message_et (failed)', primaryKey);
+        return record;
+      });
     });
   }
 
