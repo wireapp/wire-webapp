@@ -7,11 +7,11 @@
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
         <div class="conversation-details__header">
+          <!-- ko if: selectedParticipant().is_verified() -->
+            <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
+          <!-- /ko -->
           <div class="conversation-details__name conversation-details__name--centered">
             <div class="conversation-details__flex-row">
-              <!-- ko if: selectedParticipant().is_verified() -->
-                <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
-              <!-- /ko -->
               <div class="conversation-details__name" data-bind="text: selectedParticipant().name()" data-uie-name="status-name"></div>
             </div>
           </div>
