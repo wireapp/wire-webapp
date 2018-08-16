@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.7.19"></a>
+## [5.7.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.18...@wireapp/core@5.7.19) (2018-08-16)
+
+
+### Bug Fixes
+
+* **core:** Emit ping ([#1014](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1014)) ([c0c2337](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/c0c2337))
+
+
+
+
+
 <a name="5.7.18"></a>
 ## [5.7.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.17...@wireapp/core@5.7.18) (2018-08-15)
 
