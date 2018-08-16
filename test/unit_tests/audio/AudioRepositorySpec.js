@@ -81,19 +81,16 @@ describe('z.audio.AudioRepository', () => {
     });
   });
 
-  xdescribe('_play', () => {
+  describe('_play', () => {
     beforeEach(() => {
-      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL] = new Audio(
-        `/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`
-      );
+      const audioElement = new Audio(`/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`);
+
+      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL] = audioElement;
+      spyOn(audioElement, 'play').and.returnValue(Promise.resolve());
     });
 
-    afterEach(() => {
-      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL].pause();
-    });
-
-    it('plays an available sound', done => {
-      TestFactory.audio_repository
+    it('plays an available sound', () => {
+      return TestFactory.audio_repository
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
           TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL],
@@ -102,12 +99,11 @@ describe('z.audio.AudioRepository', () => {
         .then(audio_element => {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
           expect(audio_element.loop).toBeFalsy();
-          done();
-        })
-        .catch(done.fail);
+          expect(audio_element.play).toHaveBeenCalled();
+        });
     });
 
-    it('plays an available sound in loop', done => {
+    it('plays an available sound in loop', () => {
       TestFactory.audio_repository
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
@@ -117,49 +113,38 @@ describe('z.audio.AudioRepository', () => {
         .then(audio_element => {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
           expect(audio_element.loop).toBeTruthy();
-          done();
-        })
-        .catch(done.fail);
+        });
     });
 
-    it('does not play a sound twice concurrently', done => {
-      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL]
-        .play()
-        .then(() => {
-          TestFactory.audio_repository._play(
-            z.audio.AudioType.OUTGOING_CALL,
-            TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL]
-          );
-        })
-        .then(done.fail)
+    it('does not play a sound twice concurrently', () => {
+      const audioElement = TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL];
+      spyOnProperty(audioElement, 'paused', 'get').and.returnValue(false);
+      return TestFactory.audio_repository
+        ._play(
+          z.audio.AudioType.OUTGOING_CALL,
+          TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL]
+        )
+        .then(() => fail('should throw an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));
           expect(error.type).toBe(z.audio.AudioError.TYPE.ALREADY_PLAYING);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
 
-    it('handles a missing audio id sound', done => {
-      TestFactory.audio_repository
+    it('handles a missing audio id sound', () => {
+      return TestFactory.audio_repository
         ._play(undefined, TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL])
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));
           expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
 
-    it('handles a missing audio element', done => {
-      TestFactory.audio_repository
-        ._play(z.audio.AudioType.OUTGOING_CALL, undefined)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.audio.AudioError));
-          expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
-          done();
-        })
-        .catch(done.fail);
+    it('handles a missing audio element', () => {
+      return TestFactory.audio_repository._play(z.audio.AudioType.OUTGOING_CALL, undefined).catch(error => {
+        expect(error).toEqual(jasmine.any(z.audio.AudioError));
+        expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
+      });
     });
   });
 });
