@@ -95,7 +95,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   _showService(entity) {
     if (entity instanceof z.integration.ServiceEntity) {
       this.selectedService(entity);
-      this.integrationRepository.appProviderNameToParticipant(entity);
+      this.integrationRepository.addProviderNameToParticipant(entity);
       return;
     }
 
