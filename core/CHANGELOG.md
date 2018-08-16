@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.8.0"></a>
+# [5.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.21...@wireapp/core@5.8.0) (2018-08-16)
+
+
+### Features
+
+* **core:** Targeted message encryption (WEBFOUND-17) ([#939](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/939)) ([3e94394](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3e94394))
+
+
+
+
+
 <a name="5.7.21"></a>
 ## [5.7.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.20...@wireapp/core@5.7.21) (2018-08-16)
 
