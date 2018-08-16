@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.8.1"></a>
+## [5.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.8.0...@wireapp/core@5.8.1) (2018-08-16)
+
+
+### Bug Fixes
+
+* **core:** Emit confirmation ([#1017](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1017)) ([4f8839d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/4f8839d))
+
+
+
+
+
 <a name="5.8.0"></a>
 # [5.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.7.21...@wireapp/core@5.8.0) (2018-08-16)
 
