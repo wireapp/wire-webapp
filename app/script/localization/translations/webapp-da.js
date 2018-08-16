@@ -168,10 +168,6 @@ z.string.da.modalConnectAcceptHeadline = 'Acceptér?';
 z.string.da.modalConnectAcceptMessage = 'Dette vil forbinde jer og åbne en samtale med {{user}}.';
 z.string.da.modalConnectAcceptSecondary = 'Ignorér';
 
-z.string.da.modalConversationAddBotAction = 'Bekræft';
-z.string.da.modalConversationAddBotHeadline = 'Tilføj tjeneste';
-z.string.da.modalConversationAddBotMessage = 'Er du sikker på du vil starte en ny samtale med {{name}}?';
-
 z.string.da.modalConversationClearAction = 'Slet';
 z.string.da.modalConversationClearHeadline = 'Slet indhold?';
 z.string.da.modalConversationClearMessage = 'Dette vil fjerne samtaleoversigten på alle dine enheder.';
@@ -275,7 +271,6 @@ z.string.da.conversationYouNominative = 'dig';
 z.string.da.conversationYouDative = 'dig';
 z.string.da.conversationYouAccusative = 'dig';
 
-z.string.da.conversationBotUser = 'Bot';
 z.string.da.conversationConnectionAccepted = 'Forbundet';
 z.string.da.conversationConnectionBlocked = 'Blokeret';
 z.string.da.conversationConnectionCancelRequest = 'Annullér anmodning om forbindelse';
@@ -613,7 +608,6 @@ z.string.da.searchInviteButtonGmail = 'Fra Gmail';
 z.string.da.searchInviteHeadline = 'Få dine venner med';
 z.string.da.searchInviteShare = 'Del Kontakter';
 
-z.string.da.searchServiceNewConversation = 'Opret en ny samtale';
 z.string.da.searchServiceConfirmButton = 'Tilføj tjeneste';
 
 z.string.da.searchListEveryoneParticipates = 'Alle du er \nforbundet med er allerede i \ndenne samtale.';

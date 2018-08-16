@@ -18,15 +18,12 @@
  */
 
 const QUERY_KEY = {
-  BOT_PROVIDER: 'bot_provider',
-  BOT_SERVICE: 'bot_service',
   CONVERSATION_CODE: 'join_code',
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
   ENVIRONMENT: 'env',
   HIDE_SSO: 'hide_sso',
   IMMEDIATE_LOGIN: 'immediate_login',
-  INTEGRATIONS: 'integrations',
   JOIN_EXPIRES: 'expires_in',
   LANGUAGE: 'hl',
   LOCALE: 'hl',
@@ -35,14 +32,7 @@ const QUERY_KEY = {
   TRACKING: 'tracking',
 };
 
-const FORWARDED_QUERY_KEYS = [
-  QUERY_KEY.BOT_PROVIDER,
-  QUERY_KEY.BOT_SERVICE,
-  QUERY_KEY.ENVIRONMENT,
-  QUERY_KEY.INTEGRATIONS,
-  QUERY_KEY.LOCALE,
-  QUERY_KEY.TRACKING,
-];
+const FORWARDED_QUERY_KEYS = [QUERY_KEY.ENVIRONMENT, QUERY_KEY.LOCALE, QUERY_KEY.TRACKING];
 
 const LOGOUT_REASON = {
   ACCOUNT_REMOVED: 'deleted',

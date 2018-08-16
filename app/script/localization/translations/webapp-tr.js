@@ -159,8 +159,6 @@ z.string.tr.modalConnectAcceptHeadline = 'Kabul et?';
 z.string.tr.modalConnectAcceptMessage = 'Bu sizi {{user}} ile bağlayacak ve bir konuşma başlatacak.';
 z.string.tr.modalConnectAcceptSecondary = 'Görmezden gel';
 
-z.string.tr.modalConversationAddBotAction = 'Onay';
-
 z.string.tr.modalConversationClearAction = 'Sil';
 z.string.tr.modalConversationClearHeadline = 'İçerik silinsin?';
 z.string.tr.modalConversationClearOption = 'Ayrıca konuşmadan da ayrıl';
@@ -196,6 +194,7 @@ z.string.tr.modalConversationRemoveAction = 'Çıkart';
 z.string.tr.modalConversationRemoveHeadline = 'Çıkar?';
 z.string.tr.modalConversationRemoveMessage = '{{user}} bu konuşmaya mesaj gönderemeyecek ve bu konuşmadan mesaj alamayacak.';
 
+z.string.tr.modalConversationRemoveGuestsAction = 'Çıkart';
 
 z.string.tr.modalConversationTooManyMembersHeadline = 'Dolup taşmış';
 

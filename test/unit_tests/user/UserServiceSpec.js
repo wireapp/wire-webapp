@@ -33,7 +33,6 @@ describe('User Service', () => {
     server = sinon.fakeServer.create();
 
     const client = new z.service.BackendClient(urls);
-    client.logger.level = client.logger.levels.OFF;
 
     user_service = new z.user.UserService(client);
   });

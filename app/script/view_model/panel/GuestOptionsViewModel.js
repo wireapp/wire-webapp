@@ -52,6 +52,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
+
     this.shouldUpdateScrollbar = ko
       .computed(() => this.isGuestEnabled() && this.hasAccessCode() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});

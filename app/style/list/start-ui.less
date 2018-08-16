@@ -114,10 +114,11 @@
     }
   }
 }
-
+.panel-manage-services,
 .start-ui-create-group,
 .start-ui-create-guest-room,
-.start-ui-invite-people {
+.start-ui-invite-people,
+.start-ui-manage-services {
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -223,39 +224,6 @@
     height: 48px;
   }
 
-  .start-ui-service-conversations {
-    display: flex;
-    flex-basis: 336px;
-    flex-direction: column;
-    flex-grow: 1;
-    border-radius: 4px;
-
-    .start-ui-service-conversations-input {
-      margin: 8px 8px 0;
-    }
-
-    .start-ui-service-conversations-create {
-      display: flex;
-      height: 56px;
-      align-items: center;
-      cursor: pointer;
-
-      .icon-plus {
-        width: 60px;
-        text-align: center;
-      }
-
-      .start-ui-service-conversations-create-text {
-        font-size: 14px;
-        font-weight: 400;
-      }
-    }
-
-    .start-ui-service-conversations-list {
-      height: 296px;
-    }
-  }
-
   .start-ui-service-details {
     display: flex;
   }
@@ -294,8 +262,7 @@
   }
 
   &.start-ui-service-bubble.bubble-left-top,
-  &.start-ui-service-bubble.bubble-left,
-  &.start-ui-service-bubble-conversation-list.bubble-left-top {
+  &.start-ui-service-bubble.bubble-left {
     &::before {
       background-color: @app-bg;
     }
@@ -344,4 +311,41 @@
   margin-bottom: 16px;
   font-size: @font-size-xs;
   line-height: @line-height-sm;
+}
+.search__no-services {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &__icon {
+    opacity: 0.24;
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &__info {
+    max-width: 200px;
+    margin-top: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &__manage-button {
+    padding: 4px 16px;
+    margin-top: 16px;
+    background-color: rgba(255, 255, 255, 0.24);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+
+    &--alternate {
+      background-color: @seperator-color;
+    }
+  }
 }

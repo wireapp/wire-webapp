@@ -33,6 +33,9 @@
                 <div data-bind="text: activeConversation() && activeConversation().display_name()" data-uie-name="status-name"></div>
               </div>
             </div>
+            <!-- ko if: isServiceMode() -->
+              <div  class="conversation-details__provider-name" data-bind="text: firstParticipant().providerName()"></div>
+            <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko if: activeConversation() && activeConversation().is_group() -->
@@ -64,8 +67,9 @@
             <!-- ko if: showActionAddParticipants() -->
               <div class="conversation-details__participant-options">
                 <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
-                  <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
+                  <plus-icon class="panel__action-item__icon"></plus-icon>
                   <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
+                  <disclose-icon></disclose-icon>
                 </div>
               </div>
               <!-- ko if: showSectionOptions() -->
@@ -131,7 +135,7 @@
           <!-- /ko -->
         </div>
 
-        <!-- ko if: isSingleUserMode() -->
+        <!-- ko if: isSingleUserMode() && !isServiceMode() -->
           <div class="conversation-details__devices">
             <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
               <devices-icon class="panel__action-item__icon"></devices-icon>

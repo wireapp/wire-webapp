@@ -25,7 +25,7 @@ addons:
 # http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 node_js:
-  - "8"
+  - "10"
 
 # http://docs.travis-ci.com/user/gui-and-headless-browsers/
 before_install:

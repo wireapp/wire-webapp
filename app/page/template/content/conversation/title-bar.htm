@@ -48,13 +48,9 @@
         <!-- /ko -->
       </div>
     <!-- /ko -->
-    <!-- ko if: isGroupInTeam() -->
-      <!-- ko if: hasBot() -->
-        <div class="conversation-title-bar-bot-badge" data-bind="l10n_text: z.string.guestRoomConversationBadgeBot" data-uie-name="status-bot-badge"></div>
-      <!-- /ko -->
-      <!-- ko if: hasGuest() -->
-        <div class="conversation-title-bar-guest-badge" data-bind="l10n_text: z.string.guestRoomConversationBadge" data-uie-name="status-guest-badge"></div>
-      <!-- /ko -->
+    <!-- ko if: isGroupInTeam() && badgeLabelCopy() -->
+      <div class="conversation-title-bar-indication-badge" data-bind="text: badgeLabelCopy" data-uie-name="status-indication-badge"></div>
+    <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
 </div>

@@ -121,6 +121,7 @@ module.exports = function(config) {
   if (process.env.TRAVIS) {
     config.set({
       port: 9877,
+      reporters: ['dots', 'coverage'],
     });
   }
 };

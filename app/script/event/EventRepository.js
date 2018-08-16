@@ -54,13 +54,22 @@ z.event.EventRepository = class EventRepository {
   /**
    * Construct a new Event Repository.
    *
+   * @param {z.event.EventService} eventService - Service that handles interactions with events
    * @param {z.event.NotificationService} notificationService - Service handling the notification stream
    * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(notificationService, webSocketService, conversationService, cryptographyRepository, userRepository) {
+  constructor(
+    eventService,
+    notificationService,
+    webSocketService,
+    conversationService,
+    cryptographyRepository,
+    userRepository
+  ) {
+    this.eventService = eventService;
     this.notificationService = notificationService;
     this.webSocketService = webSocketService;
     this.conversationService = conversationService;
@@ -135,7 +144,20 @@ z.event.EventRepository = class EventRepository {
     this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
+    this.eventProcessMiddleware = undefined;
+
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
+  }
+
+  /**
+   * Will set a middleware to run before the EventRepository actually processes the event.
+   * Middleware is just a function with the following signature (Event) => Promise<Event>.
+   *
+   * @param {Function} middleware - middleware to run when a new event is about to be processed
+   * @returns {void} - returns nothing
+   */
+  setEventProcessMiddleware(middleware) {
+    this.eventProcessMiddleware = middleware;
   }
 
   //##############################################################################
@@ -604,6 +626,7 @@ z.event.EventRepository = class EventRepository {
       : Promise.resolve(event);
 
     return mapEvent
+      .then(mappedEvent => (this.eventProcessMiddleware ? this.eventProcessMiddleware(mappedEvent) : mappedEvent))
       .then(mappedEvent => {
         const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
@@ -651,7 +674,7 @@ z.event.EventRepository = class EventRepository {
 
     //first check if a message that should be replaced exists in DB
     const findEventToReplacePromise = mappedData.replacing_message_id
-      ? this.conversationService.load_event_from_db(conversationId, mappedData.replacing_message_id)
+      ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();
 
     return findEventToReplacePromise.then(eventToReplace => {
@@ -665,13 +688,13 @@ z.event.EventRepository = class EventRepository {
       const handleEvent = newEvent => {
         // check for duplicates (same id)
         const loadEventPromise = newEvent.id
-          ? this.conversationService.load_event_from_db(conversationId, newEvent.id)
+          ? this.eventService.loadEvent(conversationId, newEvent.id)
           : Promise.resolve();
 
         return loadEventPromise.then(storedEvent => {
           return storedEvent
-            ? this._handleLinkPreviewUpdate(storedEvent, newEvent)
-            : this.conversationService.save_event(newEvent);
+            ? this._handleDuplicatedEvent(storedEvent, newEvent)
+            : this.eventService.saveEvent(newEvent);
         });
       };
 
@@ -695,11 +718,55 @@ z.event.EventRepository = class EventRepository {
       updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
-    return this.conversationService.update_event(identifiedUpdates);
+    return this.eventService.updateEvent(identifiedUpdates);
+  }
+
+  _handleDuplicatedEvent(originalEvent, newEvent) {
+    switch (newEvent.type) {
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        return this._handleAssetUpdate(originalEvent, newEvent);
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._handleLinkPreviewUpdate(originalEvent, newEvent);
+
+      default:
+        this._throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
+    }
+  }
+
+  _handleAssetUpdate(originalEvent, newEvent) {
+    const newEventData = newEvent.data;
+    // the preview status is not sent by the client so we fake a 'preview' status in order to cleany handle it in the switch statement
+    const ASSET_PREVIEW = 'preview';
+    const isPreviewEvent = !newEventData.status && newEventData.preview_key;
+    const status = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+
+    switch (status) {
+      case ASSET_PREVIEW:
+      case z.assets.AssetTransferState.UPLOADED: {
+        const updatedData = Object.assign({}, originalEvent.data, newEventData);
+        const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
+        return this.eventService.updateEvent(updatedEvent);
+      }
+
+      case z.assets.AssetTransferState.UPLOAD_FAILED: {
+        // case of both failed or canceled upload
+        const fromOther = newEvent.from !== this.userRepository.self().id;
+        const selfCancel = !fromOther && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
+        const shouldDeleteEvent = fromOther || selfCancel;
+        return shouldDeleteEvent
+          ? this.eventService.deleteEvent(newEvent.conversation, newEvent.id).then(() => newEvent)
+          : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
+      }
+
+      default:
+        return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+    }
   }
 
   _handleLinkPreviewUpdate(originalEvent, newEvent) {
-    const newData = newEvent.data;
+    const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
@@ -707,24 +774,27 @@ z.event.EventRepository = class EventRepository {
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
+    if (!containsLinkPreview) {
+      const errorMessage = 'Link preview event does not contain previews';
+      this._throwValidationError(newEvent, errorMessage);
+    }
+
+    const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    const mappedIsMessageAdd = newEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-    const storedIsMessageAdd = originalEvent.type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-    const isLegitMessageReplacement = newData.previews.length || newData.replacing_message_id;
-    const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
-    if (userReusedId) {
+    const bothAreMessageAddType = newEvent.type === originalEvent.type;
+    if (!bothAreMessageAddType) {
       this._throwValidationError(newEvent, 'ID reused by same user');
     }
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
     const identifiedUpdates = Object.assign({}, {primary_key: originalEvent.primary_key}, updates);
-    return this.conversationService.update_event(identifiedUpdates);
+    return this.eventService.updateEvent(identifiedUpdates);
   }
 
   _getUpdatesForMessageEdit(originalEvent, newEvent) {

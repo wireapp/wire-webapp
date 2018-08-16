@@ -35,6 +35,7 @@ z.event.EventTypeHandling = {
     z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE,
     z.event.Backend.CONVERSATION.RENAME,
+    z.event.Client.CONVERSATION.ASSET_ADD,
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     z.event.Client.CONVERSATION.GROUP_CREATION,
     z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,

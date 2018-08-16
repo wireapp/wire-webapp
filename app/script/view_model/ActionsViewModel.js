@@ -174,7 +174,15 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   open1to1Conversation(userEntity) {
     if (userEntity) {
       return this.conversationRepository
-        .get_1to1_conversation(userEntity)
+        .get1To1Conversation(userEntity)
+        .then(conversationEntity => this._openConversation(conversationEntity));
+    }
+  }
+
+  open1to1ConversationWithService(serviceEntity) {
+    if (serviceEntity) {
+      return this.integrationRepository
+        .get1To1ConversationWithService(serviceEntity)
         .then(conversationEntity => this._openConversation(conversationEntity));
     }
   }
@@ -186,20 +194,22 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   _openConversation(conversationEntity) {
-    if (conversationEntity.is_archived()) {
-      this.conversationRepository.unarchiveConversation(conversationEntity, true);
-    }
+    if (conversationEntity) {
+      if (conversationEntity.is_archived()) {
+        this.conversationRepository.unarchiveConversation(conversationEntity, true);
+      }
 
-    if (conversationEntity.is_cleared()) {
-      conversationEntity.cleared_timestamp(0);
-    }
+      if (conversationEntity.is_cleared()) {
+        conversationEntity.cleared_timestamp(0);
+      }
 
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    }
   }
 
   removeFromConversation(conversationEntity, userEntity) {
     if (conversationEntity && userEntity) {
-      if (userEntity.isBot) {
+      if (userEntity.isService) {
         return this.integrationRepository.removeService(conversationEntity, userEntity);
       }
 
@@ -237,7 +247,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         action: () => {
           this.userRepository
             .unblockUser(userEntity, showConversation)
-            .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
+            .then(() => this.conversationRepository.get1To1Conversation(userEntity))
             .then(conversationEntity => {
               return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             });

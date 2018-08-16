@@ -106,6 +106,7 @@ z.main.App = class App {
       repositories.client
     );
     repositories.event = new z.event.EventRepository(
+      this.service.event,
       this.service.notification,
       this.service.webSocket,
       this.service.conversation,
@@ -135,6 +136,8 @@ z.main.App = class App {
       repositories.user
     );
 
+    const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
+    repositories.event.setEventProcessMiddleware(serviceMiddleware.processEvent.bind(serviceMiddleware));
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
       repositories.client,
@@ -182,6 +185,9 @@ z.main.App = class App {
    */
   _setupServices() {
     const storageService = new z.storage.StorageService();
+    const eventService = z.util.Environment.browser.edge
+      ? new z.event.EventServiceNoCompound(storageService)
+      : new z.event.EventService(storageService);
 
     return {
       asset: new z.assets.AssetService(this.auth.client),
@@ -191,10 +197,9 @@ z.main.App = class App {
       client: new z.client.ClientService(this.auth.client, storageService),
       connect: new z.connect.ConnectService(this.auth.client),
       connectGoogle: new z.connect.ConnectGoogleService(this.auth.client),
-      conversation: z.util.Environment.browser.edge
-        ? new z.conversation.ConversationServiceNoCompound(this.auth.client, storageService)
-        : new z.conversation.ConversationService(this.auth.client, storageService),
+      conversation: new z.conversation.ConversationService(this.auth.client, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.auth.client),
+      event: eventService,
       giphy: new z.extension.GiphyService(this.auth.client),
       integration: new z.integration.IntegrationService(this.auth.client),
       lifecycle: new z.lifecycle.LifecycleService(),
@@ -520,18 +525,7 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_SERVICE);
-    if (providerId && serviceId) {
-      this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
-      this.repository.integration.addServiceFromParam(providerId, serviceId);
-    }
-
-    const supportIntegrations = z.util.URLUtil.getParameter(z.auth.URLParameter.INTEGRATIONS);
-    if (_.isBoolean(supportIntegrations)) {
-      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
-      this.repository.integration.supportIntegrations(supportIntegrations);
-    }
+    // Currently no URL params to be handled
   }
 
   /**

@@ -192,10 +192,6 @@ z.string.modalConnectAcceptHeadline = 'Accept?';
 z.string.modalConnectAcceptMessage = 'This will connect you and open the conversation with {{user}}.';
 z.string.modalConnectAcceptSecondary = 'Ignore';
 
-z.string.modalConversationAddBotAction = 'Confirm';
-z.string.modalConversationAddBotHeadline = 'Add Service';
-z.string.modalConversationAddBotMessage = 'Are you sure you want to start a new conversation with {{name}}?';
-
 z.string.modalConversationClearAction = 'Delete';
 z.string.modalConversationClearHeadline = 'Delete content?';
 z.string.modalConversationClearMessage = 'This will clear the conversation history on all your devices.';
@@ -234,9 +230,9 @@ z.string.modalConversationRemoveAction = 'Remove';
 z.string.modalConversationRemoveHeadline = 'Remove?';
 z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or receive messages in this conversation.';
 
-z.string.modalConversationRemoveGuestsAction = 'Remove guests';
-z.string.modalConversationRemoveGuestsHeadline = 'Turn off guest access?';
-z.string.modalConversationRemoveGuestsMessage = 'Current guests will be removed from the conversation. New guests will not be allowed.';
+z.string.modalConversationRemoveGuestsAction = 'Remove';
+z.string.modalConversationRemoveGuestsHeadline = 'Turn off access?';
+z.string.modalConversationRemoveGuestsMessage = 'Current guests and services will be removed from the conversation. New guests and services will not be allowed.';
 
 z.string.modalConversationRevokeLinkAction = 'Revoke link';
 z.string.modalConversationRevokeLinkHeadline = 'Revoke the link?';
@@ -305,7 +301,6 @@ z.string.conversationYouNominative = 'you';
 z.string.conversationYouDative = 'you';
 z.string.conversationYouAccusative = 'you';
 
-z.string.conversationBotUser = 'Bot';
 z.string.conversationConnectionAccepted = 'Connected';
 z.string.conversationConnectionBlocked = 'Blocked';
 z.string.conversationConnectionCancelRequest = 'Cancel connection request';
@@ -319,7 +314,7 @@ z.string.conversationDeviceUserDevices = ' {{user}}´s devices';
 z.string.conversationDeviceNewDeviceOne = ' a new device';
 z.string.conversationDeviceNewDeviceMany = ' new devices';
 z.string.conversationDeviceNewPeopleJoined = 'New people joined.';
-z.string.conversationDeviceNewPeopleJoinedVerify = ' verify devices';
+z.string.conversationDeviceNewPeopleJoinedVerify = 'Verify devices';
 z.string.conversationJustNow = 'Just now';
 z.string.conversationLocationLink = 'Open Map';
 z.string.conversationCreated = '[bold]{{name}}[/bold] started a conversation with {{users}}';
@@ -380,6 +375,7 @@ z.string.conversationLikesCaption = '{{number}} people';
 z.string.conversationSendPastedFile = 'Pasted image at {{date}}';
 z.string.conversationSomeone = 'Someone';
 z.string.conversationTweetAuthor = ' on Twitter';
+z.string.conversationServicesWarning = 'Services have access to the content of the conversation';
 
 // Group creation
 z.string.groupCreationPreferencesAction = 'Next';
@@ -396,12 +392,13 @@ z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. 
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
-z.string.guestRoomToggleName = 'Allow guests';
-z.string.guestRoomToggleInfo = 'Open this conversation to people outside your team.';
-z.string.guestRoomToggleInfoExtended = 'Open this conversation to people outside your team. You can always change it later.';
+z.string.guestRoomToggleName = 'Allow guests and services';
+z.string.guestRoomToggleInfo = 'Open this conversation to services and people outside your team.';
+z.string.guestRoomToggleInfoExtended = 'Open this conversation to services and people outside your team. You can always change it later.';
 
 z.string.guestRoomConversationBadge = 'Guests are present';
-z.string.guestRoomConversationBadgeBot = 'Bots are present';
+z.string.guestRoomConversationBadgeService = 'Services are present';
+z.string.guestRoomConversationBadgeGuestAndService = 'Guests and services are present';
 
 z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
 z.string.guestRoomConversationButton = 'Invite people';
@@ -487,6 +484,10 @@ z.string.extensionsGiphyRandom = 'Random';
 z.string.addParticipantsConfirmLabel = 'Add';
 z.string.addParticipantsHeader = 'Add people';
 z.string.addParticipantsHeaderWithCounter = 'Add people ({{number}})';
+z.string.addParticipantsManageServices = 'Manage services';
+z.string.addParticipantsManageServicesNoResults = 'Manage services';
+z.string.addParticipantsNoServicesManager = 'Services are helpers that can improve your workflow.';
+z.string.addParticipantsNoServicesMember = 'Services are helpers that can improve your workflow. To enable them, ask your administrator.';
 z.string.addParticipantsSearchPlaceholder = 'Search by name';
 z.string.addParticipantsServiceConfirmButton = 'Add service';
 z.string.addParticipantsTabsPeople = 'People';
@@ -693,6 +694,10 @@ z.string.searchPeople = 'People';
 z.string.searchPlaceholder = 'Search by name or username';
 z.string.searchServicePlaceholder = 'Search by name';
 z.string.searchServices = 'Services';
+z.string.searchManageServices = 'Manage Services';
+z.string.searchManageServicesNoResults = 'Manage services';
+z.string.searchNoServicesManager = 'Services are helpers that can improve your workflow.';
+z.string.searchNoServicesMember = 'Services are helpers that can improve your workflow. To enable them, ask your administrator.';
 z.string.searchTeamGroups = 'Team conversations';
 z.string.searchTeamMembers = 'Team members';
 z.string.searchTopPeople = 'Top people';
@@ -708,8 +713,7 @@ z.string.searchInviteButtonGmail = 'From Gmail';
 z.string.searchInviteHeadline = 'Bring your friends';
 z.string.searchInviteShare = 'Share Contacts';
 
-z.string.searchServiceNewConversation = 'Create a new conversation';
-z.string.searchServiceConfirmButton = 'Add service';
+z.string.searchServiceConfirmButton = 'Open Conversation';
 
 // Search list: User list & service list components
 z.string.searchListEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';

@@ -44,7 +44,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.clickOnContact = this.clickOnContact.bind(this);
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
-    this.clickToAddService = this.clickToAddService.bind(this);
+    this.clickToOpenService = this.clickToOpenService.bind(this);
 
     this.clickToAcceptInvite = this.clickToAcceptInvite.bind(this);
     this.clickToIgnoreInvite = this.clickToIgnoreInvite.bind(this);
@@ -111,12 +111,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     };
 
     // View states
-    this.hasSearchResults = ko.pureComputed(
-      () =>
-        this.searchResults.groups().length || this.searchResults.contacts().length || this.searchResults.others().length
-    );
-
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
+    this.hasSearchResults = ko.pureComputed(() => {
+      const {contacts, groups, others} = this.searchResults;
+      return contacts().length || groups().length || others().length;
+    });
 
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showContacts = ko.pureComputed(() => this.contacts().length);
@@ -130,9 +128,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
     });
-    this.showNoSearchResults = ko.pureComputed(
-      () => !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching()
-    );
+    this.showNoSearchResults = ko.pureComputed(() => {
+      return !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching();
+    });
 
     this.showSearchResults = ko.pureComputed(() => {
       const shouldShowResults = this.hasSearchResults() || this.isSearching();
@@ -155,10 +153,8 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         ? z.l10n.text(z.string.inviteMetaKeyMac)
         : z.l10n.text(z.string.inviteMetaKeyPc);
 
-      if (this.inviteMessageSelected()) {
-        return z.l10n.text(z.string.inviteHintSelected, metaKey);
-      }
-      return z.l10n.text(z.string.inviteHintUnselected, metaKey);
+      const stringId = this.inviteMessageSelected() ? z.string.inviteHintSelected : z.string.inviteHintUnselected;
+      return z.l10n.text(stringId, metaKey);
     });
     this.inviteMessage = ko.pureComputed(() => {
       if (this.selfUser()) {
@@ -176,9 +172,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof z.integration.ServiceEntity);
 
     this.additionalBubbleClasses = ko.pureComputed(() => {
-      const serviceBubbleClass = this.userProfileIsService() ? 'start-ui-service-bubble' : '';
-      const serviceConversationClass = this.showServiceConversationList() ? '-conversation-list' : '';
-      return `${serviceBubbleClass}${serviceConversationClass}`;
+      return this.userProfileIsService() ? 'start-ui-service-bubble' : '';
     });
 
     this.renderAvatar = ko.observable(false);
@@ -191,10 +185,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.serviceConversations = ko.observable([]);
-    this.searchConversationInput = ko.observable('');
-    this.searchConversationInput.subscribe(query => this._searchConversationsForServices(query));
 
-    this.showServiceConversationList = ko.observable(false);
+    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
+    this.isInitialServiceSearch = ko.observable(true);
+    this.services.subscribe(() => this.isInitialServiceSearch(false));
 
     this.userBubble = undefined;
     this.userBubbleLastId = undefined;
@@ -212,11 +206,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
-  }
-
-  clickOnAddService() {
-    this._searchConversationsForServices('');
-    this.showServiceConversationList(true);
   }
 
   clickOnClose() {
@@ -242,7 +231,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
-  clickOnInviteMember() {
+  clickToOpenTeamAdmin() {
     const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
@@ -253,8 +242,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.clickOnContact(userEntity);
     }
 
-    this.showServiceConversationList(false);
-
     const createBubble = elementId => {
       this.userProfile(userEntity);
       this.userBubbleLastId = elementId;
@@ -264,14 +251,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
           this.userBubble = undefined;
           return (this.userBubbleLastId = undefined);
         },
-        on_show() {
-          return $('.start-ui-user-bubble .user-profile-connect-message').focus();
-        },
+        on_show: () => $('.start-ui-user-bubble .user-profile-connect-message').focus(),
         scroll_selector: '.start-ui-list',
       });
 
       if (this.userProfileIsService()) {
-        this.integrationRepository.getProviderNameForService(this.userProfile());
+        this.integrationRepository.addProviderNameToParticipant(this.userProfile());
       }
 
       this.userBubble.toggle();
@@ -305,17 +290,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
   }
 
-  clickToAddService(conversationEntity) {
-    this.integrationRepository.addService(conversationEntity, this.userProfile(), 'start_ui').then(() => {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-    });
-  }
-
-  clickToCreateServiceConversation() {
-    this.integrationRepository.createConversationWithService(this.userProfile(), 'start_ui');
+  clickToOpenService() {
     if (this.userBubble) {
       this.userBubble.hide();
     }
+
+    this.actionsViewModel.open1to1ConversationWithService(this.userProfile());
   }
 
   handleSearchInput() {
@@ -382,6 +362,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _updateServicesList() {
+    this.isInitialServiceSearch(true);
     this.integrationRepository.searchForServices(this.searchInput(), this.searchInput);
   }
 
@@ -549,14 +530,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchResults.contacts.removeAll();
     this.searchResults.others.removeAll();
     this.services.removeAll();
-  }
-
-  _searchConversationsForServices(query) {
-    const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
-    const conversationsForServices = this.conversationRepository
-      .getGroupsByName(normalizedQuery, false)
-      .filter(conversationEntity => conversationEntity.inTeam());
-    this.serviceConversations(conversationsForServices);
   }
 
   _searchPeople(query) {

@@ -199,9 +199,16 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {ContentMessage} Member message entity
    */
   _mapEvent1to1Creation({data: eventData}) {
+    const {has_service: hasService, userIds} = eventData;
+
     const messageEntity = new z.entity.MemberMessage();
     messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-    messageEntity.userIds(eventData.userIds);
+    messageEntity.userIds(userIds);
+
+    if (hasService) {
+      messageEntity.showServicesWarning = true;
+    }
+
     return messageEntity;
   }
 
@@ -285,31 +292,30 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {MemberMessage} Member message entity
    */
   _mapEventMemberJoin(event, conversationEntity) {
-    const {data: eventData, from} = event;
+    const {data: eventData, from: sender} = event;
+    const {has_service: hasService, user_ids: userIds} = eventData;
+
     const messageEntity = new z.entity.MemberMessage();
 
-    const one2oneConversationTypes = [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE];
-    const messageFromCreator = from === conversationEntity.creator;
+    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+    messageEntity.visible(!isSingleModeConversation);
 
-    if (one2oneConversationTypes.includes(conversationEntity.type())) {
-      const singleUserAdded = eventData.user_ids.length === 1;
-      if (messageFromCreator && singleUserAdded) {
-        messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-        eventData.user_ids = conversationEntity.participating_user_ids();
-      } else {
-        messageEntity.visible(false);
-      }
-    } else {
-      const creatorIndex = eventData.user_ids.indexOf(event.from);
+    if (conversationEntity.is_group()) {
+      const messageFromCreator = sender === conversationEntity.creator;
+      const creatorIndex = userIds.indexOf(sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
-        eventData.user_ids.splice(creatorIndex, 1);
+        userIds.splice(creatorIndex, 1);
         messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
       }
-    }
 
-    messageEntity.userIds(eventData.user_ids);
+      if (hasService) {
+        messageEntity.showServicesWarning = true;
+      }
+
+      messageEntity.userIds(userIds);
+    }
 
     return messageEntity;
   }

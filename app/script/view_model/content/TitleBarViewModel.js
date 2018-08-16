@@ -61,11 +61,11 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return this.conversationEntity().is_group() && this.conversationEntity().inTeam();
     });
 
-    this.hasBot = ko.pureComputed(() => {
+    this.hasService = ko.pureComputed(() => {
       if (this.isGroupInTeam()) {
         return this.conversationEntity()
           .participating_user_ets()
-          .some(userEntity => userEntity.isBot);
+          .some(userEntity => userEntity.isService);
       }
     });
 
@@ -75,6 +75,22 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
           .participating_user_ets()
           .some(userEntity => userEntity.isGuest());
       }
+    });
+
+    this.badgeLabelCopy = ko.pureComputed(() => {
+      let stringId;
+
+      if (this.isGroupInTeam()) {
+        if (this.hasGuest()) {
+          stringId = this.hasService()
+            ? z.string.guestRoomConversationBadgeGuestAndService
+            : z.string.guestRoomConversationBadge;
+        } else if (this.hasService()) {
+          stringId = z.string.guestRoomConversationBadgeService;
+        }
+      }
+
+      return stringId ? z.l10n.text(stringId) : '';
     });
 
     this.hasOngoingCall = ko.computed(() => {

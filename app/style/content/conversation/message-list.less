@@ -106,8 +106,13 @@
   padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
+
   & > .message-body-actions {
     top: 6px;
+  }
+
+  + .message-services-warning {
+    margin-left: 72px;
   }
 }
 
@@ -184,11 +189,19 @@
   font-size: 8px;
 }
 
-.message-header-label-service {
-  margin-left: 4px;
-  color: fade(@graphite-dark, 40%);
-  font-size: 12px;
-  text-transform: uppercase;
+.message-header-icon-service {
+  display: inline-flex;
+  margin-top: -2px;
+  margin-left: 8px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: fade(@graphite-dark, 40%);
+    }
+  }
 }
 
 .message-header-line {
@@ -462,6 +475,12 @@
   width: 160px;
 }
 
+.message-services-warning {
+  color: @w-red;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+}
+
 // MEMBER MESSAGE
 .message-connected {
   display: flex;
@@ -469,6 +488,10 @@
   align-items: center;
   margin-top: 32px;
   margin-bottom: 48px;
+
+  .message-services-warning {
+    margin-top: 32px;
+  }
 }
 
 .message-connected-header {
@@ -476,8 +499,9 @@
   line-height: 42px;
 }
 
-.message-connected-username,
-.message-connected-contacts {
+.message-connected-contacts,
+.message-connected-provider-name,
+.message-connected-username {
   color: @graphite;
   font-size: @font-size-xs;
   line-height: @line-height-sm;

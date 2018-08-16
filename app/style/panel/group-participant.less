@@ -20,26 +20,24 @@
 .group-participant {
   &__service-header {
     display: flex;
-    padding: 8px 16px;
-  }
-
-  &__service-details {
-    margin-left: 16px;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 16px 48px;
   }
 
   &__service-name {
     font-size: 24px;
-    font-weight: @font-weight-regular;
+    font-weight: @font-weight-bold;
   }
 
   &__service-provider {
-    color: fade(@graphite-dark, 40%);
+    margin: 4px 0 32px;
     font-size: 12px;
     font-weight: @font-weight-regular;
   }
 
   &__service-description {
-    padding: 16px;
+    padding: 16px 16px 32px;
     font-size: 14px;
     font-weight: @font-weight-light;
   }

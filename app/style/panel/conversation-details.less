@@ -51,6 +51,7 @@
     &--centered {
       justify-content: center;
       margin-top: 24px;
+      text-align: center;
     }
 
     &--input {
@@ -105,19 +106,22 @@
     }
   }
 
-  &__user-name {
+  &__user-name,
+  &__provider-name {
     margin-top: 8px;
     font-size: 12px;
     font-weight: @font-weight-regular;
     text-align: center;
+  }
 
-    &::before {
-      content: '@';
-    }
+  &__user-name::before {
+    content: '@';
   }
 
   &__list-head {
-    margin: 32px 16px 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
+    margin: 32px 16px 4px;
     color: @graphite;
     font-size: 11px;
     font-weight: @font-weight-bold;
@@ -129,6 +133,7 @@
   }
 
   &__bottom-actions {
+    padding-bottom: 32px;
     margin-top: 32px;
   }
 

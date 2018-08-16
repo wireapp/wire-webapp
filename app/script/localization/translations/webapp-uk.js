@@ -178,10 +178,6 @@ z.string.uk.modalConnectAcceptHeadline = 'Прийняти?';
 z.string.uk.modalConnectAcceptMessage = 'Це додасть {{user}} до ваших контактів та відкриє розмову.';
 z.string.uk.modalConnectAcceptSecondary = 'Ігнорувати';
 
-z.string.uk.modalConversationAddBotAction = 'Підтвердити';
-z.string.uk.modalConversationAddBotHeadline = 'Додати сервіс';
-z.string.uk.modalConversationAddBotMessage = 'Ви впевнені, що хочете почати нову розмову з {{name}}?';
-
 z.string.uk.modalConversationClearAction = 'Видалити';
 z.string.uk.modalConversationClearHeadline = 'Видалити вміст?';
 z.string.uk.modalConversationClearMessage = 'Це очистить історію розмови на всіх ваших пристроях.';
@@ -236,7 +232,7 @@ z.string.uk.modalConversationGuestOptionsRevokeCodeMessage = 'Не вдалос�
 z.string.uk.modalConversationGuestOptionsToggleGuestsMessage = 'Не вдалося змінити гостьові налаштування.';
 
 z.string.uk.modalConversationTooManyMembersHeadline = 'Голосовий канал переповнений';
-z.string.uk.modalConversationTooManyMembersMessage = 'До розмови може приєднатися до {{number1}} учаснків. В даний час тільки є місце для ще {{number2}} учасників.';
+z.string.uk.modalConversationTooManyMembersMessage = 'До розмови може приєднатися до {{number1}} учаснків. В даний час є місце тільки для {{number2}} учасників.';
 
 z.string.uk.modalGifTooLargeHeadline = 'Вибрана анімація завелика';
 z.string.uk.modalGifTooLargeMessage = 'Максимальний розмір повідомлення - {{number}} МБ.';
@@ -288,7 +284,6 @@ z.string.uk.conversationYouNominative = 'ви';
 z.string.uk.conversationYouDative = 'ви';
 z.string.uk.conversationYouAccusative = 'ви';
 
-z.string.uk.conversationBotUser = 'Бот';
 z.string.uk.conversationConnectionAccepted = 'Доданий(-а) до контактів';
 z.string.uk.conversationConnectionBlocked = 'Заблокований(-на)';
 z.string.uk.conversationConnectionCancelRequest = 'Скасувати запит на додавання до контактів';
@@ -667,7 +662,6 @@ z.string.uk.searchInviteButtonGmail = 'З Gmail';
 z.string.uk.searchInviteHeadline = 'Приведіть друзів';
 z.string.uk.searchInviteShare = 'Поділитись контактами';
 
-z.string.uk.searchServiceNewConversation = 'Розпочати нову розмову';
 z.string.uk.searchServiceConfirmButton = 'Додати сервіс';
 
 z.string.uk.searchListEveryoneParticipates = 'Всі ваші контакти\nуже присутні\nв даній групі.';

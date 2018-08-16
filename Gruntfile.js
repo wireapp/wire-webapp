@@ -154,7 +154,10 @@ module.exports = grunt => {
   grunt.registerTask('test_init', ['prepare_dist']);
 
   grunt.registerTask('test_run', testName => {
-    grunt.config('karma.options.reporters', ['progress']);
+    grunt.config('karma.options.reporters', ['spec']);
+    grunt.config('karma.options.specReporter', {
+      showSpecTiming: true,
+    });
     grunt.task.run(['scripts', 'newer:copy:dist_js', `test_prepare:${testName}`, 'karma:test']);
   });
 };
