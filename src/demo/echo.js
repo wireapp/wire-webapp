@@ -213,12 +213,12 @@ const messageEchoCache = {};
 
   account.on(PayloadBundleType.REACTION, async data => {
     const {
-      content: {emoji, originalMessageId},
+      content: {type, originalMessageId},
     } = data;
 
     await handleIncomingMessage(data);
 
-    const reactionPayload = account.service.conversation.createReaction(originalMessageId, emoji);
+    const reactionPayload = account.service.conversation.createReaction(originalMessageId, type);
 
     await sendMessageResponse(data, reactionPayload);
   });
