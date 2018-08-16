@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.3.7"></a>
+## [2.3.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.3.6...@wireapp/react-ui-kit@2.3.7) (2018-08-16)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Set Pill display to inline-block ([#1015](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1015)) ([efae3e9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/efae3e9))
+
+
+
+
+
 <a name="2.3.6"></a>
 ## [2.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.3.5...@wireapp/react-ui-kit@2.3.6) (2018-08-15)
 
