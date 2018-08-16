@@ -37,6 +37,7 @@ module.exports = {
       '../test/api/TestFactory.js',
       '../test/api/OpenGraphMocks.js',
       '../test/js/calling/CallRequestResponseMock.js',
+      '../test/unit_tests/event/EventServiceCommon.js',
     ],
     proxies: {
       '/audio/': '/base/audio/',

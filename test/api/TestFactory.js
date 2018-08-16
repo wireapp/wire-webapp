@@ -229,6 +229,8 @@ window.TestFactory.prototype.exposeEventActors = function() {
 
       TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
 
+      TestFactory.event_service_no_compound = new z.event.EventServiceNoCompound(TestFactory.storage_service);
+
       TestFactory.notification_service = new z.event.NotificationService(this.client, TestFactory.storage_service);
 
       TestFactory.conversation_service = new z.conversation.ConversationService(
