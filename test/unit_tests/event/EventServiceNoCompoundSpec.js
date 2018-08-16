@@ -24,6 +24,7 @@
 describe('ConversationServiceNoCompound', () => {
   let eventService = null;
   let storage_service = null;
+  const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
   const test_factory = new TestFactory();
   const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
 
@@ -39,14 +40,13 @@ describe('ConversationServiceNoCompound', () => {
   });
 
   describe('loadPrecedingEvents', () => {
-    const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     let messages = undefined;
 
     beforeEach(() => {
       const timestamp = 1479903546799;
       messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
         return {
-          conversation: conversation_id,
+          conversation: conversationId,
           time: new Date(timestamp + index).toISOString(),
         };
       });
@@ -61,7 +61,7 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads all events', () => {
-      return eventService.loadPrecedingEvents(conversation_id).then(events => {
+      return eventService.loadPrecedingEvents(conversationId).then(events => {
         expect(events.length).toBe(10);
         expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
         expect(events[9].time).toBe('2016-11-23T12:19:06.799Z');
@@ -69,7 +69,7 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads all events with limit', () => {
-      return eventService.loadPrecedingEvents(conversation_id, undefined, undefined, 5).then(events => {
+      return eventService.loadPrecedingEvents(conversationId, undefined, undefined, 5).then(events => {
         expect(events.length).toBe(5);
         expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
         expect(events[4].time).toBe('2016-11-23T12:19:06.804Z');
@@ -77,7 +77,7 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads events with lower bound', () => {
-      return eventService.loadPrecedingEvents(conversation_id, new Date(1479903546805)).then(events => {
+      return eventService.loadPrecedingEvents(conversationId, new Date(1479903546805)).then(events => {
         expect(events.length).toBe(4);
         expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
         expect(events[1].time).toBe('2016-11-23T12:19:06.807Z');
@@ -87,7 +87,7 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('loads events with upper bound', () => {
-      return eventService.loadPrecedingEvents(conversation_id, undefined, new Date(1479903546803)).then(events => {
+      return eventService.loadPrecedingEvents(conversationId, undefined, new Date(1479903546803)).then(events => {
         expect(events.length).toBe(4);
         expect(events[0].time).toBe('2016-11-23T12:19:06.802Z');
         expect(events[1].time).toBe('2016-11-23T12:19:06.801Z');
@@ -98,7 +98,7 @@ describe('ConversationServiceNoCompound', () => {
 
     it('loads events with upper and lower bound', () => {
       return eventService
-        .loadPrecedingEvents(conversation_id, new Date(1479903546806), new Date(1479903546807))
+        .loadPrecedingEvents(conversationId, new Date(1479903546806), new Date(1479903546807))
         .then(events => {
           expect(events.length).toBe(1);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
@@ -107,12 +107,66 @@ describe('ConversationServiceNoCompound', () => {
 
     it('loads events with upper and lower bound and a fetch limit', () => {
       return eventService
-        .loadPrecedingEvents(conversation_id, new Date(1479903546800), new Date(1479903546807), 2)
+        .loadPrecedingEvents(conversationId, new Date(1479903546800), new Date(1479903546807), 2)
         .then(events => {
           expect(events.length).toBe(2);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
           expect(events[1].time).toBe('2016-11-23T12:19:06.805Z');
         });
+    });
+  });
+
+  describe('loadFollowingEvents', () => {
+    let events = undefined;
+
+    beforeEach(() => {
+      const timestamp = new Date('2016-11-23T12:19:06.808Z').getTime();
+      events = [0, 1, 2, 3, 4, 5, 7, 6, 8, 9].map(index => {
+        return {
+          conversation: conversationId,
+          from: '123',
+          time: new Date(timestamp + index).toISOString(),
+        };
+      });
+
+      return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+    });
+
+    afterEach(() => {
+      TestFactory.storage_service.clearStores();
+    });
+
+    it('fails if the upperbound is not a Date', () => {
+      try {
+        eventService.loadFollowingEvents(conversationId, 'not a date', 2, false);
+        fail('should have thrown');
+      } catch (error) {
+        expect(error.message).toContain("must be of type 'Date'");
+      }
+    });
+
+    it('loads all events matching parameters', () => {
+      const tests = [
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 1], expectedEvents: events.slice(0, 1)},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 2, false], expectedEvents: events.slice(1, 3)},
+        {args: [new Date('2016-11-23T12:19:06.808Z'), 3], expectedEvents: events.slice(0, 3)},
+        {args: [new Date('2016-11-23T12:19:06.816Z'), 1000], expectedEvents: events.slice(8, 10)},
+        {
+          args: [new Date('2016-11-23T12:19:06.808Z'), 1000],
+          expectedEvents: events
+            .slice(0, 6)
+            .concat([events[7], events[6]])
+            .concat(events.slice(8)),
+        },
+      ];
+
+      const testPromises = tests.map(({args, expectedEvents}) => {
+        return eventService.loadFollowingEvents(...[conversationId].concat(args)).then(_events => {
+          expect(_events).toEqual(expectedEvents);
+        });
+      });
+
+      return Promise.all(testPromises);
     });
   });
 

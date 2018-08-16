@@ -503,7 +503,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return Promise.all([
       this.eventService.loadPrecedingEvents(conversation_et.id, new Date(0), message_date, padding),
-      this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true),
+      this.eventService.loadFollowingEvents(conversation_et.id, message_date, padding),
     ])
       .then(([older_events, newer_events]) =>
         this._addEventsToConversation(older_events.concat(newer_events), conversation_et)
@@ -526,8 +526,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const message_date = new Date(message_et.timestamp());
     conversation_et.is_pending(true);
 
-    return this.conversation_service
-      .load_subsequent_events_from_db(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
+    return this.eventService
+      .loadFollowingEvents(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
       .then(events => this._addEventsToConversation(events, conversation_et))
       .then(mapped_messages => {
         conversation_et.is_pending(false);

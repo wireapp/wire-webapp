@@ -58,49 +58,6 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('load_subsequent_events_from_db', () => {
-    const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
-    const sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6';
-    let events = undefined;
-
-    beforeEach(done => {
-      const timestamp = new Date('2016-11-23T12:19:06.808Z').getTime();
-      events = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
-        return {
-          conversation: conversation_id,
-          from: sender_id,
-          time: new Date(timestamp + index).toISOString(),
-        };
-      });
-
-      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('loads all events', done => {
-      conversation_service
-        .load_subsequent_events_from_db(conversation_id, new Date('2016-11-23T12:19:06.808Z'), 2)
-        .then(_events => {
-          expect(_events.length).toBe(2);
-          expect(_events[0].time).toBe('2016-11-23T12:19:06.808Z');
-          expect(_events[1].time).toBe('2016-11-23T12:19:06.809Z');
-          done();
-        });
-    });
-
-    it('loads all events when include message is false', done => {
-      conversation_service
-        .load_subsequent_events_from_db(conversation_id, new Date('2016-11-23T12:19:06.808Z'), 2, false)
-        .then(_events => {
-          expect(_events.length).toBe(2);
-          expect(_events[0].time).toBe('2016-11-23T12:19:06.809Z');
-          expect(_events[1].time).toBe('2016-11-23T12:19:06.810Z');
-          done();
-        });
-    });
-  });
-
   describe('search_in_conversation', () => {
     let events = undefined;
 

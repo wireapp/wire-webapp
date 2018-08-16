@@ -44,40 +44,27 @@ z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.Ev
       .then(records => records.filter(record => record.category >= category));
   }
 
-  /**
-   * Load conversation events. Start and end are not included. Events are always sorted beginning with the newest timestamp.
-   *
-   * @param {string} conversationId - ID of conversation
-   * @param {Date} [lowerBound=new Date(0)] - Starting from this timestamp
-   * @param {Date} [upperBound=new Date()] - Stop when reaching timestamp
-   * @param {number} limit - Amount of events to load
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  loadPrecedingEvents(conversationId, lowerBound = new Date(0), upperBound = new Date(), limit) {
-    if (!_.isDate(lowerBound) || !_.isDate(upperBound)) {
-      const errorMessage = `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`;
+  _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
+    const {includeFrom, includeTo} = includes;
+    if (!_.isDate(toDate) || !_.isDate(fromDate)) {
+      const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
       throw new Error(errorMessage);
     }
 
-    if (lowerBound.getTime() > upperBound.getTime()) {
-      const errorMessage = `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`;
+    if (fromDate.getTime() > toDate.getTime()) {
+      const errorMessage = `Lower bound (${toDate.getTime()}) cannot be greater than upper bound (${fromDate.getTime()}).`;
       throw new Error(errorMessage);
     }
-
-    lowerBound = lowerBound.getTime();
-    upperBound = upperBound.getTime();
 
     return this.storageService.db[this.EVENT_STORE_NAME]
       .where('conversation')
       .equals(conversationId)
-      .reverse()
-      .sortBy('time')
-      .then(records => {
-        return records.filter(record => {
-          const timestamp = new Date(record.time).getTime();
-          return timestamp >= lowerBound && timestamp < upperBound;
-        });
+      .and(record => {
+        const timestamp = new Date(record.time).getTime();
+        const fromCompareFunction = includeFrom ? date => timestamp >= date : date => timestamp > date;
+        const toCompareFunction = includeTo ? date => timestamp <= date : date => timestamp < date;
+        return fromCompareFunction(fromDate) && toCompareFunction(toDate);
       })
-      .then(records => records.slice(0, limit));
+      .limit(limit);
   }
 };
