@@ -182,23 +182,24 @@ describe('ConversationRepository', () => {
         });
     });
 
-    xit('should send delete and deletes message for own messages', done => {
-      const user_et = new z.entity.User();
-      user_et.is_me = true;
-      const message_to_delete_et = new z.entity.Message();
-      message_to_delete_et.id = z.util.createRandomUuid();
-      message_to_delete_et.user(user_et);
-      conversation_et.add_message(message_to_delete_et);
+    it('should send delete and deletes message for own messages', () => {
+      const userEntity = new z.entity.User();
+      userEntity.is_me = true;
+      const messageEntityToDelete = new z.entity.Message();
+      messageEntityToDelete.id = z.util.createRandomUuid();
+      messageEntityToDelete.user(userEntity);
+      conversation_et.add_message(messageEntityToDelete);
 
-      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined();
+      spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+        Promise.resolve(conversation_et)
+      );
+      expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
 
-      TestFactory.conversation_repository
-        .delete_message_everyone(conversation_et, message_to_delete_et)
+      return TestFactory.conversation_repository
+        .delete_message_everyone(conversation_et, messageEntityToDelete)
         .then(() => {
-          expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined();
-          done();
-        })
-        .catch(done.fail);
+          expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined();
+        });
     });
   });
 
