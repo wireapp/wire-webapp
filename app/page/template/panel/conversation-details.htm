@@ -9,13 +9,13 @@
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
         <div class="conversation-details__header">
+          <!-- ko if: isVerified() -->
+            <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
+          <!-- /ko -->
           <!-- ko if: isNameEditable() -->
             <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipConversationDetailsRename" data-uie-name="status-name">
               <div class="conversation-details__name" data-bind="text: activeConversation() && activeConversation().display_name()"></div>
               <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
-              <!-- ko if: isVerified() -->
-                <verified-icon class="conversation-details__name__verified-icon-right" data-uie-name="status-verified-conversation"></verified-icon>
-              <!-- /ko -->
             </div>
             <textarea class="conversation-details__name conversation-details__name--input"
                       dir="auto"
@@ -27,9 +27,6 @@
           <!-- ko ifnot: isNameEditable() -->
             <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': isSingleUserMode()}">
               <div class="conversation-details__flex-row">
-                <!-- ko if: isVerified() -->
-                  <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
-                <!-- /ko -->
                 <div data-bind="text: activeConversation() && activeConversation().display_name()" data-uie-name="status-name"></div>
               </div>
             </div>
