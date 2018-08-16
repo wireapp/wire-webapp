@@ -24,13 +24,13 @@ import React from 'react';
 
 const pathLength = 125.68;
 
-function LoadingComponent({className, progress}) {
+function LoadingComponent({className, progress, size}) {
   const additionalProps = {};
   if (progress !== null) {
     additionalProps.strokeDashoffset = `${pathLength - pathLength * progress}`;
   }
   return (
-    <svg className={className} width="43" height="43" viewBox="0 0 43 43" strokeWidth="3" fill="none">
+    <svg className={className} width={size} height={size} viewBox="0 0 43 43" strokeWidth="3" fill="none">
       <circle cx="21.5" cy="21.5" r="20" stroke="rgba(51,55,58,.08)" />
       <circle
         cx="21.5"
@@ -47,6 +47,7 @@ function LoadingComponent({className, progress}) {
 LoadingComponent.propTypes = {
   className: PropTypes.string.isRequired,
   progress: PropTypes.number,
+  size: PropTypes.number.isRequired,
 };
 LoadingComponent.defaultProps = {
   progress: null,
@@ -79,10 +80,12 @@ const Loading = styled(LoadingComponent)`
 
 Loading.propTypes = {
   progress: PropTypes.number,
+  size: PropTypes.number,
 };
 
 Loading.defaultProps = {
   progress: null,
+  size: 43,
 };
 
 export {Loading};
