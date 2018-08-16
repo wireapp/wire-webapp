@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.4.0"></a>
+# [2.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.3.7...@wireapp/react-ui-kit@2.4.0) (2018-08-16)
+
+
+### Features
+
+* **react-ui-kit:** loading spinner size prop ([#1016](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1016)) ([0980054](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0980054))
+
+
+
+
+
 <a name="2.3.7"></a>
 ## [2.3.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.3.6...@wireapp/react-ui-kit@2.3.7) (2018-08-16)
 
