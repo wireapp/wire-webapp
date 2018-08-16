@@ -297,7 +297,7 @@ class Demo extends React.PureComponent {
             <Logo scale={3} color={COLOR.BLUE} />
             <Loading />
             <Loading progress={0.33} />
-            <Loading progress={0.66} />
+            <Loading progress={0.66} size={100} />
           </Container>
           <Container>
             <H1>Pills</H1>
