@@ -35,6 +35,7 @@ const Select = styled(Input.withComponent('select'))`
     background-image: url('data:image/svg+xml;utf8,${ArrowDown}');
     background-repeat: no-repeat;
     background-position: center right 16px;
+    cursor: pointer;
   `};
   font-weight: 300;
   padding-right: 32px;
