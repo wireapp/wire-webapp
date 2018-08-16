@@ -79,7 +79,7 @@ class ChangelogBot {
     const omittedMessage = '... (content omitted)';
 
     const changelog = await Changelog.generate({
-      exclude: ['build', 'chore', 'refactor'],
+      exclude: ['build', 'chore', 'docs', 'refactor', 'test'],
       repoUrl: `https://github.com/${repoSlug}`,
       tag: previousGitTag,
     });
