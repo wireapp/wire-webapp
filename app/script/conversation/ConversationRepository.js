@@ -3597,7 +3597,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
       }
 
-      return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key, reason);
+      return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
     }
   }
 
@@ -3621,7 +3621,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     asset_et.status(z.assets.AssetTransferState.UPLOADED);
     message_et.status(z.message.StatusType.SENT);
 
-    return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, event_json);
+    return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
   }
 
   //##############################################################################
