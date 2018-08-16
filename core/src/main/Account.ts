@@ -253,18 +253,18 @@ class Account extends EventEmitter {
 
       if (genericMessage.content === GenericMessageType.EPHEMERAL) {
         const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, otrMessage);
+        unwrappedMessage.id = genericMessage.messageId;
         if (genericMessage.ephemeral) {
           const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
           unwrappedMessage.messageTimer =
             typeof expireAfterMillis === 'number' ? expireAfterMillis : (expireAfterMillis as Long).toNumber();
         }
         return unwrappedMessage;
-      } else {
-        return this.mapGenericMessage(genericMessage, otrMessage);
       }
-    } else {
-      throw decryptedMessage.error;
+      return this.mapGenericMessage(genericMessage, otrMessage);
     }
+
+    throw decryptedMessage.error;
   }
 
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
@@ -537,12 +537,11 @@ class Account extends EventEmitter {
             break;
         }
       } else {
-        const conversationEvent = event as ConversationEvent;
-        this.logger.log(
-          `Received unsupported event "${event.type}" in conversation "${conversationEvent.conversation}" from user "${
-            conversationEvent.from
-          }".`
-        );
+        const {type, conversation, from} = event as ConversationEvent;
+        const conversationText = conversation ? ` in conversation "${conversation}"` : '';
+        const fromText = from ? ` from user "${from}".` : '';
+
+        this.logger.log(`Received unsupported event "${type}"${conversationText}${fromText}`, {event});
       }
     }
   }
