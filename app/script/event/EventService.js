@@ -94,9 +94,8 @@ z.event.EventService = class EventService {
       .reverse()
       .sortBy('time')
       .catch(error => {
-        this.logger.error(
-          `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`
-        );
+        const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;
+        this.logger.error(message);
         throw error;
       });
   }
