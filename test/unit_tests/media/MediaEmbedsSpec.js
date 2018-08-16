@@ -75,11 +75,6 @@ describe('MediaEmbeds', () => {
         ).not.toBeNull();
       });
 
-      // since this is not a link it will not render
-      xit('matches spotify:track:3EpA2bm37w6ho1iPn9YFQ8', () => {
-        expect('spotify:track:3EpA2bm37w6ho1iPn9YFQ8'.match(re_spotify)).not.toBeNull();
-      });
-
       it('doesn’t match normal Spotify links', () => {
         test_link_variants('spotify', re_spotify);
       });
