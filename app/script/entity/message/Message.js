@@ -93,6 +93,9 @@ z.entity.Message = class Message {
     };
 
     this.sender_name = ko.pureComputed(() => z.util.SanitizationUtil.getEscapedFirstName(this.user()));
+    this.headerSenderName = ko.pureComputed(() => {
+      return this.user().isService ? this.user().name() : this.user().first_name();
+    });
 
     this.accent_color = ko.pureComputed(() => {
       return `accent-color-${this.user().accent_id()}`;
