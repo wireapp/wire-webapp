@@ -179,7 +179,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
 
-    this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
+    this.pictureSubscription = this.participant().mediumPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
         _loadAvatarPicture();
       }
@@ -191,7 +191,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
   dispose() {
     z.ui.ViewportObserver.removeElement(this.element[0]);
     this.participantSubscription.dispose();
-    this.picturePreviewSubscription.dispose();
+    this.pictureSubscription.dispose();
   }
 };
 
