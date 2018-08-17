@@ -223,8 +223,8 @@ z.string.de.modalConversationRevokeLinkAction = 'Link widerrufen';
 z.string.de.modalConversationRevokeLinkHeadline = 'Link widerrufen?';
 z.string.de.modalConversationRevokeLinkMessage = 'Neue Gäste werden nicht mehr mit diesem Link beitreten können. Aktuelle Gäste haben weiterhin Zugriff auf die Unterhaltung.';
 
-z.string.de.modalConversationGuestOptionsAllowGuestMessage = 'Gäste konnten nicht zugelassen werden. Bitte versuche es erneut.';
-z.string.de.modalConversationGuestOptionsDisableGuestMessage = 'Gäste konnten nicht entfernt werden. Bitte versuche es erneut.';
+z.string.de.modalConversationGuestOptionsAllowGuestMessage = 'Gäste und Dienste konnten nicht zugelassen werden. Bitte versuche es erneut.';
+z.string.de.modalConversationGuestOptionsDisableGuestMessage = 'Gäste und Dienste konnten nicht entfernt werden. Bitte versuche es erneut.';
 z.string.de.modalConversationGuestOptionsGetCodeMessage = 'Konnte Zugangs-Link nicht laden.';
 z.string.de.modalConversationGuestOptionsRequestCodeMessage = 'Konnte Zugangs-Link nicht erstellen. Bitte versuche es erneut.';
 z.string.de.modalConversationGuestOptionsRevokeCodeMessage = 'Konnte Zugangs-Link nicht widerrufen. Bitte versuche es erneut.';
@@ -470,7 +470,7 @@ z.string.de.conversationDetailsActionClear = 'Unterhaltungsverlauf löschen…';
 z.string.de.conversationDetailsActionConversationParticipants = 'Zeige alle ({{number}})';
 z.string.de.conversationDetailsActionCreateGroup = 'Gruppe erstellen';
 z.string.de.conversationDetailsActionDevices = 'Geräte';
-z.string.de.conversationDetailsActionGuestOptions = 'Gast-Optionen';
+z.string.de.conversationDetailsActionGuestOptions = 'Gäste und Dienste';
 z.string.de.conversationDetailsActionTimedMessages = 'Temporäre Nachrichten';
 z.string.de.conversationDetailsActionLeave = 'Gruppe verlassen…';
 z.string.de.conversationDetailsGuestsOff = 'Aus';
@@ -505,7 +505,7 @@ z.string.de.guestOptionsCreateLink = 'Link erstellen';
 z.string.de.guestOptionsInfoHeader = 'Andere per Link einladen';
 z.string.de.guestOptionsInfoText = 'Jeder kann der Gruppe mit diesem Link beitreten - auch ohne eine Wire-Benutzerkonto.';
 z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
-z.string.de.guestOptionsTitle = 'Gast-Optionen';
+z.string.de.guestOptionsTitle = 'Gäste und Dienste';
 
 z.string.de.timedMessagesTitle = 'Temporäre Nachrichten';
 z.string.de.timedMessageDisclaimer = 'Temporäre Nachrichten werden für alle Teilnehmer dieser Unterhaltung eingeschaltet.';
@@ -672,7 +672,7 @@ z.string.de.searchInviteButtonGmail = 'Aus Gmail';
 z.string.de.searchInviteHeadline = 'Hole deine Freunde';
 z.string.de.searchInviteShare = 'Teile deine Kontakte';
 
-z.string.de.searchServiceConfirmButton = 'Dienst hinzufügen';
+z.string.de.searchServiceConfirmButton = 'Unterhaltung öffnen';
 
 z.string.de.searchListEveryoneParticipates = 'Alle deine Kontakte\nsind bereits in\ndieser Unterhaltung.';
 z.string.de.searchListNoMatches = 'Kein passendes Ergebnis.\nSuche nach einen\nanderen Namen.';
