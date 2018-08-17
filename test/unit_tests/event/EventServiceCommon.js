@@ -209,6 +209,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
         }
       });
 
+      it('accepts timestamps in the future', () => {
+        const futureTimestamp = Date.now() + 1000;
+        return TestFactory[testedServiceName].loadFollowingEvents(conversationId, new Date(futureTimestamp), 1);
+      });
+
       it('loads all events matching parameters', () => {
         const tests = [
           {args: [new Date('2016-11-23T12:19:06.808Z'), 1], expectedEvents: events.slice(0, 1)},
