@@ -24,7 +24,7 @@
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "exit 0",
-    "test:node": "exit 0",
+    "test:node": "jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
   "version": "0.2.35"

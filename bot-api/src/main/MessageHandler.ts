@@ -18,6 +18,7 @@
  */
 
 import {Account} from '@wireapp/core';
+import {ImageContent} from '@wireapp/core/dist/conversation/content/';
 import {PayloadBundleIncoming, ReactionType} from '@wireapp/core/dist/conversation/root';
 
 abstract class MessageHandler {
@@ -34,6 +35,13 @@ abstract class MessageHandler {
   public async removeUser(conversationId: string, userId: string): Promise<void> {
     if (this.account && this.account.service) {
       await this.account.service.conversation.removeUser(conversationId, userId);
+    }
+  }
+
+  public async sendImage(conversationId: string, image: ImageContent): Promise<void> {
+    if (this.account && this.account.service) {
+      const imagePayload = await this.account.service.conversation.createImage(image);
+      await this.account.service.conversation.send(conversationId, imagePayload);
     }
   }
 

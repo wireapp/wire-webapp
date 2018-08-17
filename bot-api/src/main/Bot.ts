@@ -28,7 +28,7 @@ import {BotConfig} from './BotConfig';
 import {MessageHandler} from './MessageHandler';
 
 class Bot {
-  public account: Account | undefined;
+  public account?: Account;
 
   private readonly credentials: {email: string; password: string};
   private readonly config: BotConfig;
