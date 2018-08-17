@@ -463,7 +463,7 @@ describe('Event Repository', () => {
     it('saves a text message with link preview with an ID previously used by the same user for a plain text message', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
-      spyOn(TestFactory.event_service, 'updateEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      spyOn(TestFactory.event_service, 'replaceEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -474,14 +474,14 @@ describe('Event Repository', () => {
         expect(saved_event.time).toEqual(initial_time);
         expect(saved_event.time).not.toEqual(changed_time);
         expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
-        expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });
 
     it('ignores edit message with missing associated original message', () => {
       const linkPreviewEvent = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
-      spyOn(TestFactory.event_service, 'updateEvent').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.event_service, 'replaceEvent').and.returnValue(Promise.resolve());
 
       linkPreviewEvent.data.replacing_message_id = 'initial_message_id';
 
@@ -489,7 +489,7 @@ describe('Event Repository', () => {
         ._handleEventSaving(linkPreviewEvent)
         .then(() => fail('Should have thrown an error'))
         .catch(error => {
-          expect(TestFactory.event_service.updateEvent).not.toHaveBeenCalled();
+          expect(TestFactory.event_service.replaceEvent).not.toHaveBeenCalled();
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -505,13 +505,13 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
         return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
       });
-      spyOn(TestFactory.event_service, 'updateEvent').and.callFake(ev => ev);
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
 
       linkPreviewEvent.data.replacing_message_id = replacingId;
       linkPreviewEvent.data.previews = ['preview'];
 
       return TestFactory.event_repository._handleEventSaving(linkPreviewEvent).then(updatedEvent => {
-        expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
         expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         expect(updatedEvent.data.previews[0]).toEqual('preview');
       });
@@ -520,7 +520,7 @@ describe('Event Repository', () => {
     it('updates edited messages', () => {
       const originalMessage = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
-      spyOn(TestFactory.event_service, 'updateEvent').and.callFake(updates => updates);
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(updates => updates);
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -535,7 +535,7 @@ describe('Event Repository', () => {
         expect(updatedEvent.time).not.toEqual(changed_time);
         expect(updatedEvent.data.content).toEqual('new content');
         expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
-        expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });
 
@@ -548,12 +548,12 @@ describe('Event Repository', () => {
       });
       const editEvent = Object.assign({}, event);
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(storedEvent));
-      spyOn(TestFactory.event_service, 'updateEvent').and.callFake(ev => ev);
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
 
       editEvent.data.replacing_message_id = replacingId;
 
       return TestFactory.event_repository._handleEventSaving(editEvent).then(updatedEvent => {
-        expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
         expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         expect(updatedEvent.data.previews.length).toEqual(0);
       });
@@ -653,13 +653,13 @@ describe('Event Repository', () => {
         time: '2017-09-06T09:43:36.528Z',
       });
 
-      spyOn(TestFactory.event_service, 'updateEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
 
       return TestFactory.event_repository.processEvent(updateStatusEvent).then(updatedEvent => {
         expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
         expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
-        expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });
 
@@ -673,13 +673,13 @@ describe('Event Repository', () => {
         time: '2017-09-06T09:43:36.528Z',
       });
 
-      spyOn(TestFactory.event_service, 'updateEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
 
       return TestFactory.event_repository.processEvent(AssetPreviewEvent).then(updatedEvent => {
         expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
         expect(updatedEvent.data.preview_key).toEqual(AssetPreviewEvent.data.preview_key);
-        expect(TestFactory.event_service.updateEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });
   });

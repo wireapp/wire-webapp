@@ -22,6 +22,7 @@
 window.z = window.z || {};
 window.z.event = z.event || {};
 
+/** Handles all databases interactions related to events */
 z.event.EventService = class EventService {
   /**
    * Construct a new Event Service.
@@ -34,7 +35,7 @@ z.event.EventService = class EventService {
   }
 
   /**
-   * Load event from DB
+   * Load event from database.
    *
    * @param {string} conversationId - ID of conversation
    * @param {string} eventId - ID of event to retrieve
@@ -60,7 +61,7 @@ z.event.EventService = class EventService {
   }
 
   /**
-   * Get events with given category.
+   * Load all events that match a minimun category from database.
    *
    * @param {string} conversationId - ID of conversation to add users to
    * @param {MessageCategory} categoryMin - Minimum message category
@@ -75,8 +76,7 @@ z.event.EventService = class EventService {
   }
 
   /**
-   * Load conversation events starting from the upper bound going back in history
-   *  until either limit or lower bound is reached.
+   * Load events starting from the fromDate going back in history until either limit or toDate is reached.
    *
    * @param {string} conversationId - ID of conversation
    * @param {Date} [fromDate=new Date(0)] - Load from this date (included)
@@ -101,7 +101,7 @@ z.event.EventService = class EventService {
   }
 
   /**
-   * Load conversation events starting from the upper bound to the present until the limit is reached.
+   * Load events starting from the fromDate to the present until the limit is reached.
    *
    * @param {string} conversationId - ID of conversation
    * @param {Date} fromDate - Load until this date (excluded)
@@ -143,8 +143,10 @@ z.event.EventService = class EventService {
 
   /**
    * Save an unencrypted conversation event.
+   * Will also recompute the category of the event to be stored.
+   *
    * @param {Object} event - JSON event to be stored
-   * @returns {Promise} Resolves with the stored record
+   * @returns {Promise<Event>} Resolves with the stored record
    */
   saveEvent(event) {
     event.category = z.message.MessageCategorization.categoryFromEvent(event);
@@ -152,31 +154,59 @@ z.event.EventService = class EventService {
   }
 
   /**
-   * Update an unencrypted conversation event.
+   * Update an unencrypted event.
+   *
    * @param {Object} event - JSON event to be stored
-   * @returns {Promise} Resolves with the updated record
+   * @returns {Promise<Event>} Resolves with the updated record
    */
-  updateEvent(event) {
+  replaceEvent(event) {
     return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
   }
 
   /**
-   * Update a message in the database and checks for non sequential updates.
+   * Update an unencrypted event.
+   * A valid update must not contain a 'version' property.
    *
-   * @param {Message} messageEntity - Message event to update in the database
-   * @param {Object} [changes={}] - Changes to update message with
-   * @param {string} conversationId - ID of conversation
-   * @returns {Promise} Resolves when the message was updated in database
+   * @param {number} primaryKey - event's primary key
+   * @param {Object<Event>} [updates={}] - Updates to perform on the message.
+   * @returns {Promise} Resolves when the message was updated in database.
    */
-  updateMessageSequentially(messageEntity, changes = {}, conversationId) {
-    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
+  updateEvent(primaryKey, updates) {
+    return Promise.resolve(primaryKey).then(key => {
+      const hasChanges = updates && !!Object.keys(updates).length;
+      if (!hasChanges) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+      }
+
+      const hasVersionedUpdates = !!updates.version;
+      if (hasVersionedUpdates) {
+        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+        error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
+        throw error;
+      }
+
+      const identifiedUpdates = Object.assign({}, updates, {primary_key: key});
+      return this.replaceEvent(identifiedUpdates);
+    });
+  }
+
+  /**
+   * Update an event in the database and checks that the update is sequential.
+   *
+   * @param {number} primaryKey - Event primary key
+   * @param {Object} [changes={}] - Changes to update message with
+   * @returns {Promise<Event>} Resolves when the message was updated in database
+   */
+  updateEventSequentially(primaryKey, changes = {}) {
+    return Promise.resolve(primaryKey).then(key => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
       }
 
+      // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-        return this.loadEvent(conversationId, messageEntity.id).then(record => {
+        return this.storageService.load(this.EVENT_STORE_NAME, key).then(record => {
           if (!record) {
             throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
           }
@@ -230,6 +260,7 @@ z.event.EventService = class EventService {
 
   /**
    * Delete all events of a conversation.
+   *
    * @param {string} conversationId - Delete events for this conversation
    * @param {string} [isoDate] - Date in ISO string format as upper bound which events should be removed
    * @returns {Promise} Resolves when the events was deleted
@@ -240,29 +271,5 @@ z.event.EventService = class EventService {
       .equals(conversationId)
       .filter(record => !isoDate || isoDate >= record.time)
       .delete();
-  }
-
-  /**
-   * Update a message entity in the database.
-   *
-   * @param {Message} messageEntity - Message event to update in the database.
-   * @param {Object} [updates={}] - Updates to perform on the message.
-   * @returns {Promise} Resolves when the message was updated in database.
-   */
-  updateMessage(messageEntity, updates) {
-    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
-      const hasChanges = updates && !!Object.keys(updates).length;
-      if (!hasChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
-      }
-
-      const hasVersionedUpdates = !!updates.version;
-      if (hasVersionedUpdates) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
-      }
-
-      const identifiedUpdates = Object.assign({}, updates, {primary_key: primaryKey});
-      return this.updateEvent(identifiedUpdates);
-    });
   }
 };

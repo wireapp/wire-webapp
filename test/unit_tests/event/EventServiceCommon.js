@@ -319,7 +319,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
-    describe('updateEvent', () => {
+    describe('replaceEvent', () => {
       /* eslint-disable sort-keys*/
       const updatedEvent = {
         conversation: conversationId,
@@ -335,18 +335,17 @@ window.testEventServiceClass = (testedServiceName, className) => {
       it('update event in the database', () => {
         spyOn(TestFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
 
-        return TestFactory[testedServiceName].updateEvent(updatedEvent).then(event => {
+        return TestFactory[testedServiceName].replaceEvent(updatedEvent).then(event => {
           expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, event);
         });
       });
     });
 
-    describe('updateMessageSequentially', () => {
+    describe('updateEventSequentially', () => {
       it('fails if changes do not contain version property', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id']};
         return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
+          .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
@@ -354,13 +353,12 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('fails if version is not sequential', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id'], version: 1};
 
-        spyOn(TestFactory[testedServiceName], 'loadEvent').and.returnValue(Promise.resolve({version: 2}));
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 2}));
 
         return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
+          .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
@@ -368,14 +366,13 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('fails if record is not found', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id'], version: 2};
 
-        spyOn(TestFactory[testedServiceName], 'loadEvent').and.returnValue(Promise.resolve(undefined));
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
         spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
 
         return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
+          .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(z.storage.StorageError.TYPE.NOT_FOUND);
@@ -383,23 +380,16 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('updates message in DB', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id'], version: 2};
 
-        spyOn(TestFactory[testedServiceName], 'loadEvent').and.returnValue(Promise.resolve({version: 1}));
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 1}));
         spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
         spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
-          .then(result => {
-            expect(TestFactory.storage_service.update).toHaveBeenCalledWith(
-              eventStoreName,
-              messageEntity.primary_key,
-              updates
-            );
-            expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
-          });
+        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(result => {
+          expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
+          expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
+        });
       });
     });
 
@@ -535,9 +525,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
-    describe('updateMessage', () => {
+    describe('updateEvent', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const MessageEntity = {
+      const messageEntity = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
         from: senderId,
@@ -548,18 +538,20 @@ window.testEventServiceClass = (testedServiceName, className) => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       it('updated event in the database', () => {
-        spyOn(TestFactory[testedServiceName], 'updateEvent').and.returnValue(Promise.resolve());
+        spyOn(TestFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());
 
-        MessageEntity.time = new Date().toISOString();
-        MessageEntity.primary_key = 1337;
-        return TestFactory[testedServiceName].updateMessage(MessageEntity, {time: MessageEntity.time}).then(() => {
-          expect(TestFactory[testedServiceName].updateEvent).toHaveBeenCalled();
-        });
+        messageEntity.time = new Date().toISOString();
+        messageEntity.primary_key = 1337;
+        return TestFactory[testedServiceName]
+          .updateEvent(messageEntity.primary_key, {time: messageEntity.time})
+          .then(() => {
+            expect(TestFactory[testedServiceName].replaceEvent).toHaveBeenCalled();
+          });
       });
 
       it('fails if changes are not specified', () => {
         return TestFactory[testedServiceName]
-          .updateMessage(event, undefined)
+          .updateEvent(12, undefined)
           .then(() => fail('should have thrown'))
           .catch(error => {
             expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
