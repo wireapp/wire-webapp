@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@0.2.35...@wireapp/bot-api@0.3.0) (2018-08-17)
+
+
+### Features
+
+* **bot-api:** Send image ([#1020](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1020)) ([0a20a93](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/0a20a93))
+
+
+
+
+
 <a name="0.2.35"></a>
 ## [0.2.35](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@0.2.34...@wireapp/bot-api@0.2.35) (2018-08-17)
 

@@ -27,5 +27,5 @@
     "test:node": "jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.2.35"
+  "version": "0.3.0"
 }
