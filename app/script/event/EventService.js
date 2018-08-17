@@ -114,8 +114,13 @@ z.event.EventService = class EventService {
       includeFrom,
       includeTo: true,
     };
+    if (!_.isDate(fromDate)) {
+      const errorMessage = `fromDate ('${typeof fromDate}') must be of type 'Date'.`;
+      throw new Error(errorMessage);
+    }
+    const toDate = new Date(Math.max(fromDate.getTime() + 1, Date.now()));
 
-    return this._loadEventsInDateRange(conversationId, fromDate, new Date(), limit, includeParams).sortBy('time');
+    return this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams).sortBy('time');
   }
 
   _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
@@ -126,7 +131,7 @@ z.event.EventService = class EventService {
     }
 
     if (fromDate.getTime() > toDate.getTime()) {
-      const errorMessage = `Lower bound (${toDate.getTime()}) cannot be greater than upper bound (${fromDate.getTime()}).`;
+      const errorMessage = `Lower bound (${fromDate.getTime()}) cannot be greater than upper bound (${toDate.getTime()}).`;
       throw new Error(errorMessage);
     }
 
