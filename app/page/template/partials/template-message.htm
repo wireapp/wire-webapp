@@ -74,7 +74,7 @@
         <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
-        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
+        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
         <!-- ko if: message.user().isService -->
           <service-icon class="message-header-icon-service"></service-icon>
         <!-- /ko -->
