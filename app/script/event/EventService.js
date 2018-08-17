@@ -186,7 +186,7 @@ z.event.EventService = class EventService {
       record.status = z.message.StatusType.SENT;
       record.time = time;
 
-      return this.updateEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
+      return this.replaceEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
     });
   }
 
@@ -205,7 +205,7 @@ z.event.EventService = class EventService {
       record.data.reason = reason;
       record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
 
-      return this.updateEvent(record).then(() => {
+      return this.replaceEvent(record).then(() => {
         this.logger.info('Updated asset message_et (failed)', primaryKey);
         return record;
       });
