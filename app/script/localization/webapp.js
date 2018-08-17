@@ -502,7 +502,7 @@ z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionConversationParticipants = 'Show all ({{number}})';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
-z.string.conversationDetailsActionGuestOptions = 'Guests';
+z.string.conversationDetailsActionGuestOptions = 'Guests and services';
 z.string.conversationDetailsActionTimedMessages = 'Timed messages';
 z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
@@ -540,7 +540,7 @@ z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link…';
-z.string.guestOptionsTitle = 'Guest options';
+z.string.guestOptionsTitle = 'Guests and services';
 
 // Panel: Timed messages
 z.string.timedMessagesTitle = 'Timed messages';
