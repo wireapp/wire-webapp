@@ -209,7 +209,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   searchForServices(query, queryObservable) {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
-    this.teamRepository
+    return this.teamRepository
       .getWhitelistedServices(this.teamRepository.team().id, 20)
       .then(serviceEntities => {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());

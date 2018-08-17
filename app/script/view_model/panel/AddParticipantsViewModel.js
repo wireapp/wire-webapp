@@ -54,8 +54,6 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.selectedService = ko.observable();
     this.state = ko.observable(AddParticipantsViewModel.STATE.ADD_PEOPLE);
 
-    this.services.subscribe(() => this.isInitialServiceSearch(false));
-
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
 
     this.showIntegrations = ko.pureComputed(() => {
@@ -154,7 +152,9 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
 
   searchServices(query) {
     if (this.isStateAddService()) {
-      this.integrationRepository.searchForServices(query, this.searchInput);
+      this.integrationRepository
+        .searchForServices(this.searchInput(), this.searchInput)
+        .then(() => this.isInitialServiceSearch(false));
     }
   }
 
