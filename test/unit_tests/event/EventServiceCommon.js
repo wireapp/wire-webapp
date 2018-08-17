@@ -341,12 +341,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
-    describe('updateMessageSequentially', () => {
+    describe('updateEventSequentially', () => {
       it('fails if changes do not contain version property', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id']};
         return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
+          .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
@@ -354,13 +353,12 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('fails if version is not sequential', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id'], version: 1};
 
-        spyOn(TestFactory[testedServiceName], 'loadEvent').and.returnValue(Promise.resolve({version: 2}));
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 2}));
 
         return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
+          .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
@@ -368,14 +366,13 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('fails if record is not found', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id'], version: 2};
 
-        spyOn(TestFactory[testedServiceName], 'loadEvent').and.returnValue(Promise.resolve(undefined));
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
         spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
 
         return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
+          .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(z.storage.StorageError.TYPE.NOT_FOUND);
@@ -383,23 +380,16 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('updates message in DB', () => {
-        const messageEntity = {id: 'twelve', primary_key: 12};
         const updates = {reactions: ['user-id'], version: 2};
 
-        spyOn(TestFactory[testedServiceName], 'loadEvent').and.returnValue(Promise.resolve({version: 1}));
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 1}));
         spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
         spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return TestFactory[testedServiceName]
-          .updateMessageSequentially(messageEntity, updates, conversationId)
-          .then(result => {
-            expect(TestFactory.storage_service.update).toHaveBeenCalledWith(
-              eventStoreName,
-              messageEntity.primary_key,
-              updates
-            );
-            expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
-          });
+        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(result => {
+          expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
+          expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
+        });
       });
     });
 

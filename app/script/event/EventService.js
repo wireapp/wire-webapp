@@ -161,22 +161,22 @@ z.event.EventService = class EventService {
   }
 
   /**
-   * Update a message in the database and checks for non sequential updates.
+   * Update an event in the database and checks that the update is sequential.
    *
-   * @param {Message} messageEntity - Message event to update in the database
+   * @param {number} primaryKey - Event primary key
    * @param {Object} [changes={}] - Changes to update message with
-   * @param {string} conversationId - ID of conversation
    * @returns {Promise} Resolves when the message was updated in database
    */
-  updateMessageSequentially(messageEntity, changes = {}, conversationId) {
-    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
+  updateEventSequentially(primaryKey, changes = {}) {
+    return Promise.resolve(primaryKey).then(key => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
       }
 
+      // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-        return this.loadEvent(conversationId, messageEntity.id).then(record => {
+        return this.storageService.load(this.EVENT_STORE_NAME, key).then(record => {
           if (!record) {
             throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
           }
