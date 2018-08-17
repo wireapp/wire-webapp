@@ -245,12 +245,12 @@ z.event.EventService = class EventService {
   /**
    * Update a message entity in the database.
    *
-   * @param {Message} messageEntity - Message event to update in the database.
+   * @param {number} primaryKey - event's primary key
    * @param {Object} [updates={}] - Updates to perform on the message.
    * @returns {Promise} Resolves when the message was updated in database.
    */
-  updateMessage(messageEntity, updates) {
-    return Promise.resolve(messageEntity.primary_key).then(primaryKey => {
+  updateEvent(primaryKey, updates) {
+    return Promise.resolve(primaryKey).then(key => {
       const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
@@ -261,7 +261,7 @@ z.event.EventService = class EventService {
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
       }
 
-      const identifiedUpdates = Object.assign({}, updates, {primary_key: primaryKey});
+      const identifiedUpdates = Object.assign({}, updates, {primary_key: key});
       return this.replaceEvent(identifiedUpdates);
     });
   }

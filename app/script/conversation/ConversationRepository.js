@@ -2224,7 +2224,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         this.checkMessageTimer(messageEntity);
         if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
-          return this.eventService.updateMessage(messageEntity, changes);
+          return this.eventService.updateEvent(messageEntity.primary_key, changes);
         }
       })
       .catch(error => {
@@ -2952,7 +2952,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         if (was_updated) {
           const changes = {status: message_et.status()};
-          return this.eventService.updateMessage(message_et, changes);
+          return this.eventService.updateEvent(message_et.primary_key, changes);
         }
       })
       .catch(error => {

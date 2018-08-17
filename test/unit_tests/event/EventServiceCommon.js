@@ -525,9 +525,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
-    describe('updateMessage', () => {
+    describe('updateEvent', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const MessageEntity = {
+      const messageEntity = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
         from: senderId,
@@ -540,16 +540,18 @@ window.testEventServiceClass = (testedServiceName, className) => {
       it('updated event in the database', () => {
         spyOn(TestFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());
 
-        MessageEntity.time = new Date().toISOString();
-        MessageEntity.primary_key = 1337;
-        return TestFactory[testedServiceName].updateMessage(MessageEntity, {time: MessageEntity.time}).then(() => {
-          expect(TestFactory[testedServiceName].replaceEvent).toHaveBeenCalled();
-        });
+        messageEntity.time = new Date().toISOString();
+        messageEntity.primary_key = 1337;
+        return TestFactory[testedServiceName]
+          .updateEvent(messageEntity.primary_key, {time: messageEntity.time})
+          .then(() => {
+            expect(TestFactory[testedServiceName].replaceEvent).toHaveBeenCalled();
+          });
       });
 
       it('fails if changes are not specified', () => {
         return TestFactory[testedServiceName]
-          .updateMessage(event, undefined)
+          .updateEvent(12, undefined)
           .then(() => fail('should have thrown'))
           .catch(error => {
             expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
