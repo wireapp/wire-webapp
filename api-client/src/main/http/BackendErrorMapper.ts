@@ -27,7 +27,7 @@ import {
   TokenExpiredError,
 } from '../auth';
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation';
-import {InviteEmailInUseError} from '../team';
+import {InviteEmailInUseError, ServiceNotFoundError} from '../team';
 import {InvalidInvitationCodeError} from '../team/index';
 import {UnconnectedUserError, UserIsUnknownError} from '../user';
 
@@ -83,6 +83,11 @@ class BackendErrorMapper {
           ['The given e-mail address or phone number is in use.']: new IdentifierExistsError(
             'The given e-mail address or phone number is in use.'
           ),
+        },
+      },
+      [StatusCode.NOT_FOUND]: {
+        [BackendErrorLabel.NOT_FOUND]: {
+          ['Service not found']: new ServiceNotFoundError('Service not found'),
         },
       },
     };

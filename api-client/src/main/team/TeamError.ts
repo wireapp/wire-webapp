@@ -50,3 +50,15 @@ export class InvalidInvitationCodeError extends TeamError {
     this.name = 'InvalidInvitationCodeError';
   }
 }
+
+export class ServiceNotFoundError extends TeamError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.SERVICE_NOT_FOUND,
+    code: StatusCode = StatusCode.NOT_FOUND
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, ServiceNotFoundError.prototype);
+    this.name = 'ServiceNotFoundError';
+  }
+}
