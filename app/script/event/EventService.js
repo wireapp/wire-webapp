@@ -114,11 +114,13 @@ z.event.EventService = class EventService {
       includeFrom,
       includeTo: true,
     };
-    const toTimestamp = _.isDate(fromDate) ? Math.max(fromDate.getTime() + 1, Date.now()) : 0;
+    if (!_.isDate(fromDate)) {
+      const errorMessage = `fromDate ('${typeof fromDate}') must be of type 'Date'.`;
+      throw new Error(errorMessage);
+    }
+    const toDate = new Date(Math.max(fromDate.getTime() + 1, Date.now()));
 
-    return this._loadEventsInDateRange(conversationId, fromDate, new Date(toTimestamp), limit, includeParams).sortBy(
-      'time'
-    );
+    return this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams).sortBy('time');
   }
 
   _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
