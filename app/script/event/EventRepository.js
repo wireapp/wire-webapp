@@ -718,7 +718,7 @@ z.event.EventRepository = class EventRepository {
       updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
-    return this.eventService.updateEvent(identifiedUpdates);
+    return this.eventService.replaceEvent(identifiedUpdates);
   }
 
   _handleDuplicatedEvent(originalEvent, newEvent) {
@@ -746,7 +746,7 @@ z.event.EventRepository = class EventRepository {
       case z.assets.AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
-        return this.eventService.updateEvent(updatedEvent);
+        return this.eventService.replaceEvent(updatedEvent);
       }
 
       case z.assets.AssetTransferState.UPLOAD_FAILED: {
@@ -794,7 +794,7 @@ z.event.EventRepository = class EventRepository {
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
     const identifiedUpdates = Object.assign({}, {primary_key: originalEvent.primary_key}, updates);
-    return this.eventService.updateEvent(identifiedUpdates);
+    return this.eventService.replaceEvent(identifiedUpdates);
   }
 
   _getUpdatesForMessageEdit(originalEvent, newEvent) {

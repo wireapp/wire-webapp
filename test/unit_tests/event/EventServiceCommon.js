@@ -319,7 +319,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
-    describe('updateEvent', () => {
+    describe('replaceEvent', () => {
       /* eslint-disable sort-keys*/
       const updatedEvent = {
         conversation: conversationId,
@@ -335,7 +335,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       it('update event in the database', () => {
         spyOn(TestFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
 
-        return TestFactory[testedServiceName].updateEvent(updatedEvent).then(event => {
+        return TestFactory[testedServiceName].replaceEvent(updatedEvent).then(event => {
           expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, event);
         });
       });
@@ -538,12 +538,12 @@ window.testEventServiceClass = (testedServiceName, className) => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       it('updated event in the database', () => {
-        spyOn(TestFactory[testedServiceName], 'updateEvent').and.returnValue(Promise.resolve());
+        spyOn(TestFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());
 
         MessageEntity.time = new Date().toISOString();
         MessageEntity.primary_key = 1337;
         return TestFactory[testedServiceName].updateMessage(MessageEntity, {time: MessageEntity.time}).then(() => {
-          expect(TestFactory[testedServiceName].updateEvent).toHaveBeenCalled();
+          expect(TestFactory[testedServiceName].replaceEvent).toHaveBeenCalled();
         });
       });
 

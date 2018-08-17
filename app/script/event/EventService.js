@@ -156,7 +156,7 @@ z.event.EventService = class EventService {
    * @param {Object} event - JSON event to be stored
    * @returns {Promise} Resolves with the updated record
    */
-  updateEvent(event) {
+  replaceEvent(event) {
     return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
   }
 
@@ -262,7 +262,7 @@ z.event.EventService = class EventService {
       }
 
       const identifiedUpdates = Object.assign({}, updates, {primary_key: primaryKey});
-      return this.updateEvent(identifiedUpdates);
+      return this.replaceEvent(identifiedUpdates);
     });
   }
 };
