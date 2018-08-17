@@ -111,8 +111,8 @@ describe('z.user.UserRepository', () => {
     });
 
     describe('get_connections', () => {
-      // TODO: This test seems to be flaky!
-      xit('should return the connected users', done => {
+      // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
+      it('should return the connected users', () => {
         server.respondWith('GET', `${test_factory.settings.connection.restUrl}/connections?size=500`, [
           200,
           {'Content-Type': 'application/json'},
@@ -127,17 +127,13 @@ describe('z.user.UserRepository', () => {
           [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
         );
 
-        TestFactory.user_repository
-          .get_connections()
-          .then(() => {
-            expect(TestFactory.user_repository.connections().length).toBe(2);
-            expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
-            expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
-              '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
-            );
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.user_repository.get_connections().then(() => {
+          expect(TestFactory.user_repository.connections().length).toBe(2);
+          expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
+          expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
+            '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
+          );
+        });
       });
     });
   });
