@@ -23,15 +23,16 @@
 enum BackendErrorLabel {
   ACCESS_DENIED = 'access-denied',
   BAD_REQUEST = 'bad-request',
-  INVALID_OPERATION = 'invalid-op',
-  NOT_FOUND = 'not-found',
-  OPERATION_DENIED = 'operation-denied',
-  UNAUTHORIZED = 'unauthorized',
+  CLIENT_ERROR = 'client-error',
+  INSUFFICIENT_PERMISSIONS = 'insufficient-permissions',
   INTERNAL_ERROR = 'internal-error',
+  INVALID_OPERATION = 'invalid-op',
   INVALID_PAYLOAD = 'invalid-payload',
   INVALID_PERMISSIONS = 'invalid-permissions',
-  CLIENT_ERROR = 'client-error',
+  NOT_FOUND = 'not-found',
+  OPERATION_DENIED = 'operation-denied',
   QUEUE_FULL = 'queue-full',
+  UNAUTHORIZED = 'unauthorized',
   UNKNOWN = 'unknown-error', // defined by web team
   // Authentication errors
   BLACKLISTED_EMAIL = 'blacklisted-email',
@@ -72,6 +73,8 @@ enum BackendErrorLabel {
   NO_ADD_TO_MANAGED = 'no-add-to-managed',
   // Payment errors
   EXPIRED_CARD = 'expired_card',
+  // Service errors
+  SERVICE_NOT_FOUND = 'service-not-found', // defined by web team
 }
 
 export {BackendErrorLabel};
