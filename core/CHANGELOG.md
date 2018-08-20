@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.9.0"></a>
+# [5.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.8.4...@wireapp/core@5.9.0) (2018-08-20)
+
+
+### Features
+
+* **core,api-client:** Send link previews (WEBFOUND-33) ([#1022](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1022)) ([3c10247](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3c10247))
+
+
+
+
+
 <a name="5.8.4"></a>
 ## [5.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.8.3...@wireapp/core@5.8.4) (2018-08-20)
 
