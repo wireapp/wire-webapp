@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.4.2"></a>
+## [2.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.4.1...@wireapp/react-ui-kit@2.4.2) (2018-08-20)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Repair keyframes definition for Pill component ([#1025](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1025)) ([f8cc8e7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/f8cc8e7))
+
+
+
+
+
 <a name="2.4.1"></a>
 ## [2.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.4.0...@wireapp/react-ui-kit@2.4.1) (2018-08-16)
 
