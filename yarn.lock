@@ -3478,9 +3478,9 @@ enzyme-to-json@3.3.4:
   dependencies:
     lodash "^4.17.4"
 
-enzyme@3.4.3:
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/enzyme/-/enzyme-3.4.3.tgz#86c4a1219a967cddb8d0359f28e119a93302014b"
+enzyme@3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/enzyme/-/enzyme-3.4.4.tgz#92c7c6b9e59d4ef0c3d36a75dccc0e41a5c14d21"
   dependencies:
     array.prototype.flat "^1.2.1"
     cheerio "^1.0.0-rc.2"
