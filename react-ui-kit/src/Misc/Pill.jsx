@@ -34,7 +34,6 @@ const backgroundColors = {
 };
 
 const pillAnimation = keyframes`
-@keyframes pill-activate {
     0% {
       background-color: transparent;
     }
