@@ -33,20 +33,8 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
 
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
 
-    this.availabilityLabel = ko.pureComputed(() => {
-      if (this.isVisible() && this.selectedParticipant()) {
-        const availabilitySetToNone = this.selectedParticipant().availability() === z.user.AvailabilityType.NONE;
-        if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(this.selectedParticipant().availability());
-        }
-      }
-    });
-
     this.selectedParticipant = ko.observable(undefined);
 
-    this.inTeam = ko.pureComputed(() => this.selectedParticipant().inTeam());
-    this.isGuest = ko.pureComputed(() => this.selectedParticipant().isGuest());
-    this.isTemporaryGuest = ko.pureComputed(() => this.selectedParticipant().isTemporaryGuest());
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
 
     this.selectedIsConnected = ko.pureComputed(() => {

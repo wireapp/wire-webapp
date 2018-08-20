@@ -93,20 +93,9 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   }
 
   _showService(entity) {
-    if (entity instanceof z.integration.ServiceEntity) {
-      this.selectedService(entity);
-      this.integrationRepository.addProviderNameToParticipant(entity);
-      return;
-    }
-
-    const {providerId, serviceId} = entity;
-
-    this.integrationRepository
-      .getServiceById(providerId, serviceId)
-      .then(serviceEntity => {
-        this.selectedService(serviceEntity);
-        return this.integrationRepository.getProviderById(providerId);
-      })
-      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
+    this.integrationRepository.getServiceFromUser(entity).then(serviceEntity => {
+      this.selectedService(serviceEntity);
+      this.integrationRepository.addProviderNameToParticipant(serviceEntity);
+    });
   }
 };
