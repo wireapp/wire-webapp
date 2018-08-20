@@ -48,24 +48,12 @@
     font-weight: @font-weight-bold;
     word-break: break-word;
 
-    &--centered {
-      justify-content: center;
-      margin-top: 24px;
-      text-align: center;
-    }
-
     &--input {
       width: 250px;
       height: auto;
       border: 0;
       outline: none;
       resize: none;
-    }
-
-    &__verified-icon {
-      display: block;
-      margin: 24px 0 -16px;
-      text-align: center;
     }
 
     &__edit-icon {
@@ -104,18 +92,6 @@
     }
   }
 
-  &__user-name,
-  &__provider-name {
-    margin-top: 8px;
-    font-size: 12px;
-    font-weight: @font-weight-regular;
-    text-align: center;
-  }
-
-  &__user-name::before {
-    content: '@';
-  }
-
   &__list-head {
     padding-bottom: 8px;
     border-bottom: 1px solid fade(@graphite-dark, 8%);
@@ -143,47 +119,6 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 8px;
-
-    & > participant-avatar {
-      margin: 24px auto;
-    }
-  }
-
-  &__guest-label {
-    display: flex;
-    justify-content: center;
-
-    path {
-      fill: @graphite-dark;
-    }
-
-    span {
-      margin-left: 8px;
-      font-size: 12px;
-    }
-  }
-
-  &__guest-expiration {
-    display: flex;
-    justify-content: center;
-    margin-top: 8px;
-    color: fade(@graphite-dark, 56%);
-    font-size: 12px;
-    font-weight: @font-weight-bold;
-  }
-
-  &__availability {
-    justify-content: center;
-    font-size: 11px;
-    font-weight: @font-weight-bold;
-    text-transform: uppercase;
-  }
-
-  &__guest-label,
-  &__guest-expiration,
-  &__availability > svg,
-  &__availability > div {
-    margin-bottom: 16px;
   }
 
   &__group-size-info {
