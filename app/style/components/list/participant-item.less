@@ -111,11 +111,14 @@ participant-item {
       }
 
       .participant-item-content-info {
-        display: flex;
+        overflow: hidden;
+        max-width: 100%;
         margin-top: 2px;
         font-size: 12px;
         line-height: 16px;
         opacity: 0.56;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
