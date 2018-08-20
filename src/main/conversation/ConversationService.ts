@@ -43,6 +43,7 @@ import {
 } from '../conversation/root';
 
 import {
+  Article,
   Asset,
   Cleared,
   ClientAction,
@@ -50,12 +51,14 @@ import {
   Ephemeral,
   GenericMessage,
   Knock,
+  LinkPreview,
   Location,
   MessageDelete,
   MessageEdit,
   MessageHide,
   Reaction,
   Text,
+  Tweet,
 } from '@wireapp/protocol-messaging';
 import {
   ClientActionContent,
@@ -68,10 +71,12 @@ import {
   FileMetaDataContent,
   ImageAssetContent,
   ImageContent,
+  LinkPreviewContent,
   LocationContent,
   ReactionContent,
   RemoteData,
   TextContent,
+  TweetContent,
 } from '../conversation/content/';
 
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
@@ -584,11 +589,72 @@ class ConversationService {
       state: PayloadBundleState.OUTGOING_SENT,
     };
 
+    const payloadBundleContent = payloadBundle.content as TextContent;
+
+    const textMessage = Text.create({
+      content: payloadBundleContent.text,
+    });
+
+    if (payloadBundleContent.linkPreview) {
+      for (const linkPreview of payloadBundleContent.linkPreview) {
+        const linkPreviewMessage = LinkPreview.create({
+          permanentUrl: linkPreview.permanentUrl,
+          summary: linkPreview.summary,
+          url: linkPreview.url,
+          urlOffset: linkPreview.urlOffset,
+        });
+
+        if (linkPreview.tweet) {
+          linkPreviewMessage.tweet = Tweet.create({
+            author: linkPreview.tweet.author,
+            username: linkPreview.tweet.username,
+          });
+        }
+
+        if (linkPreview.image) {
+          const encryptedAsset = linkPreview.image;
+
+          const imageMetadata = Asset.ImageMetaData.create({
+            height: encryptedAsset.image.height,
+            width: encryptedAsset.image.width,
+          });
+
+          const original = Asset.Original.create({
+            [GenericMessageType.IMAGE]: imageMetadata,
+            mimeType: encryptedAsset.image.type,
+            name: null,
+            size: encryptedAsset.image.data.length,
+          });
+
+          const remoteData = Asset.RemoteData.create({
+            assetId: encryptedAsset.asset.key,
+            assetToken: encryptedAsset.asset.token,
+            otrKey: encryptedAsset.asset.keyBytes,
+            sha256: encryptedAsset.asset.sha256,
+          });
+
+          const assetMessage = Asset.create({
+            original,
+            uploaded: remoteData,
+          });
+
+          assetMessage.status = AssetTransferState.UPLOADED;
+
+          linkPreviewMessage.article = Article.create({
+            image: assetMessage,
+            permanentUrl: linkPreview.permanentUrl,
+            summary: linkPreview.summary,
+            title: linkPreview.title,
+          });
+        }
+
+        textMessage.linkPreview.push(linkPreviewMessage);
+      }
+    }
+
     let genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
-      [GenericMessageType.TEXT]: Text.create({
-        content: (payloadBundle.content as TextContent).text,
-      }),
+      [GenericMessageType.TEXT]: textMessage,
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
@@ -664,10 +730,12 @@ class ConversationService {
   public createEditedText(
     newMessageText: string,
     originalMessageId: string,
+    newLinkPreview?: LinkPreviewContent[],
     messageId: string = ConversationService.createId()
   ): PayloadBundleOutgoingUnsent {
     return {
       content: {
+        linkPreview: newLinkPreview,
         originalMessageId,
         text: newMessageText,
       },
@@ -755,6 +823,35 @@ class ConversationService {
     };
   }
 
+  public async createLinkPreview(
+    url: string,
+    urlOffset: number,
+    permanentUrl: string,
+    image?: ImageContent,
+    summary?: string,
+    title?: string,
+    tweet?: TweetContent
+  ): Promise<LinkPreviewContent> {
+    const linkPreview: LinkPreviewContent = {
+      permanentUrl,
+      summary,
+      title,
+      tweet,
+      url,
+      urlOffset,
+    };
+
+    if (image) {
+      const imageAsset = await this.assetService.uploadImageAsset(image);
+      linkPreview.image = {
+        asset: imageAsset,
+        image,
+      };
+    }
+
+    return linkPreview;
+  }
+
   public createLocation(
     location: LocationContent,
     messageId: string = ConversationService.createId()
@@ -786,8 +883,12 @@ class ConversationService {
     };
   }
 
-  public createText(text: string, messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
-    const content: TextContent = {text};
+  public createText(
+    text: string,
+    linkPreview?: LinkPreviewContent[],
+    messageId: string = ConversationService.createId()
+  ): PayloadBundleOutgoingUnsent {
+    const content: TextContent = {text, linkPreview};
 
     return {
       content,
