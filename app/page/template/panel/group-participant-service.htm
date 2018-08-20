@@ -8,12 +8,7 @@
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
 
         <!-- ko if: selectedService() -->
-          <div class="group-participant__service-header">
-            <div class="group-participant__service-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
-            <div class="group-participant__service-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
-            <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-          </div>
-          <div class="group-participant__service-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
+          <panel-service-details params="service: selectedService()"></panel-service-details>
 
           <!-- ko if: showActions() -->
             <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">

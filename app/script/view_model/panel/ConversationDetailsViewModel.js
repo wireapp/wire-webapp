@@ -50,17 +50,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
     this.showAllUsersCount = ko.observable(0);
-
-    this.availabilityLabel = ko.pureComputed(() => {
-      if (this.isVisible() && this.isTeam() && this.activeConversation() && this.activeConversation().is_one2one()) {
-        const userAvailability = this.firstParticipant() && this.firstParticipant().availability();
-        const availabilitySetToNone = userAvailability === z.user.AvailabilityType.NONE;
-
-        if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(userAvailability);
-        }
-      }
-    });
+    this.selectedService = ko.observable();
 
     ko.computed(() => {
       if (this.activeConversation()) {
@@ -93,14 +83,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation()
         ? this.activeConversation().is_one2one() || this.activeConversation().is_request()
         : false;
-    });
-
-    this.userName = ko.pureComputed(() => {
-      return this.firstParticipant() ? this.firstParticipant().username() : '';
-    });
-
-    this.isGuest = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isGuest();
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
@@ -212,7 +194,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isServiceMode.subscribe(isService => {
       if (isService) {
-        this.integrationRepository.addProviderNameToParticipant(this.firstParticipant());
+        const entity = this.firstParticipant();
+        this.integrationRepository.getServiceFromUser(entity).then(serviceEntity => {
+          this.selectedService(serviceEntity);
+          this.integrationRepository.addProviderNameToParticipant(serviceEntity);
+        });
       }
     });
   }
