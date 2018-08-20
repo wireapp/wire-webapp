@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.14.0"></a>
+# [1.14.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.13.19...@wireapp/api-client@1.14.0) (2018-08-20)
+
+
+### Features
+
+* **core,api-client:** Send link previews (WEBFOUND-33) ([#1022](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1022)) ([3c10247](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3c10247))
+
+
+
+
+
 <a name="1.13.19"></a>
 ## [1.13.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.13.18...@wireapp/api-client@1.13.19) (2018-08-20)
 
