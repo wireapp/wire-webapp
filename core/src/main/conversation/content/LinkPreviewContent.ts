@@ -17,11 +17,16 @@
  *
  */
 
-import {LinkPreviewContent} from '../content';
+import {ImageAssetContent, TweetContent} from '../content/';
 
-interface TextContent {
-  text: string;
-  linkPreview?: LinkPreviewContent[];
+interface LinkPreviewContent {
+  image?: ImageAssetContent;
+  permanentUrl: string;
+  summary?: string;
+  title?: string;
+  tweet?: TweetContent;
+  url: string;
+  urlOffset: number;
 }
 
-export {TextContent};
+export {LinkPreviewContent};

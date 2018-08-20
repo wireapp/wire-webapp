@@ -25,7 +25,7 @@ const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/'
 const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
 
 const assetOriginalCache = {};
-const messageEchoCache = {};
+const messageIdCache = {};
 
 (async () => {
   const login = {
@@ -91,11 +91,53 @@ const messageEchoCache = {};
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {content, id: messageId} = data;
+    let textPayload;
 
-    const textPayload = account.service.conversation.createText(content.text);
-    messageEchoCache[messageId] = textPayload.id;
+    const linkPreviews = [];
 
-    await handleIncomingMessage(data);
+    if (content.linkPreview) {
+      for (const linkPreview of content.linkPreview) {
+        let linkPreviewImage;
+
+        if (linkPreview.article && linkPreview.article.image) {
+          const originalLinkPreviewImage = linkPreview.article.image;
+          const imageBuffer = await account.service.conversation.getAsset(originalLinkPreviewImage.uploaded);
+
+          linkPreviewImage = {
+            data: imageBuffer,
+            height: originalLinkPreviewImage.original.image.height,
+            type: originalLinkPreviewImage.original.mimeType,
+            width: originalLinkPreviewImage.original.image.width,
+          };
+        }
+
+        const newLinkPreview = await account.service.conversation.createLinkPreview(
+          linkPreview.url,
+          linkPreview.urlOffset,
+          linkPreview.permanentUrl,
+          linkPreviewImage,
+          linkPreview.summary,
+          linkPreview.title,
+          linkPreview.tweet
+        );
+
+        linkPreviews.push(newLinkPreview);
+      }
+
+      await handleIncomingMessage(data);
+
+      const messageIdOriginal = messageIdCache[messageId];
+
+      if (messageIdOriginal) {
+        textPayload = account.service.conversation.createText(content.text, linkPreviews, messageIdOriginal);
+      } else {
+        logger.warn(`Link preview for message ID "${messageId} was received before the original message."`);
+        return;
+      }
+    } else {
+      textPayload = account.service.conversation.createText(content.text);
+      messageIdCache[messageId] = textPayload.id;
+    }
 
     await sendMessageResponse(data, textPayload);
   });
@@ -108,6 +150,7 @@ const messageEchoCache = {};
     const cacheOriginal = assetOriginalCache[messageId];
     if (!cacheOriginal) {
       logger.warn(`Uploaded data for message ID "${messageId} was received before the metadata."`);
+      return;
     }
 
     const fileBuffer = await account.service.conversation.getAsset(content.uploaded);
@@ -124,7 +167,7 @@ const messageEchoCache = {};
 
     try {
       const filePayload = await account.service.conversation.createFileData({data: fileBuffer}, fileMetaDataPayload.id);
-      messageEchoCache[messageId] = filePayload.id;
+      messageIdCache[messageId] = filePayload.id;
       await sendMessageResponse(data, filePayload);
     } catch (error) {
       logger.warn(`Error while sending asset: "${error.stack}"`);
@@ -151,7 +194,8 @@ const messageEchoCache = {};
 
     const cacheOriginal = assetOriginalCache[messageId];
     if (!cacheOriginal) {
-      throw new Error(`Abort message for message ID "${messageId} was received before the metadata."`);
+      logger.warn(`Asset abort message for message ID "${messageId} was received before the metadata."`);
+      return;
     }
 
     const fileMetaDataPayload = await account.service.conversation.createFileMetadata({
@@ -167,7 +211,7 @@ const messageEchoCache = {};
     await sendMessageResponse(data, fileAbortPayload);
 
     delete assetOriginalCache[messageId];
-    delete messageEchoCache[messageId];
+    delete messageIdCache[messageId];
   });
 
   account.on(PayloadBundleType.ASSET_IMAGE, async data => {
@@ -185,7 +229,7 @@ const messageEchoCache = {};
       width: original.image.width,
     });
 
-    messageEchoCache[messageId] = imagePayload.id;
+    messageIdCache[messageId] = imagePayload.id;
 
     await handleIncomingMessage(data);
     await sendMessageResponse(data, imagePayload);
@@ -246,10 +290,10 @@ const messageEchoCache = {};
 
     await handleIncomingMessage(data);
 
-    if (messageEchoCache[originalMessageId]) {
-      await account.service.conversation.deleteMessageEveryone(conversationId, messageEchoCache[originalMessageId]);
+    if (messageIdCache[originalMessageId]) {
+      await account.service.conversation.deleteMessageEveryone(conversationId, messageIdCache[originalMessageId]);
 
-      delete messageEchoCache[originalMessageId];
+      delete messageIdCache[originalMessageId];
     }
   });
 
@@ -259,8 +303,14 @@ const messageEchoCache = {};
       id: messageId,
     } = data;
 
-    const editedPayload = account.service.conversation.createEditedText(text, messageEchoCache[originalMessageId]);
-    messageEchoCache[messageId] = editedPayload.id;
+    const originalMessage = messageIdCache[originalMessageId];
+    if (!originalMessage) {
+      logger.warn(`Edited message for message ID "${messageId} was received before the original message."`);
+      return;
+    }
+
+    const editedPayload = account.service.conversation.createEditedText(text, originalMessage);
+    messageIdCache[messageId] = editedPayload.id;
 
     await handleIncomingMessage(data);
     await sendMessageResponse(data, editedPayload);

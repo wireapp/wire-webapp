@@ -271,9 +271,9 @@ class Account extends EventEmitter {
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
-        const text = genericMessage[GenericMessageType.TEXT].content;
+        const {content: text, linkPreview} = genericMessage[GenericMessageType.TEXT];
 
-        const content: TextContent = {text};
+        const content: TextContent = {text, linkPreview};
 
         return {
           content,
