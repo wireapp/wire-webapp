@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosResponse} from 'axios';
+import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {HttpClient} from '../http';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
@@ -39,19 +39,18 @@ class AssetAPI {
       throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
     }
 
-    return this.client
-      .sendRequest(
-        {
-          method: 'get',
-          params: {
-            asset_token: token,
-          },
-          responseType: 'arraybuffer',
-          url: `${AssetAPI.ASSET_URL}/${assetId}`,
-        },
-        true
-      )
-      .then((response: AxiosResponse) => response.data);
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      params: {},
+      responseType: 'arraybuffer',
+      url: `${AssetAPI.ASSET_URL}/${assetId}`,
+    };
+
+    if (token) {
+      config.params.asset_token = token;
+    }
+
+    return this.client.sendRequest(config, true).then((response: AxiosResponse) => response.data);
   }
 
   postAsset(asset: Uint8Array, options?: {public: boolean; retention: AssetRetentionPolicy}): Promise<AssetUploadData> {
