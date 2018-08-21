@@ -93,14 +93,15 @@ const messageIdCache = {};
     const {content, id: messageId} = data;
     let textPayload;
 
-    const linkPreviews = [];
+    const newLinkPreviews = [];
 
-    if (content.linkPreview) {
-      for (const linkPreview of content.linkPreview) {
+    if (content.linkPreviews) {
+      for (const linkPreview of content.linkPreviews) {
+        const originalLinkPreviewImage =
+          linkPreview.article && linkPreview.article.image ? linkPreview.article.image : linkPreview.image;
         let linkPreviewImage;
 
-        if (linkPreview.article && linkPreview.article.image) {
-          const originalLinkPreviewImage = linkPreview.article.image;
+        if (originalLinkPreviewImage) {
           const imageBuffer = await account.service.conversation.getAsset(originalLinkPreviewImage.uploaded);
 
           linkPreviewImage = {
@@ -111,17 +112,12 @@ const messageIdCache = {};
           };
         }
 
-        const newLinkPreview = await account.service.conversation.createLinkPreview(
-          linkPreview.url,
-          linkPreview.urlOffset,
-          linkPreview.permanentUrl,
-          linkPreviewImage,
-          linkPreview.summary,
-          linkPreview.title,
-          linkPreview.tweet
-        );
+        const newLinkPreview = await account.service.conversation.createLinkPreview({
+          ...linkPreview,
+          image: linkPreviewImage,
+        });
 
-        linkPreviews.push(newLinkPreview);
+        newLinkPreviews.push(newLinkPreview);
       }
 
       await handleIncomingMessage(data);
@@ -129,7 +125,7 @@ const messageIdCache = {};
       const messageIdOriginal = messageIdCache[messageId];
 
       if (messageIdOriginal) {
-        textPayload = account.service.conversation.createText(content.text, linkPreviews, messageIdOriginal);
+        textPayload = account.service.conversation.createText(content.text, newLinkPreviews, messageIdOriginal);
       } else {
         logger.warn(`Link preview for message ID "${messageId} was received before the original message."`);
         return;

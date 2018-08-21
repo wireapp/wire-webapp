@@ -17,12 +17,12 @@
  *
  */
 
-import {LinkPreviewContent} from '../content/';
+import {LinkPreviewUploadedContent} from '../content/';
 
 interface EditedTextContent {
   originalMessageId: string;
   text: string;
-  linkPreview?: LinkPreviewContent;
+  linkPreviews?: LinkPreviewUploadedContent[];
 }
 
 export {EditedTextContent};
