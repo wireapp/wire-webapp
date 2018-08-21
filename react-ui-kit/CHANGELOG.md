@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.5.0"></a>
+# [2.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.4.2...@wireapp/react-ui-kit@2.5.0) (2018-08-21)
+
+
+### Features
+
+* **react-ui-kit:** Add ContainerLG ([#1030](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1030)) ([3ef660d](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/3ef660d))
+
+
+
+
+
 <a name="2.4.2"></a>
 ## [2.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.4.1...@wireapp/react-ui-kit@2.4.2) (2018-08-20)
 
