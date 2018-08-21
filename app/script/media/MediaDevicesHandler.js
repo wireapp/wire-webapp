@@ -115,12 +115,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   _subscribeToDevices() {
-    if (navigator.mediaDevices.ondevicechange) {
-      navigator.mediaDevices.ondevicechange = () => {
-        this.logger.info('List of available MediaDevices has changed');
-        this.getMediaDevices();
-      };
-    }
+    navigator.mediaDevices.ondevicechange = () => {
+      this.logger.info('List of available MediaDevices has changed');
+      this.getMediaDevices();
+    };
   }
 
   /**
