@@ -23,7 +23,7 @@ import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from
 import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
-import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
+import {BackendErrorLabel, BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 class HttpClient extends EventEmitter {
@@ -112,16 +112,10 @@ class HttpClient extends EventEmitter {
         return response;
       })
       .catch(error => {
-        // Map Axios errors
-        const isNetworkError = !error.response && error.request && Object.keys(error.request).length === 0;
-        const isForbidden = error.response && error.response.status === StatusCode.FORBIDDEN;
-        const isBackendError =
-          error.response &&
-          error.response.data &&
-          error.response.data.code &&
-          error.response.data.label &&
-          error.response.data.message;
+        const {response, request} = error;
 
+        // Map Axios errors
+        const isNetworkError = !response && request && !Object.keys(request).length;
         if (isNetworkError) {
           const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
           const networkError = new NetworkError(message);
@@ -129,12 +123,20 @@ class HttpClient extends EventEmitter {
           return Promise.reject(networkError);
         }
 
-        if (isForbidden && this.accessTokenStore && this.accessTokenStore.accessToken && !retry) {
-          return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam, true));
-        }
+        if (response) {
+          const {data: errorData, status: errorStatus} = response;
+          const isBackendError = errorData && errorData.code && errorData.label && errorData.message;
 
-        if (isBackendError) {
-          error = BackendErrorMapper.map(error.response.data);
+          if (isBackendError) {
+            const isForbidden = errorStatus === StatusCode.FORBIDDEN;
+            const isInvalidCredentials = errorData.label === BackendErrorLabel.INVALID_CREDENTIALS;
+            const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
+            if (isForbidden && isInvalidCredentials && hasAccessToken && !retry) {
+              return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam, true));
+            }
+
+            error = BackendErrorMapper.map(errorData);
+          }
         }
 
         return Promise.reject(error);
