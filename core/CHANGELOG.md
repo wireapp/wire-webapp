@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.9.2"></a>
+## [5.9.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.9.1...@wireapp/core@5.9.2) (2018-08-21)
+
+
+### Bug Fixes
+
+* **core:** Linkpreview title, expose Asset API (WEBFOUND-34) ([#1029](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1029)) ([ba9732d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/ba9732d))
+
+
+
+
+
 <a name="5.9.1"></a>
 ## [5.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.9.0...@wireapp/core@5.9.1) (2018-08-21)
 
