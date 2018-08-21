@@ -35,6 +35,7 @@ import {
   Muted,
   Small,
   Link,
+  Loading,
   ArrowIcon,
   COLOR,
   ErrorMessage,
@@ -321,15 +322,19 @@ class Login extends React.PureComponent {
                           required
                           data-uie-name="enter-password"
                         />
-                        <RoundIconButton
-                          tabIndex="4"
-                          disabled={!email || !password}
-                          type="submit"
-                          formNoValidate
-                          icon={ICON_NAME.ARROW}
-                          onClick={this.handleSubmit}
-                          data-uie-name="do-sign-in"
-                        />
+                        {this.props.isFetching ? (
+                          <Loading size={32} />
+                        ) : (
+                          <RoundIconButton
+                            tabIndex="4"
+                            disabled={!email || !password}
+                            type="submit"
+                            formNoValidate
+                            icon={ICON_NAME.ARROW}
+                            onClick={this.handleSubmit}
+                            data-uie-name="do-sign-in"
+                          />
+                        )}
                       </InputSubmitCombo>
                     </InputBlock>
                     {validationErrors.length ? (

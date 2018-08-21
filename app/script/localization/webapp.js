@@ -238,8 +238,8 @@ z.string.modalConversationRevokeLinkAction = 'Revoke link';
 z.string.modalConversationRevokeLinkHeadline = 'Revoke the link?';
 z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
 
-z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests. Please try again.';
-z.string.modalConversationGuestOptionsDisableGuestMessage = 'Could not remove guests. Please try again.';
+z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests and services. Please try again.';
+z.string.modalConversationGuestOptionsDisableGuestMessage = 'Could not remove guests and services. Please try again.';
 z.string.modalConversationGuestOptionsGetCodeMessage = 'Could not get access link.';
 z.string.modalConversationGuestOptionsRequestCodeMessage = 'Could not request access link. Please try again.';
 z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke access link. Please try again.';
@@ -502,7 +502,7 @@ z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionConversationParticipants = 'Show all ({{number}})';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
-z.string.conversationDetailsActionGuestOptions = 'Guests';
+z.string.conversationDetailsActionGuestOptions = 'Guests and services';
 z.string.conversationDetailsActionTimedMessages = 'Timed messages';
 z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
@@ -540,7 +540,7 @@ z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link…';
-z.string.guestOptionsTitle = 'Guest options';
+z.string.guestOptionsTitle = 'Guests and services';
 
 // Panel: Timed messages
 z.string.timedMessagesTitle = 'Timed messages';

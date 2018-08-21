@@ -427,49 +427,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Load conversation events by event type.
-   * @param {Array<strings>} event_types - Array of event types to match
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_events_with_types(event_types) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('type')
-      .anyOf(event_types)
-      .sortBy('time');
-  }
-
-  /**
-   * Load conversation events starting from the upper bound to the present until the limit is reached
-   *
-   * @param {string} conversation_id - ID of conversation
-   * @param {Date} upper_bound - Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
-   * @param {boolean} [include_upper_bound=true] - Should upper bound be part of the message
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_subsequent_events_from_db(
-    conversation_id,
-    upper_bound,
-    limit = Number.MAX_SAFE_INTEGER,
-    include_upper_bound = true
-  ) {
-    if (!_.isDate(upper_bound)) {
-      throw new Error(`Upper bound (${typeof upper_bound}) must be of type 'Date'.`);
-    }
-
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+time]')
-      .between(
-        [conversation_id, upper_bound.toISOString()],
-        [conversation_id, new Date().toISOString()],
-        include_upper_bound,
-        true
-      )
-      .limit(limit)
-      .toArray();
-  }
-
-  /**
    * Saves a list of conversation records in the local database.
    * @param {Array<Conversation>} conversations - Conversation entity
    * @returns {Promise<Array>} Resolves with a list of conversation records

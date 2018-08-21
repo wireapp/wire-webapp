@@ -63,6 +63,19 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   /**
+   * Get ServiceEntity for entity.
+   * @param {z.integration.ServiceEntity|User} entity - Service or user to resolve to ServiceEntity
+   * @returns {Promise} - Resolves with the ServiceEntity
+   */
+  getServiceFromUser(entity) {
+    if (entity instanceof z.integration.ServiceEntity) {
+      return Promise.resolve(entity);
+    }
+    const {providerId, serviceId} = entity;
+    return this.getServiceById(providerId, serviceId);
+  }
+
+  /**
    * Add a service to an existing conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to add service to
@@ -209,7 +222,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   searchForServices(query, queryObservable) {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
-    this.teamRepository
+    return this.teamRepository
       .getWhitelistedServices(this.teamRepository.team().id, 20)
       .then(serviceEntities => {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());

@@ -109,7 +109,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
           ephemeral_started: messageEntity.ephemeral_started(),
         };
 
-        this.eventService.updateMessage(messageEntity, changes);
+        this.eventService.updateEvent(messageEntity.primary_key, changes);
         break;
       }
 
@@ -160,7 +160,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     };
 
-    this.eventService.updateMessage(messageEntity, changes);
+    this.eventService.updateEvent(messageEntity.primary_key, changes);
     this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
@@ -179,7 +179,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     };
 
-    this.eventService.updateMessage(messageEntity, changes);
+    this.eventService.updateEvent(messageEntity.primary_key, changes);
     this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
@@ -218,7 +218,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     };
 
-    this.eventService.updateMessage(messageEntity, changes);
+    this.eventService.updateEvent(messageEntity.primary_key, changes);
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 
