@@ -35,7 +35,6 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
-    this.expired = this.message.is_expired;
 
     this.preview_subscription = undefined;
 
@@ -119,7 +118,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
 ko.components.register('video-asset', {
   template: `
-    <!-- ko ifnot: expired() -->
+    <!-- ko ifnot: message.isObfuscated() -->
       <div class="video-asset-container" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}" data-uie-name="video-asset">
         <video playsinline
                data-bind="attr: {src: video_src},
