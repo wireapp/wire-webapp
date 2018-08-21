@@ -73,6 +73,7 @@ class Account extends EventEmitter {
 
   private readonly apiClient: APIClient;
   public service?: {
+    asset: AssetService;
     client: ClientService;
     conversation: ConversationService;
     connection: ConnectionService;
@@ -98,6 +99,7 @@ class Account extends EventEmitter {
     const selfService = new SelfService(this.apiClient);
 
     this.service = {
+      asset: assetService,
       client: clientService,
       connection: connectionService,
       conversation: conversationService,
@@ -273,7 +275,11 @@ class Account extends EventEmitter {
       case GenericMessageType.TEXT: {
         const {content: text, linkPreview} = genericMessage[GenericMessageType.TEXT];
 
-        const content: TextContent = {text, linkPreview};
+        const content: TextContent = {text};
+
+        if (linkPreview.length) {
+          content.linkPreviews = linkPreview;
+        }
 
         return {
           content,
@@ -320,7 +326,7 @@ class Account extends EventEmitter {
       }
       case GenericMessageType.EDITED: {
         const {
-          text: {content: editedText},
+          text: {content: editedText, linkPreview: editedLinkPreview},
           replacingMessageId,
         } = genericMessage[GenericMessageType.EDITED];
 
@@ -328,6 +334,10 @@ class Account extends EventEmitter {
           originalMessageId: replacingMessageId,
           text: editedText,
         };
+
+        if (editedLinkPreview.length) {
+          content.linkPreviews = editedLinkPreview;
+        }
 
         return {
           content,

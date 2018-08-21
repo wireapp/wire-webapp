@@ -17,11 +17,11 @@
  *
  */
 
-import {LinkPreviewContent} from '../content';
+import {LinkPreviewUploadedContent} from '../content';
 
 interface TextContent {
   text: string;
-  linkPreview?: LinkPreviewContent[];
+  linkPreviews?: LinkPreviewUploadedContent[];
 }
 
 export {TextContent};
