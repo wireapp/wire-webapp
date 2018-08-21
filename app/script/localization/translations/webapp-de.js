@@ -357,7 +357,7 @@ z.string.de.conversationLikesCaption = '{{number}} Personen';
 z.string.de.conversationSendPastedFile = 'Bild eingefügt am {{date}}';
 z.string.de.conversationSomeone = 'Jemand';
 z.string.de.conversationTweetAuthor = ' auf Twitter';
-z.string.de.conversationServicesWarning = 'Dienste haben Zugriff auf den Inhalt der Unterhaltung';
+z.string.de.conversationServicesWarning = 'Dienste haben Zugriff auf den Inhalt dieser Unterhaltung';
 
 z.string.de.groupCreationPreferencesAction = 'Weiter';
 z.string.de.groupCreationPreferencesErrorNameShort = 'Gib mindestens ein Zeichen ein';
@@ -377,7 +377,7 @@ z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Dienste und Pe
 z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Dienste und Personen außerhalb des Teams. Diese Einstellung kann später jederzeit geändert werden.';
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
-z.string.de.guestRoomConversationBadgeService = 'Dienste anwesend';
+z.string.de.guestRoomConversationBadgeService = 'Dienste aktiv';
 z.string.de.guestRoomConversationBadgeGuestAndService = 'Gäste und Dienste anwesend';
 
 z.string.de.guestRoomConversationHead = 'Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.';
