@@ -62,32 +62,28 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     });
 
     this.hasService = ko.pureComputed(() => {
-      if (this.isGroupInTeam()) {
-        return this.conversationEntity()
-          .participating_user_ets()
-          .some(userEntity => userEntity.isService);
-      }
+      return this.conversationEntity()
+        .participating_user_ets()
+        .some(userEntity => userEntity.isService);
     });
 
     this.hasGuest = ko.pureComputed(() => {
-      if (this.isGroupInTeam()) {
-        return this.conversationEntity()
-          .participating_user_ets()
-          .some(userEntity => userEntity.isGuest());
-      }
+      return !this.isGroupInTeam()
+        ? false
+        : this.conversationEntity()
+            .participating_user_ets()
+            .some(userEntity => userEntity.isGuest());
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
       let stringId;
 
-      if (this.isGroupInTeam()) {
-        if (this.hasGuest()) {
-          stringId = this.hasService()
-            ? z.string.guestRoomConversationBadgeGuestAndService
-            : z.string.guestRoomConversationBadge;
-        } else if (this.hasService()) {
-          stringId = z.string.guestRoomConversationBadgeService;
-        }
+      if (this.hasGuest()) {
+        stringId = this.hasService()
+          ? z.string.guestRoomConversationBadgeGuestAndService
+          : z.string.guestRoomConversationBadge;
+      } else if (this.hasService()) {
+        stringId = z.string.guestRoomConversationBadgeService;
       }
 
       return stringId ? z.l10n.text(stringId) : '';
