@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.14.2"></a>
+## [1.14.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.14.1...@wireapp/api-client@1.14.2) (2018-08-21)
+
+
+### Bug Fixes
+
+* **api-client:** Check for invalid credentials label to trigger access token refresh ([#1032](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1032)) ([7745079](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7745079))
+
+
+
+
+
 <a name="1.14.1"></a>
 ## [1.14.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.14.0...@wireapp/api-client@1.14.1) (2018-08-21)
 
