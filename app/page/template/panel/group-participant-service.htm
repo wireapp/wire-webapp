@@ -8,7 +8,7 @@
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
 
         <!-- ko if: selectedService() -->
-          <panel-service-details params="service: selectedService()"></panel-service-details>
+          <panel-service-details params="service: selectedService"></panel-service-details>
 
           <!-- ko if: showActions() -->
             <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">
