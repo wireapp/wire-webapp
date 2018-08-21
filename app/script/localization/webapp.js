@@ -231,7 +231,7 @@ z.string.modalConversationRemoveHeadline = 'Remove?';
 z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or receive messages in this conversation.';
 
 z.string.modalConversationRemoveGuestsAction = 'Remove';
-z.string.modalConversationRemoveGuestsHeadline = 'Turn off access?';
+z.string.modalConversationRemoveGuestsHeadline = 'Disable access?';
 z.string.modalConversationRemoveGuestsMessage = 'Current guests and services will be removed from the conversation. New guests and services will not be allowed.';
 
 z.string.modalConversationRevokeLinkAction = 'Revoke link';
@@ -375,7 +375,7 @@ z.string.conversationLikesCaption = '{{number}} people';
 z.string.conversationSendPastedFile = 'Pasted image at {{date}}';
 z.string.conversationSomeone = 'Someone';
 z.string.conversationTweetAuthor = ' on Twitter';
-z.string.conversationServicesWarning = 'Services have access to the content of the conversation';
+z.string.conversationServicesWarning = 'Services have access to the content of this conversation';
 
 // Group creation
 z.string.groupCreationPreferencesAction = 'Next';
@@ -397,7 +397,7 @@ z.string.guestRoomToggleInfo = 'Open this conversation to services and people ou
 z.string.guestRoomToggleInfoExtended = 'Open this conversation to services and people outside your team. You can always change it later.';
 
 z.string.guestRoomConversationBadge = 'Guests are present';
-z.string.guestRoomConversationBadgeService = 'Services are present';
+z.string.guestRoomConversationBadgeService = 'Services are active';
 z.string.guestRoomConversationBadgeGuestAndService = 'Guests and services are present';
 
 z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
