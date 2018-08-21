@@ -26,6 +26,7 @@ import media from '../mediaQueries';
 import styled from 'styled-components';
 
 const LEVEL = {
+  lg: `max-width: ${WIDTH.DESKTOP_MAX}px;`,
   md: `max-width: ${WIDTH.TABLET_MAX}px;`,
   sm: `max-width: ${WIDTH.TABLET_MIN}px;`,
   xs: `max-width: ${WIDTH.MOBILE}px;`,
@@ -63,9 +64,10 @@ Container.defaultProps = {
   verticalCenter: false,
 };
 
+const ContainerLG = defaultProps({level: 'lg'})(Container);
 const ContainerMD = defaultProps({level: 'md'})(Container);
 const ContainerSM = defaultProps({level: 'sm'})(Container);
 const ContainerXS = defaultProps({level: 'xs'})(Container);
 const ContainerXXS = defaultProps({level: 'xxs'})(Container);
 
-export {Container, ContainerMD, ContainerSM, ContainerXS, ContainerXXS};
+export {Container, ContainerLG, ContainerMD, ContainerSM, ContainerXS, ContainerXXS};
