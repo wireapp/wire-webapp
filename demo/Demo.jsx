@@ -39,6 +39,7 @@ import {
   Column,
   Columns,
   Container,
+  ContainerLG,
   ContainerMD,
   ContainerSM,
   ContainerXS,
@@ -360,6 +361,7 @@ class Demo extends React.PureComponent {
             <ContainerXS style={ContainerStyle}>ContainerXS</ContainerXS>
             <ContainerSM style={ContainerStyle}>ContainerSM</ContainerSM>
             <ContainerMD style={ContainerStyle}>ContainerMD</ContainerMD>
+            <ContainerLG style={ContainerStyle}>ContainerLG</ContainerLG>
             <H2>Columns</H2>
             <Line />
 
