@@ -61,7 +61,7 @@ z.entity.User = class User {
   constructor(id = '') {
     this.id = id;
     this.is_me = false;
-    this.isBot = false;
+    this.isService = false;
     this.isSingleSignOn = false;
 
     this.joaatHash = -1;

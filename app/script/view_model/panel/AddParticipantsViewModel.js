@@ -34,29 +34,37 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
 
   constructor(params) {
     super(params);
+
     this.conversationRepository = this.repositories.conversation;
     this.integrationRepository = this.repositories.integration;
     this.teamRepository = this.repositories.team;
     this.userRepository = this.repositories.user;
+
+    this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
+
     this.isTeam = this.teamRepository.isTeam;
-    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
+    this.selfUser = this.userRepository.self;
     this.services = this.integrationRepository.services;
-    this.showIntegrations = ko.pureComputed(() => {
-      if (this.activeConversation()) {
-        const firstUserEntity = this.activeConversation().firstUserEntity();
-        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
-        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
-        const enableIntegrations = this.repositories.integration.enableIntegrations();
-        return enableIntegrations && allowIntegrations && !this.isTeamOnly();
-      }
-    });
     this.teamUsers = this.teamRepository.teamUsers;
     this.teamMembers = this.teamRepository.teamMembers;
 
+    this.isInitialServiceSearch = ko.observable(true);
     this.searchInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
     this.selectedService = ko.observable();
     this.state = ko.observable(AddParticipantsViewModel.STATE.ADD_PEOPLE);
+
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
+
+    this.showIntegrations = ko.pureComputed(() => {
+      if (this.activeConversation()) {
+        const firstUserEntity = this.activeConversation().firstUserEntity();
+        const hasBotUser = firstUserEntity && firstUserEntity.isService;
+        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
+        return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
+      }
+    });
+    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
 
     this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 
@@ -106,10 +114,6 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     return 'add-participants';
   }
 
-  shouldSkipTransition() {
-    return true;
-  }
-
   clickOnAddPeople() {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
   }
@@ -132,16 +136,25 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.onGoBack();
   }
 
+  clickToOpenTeamAdmin() {
+    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+  }
+
   initView() {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
     this.selectedContacts.removeAll();
     this.selectedService(undefined);
     this.searchInput('');
+    this.isInitialServiceSearch(true);
   }
 
   searchServices(query) {
     if (this.isStateAddService()) {
-      this.integrationRepository.searchForServices(query, this.searchInput);
+      this.integrationRepository
+        .searchForServices(this.searchInput(), this.searchInput)
+        .then(() => this.isInitialServiceSearch(false));
     }
   }
 

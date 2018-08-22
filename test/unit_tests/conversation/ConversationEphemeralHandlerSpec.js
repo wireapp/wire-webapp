@@ -21,8 +21,8 @@
 
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new z.conversation.ConversationMapper();
-  const conversationService = new z.conversation.ConversationService(null, null);
-  return new z.conversation.ConversationEphemeralHandler(conversationService, conversationMapper, () => {});
+  const eventService = new z.event.EventService(null, null);
+  return new z.conversation.ConversationEphemeralHandler(conversationMapper, eventService, () => {});
 };
 
 describe('z.conversation.ConversationEphemeralHandler', () => {

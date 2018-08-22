@@ -36,7 +36,6 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
-    this.expired = this.message.is_expired;
     this.header = params.header || false;
 
     this.audio_src = ko.observable();
@@ -92,7 +91,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
 ko.components.register('audio-asset', {
   template: `
     <audio data-bind="attr: {src: audio_src}, event: {timeupdate: on_timeupdate}"></audio>
-    <!-- ko ifnot: expired() -->
+    <!-- ko ifnot: message.isObfuscated() -->
       <!-- ko if: header -->
         <asset-header params="message: message"></asset-header>
       <!-- /ko -->

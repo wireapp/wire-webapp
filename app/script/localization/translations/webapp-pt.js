@@ -159,8 +159,6 @@ z.string.pt.modalConnectAcceptHeadline = 'Aceitar?';
 z.string.pt.modalConnectAcceptMessage = 'Isto irá ligá-lo e criar uma conversa com {{user}}.';
 z.string.pt.modalConnectAcceptSecondary = 'Ignorar';
 
-z.string.pt.modalConversationAddBotAction = 'Confirmar';
-
 z.string.pt.modalConversationClearAction = 'Eliminar';
 z.string.pt.modalConversationClearHeadline = 'Apagar conteúdo?';
 z.string.pt.modalConversationClearOption = 'Também abandona a conversa';
@@ -196,6 +194,7 @@ z.string.pt.modalConversationRemoveAction = 'Remover';
 z.string.pt.modalConversationRemoveHeadline = 'Remover?';
 z.string.pt.modalConversationRemoveMessage = '{{user}} não será capaz de enviar ou receber mensagens nesta conversa.';
 
+z.string.pt.modalConversationRemoveGuestsAction = 'Remover';
 
 z.string.pt.modalConversationTooManyMembersHeadline = 'Casa cheia';
 

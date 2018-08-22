@@ -24,14 +24,17 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
-  constructor({onClose, onGoBack, onGoToRoot, isVisible, navigateTo, mainViewModel, repositories}) {
+  constructor({isVisible, mainViewModel, navigateTo, onClose, onGoBack, onGoToRoot, repositories}) {
     this.onClose = onClose;
     this.onGoBack = onGoBack;
-    this.isVisible = isVisible;
-    this.navigateTo = navigateTo;
     this.onGoToRoot = onGoToRoot;
+    this.navigateTo = navigateTo;
+
+    this.isVisible = isVisible;
+
     this.repositories = repositories;
     this.mainViewModel = mainViewModel;
+
     this.activeConversation = repositories.conversation.active_conversation;
     this.actionsViewModel = mainViewModel.actions;
     this.isActivatedAccount = mainViewModel.isActivatedAccount;

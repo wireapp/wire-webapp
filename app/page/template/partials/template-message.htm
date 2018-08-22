@@ -25,8 +25,7 @@
         <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>
-        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -75,9 +74,9 @@
         <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
-        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
-        <!-- ko if: message.user().isBot -->
-          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversationBotUser"></span>
+        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
+        <!-- ko if: message.user().isService -->
+          <service-icon class="message-header-icon-service"></service-icon>
         <!-- /ko -->
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
@@ -191,7 +190,12 @@
   <!-- ko if: showLargeAvatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: otherUser().name()'></span>
-      <span class="message-connected-username label-username" data-bind='text: otherUser().username()'></span>
+      <!-- ko if: otherUser().isService -->
+        <span class="message-connected-provider-name" data-bind='text: otherUser().providerName()'></span>
+      <!-- /ko -->
+      <!-- ko ifnot: otherUser().isService -->
+        <span class="message-connected-username label-username" data-bind='text: otherUser().username()'></span>
+      <!-- /ko -->
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': otherUser().is_outgoing_request()}"
                    params="participant: otherUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
@@ -200,6 +204,9 @@
              data-bind="click: $parent.click_on_cancel_request,
                         l10n_text: z.string.conversationConnectionCancelRequest"
              data-uie-name="do-cancel-request"></div>
+      <!-- /ko -->
+      <!-- ko if: showServicesWarning -->
+        <div class="message-services-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
       <!-- /ko -->
     </div>
   <!-- /ko -->
@@ -228,6 +235,9 @@
           </div>
         <!-- /ko -->
       </div>
+      <!-- ko if: showServicesWarning -->
+        <div class="message-services-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
+      <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if: message.isGroupCreation() -->

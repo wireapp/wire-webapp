@@ -23,11 +23,7 @@
 
 describe('z.util.ArrayUtil', () => {
   describe('chunk', () => {
-    let array = null;
-
-    beforeEach(() => {
-      array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    });
+    const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     it('returns one chunk with all items when the size is bigger than the array', () => {
       const actual = z.util.ArrayUtil.chunk(array, 10);
@@ -63,14 +59,9 @@ describe('z.util.ArrayUtil', () => {
     const thirdItem = 'c';
     const unknownItem = 'd';
     const array = [firstItem, secondItem, thirdItem];
-    const filter = item => item !== secondItem;
 
     it('returns the second item when first item was given', () => {
       expect(z.util.ArrayUtil.getNextItem(array, firstItem)).toEqual(secondItem);
-    });
-
-    it('returns the third item when first item was given and filter skips the second item', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, firstItem, filter)).toEqual(thirdItem);
     });
 
     it('returns the second item when last item was given', () => {

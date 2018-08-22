@@ -127,9 +127,7 @@ z.entity.File = class File extends z.entity.Asset {
         const download_duration = (Date.now() - download_started) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);
       })
-      .catch(error => {
-        this.logger.error('Failed to download asset', error);
-      });
+      .catch(error => this.logger.error('Failed to download asset', error));
   }
 
   cancel_download() {

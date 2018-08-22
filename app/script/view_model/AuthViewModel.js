@@ -27,10 +27,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [
-        z.auth.URLParameter.BOT_PROVIDER,
-        z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
-        z.auth.URLParameter.INTEGRATIONS,
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
@@ -69,7 +66,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.client_service = new z.client.ClientService(this.auth.client, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.user_mapper = new z.user.UserMapper();
     this.user_service = new z.user.UserService(this.auth.client);
     this.user_repository = new z.user.UserRepository(
       this.user_service,
@@ -80,9 +76,11 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
 
+    const eventService = new z.event.EventService(this.storageService);
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
+      eventService,
       this.notification_service,
       this.web_socket_service,
       undefined,

@@ -169,10 +169,6 @@ z.string.ro.modalConnectAcceptHeadline = 'Acceptă?';
 z.string.ro.modalConnectAcceptMessage = 'Aceasta te va conecta și va deschide o conversație cu {{user}}.';
 z.string.ro.modalConnectAcceptSecondary = 'Ignoră';
 
-z.string.ro.modalConversationAddBotAction = 'Confirmă';
-z.string.ro.modalConversationAddBotHeadline = 'Adaugă serviciul';
-z.string.ro.modalConversationAddBotMessage = 'Sigur dorești să pornești o nouă conversație cu {{name}}?';
-
 z.string.ro.modalConversationClearAction = 'Șterge';
 z.string.ro.modalConversationClearHeadline = 'Ștergeți conținutul?';
 z.string.ro.modalConversationClearOption = 'Părăsește conversația';
@@ -208,6 +204,7 @@ z.string.ro.modalConversationRemoveAction = 'Șterge';
 z.string.ro.modalConversationRemoveHeadline = 'Șterge?';
 z.string.ro.modalConversationRemoveMessage = '{{user}} nu va mai putea trimite sau primi mesaje în această conversație.';
 
+z.string.ro.modalConversationRemoveGuestsAction = 'Șterge';
 
 z.string.ro.modalConversationTooManyMembersHeadline = 'Canalul este plin';
 
@@ -245,7 +242,6 @@ z.string.ro.conversationYouNominative = 'tu';
 z.string.ro.conversationYouDative = 'tu';
 z.string.ro.conversationYouAccusative = 'tu';
 
-z.string.ro.conversationBotUser = 'Bot';
 z.string.ro.conversationConnectionAccepted = 'Conectat';
 z.string.ro.conversationConnectionBlocked = 'Blocat';
 z.string.ro.conversationConnectionCancelRequest = 'Anulează cererea de conectare';

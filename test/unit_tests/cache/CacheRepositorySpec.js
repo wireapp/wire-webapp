@@ -23,7 +23,6 @@
 
 describe('z.cache.CacheRepository', () => {
   const cache_repository = new z.cache.CacheRepository();
-  cache_repository.logger.level = cache_repository.logger.levels.ERROR;
   const TEMP_KEY = 'should_be_deleted';
 
   describe('clearCache', () => {

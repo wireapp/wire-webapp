@@ -140,7 +140,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
             ? this.remote_version
             : undefined,
           started_as_video: videoTypes.includes(this.mediaType),
-          with_service: conversationEntity.isWithBot(),
+          with_service: conversationEntity.isWithService(),
         },
         z.tracking.helpers.getGuestAttributes(conversationEntity),
         attributes

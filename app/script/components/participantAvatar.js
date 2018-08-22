@@ -50,11 +50,11 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
     this.isService = ko.pureComputed(() => {
-      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isBot;
+      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isService;
     });
 
     this.isUser = ko.pureComputed(() => {
-      return this.participant() instanceof z.entity.User && !this.participant().isBot;
+      return this.participant() instanceof z.entity.User && !this.participant().isService;
     });
 
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
@@ -128,7 +128,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     this.cssClasses = ko.pureComputed(() => {
       if (this.isService()) {
-        return 'accent-color-bot';
+        return 'accent-color-service';
       }
 
       return this.isTemporaryGuest()
@@ -179,7 +179,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
 
-    this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
+    this.pictureSubscription = this.participant().mediumPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
         _loadAvatarPicture();
       }
@@ -191,7 +191,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
   dispose() {
     z.ui.ViewportObserver.removeElement(this.element[0]);
     this.participantSubscription.dispose();
-    this.picturePreviewSubscription.dispose();
+    this.pictureSubscription.dispose();
   }
 };
 

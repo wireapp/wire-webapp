@@ -142,8 +142,9 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (service) {
-      userEntity.isBot = true;
+      userEntity.isService = true;
       userEntity.providerId = service.provider;
+      userEntity.providerName = ko.observable('');
       userEntity.serviceId = service.id;
     }
 

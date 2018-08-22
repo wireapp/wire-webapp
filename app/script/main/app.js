@@ -53,12 +53,15 @@ z.main.App = class App {
     this.logger = new z.util.Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
     this.telemetry = new z.telemetry.app_init.AppInitTelemetry();
-    this.window_handler = new z.ui.WindowHandler().init();
+    this.windowHandler = new z.ui.WindowHandler().init();
 
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
+
+    // @todo Added for wrapper backwards compatibility. Remove after uptake of version > 3.2.
+    this.service.connect_google = this.service.connectGoogle;
 
     this.instanceId = z.util.createRandomUuid();
 
@@ -103,8 +106,9 @@ z.main.App = class App {
       repositories.client
     );
     repositories.event = new z.event.EventRepository(
+      this.service.event,
       this.service.notification,
-      this.service.web_socket,
+      this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
       repositories.user
@@ -113,7 +117,7 @@ z.main.App = class App {
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(
       this.service.connect,
-      this.service.connect_google,
+      this.service.connectGoogle,
       repositories.properties
     );
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
@@ -132,6 +136,8 @@ z.main.App = class App {
       repositories.user
     );
 
+    const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
+    repositories.event.setEventProcessMiddleware(serviceMiddleware.processEvent.bind(serviceMiddleware));
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
       repositories.client,
@@ -149,10 +155,11 @@ z.main.App = class App {
       this.service.calling,
       repositories.client,
       repositories.conversation,
+      repositories.event,
       repositories.media,
       repositories.user
     );
-    repositories.event_tracker = new z.tracking.EventTrackingRepository(
+    repositories.eventTracker = new z.tracking.EventTrackingRepository(
       repositories.conversation,
       repositories.team,
       repositories.user
@@ -178,6 +185,9 @@ z.main.App = class App {
    */
   _setupServices() {
     const storageService = new z.storage.StorageService();
+    const eventService = z.util.Environment.browser.edge
+      ? new z.event.EventServiceNoCompound(storageService)
+      : new z.event.EventService(storageService);
 
     return {
       asset: new z.assets.AssetService(this.auth.client),
@@ -186,11 +196,10 @@ z.main.App = class App {
       calling: new z.calling.CallingService(this.auth.client),
       client: new z.client.ClientService(this.auth.client, storageService),
       connect: new z.connect.ConnectService(this.auth.client),
-      connect_google: new z.connect.ConnectGoogleService(this.auth.client),
-      conversation: z.util.Environment.browser.edge
-        ? new z.conversation.ConversationServiceNoCompound(this.auth.client, storageService)
-        : new z.conversation.ConversationService(this.auth.client, storageService),
+      connectGoogle: new z.connect.ConnectGoogleService(this.auth.client),
+      conversation: new z.conversation.ConversationService(this.auth.client, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.auth.client),
+      event: eventService,
       giphy: new z.extension.GiphyService(this.auth.client),
       integration: new z.integration.IntegrationService(this.auth.client),
       lifecycle: new z.lifecycle.LifecycleService(),
@@ -201,7 +210,7 @@ z.main.App = class App {
       storage: storageService,
       team: new z.team.TeamService(this.auth.client),
       user: new z.user.UserService(this.auth.client, storageService),
-      web_socket: new z.event.WebSocketService(this.auth.client),
+      webSocket: new z.event.WebSocketService(this.auth.client),
     };
   }
 
@@ -210,11 +219,7 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return z.util.Environment.frontend.isProduction()
-      ? {}
-      : {
-          debug: new z.util.DebugUtil(this.repository),
-        };
+    return z.util.Environment.frontend.isProduction() ? {} : {debug: new z.util.DebugUtil(this.repository)};
   }
 
   /**
@@ -259,44 +264,39 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._getUserSelf(), z.util.protobuf.loadProtos(protoFile)]);
+        return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
-      .then(([self_user_et]) => {
+      .then(() => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
-        this.repository.client.init(self_user_et);
-        this.repository.properties.init(self_user_et);
-        return this.repository.client.getValidLocalClient();
+        return this._initiateSelfUserClients();
       })
-      .then(client_observable => {
+      .then(clientEntity => {
         this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
-
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        this.repository.cryptography.currentClient = client_observable;
-        this.repository.event.currentClient = client_observable;
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         this.view.loading.updateProgress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-        this.repository.event.connectWebSocket();
 
+        this.repository.event.connectWebSocket();
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
-      .then(([conversation_ets, connection_ets]) => {
+      .then(([conversationEntities, connectionEntities]) => {
         this.view.loading.updateProgress(25, z.string.initReceivedUserData);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS,
-          conversation_ets.length,
+          conversationEntities.length,
           50
         );
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS,
-          connection_ets.length,
+          connectionEntities.length,
           50
         );
 
@@ -307,30 +307,30 @@ z.main.App = class App {
       })
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initializeFromStream())
-      .then(notifications_count => {
+      .then(notificationsCount => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS,
-          notifications_count,
+          notificationsCount,
           100
         );
 
-        this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
+        this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
         this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
 
         this._watchOnlineStatus();
-        return this.repository.client.getClientsForSelf();
+        return this.repository.client.updateClientsForSelf();
       })
-      .then(client_ets => {
+      .then(clientEntities => {
         this.view.loading.updateProgress(99);
 
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, clientEntities.length);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
 
-        this.repository.user.self().devices(client_ets);
+        this.repository.user.self().devices(clientEntities);
         this.logger.info('App pre-loading completed');
         return this._handleUrlParams();
       })
@@ -481,10 +481,10 @@ z.main.App = class App {
   }
 
   /**
-   * Get the self user from the backend.
+   * Initiate the self user by getting it from the backend.
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
-  _getUserSelf() {
+  _initiateSelfUser() {
     return this.repository.user.getSelf().then(userEntity => {
       this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
@@ -496,8 +496,27 @@ z.main.App = class App {
         }
       }
 
-      return this.service.storage.init(userEntity.id).then(() => this._checkUserInformation(userEntity));
+      return this.service.storage
+        .init(userEntity.id)
+        .then(() => this.repository.client.init(userEntity))
+        .then(() => this.repository.properties.init(userEntity))
+        .then(() => this._checkUserInformation(userEntity));
     });
+  }
+
+  /**
+   * Initiate the current client of the self user.
+   * @returns {Promise<z.client.Client>} Resolves with the local client entity
+   */
+  _initiateSelfUserClients() {
+    return this.repository.client
+      .getValidLocalClient()
+      .then(clientObservable => {
+        this.repository.cryptography.currentClient = clientObservable;
+        this.repository.event.currentClient = clientObservable;
+        return this.repository.client.getClientsForSelf();
+      })
+      .then(() => this.repository.client.currentClient());
   }
 
   /**
@@ -506,18 +525,7 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_SERVICE);
-    if (providerId && serviceId) {
-      this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
-      this.repository.integration.addServiceFromParam(providerId, serviceId);
-    }
-
-    const supportIntegrations = z.util.URLUtil.getParameter(z.auth.URLParameter.INTEGRATIONS);
-    if (_.isBoolean(supportIntegrations)) {
-      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
-      this.repository.integration.supportIntegrations(supportIntegrations);
-    }
+    // Currently no URL params to be handled
   }
 
   /**
@@ -527,9 +535,8 @@ z.main.App = class App {
    */
   _isReload() {
     const isReload = z.util.isSameLocation(document.referrer, window.location.href);
-    this.logger.debug(
-      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
-    );
+    const log = `App reload: '${isReload}', Referrer: '${document.referrer}', Location: '${window.location.href}'`;
+    this.logger.debug(log);
     return isReload;
   }
 

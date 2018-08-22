@@ -71,29 +71,15 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.elementId = 'right-column';
     this.repositories = repositories;
     this.conversationRepository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.teamRepository = repositories.team;
     this.mainViewModel = mainViewModel;
 
-    this.conversationEntity = repositories.conversation.active_conversation;
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
+    this.conversationEntity = this.conversationRepository.active_conversation;
     this.stateHistory = [];
 
     this.isAnimating = ko.observable(false);
     this.isVisible = ko.pureComputed(() => this.state() !== null);
     this.exitingState = ko.observable(undefined);
     this.state = ko.observable(null);
-    this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
-    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
-
-    this.showIntegrations = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        const firstUserEntity = this.conversationEntity().firstUserEntity();
-        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
-        const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
-        return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
-      }
-    });
 
     this.conversationEntity.subscribe(this._forceClosePanel.bind(this), null, 'beforeChange');
     this.subViews = this.buildSubViews();

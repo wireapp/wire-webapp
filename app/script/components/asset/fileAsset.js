@@ -32,7 +32,6 @@ z.components.FileAssetComponent = class FileAssetComponent {
   constructor(params) {
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
-    this.expired = this.message.is_expired;
     this.header = params.header || false;
 
     this.circle_upload_progress = ko.pureComputed(() => {
@@ -54,7 +53,7 @@ z.components.FileAssetComponent = class FileAssetComponent {
 
 ko.components.register('file-asset', {
   template: `\
-    <!-- ko ifnot: expired() -->
+    <!-- ko ifnot: message.isObfuscated() -->
       <!-- ko if: header -->
         <asset-header params="message: message"></asset-header>
       <!-- /ko -->

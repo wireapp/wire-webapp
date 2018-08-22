@@ -26,7 +26,12 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends z.viewModel.panel.BasePanelViewModel {
   constructor(params) {
     super(params);
+
+    this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
+    this.clickOnMessageTimeOff = this.clickOnMessageTime.bind(this, {value: null});
+
     this.conversationRepository = this.repositories.conversation;
+
     this.messageTimes = ko.pureComputed(() => {
       const times = z.ephemeral.timings.VALUES;
       const currentTime = this.currentMessageTimer();
@@ -58,9 +63,6 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.isRendered())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
-
-    this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
-    this.clickOnMessageTimeOff = this.clickOnMessageTime.bind(this, {value: null});
   }
 
   getElementId() {

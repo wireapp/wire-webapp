@@ -48,8 +48,11 @@ window.z.config = {
   // 10 seconds until phone code expires
   LOGIN_CODE_EXPIRATION: 10 * 60,
 
-  // 25 megabyte upload limit (minus AES overhead)
-  MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 32,
+  // 25 megabyte upload limit for personal use
+  MAXIMUM_ASSET_FILE_SIZE_PERSONAL: 25 * 1024 * 1024,
+
+  // 100 megabyte upload limit for organizations
+  MAXIMUM_ASSET_FILE_SIZE_TEAM: 100 * 1024 * 1024,
 
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,

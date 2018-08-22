@@ -57,11 +57,37 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
     });
 
-    this.hasGuests = ko.pureComputed(() =>
-      this.conversationEntity()
+    this.isGroupInTeam = ko.pureComputed(() => {
+      return this.conversationEntity().is_group() && this.conversationEntity().inTeam();
+    });
+
+    this.hasService = ko.pureComputed(() => {
+      return this.conversationEntity()
         .participating_user_ets()
-        .some(userEntity => userEntity.isGuest())
-    );
+        .some(userEntity => userEntity.isService);
+    });
+
+    this.hasGuest = ko.pureComputed(() => {
+      return !this.isGroupInTeam()
+        ? false
+        : this.conversationEntity()
+            .participating_user_ets()
+            .some(userEntity => userEntity.isGuest());
+    });
+
+    this.badgeLabelCopy = ko.pureComputed(() => {
+      let stringId;
+
+      if (this.hasGuest()) {
+        stringId = this.hasService()
+          ? z.string.guestRoomConversationBadgeGuestAndService
+          : z.string.guestRoomConversationBadge;
+      } else if (this.hasService()) {
+        stringId = z.string.guestRoomConversationBadgeService;
+      }
+
+      return stringId ? z.l10n.text(stringId) : '';
+    });
 
     this.hasOngoingCall = ko.computed(() => {
       return this.hasCall() && this.joinedCall() ? this.joinedCall().isOngoing() : false;

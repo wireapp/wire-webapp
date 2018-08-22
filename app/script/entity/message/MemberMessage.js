@@ -52,6 +52,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.hasUsers = ko.pureComputed(() => this.userEntities().length);
     this.allTeamMembers = undefined;
+    this.showServicesWarning = false;
 
     this.hasUsers = ko.pureComputed(() => this.userEntities().length);
 

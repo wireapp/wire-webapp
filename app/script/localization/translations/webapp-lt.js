@@ -178,10 +178,6 @@ z.string.lt.modalConnectAcceptHeadline = 'Priimti?';
 z.string.lt.modalConnectAcceptMessage = 'Tai užmegs kontaktą ir atvers pokalbį su {{user}}.';
 z.string.lt.modalConnectAcceptSecondary = 'Nepaisyti';
 
-z.string.lt.modalConversationAddBotAction = 'Patvirtinti';
-z.string.lt.modalConversationAddBotHeadline = 'Pridėti paslaugą';
-z.string.lt.modalConversationAddBotMessage = 'Ar tikrai norite pradėti susirašinėjimą su {{name}}?';
-
 z.string.lt.modalConversationClearAction = 'Ištrinti';
 z.string.lt.modalConversationClearHeadline = 'Ištrinti turinį?';
 z.string.lt.modalConversationClearMessage = 'Tai išvalys bendravimo praeitį visuose jūsų įrenginiuose.';
@@ -288,7 +284,6 @@ z.string.lt.conversationYouNominative = 'jūs';
 z.string.lt.conversationYouDative = 'jūs';
 z.string.lt.conversationYouAccusative = 'jūs';
 
-z.string.lt.conversationBotUser = 'Robotas';
 z.string.lt.conversationConnectionAccepted = 'Kontaktas užmegztas';
 z.string.lt.conversationConnectionBlocked = 'Užblokuotas(-a)';
 z.string.lt.conversationConnectionCancelRequest = 'Atsisakyti kontakto užmezgimo užklausos';
@@ -667,7 +662,6 @@ z.string.lt.searchInviteButtonGmail = 'Iš Gmail';
 z.string.lt.searchInviteHeadline = 'Pasikvieskite savo draugus';
 z.string.lt.searchInviteShare = 'Dalintis kontaktais';
 
-z.string.lt.searchServiceNewConversation = 'Kurti naują susirašinėjimą';
 z.string.lt.searchServiceConfirmButton = 'Pridėti paslaugą';
 
 z.string.lt.searchListEveryoneParticipates = 'Visi, su kuo esate\nužmezgę kontaktą, jau yra\nšiame pokalbyje.';

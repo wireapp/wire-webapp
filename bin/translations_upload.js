@@ -19,6 +19,12 @@
 
 const {join, resolve} = require('path');
 const {execSync} = require('child_process');
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 const root = resolve(__dirname, '..');
 
@@ -27,4 +33,10 @@ const uploadToCrowdin = () => {
   execSync(`crowdin upload sources --identity="${crowdinYaml}"`, {stdio: [0, 1]});
 };
 
-uploadToCrowdin();
+rl.question(
+  '\x1b[41m\x1b[1m\x1b[5m !!! WAIT !!! \x1b[0m \x1b[1mDid you pull and run the project at least once before uploading to Crowdin?\x1b[0m (type "yes")\n',
+  answer => {
+    rl.close();
+    return answer === 'yes' ? uploadToCrowdin() : process.exit();
+  }
+);

@@ -3,12 +3,12 @@
     <span class="left-list-header-text" data-bind="text: teamName" data-uie-name="status-team-name-search"></span>
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close"></span>
   </div>
-  <div id="start-ui-header" class="start-ui-header border-theme" data-bind="css: {'start-ui-header-integrations': enableIntegrations()}">
+  <div id="start-ui-header" class="start-ui-header border-theme" data-bind="css: {'start-ui-header-integrations': isTeam()}">
     <user-input class="start-ui-header-user-input"
                 params="input: searchInput, placeholder: z.string.searchPlaceholder, enter: handleSearchInput"
                 data-uie-name="enter-search">
     </user-input>
-    <!-- ko if: enableIntegrations() -->
+    <!-- ko if: isTeam() -->
       <div class="start-ui-list-tabs">
         <div class="start-ui-list-tab" data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, l10n_text: z.string.searchPeople" data-uie-name="do-add-people"></div>
         <div class="start-ui-list-tab" data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, l10n_text: z.string.searchServices" data-uie-name="do-add-services"></div>
@@ -37,7 +37,7 @@
           <!-- ko ifnot: showSearchResults() -->
             <!-- ko if: showInviteMember() -->
               <ul class="start-ui-invite-people left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnInviteMember" data-uie-name="do-invite-member">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="do-invite-member">
                   <div class="left-column-icon icon-envelope"></div>
                   <div class="center-column" data-bind="l10n_text: z.string.searchMemberInvite"></div>
                 </li>
@@ -105,7 +105,29 @@
         <!-- /ko -->
 
         <!-- ko ifnot: peopleTabActive() -->
-          <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
+          <!-- ko if: services().length -->
+            <!-- ko if: isTeamManager() -->
+              <ul class="start-ui-manage-services left-list-items">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="go-manage-services">
+                  <service-icon class="left-column-icon"></service-icon>
+                  <div class="center-column" data-bind="l10n_text: z.string.searchManageServices"></div>
+                </li>
+              </ul>
+            <!-- /ko -->
+            <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
+          <!-- /ko -->
+          <!-- ko if: !services().length && !isInitialServiceSearch() -->
+            <div class="search__no-services">
+              <service-icon class="search__no-services__icon"></service-icon>
+              <!-- ko if: isTeamManager() -->
+                <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
+                <div class="search__no-services__manage-button" data-bind="l10n_text: z.string.searchManageServicesNoResults, click: clickToOpenTeamAdmin" data-uie-name="go-enable-services"></div>
+              <!-- /ko -->
+              <!-- ko ifnot: isTeamManager() -->
+                <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesMember" data-uie-name="label-no-services-enabled"></div>
+              <!-- /ko -->
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -162,33 +184,12 @@
               </div>
             </div>
 
-            <!-- ko ifnot: showServiceConversationList() -->
-              <div class="start-ui-service-description" data-bind="text: userProfile().description" data-uie-name="status-service-description"></div>
-            <!-- /ko -->
+            <div class="start-ui-service-description" data-bind="text: userProfile().description" data-uie-name="status-service-description"></div>
           </div>
 
-          <!-- ko if: showServiceConversationList() -->
-            <div class="start-ui-service-conversations">
-              <user-input class="start-ui-service-conversations-input user-list-light" params="input: searchConversationInput, placeholder: z.string.searchServicePlaceholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
-              <div class="start-ui-service-conversation-list-wrapper">
-                <div class="start-ui-service-conversations-list" data-bind="antiscroll: shouldUpdateServiceScrollbar">
-                  <div class="start-ui-service-conversations-create" data-bind="click: clickToCreateServiceConversation" data-uie-name="do-create-conversation">
-                    <div class="icon-plus"></div>
-                    <div class="start-ui-service-conversations-create-text" data-bind="text: z.string.searchServiceNewConversation"></div>
-                  </div>
-                  <!-- ko foreach: serviceConversations() -->
-                    <conversation-list-cell params="conversation: $data" data-bind="click: $parent.clickToAddService" data-uie-name="item-conversation"></conversation-list-cell>
-                  <!-- /ko -->
-                </div>
-              </div>
-            </div>
-          <!-- /ko -->
-
-          <!-- ko ifnot: showServiceConversationList() -->
-            <div class="start-ui-service-footer">
-              <button class="start-ui-service-button" data-bind="click: clickOnAddService, l10n_text: z.string.searchServiceConfirmButton" data-uie-name="do-service-confirm"></button>
-            </div>
-          <!-- /ko -->
+          <div class="start-ui-service-footer">
+            <button class="start-ui-service-button" data-bind="click: clickToOpenService, l10n_text: z.string.searchServiceConfirmButton" data-uie-name="do-service-confirm"></button>
+          </div>
         </div>
       <!-- /ko -->
     </div>

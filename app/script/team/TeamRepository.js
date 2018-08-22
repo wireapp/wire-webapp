@@ -53,7 +53,7 @@ z.team.TeamRepository = class TeamRepository {
         .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
     });
 
-    this.teamMembers.subscribe(() => this.userRepository.map_guest_status());
+    this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
     });
@@ -93,6 +93,12 @@ z.team.TeamRepository = class TeamRepository {
       if (members.length) {
         return this.teamMapper.mapMemberFromArray(members);
       }
+    });
+  }
+
+  getWhitelistedServices(teamId, size, prefix) {
+    return this.teamService.getWhitelistedServices(teamId, size, prefix).then(({services: servicesData}) => {
+      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 

@@ -25,7 +25,7 @@ addons:
 # http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 node_js:
-  - "8"
+  - "10"
 
 # http://docs.travis-ci.com/user/gui-and-headless-browsers/
 before_install:
@@ -120,6 +120,6 @@ deploy:
 after_deploy:
   - |
     if [ "${TRAVIS_BRANCH}" == "staging" ] && [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_EVENT_TYPE}" == "push" ]; then
-      yarn global add @wireapp/changelog-bot@latest
+      yarn global add @wireapp/changelog-bot@0.2.82
       wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "a720ce02-c44c-4981-936c-609380884231"
     fi

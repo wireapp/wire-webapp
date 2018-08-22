@@ -54,13 +54,22 @@ z.event.EventRepository = class EventRepository {
   /**
    * Construct a new Event Repository.
    *
+   * @param {z.event.EventService} eventService - Service that handles interactions with events
    * @param {z.event.NotificationService} notificationService - Service handling the notification stream
    * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(notificationService, webSocketService, conversationService, cryptographyRepository, userRepository) {
+  constructor(
+    eventService,
+    notificationService,
+    webSocketService,
+    conversationService,
+    cryptographyRepository,
+    userRepository
+  ) {
+    this.eventService = eventService;
     this.notificationService = notificationService;
     this.webSocketService = webSocketService;
     this.conversationService = conversationService;
@@ -135,8 +144,20 @@ z.event.EventRepository = class EventRepository {
     this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
+    this.eventProcessMiddleware = undefined;
+
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.injectEvent.bind(this));
+  }
+
+  /**
+   * Will set a middleware to run before the EventRepository actually processes the event.
+   * Middleware is just a function with the following signature (Event) => Promise<Event>.
+   *
+   * @param {Function} middleware - middleware to run when a new event is about to be processed
+   * @returns {void} - returns nothing
+   */
+  setEventProcessMiddleware(middleware) {
+    this.eventProcessMiddleware = middleware;
   }
 
   //##############################################################################
@@ -605,6 +626,7 @@ z.event.EventRepository = class EventRepository {
       : Promise.resolve(event);
 
     return mapEvent
+      .then(mappedEvent => (this.eventProcessMiddleware ? this.eventProcessMiddleware(mappedEvent) : mappedEvent))
       .then(mappedEvent => {
         const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
@@ -647,77 +669,132 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const {conversation: conversationId, data: mappedData} = event;
-    const eventId = (mappedData && mappedData.replacing_message_id) || event.id;
+    const conversationId = event.conversation;
+    const mappedData = event.data || {};
 
-    const loadPromise = eventId
-      ? this.conversationService.load_event_from_db(conversationId, eventId)
+    //first check if a message that should be replaced exists in DB
+    const findEventToReplacePromise = mappedData.replacing_message_id
+      ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();
 
-    return loadPromise.then(storedEvent => {
-      if (!storedEvent) {
-        return this.conversationService.save_event(event);
+    return findEventToReplacePromise.then(eventToReplace => {
+      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+      if (isReplacementWithoutOriginal && !hasLinkPreview) {
+        // the only valid case of a replacement with no original message is when an edited message gets a link preview
+        this._throwValidationError(event, 'Edit event without original event');
       }
 
-      const {from: mappedFrom, type: mappedType} = event;
-      const {from: storedFrom, type: storedType} = storedEvent;
+      const handleEvent = newEvent => {
+        // check for duplicates (same id)
+        const loadEventPromise = newEvent.id
+          ? this.eventService.loadEvent(conversationId, newEvent.id)
+          : Promise.resolve();
 
-      const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
+        return loadEventPromise.then(storedEvent => {
+          return storedEvent
+            ? this._handleDuplicatedEvent(storedEvent, newEvent)
+            : this.eventService.saveEvent(newEvent);
+        });
+      };
 
-      const fromDifferentUsers = storedFrom !== mappedFrom;
-      if (fromDifferentUsers) {
-        this.logger.warn(`${logMessage} ID previously used by user '${storedFrom}'`, event);
-        const errorMessage = 'Event validation failed: ID reused by other user';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const isLegitMessageReplacement = mappedData.previews.length || mappedData.replacing_message_id;
-      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
-      if (userReusedId) {
-        this.logger.warn(`${logMessage} ID previously used by same user`, event);
-        const errorMessage = 'Event validation failed: ID reused by same user';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      return this._handleDuplicateEvents(storedEvent, event);
+      return eventToReplace ? this._handleEventReplacement(eventToReplace, event) : handleEvent(event);
     });
   }
 
-  _handleDuplicateEvents(originalEvent, newEvent) {
-    const newData = newEvent.data;
+  _handleEventReplacement(originalEvent, newEvent) {
+    const newData = newEvent.data || {};
+    if (originalEvent.data.from !== newData.from) {
+      const logMessage = `ID previously used by user '${newEvent.from}'`;
+      const errorMessage = 'ID reused by other user';
+      this._throwValidationError(newEvent, errorMessage, logMessage);
+    }
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
-    let updates;
+    const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
-    /*
-     * The only two valid cases for a duplicate event are:
-     *  - a link preview has been received (the text message already being in DB) ;
-     *  - a message has been updated
-     */
-    const isMessageEdit = !!(newData && newData.replacing_message_id);
-    const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
+    let updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
 
-    switch (true) {
-      case isMessageEdit: {
-        updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
-        break;
-      }
-
-      case isLinkPreviewUpdate: {
-        // case of a link preview
-        updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
-        break;
-      }
-
-      default: {
-        this.logger.error(`Unhandled ID duplication '${originalEvent.id}' by event '${newEvent.type}'`, newEvent);
-        const errorMessage = 'Event validation failed: Unhandled event duplicate';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
+    if (isLinkPreviewEdit) {
+      updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
     }
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
-    return this.conversationService.update_event(identifiedUpdates);
+    return this.eventService.replaceEvent(identifiedUpdates);
+  }
+
+  _handleDuplicatedEvent(originalEvent, newEvent) {
+    switch (newEvent.type) {
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        return this._handleAssetUpdate(originalEvent, newEvent);
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._handleLinkPreviewUpdate(originalEvent, newEvent);
+
+      default:
+        this._throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
+    }
+  }
+
+  _handleAssetUpdate(originalEvent, newEvent) {
+    const newEventData = newEvent.data;
+    // the preview status is not sent by the client so we fake a 'preview' status in order to cleany handle it in the switch statement
+    const ASSET_PREVIEW = 'preview';
+    const isPreviewEvent = !newEventData.status && newEventData.preview_key;
+    const status = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+
+    switch (status) {
+      case ASSET_PREVIEW:
+      case z.assets.AssetTransferState.UPLOADED: {
+        const updatedData = Object.assign({}, originalEvent.data, newEventData);
+        const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
+        return this.eventService.replaceEvent(updatedEvent);
+      }
+
+      case z.assets.AssetTransferState.UPLOAD_FAILED: {
+        // case of both failed or canceled upload
+        const fromOther = newEvent.from !== this.userRepository.self().id;
+        const selfCancel = !fromOther && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
+        const shouldDeleteEvent = fromOther || selfCancel;
+        return shouldDeleteEvent
+          ? this.eventService.deleteEvent(newEvent.conversation, newEvent.id).then(() => newEvent)
+          : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
+      }
+
+      default:
+        return this._throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+    }
+  }
+
+  _handleLinkPreviewUpdate(originalEvent, newEvent) {
+    const newEventData = newEvent.data;
+    const originalData = originalEvent.data;
+    if (originalEvent.from !== newEvent.from) {
+      const logMessage = `ID previously used by user '${newEvent.from}'`;
+      const errorMessage = 'ID reused by other user';
+      this._throwValidationError(newEvent, errorMessage, logMessage);
+    }
+
+    const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
+    if (!containsLinkPreview) {
+      const errorMessage = 'Link preview event does not contain previews';
+      this._throwValidationError(newEvent, errorMessage);
+    }
+
+    const textContentMatches = newEventData.content === originalData.content;
+    if (!textContentMatches) {
+      const errorMessage = 'ID of link preview reused';
+      const logMessage = 'Text content for link preview not matching';
+      this._throwValidationError(newEvent, errorMessage, logMessage);
+    }
+
+    const bothAreMessageAddType = newEvent.type === originalEvent.type;
+    if (!bothAreMessageAddType) {
+      this._throwValidationError(newEvent, 'ID reused by same user');
+    }
+
+    const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
+    const identifiedUpdates = Object.assign({}, {primary_key: originalEvent.primary_key}, updates);
+    return this.eventService.replaceEvent(identifiedUpdates);
   }
 
   _getUpdatesForMessageEdit(originalEvent, newEvent) {
@@ -733,16 +810,14 @@ z.event.EventRepository = class EventRepository {
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
     if (updatingLinkPreview) {
-      this.logger.warn(`ID of link preview reused`, newEvent);
-      const errorMessage = 'Event validation failed: ID of link preview reused';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      this._throwValidationError(newEvent, 'ID of link preview reused');
     }
 
     const textContentMatches = !newData.previews.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      this.logger.warn(`Text content for link preview not matching`, newEvent);
-      const errorMessage = 'Event validation failed: ID of link preview reused';
-      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      const logMessage = 'Text content for link preview not matching';
+      const errorMessage = 'ID of link preview reused';
+      this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     return Object.assign({}, newEvent, {
@@ -751,6 +826,13 @@ z.event.EventRepository = class EventRepository {
       time: originalEvent.time,
       version: originalEvent.version,
     });
+  }
+
+  _throwValidationError(event, errorMessage, logMessage) {
+    const baseLogMessage = `Ignored '${event.type}' (${event.id}) in '${event.conversation}' from '${event.from}':'`;
+    const baseErrorMessage = 'Event validation failed:';
+    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
+    throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
   }
 
   /**
