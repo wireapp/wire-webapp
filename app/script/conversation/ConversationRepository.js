@@ -2705,6 +2705,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           const isBackendTimestamp = eventSource !== z.event.EventRepository.SOURCE.INJECTED;
           conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+
+          const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
+          const isFromUnknownUser = !allParticipantIds.includes(eventJson.from);
+          if (isFromUnknownUser) {
+            this.logger.warn('Received event from user not in the conversation');
+            conversationEntity.participating_user_ids.push(eventJson.from);
+            return this.updateParticipatingUserEntities(conversationEntity, false, true).then(updatedConversation => {
+              this.verification_state_handler.onMemberJoined(updatedConversation, [eventJson.from]);
+              return updatedConversation;
+            });
+          }
         }
 
         return conversationEntity;
