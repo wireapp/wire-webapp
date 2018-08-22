@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.5.1"></a>
+## [2.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.5.0...@wireapp/react-ui-kit@2.5.1) (2018-08-22)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Font weight for Lead set to 300 ([#1036](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1036)) ([4523e3c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/4523e3c))
+
+
+
+
+
 <a name="2.5.0"></a>
 # [2.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.4.2...@wireapp/react-ui-kit@2.5.0) (2018-08-21)
 
