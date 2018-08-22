@@ -51,7 +51,6 @@ Lead.defaultProps = {
   block: true,
   center: true,
   fontSize: '24px',
-  light: true,
 };
 
 export {Paragraph, Lead};
