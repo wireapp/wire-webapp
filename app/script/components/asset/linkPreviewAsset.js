@@ -63,7 +63,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
 
 ko.components.register('link-preview-asset', {
   template: `
-    <!-- ko ifnot: messageEntity.is_expired() -->
+    <!-- ko ifnot: messageEntity.isObfuscated() -->
       <div class="link-preview-image-container">
         <!-- ko if: !preview || !preview.image_resource() -->
           <div class="link-preview-image-placeholder icon-link"></div>
@@ -93,7 +93,7 @@ ko.components.register('link-preview-asset', {
       </div>
     <!-- /ko -->
 
-    <!-- ko if: messageEntity.is_expired() -->
+    <!-- ko if: messageEntity.isObfuscated() -->
       <div class="link-preview-image-container">
         <div class="link-preview-image-placeholder icon-link bg-color-ephemeral text-white"></div>
       </div>

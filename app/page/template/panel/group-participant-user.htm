@@ -7,7 +7,7 @@
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
         <!-- ko if: selectedParticipant() -->
-          <panel-user-details params="participant: selectedParticipant()"></panel-user-details>
+          <panel-user-details params="participant: selectedParticipant"></panel-user-details>
         <!-- /ko -->
         <!-- ko if: showActionDevices() -->
           <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">

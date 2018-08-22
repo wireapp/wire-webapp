@@ -23,7 +23,7 @@ ko.components.register('panel-user-details', {
   template: `
     <div class="panel-participant">
 
-      <!-- ko if: participant().is_verified() -->
+      <!-- ko if: isVerified() -->
         <verified-icon class="panel-participant__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
       <!-- /ko -->
 
@@ -59,6 +59,7 @@ ko.components.register('panel-user-details', {
   viewModel: class {
     constructor(params) {
       this.participant = params.participant;
+      this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
       this.availabilityLabel = ko.pureComputed(() => {
         const availabilitySetToNone = this.participant().availability() === z.user.AvailabilityType.NONE;
         if (!availabilitySetToNone) {
