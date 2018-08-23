@@ -191,7 +191,10 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
+    this.hasUnreadMessages = ko.observable(false);
+
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
