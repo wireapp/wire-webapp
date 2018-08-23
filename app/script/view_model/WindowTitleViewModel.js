@@ -49,27 +49,22 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
     ko.computed(() => {
       if (this.updateWindowTitle()) {
-        let specificTitle = '';
-        let unreadConversations = 0;
         const connectionRequests = this.userRepository.connect_requests().length;
 
-        this.conversationRepository.conversations_unarchived().forEach(conversationEntity => {
-          const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
-          if (conversationEntity.unread_message_count() && !isIgnored) {
-            unreadConversations++;
-          }
-        });
+        const unreadConversations = this.conversationRepository
+          .conversations_unarchived()
+          .filter(conversationEntity => {
+            const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
+            return conversationEntity.unread_message_count() && !isIgnored;
+          }).length;
 
-        this.conversationRepository.conversations_calls().forEach(conversationEntity => {
-          if (conversationEntity.hasJoinableCall()) {
-            unreadConversations++;
-          }
-        });
+        const joinableCalls = this.conversationRepository
+          .conversations_calls()
+          .filter(conversationEntity => conversationEntity.hasJoinableCall()).length;
 
-        const unreadCount = connectionRequests + unreadConversations;
-        if (unreadCount > 0) {
-          specificTitle = `(${unreadCount}) · `;
-        }
+        const unreadCount = connectionRequests + unreadConversations + joinableCalls;
+
+        let specificTitle = unreadCount > 0 ? `(${unreadCount}) · ` : '';
 
         amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
