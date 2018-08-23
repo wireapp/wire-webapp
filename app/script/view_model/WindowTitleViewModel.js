@@ -55,14 +55,11 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
           .conversations_unarchived()
           .filter(conversationEntity => {
             const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
-            return conversationEntity.unread_message_count() && !isIgnored;
+            const hasActions = conversationEntity.unread_message_count() || conversationEntity.hasJoinableCall();
+            return hasActions && !isIgnored;
           }).length;
 
-        const joinableCalls = this.conversationRepository
-          .conversations_calls()
-          .filter(conversationEntity => conversationEntity.hasJoinableCall()).length;
-
-        const unreadCount = connectionRequests + unreadConversations + joinableCalls;
+        const unreadCount = connectionRequests + unreadConversations;
 
         let specificTitle = unreadCount > 0 ? `(${unreadCount}) · ` : '';
 
