@@ -87,7 +87,7 @@ const Modal = ({children, fullscreen, onClose, onBackgroundClick, ...props}) => 
   <OverlayWrapper {...props}>
     <ModalBody fullscreen={fullscreen}>
       <ModalContent>{children}</ModalContent>
-      {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="modal-close" />}
+      {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="do-close" />}
     </ModalBody>
     {!fullscreen && (
       <ModalBackground

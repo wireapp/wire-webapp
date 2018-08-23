@@ -68,7 +68,7 @@ const OverlayBackground = styled.div`
 `;
 
 const Overlay = ({children, ...props}) => (
-  <OverlayWrapper {...props}>
+  <OverlayWrapper {...props} data-uie-name="modal">
     <OverlayContent>{children}</OverlayContent>
     <OverlayBackground data-uie-name="overlay-background" />
   </OverlayWrapper>
