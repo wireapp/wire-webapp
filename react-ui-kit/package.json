@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "bazinga64": "5.3.5",
+    "bazinga64": "5.3.6",
     "color": "3.0.0",
     "react": "16.4.2",
     "react-dom": "16.4.2",
@@ -40,5 +40,5 @@
     "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0"
   },
-  "version": "2.5.2"
+  "version": "2.5.3"
 }
