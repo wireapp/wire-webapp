@@ -111,18 +111,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     const containsUnkownUsers = missingUserIds.length > 0;
 
     if (containsUnkownUsers) {
-      this.conversationRepository
-        .get_conversation_by_id(conversationId)
-        .then(conversationEntity => {
-          missingUserIds.forEach(userId => conversationEntity.participating_user_ids.push(userId));
-          return this.conversationRepository.updateParticipatingUserEntities(conversationEntity, false, true);
-        })
-        .then(conversationEntity => {
-          return this.conversationRepository.verification_state_handler.onMemberJoined(
-            conversationEntity,
-            missingUserIds
-          );
-        });
+      this.conversationRepository.triggerSpontaneousMemberJoin(conversationId, missingUserIds);
     }
 
     return this.cryptographyRepository

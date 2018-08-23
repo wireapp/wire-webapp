@@ -1150,6 +1150,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
   }
 
+  triggerSpontaneousMemberJoin(conversationId, userIds) {
+    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
+      const memberJoinEvent = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, userIds, this.timeOffset);
+      return this.eventRepository.injectEvent(memberJoinEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+    });
+  }
+
   /**
    * Add a service to an existing conversation.
    *
@@ -2710,11 +2717,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const isFromUnknownUser = !allParticipantIds.includes(eventJson.from);
           if (isFromUnknownUser) {
             this.logger.warn('Received event from user not in the conversation');
-            conversationEntity.participating_user_ids.push(eventJson.from);
-            return this.updateParticipatingUserEntities(conversationEntity, false, true).then(updatedConversation => {
-              this.verification_state_handler.onMemberJoined(updatedConversation, [eventJson.from]);
-              return updatedConversation;
-            });
+            return this.triggerSpontaneousMemberJoin(conversationEntity.id, [eventJson.from]).then(
+              () => conversationEntity
+            );
           }
         }
 
