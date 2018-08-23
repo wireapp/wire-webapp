@@ -45,6 +45,7 @@ import {
   ContainerXS,
   Content,
   DeviceIcon,
+  DownloadIcon,
   EditIcon,
   ErrorMessage,
   FacebookIcon,
@@ -330,6 +331,7 @@ class Demo extends React.PureComponent {
               <CamIcon width={32} />
               <CheckIcon width={32} />
               <DeviceIcon height={32} />
+              <DownloadIcon height={32} />
               <EditIcon height={32} />
               <FileIcon height={32} />
               <GifIcon width={32} />
