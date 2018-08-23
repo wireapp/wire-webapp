@@ -30,10 +30,10 @@
           <div id="video-controls" class="video-controls" data-bind="css: {'hide-controls-hidden': !showRemoteParticipant()}">
 
             <div class="video-controls__button" data-bind="click: clickedOnMinimize" data-uie-name="do-call-controls-video-minimize">
-              <!-- ko if: hasUnreadMessages -->
+              <!-- ko if: hasUnreadMessages() -->
                 <message-unread-icon></message-unread-icon>
               <!-- /ko -->
-              <!-- ko ifnot: hasUnreadMessages -->
+              <!-- ko ifnot: hasUnreadMessages() -->
                 <message-icon></message-icon>
               <!-- /ko -->
               <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayConversations"></div>
