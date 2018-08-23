@@ -19,18 +19,12 @@
 
 // https://stripe.com/docs/api#invoice_object
 interface PaymentStripeInvoice {
-  amount_due: number;
-  attempt_count: number;
-  attempted: boolean;
-  currency: 'eur';
-  date: number;
   id: string;
-  livemode: boolean;
+  number: string;
+  date: number;
   paid: boolean;
-  starting_balance: number;
-  subtotal: number;
-  tax_percent: number;
-  tax: number;
+  closed: boolean;
+  url: string;
   total: number;
 }
 

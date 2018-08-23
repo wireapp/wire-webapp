@@ -118,7 +118,7 @@ class PaymentAPI {
       url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.CHARGES}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data.data);
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
   public getInvoices(teamId: string): Promise<PaymentStripeInvoice[]> {
@@ -127,7 +127,7 @@ class PaymentAPI {
       url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.INVOICES}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data.data);
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
 
