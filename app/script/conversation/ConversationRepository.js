@@ -2715,7 +2715,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
           const isFromUnknownUser = !allParticipantIds.includes(eventJson.from);
-          if (isFromUnknownUser) {
+          const isMemberJoinEvent = eventJson.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
+          // we ignore member-join event that have users we don't know about because this is exactly the purpose of this event
+          if (!isMemberJoinEvent && isFromUnknownUser) {
             this.logger.warn('Received event from user not in the conversation');
             return this.triggerSpontaneousMemberJoin(conversationEntity.id, [eventJson.from]).then(
               () => conversationEntity
