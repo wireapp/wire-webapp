@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.6.0"></a>
+# [2.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.5.3...@wireapp/react-ui-kit@2.6.0) (2018-08-23)
+
+
+### Features
+
+* **react-ui-kit:** download icon ([#1039](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1039)) ([1164b48](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/1164b48))
+
+
+
+
+
 <a name="2.5.3"></a>
 ## [2.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.5.2...@wireapp/react-ui-kit@2.5.3) (2018-08-23)
 

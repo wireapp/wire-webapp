@@ -40,5 +40,5 @@
     "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0"
   },
-  "version": "2.5.3"
+  "version": "2.6.0"
 }
