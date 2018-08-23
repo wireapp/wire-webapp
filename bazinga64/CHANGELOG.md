@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.3.5"></a>
+## 5.3.5 (2018-08-23)
+
+
+### Bug Fixes
+
+* **api-client:** Update Provider type ([#1007](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/1007)) ([2f2c479](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/2f2c479))
+
+
+
+
+
 <a name="5.3.4"></a>
 ## [5.3.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.3.3...bazinga64@5.3.4) (2018-08-14)
 
