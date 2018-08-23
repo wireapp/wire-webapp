@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.14.4"></a>
+## [1.14.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.14.3...@wireapp/api-client@1.14.4) (2018-08-23)
+
+
+### Bug Fixes
+
+* **api-client:** Remove double data from getCharges & getInvoices ([#1038](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1038)) ([75b478e](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/75b478e))
+
+
+
+
+
 <a name="1.14.3"></a>
 ## [1.14.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.14.2...@wireapp/api-client@1.14.3) (2018-08-22)
 
