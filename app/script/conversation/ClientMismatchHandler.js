@@ -110,12 +110,12 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     const missingUserIds = z.util.ArrayUtil.getDifference(originalRecipients, missingRecipients);
     const containsUnkownUsers = missingUserIds.length > 0;
 
-    if (containsUnkownUsers) {
-      this.conversationRepository.triggerSpontaneousMemberJoin(conversationId, missingUserIds);
-    }
+    const unknownUsersPromise = containsUnkownUsers
+      ? this.conversationRepository.triggerSpontaneousMemberJoin(conversationId, missingUserIds)
+      : Promise.resolve();
 
-    return this.cryptographyRepository
-      .encryptGenericMessage(recipients, genericMessage, payload)
+    return unknownUsersPromise
+      .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
       .then(updatedPayload => {
         payload = updatedPayload;
 

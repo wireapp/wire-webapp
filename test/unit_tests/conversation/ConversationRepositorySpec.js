@@ -486,6 +486,7 @@ describe('ConversationRepository', () => {
       const conversationId = z.util.createRandomUuid();
       const senderId = z.util.createRandomUuid();
       const messageId = z.util.createRandomUuid();
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.REGULAR);
       const event = {
         conversation: conversationId,
         from: senderId,
@@ -498,7 +499,11 @@ describe('ConversationRepository', () => {
       const memberJoinInjectedEvent = {};
 
       spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(memberJoinInjectedEvent);
-      TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
+      spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+        Promise.resolve(conversationEntity)
+      );
+
+      return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
         expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
           memberJoinInjectedEvent,
           z.event.EventRepository.SOURCE.BACKEND_RESPONSE
