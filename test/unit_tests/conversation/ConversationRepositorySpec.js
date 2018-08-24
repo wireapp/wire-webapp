@@ -119,8 +119,8 @@ describe('ConversationRepository', () => {
           message_et.assets.push(file_et);
           conversation_et.add_message(message_et);
 
-          spyOn(TestFactory.conversation_service, 'update_asset_as_uploaded_in_db');
-          spyOn(TestFactory.conversation_service, 'update_asset_as_failed_in_db');
+          spyOn(TestFactory.event_service, 'updateEventAsUploadSucceeded');
+          spyOn(TestFactory.event_service, 'updateEventAsUploadFailed');
           spyOn(TestFactory.event_service, 'deleteEvent');
           done();
         })
@@ -147,7 +147,7 @@ describe('ConversationRepository', () => {
       TestFactory.conversation_repository
         ._on_asset_upload_complete(conversation_et, event)
         .then(() => {
-          expect(TestFactory.conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled();
+          expect(TestFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
           const [firstAsset] = message_et.assets();
           expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
