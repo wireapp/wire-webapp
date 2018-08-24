@@ -561,7 +561,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _onIceCandidate({candidate: iceCandidate}) {
     if (!iceCandidate) {
       if (this.shouldSendLocalSdp()) {
-        this.callLogger.info('Generation of ICE candidates completed - sending SDP');
+        this.callLogger.info('Generation of ICE candidates completed');
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED);
         this.sendLocalSdp();
       }
@@ -839,7 +839,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   sendLocalSdp(sendingOnTimeout = false) {
+    this.callLogger.info(`Sending local SDP${sendingOnTimeout ? ' on timeout' : ''}`);
     this._clearSendSdpTimeout();
+
+    if (!this.peerConnection) {
+      this.callLogger.warn('Cannot send local SDP without existing PeerConnection');
+      return;
+    }
 
     z.calling.SDPMapper.rewriteSdp(this.peerConnection.localDescription, z.calling.enum.SDP_SOURCE.LOCAL, this)
       .then(({iceCandidates, sdp: localSdp}) => {
@@ -1163,10 +1169,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _setSendSdpTimeout(initialTimeout = true) {
     const timeout = initialTimeout ? FlowEntity.CONFIG.SDP_SEND_TIMEOUT : FlowEntity.CONFIG.SDP_SEND_TIMEOUT_RESET;
-    this.sendSdpTimeout = window.setTimeout(() => {
-      this.callLogger.info('Sending local SDP on timeout');
-      this.sendLocalSdp(true);
-    }, timeout);
+    this.sendSdpTimeout = window.setTimeout(() => this.sendLocalSdp(true), timeout);
   }
 
   //##############################################################################

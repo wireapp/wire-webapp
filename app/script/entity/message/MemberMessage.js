@@ -59,7 +59,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
       return this.userEntities()
-        .filter(userEntity => userEntity.id !== this.user().id)
+        .filter(userEntity => !this.user() || this.user().id !== userEntity.id)
         .map(userEntity => userEntity);
     });
 

@@ -710,16 +710,16 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@2.5.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-2.5.0.tgz#3ec6ac14e88e6a3b6d81943fb94284b851ab1df3"
+"@wireapp/react-ui-kit@2.6.1":
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-2.6.1.tgz#a54d4457afa35a45ace2ffd7b8bbc7ab217495e1"
   dependencies:
-    bazinga64 "5.3.4"
+    bazinga64 "5.3.6"
     color "3.0.0"
     react "16.4.2"
     react-dom "16.4.2"
     recompose "0.28.2"
-    styled-components "3.3.3"
+    styled-components "3.4.4"
     styled-normalize "8.0.0"
 
 "@wireapp/store-engine@0.11.52":
@@ -1114,12 +1114,12 @@ atob@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.1.tgz#ae2d5a729477f289d60dd7f96a6314a22dd6c22a"
 
-autoprefixer@9.1.2, autoprefixer@^9.0.0:
-  version "9.1.2"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.1.2.tgz#73672614e3ee43a433b84c1c2a4b1ca392d2f6a1"
+autoprefixer@9.1.3, autoprefixer@^9.0.0:
+  version "9.1.3"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.1.3.tgz#bd5940ccb9d1bfa3508308659915f0a14394c8d5"
   dependencies:
     browserslist "^4.0.2"
-    caniuse-lite "^1.0.30000877"
+    caniuse-lite "^1.0.30000878"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
     postcss "^7.0.2"
@@ -1824,9 +1824,9 @@ bazinga64@5.2.18:
   version "5.2.18"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
 
-bazinga64@5.3.4:
-  version "5.3.4"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.4.tgz#022ad9aaa28b0218bb685051f45d0dbb452a1ab4"
+bazinga64@5.3.6:
+  version "5.3.6"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.6.tgz#ef9977f971ada2f75a7cd8b06ef12bda88d70179"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2244,9 +2244,9 @@ caniuse-lite@^1.0.30000876:
   version "1.0.30000876"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000876.tgz#69fc1b696a35fd91089061aa916f677ee7057ada"
 
-caniuse-lite@^1.0.30000877:
-  version "1.0.30000877"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000877.tgz#f189673b86ecc06436520e3e391de6a13ca923b4"
+caniuse-lite@^1.0.30000878:
+  version "1.0.30000878"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000878.tgz#c644c39588dd42d3498e952234c372e5a40a4123"
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -2608,9 +2608,9 @@ commander@~2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
 
-commander@~2.16.0:
-  version "2.16.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.16.0.tgz#f16390593996ceb4f3eeb020b31d78528f7f8a50"
+commander@~2.17.1:
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
 
 comment-parser@^0.4.2:
   version "0.4.2"
@@ -8724,9 +8724,9 @@ react-dom@16.4.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-hot-loader@4.3.4:
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.3.4.tgz#4f9bdd55bb20d77a6ae8931fa1c187e5f0ce6279"
+react-hot-loader@4.3.5:
+  version "4.3.5"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.3.5.tgz#d8659839d8072d4b78938a776f29f5f1d2a40170"
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
@@ -10066,15 +10066,14 @@ style-search@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/style-search/-/style-search-0.1.0.tgz#7958c793e47e32e07d2b5cafe5c0bf8e12e77902"
 
-styled-components@3.3.3:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.3.3.tgz#09e702055ab11f7a8eab8229b1c0d0b855095686"
+styled-components@3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.4.4.tgz#dbd2ea6338fb050b5b56783e189434fd7f18eda5"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
     fbjs "^0.8.16"
     hoist-non-react-statics "^2.5.0"
-    is-plain-object "^2.0.1"
     prop-types "^15.5.4"
     react-is "^16.3.1"
     stylis "^3.5.0"
@@ -10569,11 +10568,11 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@3.4.7:
-  version "3.4.7"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.7.tgz#4df6b92e54789aa921a254cb1e33704d6ec12b89"
+uglify-js@3.4.8:
+  version "3.4.8"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.8.tgz#d590777b208258b54131b1ae45bc9d3f68033a3e"
   dependencies:
-    commander "~2.16.0"
+    commander "~2.17.1"
     source-map "~0.6.1"
 
 uglify-js@^2.6:
@@ -11011,9 +11010,9 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack@4.17.0:
-  version "4.17.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.17.0.tgz#7e8df9529dd5fca65c700b3341a001aeae27c749"
+webpack@4.17.1:
+  version "4.17.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.17.1.tgz#0f026e3d823f3fc604f811ed3ea8f0d9b267fb1e"
   dependencies:
     "@webassemblyjs/ast" "1.5.13"
     "@webassemblyjs/helper-module-context" "1.5.13"

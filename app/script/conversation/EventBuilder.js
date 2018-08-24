@@ -23,8 +23,9 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.EventBuilder = {
-  build1to1Creation(conversationEntity, timestamp = 0) {
+  build1to1Creation(conversationEntity, timestamp) {
     const {creator: creatorId, id} = conversationEntity;
+    const isoDate = new Date(timestamp || conversationEntity.last_event_timestamp()).toISOString();
 
     return {
       conversation: id,
@@ -33,7 +34,7 @@ z.conversation.EventBuilder = {
       },
       from: creatorId,
       id: z.util.createRandomUuid(),
-      time: new Date(timestamp).toISOString(),
+      time: isoDate,
       type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
     };
   },
@@ -99,8 +100,9 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     };
   },
-  buildGroupCreation(conversationEntity, isTemporaryGuest = false, timestamp = 0) {
+  buildGroupCreation(conversationEntity, isTemporaryGuest = false, timestamp) {
     const {creator: creatorId, id, self: selfUser} = conversationEntity;
+    const isoDate = new Date(timestamp || conversationEntity.last_event_timestamp()).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUser.id || isTemporaryGuest;
@@ -117,7 +119,7 @@ z.conversation.EventBuilder = {
       },
       from: isTemporaryGuest ? selfUser.id : creatorId,
       id: z.util.createRandomUuid(),
-      time: new Date(timestamp).toISOString(),
+      time: isoDate,
       type: z.event.Client.CONVERSATION.GROUP_CREATION,
     };
   },
