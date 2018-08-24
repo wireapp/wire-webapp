@@ -1153,7 +1153,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   triggerSpontaneousMemberJoin(conversationId, userIds) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const memberJoinEvent = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, userIds, this.timeOffset);
-      return this.eventRepository.injectEvent(memberJoinEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return this.eventRepository.injectEvent(memberJoinEvent, z.event.EventRepository.SOURCE.INJECTED);
     });
   }
 
