@@ -483,30 +483,25 @@ describe('ConversationRepository', () => {
 
   describe('"_handleConversationEvent"', () => {
     it('detects events send by a user not in the conversation', () => {
-      const conversationId = z.util.createRandomUuid();
-      const senderId = z.util.createRandomUuid();
-      const messageId = z.util.createRandomUuid();
       const conversationEntity = _generate_conversation(z.conversation.ConversationType.REGULAR);
       const event = {
-        conversation: conversationId,
-        from: senderId,
-        id: messageId,
+        conversation: conversationEntity.id,
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
         time: '2017-09-06T09:43:36.528Z',
         data: {},
         type: 'conversation.message-add',
       };
 
-      const memberJoinInjectedEvent = {};
-
-      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(memberJoinInjectedEvent);
+      spyOn(TestFactory.conversation_repository, 'triggerSpontaneousMemberJoin').and.returnValue(Promise.resolve());
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity)
       );
 
       return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
-        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
-          memberJoinInjectedEvent,
-          z.event.EventRepository.SOURCE.BACKEND_RESPONSE
+        expect(TestFactory.conversation_repository.triggerSpontaneousMemberJoin).toHaveBeenCalledWith(
+          event.conversation,
+          [event.from]
         );
       });
     });
