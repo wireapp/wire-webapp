@@ -2608,9 +2608,9 @@ commander@~2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
 
-commander@~2.16.0:
-  version "2.16.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.16.0.tgz#f16390593996ceb4f3eeb020b31d78528f7f8a50"
+commander@~2.17.1:
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
 
 comment-parser@^0.4.2:
   version "0.4.2"
@@ -10568,11 +10568,11 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@3.4.7:
-  version "3.4.7"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.7.tgz#4df6b92e54789aa921a254cb1e33704d6ec12b89"
+uglify-js@3.4.8:
+  version "3.4.8"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.8.tgz#d590777b208258b54131b1ae45bc9d3f68033a3e"
   dependencies:
-    commander "~2.16.0"
+    commander "~2.17.1"
     source-map "~0.6.1"
 
 uglify-js@^2.6:
