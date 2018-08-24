@@ -224,6 +224,35 @@ describe('Client', () => {
         done.fail(error);
       }
     });
+
+    it('ignores errors when told to', async () => {
+      const client = new APIClient();
+      const testError = new Error('Test rejection');
+
+      spyOn(client.auth.api, 'postLogout').and.returnValue(Promise.reject(testError));
+      spyOn(client, 'disconnect').and.returnValue();
+      spyOn(client.accessTokenStore, 'delete').and.returnValue();
+      spyOn(client.logger, 'error').and.returnValue();
+
+      await client.logout({ignoreError: true});
+      expect(client.logger.error).toHaveBeenCalledWith(testError);
+    });
+
+    it('stops at errors when told to', async () => {
+      const client = new APIClient();
+      const testError = new Error('Test rejection');
+
+      spyOn(client.auth.api, 'postLogout').and.returnValue(Promise.reject(testError));
+      spyOn(client.logger, 'error').and.returnValue();
+
+      try {
+        await client.logout();
+        fail('Did not throw error');
+      } catch (error) {
+        expect(error === testError);
+        expect(client.logger.error).toHaveBeenCalledTimes(0);
+      }
+    });
   });
 
   describe('"register"', () => {

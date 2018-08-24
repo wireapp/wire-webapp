@@ -82,7 +82,7 @@ class AuthAPI {
       data: login,
       method: 'post',
       params: {
-        persist: loginData.clientType === ClientType.PERMANENT ? true : false,
+        persist: loginData.clientType === ClientType.PERMANENT,
       },
       url: AuthAPI.URL.LOGIN,
       withCredentials: true,

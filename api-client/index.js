@@ -48,11 +48,9 @@ const config = {
 
 const apiClient = new APIClient(config);
 
-Promise.resolve()
-  .then(() => {
-    // Trying to login (works only if there is already a valid cookie stored in the FileEngine)
-    return apiClient.init();
-  })
+// Trying to login (works only if there is already a valid cookie stored in the FileEngine)
+apiClient
+  .init()
   .catch(error => {
     logger.log(`Authentication via existing authenticator (Session Cookie or Access Token) failed: ${error.message}`);
     return apiClient.login(login);

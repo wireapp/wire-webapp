@@ -94,6 +94,7 @@ class WebSocketClient extends EventEmitter {
             throw error;
           }
         });
+
       this.socket.onopen = () => (this.socket ? (this.socket.binaryType = 'arraybuffer') : undefined);
     }
 
