@@ -493,7 +493,9 @@ describe('ConversationRepository', () => {
         type: 'conversation.message-add',
       };
 
-      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(
+        Promise.resolve(conversationEntity)
+      );
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity)
       );
@@ -1194,7 +1196,7 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
         expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
           event,
-          z.event.EventRepository.SOURCE.BACKEND_RESPONSE
+          z.event.EventRepository.SOURCE.INJECTED
         );
       });
     });

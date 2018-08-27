@@ -96,7 +96,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
    * @param {z.proto.GenericMessage} genericMessage - Protobuffer message to be sent
-   * @param {string} [conversationId] - ID of conversation the message was sent in
+   * @param {string} conversationId - ID of conversation the message was sent in
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchMissing(recipients, payload, genericMessage, conversationId) {

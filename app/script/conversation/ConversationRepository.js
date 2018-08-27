@@ -2740,11 +2740,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return;
     }
 
-    // We ignore 'conversation.member-join' events from self joining users
-    const {from: sender, type, user_ids: userIds} = eventJson;
+    const {data: eventData, from: sender, type} = eventJson;
+
     const isMemberJoinEvent = type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
-    const isSelfJoiningUser = isMemberJoinEvent && userIds.includes(sender);
-    if (!isSelfJoiningUser) {
+    const userIds = eventData.user_ids;
+    const isFromJoiningUser = isMemberJoinEvent && userIds.includes(sender);
+
+    // We ignore 'conversation.member-join' events from self joining users
+    if (!isFromJoiningUser) {
       const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
