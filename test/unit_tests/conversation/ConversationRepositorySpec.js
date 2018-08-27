@@ -493,16 +493,15 @@ describe('ConversationRepository', () => {
         type: 'conversation.message-add',
       };
 
-      spyOn(TestFactory.conversation_repository, 'triggerSpontaneousMemberJoin').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity)
       );
 
       return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
-        expect(TestFactory.conversation_repository.triggerSpontaneousMemberJoin).toHaveBeenCalledWith(
-          event.conversation,
-          [event.from]
-        );
+        expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(event.conversation, [
+          event.from,
+        ]);
       });
     });
 
@@ -1185,21 +1184,19 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('triggerSpontaneousMemberJoin', () => {
+  describe('addMissingMember', () => {
     it('injects a member-join event if unknown user is detected', () => {
       const conversationId = z.util.createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
       spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
-      return TestFactory.conversation_repository
-        .triggerSpontaneousMemberJoin(conversationId, ['unknown-user-id'])
-        .then(() => {
-          expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
-            event,
-            z.event.EventRepository.SOURCE.BACKEND_RESPONSE
-          );
-        });
+      return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
+        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
+          event,
+          z.event.EventRepository.SOURCE.BACKEND_RESPONSE
+        );
+      });
     });
   });
 });

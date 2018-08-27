@@ -1150,7 +1150,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
   }
 
-  triggerSpontaneousMemberJoin(conversationId, userIds) {
+  addMissingMember(conversationId, userIds) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const memberJoinEvent = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, userIds, this.timeOffset);
       return this.eventRepository.injectEvent(memberJoinEvent, z.event.EventRepository.SOURCE.INJECTED);
@@ -2652,10 +2652,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {number} Number of pending uploads
    */
   get_number_of_pending_uploads() {
-    return this.conversations().reduce(
-      (sum, conversation_et) => sum + conversation_et.get_number_of_pending_uploads(),
-      0
-    );
+    return this.conversations().reduce((sum, conversationEntity) => {
+      return sum + conversationEntity.get_number_of_pending_uploads();
+    }, 0);
   }
 
   //##############################################################################
@@ -2712,21 +2711,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           const isBackendTimestamp = eventSource !== z.event.EventRepository.SOURCE.INJECTED;
           conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
-
-          const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
-          const isFromUnknownUser = !allParticipantIds.includes(eventJson.from);
-          const isMemberJoinEvent = eventJson.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
-          // we ignore member-join event that have users we don't know about because this is exactly the purpose of this event
-          if (!isMemberJoinEvent && isFromUnknownUser) {
-            this.logger.warn('Received event from user not in the conversation');
-            return this.triggerSpontaneousMemberJoin(conversationEntity.id, [eventJson.from]).then(
-              () => conversationEntity
-            );
-          }
         }
 
         return conversationEntity;
       })
+      .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
@@ -2739,8 +2728,39 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Check that sender of received event is a known conversation participant.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @returns {Promise} Resolves when the participant list has been checked
+   */
+  _checkConversationParticipants(conversationEntity, eventJson) {
+    if (!conversationEntity) {
+      return;
+    }
+
+    // We ignore 'conversation.member-join' events from self joining users
+    const {from: sender, type, user_ids: userIds} = eventJson;
+    const isMemberJoinEvent = type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
+    const isSelfJoiningUser = isMemberJoinEvent && userIds.includes(sender);
+    if (!isSelfJoiningUser) {
+      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
+      const isFromUnknownUser = !allParticipantIds.includes(sender);
+
+      if (isFromUnknownUser) {
+        this.logger.warn(`Received event from user '${sender}' not in the conversation`);
+        return this.addMissingMember(conversationEntity.id, [sender]).then(() => conversationEntity);
+      }
+    }
+
+    return conversationEntity;
+  }
+
+  /**
    * Triggers the methods associated with a specific event.
    *
+   * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
    * @param {z.event.EventRepository.SOURCE} eventSource - Source of event

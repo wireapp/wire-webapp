@@ -95,17 +95,16 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      spyOn(TestFactory.conversation_repository, 'triggerSpontaneousMemberJoin').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
       spyOn(TestFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
 
       return TestFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(clientMismatch, null, payload, conversationId)
         .then(() => {
-          expect(TestFactory.conversation_repository.triggerSpontaneousMemberJoin).toHaveBeenCalledWith(
-            conversationId,
-            [unknownUserId]
-          );
+          expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(conversationId, [
+            unknownUserId,
+          ]);
         });
     });
 

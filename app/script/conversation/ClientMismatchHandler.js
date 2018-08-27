@@ -48,9 +48,9 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     return Promise.resolve()
       .then(() => this._handleClientMismatchRedundant(redundantClients, payload, conversationId))
       .then(updatedPayload => this._handleClientMismatchDeleted(deletedClients, updatedPayload))
-      .then(updatedPayload =>
-        this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage, conversationId)
-      );
+      .then(updatedPayload => {
+        return this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage, conversationId);
+      });
   }
 
   /**
@@ -104,14 +104,12 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
       return Promise.resolve(payload);
     }
 
-    this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
-    const originalRecipients = Object.keys(payload.recipients);
     const missingRecipients = Object.keys(recipients);
-    const missingUserIds = z.util.ArrayUtil.getDifference(originalRecipients, missingRecipients);
-    const containsUnkownUsers = missingUserIds.length > 0;
+    this.logger.debug(`Message is missing clients of '${missingRecipients.length}' users`, recipients);
+    const missingUserIds = z.util.ArrayUtil.getDifference(Object.keys(payload.recipients), missingRecipients);
 
-    const unknownUsersPromise = containsUnkownUsers
-      ? this.conversationRepository.triggerSpontaneousMemberJoin(conversationId, missingUserIds)
+    const unknownUsersPromise = !!missingUserIds.length
+      ? this.conversationRepository.addMissingMember(conversationId, missingUserIds)
       : Promise.resolve();
 
     return unknownUsersPromise
