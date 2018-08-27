@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@types/node": "10.9.2",
-    "@types/spark-md5": "3.0.0",
+    "@types/spark-md5": "3.0.1",
     "@types/tough-cookie": "2.3.3",
     "@wireapp/priority-queue": "0.2.7",
     "@wireapp/store-engine": "0.12.7",
