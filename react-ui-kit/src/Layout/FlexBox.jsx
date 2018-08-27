@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,28 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-setGlobalStyles();
+const FlexBox = styled.div`
+  display: flex;
+  flex-direction: ${props => (props.column ? 'column' : 'row')};
+  align-items: ${props => props.align};
+  justify-content: ${props => props.justify};
+  flex-wrap: ${props => (props.wrap ? 'wrap' : 'no-wrap')};
+`;
 
-export * from './Box';
-export * from './Column';
-export * from './Container';
-export * from './Content';
-export * from './FlexBox';
-export * from './Footer';
-export * from './Header';
-export * from './HeaderMenu';
-export * from './Spacer';
-export * from './StyledApp';
-export * from './sizes';
+FlexBox.propTypes = {
+  align: PropTypes.string,
+  column: PropTypes.bool,
+  justify: PropTypes.string,
+  wrap: PropTypes.bool,
+};
+FlexBox.defaultProps = {
+  align: 'flex-start',
+  column: false,
+  justify: 'flex-start',
+  wrap: false,
+};
+
+export default FlexBox;
