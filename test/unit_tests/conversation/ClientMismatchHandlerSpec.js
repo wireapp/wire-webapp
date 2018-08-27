@@ -83,6 +83,31 @@ describe('ClientMismatchHandler', () => {
       };
     });
 
+    it('should trigger member-join event if new user is detected', () => {
+      const conversationId = z.util.createRandomUuid();
+      const unknownUserId = z.util.createRandomUuid();
+      clientMismatch = {
+        deleted: {},
+        missing: {
+          [unknownUserId]: [`${johnDoe.client_id}`],
+        },
+        redundant: {},
+        time: '2016-04-29T10:38:23.002Z',
+      };
+
+      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
+      spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
+
+      return TestFactory.conversation_repository.clientMismatchHandler
+        .onClientMismatch(clientMismatch, null, payload, conversationId)
+        .then(() => {
+          expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(conversationId, [
+            unknownUserId,
+          ]);
+        });
+    });
+
     it('should add missing clients to the payload', () => {
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
       // TODO: Make this fake method available as a utility function for testing

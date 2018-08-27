@@ -136,6 +136,17 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
+  buildMemberJoin(conversationEntity, userIds, timeOffset) {
+    return {
+      conversation: conversationEntity.id,
+      data: {
+        user_ids: userIds,
+      },
+      from: userIds[0],
+      time: conversationEntity.get_next_iso_date(timeOffset),
+      type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
+    };
+  },
   buildMemberLeave(conversationEntity, userId, removedBySelfUser, timeOffset) {
     const {id, self} = conversationEntity;
 
