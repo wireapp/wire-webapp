@@ -106,11 +106,14 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
     const missingRecipients = Object.keys(recipients);
     this.logger.debug(`Message is missing clients of '${missingRecipients.length}' users`, recipients);
-    const missingUserIds = z.util.ArrayUtil.getDifference(Object.keys(payload.recipients), missingRecipients);
 
-    const unknownUsersPromise = !!missingUserIds.length
-      ? this.conversationRepository.addMissingMember(conversationId, missingUserIds)
-      : Promise.resolve();
+    const unknownUsersPromise = !missingRecipients.length
+      ? Promise.resolve()
+      : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+          const knownUserIds = conversationEntity.participating_user_ids();
+          const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingRecipients);
+          return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
+        });
 
     return unknownUsersPromise
       .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
