@@ -84,12 +84,17 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should trigger member-join event if new user is detected', () => {
-      const conversationId = z.util.createRandomUuid();
-      const unknownUserId = z.util.createRandomUuid();
+      const conversationId = conversationEntity.id;
+      const knownUserId = johnDoe.user_id;
+      const unknownUserId = janeRoe.user_id;
+
+      conversationEntity.participating_user_ids([knownUserId]);
+
       clientMismatch = {
         deleted: {},
         missing: {
-          [unknownUserId]: [`${johnDoe.client_id}`],
+          [knownUserId]: [johnDoe.client_id],
+          [unknownUserId]: [janeRoe.client_id],
         },
         redundant: {},
         time: '2016-04-29T10:38:23.002Z',
