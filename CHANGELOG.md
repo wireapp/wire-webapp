@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.15.0"></a>
+# [1.15.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.14.11...@wireapp/api-client@1.15.0) (2018-08-28)
+
+
+### Features
+
+* **api-client:** GET supported currencies ([#1055](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1055)) ([1c48416](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/1c48416))
+
+
+
+
+
 <a name="1.14.11"></a>
 ## [1.14.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.14.10...@wireapp/api-client@1.14.11) (2018-08-28)
 
