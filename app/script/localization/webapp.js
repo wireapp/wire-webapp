@@ -110,6 +110,7 @@ z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
+z.string.videoCallOverlayFitVideoLabel = 'Double-click to fit or fill video to container';
 z.string.videoCallOverlayConversations = 'Conversations';
 z.string.videoCallOverlayMute = 'Mute';
 z.string.videoCallOverlayVideo = 'Video';

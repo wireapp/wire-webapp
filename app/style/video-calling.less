@@ -84,9 +84,7 @@
 .video-controls {
   position: fixed;
   bottom: 54px;
-  display: flex;
   width: 100%;
-  justify-content: center;
   transition: opacity 0.25s ease-in-out;
 
   &__button,
@@ -108,6 +106,22 @@
     &:last-child {
       margin: 0;
     }
+  }
+
+  &__fit-info {
+    width: 100%;
+    margin-bottom: 24px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: @font-weight-regular;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: center;
   }
 
   &__button {
