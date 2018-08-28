@@ -203,8 +203,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       })
       .then(() => {
         const lastMessageEntity = this.conversation().getLastMessage();
-        if (lastMessageEntity && lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp()) {
-          this.conversation_reached_bottom = true;
+        if (lastMessageEntity) {
+          const isLastConversationEvent = lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp();
+          const hasReachedBottom = isLastConversationEvent || !lastMessageEntity.timestamp();
+          if (hasReachedBottom) {
+            this.conversation_reached_bottom = true;
+          }
         }
         conversationEntity.is_loaded(true);
         return this._render_conversation(conversationEntity);
