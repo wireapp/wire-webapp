@@ -106,6 +106,7 @@ import {
   Text,
   TimedIcon,
   Title,
+  Tooltip,
   TrashIcon,
   TwitterIcon,
   Uppercase,
@@ -305,8 +306,12 @@ class Demo extends React.PureComponent {
 
         <Content>
           <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
-            <Logo scale={3} color={COLOR.BLUE} />
-            <Loading />
+            <Tooltip light right text="This is our logo with a whole bunch of text in here">
+              <Logo scale={3} color={COLOR.BLUE} />
+            </Tooltip>
+            <Tooltip text="This is our logo with a whole bunch of text in here">
+              <Loading />
+            </Tooltip>
             <Loading progress={0.33} />
             <Loading progress={0.66} size={100} />
           </Container>
@@ -554,30 +559,34 @@ class Demo extends React.PureComponent {
                     event.preventDefault();
                   }}
                 >
-                  <Input placeholder="Placeholder" type="email" required />
+                  <Tooltip text="This shows a placeholder input">
+                    <Input placeholder="Placeholder" type="email" required />
+                  </Tooltip>
                   <Button type="submit" formNoValidate>
                     Submit Button
                   </Button>
                   <InputBlock>
                     <Input placeholder="InputBlock" markInvalid />
-                    <InputSubmitCombo>
-                      <Input placeholder="InputSubmitCombo" name="password" />
-                      <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.GIF} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.IMAGE} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.PING} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
-                      <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
-                      <RoundIconButton type="submit" formNoValidate>
-                        M
-                      </RoundIconButton>
-                    </InputSubmitCombo>
+                    <Tooltip text="Lots of icons here">
+                      <InputSubmitCombo>
+                        <Input placeholder="InputSubmitCombo" name="password" />
+                        <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.GIF} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.IMAGE} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.PING} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
+                        <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
+                        <RoundIconButton type="submit" formNoValidate>
+                          M
+                        </RoundIconButton>
+                      </InputSubmitCombo>
+                    </Tooltip>
                   </InputBlock>
                 </Form>
               </ShakeBox>
