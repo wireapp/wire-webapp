@@ -25,7 +25,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.EventBuilder = {
   build1to1Creation(conversationEntity, timestamp) {
     const {creator: creatorId, id} = conversationEntity;
-    const isoDate = new Date(timestamp || conversationEntity.last_event_timestamp()).toISOString();
+    const isoDate = new Date(timestamp || 0).toISOString();
 
     return {
       conversation: id,
@@ -102,7 +102,7 @@ z.conversation.EventBuilder = {
   },
   buildGroupCreation(conversationEntity, isTemporaryGuest = false, timestamp) {
     const {creator: creatorId, id, self: selfUser} = conversationEntity;
-    const isoDate = new Date(timestamp || conversationEntity.last_event_timestamp()).toISOString();
+    const isoDate = new Date(timestamp || 0).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUser.id || isTemporaryGuest;
