@@ -2743,8 +2743,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {data: eventData, from: sender, type} = eventJson;
 
     const isMemberJoinEvent = type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
-    const userIds = eventData.user_ids;
-    const isFromJoiningUser = isMemberJoinEvent && userIds.includes(sender);
+    const isFromJoiningUser = isMemberJoinEvent && eventData.user_ids.includes(sender);
 
     // We ignore 'conversation.member-join' events from self joining users
     if (!isFromJoiningUser) {
