@@ -43,6 +43,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
         audioSend: selfStreamState.audioSend,
         id: stream && stream.id,
         isSelf: true,
+        screenSend: selfStreamState.screenSend,
         stream: stream,
         videoSend: selfStreamState.videoSend,
       };
@@ -66,6 +67,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
           return {
             id: stream.id,
             picture: participant.user.mediumPictureResource,
+            screenSend: participant.state.screenSend,
             stream: stream,
             videoSend: participant.state.videoSend,
           };
