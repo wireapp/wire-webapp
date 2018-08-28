@@ -37,7 +37,7 @@ class PaymentAPI {
     return {
       BILLING: 'billing',
       CHARGES: 'charges',
-      CURRENCY: 'currency',
+      CURRENCIES: 'currencies',
       INFO: 'info',
       INVOICES: 'invoices',
       PLAN: 'plan',
@@ -134,7 +134,7 @@ class PaymentAPI {
   public getSupportedCurrencies(teamId: string): Promise<string[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.CURRENCY}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.CURRENCIES}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
