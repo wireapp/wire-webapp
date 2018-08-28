@@ -22,4 +22,5 @@ import setGlobalStyles from '../globalStyles';
 setGlobalStyles();
 
 export * from './Loading';
+export * from './Pagination';
 export * from './Pill';

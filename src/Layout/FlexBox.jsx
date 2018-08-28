@@ -41,4 +41,4 @@ FlexBox.defaultProps = {
   wrap: false,
 };
 
-export default FlexBox;
+export {FlexBox};
