@@ -136,11 +136,10 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
     this.disableToggleScreen = ko.pureComputed(() => {
-      return (
-        !z.calling.CallingRepository.supportsScreenSharing ||
-        (this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true)
-      );
+      return !z.calling.CallingRepository.supportsScreenSharing;
     });
+
+    this.screenshareTooltip = z.l10n.text(z.string.videoCallScreenShareNotSupported);
 
     this.visibleCallId = undefined;
     this.joinedCall.subscribe(callEntity => {
@@ -262,7 +261,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnShareScreen() {
-    if (this.joinedCall()) {
+    if (!this.disableToggleScreen() && this.joinedCall()) {
       this.chooseSharedScreen(this.joinedCall().id);
     }
   }

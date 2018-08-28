@@ -71,8 +71,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return isOutgoingVideoCall || isVideoUnsupported;
     });
     this.disableScreenButton = ko.pureComputed(() => {
-      const isScreenSend = this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
-      return !z.calling.CallingRepository.supportsScreenSharing || isScreenSend;
+      return !z.calling.CallingRepository.supportsScreenSharing;
     });
 
     this.participantsButtonLabel = ko.pureComputed(() => {
@@ -96,6 +95,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.callParticipants() && this.showParticipants())
       .extend({notify: 'always', rateLimit: 100});
+
+    this.screenshareTooltip = z.l10n.text(z.string.videoCallScreenShareNotSupported);
   }
 
   onEndCall() {
@@ -218,8 +219,10 @@ ko.components.register('conversation-list-calling-cell', {
             </div>
           <!-- /ko -->
           <!-- ko if: isConnected() -->
-            <div class="call-ui__button" data-bind="click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
-              <screenshare-icon class="small-icon"></screenshare-icon>
+            <div class="with-tooltip with-tooltip--bottom" data-bind="css: {'with-tooltip--disabled':!disableScreenButton()}, attr: {'data-text': screenshareTooltip}">
+              <div class="call-ui__button" data-bind="click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+                <screenshare-icon class="small-icon"></screenshare-icon>
+              </div>
             </div>
           <!-- /ko -->
         </div>
