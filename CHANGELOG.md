@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.8.0"></a>
+# [2.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.7.1...@wireapp/react-ui-kit@2.8.0) (2018-08-28)
+
+
+### Features
+
+* **react-ui-kit:** Pagination ([#1054](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1054)) ([49d5c75](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/49d5c75))
+
+
+
+
+
 <a name="2.7.1"></a>
 ## [2.7.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.7.0...@wireapp/react-ui-kit@2.7.1) (2018-08-28)
 
