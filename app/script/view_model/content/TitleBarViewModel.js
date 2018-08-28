@@ -57,32 +57,14 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
     });
 
-    this.isGroupInTeam = ko.pureComputed(() => {
-      return this.conversationEntity().is_group() && this.conversationEntity().inTeam();
-    });
-
-    this.hasService = ko.pureComputed(() => {
-      return this.conversationEntity()
-        .participating_user_ets()
-        .some(userEntity => userEntity.isService);
-    });
-
-    this.hasGuest = ko.pureComputed(() => {
-      return !this.isGroupInTeam()
-        ? false
-        : this.conversationEntity()
-            .participating_user_ets()
-            .some(userEntity => userEntity.isGuest());
-    });
-
     this.badgeLabelCopy = ko.pureComputed(() => {
       let stringId;
 
-      if (this.hasGuest()) {
-        stringId = this.hasService()
+      if (this.conversationEntity().hasGuest()) {
+        stringId = this.conversationEntity().hasService()
           ? z.string.guestRoomConversationBadgeGuestAndService
           : z.string.guestRoomConversationBadge;
-      } else if (this.hasService()) {
+      } else if (this.conversationEntity().hasService()) {
         stringId = z.string.guestRoomConversationBadgeService;
       }
 
