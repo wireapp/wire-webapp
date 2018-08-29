@@ -107,7 +107,7 @@ z.calling.SDPMapper = {
           }
         } else if (z.util.Environment.browser.firefox && isLocalSdp && isOffer) {
           // Set ports to activate media in outgoing Firefox SDP to ensure enabled media
-          outline = sdpLine.replace('m=video 0', 'm=video 9').replace('m=application 0', 'm=application 9');
+          outline = sdpLine.replace(/^m=(application|video) 0/, 'm=$1 9');
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
         const shouldAddPTime = isLocalSdpInGroup || isIceRestart;
