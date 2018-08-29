@@ -137,8 +137,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.disableToggleScreen = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
 
-    this.screenshareTooltip = z.l10n.text(z.string.videoCallScreenShareNotSupported);
-
     this.visibleCallId = undefined;
     this.joinedCall.subscribe(callEntity => {
       if (callEntity) {

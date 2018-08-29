@@ -87,27 +87,6 @@
   width: 100%;
   transition: opacity 0.25s ease-in-out;
 
-  &__button,
-  .with-tooltip {
-    margin: 0 20px;
-
-    &:first-child {
-      margin: 0 52px 0 0;
-    }
-
-    &:last-child {
-      margin: 0 0 0 52px;
-    }
-  }
-
-  .with-tooltip &__button {
-    &,
-    &:first-child,
-    &:last-child {
-      margin: 0;
-    }
-  }
-
   &__fit-info {
     width: 100%;
     margin-bottom: 24px;
@@ -131,10 +110,19 @@
     height: 56px;
     align-items: center;
     justify-content: center;
+    margin: 0 20px;
     background-color: rgba(255, 255, 255, 0.24);
     border-radius: 32px;
     cursor: pointer;
     line-height: 0;
+
+    &:first-child {
+      margin: 0 52px 0 0;
+    }
+
+    &:last-child {
+      margin: 0 0 0 52px;
+    }
 
     svg > path {
       fill: #fff;

@@ -19,14 +19,11 @@
 
 .with-tooltip {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 
   &::after {
     position: absolute;
     z-index: 1;
+    left: 50%;
     display: block;
     min-width: 160px;
     max-width: 220px;
@@ -35,7 +32,7 @@
     border-radius: 4px;
     box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.12);
     color: @graphite-dark;
-    content: attr(data-text);
+    content: attr(data-tooltip);
     font-size: 12px;
     font-weight: 400;
     line-height: 14px;
@@ -47,18 +44,18 @@
 
   &:hover::after {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, 0);
     transition: all 0.25s ease-in-out;
   }
 
   &--top::after {
     bottom: calc(100% + 8px);
-    transform: translateY(16px);
+    transform: translate(-50%, 16px);
   }
 
   &--bottom::after {
     top: calc(100% + 8px);
-    transform: translateY(-16px);
+    transform: translate(-50%, -16px);
   }
 
   &--disabled::after {

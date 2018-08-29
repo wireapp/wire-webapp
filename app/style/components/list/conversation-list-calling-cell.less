@@ -52,7 +52,6 @@
 
     &--disabled {
       cursor: default;
-      pointer-events: none;
 
       svg {
         opacity: 0.4;
@@ -107,9 +106,7 @@
       background-color: @w-red;
     }
 
-    & + &,
-    & + .with-tooltip,
-    .with-tooltip + & {
+    & + & {
       margin-left: 8px;
     }
   }

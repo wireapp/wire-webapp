@@ -93,8 +93,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.callParticipants() && this.showParticipants())
       .extend({notify: 'always', rateLimit: 100});
-
-    this.screenshareTooltip = z.l10n.text(z.string.videoCallScreenShareNotSupported);
   }
 
   onEndCall() {
@@ -217,10 +215,8 @@ ko.components.register('conversation-list-calling-cell', {
             </div>
           <!-- /ko -->
           <!-- ko if: isConnected() -->
-            <div class="with-tooltip with-tooltip--bottom" data-bind="css: {'with-tooltip--disabled':!disableScreenButton()}, attr: {'data-text': screenshareTooltip}">
-              <div class="call-ui__button" data-bind="click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
-                <screenshare-icon class="small-icon"></screenshare-icon>
-              </div>
+            <div class="call-ui__button" data-bind="tooltip: {text: z.string.videoCallScreenShareNotSupported, disabled: !disableScreenButton(), position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+              <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
           <!-- /ko -->
         </div>
