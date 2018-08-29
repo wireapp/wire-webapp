@@ -100,10 +100,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
-    this.showRemote = ko.pureComputed(() => {
-      return this.showRemoteVideo() || this.showRemoteParticipant() || this.isChoosingScreen();
-    });
-
     this.showRemoteParticipant = ko.pureComputed(() => {
       const showRemoteParticipant = this.remoteUser() && !this.multitasking.isMinimized() && !this.isChoosingScreen();
       return showRemoteParticipant && this.isCallOngoing() && !this.showRemoteVideo();
