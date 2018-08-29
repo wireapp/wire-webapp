@@ -98,12 +98,14 @@ z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
 z.string.de.callParticipants = '{{number}} im Anruf';
 
+z.string.de.videoCallOverlayFitVideoLabel = 'Füllmodus der Videos kann per Doppelklick geändert werden';
 z.string.de.videoCallOverlayConversations = 'Unterhaltungen';
 z.string.de.videoCallOverlayMute = 'Stummschalten';
 z.string.de.videoCallOverlayVideo = 'Video';
 z.string.de.videoCallOverlayShareScreen = 'Bildschirm teilen';
 z.string.de.videoCallOverlayHangUp = 'Beenden';
 z.string.de.videoCallPaused = 'Video wurde angehalten';
+z.string.de.videoCallScreenShareNotSupported = 'Bildschirm teilen ist in diesem Browser nicht verfügbar';
 
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
@@ -179,7 +181,7 @@ z.string.de.modalConnectAcceptSecondary = 'Ignorieren';
 
 z.string.de.modalConversationClearAction = 'Löschen';
 z.string.de.modalConversationClearHeadline = 'Unterhaltungsverlauf löschen?';
-z.string.de.modalConversationClearMessage = 'Der Unterhaltungsverlauf wird auf allen deiner Geräte gelöscht.';
+z.string.de.modalConversationClearMessage = 'Der Unterhaltungsverlauf wird auf all deinen Geräten gelöscht.';
 z.string.de.modalConversationClearOption = 'Unterhaltung auch verlassen';
 
 z.string.de.modalConversationDeleteMessageAction = 'Löschen';
@@ -230,7 +232,7 @@ z.string.de.modalConversationGuestOptionsRequestCodeMessage = 'Konnte Zugangs-Li
 z.string.de.modalConversationGuestOptionsRevokeCodeMessage = 'Konnte Zugangs-Link nicht widerrufen. Bitte versuche es erneut.';
 z.string.de.modalConversationGuestOptionsToggleGuestsMessage = 'Konnte den Gast-Status nicht wechseln.';
 
-z.string.de.modalConversationTooManyMembersHeadline = 'Volles Haus';
+z.string.de.modalConversationTooManyMembersHeadline = 'Die Gruppe ist voll';
 z.string.de.modalConversationTooManyMembersMessage = 'An einer Gruppe können bis zu {{number1}} Personen teilnehmen. Hier ist nur noch Platz für {{number2}} Personen.';
 
 z.string.de.modalGifTooLargeHeadline = 'Ausgewählte Animation zu groß';

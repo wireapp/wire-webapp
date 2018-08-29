@@ -28,52 +28,59 @@
 
         <!-- ko if: showControls() && !isChoosingScreen() -->
           <div id="video-controls" class="video-controls" data-bind="css: {'hide-controls-hidden': !showRemoteParticipant()}">
+            <div class="video-controls__fit-info" data-bind="l10n_text: z.string.videoCallOverlayFitVideoLabel"></div>
+            <div class="video-controls__wrapper">
+              <div class="video-controls__button" data-bind="click: clickedOnMinimize" data-uie-name="do-call-controls-video-minimize">
+                <!-- ko if: hasUnreadMessages() -->
+                  <message-unread-icon></message-unread-icon>
+                <!-- /ko -->
+                <!-- ko ifnot: hasUnreadMessages() -->
+                  <message-icon></message-icon>
+                <!-- /ko -->
+                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayConversations"></div>
+              </div>
 
-            <div class="video-controls__button" data-bind="click: clickedOnMinimize" data-uie-name="do-call-controls-video-minimize">
-              <message-icon></message-icon>
-              <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayConversations"></div>
-            </div>
-
-            <div class="video-controls__button"
-                 data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}"
-                 data-uie-name="do-call-controls-video-call-mute">
-              <micoff-icon></micoff-icon>
-              <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayMute"></div>
-            </div>
-
-            <!-- ko if: showToggleVideo() -->
               <div class="video-controls__button"
-                   data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}"
-                   data-uie-name="do-call-controls-toggle-video">
-                <camera-icon></camera-icon>
-                <!-- ko if: showSwitchCamera() -->
-                  <device-toggle-button data-bind="click: clickedOnToggleCamera, clickBubble: false"
-                                        params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: z.media.MediaDeviceType.VIDEO_INPUT">
+                  data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}"
+                  data-uie-name="do-call-controls-video-call-mute">
+                <micoff-icon></micoff-icon>
+                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayMute"></div>
+              </div>
+
+              <!-- ko if: showToggleVideo() -->
+                <div class="video-controls__button"
+                    data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}"
+                    data-uie-name="do-call-controls-toggle-video">
+                  <camera-icon></camera-icon>
+                  <!-- ko if: showSwitchCamera() -->
+                    <device-toggle-button data-bind="click: clickedOnToggleCamera, clickBubble: false"
+                                          params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: z.media.MediaDeviceType.VIDEO_INPUT">
+                    </device-toggle-button>
+                  <!-- /ko -->
+                  <!-- ko ifnot: showSwitchCamera() -->
+                    <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayVideo"></div>
+                  <!-- /ko -->
+                </div>
+              <!-- /ko -->
+
+              <div class="video-controls__button"
+                  data-bind="tooltip: {text: z.string.videoCallScreenShareNotSupported, disabled: !disableToggleScreen()}, click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
+                  data-uie-name="do-toggle-screen">
+                <screenshare-icon></screenshare-icon>
+                <!-- ko if: showSwitchScreen() -->
+                  <device-toggle-button data-bind="click: clickedOnToggleScreen, clickBubble: false"
+                                        params="index: currentDeviceIndex.screenInput, devices: availableDevices.screenInput, type: z.media.MediaDeviceType.SCREEN_INPUT">
                   </device-toggle-button>
                 <!-- /ko -->
-                <!-- ko ifnot: showSwitchCamera() -->
-                  <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayVideo"></div>
+                <!-- ko ifnot: showSwitchScreen() -->
+                  <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayShareScreen"></div>
                 <!-- /ko -->
               </div>
-            <!-- /ko -->
 
-            <div class="video-controls__button"
-                 data-bind="click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
-                 data-uie-name="do-toggle-screen">
-              <screenshare-icon></screenshare-icon>
-              <!-- ko if: showSwitchScreen() -->
-                <device-toggle-button data-bind="click: clickedOnToggleScreen, clickBubble: false"
-                                      params="index: currentDeviceIndex.screenInput, devices: availableDevices.screenInput, type: z.media.MediaDeviceType.SCREEN_INPUT">
-                </device-toggle-button>
-              <!-- /ko -->
-              <!-- ko ifnot: showSwitchScreen() -->
-                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayShareScreen"></div>
-              <!-- /ko -->
-            </div>
-
-            <div class="video-controls__button video-controls__button--red" data-bind="click: clickedOnLeaveCall" data-uie-name="do-call-controls-video-call-cancel">
-              <hangup-icon></hangup-icon>
-              <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayHangUp"></div>
+              <div class="video-controls__button video-controls__button--red" data-bind="click: clickedOnLeaveCall" data-uie-name="do-call-controls-video-call-cancel">
+                <hangup-icon></hangup-icon>
+                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayHangUp"></div>
+              </div>
             </div>
           </div>
         <!-- /ko -->

@@ -48,7 +48,9 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     return Promise.resolve()
       .then(() => this._handleClientMismatchRedundant(redundantClients, payload, conversationId))
       .then(updatedPayload => this._handleClientMismatchDeleted(deletedClients, updatedPayload))
-      .then(updatedPayload => this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage));
+      .then(updatedPayload => {
+        return this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage, conversationId);
+      });
   }
 
   /**
@@ -94,17 +96,31 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
    * @param {z.proto.GenericMessage} genericMessage - Protobuffer message to be sent
+   * @param {string} conversationId - ID of conversation the message was sent in
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchMissing(recipients, payload, genericMessage) {
-    if (_.isEmpty(recipients)) {
+  _handleClientMismatchMissing(recipients, payload, genericMessage, conversationId) {
+    const missingUserIds = Object.keys(recipients);
+    if (!missingUserIds.length) {
       return Promise.resolve(payload);
     }
 
-    this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
+    this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
 
-    return this.cryptographyRepository
-      .encryptGenericMessage(recipients, genericMessage, payload)
+    const skipParticipantsCheck = !conversationId;
+    const participantsCheckPromise = skipParticipantsCheck
+      ? Promise.resolve()
+      : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+          const knownUserIds = conversationEntity.participating_user_ids();
+          const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingUserIds);
+
+          if (unknownUserIds.length) {
+            return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
+          }
+        });
+
+    return participantsCheckPromise
+      .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
       .then(updatedPayload => {
         payload = updatedPayload;
 

@@ -43,7 +43,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: z.viewModel.panel.ConversationParticipantsViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: z.viewModel.panel.GroupParticipantServiceViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: z.viewModel.panel.GroupParticipantUserViewModel,
-      [PanelViewModel.STATE.GUEST_OPTIONS]: z.viewModel.panel.GuestOptionsViewModel,
+      [PanelViewModel.STATE.GUEST_OPTIONS]: z.viewModel.panel.GuestsAndServicesViewModel,
       [PanelViewModel.STATE.PARTICIPANT_DEVICES]: z.viewModel.panel.ParticipantDevicesViewModel,
       [PanelViewModel.STATE.TIMED_MESSAGES]: z.viewModel.panel.TimedMessagesViewModel,
     };

@@ -341,6 +341,70 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
+    describe('updateEventAsUploadSucceeded', () => {
+      /* eslint-disable sort-keys*/
+      it("doesn't do anything if initial event is not found", () => {
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
+        spyOn(TestFactory.storage_service, 'update');
+        TestFactory.event_service.updateEventAsUploadSucceeded(12, {}).then(() => {
+          expect(TestFactory.storage_repository.update).not.toHaveBeenCalled();
+        });
+      });
+      it('sets asset data and update event', () => {
+        const initialEvent = {
+          id: 'event-id',
+          data: {content: ''},
+        };
+        const successEvent = {
+          data: {
+            id: 'asset-id',
+            key: 'asset-key',
+            otr_key: 'otr_key',
+            sha256: 'sha',
+            token: 'asset-token',
+          },
+          time: '2016-08-04T13:27:58.993Z',
+        };
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
+        spyOn(TestFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
+          expect(updates.data).toEqual(jasmine.objectContaining(successEvent.data));
+          expect(updates.data.content).toEqual(initialEvent.data.content);
+          return Promise.resolve(undefined);
+        });
+        return TestFactory.event_service.updateEventAsUploadSucceeded(12, successEvent).then(() => {
+          expect(TestFactory.storage_service.update).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('updateEventAsUploadFailed', () => {
+      /* eslint-disable sort-keys*/
+      it("doesn't do anything if initial event is not found", () => {
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
+        spyOn(TestFactory.storage_service, 'update');
+        TestFactory.event_service.updateEventAsUploadFailed(12, {}).then(() => {
+          expect(TestFactory.storage_repository.update).not.toHaveBeenCalled();
+        });
+      });
+      it('sets asset data and update event', () => {
+        const initialEvent = {
+          id: 'event-id',
+          data: {content: ''},
+        };
+        const reason = z.assets.AssetTransferState.UPLOAD_FAILED;
+        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
+        spyOn(TestFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
+          expect(updates.data.reason).toEqual(reason);
+          expect(updates.data.status).toEqual(z.assets.AssetTransferState.UPLOAD_FAILED);
+          expect(updates.data.content).toEqual(initialEvent.data.content);
+          return Promise.resolve(undefined);
+        });
+        return TestFactory.event_service.updateEventAsUploadFailed(12, reason).then(() => {
+          expect(TestFactory.storage_service.update).toHaveBeenCalled();
+        });
+      });
+    });
+
     describe('updateEventSequentially', () => {
       it('fails if changes do not contain version property', () => {
         const updates = {reactions: ['user-id']};

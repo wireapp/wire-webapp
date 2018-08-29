@@ -219,6 +219,14 @@ ko.components.register('message-icon', {
   `,
 });
 
+ko.components.register('message-unread-icon', {
+  template: `
+  <svg width="18" height="18" viewBox="0 0 18 18">
+    <path d="M12 2a4 4 0 0 0 4 4v6a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2A1 1 0 0 1 0 17V5a3 3 0 0 1 3-3h9zm4 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('micoff-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">

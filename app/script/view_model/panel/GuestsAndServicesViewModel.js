@@ -23,7 +23,8 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.viewModel.panel.BasePanelViewModel {
+z.viewModel.panel.GuestsAndServicesViewModel = class GuestsAndServicesViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
   static get CONFIG() {
     return {
       CONFIRM_DURATION: 1500,
@@ -67,7 +68,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
       z.util.ClipboardUtil.copyText(this.activeConversation().accessCode()).then(() => {
         this.isLinkCopied(true);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
-        window.setTimeout(() => this.isLinkCopied(false), GuestOptionsViewModel.CONFIG.CONFIRM_DURATION);
+        window.setTimeout(() => this.isLinkCopied(false), GuestsAndServicesViewModel.CONFIG.CONFIRM_DURATION);
       });
     }
   }
@@ -122,7 +123,9 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
         }
       };
 
-      if (this.isTeamOnly()) {
+      const hasGuestOrService = conversationEntity.hasGuest() || conversationEntity.hasService();
+
+      if (this.isTeamOnly() || !hasGuestOrService) {
         return _changeAccessState();
       }
 

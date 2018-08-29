@@ -80,6 +80,11 @@ z.entity.Conversation = class Conversation {
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
 
+    this.hasGuest = ko.pureComputed(() => {
+      return this.is_group() && this.participating_user_ets().some(userEntity => userEntity.isGuest());
+    });
+    this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
+
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
     this.connection.subscribe(connection_et => {

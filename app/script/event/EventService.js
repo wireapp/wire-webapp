@@ -164,6 +164,55 @@ z.event.EventService = class EventService {
   }
 
   /**
+   * Update event as uploaded in database.
+   *
+   * @param {string} primaryKey - Primary key used to find an event in the database
+   * @param {Object} event - Updated event asset data
+   * @returns {Promise} Resolves when the message was updated in database
+   */
+  updateEventAsUploadSucceeded(primaryKey, event) {
+    return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
+      if (!record) {
+        return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
+      }
+      const {data: assetData, time} = event;
+
+      record.data.id = assetData.id;
+      record.data.key = assetData.key;
+      record.data.otr_key = assetData.otr_key;
+      record.data.sha256 = assetData.sha256;
+      record.data.status = z.assets.AssetTransferState.UPLOADED;
+      record.data.token = assetData.token;
+      record.status = z.message.StatusType.SENT;
+      record.time = time;
+
+      return this.replaceEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
+    });
+  }
+
+  /**
+   * Update event as upload failed in database.
+   *
+   * @param {string} primaryKey - Primary key used to find an event in the database
+   * @param {string} reason - Failure reason
+   * @returns {Promise} Resolves when the message was updated in database
+   */
+  updateEventAsUploadFailed(primaryKey, reason) {
+    return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
+      if (!record) {
+        return this.logger.warn('Did not find message to update asset (failed)', primaryKey);
+      }
+      record.data.reason = reason;
+      record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
+
+      return this.replaceEvent(record).then(() => {
+        this.logger.info('Updated asset message_et (failed)', primaryKey);
+        return record;
+      });
+    });
+  }
+
+  /**
    * Update an unencrypted event.
    * A valid update must not contain a 'version' property.
    *

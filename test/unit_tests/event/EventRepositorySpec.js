@@ -633,13 +633,13 @@ describe('Event Repository', () => {
 
       spyOn(TestFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
-      spyOn(TestFactory.conversation_service, 'update_asset_as_failed_in_db').and.returnValue(
+      spyOn(TestFactory.event_service, 'updateEventAsUploadFailed').and.returnValue(
         Promise.resolve(assetUploadFailedEvent)
       );
 
       return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
         expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
-        expect(TestFactory.conversation_service.update_asset_as_failed_in_db).toHaveBeenCalled();
+        expect(TestFactory.event_service.updateEventAsUploadFailed).toHaveBeenCalled();
       });
     });
 

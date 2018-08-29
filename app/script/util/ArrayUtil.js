@@ -31,6 +31,13 @@ z.util.ArrayUtil = {
     return chunks;
   },
 
+  /**
+   * Gets all the values that are in array2 which are not in array1.
+   *
+   * @param {Array} array1 - the base array
+   * @param {Array} array2 - the array to compare with
+   * @returns {Array} - the array containing values in array2 that are not in array1
+   */
   getDifference: (array1, array2) => {
     return array2.filter(element => !array1.includes(element));
   },
