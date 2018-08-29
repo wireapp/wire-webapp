@@ -69,7 +69,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         .getRandom(options.tag)
         .then(({data: randomGif}) => {
           if (!randomGif.id) {
-            throw new Error(`Could not find any gif with tag "${options.tag}"`);
+            throw new Error(`Could not find any gif with tag '${options.tag}'`);
           }
           return this.giphyService.getById(randomGif.id);
         })
