@@ -27,6 +27,11 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     return {
       DEFAULT_DEVICE_ID: 'default',
       SCREEN_CONSTRAINTS: {
+        FIREFOX: {
+          frameRate: 30,
+          height: {exact: 720},
+          mediaSource: 'screen',
+        },
         MEDIA_SOURCE: 'desktop',
         SOURCE_TYPE: 'screen',
       },
@@ -134,9 +139,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: {
-          mediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.SOURCE_TYPE,
-        },
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.FIREFOX,
       };
 
       return Promise.resolve(streamConstraints);
@@ -179,9 +182,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     }
 
     if (_.isString(mediaDeviceId)) {
-      streamConstraints.deviceId = {
-        exact: mediaDeviceId,
-      };
+      streamConstraints.deviceId = {exact: mediaDeviceId};
     } else {
       streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.PREFERRED_FACING_MODE;
     }
