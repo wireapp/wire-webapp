@@ -80,10 +80,8 @@ z.entity.Conversation = class Conversation {
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
 
-    this.isGroupInTeam = ko.pureComputed(() => this.is_group() && this.inTeam());
-
     this.hasGuest = ko.pureComputed(() => {
-      return !this.isGroupInTeam() ? false : this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      return this.is_group() && this.participating_user_ets().some(userEntity => userEntity.isGuest());
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
