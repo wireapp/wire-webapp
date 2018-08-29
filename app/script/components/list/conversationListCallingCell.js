@@ -70,9 +70,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
-    this.disableScreenButton = ko.pureComputed(() => {
-      return !z.calling.CallingRepository.supportsScreenSharing;
-    });
+    this.disableScreenButton = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
 
     this.participantsButtonLabel = ko.pureComputed(() => {
       return z.l10n.text(z.string.callParticipants, this.callParticipants().length);
