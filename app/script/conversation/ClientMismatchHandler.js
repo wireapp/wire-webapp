@@ -100,25 +100,26 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchMissing(recipients, payload, genericMessage, conversationId) {
-    if (_.isEmpty(recipients)) {
+    const missingUserIds = Object.keys(recipients);
+    if (!missingUserIds.length) {
       return Promise.resolve(payload);
     }
 
-    const missingRecipients = Object.keys(recipients);
-    this.logger.debug(`Message is missing clients of '${missingRecipients.length}' users`, recipients);
+    this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
 
-    const unknownUsersPromise = !missingRecipients.length
+    const skipParticipantsCheck = !conversationId;
+    const participantsCheckPromise = skipParticipantsCheck
       ? Promise.resolve()
       : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
           const knownUserIds = conversationEntity.participating_user_ids();
-          const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingRecipients);
+          const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingUserIds);
 
           if (unknownUserIds.length) {
             return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
           }
         });
 
-    return unknownUsersPromise
+    return participantsCheckPromise
       .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
       .then(updatedPayload => {
         payload = updatedPayload;
