@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.9.0"></a>
+# [2.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.8.0...@wireapp/react-ui-kit@2.9.0) (2018-08-29)
+
+
+### Features
+
+* **react-ui-kit:** added mediaMatcher ([#1061](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1061)) ([d616fe4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d616fe4))
+
+
+
+
+
 <a name="2.8.0"></a>
 # [2.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.7.1...@wireapp/react-ui-kit@2.8.0) (2018-08-28)
 
