@@ -2665,7 +2665,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {z.event.EventRepository.SOURCE} [eventSource=z.event.EventRepository.SOURCE.STREAM] - Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
@@ -2715,7 +2715,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return conversationEntity;
       })
-      .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson))
+      .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
@@ -2733,25 +2733,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when the participant list has been checked
    */
-  _checkConversationParticipants(conversationEntity, eventJson) {
-    if (!conversationEntity) {
-      return;
+  _checkConversationParticipants(conversationEntity, eventJson, eventSource) {
+    // We ignore injected events
+    const isInjectedEvent = eventSource === z.event.EventRepository.SOURCE.INJECTED;
+    if (isInjectedEvent || !conversationEntity) {
+      return conversationEntity;
     }
 
-    const {data: eventData, from: sender, type} = eventJson;
+    const {id, from: sender, type} = eventJson;
 
-    const isMemberJoinEvent = type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
-    const isFromJoiningUser = isMemberJoinEvent && eventData.user_ids.includes(sender);
-
-    // We ignore 'conversation.member-join' events from self joining users
-    if (!isFromJoiningUser) {
+    if (sender) {
       const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
-        this.logger.warn(`Received event from user '${sender}' not in the conversation`);
+        const message = `Received '${type}' event '${id}' from user '${sender}' unknown in '${conversationEntity.id}'`;
+        this.logger.warn(message, eventJson);
         return this.addMissingMember(conversationEntity.id, [sender]).then(() => conversationEntity);
       }
     }
