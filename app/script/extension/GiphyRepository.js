@@ -67,7 +67,12 @@ z.extension.GiphyRepository = class GiphyRepository {
 
       return this.giphyService
         .getRandom(options.tag)
-        .then(({data: randomGif}) => this.giphyService.getById(randomGif.id))
+        .then(({data: randomGif}) => {
+          if (!randomGif.id) {
+            throw new Error(`Could not find any gif with tag "${options.tag}"`);
+          }
+          return this.giphyService.getById(randomGif.id);
+        })
         .then(({data: {images, url}}) => {
           const staticGif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animatedGif = images[z.extension.GiphyContentSizes.DOWNSIZED];
