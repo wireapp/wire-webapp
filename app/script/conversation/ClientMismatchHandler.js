@@ -112,7 +112,10 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
       : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
           const knownUserIds = conversationEntity.participating_user_ids();
           const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingRecipients);
-          return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
+
+          if (unknownUserIds.length) {
+            return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
+          }
         });
 
     return unknownUsersPromise

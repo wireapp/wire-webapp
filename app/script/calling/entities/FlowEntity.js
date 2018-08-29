@@ -27,9 +27,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
-      NEGOTIATION_FAILED_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30.5,
-      NEGOTIATION_RESTART_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2.5,
-      SDP_SEND_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      NEGOTIATION_THRESHOLD: 0.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      RECONNECTION_TIMEOUT: 2.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      RENEGOTIATION_TIMEOUT: 30 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      SDP_SEND_TIMEOUT: 5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       SDP_SEND_TIMEOUT_RESET: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
     };
   }
@@ -379,7 +380,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.negotiationMode(negotiationMode);
       this.negotiationNeeded(true);
       this.pcInitialized(true);
-      this._setNegotiationFailedTimeout();
+
+      const isDefaultNegotiationMode = negotiationMode === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
+      this._setNegotiationFailedTimeout(isDefaultNegotiationMode);
     });
   }
 
@@ -1133,14 +1136,20 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
   /**
    * Set the negotiation failed timeout.
+   *
    * @private
+   * @param {boolean} isInitialNegotiation - Is negotiation during initial call setup
    * @returns {undefined} No return value
    */
-  _setNegotiationFailedTimeout() {
+  _setNegotiationFailedTimeout(isInitialNegotiation) {
+    const timeout = isInitialNegotiation
+      ? z.calling.entities.CallEntity.CONFIG.STATE_TIMEOUT
+      : FlowEntity.CONFIG.RENEGOTIATION_TIMEOUT;
+
     this.negotiationTimeout = window.setTimeout(() => {
       this.callLogger.info('Removing call participant on negotiation timeout');
       this._removeDroppedParticipant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
-    }, FlowEntity.CONFIG.NEGOTIATION_FAILED_TIMEOUT);
+    }, timeout + FlowEntity.CONFIG.NEGOTIATION_THRESHOLD);
   }
 
   /**
@@ -1158,7 +1167,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       if (isModeDefault) {
         this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false);
       }
-    }, FlowEntity.CONFIG.NEGOTIATION_RESTART_TIMEOUT);
+    }, FlowEntity.CONFIG.RECONNECTION_TIMEOUT);
   }
 
   /**
@@ -1422,7 +1431,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const supportsRemoveStream = typeof this.peerConnection.removeStream === 'function';
       if (!isSignalingStateClosed && supportsRemoveStream) {
         this.peerConnection.removeStream(mediaStream);
-        this.callLogger.debug(`Removed local '${mediaStream.type}' MediaStream from PeerConnection`, {
+        const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
+        this.callLogger.debug(`Removed local '${mediaType}' MediaStream from PeerConnection`, {
           audioTracks: mediaStream.getAudioTracks(),
           stream: mediaStream,
           videoTracks: mediaStream.getVideoTracks(),
