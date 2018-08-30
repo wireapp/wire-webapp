@@ -41,8 +41,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.thumbnailStream = videoGridRepository.thumbnailStream;
     this.streams = videoGridRepository.streams;
 
-    const getStreamInfo = id => this.streams().find(stream => stream.id === id);
-    this.gridInfo = ko.pureComputed(() => this.grid().map(getStreamInfo));
+    this.getStreamInfo = id => this.streams().find(stream => stream.id === id);
+    this.gridInfo = ko.pureComputed(() => this.grid().map(this.getStreamInfo));
 
     this.minimized = minimized;
 
@@ -52,6 +52,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     });
 
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
+    this.doubleClickedOnVideo = this.doubleClickedOnVideo.bind(this);
 
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
@@ -60,11 +61,23 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   scaleVideos(rootElement) {
     const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
     const setScale = (videoElement, wrapper) => {
+      const streamId = wrapper.dataset.streamId;
+      const streamInfo = this.getStreamInfo(streamId);
+      const isScreenSend = streamInfo.screenSend();
+      updateContainClass(videoElement, wrapper, isScreenSend, streamInfo);
+      streamInfo.screenSend.subscribe(screenSend => {
+        delete streamInfo.fitContain;
+        updateContainClass(videoElement, wrapper, screenSend, streamInfo);
+      });
+    };
+
+    const updateContainClass = (videoElement, wrapper, isScreenSend, streamInfo) => {
+      const hasFitSet = streamInfo.hasOwnProperty('fitContain');
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
       const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const isScreenSend = videoElement.dataset.screen === 'true';
-      videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, isVeryDifferent || isScreenSend);
+      const forceClass = hasFitSet ? streamInfo.fitContain : isVeryDifferent || isScreenSend;
+      videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, forceClass);
     };
 
     elements.forEach(element => {
@@ -77,9 +90,12 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     });
   }
 
-  doubleClickedOnVideo(data, event) {
-    const childVideo = event.currentTarget.querySelector('video');
-    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
+  doubleClickedOnVideo(_, {currentTarget}) {
+    const childVideo = currentTarget.querySelector('video');
+    const streamId = currentTarget.dataset.streamId;
+    const streamInfo = this.getStreamInfo(streamId);
+    streamInfo.fitContain = !streamInfo.fitContain;
+    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, streamInfo.fitContain);
   }
 
   getSizeForVideo(index) {
@@ -130,11 +146,11 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 
 ko.components.register('group-video-grid', {
   template: `
-      <div class="group-video" data-bind="template: {afterRender: scaleVideos}">
-        <div class="group-video-grid" data-bind="foreach: {data: gridInfo, as: 'streamInfo'}, css: {'group-video-grid--black-background': hasBlackBackground()}">
+      <div class="group-video">
+        <div class="group-video-grid" data-bind="foreach: {data: gridInfo, as: 'streamInfo', afterRender: scaleVideos}, css: {'group-video-grid--black-background': hasBlackBackground()}">
           <!-- ko if: streamInfo -->
-            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), streamInfo.isSelf && streamInfo.videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}, event: {dblclick: $parent.doubleClickedOnVideo}">
-              <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: streamInfo.stream, muteMediaElement: streamInfo.stream, attr: {'data-screen': streamInfo.screenSend()}">
+            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), streamInfo.isSelf && streamInfo.videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()), 'data-stream-id': streamInfo.id}, event: {dblclick: $parent.doubleClickedOnVideo}">
+              <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: streamInfo.stream, muteMediaElement: streamInfo.stream">
               </video>
               <!-- ko if: streamInfo.isSelf && !streamInfo.audioSend() && !$parent.minimized -->
                 <div class="group-video-grid__mute-overlay">
