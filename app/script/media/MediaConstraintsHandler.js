@@ -27,13 +27,18 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     return {
       DEFAULT_DEVICE_ID: 'default',
       SCREEN_CONSTRAINTS: {
+        CHROME: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            maxHeight: 1080,
+            minHeight: 1080,
+          },
+        },
         FIREFOX: {
           frameRate: 30,
           height: {exact: 720},
           mediaSource: 'screen',
         },
-        MEDIA_SOURCE: 'desktop',
-        SOURCE_TYPE: 'screen',
       },
       VIDEO_CONSTRAINTS: {
         FULL_HD: {
@@ -114,22 +119,13 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     if (window.desktopCapturer) {
       this.logger.info('Enabling screen sharing from Electron');
 
-      const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
-      const preferredResolution = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
-
       const streamConstraints = {
         audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.MEDIA_SOURCE,
-            chromeMediaSourceId: currentDeviceId.screenInput(),
-            maxHeight: preferredResolution.height,
-            maxWidth: preferredResolution.width,
-            minHeight: preferredResolution.height,
-            minWidth: preferredResolution.width,
-          },
-        },
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.CHROME,
       };
+
+      const chromeMediaSourceId = this.mediaRepository.devicesHandler.currentDeviceId.screenInput();
+      streamConstraints.video.mandatory = Object.assign(streamConstraints.video.mandatory, {chromeMediaSourceId});
 
       return Promise.resolve(streamConstraints);
     }
