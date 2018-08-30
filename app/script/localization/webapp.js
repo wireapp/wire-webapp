@@ -110,14 +110,14 @@ z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
-z.string.videoCallOverlayFitVideoLabel = 'Double-click to fit or fill video to container';
+z.string.videoCallOverlayFitVideoLabel = 'Double-click to fit or fill video to frame';
 z.string.videoCallOverlayConversations = 'Conversations';
 z.string.videoCallOverlayMute = 'Mute';
 z.string.videoCallOverlayVideo = 'Video';
 z.string.videoCallOverlayShareScreen = 'Share Screen';
 z.string.videoCallOverlayHangUp = 'Hang Up';
 z.string.videoCallPaused = 'Video paused';
-z.string.videoCallScreenShareNotSupported = 'Your browser does not support screen sharing';
+z.string.videoCallScreenShareNotSupported = 'Screen sharing is not supported in this browser';
 
 // Modals
 // Modals type defaults
