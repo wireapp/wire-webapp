@@ -17,28 +17,9 @@
  *
  */
 
-export const USER_ACTIVATION_START = 'USER_ACTIVATION_START';
-export const USER_ACTIVATION_SUCCESS = 'USER_ACTIVATION_SUCCESS';
-export const USER_ACTIVATION_FAILED = 'USER_ACTIVATION_FAILED';
-
 export const USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START';
 export const USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS';
 export const USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED';
-
-export const startAccountActivation = params => ({
-  params,
-  type: USER_ACTIVATION_START,
-});
-
-export const successfulAccountActivation = activationResponse => ({
-  payload: activationResponse,
-  type: USER_ACTIVATION_SUCCESS,
-});
-
-export const failedAccountActivation = error => ({
-  payload: error,
-  type: USER_ACTIVATION_FAILED,
-});
 
 export const startSendActivationCode = params => ({
   params,
