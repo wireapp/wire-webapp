@@ -20,20 +20,6 @@
 import * as UserActionCreator from './creator/UserActionCreator';
 import {currentLanguage} from '../../localeConfig';
 
-export function doActivateAccount(code, key) {
-  const params = [...arguments];
-  return function(dispatch, getState, {apiClient}) {
-    dispatch(UserActionCreator.startAccountActivation(params));
-    return Promise.resolve()
-      .then(() => apiClient.user.api.postActivation({code, dryrun: false, key}))
-      .then(activationResponse => dispatch(UserActionCreator.successfulAccountActivation(activationResponse)))
-      .catch(error => {
-        dispatch(UserActionCreator.failedAccountActivation(error));
-        throw error;
-      });
-  };
-}
-
 export function doSendActivationCode(email) {
   const params = [...arguments];
   return function(dispatch, getState, {apiClient}) {
