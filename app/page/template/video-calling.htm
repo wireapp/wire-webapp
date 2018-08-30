@@ -26,7 +26,7 @@
 
         <!-- ko ifnot: isChoosingScreen() -->
           <div id="video-controls" class="video-controls hide-controls-hidden">
-            <div class="video-controls__fit-info" data-bind="l10n_text: z.string.videoCallOverlayFitVideoLabel"></div>
+            <div class="video-controls__fit-info" data-bind="l10n_text: z.string.videoCallOverlayFitVideoLabel" data-uie-name="label-fit-fill-info"></div>
             <div class="video-controls__wrapper">
               <div class="video-controls__button" data-bind="click: clickedOnMinimize" data-uie-name="do-call-controls-video-minimize">
                 <!-- ko if: hasUnreadMessages() -->
