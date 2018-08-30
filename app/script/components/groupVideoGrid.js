@@ -37,6 +37,9 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   }
 
   constructor({minimized, videoGridRepository}, rootElement) {
+    this.scaleVideos = this.scaleVideos.bind(this, rootElement);
+    this.doubleClickedOnVideo = this.doubleClickedOnVideo.bind(this);
+
     this.grid = videoGridRepository.grid;
     this.thumbnailStream = videoGridRepository.thumbnailStream;
     this.streams = videoGridRepository.streams;
@@ -50,9 +53,6 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       const gridElementsCount = this.grid().filter(id => id !== 0).length;
       return this.minimized && gridElementsCount > 1;
     });
-
-    this.scaleVideos = this.scaleVideos.bind(this, rootElement);
-    this.doubleClickedOnVideo = this.doubleClickedOnVideo.bind(this);
 
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
@@ -90,7 +90,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     });
   }
 
-  doubleClickedOnVideo(_, {currentTarget}) {
+  doubleClickedOnVideo(viewModel, {currentTarget}) {
     const childVideo = currentTarget.querySelector('video');
     const streamId = currentTarget.dataset.streamId;
     const streamInfo = this.getStreamInfo(streamId);
