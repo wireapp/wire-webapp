@@ -36,7 +36,7 @@ z.calling.CallingService = class CallingService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCallsConfigV2
    *
-   * @param {number} [limit] - Limit the number of TURNs servers in the resoinse (range 1, 10)
+   * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
    * @returns {Promise} Resolves with call config information
    */
   getConfig(limit) {
