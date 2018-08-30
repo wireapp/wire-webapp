@@ -45,9 +45,12 @@ participant-item {
     margin-left: 16px;
   }
 
-  guest-icon,
-  camera-icon {
+  guest-icon {
     opacity: 0.48;
+  }
+
+  camera-icon {
+    animation: camera-pulse 1s alternate ease-in-out infinite;
   }
 
   disclose-icon {
@@ -108,6 +111,7 @@ participant-item {
         .ellipsis;
 
         width: 100%;
+        padding-right: 8px;
       }
 
       .participant-item-content-info {
@@ -131,5 +135,14 @@ participant-item {
   }
   100% {
     background-color: fade(@graphite-dark, 8%);
+  }
+}
+
+@keyframes camera-pulse {
+  0% {
+    opacity: 0.32;
+  }
+  100% {
+    opacity: 0.72;
   }
 }

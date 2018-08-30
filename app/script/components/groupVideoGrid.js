@@ -136,7 +136,7 @@ ko.components.register('group-video-grid', {
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), streamInfo.isSelf && streamInfo.videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}, event: {dblclick: $parent.doubleClickedOnVideo}">
               <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: streamInfo.stream, muteMediaElement: streamInfo.stream, attr: {'data-screen': streamInfo.screenSend()}">
               </video>
-              <!-- ko if: streamInfo.isSelf && streamInfo.audioSend() && !$parent.minimized -->
+              <!-- ko if: streamInfo.isSelf && !streamInfo.audioSend() && !$parent.minimized -->
                 <div class="group-video-grid__mute-overlay">
                   <micoff-icon></micoff-icon>
                 </div>

@@ -1030,15 +1030,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Mark conversation as read.
-   * @param {Conversation} conversation_et - Conversation to be marked as read
+   * @param {Conversation} conversationEntity - Conversation to be marked as read
    * @returns {undefined} No return value
    */
-  mark_as_read(conversation_et) {
-    const has_unread_events = conversation_et && conversation_et.unread_event_count() !== 0;
-
-    if (has_unread_events && !this.block_event_handling()) {
-      this._update_last_read_timestamp(conversation_et);
-      amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
+  markAsRead(conversationEntity) {
+    if (conversationEntity) {
+      const hasUnreadEvents = conversationEntity.last_read_timestamp() < conversationEntity.last_server_timestamp();
+      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unread_event_count();
+      if (isNotMarkedAsRead && !this.block_event_handling()) {
+        this._update_last_read_timestamp(conversationEntity);
+        amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
+      }
     }
   }
 
