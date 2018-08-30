@@ -33,6 +33,7 @@ import {
   Input,
   RoundIconButton,
   ErrorMessage,
+  mediaMatcher,
 } from '@wireapp/react-ui-kit';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
@@ -55,12 +56,20 @@ class TeamName extends Component {
   state = {
     enteredTeamName: this.props.teamName || '',
     error: null,
+    isMobile: mediaMatcher.isMobile(),
     isValidTeamName: !!this.props.teamName,
   };
 
   componentDidMount() {
     this.props.enterTeamCreationFlow();
+    window.addEventListener('resize', this.updateIsMobile);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateIsMobile);
+  }
+
+  updateIsMobile = () => this.setState({isMobile: mediaMatcher.isMobile()});
 
   handleSubmit = event => {
     event.preventDefault();
@@ -88,18 +97,22 @@ class TeamName extends Component {
     const {
       intl: {formatMessage: _},
     } = this.props;
-    const {enteredTeamName, isValidTeamName, error} = this.state;
+    const {enteredTeamName, isValidTeamName, isMobile, error} = this.state;
+    const backArrow = (
+      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
+        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      </Link>
+    );
     return (
       <Page>
+        {isMobile && <div style={{margin: 16}}>{backArrow}</div>}
         <Container centerText verticalCenter style={{width: '100%'}}>
           <Columns>
-            <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>
-                <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
-                  <ArrowIcon direction="left" color={COLOR.GRAY} />
-                </Link>
-              </div>
-            </Column>
+            {!isMobile && (
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              </Column>
+            )}
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
