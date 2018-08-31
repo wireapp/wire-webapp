@@ -43,6 +43,8 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
     this.panelViewModel = mainViewModel.panel;
 
+    this.panelIsVisible = this.panelViewModel.isVisible;
+
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 

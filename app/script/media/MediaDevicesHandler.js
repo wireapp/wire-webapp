@@ -26,6 +26,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   static get CONFIG() {
     return {
       DEFAULT_DEVICE_ID: 'default',
+      SCREEN_DEVICE_TYPE: 'screen',
     };
   }
 
@@ -251,7 +252,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
           height: 176,
           width: 312,
         },
-        types: [z.media.MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.SOURCE_TYPE],
+        types: [MediaDevicesHandler.CONFIG.SCREEN_DEVICE_TYPE],
       };
 
       return window.desktopCapturer.getSources(options, (error, screenSources) => {

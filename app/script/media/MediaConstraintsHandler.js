@@ -27,8 +27,18 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     return {
       DEFAULT_DEVICE_ID: 'default',
       SCREEN_CONSTRAINTS: {
-        MEDIA_SOURCE: 'desktop',
-        SOURCE_TYPE: 'screen',
+        CHROME: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            maxHeight: 1080,
+            minHeight: 1080,
+          },
+        },
+        FIREFOX: {
+          frameRate: 30,
+          height: {exact: 720},
+          mediaSource: 'screen',
+        },
       },
       VIDEO_CONSTRAINTS: {
         FULL_HD: {
@@ -109,22 +119,13 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     if (window.desktopCapturer) {
       this.logger.info('Enabling screen sharing from Electron');
 
-      const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
-      const preferredResolution = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
-
       const streamConstraints = {
         audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.MEDIA_SOURCE,
-            chromeMediaSourceId: currentDeviceId.screenInput(),
-            maxHeight: preferredResolution.height,
-            maxWidth: preferredResolution.width,
-            minHeight: preferredResolution.height,
-            minWidth: preferredResolution.width,
-          },
-        },
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.CHROME,
       };
+
+      const chromeMediaSourceId = this.mediaRepository.devicesHandler.currentDeviceId.screenInput();
+      streamConstraints.video.mandatory = Object.assign(streamConstraints.video.mandatory, {chromeMediaSourceId});
 
       return Promise.resolve(streamConstraints);
     }
@@ -134,9 +135,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: {
-          mediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.SOURCE_TYPE,
-        },
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.FIREFOX,
       };
 
       return Promise.resolve(streamConstraints);
@@ -179,9 +178,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     }
 
     if (_.isString(mediaDeviceId)) {
-      streamConstraints.deviceId = {
-        exact: mediaDeviceId,
-      };
+      streamConstraints.deviceId = {exact: mediaDeviceId};
     } else {
       streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.PREFERRED_FACING_MODE;
     }

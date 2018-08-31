@@ -19,8 +19,8 @@
       <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
     </div>
 
-    <!-- ko if: showCallControls() -->
-      <div class="conversation-title-bar-icons">
+    <div class="conversation-title-bar-icons">
+      <!-- ko if: showCallControls() -->
         <!-- ko if: supportsVideoCall() -->
           <camera-icon class="conversation-title-bar-icon"
                 data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltipConversationVideoCall"
@@ -31,11 +31,8 @@
               data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
               data-uie-name="do-call">
         </pickup-icon>
-      </div>
-    <!-- /ko -->
-
-    <!-- ko if: hasOngoingCall() -->
-      <div class="conversation-title-bar-icons">
+      <!-- /ko -->
+      <!-- ko if: hasOngoingCall() -->
         <!-- ko if: selfStreamState.screenSend() -->
           <span class="conversation-title-bar-icon button-icon-large icon-screensharing"
             data-uie-name="status-self-screensharing">
@@ -46,11 +43,12 @@
                 data-uie-name="status-self-video">
           </span>
         <!-- /ko -->
-      </div>
-    <!-- /ko -->
+      <!-- /ko -->
+      <info-icon class="conversation-title-bar-icon" data-bind="click: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}"></info-icon>
+    </div>
+
     <!-- ko if: badgeLabelCopy() -->
       <div class="conversation-title-bar-indication-badge" data-bind="text: badgeLabelCopy" data-uie-name="status-indication-badge"></div>
-    <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
 </div>
