@@ -439,7 +439,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
  */
 ko.bindingHandlers.hide_controls = {
   init(element, valueAccessor) {
-    const timeout = valueAccessor();
+    const {timeout = valueAccessor(), skipClass} = valueAccessor();
     let hide_timeout = undefined;
 
     element.onmouseenter = function() {
@@ -452,12 +452,20 @@ ko.bindingHandlers.hide_controls = {
       }
     };
 
-    element.onmousemove = function() {
+    element.onmousemove = function({target}) {
       if (hide_timeout) {
         window.clearTimeout(hide_timeout);
       }
 
       element.classList.remove('hide-controls');
+
+      let node = target;
+      while (node && node !== element) {
+        if (node.classList.contains(skipClass)) {
+          return;
+        }
+        node = node.parentNode;
+      }
 
       hide_timeout = window.setTimeout(() => {
         element.classList.add('hide-controls');
