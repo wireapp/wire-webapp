@@ -757,7 +757,7 @@ z.event.EventRepository = class EventRepository {
         const shouldDeleteEvent = fromOther || selfCancel;
         return shouldDeleteEvent
           ? this.eventService.deleteEvent(newEvent.conversation, newEvent.id).then(() => newEvent)
-          : this.conversationService.update_asset_as_failed_in_db(originalEvent.primary_key, newEvent.data.reason);
+          : this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
       }
 
       default:

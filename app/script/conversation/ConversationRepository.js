@@ -1030,15 +1030,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Mark conversation as read.
-   * @param {Conversation} conversation_et - Conversation to be marked as read
+   * @param {Conversation} conversationEntity - Conversation to be marked as read
    * @returns {undefined} No return value
    */
-  mark_as_read(conversation_et) {
-    const has_unread_events = conversation_et && conversation_et.unread_event_count() !== 0;
-
-    if (has_unread_events && !this.block_event_handling()) {
-      this._update_last_read_timestamp(conversation_et);
-      amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
+  markAsRead(conversationEntity) {
+    if (conversationEntity) {
+      const hasUnreadEvents = conversationEntity.last_read_timestamp() < conversationEntity.last_server_timestamp();
+      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unread_event_count();
+      if (isNotMarkedAsRead && !this.block_event_handling()) {
+        this._update_last_read_timestamp(conversationEntity);
+        amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
+      }
     }
   }
 
@@ -1148,6 +1150,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
+  }
+
+  addMissingMember(conversationId, userIds) {
+    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
+      const memberJoinEvent = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, userIds, this.timeOffset);
+      return this.eventRepository.injectEvent(memberJoinEvent, z.event.EventRepository.SOURCE.INJECTED);
+    });
   }
 
   /**
@@ -2645,10 +2654,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {number} Number of pending uploads
    */
   get_number_of_pending_uploads() {
-    return this.conversations().reduce(
-      (sum, conversation_et) => sum + conversation_et.get_number_of_pending_uploads(),
-      0
-    );
+    return this.conversations().reduce((sum, conversationEntity) => {
+      return sum + conversationEntity.get_number_of_pending_uploads();
+    }, 0);
   }
 
   //##############################################################################
@@ -2659,7 +2667,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {z.event.EventRepository.SOURCE} [eventSource=z.event.EventRepository.SOURCE.STREAM] - Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
@@ -2709,6 +2717,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return conversationEntity;
       })
+      .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
@@ -2721,8 +2730,41 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Check that sender of received event is a known conversation participant.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @returns {Promise} Resolves when the participant list has been checked
+   */
+  _checkConversationParticipants(conversationEntity, eventJson, eventSource) {
+    // We ignore injected events
+    const isInjectedEvent = eventSource === z.event.EventRepository.SOURCE.INJECTED;
+    if (isInjectedEvent || !conversationEntity) {
+      return conversationEntity;
+    }
+
+    const {id, from: sender, type} = eventJson;
+
+    if (sender) {
+      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
+      const isFromUnknownUser = !allParticipantIds.includes(sender);
+
+      if (isFromUnknownUser) {
+        const message = `Received '${type}' event '${id}' from user '${sender}' unknown in '${conversationEntity.id}'`;
+        this.logger.warn(message, eventJson);
+        return this.addMissingMember(conversationEntity.id, [sender]).then(() => conversationEntity);
+      }
+    }
+
+    return conversationEntity;
+  }
+
+  /**
    * Triggers the methods associated with a specific event.
    *
+   * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
    * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
@@ -3597,7 +3639,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
       }
 
-      return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key, reason);
+      return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
     }
   }
 
@@ -3621,7 +3663,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     asset_et.status(z.assets.AssetTransferState.UPLOADED);
     message_et.status(z.message.StatusType.SENT);
 
-    return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, event_json);
+    return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
   }
 
   //##############################################################################

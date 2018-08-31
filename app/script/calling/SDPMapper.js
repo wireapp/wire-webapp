@@ -91,40 +91,29 @@ z.calling.SDPMapper = {
           const browserString = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
           const webappVersion = z.util.Environment.version(false);
 
-          if (z.util.Environment.desktop) {
-            const desktopVersion = z.util.Environment.version(true);
-            outline = `a=tool:electron ${desktopVersion} ${webappVersion} (${browserString})`;
-          } else {
-            outline = `a=tool:webapp ${webappVersion} (${browserString})`;
-          }
+          outline = z.util.Environment.desktop
+            ? `a=tool:electron ${z.util.Environment.version(true)} ${webappVersion} (${browserString})`
+            : `a=tool:webapp ${webappVersion} (${browserString})`;
         }
       } else if (sdpLine.startsWith('a=candidate')) {
         iceCandidates.push(sdpLine);
-      } else if (sdpLine.startsWith('a=mid')) {
-        // Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
-        const isAffectedSetup = z.util.Environment.browser.firefox && !isLocalSdp && !isOffer;
-        const shouldFixMediaStreamId = isAffectedSetup && sdpLine === 'a=mid:data';
-        if (shouldFixMediaStreamId) {
-          outline = 'a=mid:sdparta_2';
-        }
-      } else if (sdpLine.startsWith('m=audio')) {
-        // Code to nail in bit-rate and ptime settings for improved performance and experience
-        const shouldAddBitRate = isLocalSdpInGroup || isIceRestart;
-        if (shouldAddBitRate) {
-          sdpLines.push(sdpLine);
-          outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
+      } else if (sdpLine.startsWith('m=')) {
+        if (sdpLine.startsWith('m=audio')) {
+          // Code to nail in bit-rate and ptime settings for improved performance and experience
+          const shouldAddBitRate = isLocalSdpInGroup || isIceRestart;
+          if (shouldAddBitRate) {
+            sdpLines.push(sdpLine);
+            outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
+          }
+        } else if (z.util.Environment.browser.firefox && isLocalSdp && isOffer) {
+          // Set ports to activate media in outgoing Firefox SDP to ensure enabled media
+          outline = sdpLine.replace(/^m=(application|video) 0/, 'm=$1 9');
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
         const shouldAddPTime = isLocalSdpInGroup || isIceRestart;
         if (shouldAddPTime && z.util.StringUtil.includes(sdpLine, 'opus')) {
           sdpLines.push(sdpLine);
           outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
-        }
-      } else if (sdpLine.startsWith('a=fmtp')) {
-        // Workaround for incompatibility between Chrome 57 and AVS builds. Remove once update of clients with AVS 3.3.x is high enough.
-        const shouldFixCodec = sdpLine === 'a=fmtp:125 apt=100';
-        if (shouldFixCodec) {
-          outline = 'a=fmtp:125 apt=96';
         }
       }
 

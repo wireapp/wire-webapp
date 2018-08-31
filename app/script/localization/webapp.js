@@ -110,12 +110,14 @@ z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
+z.string.videoCallOverlayFitVideoLabel = 'Double-click to fit or fill video to frame';
 z.string.videoCallOverlayConversations = 'Conversations';
 z.string.videoCallOverlayMute = 'Mute';
 z.string.videoCallOverlayVideo = 'Video';
 z.string.videoCallOverlayShareScreen = 'Share Screen';
 z.string.videoCallOverlayHangUp = 'Hang Up';
 z.string.videoCallPaused = 'Video paused';
+z.string.videoCallScreenShareNotSupported = 'Screen sharing is not supported in this browser';
 
 // Modals
 // Modals type defaults
@@ -245,7 +247,7 @@ z.string.modalConversationGuestOptionsRequestCodeMessage = 'Could not request ac
 z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke access link. Please try again.';
 z.string.modalConversationGuestOptionsToggleGuestsMessage = 'Could not change guests state.';
 
-z.string.modalConversationTooManyMembersHeadline = 'Full house';
+z.string.modalConversationTooManyMembersHeadline = 'The group is full';
 z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. Currently there is only room for {{number2}} more.';
 
 z.string.modalGifTooLargeHeadline = 'Selected animation is too large';

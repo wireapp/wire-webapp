@@ -505,3 +505,14 @@ ko.bindingHandlers.in_viewport = {
     });
   },
 };
+
+ko.bindingHandlers.tooltip = {
+  update(element, valueAccessor) {
+    const {text = valueAccessor(), position, disabled} = valueAccessor();
+    if (!disabled) {
+      const {id = text, substitute} = text;
+      element.classList.add('with-tooltip', `with-tooltip--${position === 'bottom' ? 'bottom' : 'top'}`);
+      element.setAttribute('data-tooltip', z.l10n.text(id, substitute));
+    }
+  },
+};

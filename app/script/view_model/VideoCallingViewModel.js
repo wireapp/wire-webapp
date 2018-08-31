@@ -100,10 +100,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
-    this.showRemote = ko.pureComputed(() => {
-      return this.showRemoteVideo() || this.showRemoteParticipant() || this.isChoosingScreen();
-    });
-
     this.showRemoteParticipant = ko.pureComputed(() => {
       const showRemoteParticipant = this.remoteUser() && !this.multitasking.isMinimized() && !this.isChoosingScreen();
       return showRemoteParticipant && this.isCallOngoing() && !this.showRemoteVideo();
@@ -135,12 +131,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.showToggleVideo = ko.pureComputed(() => {
       return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
-    this.disableToggleScreen = ko.pureComputed(() => {
-      return (
-        !z.calling.CallingRepository.supportsScreenSharing ||
-        (this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true)
-      );
-    });
+    this.disableToggleScreen = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
 
     this.visibleCallId = undefined;
     this.joinedCall.subscribe(callEntity => {
@@ -191,7 +182,10 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
+    this.hasUnreadMessages = ko.observable(false);
+
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -259,7 +253,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnShareScreen() {
-    if (this.joinedCall()) {
+    if (!this.disableToggleScreen() && this.joinedCall()) {
       this.chooseSharedScreen(this.joinedCall().id);
     }
   }

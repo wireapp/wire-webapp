@@ -123,7 +123,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     $(window).on('focus', () => {
       if (this.mark_as_read_on_focus) {
         window.setTimeout(() => {
-          this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
+          this.conversation_repository.markAsRead(this.mark_as_read_on_focus);
           this.mark_as_read_on_focus = undefined;
         }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
       }
@@ -145,7 +145,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   _mark_conversation_as_read_on_focus(conversation_et) {
     if (document.hasFocus()) {
-      return this.conversation_repository.mark_as_read(conversation_et);
+      return this.conversation_repository.markAsRead(conversation_et);
     }
     this.mark_as_read_on_focus = conversation_et;
   }
@@ -203,8 +203,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       })
       .then(() => {
         const lastMessageEntity = this.conversation().getLastMessage();
-        if (lastMessageEntity && lastMessageEntity.timestamp() === this.conversation().last_event_timestamp()) {
-          this.conversation_reached_bottom = true;
+        if (lastMessageEntity) {
+          const isLastConversationEvent = lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp();
+          const hasReachedBottom = isLastConversationEvent || !lastMessageEntity.timestamp();
+          if (hasReachedBottom) {
+            this.conversation_reached_bottom = true;
+          }
         }
         conversationEntity.is_loaded(true);
         return this._render_conversation(conversationEntity);
@@ -252,7 +256,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
             messages_container.scrollToBottom();
           }
         } else {
-          this.conversation_repository.mark_as_read(conversation_et);
+          this.conversation_repository.markAsRead(conversation_et);
         }
 
         $('.conversation').css({opacity: 1});
@@ -305,7 +309,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
-        this.conversation_repository.mark_as_read(this.conversation());
+        this.conversation_repository.markAsRead(this.conversation());
       }
     }
 
