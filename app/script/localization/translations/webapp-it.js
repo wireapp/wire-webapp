@@ -92,6 +92,9 @@ z.string.it.callJoin = 'Entra';
 z.string.it.callChooseSharedScreen = 'Scegli quale schermata condividere';
 z.string.it.callParticipants = '{{number}} nella chiamata';
 
+z.string.it.videoCallOverlayMute = 'Silenzia';
+z.string.it.videoCallOverlayHangUp = 'Riattacca';
+
 z.string.it.modalAcknowledgeAction = 'Ok';
 z.string.it.modalConfirmSecondary = 'Annulla';
 z.string.it.modalOptionSecondary = 'Annulla';
@@ -188,10 +191,13 @@ z.string.it.modalConversationRemoveAction = 'Rimuovi';
 z.string.it.modalConversationRemoveHeadline = 'Rimuovere?';
 z.string.it.modalConversationRemoveMessage = '{{user}} non sarà in grado di inviare o ricevere messaggi in questa conversazione.';
 
+z.string.it.modalConversationRemoveGuestsAction = 'Rimuovi';
 
 z.string.it.modalConversationTooManyMembersHeadline = 'Chiamata piena';
 
 
+
+z.string.it.modalImproveWireAction = 'Accetta';
 
 z.string.it.modalSessionResetHeadline = 'La sessione è stata reimpostata';
 z.string.it.modalSessionResetMessage1 = 'Se il problema non viene risolto,';
@@ -221,8 +227,6 @@ z.string.it.conversationYouAccusative = 'tu';
 z.string.it.conversationConnectionAccepted = 'Connesso';
 z.string.it.conversationConnectionBlocked = 'Bloccato';
 z.string.it.conversationConnectionCancelRequest = 'Annulla la richiesta di connessione';
-z.string.it.conversationCreate = ' ha iniziato una conversazione con {{users}}';
-z.string.it.conversationCreateYou = ' ha iniziato una conversazione con {{users}}';
 z.string.it.conversationDeviceStartedUsingOne = ' ha iniziato ad usare';
 z.string.it.conversationDeviceStartedUsingMany = ' ha iniziato ad usare';
 z.string.it.conversationDeviceUnverified = ' hai tolto la verifica di';
@@ -233,17 +237,10 @@ z.string.it.conversationDeviceNewDeviceMany = ' nuovi dispositivi';
 z.string.it.conversationDeviceNewPeopleJoinedVerify = ' verifica i dispositivi';
 z.string.it.conversationJustNow = 'Adesso';
 z.string.it.conversationLocationLink = 'Apri mappa';
-z.string.it.conversationMemberJoin = ' ha aggiunto {{users}}';
-z.string.it.conversationMemberJoinYou = ' ha aggiunto {{users}}';
-z.string.it.conversationMemberLeaveLeft = ' ha lasciato la conversazione';
-z.string.it.conversationMemberLeaveLeftYou = ' ha lasciato la conversazione';
-z.string.it.conversationMemberLeaveRemoved = ' ha rimosso {{users}}';
-z.string.it.conversationMemberLeaveRemovedYou = ' ha rimosso {{users}}';
 z.string.it.conversationMessageDelivered = 'Consegnato';
 z.string.it.conversationRename = ' ha rinominato la conversazione';
 z.string.it.conversationRenameYou = ' ha rinominato la conversazione';
 z.string.it.conversationResume = 'Inizia una conversazione con {{users}}';
-z.string.it.conversationTeamLeave = ' è stato rimosso dal team';
 z.string.it.conversationPing = ' ha fatto un trillo';
 z.string.it.conversationPingYou = ' ha fatto un trillo';
 z.string.it.conversationToday = 'oggi';
@@ -259,6 +256,7 @@ z.string.it.conversationMissedMessages = 'È da un po’ di tempo che non utiliz
 z.string.it.conversationAssetDownloading = 'Download in corso…';
 z.string.it.conversationAssetUploadFailed = 'Caricamento fallito';
 z.string.it.conversationPlaybackError = 'Impossibile riprodurre';
+z.string.it.conversationContextMenuCopy = 'Copia';
 z.string.it.conversationContextMenuEdit = 'Modifica';
 z.string.it.conversationContextMenuDelete = 'Elimina per me';
 z.string.it.conversationContextMenuDeleteEveryone = 'Elimina per tutti';
@@ -293,10 +291,7 @@ z.string.it.conversationsConnectionRequestOne = '1 persona in attesa';
 z.string.it.conversationsEmptyConversation = 'Conversazione di gruppo';
 z.string.it.conversationsNoConversations = 'Nessuna conversazione';
 z.string.it.conversationsPopoverArchive = 'Archivia';
-z.string.it.conversationsPopoverBlock = 'Blocca';
 z.string.it.conversationsPopoverCancel = 'Annulla richiesta';
-z.string.it.conversationsPopoverClear = 'Elimina';
-z.string.it.conversationsPopoverLeave = 'Abbandona';
 z.string.it.conversationsPopoverNotify = 'Riattiva audio';
 z.string.it.conversationsPopoverSilence = 'Silenzia';
 z.string.it.conversationsPopoverUnarchive = 'Disarchivia';
@@ -342,13 +337,18 @@ z.string.it.addParticipantsSearchPlaceholder = 'Cerca per nome';
 z.string.it.addParticipantsTabsPeople = 'Persone';
 z.string.it.addParticipantsTabsServices = 'Servizi';
 
+z.string.it.conversationDetailsActionArchive = 'Archivia';
 z.string.it.conversationDetailsActionCancelRequest = 'Annulla richiesta';
 z.string.it.conversationDetailsActionDevices = 'Dispositivi';
 z.string.it.conversationDetailsGuestsOff = 'Off';
+z.string.it.conversationDetailsOptions = 'Opzioni';
 z.string.it.conversationDetailsParticipantsServicesMany = 'Servizi';
 z.string.it.conversationDetailsParticipantsUsersMany = 'Persone';
 z.string.it.conversationDetailsPeople = 'Persone';
 z.string.it.conversationDetailsServices = 'Servizi';
+
+z.string.it.conversationParticipantsTitle = 'Persone';
+z.string.it.conversationParticipantsSearchPlaceholder = 'Cerca per nome';
 
 z.string.it.groupParticipantActionCancelRequest = 'Annulla richiesta';
 z.string.it.groupParticipantActionDevices = 'Dispositivi';
@@ -414,7 +414,6 @@ z.string.it.preferencesDevicesCurrent = 'Attuale';
 z.string.it.preferencesDevicesFingerprint = 'Impronta digitale della chiave';
 z.string.it.preferencesDevicesFingerprintDetail = 'Wire dà un impronta digitale unica a ogni dispositivo. Confrontale per verificare i tuoi dispositivi e le conversazioni.';
 z.string.it.preferencesDevicesId = 'ID: ';
-z.string.it.preferencesDevicesRemove = 'Rimuovi';
 z.string.it.preferencesDevicesRemoveCancel = 'Annulla';
 z.string.it.preferencesDevicesRemoveDetail = 'RimuovI questo dispositivo se hai smesso di usarlo. Verrai disconnesso immediatamente.';
 z.string.it.preferencesDevicesSessionConfirmation = 'La sessione è stata resettata.';
@@ -434,9 +433,6 @@ z.string.it.preferencesOptionsContacts = 'Contatti';
 z.string.it.preferencesOptionsContactsGmail = 'Importa da Gmail';
 z.string.it.preferencesOptionsContactsMacos = 'Importa dalla rubrica';
 z.string.it.preferencesOptionsContactsDetail = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
-z.string.it.preferencesOptionsData = 'Segnalazioni di crash e dati di utilizzo';
-z.string.it.preferencesOptionsDataCheckbox = 'Segnalazioni di crash e dati di utilizzo';
-z.string.it.preferencesOptionsDataDetail = 'Migliora Wire con l’invio di informazioni anonime.';
 z.string.it.preferencesOptionsPopular = 'A grande richiesta';
 z.string.it.preferencesOptionsEmojiReplaceCheckbox = 'Sostituire il tipo emoticon con Emoji';
 z.string.it.preferencesOptionsPreviewsSendCheckbox = 'Genera anteprime per i link inviati da te';
@@ -446,6 +442,8 @@ z.string.it.preferencesOptionsNotificationsNone = 'Off';
 z.string.it.preferencesOptionsNotificationsObfuscate = 'Nascondi dettagli';
 z.string.it.preferencesOptionsNotificationsObfuscateMessage = 'Mostra mittente';
 z.string.it.preferencesOptionsNotificationsOn = 'Mostra mittente e messaggio';
+
+z.string.it.backupCancel = 'Annulla';
 
 z.string.it.searchConnect = 'Connetti';
 z.string.it.searchConnections = 'Connessioni';
@@ -555,13 +553,5 @@ z.string.it.initReceivedUserData = 'Controllo nuovi messaggi';
 z.string.it.initDecryption = 'Decriptare i messaggi';
 z.string.it.initEvents = 'Caricamento messaggi';
 
-z.string.it.ephememalUnitsNone = 'Off';
-z.string.it.ephememalUnitsSecond = 'secondo';
-z.string.it.ephememalUnitsSeconds = 'secondi';
-z.string.it.ephememalUnitsMinute = 'minuto';
-z.string.it.ephememalUnitsMinutes = 'minuti';
-z.string.it.ephememalUnitsHour = 'ora';
-z.string.it.ephememalUnitsHours = 'ore';
-z.string.it.ephememalUnitsDay = 'giorno';
-z.string.it.ephememalUnitsDays = 'giorni';
+z.string.it.ephemeralUnitsNone = 'Off';
 

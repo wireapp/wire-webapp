@@ -27,10 +27,10 @@ z.service.BackendClient = class BackendClient {
     return {
       CONNECTIVITY_CHECK: {
         INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: 2000,
-        REQUEST_TIMEOUT: 500,
+        RECHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+        REQUEST_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
       },
-      QUEUE_CHECK_TIMEOUT: 60 * 1000,
+      QUEUE_CHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 
@@ -75,15 +75,15 @@ z.service.BackendClient = class BackendClient {
    *
    * @param {Object} settings - Settings for different backend environments
    * @param {string} settings.environment - Backend environment used
-   * @param {string} settings.rest_url - Backend REST URL
-   * @param {string} settings.web_socket_url - Backend WebSocket URL
+   * @param {string} settings.restUrl - Backend REST URL
+   * @param {string} settings.webSocketUrl - Backend WebSocket URL
    */
   constructor(settings) {
     this.logger = new z.util.Logger('z.service.BackendClient', z.config.LOGGER.OPTIONS);
 
     z.util.Environment.backend.current = settings.environment;
-    this.rest_url = settings.rest_url;
-    this.web_socket_url = settings.web_socket_url;
+    this.restUrl = settings.restUrl;
+    this.webSocketUrl = settings.webSocketUrl;
 
     this.connectivity_timeout = undefined;
     this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
@@ -109,8 +109,8 @@ z.service.BackendClient = class BackendClient {
     // http://stackoverflow.com/a/18996758/451634
     $.ajaxPrefilter((options, originalOptions, jqXHR) => {
       jqXHR.wire = {
-        original_request_options: originalOptions,
-        request_id: this.number_of_requests(),
+        originalRequestOptions: originalOptions,
+        requestId: this.number_of_requests(),
         requested: new Date(),
       };
     });
@@ -123,7 +123,7 @@ z.service.BackendClient = class BackendClient {
    */
   create_url(path) {
     z.util.ValidationUtil.isValidApiPath(path);
-    return `${this.rest_url}${path}`;
+    return `${this.restUrl}${path}`;
   }
 
   /**
@@ -256,10 +256,8 @@ z.service.BackendClient = class BackendClient {
    */
   send_request(config) {
     if (this.queue_state() !== z.service.QUEUE_STATE.READY) {
-      this.logger.info(
-        `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`,
-        config
-      );
+      const logMessage = `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`;
+      this.logger.info(logMessage, config);
     }
 
     return this.request_queue.push(() => this._send_request(config));
@@ -305,18 +303,15 @@ z.service.BackendClient = class BackendClient {
         url: config.url,
         xhrFields: config.xhrFields,
       })
-        .done((data, textStatus, {wire: wire_request}) => {
-          const request_id = wire_request ? wire_request.request : 'ID not set';
-          this.logger.debug(
-            this.logger.levels.OFF,
-            `Server response to '${config.type}' request '${config.url}' - '${request_id}':`,
-            data
-          );
+        .done((data, textStatus, {wire: wireRequest}) => {
+          const requestId = wireRequest ? wireRequest.requestId : 'ID not set';
+          const logMessage = `Server response to '${config.type}' request '${config.url}' - '${requestId}':`;
+          this.logger.debug(this.logger.levels.OFF, logMessage, data);
 
           resolve(data);
         })
-        .fail(({responseJSON: response, status: status_code, wire: wire_request}) => {
-          switch (status_code) {
+        .fail(({responseJSON: response, status: statusCode, wire: wireRequest}) => {
+          switch (statusCode) {
             case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
               this._prepend_request_queue(config, resolve, reject);
@@ -326,19 +321,20 @@ z.service.BackendClient = class BackendClient {
 
             case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
               if (response) {
-                const error_label = response.label;
-                const error_message = `Server request forbidden: ${error_label}`;
+                const errorLabel = response.label;
+                const errorMessage = `Server request forbidden: ${errorLabel}`;
 
-                if (BackendClient.IGNORED_BACKEND_LABELS.includes(error_label)) {
-                  this.logger.warn(error_message);
+                if (BackendClient.IGNORED_BACKEND_LABELS.includes(errorLabel)) {
+                  this.logger.warn(errorMessage);
                 } else {
-                  const request_id = wire_request ? wire_request.request_id : undefined;
-                  const custom_data = {
+                  const requestId = wireRequest ? wireRequest.requestId : undefined;
+                  const customData = {
                     endpoint: config.url,
-                    request_id: request_id,
+                    method: config.type,
+                    requestId,
                   };
 
-                  Raygun.send(new Error(error_message), custom_data);
+                  Raygun.send(new Error(errorMessage), customData);
                 }
               }
               break;
@@ -363,19 +359,20 @@ z.service.BackendClient = class BackendClient {
             }
 
             default: {
-              if (!BackendClient.IGNORED_BACKEND_ERRORS.includes(status_code)) {
-                const request_id = wire_request ? wire_request.request_id : undefined;
-                const custom_data = {
+              if (!BackendClient.IGNORED_BACKEND_ERRORS.includes(statusCode)) {
+                const requestId = wireRequest ? wireRequest.requestId : undefined;
+                const customData = {
                   endpoint: config.url,
-                  request_id: request_id,
+                  method: config.type,
+                  requestId,
                 };
 
-                Raygun.send(new Error(`Server request failed: ${status_code}`), custom_data);
+                Raygun.send(new Error(`Server request failed: ${statusCode}`), customData);
               }
             }
           }
 
-          reject(response || new z.service.BackendClientError(status_code));
+          reject(response || new z.service.BackendClientError(statusCode));
         });
     });
   }

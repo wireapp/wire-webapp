@@ -24,6 +24,7 @@ window.z.media = z.media || {};
 
 z.media.VIDEO_QUALITY_MODE = {
   FULL_HD: 'z.media.VIDEO_QUALITY_MODE.FULL_HD',
+  GROUP: 'z.media.VIDEO_QUALITY_MODE.GROUP',
   HD: 'z.media.VIDEO_QUALITY_MODE.MOBILE.HD',
   MOBILE: 'z.media.VIDEO_QUALITY_MODE.MOBILE',
 };

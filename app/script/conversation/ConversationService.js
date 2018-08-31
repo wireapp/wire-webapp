@@ -33,10 +33,12 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Construct a new Conversation Service.
    * @param {BackendClient} client - Client for the API calls
+   * @param {EventService} eventService - Service that handles events
    * @param {StorageService} storageService - Service for all storage interactions
    */
-  constructor(client, storageService) {
+  constructor(client, eventService, storageService) {
     this.client = client;
+    this.eventService = eventService;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
 
@@ -78,7 +80,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {string} conversation_id - Conversation ID to start from
    * @returns {Promise} Resolves with the conversation information
    */
-  get_conversations(limit = 100, conversation_id) {
+  getConversations(limit = 100, conversation_id) {
     return this.client.send_request({
       data: {
         size: limit,
@@ -94,24 +96,20 @@ z.conversation.ConversationService = class ConversationService {
    * @param {number} [limit=500] - Number of results to return (default 500, max 500)
    * @returns {Promise} Resolves with the conversation information
    */
-  get_all_conversations(limit = 500) {
-    let all_conversations = [];
+  getAllConversations(limit = 500) {
+    let allConversations = [];
 
-    const _get_conversations = conversation_id => {
-      return this.get_conversations(limit, conversation_id).then(({conversations, has_more}) => {
+    const _getConversations = conversationId => {
+      return this.getConversations(limit, conversationId).then(({conversations, has_more: hasMore}) => {
         if (conversations.length) {
-          all_conversations = all_conversations.concat(conversations);
+          allConversations = allConversations.concat(conversations);
         }
 
-        if (has_more) {
-          return _get_conversations(conversations.pop().id);
-        }
-
-        return all_conversations;
+        return hasMore ? _getConversations(conversations.pop().id) : allConversations;
       });
     };
 
-    return _get_conversations();
+    return _getConversations();
   }
 
   /**
@@ -130,24 +128,38 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Update conversation properties.
+   * Update the conversation name.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    *
-   * @param {string} conversation_id - ID of conversation to rename
-   * @param {string} name - New conversation name
+   * @param {string} conversationId - ID of conversation to rename
+   * @param {string} name - new name of the conversation
    * @returns {Promise} Resolves with the server response
    */
-  update_conversation_properties(conversation_id, name) {
+  updateConversationName(conversationId, name) {
     return this.client.send_json({
-      data: {
-        name: name,
-      },
+      data: {name},
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`),
     });
   }
 
+  /**
+   * Update the conversation message timer value.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
+   *
+   * @param {string} conversationId - ID of conversation to rename
+   * @param {number} messageTimer - new message timer of the conversation
+   * @returns {Promise} Resolves with the server response
+   */
+  updateConversationMessageTimer(conversationId, messageTimer) {
+    return this.client.send_json({
+      data: {message_timer: messageTimer},
+      type: 'PUT',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`),
+    });
+  }
   /**
    * Update self membership properties.
    *
@@ -256,10 +268,10 @@ z.conversation.ConversationService = class ConversationService {
   //##############################################################################
 
   /**
-   * Remove bot from conversation.
+   * Remove service from conversation.
    *
-   * @param {string} conversationId - ID of conversation to remove bot from
-   * @param {string} userId - ID of bot to be removed from the the conversation
+   * @param {string} conversationId - ID of conversation to remove service from
+   * @param {string} userId - ID of service to be removed from the the conversation
    * @returns {Promise} Resolves with the server response
    */
   deleteBots(conversationId, userId) {
@@ -288,11 +300,11 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Add a bot to an existing conversation.
+   * Add a service to an existing conversation.
    *
    * @param {string} conversationId - ID of conversation to add users to
-   * @param {string} providerId - ID of bot provider
-   * @param {string} serviceId - ID of service provider
+   * @param {string} providerId - ID of service provider
+   * @param {string} serviceId - ID of service
    * @returns {Promise} Resolves with the server response
    */
   postBots(conversationId, providerId, serviceId) {
@@ -380,45 +392,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Delete a message from a conversation. Duplicates are delete as well.
-   *
-   * @param {string} conversation_id - ID of conversation to remove message from
-   * @param {string} message_id - ID of the actual message
-   * @returns {Promise} Resolves with the number of deleted records
-   */
-  delete_message_from_db(conversation_id, message_id) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversation_id)
-      .and(record => record.id === message_id)
-      .delete();
-  }
-
-  /**
-   * Delete a message from a conversation with the given primary.
-   *
-   * @param {string} primary_key - ID of the actual message
-   * @returns {Promise} Resolves with the number of deleted records
-   */
-  delete_message_with_key_from_db(primary_key) {
-    return this.storageService.db[this.EVENT_STORE_NAME].delete(primary_key);
-  }
-
-  /**
-   * Delete all message of a conversation.
-   * @param {string} conversation_id - Delete messages for this conversation
-   * @param {string} [iso_date] - Date in ISO string format as upper bound which messages should be removed
-   * @returns {Promise} Resolves when the message was deleted
-   */
-  delete_messages_from_db(conversation_id, iso_date) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversation_id)
-      .filter(record => !iso_date || iso_date >= record.time)
-      .delete();
-  }
-
-  /**
    * Get active conversations from database.
    * @returns {Promise} Resolves with active conversations
    */
@@ -451,142 +424,6 @@ z.conversation.ConversationService = class ConversationService {
    */
   load_conversation_states_from_db() {
     return this.storageService.getAll(this.CONVERSATION_STORE_NAME);
-  }
-
-  /**
-   * Load conversation event.
-   *
-   * @param {string} conversation_id - ID of conversation
-   * @param {string} message_id - ID of message to retrieve
-   * @returns {Promise} Resolves with the stored record
-   */
-  load_event_from_db(conversation_id, message_id) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversation_id)
-      .filter(record => message_id && record.id === message_id)
-      .first()
-      .catch(error => {
-        this.logger.error(`Failed to get event for conversation '${conversation_id}': ${error.message}`, error);
-        throw error;
-      });
-  }
-
-  /**
-   * Get events with given category.
-   *
-   * @param {string} conversation_id - ID of conversation to add users to
-   * @param {MessageCategory} category_min - Minimum message category
-   * @param {MessageCategory} [category_max=z.message.MessageCategory.LIKED] - Maximum message category
-   * @returns {Promise} Resolves with matching events
-   */
-  load_events_with_category_from_db(conversation_id, category_min, category_max = z.message.MessageCategory.LIKED) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+category]')
-      .between([conversation_id, category_min], [conversation_id, category_max], true, true)
-      .sortBy('time');
-  }
-
-  /**
-   * Load conversation events by event type.
-   * @param {Array<strings>} event_types - Array of event types to match
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_events_with_types(event_types) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('type')
-      .anyOf(event_types)
-      .sortBy('time');
-  }
-
-  /**
-   * Load conversation events starting from the upper bound going back in history
-   *  until either limit or lower bound is reached.
-   *
-   * @param {string} conversation_id - ID of conversation
-   * @param {Date} [lower_bound=new Date(0)] - Load from this date (included)
-   * @param {Date} [upper_bound=new Date()] - Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_preceding_events_from_db(
-    conversation_id,
-    lower_bound = new Date(0),
-    upper_bound = new Date(),
-    limit = Number.MAX_SAFE_INTEGER
-  ) {
-    if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
-      throw new Error(
-        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`
-      );
-    } else if (lower_bound.getTime() > upper_bound.getTime()) {
-      throw new Error(
-        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`
-      );
-    }
-
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+time]')
-      .between([conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false)
-      .reverse()
-      .limit(limit)
-      .toArray()
-      .catch(error => {
-        this.logger.error(
-          `Failed to load events for conversation '${conversation_id}' from database: '${error.message}'`
-        );
-        throw error;
-      });
-  }
-
-  /**
-   * Load conversation events starting from the upper bound to the present until the limit is reached
-   *
-   * @param {string} conversation_id - ID of conversation
-   * @param {Date} upper_bound - Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
-   * @param {boolean} [include_upper_bound=true] - Should upper bound be part of the message
-   * @returns {Promise} Resolves with the retrieved records
-   */
-  load_subsequent_events_from_db(
-    conversation_id,
-    upper_bound,
-    limit = Number.MAX_SAFE_INTEGER,
-    include_upper_bound = true
-  ) {
-    if (!_.isDate(upper_bound)) {
-      throw new Error(`Upper bound (${typeof upper_bound}) must be of type 'Date'.`);
-    }
-
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+time]')
-      .between(
-        [conversation_id, upper_bound.toISOString()],
-        [conversation_id, new Date().toISOString()],
-        include_upper_bound,
-        true
-      )
-      .limit(limit)
-      .toArray();
-  }
-
-  /**
-   * Save an unencrypted conversation event.
-   * @param {Object} event - JSON event to be stored
-   * @returns {Promise} Resolves with the stored record
-   */
-  save_event(event) {
-    event.category = z.message.MessageCategorization.categoryFromEvent(event);
-    return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
-  }
-
-  /**
-   * Update an unencrypted conversation event.
-   * @param {Object} event - JSON event to be stored
-   * @returns {Promise} Resolves with the updated record
-   */
-  update_event(event) {
-    return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
   }
 
   /**
@@ -627,103 +464,8 @@ z.conversation.ConversationService = class ConversationService {
     const category_max =
       z.message.MessageCategory.TEXT | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
 
-    return this.load_events_with_category_from_db(conversation_id, category_min, category_max).then(events => {
+    return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
       return events.filter(({data: event_data}) => z.search.FullTextSearch.search(event_data.content, query));
-    });
-  }
-
-  /**
-   * Update asset as uploaded in database.
-   *
-   * @param {string} primary_key - Primary key used to find an event in the database
-   * @param {Object} event_json - Updated event asset data
-   * @returns {Promise} Resolves when the message was updated in database
-   */
-  update_asset_as_uploaded_in_db(primary_key, event_json) {
-    return this.storageService.load(this.EVENT_STORE_NAME, primary_key).then(record => {
-      if (record) {
-        const {data: asset_data, time} = event_json;
-
-        record.data.id = asset_data.id;
-        record.data.key = asset_data.key;
-        record.data.otr_key = asset_data.otr_key;
-        record.data.sha256 = asset_data.sha256;
-        record.data.status = z.assets.AssetTransferState.UPLOADED;
-        record.data.token = asset_data.token;
-        record.status = z.message.StatusType.SENT;
-        record.time = time;
-
-        return this.storageService
-          .update(this.EVENT_STORE_NAME, primary_key, record)
-          .then(() => this.logger.info('Updated asset message_et (uploaded)', primary_key));
-      }
-
-      this.logger.warn('Did not find message to update asset (uploaded)', primary_key);
-    });
-  }
-
-  /**
-   * Update asset as failed in database.
-   *
-   * @param {string} primary_key - Primary key used to find an event in the database
-   * @param {string} reason - Failure reason
-   * @returns {Promise} Resolves when the message was updated in database
-   */
-  update_asset_as_failed_in_db(primary_key, reason) {
-    return this.storageService.load(this.EVENT_STORE_NAME, primary_key).then(record => {
-      if (record) {
-        record.data.reason = reason;
-        record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
-
-        return this.storageService.update(this.EVENT_STORE_NAME, primary_key, record).then(() => {
-          this.logger.info('Updated asset message_et (failed)', primary_key);
-          return record;
-        });
-      }
-
-      this.logger.warn('Did not find message to update asset (failed)', primary_key);
-    });
-  }
-
-  /**
-   * Update a message in the database.
-   *
-   * @param {Message} message_et - Message event to update in the database
-   * @param {Object} [changes={}] - Changes to update message with
-   * @param {string} conversation_id - ID of conversation
-   * @returns {Promise} Resolves when the message was updated in database
-   */
-  update_message_in_db(message_et, changes = {}, conversation_id) {
-    return Promise.resolve(message_et.primary_key).then(primary_key => {
-      if (Object.keys(changes).length) {
-        if (changes.version) {
-          return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-            return this.load_event_from_db(conversation_id, message_et.id).then(record => {
-              let custom_data;
-
-              if (record) {
-                const database_version = record.version || 1;
-
-                if (changes.version === database_version + 1) {
-                  return this.storageService.update(this.EVENT_STORE_NAME, primary_key, changes);
-                }
-
-                custom_data = {
-                  database_version: database_version,
-                  update_version: changes.version,
-                };
-              }
-
-              Raygun.send('Failed sequential database update', custom_data);
-              throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
-            });
-          });
-        }
-
-        return this.storageService.update(this.EVENT_STORE_NAME, primary_key, changes);
-      }
-
-      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
     });
   }
 };

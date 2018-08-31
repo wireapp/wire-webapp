@@ -23,7 +23,6 @@
 
 describe('z.cryptography.CryptographyMapper', () => {
   const mapper = new z.cryptography.CryptographyMapper();
-  mapper.logger.level = mapper.logger.levels.ERROR;
 
   let event = undefined;
 

@@ -34,7 +34,7 @@ export function parseError(error) {
 export function parseValidationErrors(errors) {
   const errorMessages = [].concat(errors || []);
   return errorMessages.map(error => (
-    <ErrorMessage key={error.label}>
+    <ErrorMessage data-uie-name="error-message" key={error.label}>
       {validationErrorStrings.hasOwnProperty(error.label) ? (
         <FormattedHTMLMessage {...validationErrorStrings[error.label]} />
       ) : (

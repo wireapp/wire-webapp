@@ -48,25 +48,12 @@
     font-weight: @font-weight-bold;
     word-break: break-word;
 
-    &--centered {
-      justify-content: center;
-      margin-top: 24px;
-    }
-
     &--input {
       width: 250px;
       height: auto;
       border: 0;
       outline: none;
       resize: none;
-    }
-
-    &__verified-icon {
-      margin: 0 8px;
-    }
-
-    &__verified-icon-right {
-      margin-left: 8px;
     }
 
     &__edit-icon {
@@ -105,19 +92,10 @@
     }
   }
 
-  &__user-name {
-    margin-top: 8px;
-    font-size: 12px;
-    font-weight: @font-weight-regular;
-    text-align: center;
-
-    &::before {
-      content: '@';
-    }
-  }
-
   &__list-head {
-    margin: 32px 16px 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
+    margin: 32px 16px 4px;
     color: @graphite;
     font-size: 11px;
     font-weight: @font-weight-bold;
@@ -128,53 +106,25 @@
     margin: 32px 0 0;
   }
 
-  &__guest-options {
-    margin: 16px 0 0;
-  }
-
   &__bottom-actions {
+    padding-bottom: 32px;
     margin-top: 32px;
   }
 
   &__devices {
-    margin: 88px 0 56px;
+    margin: 0 0 56px;
   }
 
   &__participants {
     display: flex;
     flex-direction: column;
-    & > participant-avatar {
-      margin: 24px auto;
-    }
+    margin-bottom: 8px;
   }
 
-  &__guest-label {
-    display: flex;
-    justify-content: center;
-
-    path {
-      fill: @graphite-dark;
-    }
-
-    span {
-      margin-left: 8px;
-      font-size: 12px;
-    }
-  }
-
-  &__guest-expiration {
-    display: flex;
-    justify-content: center;
-    margin-top: 8px;
-    color: fade(@graphite-dark, 56%);
-    font-size: 12px;
-    font-weight: @font-weight-bold;
-  }
-
-  &__availability {
-    justify-content: center;
-    font-size: 11px;
-    font-weight: @font-weight-bold;
-    text-transform: uppercase;
+  &__group-size-info {
+    margin: 8px 0 0;
+    color: @graphite;
+    font-size: @font-size-xs;
+    line-height: @line-height-sm;
   }
 }

@@ -39,9 +39,9 @@ z.entity.User = class User {
   static get CONFIG() {
     return {
       TEMPORARY_GUEST: {
-        EXPIRATION_INTERVAL: 60 * 1000,
-        EXPIRATION_THRESHOLD: 10 * 1000,
-        LIFETIME: 24 * 60 * 60 * 1000,
+        EXPIRATION_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        EXPIRATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+        LIFETIME: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
       },
     };
   }
@@ -61,7 +61,8 @@ z.entity.User = class User {
   constructor(id = '') {
     this.id = id;
     this.is_me = false;
-    this.isBot = false;
+    this.isService = false;
+    this.isSingleSignOn = false;
 
     this.joaatHash = -1;
 
@@ -120,12 +121,15 @@ z.entity.User = class User {
     this.phone = ko.observable();
 
     this.name = ko.observable('');
-    this.first_name = ko.pureComputed(() => this.name().split(' ')[0]);
+    this.first_name = ko.pureComputed(() => {
+      const [firstName] = this.name().split(' ');
+      return firstName || '';
+    });
 
     this.last_name = ko.pureComputed(() => {
-      const parts = this.name().split(' ');
-      if (parts.length > 1) {
-        return parts.pop();
+      const nameParts = this.name().split(' ');
+      if (nameParts.length > 1) {
+        return nameParts.pop();
       }
     });
 
@@ -169,7 +173,7 @@ z.entity.User = class User {
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
-    this.devices = ko.observableArray();
+    this.devices = ko.observableArray(); // does not include current client/device
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.is_me) {
         return false;
@@ -206,6 +210,10 @@ z.entity.User = class User {
     }
 
     return true;
+  }
+
+  hasActivatedIdentity() {
+    return this.email() || this.phone() || this.isSingleSignOn;
   }
 
   remove_client(client_id) {
@@ -273,11 +281,8 @@ z.entity.User = class User {
   }
 
   _setRemainingExpirationTime(expirationTime) {
-    const MILLISECONDS_IN_MINUTE = 60 * 1000;
-    const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
-
-    const remainingTime = Math.max(expirationTime - Date.now(), 0);
-    const remainingMinutes = Math.ceil(remainingTime / MILLISECONDS_IN_MINUTE);
+    const remainingTime = z.util.NumberUtil.clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
+    const remainingMinutes = Math.ceil(remainingTime / z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
     let timeLeftText = z.string.userRemainingTimeHours;
     let timeValue = 0;
@@ -286,12 +291,12 @@ z.entity.User = class User {
       timeLeftText = z.string.userRemainingTimeMinutes;
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
       timeValue = remainingQuarters * 15;
-      this.expirationRemaining(timeValue * MILLISECONDS_IN_MINUTE);
+      this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
       timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
-      this.expirationRemaining(timeValue * MILLISECONDS_IN_HOUR);
+      this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 

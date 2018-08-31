@@ -187,6 +187,39 @@ z.user.UserService = class UserService {
   }
 
   /**
+   * Get your consents.
+   * @returns {Promise} Promise that will resolve with the consents user has given
+   */
+  getConsent() {
+    return this.client
+      .send_request({
+        type: 'GET',
+        url: this.client.create_url(`${UserService.URL.SELF}/consent`),
+      })
+      .then(data => data.results);
+  }
+
+  /**
+   * Put a consent.
+   *
+   * @param {number} consentType - Type of consent given
+   * @param {number} value - Value of consent
+   * @param {string} source - Identifier of app from consent
+   * @returns {Promise} Promise that will resolve with the self user
+   */
+  putConsent(consentType, value, source) {
+    return this.client.send_json({
+      data: {
+        source: source,
+        type: consentType,
+        value: value,
+      },
+      type: 'PUT',
+      url: this.client.create_url(`${UserService.URL.SELF}/consent`),
+    });
+  }
+
+  /**
    * Update your own user profile.
    * @option data {Array<z.assets.Asset>} picture
    * @option data {number} accent_id

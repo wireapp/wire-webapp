@@ -25,9 +25,9 @@ window.z.lifecycle = z.lifecycle || {};
 z.lifecycle.LifecycleRepository = class LifecycleRepository {
   static get CONFIG() {
     return {
-      CHECK_INTERVAL: 3 * 60 * 60 * 1000,
-      CHECK_TIMEOUT: 5 * 60 * 1000,
-      UPDATE_INTERVAL: 6 * 60 * 60 * 1000,
+      CHECK_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR * 3,
+      CHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
+      UPDATE_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR * 6,
     };
   }
 

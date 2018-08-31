@@ -20,10 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
+window.z.user = z.user || {};
 
-z.calling.enum.VIDEO_ORIENTATION = {
-  LANDSCAPE: 'landscape',
-  PORTRAIT: 'portrait',
+z.user.ConsentType = {
+  MARKETING: 2,
+  TERMS_OF_USE: 1,
 };

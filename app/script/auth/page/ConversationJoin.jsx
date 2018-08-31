@@ -19,11 +19,12 @@
 
 import {
   H2,
-  H3,
+  Text,
   Link,
   Small,
   Form,
   Button,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
@@ -34,6 +35,8 @@ import {
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {isMobileOs, isSafari} from '../Runtime';
+import * as Environment from '../Environment';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -46,16 +49,15 @@ import {Redirect} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {getURLParameter, pathWithParams} from '../util/urlUtil';
+import {getURLParameter, getAppPath, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
-import * as TrackingAction from '../module/action/TrackingAction';
 import * as AccentColor from '../util/AccentColor';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 class ConversationJoin extends Component {
   state = {
@@ -72,6 +74,9 @@ class ConversationJoin extends Component {
   };
 
   readAndUpdateParamsFromUrl = nextProps => {
+    if (this.isPwaSupportedBrowser()) {
+      this.setState({forceNewTemporaryGuestAccount: true});
+    }
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
     const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
@@ -103,7 +108,6 @@ class ConversationJoin extends Component {
   };
 
   componentDidMount = () => {
-    this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
     this.props
       .doInit({shouldValidateLocalClient: true})
       .catch(() => {})
@@ -115,8 +119,22 @@ class ConversationJoin extends Component {
   onOpenWireClick = () => {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
-      .then(() => this.trackAddParticipant())
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+      .then(() => this.routeToApp());
+  };
+
+  isPwaSupportedBrowser = () => {
+    const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
+    return Environment.onEnvironment({
+      onProduction: false,
+      onStaging: pwaAware && (isMobileOs() || isSafari()),
+    });
+  };
+
+  routeToApp = () => {
+    const redirectLocation = this.isPwaSupportedBrowser()
+      ? pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, QUERY_KEY.IMMEDIATE_LOGIN)
+      : getAppPath();
+    window.location.replace(redirectLocation);
   };
 
   handleSubmit = event => {
@@ -136,35 +154,22 @@ class ConversationJoin extends Component {
             expires_in: this.state.expiresIn,
             name,
           };
-          return this.props.doRegisterWireless(registrationData);
+          return this.props.doRegisterWireless(registrationData, {
+            shouldInitializeClient: !this.isPwaSupportedBrowser(),
+          });
         })
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
-        .then(() => this.trackAddParticipant())
-        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .then(() => this.routeToApp())
         .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();
   };
 
   isConversationFullError = error =>
-    error && error.label && error.is(BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS);
+    error && error.label && error.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
 
   resetErrors = () => this.setState({error: null, isValidName: true});
-
-  trackAddParticipant = () => {
-    const {isTemporaryGuest, trackEvent} = this.props;
-
-    return trackEvent({
-      attributes: {
-        guest_num: isTemporaryGuest ? 0 : 1,
-        is_allow_guests: true,
-        temporary_guest_num: isTemporaryGuest ? 1 : 0,
-        user_num: 0,
-      },
-      name: TrackingAction.EVENT_NAME.CONVERSATION.ADD_PARTICIPANTS,
-    });
-  };
 
   renderActivatedAccount = () => {
     const {
@@ -174,7 +179,7 @@ class ConversationJoin extends Component {
     const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen />
+        <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
         <H2
           style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
           color={COLOR.GRAY}
@@ -189,7 +194,7 @@ class ConversationJoin extends Component {
             <FormattedHTMLMessage {...conversationJoinStrings.headline} />
           )}
         </H2>
-        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
+        <Text style={{fontSize: '16px', marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</Text>
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
@@ -217,13 +222,13 @@ class ConversationJoin extends Component {
     const {enteredName, isValidName, error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen />
+        <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
-        <H3 style={{marginTop: '10px'}}>
+        <Text style={{fontSize: '16px', marginTop: '10px'}}>
           <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
-        </H3>
+        </Text>
         <Form style={{marginTop: 30}}>
           <InputSubmitCombo>
             <Input
@@ -247,6 +252,7 @@ class ConversationJoin extends Component {
               disabled={!enteredName || !isValidName}
               type="submit"
               formNoValidate
+              icon={ICON_NAME.ARROW}
               onClick={this.handleSubmit}
               data-uie-name="do-next"
             />
@@ -255,17 +261,19 @@ class ConversationJoin extends Component {
             {error ? parseValidationErrors(error) : parseError(this.props.error)}
           </ErrorMessage>
         </Form>
-        <Small block>
-          {`${_(conversationJoinStrings.hasAccount)} `}
-          <Link
-            component={RRLink}
-            to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
-            textTransform={'none'}
-            data-uie-name="go-login"
-          >
-            {_(conversationJoinStrings.loginLink)}
-          </Link>
-        </Small>
+        {!this.isPwaSupportedBrowser() && (
+          <Small block>
+            {`${_(conversationJoinStrings.hasAccount)} `}
+            <Link
+              component={RRLink}
+              to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
+              textTransform={'none'}
+              data-uie-name="go-login"
+            >
+              {_(conversationJoinStrings.loginLink)}
+            </Link>
+          </Small>
+        )}
       </ContainerXS>
     );
   };
@@ -283,9 +291,9 @@ class ConversationJoin extends Component {
         >
           <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
         </H2>
-        <H3 style={{marginTop: '10px'}} data-uie-name="status-full-text">
+        <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
           {_(conversationJoinStrings.fullConversationSubhead)}
-        </H3>
+        </Text>
       </ContainerXS>
     );
   };
@@ -332,7 +340,6 @@ export default withRouter(
         ...AuthAction,
         ...ConversationAction,
         ...NotificationAction,
-        ...TrackingAction,
       }
     )(ConversationJoin)
   )

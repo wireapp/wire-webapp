@@ -19,6 +19,7 @@
 
 import {getURLParameter} from './util/urlUtil';
 import {QUERY_KEY} from './route';
+import {APIClient} from '@wireapp/api-client';
 
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
@@ -27,16 +28,29 @@ export const PRODUCTION = 'PRODUCTION';
 export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 export function getEnvironmentFromQuery() {
-  const isProductionHost = window.location.hostname.endsWith('wire.com');
-  const isLocalHost = window.location.hostname.includes('localhost');
   switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
-    case 'staging':
+    case 'staging': {
       return STAGING;
-    case 'prod':
+    }
+    case 'prod': {
       return PRODUCTION;
-    default:
-      return isProductionHost ? PRODUCTION : isLocalHost ? LOCAL : STAGING;
+    }
+    default: {
+      const isProductionHost = window.location.hostname.endsWith('wire.com');
+      if (isProductionHost) {
+        return PRODUCTION;
+      }
+      return isLocalhost() ? LOCAL : STAGING;
+    }
   }
+}
+
+export function isLocalhost() {
+  return window.location.hostname.includes('localhost') || window.location.hostname.startsWith('192.168.');
+}
+
+export function isInternalEnvironment() {
+  return window.location.hostname.includes('wire-webapp') || isLocalhost();
 }
 
 export function checkEnvironment() {
@@ -54,19 +68,26 @@ export function isEnvironment(environment) {
   return APP_ENVIRONMENT === environment;
 }
 
-export function onEnvironment(onLocal, onStaging, onProduction) {
+export function onEnvironment(environmentConditions) {
   switch (getEnvironment()) {
     case LOCAL: {
-      return onLocal;
+      return environmentConditions.onLocal === undefined
+        ? environmentConditions.onStaging
+        : environmentConditions.onLocal;
     }
     case STAGING: {
-      return onStaging;
+      return environmentConditions.onStaging;
     }
     case PRODUCTION: {
-      return onProduction;
+      return environmentConditions.onProduction;
     }
     default: {
-      return onProduction;
+      return environmentConditions.onProduction;
     }
   }
 }
+
+export const BACKEND = onEnvironment({
+  onProduction: APIClient.BACKEND.PRODUCTION,
+  onStaging: APIClient.BACKEND.STAGING,
+});

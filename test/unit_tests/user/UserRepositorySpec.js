@@ -111,9 +111,9 @@ describe('z.user.UserRepository', () => {
     });
 
     describe('get_connections', () => {
-      // TODO: This test seems to be flaky!
-      xit('should return the connected users', done => {
-        server.respondWith('GET', `${test_factory.settings.connection.rest_url}/connections?size=500`, [
+      // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
+      it('should return the connected users', () => {
+        server.respondWith('GET', `${test_factory.settings.connection.restUrl}/connections?size=500`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(payload.connections.get),
@@ -121,35 +121,31 @@ describe('z.user.UserRepository', () => {
 
         server.respondWith(
           'GET',
-          `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${
+          `${test_factory.settings.connection.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${
             entities.user.jane_roe.id
           }`,
           [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
         );
 
-        TestFactory.user_repository
-          .get_connections()
-          .then(() => {
-            expect(TestFactory.user_repository.connections().length).toBe(2);
-            expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
-            expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
-              '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
-            );
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.user_repository.get_connections().then(() => {
+          expect(TestFactory.user_repository.connections().length).toBe(2);
+          expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
+          expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
+            '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
+          );
+        });
       });
     });
   });
 
   describe('users', () => {
-    describe('fetch_user_by_id', () => {
+    describe('fetchUserById', () => {
       it('should handle malformed input', done => {
         TestFactory.user_repository
-          .fetch_users_by_id()
+          .fetchUsersById()
           .then(response => {
             expect(response.length).toBe(0);
-            return TestFactory.user_repository.fetch_users_by_id([undefined, undefined, undefined]);
+            return TestFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
           })
           .then(response => {
             expect(response.length).toBe(0);
@@ -336,7 +332,7 @@ describe('z.user.UserRepository', () => {
     describe('verify_usernames', () => {
       it('resolves with username when username is not taken', done => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
+        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(usernames),
@@ -353,7 +349,7 @@ describe('z.user.UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
+        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify([]),
@@ -372,7 +368,7 @@ describe('z.user.UserRepository', () => {
     describe('verify_username', () => {
       it('resolves with username when username is not taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
+        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
           404,
           {},
           '',
@@ -389,7 +385,7 @@ describe('z.user.UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
+        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
           200,
           {},
           '',
@@ -398,7 +394,7 @@ describe('z.user.UserRepository', () => {
         TestFactory.user_repository
           .verify_username(username)
           .then(done.fail)
-          .catch(done);
+          .catch(() => done());
       });
     });
   });

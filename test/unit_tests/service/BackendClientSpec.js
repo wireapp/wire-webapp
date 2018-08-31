@@ -26,13 +26,12 @@ describe('z.service.BackendClient', () => {
   let server = null;
 
   const urls = {
-    rest_url: 'http://localhost',
+    restUrl: 'http://localhost',
     websocket_url: 'wss://localhost',
   };
 
   beforeEach(() => {
     backend_client = new z.service.BackendClient(urls);
-    backend_client.logger.level = backend_client.logger.levels.ERROR;
   });
 
   afterEach(() => {

@@ -27,9 +27,6 @@ window.z.tracking = z.tracking || {};
  * @returns {z.tracking.EventName} Event names (defined by Business Intelligence Team)
  */
 z.tracking.EventName = {
-  ACCOUNT: {
-    LOGGED_IN: 'account.logged_in',
-  },
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
     ENDED_VIDEO_CALL: 'calling.ended_video_call',
@@ -62,6 +59,12 @@ z.tracking.EventName = {
     LINK_COPIED: 'guest_rooms.link_copied',
     LINK_CREATED: 'guest_rooms.link_created',
     LINK_REVOKED: 'guest_rooms.link_revoked',
+  },
+  HISTORY: {
+    BACKUP_FAILED: 'history.backup_failed',
+    BACKUP_SUCCEEDED: 'history.backup_succeeded',
+    RESTORE_FAILED: 'history.restore_failed',
+    RESTORE_SUCCEEDED: 'history.restore_succeeded',
   },
   INTEGRATION: {
     ADDED_SERVICE: 'integration.added_service',

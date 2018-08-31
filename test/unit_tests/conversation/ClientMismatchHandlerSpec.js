@@ -83,7 +83,37 @@ describe('ClientMismatchHandler', () => {
       };
     });
 
-    it('should add missing clients to the payload', done => {
+    it('should trigger member-join event if new user is detected', () => {
+      const conversationId = conversationEntity.id;
+      const knownUserId = johnDoe.user_id;
+      const unknownUserId = janeRoe.user_id;
+
+      conversationEntity.participating_user_ids([knownUserId]);
+
+      clientMismatch = {
+        deleted: {},
+        missing: {
+          [knownUserId]: [johnDoe.client_id],
+          [unknownUserId]: [janeRoe.client_id],
+        },
+        redundant: {},
+        time: '2016-04-29T10:38:23.002Z',
+      };
+
+      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
+      spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
+
+      return TestFactory.conversation_repository.clientMismatchHandler
+        .onClientMismatch(clientMismatch, null, payload, conversationId)
+        .then(() => {
+          expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(conversationId, [
+            unknownUserId,
+          ]);
+        });
+    });
+
+    it('should add missing clients to the payload', () => {
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
       // TODO: Make this fake method available as a utility function for testing
       spyOn(TestFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(recipients => {
@@ -118,14 +148,16 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
-        .then(updatedPayload => {
-          expect(Object.keys(updatedPayload.recipients).length).toBe(2);
-          expect(Object.keys(updatedPayload.recipients[johnDoe.user_id]).length).toBe(1);
-          done();
-        })
-        .catch(done.fail);
+      TestFactory.cryptography_repository.createCryptobox.and.callThrough();
+
+      return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db).then(() => {
+        return TestFactory.conversation_repository.clientMismatchHandler
+          .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
+          .then(updatedPayload => {
+            expect(Object.keys(updatedPayload.recipients).length).toBe(2);
+            expect(Object.keys(updatedPayload.recipients[johnDoe.user_id]).length).toBe(1);
+          });
+      });
     });
 
     it('should remove the payload of deleted clients', done => {

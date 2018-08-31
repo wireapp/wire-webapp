@@ -21,19 +21,22 @@ import {
   COLOR,
   ArrowIcon,
   H1,
-  Text,
+  Muted,
   Link,
   Container,
   ContainerXS,
   Columns,
   Column,
   Form,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
   ErrorMessage,
+  mediaMatcher,
 } from '@wireapp/react-ui-kit';
 import {ROUTE} from '../route';
+import {isDesktopApp, isMacOS} from '../Runtime';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -48,18 +51,25 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import React, {Component} from 'react';
 import Page from './Page';
-import * as TrackingAction from '../module/action/TrackingAction';
 
 class TeamName extends Component {
   state = {
     enteredTeamName: this.props.teamName || '',
     error: null,
+    isMobile: mediaMatcher.isMobile(),
     isValidTeamName: !!this.props.teamName,
   };
 
   componentDidMount() {
     this.props.enterTeamCreationFlow();
+    window.addEventListener('resize', this.updateIsMobile);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateIsMobile);
+  }
+
+  updateIsMobile = () => this.setState({isMobile: mediaMatcher.isMobile()});
 
   handleSubmit = event => {
     event.preventDefault();
@@ -73,7 +83,6 @@ class TeamName extends Component {
       Promise.resolve(this.teamNameInput.value)
         .then(teamName => teamName.trim())
         .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
-        .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.ADDED_TEAM_NAME}))
         .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
     this.teamNameInput.focus();
@@ -88,18 +97,22 @@ class TeamName extends Component {
     const {
       intl: {formatMessage: _},
     } = this.props;
-    const {enteredTeamName, isValidTeamName, error} = this.state;
+    const {enteredTeamName, isValidTeamName, isMobile, error} = this.state;
+    const backArrow = (
+      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
+        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      </Link>
+    );
     return (
       <Page>
+        {isMobile && <div style={{margin: 16}}>{backArrow}</div>}
         <Container centerText verticalCenter style={{width: '100%'}}>
           <Columns>
-            <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>
-                <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
-                  <ArrowIcon direction="left" color={COLOR.GRAY} />
-                </Link>
-              </div>
-            </Column>
+            {!isMobile && (
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              </Column>
+            )}
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
@@ -107,7 +120,7 @@ class TeamName extends Component {
               >
                 <div>
                   <H1 center>{_(teamNameStrings.headline)}</H1>
-                  <Text>{_(teamNameStrings.subhead)}</Text>
+                  <Muted>{_(teamNameStrings.subhead)}</Muted>
                   <Form style={{marginTop: 30}}>
                     <InputSubmitCombo>
                       <Input
@@ -129,6 +142,7 @@ class TeamName extends Component {
                         disabled={!enteredTeamName || !isValidTeamName}
                         type="submit"
                         formNoValidate
+                        icon={ICON_NAME.ARROW}
                         onClick={this.handleSubmit}
                         data-uie-name="do-next"
                       />
@@ -138,11 +152,13 @@ class TeamName extends Component {
                     </ErrorMessage>
                   </Form>
                 </div>
-                <div>
-                  <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
-                    {_(teamNameStrings.whatIsWireTeamsLink)}
-                  </Link>
-                </div>
+                {!(isDesktopApp() && isMacOS()) && (
+                  <div>
+                    <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
+                      {_(teamNameStrings.whatIsWireTeamsLink)}
+                    </Link>
+                  </div>
+                )}
               </ContainerXS>
             </Column>
             <Column />
@@ -162,7 +178,6 @@ export default withRouter(
       }),
       {
         ...AuthAction,
-        ...TrackingAction,
         enterTeamCreationFlow,
         resetError,
       }

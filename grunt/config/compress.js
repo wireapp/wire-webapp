@@ -27,7 +27,7 @@ module.exports = {
       {
         cwd: '<%= dir.aws_ %>',
         expand: true,
-        src: ['**', '!<%= dir.aws.s3 %>'],
+        src: ['**/*', '.**/*', '!<%= dir.aws.s3 %>'],
       },
     ],
     options: {

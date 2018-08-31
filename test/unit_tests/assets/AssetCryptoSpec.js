@@ -44,7 +44,7 @@ describe('AssetsCrypto', () => {
         return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, null);
       })
       .then(done.fail)
-      .catch(done);
+      .catch(() => done());
   });
 
   it('should not decrypt when hash is an empty array', done => {
@@ -56,6 +56,6 @@ describe('AssetsCrypto', () => {
         return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, new Uint8Array([]));
       })
       .then(done.fail)
-      .catch(done);
+      .catch(() => done());
   });
 });

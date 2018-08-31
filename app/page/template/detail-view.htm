@@ -12,7 +12,7 @@
         <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
-        <!-- ko if: messageEntity().is_downloadable() && !messageEntity().is_ephemeral() -->
+        <!-- ko if: messageEntity().is_downloadable() -->
           <span class="detail-view-action-button" data-bind="click: clickOnDownload" data-uie-name="do-download-fullscreen-picture">
             <span class="icon-download"></span>
             <span data-bind="l10n_text: z.string.conversationContextMenuDownload"></span>

@@ -21,6 +21,28 @@
 
 'use strict';
 
+async function createEncodedCiphertext(
+  preKey,
+  text = 'Hello, World!',
+  receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity
+) {
+  const bobEngine = new window.StoreEngine.MemoryEngine();
+  await bobEngine.init('bob');
+
+  const sender = new window.cryptobox.Cryptobox(bobEngine, 1);
+  await sender.create();
+
+  const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+  genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(text));
+
+  const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
+  const preKeyBundle = Proteus.keys.PreKeyBundle.new(receivingIdentity.public_key, preKey);
+
+  const cipherText = await sender.encrypt(sessionId, genericMessage.toArrayBuffer(), preKeyBundle.serialise());
+
+  return z.util.arrayToBase64(cipherText);
+}
+
 describe('Event Repository', () => {
   const test_factory = new TestFactory();
   let last_notification_id = undefined;
@@ -39,16 +61,18 @@ describe('Event Repository', () => {
     };
   })();
 
-  beforeEach(done => {
-    test_factory
-      .exposeEventActors()
-      .then(event_repository => {
-        event_repository.webSocketService = websocket_service_mock;
+  beforeAll(() => {
+    return z.util.protobuf
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
+      .then(() => test_factory.exposeClientActors());
+  });
 
-        last_notification_id = undefined;
-        done();
-      })
-      .catch(done.fail);
+  beforeEach(() => {
+    return test_factory.exposeEventActors().then(event_repository => {
+      event_repository.webSocketService = websocket_service_mock;
+
+      last_notification_id = undefined;
+    });
   });
 
   describe('updateFromStream', () => {
@@ -88,22 +112,18 @@ describe('Event Repository', () => {
       );
     });
 
-    it('should fetch last notifications ID from backend if not found in storage', done => {
+    it('should fetch last notifications ID from backend if not found in storage', () => {
       const missed_events_spy = jasmine.createSpy();
       amplify.unsubscribeAll(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
       amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, missed_events_spy);
 
       TestFactory.event_repository.connectWebSocket();
-      TestFactory.event_repository
-        .initializeFromStream()
-        .then(() => {
-          expect(TestFactory.notification_service.getLastNotificationIdFromDb).toHaveBeenCalled();
-          expect(TestFactory.notification_service.getNotificationsLast).toHaveBeenCalled();
-          expect(TestFactory.notification_service.getNotifications).toHaveBeenCalled();
-          expect(missed_events_spy).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository.initializeFromStream().then(() => {
+        expect(TestFactory.notification_service.getLastNotificationIdFromDb).toHaveBeenCalled();
+        expect(TestFactory.notification_service.getNotificationsLast).toHaveBeenCalled();
+        expect(TestFactory.notification_service.getNotifications).toHaveBeenCalled();
+        expect(missed_events_spy).toHaveBeenCalled();
+      });
     });
 
     it('should buffer notifications when notification stream is not processed', () => {
@@ -116,7 +136,7 @@ describe('Event Repository', () => {
       expect(TestFactory.event_repository.webSocketBuffer.length).toBe(1);
     });
 
-    it('should handle buffered notifications after notifications stream was processed', done => {
+    it('should handle buffered notifications after notifications stream was processed', () => {
       last_notification_id = z.util.createRandomUuid();
       const last_published_notification_id = z.util.createRandomUuid();
       TestFactory.event_repository.lastNotificationId(last_notification_id);
@@ -124,18 +144,14 @@ describe('Event Repository', () => {
       websocket_service_mock.publish({id: z.util.createRandomUuid(), payload: []});
 
       websocket_service_mock.publish({id: last_published_notification_id, payload: []});
-      TestFactory.event_repository
-        .initializeFromStream()
-        .then(() => {
-          expect(TestFactory.event_repository._handleBufferedNotifications).toHaveBeenCalled();
-          expect(TestFactory.event_repository.webSocketBuffer.length).toBe(0);
-          expect(TestFactory.event_repository.lastNotificationId()).toBe(last_published_notification_id);
-          expect(TestFactory.event_repository.notificationHandlingState()).toBe(
-            z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-          );
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository.initializeFromStream().then(() => {
+        expect(TestFactory.event_repository._handleBufferedNotifications).toHaveBeenCalled();
+        expect(TestFactory.event_repository.webSocketBuffer.length).toBe(0);
+        expect(TestFactory.event_repository.lastNotificationId()).toBe(last_published_notification_id);
+        expect(TestFactory.event_repository.notificationHandlingState()).toBe(
+          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
+        );
+      });
     });
   });
 
@@ -147,30 +163,27 @@ describe('Event Repository', () => {
       TestFactory.event_repository.lastNotificationId(last_notification_id);
     });
 
-    it('should not update last notification id if transient is true', done => {
+    it('should not update last notification id if transient is true', () => {
       const notification_payload = {id: z.util.createRandomUuid(), payload: [], transient: true};
 
-      TestFactory.event_repository._handleNotification(notification_payload).then(() => {
+      return TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(last_notification_id);
-        done();
       });
     });
 
-    it('should update last notification id if transient is false', done => {
+    it('should update last notification id if transient is false', () => {
       const notification_payload = {id: z.util.createRandomUuid(), payload: [], transient: false};
 
-      TestFactory.event_repository._handleNotification(notification_payload).then(() => {
+      return TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(notification_payload.id);
-        done();
       });
     });
 
-    it('should update last notification id if transient is not present', done => {
+    it('should update last notification id if transient is not present', () => {
       const notification_payload = {id: z.util.createRandomUuid(), payload: []};
 
-      TestFactory.event_repository._handleNotification(notification_payload).then(() => {
+      return TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(notification_payload.id);
-        done();
       });
     });
   });
@@ -178,46 +191,32 @@ describe('Event Repository', () => {
   describe('_handleEvent', () => {
     beforeEach(() => {
       TestFactory.event_repository.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      spyOn(TestFactory.event_repository.conversationService, 'save_event').and.returnValue(
-        Promise.resolve({data: 'dummy content'})
-      );
+      spyOn(TestFactory.event_service, 'saveEvent').and.returnValue(Promise.resolve({data: 'dummy content'}));
       spyOn(TestFactory.event_repository, '_distributeEvent');
     });
 
-    it('should not save but distribute "user.*" events', done => {
-      TestFactory.event_repository
-        ._handleEvent({type: z.event.Backend.USER.UPDATE})
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+    it('should not save but distribute "user.*" events', () => {
+      return TestFactory.event_repository._handleEvent({type: z.event.Backend.USER.UPDATE}).then(() => {
+        expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('should not save but distribute "call.*" events', done => {
-      TestFactory.event_repository
-        ._handleEvent({type: z.event.Client.CALL.E_CALL})
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+    it('should not save but distribute "call.*" events', () => {
+      return TestFactory.event_repository._handleEvent({type: z.event.Client.CALL.E_CALL}).then(() => {
+        expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('should not save but distribute "conversation.create" events', done => {
-      TestFactory.event_repository
-        ._handleEvent({type: z.event.Backend.CONVERSATION.CREATE})
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+    it('should not save but distribute "conversation.create" events', () => {
+      return TestFactory.event_repository._handleEvent({type: z.event.Backend.CONVERSATION.CREATE}).then(() => {
+        expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('accepts conversation.rename events', done => {
+    it('accepts "conversation.rename" events', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -229,17 +228,13 @@ describe('Event Repository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.event_repository
-        ._handleEvent(event)
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEvent(event).then(() => {
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('accepts conversation.member-join events', done => {
+    it('accepts "conversation.member-join" events', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -251,17 +246,13 @@ describe('Event Repository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.event_repository
-        ._handleEvent(event)
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEvent(event).then(() => {
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('accepts conversation.member-leave events', done => {
+    it('accepts "conversation.member-leave" events', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -273,17 +264,13 @@ describe('Event Repository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.event_repository
-        ._handleEvent(event)
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEvent(event).then(() => {
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('accepts conversation.voice-channel-deactivate (missed call) events', done => {
+    it('accepts "conversation.voice-channel-deactivate" (missed call) events', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -295,17 +282,13 @@ describe('Event Repository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.event_repository
-        ._handleEvent(event)
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEvent(event).then(() => {
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
 
-    it('accepts plain decryption error events', done => {
+    it('accepts plain decryption error events', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '7f0939c8-dbd9-48f5-839e-b0ebcfffec8c',
@@ -318,18 +301,47 @@ describe('Event Repository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.event_repository
-        ._handleEvent(event)
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository._handleEvent(event).then(() => {
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+        expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
+      });
     });
   });
 
-  describe('_handleEventSaving', () => {
+  describe('processEvent', () => {
+    it('processes OTR events', () => {
+      const text = 'Hello, this is a test!';
+      const ownClientId = 'f180a823bf0d1204';
+
+      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: ownClientId}));
+      TestFactory.cryptography_repository.createCryptobox.and.callThrough();
+
+      return Promise.resolve()
+        .then(() => TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db))
+        .then(() => TestFactory.cryptography_repository.cryptobox.get_prekey())
+        .then(async preKeyBundle => {
+          const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
+          const event = {
+            conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
+            data: {
+              recipient: ownClientId,
+              sender: '4c28652a6dd21938',
+              text: ciphertext,
+            },
+            from: '6f88716b-1383-44da-9d57-45b51cc64d90',
+            time: '2018-07-10T14:54:21.621Z',
+            type: 'conversation.otr-message-add',
+          };
+          const source = z.event.EventRepository.SOURCE.STREAM;
+          return TestFactory.event_repository.processEvent(event, source);
+        })
+        .then(messagePayload => {
+          expect(messagePayload.data.content).toBe(text);
+        });
+    });
+  });
+
+  describe('processEvent', () => {
     let event = undefined;
     let previously_stored_event = undefined;
 
@@ -346,168 +358,344 @@ describe('Event Repository', () => {
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
-      spyOn(TestFactory.event_repository.conversationService, 'save_event').and.callFake(saved_event =>
-        Promise.resolve(saved_event)
-      );
+      spyOn(TestFactory.event_service, 'saveEvent').and.callFake(saved_event => Promise.resolve(saved_event));
     });
 
-    it('saves an event with a previously not used ID', done => {
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(Promise.resolve());
+    it('saves an event with a previously not used ID', () => {
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(() => {
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository.processEvent(event).then(() => {
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+      });
     });
 
-    it('ignores an event with an ID previously used by another user', done => {
+    it('ignores an event with an ID previously used by another user', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       previously_stored_event.from = z.util.createRandomUuid();
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(done.fail)
+      return TestFactory.event_repository
+        .processEvent(event)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          done();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
 
-    it('ignores a non-"text message" with an ID previously used by the same user', done => {
+    it('ignores a non-"text message" with an ID previously used by the same user', () => {
       event.type = z.event.Client.CALL.E_CALL;
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
-      TestFactory.event_repository
+      return TestFactory.event_repository
         ._handleEventSaving(event)
-        .then(done.fail)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          done();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
 
-    it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', done => {
+    it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       previously_stored_event.type = z.event.Client.CALL.E_CALL;
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(done.fail)
+      return TestFactory.event_repository
+        .processEvent(event)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          done();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
 
-    it('ignores a plain text message with an ID previously used by the same user', done => {
+    it('ignores a plain text message with an ID previously used by the same user', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(done.fail)
+      return TestFactory.event_repository
+        .processEvent(event)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          done();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
 
-    it('ignores a text message with link preview with an ID previously used by the same user for a text message with link preview', done => {
+    it('ignores a text message with link preview with an ID previously used by the same user for a text message with link preview', () => {
       event.data.previews.push(1);
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(done.fail)
+      return TestFactory.event_repository
+        .processEvent(event)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          done();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
 
-    it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', done => {
+    it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
       event.data.previews.push(1);
       event.data.content = 'Ipsum loren';
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(done.fail)
+      return TestFactory.event_repository
+        .processEvent(event)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          expect(TestFactory.event_repository.conversationService.save_event).not.toHaveBeenCalled();
-          done();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
 
-    it('saves a text message with link preview with an ID previously used by the same user for a plain text message', done => {
+    it('saves a text message with link preview with an ID previously used by the same user for a plain text message', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
-        Promise.resolve(previously_stored_event)
-      );
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      spyOn(TestFactory.event_service, 'replaceEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
       event.data.previews.push(1);
       event.time = changed_time;
 
-      TestFactory.event_repository
-        ._handleEventSaving(event)
-        .then(saved_event => {
-          expect(saved_event.time).toEqual(initial_time);
-          expect(saved_event.time).not.toEqual(changed_time);
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.event_repository.processEvent(event).then(saved_event => {
+        expect(saved_event.time).toEqual(initial_time);
+        expect(saved_event.time).not.toEqual(changed_time);
+        expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
+      });
+    });
+
+    it('ignores edit message with missing associated original message', () => {
+      const linkPreviewEvent = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.event_service, 'replaceEvent').and.returnValue(Promise.resolve());
+
+      linkPreviewEvent.data.replacing_message_id = 'initial_message_id';
+
+      return TestFactory.event_repository
+        ._handleEventSaving(linkPreviewEvent)
+        .then(() => fail('Should have thrown an error'))
+        .catch(error => {
+          expect(TestFactory.event_service.replaceEvent).not.toHaveBeenCalled();
+          expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
+        });
+    });
+
+    it('updates edited messages when link preview arrives', () => {
+      const replacingId = 'old-replaced-message-id';
+      const storedEvent = Object.assign({}, event, {
+        data: Object.assign({}, event.data, {
+          replacing_message_id: replacingId,
+        }),
+      });
+      const linkPreviewEvent = Object.assign({}, event);
+      spyOn(TestFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
+        return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
+      });
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
+
+      linkPreviewEvent.data.replacing_message_id = replacingId;
+      linkPreviewEvent.data.previews = ['preview'];
+
+      return TestFactory.event_repository._handleEventSaving(linkPreviewEvent).then(updatedEvent => {
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
+        expect(updatedEvent.data.previews[0]).toEqual('preview');
+      });
+    });
+
+    it('updates edited messages', () => {
+      const originalMessage = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(updates => updates);
+
+      const initial_time = event.time;
+      const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
+      originalMessage.primary_key = 12;
+      event.id = z.util.createRandomUuid();
+      event.data.content = 'new content';
+      event.data.replacing_message_id = originalMessage.id;
+      event.time = changed_time;
+
+      return TestFactory.event_repository._handleEventSaving(event).then(updatedEvent => {
+        expect(updatedEvent.time).toEqual(initial_time);
+        expect(updatedEvent.time).not.toEqual(changed_time);
+        expect(updatedEvent.data.content).toEqual('new content');
+        expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
+      });
+    });
+
+    it('updates link preview when edited', () => {
+      const replacingId = 'replaced-message-id';
+      const storedEvent = Object.assign({}, event, {
+        data: Object.assign({}, event.data, {
+          previews: ['preview'],
+        }),
+      });
+      const editEvent = Object.assign({}, event);
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(storedEvent));
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
+
+      editEvent.data.replacing_message_id = replacingId;
+
+      return TestFactory.event_repository._handleEventSaving(editEvent).then(updatedEvent => {
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
+        expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
+        expect(updatedEvent.data.previews.length).toEqual(0);
+      });
+    });
+
+    it('saves a conversation.asset-add event', () => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
+
+      return TestFactory.event_repository.processEvent(assetAddEvent).then(updatedEvent => {
+        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
+      });
+    });
+
+    it('deletes cancelled conversation.asset-add event', () => {
+      const froms = [
+        // cancel from an other user
+        'other-user-id',
+        // cancel from the self user
+        TestFactory.event_repository.userRepository.self().id,
+      ];
+
+      const loadEventSpy = spyOn(TestFactory.event_service, 'loadEvent');
+      const deleteEventSpy = spyOn(TestFactory.event_service, 'deleteEvent');
+      const testPromises = froms.map(from => {
+        const assetAddEvent = Object.assign({}, event, {
+          from,
+          type: z.event.Client.CONVERSATION.ASSET_ADD,
+        });
+        const assetCancelEvent = Object.assign({}, assetAddEvent, {
+          data: {reason: z.assets.AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+          time: '2017-09-06T09:43:36.528Z',
+        });
+
+        loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
+        deleteEventSpy.and.returnValue(Promise.resolve());
+
+        return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
+          expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalled();
+        });
+      });
+
+      return Promise.all(testPromises);
+    });
+
+    it('deletes other user failed upload for conversation.asset-add event', () => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+      const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
+        data: {reason: z.assets.AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
+      spyOn(TestFactory.event_service, 'deleteEvent').and.returnValue(Promise.resolve());
+
+      return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
+        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_service.deleteEvent).toHaveBeenCalled();
+      });
+    });
+
+    it('updates self failed upload for conversation.asset-add event', () => {
+      const assetAddEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+      const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
+        data: {reason: z.assets.AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
+      spyOn(TestFactory.event_service, 'updateEventAsUploadFailed').and.returnValue(
+        Promise.resolve(assetUploadFailedEvent)
+      );
+
+      return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
+        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(TestFactory.event_service.updateEventAsUploadFailed).toHaveBeenCalled();
+      });
+    });
+
+    it('handles conversation.asset-add state update event', () => {
+      const initialAssetEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+
+      const updateStatusEvent = Object.assign({}, initialAssetEvent, {
+        data: {status: z.assets.AssetTransferState.UPLOADED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
+
+      return TestFactory.event_repository.processEvent(updateStatusEvent).then(updatedEvent => {
+        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
+      });
+    });
+
+    it('updates video when preview is received', () => {
+      const initialAssetEvent = Object.assign({}, event, {
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
+      });
+
+      const AssetPreviewEvent = Object.assign({}, initialAssetEvent, {
+        data: {status: z.assets.AssetTransferState.UPLOADED},
+        time: '2017-09-06T09:43:36.528Z',
+      });
+
+      spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
+      spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
+
+      return TestFactory.event_repository.processEvent(AssetPreviewEvent).then(updatedEvent => {
+        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.data.preview_key).toEqual(AssetPreviewEvent.data.preview_key);
+        expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
+      });
     });
   });
 
   describe('_handleEventValidation', () => {
-    it('ignores "conversation.typing" events', done => {
+    it('ignores "conversation.typing" events', () => {
       TestFactory.event_repository
         ._handleEventValidation({type: z.event.Backend.CONVERSATION.TYPING})
-        .then(done.fail)
+        .then(fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          done();
         });
     });
 
-    it('skips outdated events arriving via notification stream', done => {
+    it('skips outdated events arriving via notification stream', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '9fe8b359-b9e0-4624-b63c-71747664e4fa',
@@ -522,11 +710,10 @@ describe('Event Repository', () => {
 
       TestFactory.event_repository
         ._handleEventValidation(event, z.event.EventRepository.SOURCE.STREAM)
-        .then(done.fail)
+        .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.event.EventError));
           expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
-          done();
         });
     });
   });

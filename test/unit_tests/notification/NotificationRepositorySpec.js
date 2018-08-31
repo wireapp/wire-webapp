@@ -71,7 +71,7 @@ describe('z.notification.NotificationRepository', () => {
 
         // Mocks
         document.hasFocus = () => false;
-        TestFactory.notification_repository.permissionState = z.notification.PermissionStatusState.GRANTED;
+        TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
         z.util.Environment.browser.supports.notifications = true;
         window.wire.app = {
           service: {
@@ -285,7 +285,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the user permission was denied', done => {
-      TestFactory.notification_repository.permissionState = z.notification.PermissionStatusState.DENIED;
+      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.DENIED);
 
       TestFactory.notification_repository
         .notify(message_et, undefined, conversation_et)
@@ -479,6 +479,22 @@ describe('z.notification.NotificationRepository', () => {
 
       const expected_body = `${first_name} renamed the conversation to ${message_et.name}`;
       verify_notification_system(done, conversation_et, message_et, expected_body);
+    });
+
+    it('if a group message timer is updated', done => {
+      message_et = new z.entity.MessageTimerUpdateMessage(5000);
+      message_et.user(user_et);
+
+      const expectedBody = `${first_name} set the message timer to 5 seconds`;
+      verify_notification_system(done, conversation_et, message_et, expectedBody);
+    });
+
+    it('if a group message timer is reset', done => {
+      message_et = new z.entity.MessageTimerUpdateMessage(null);
+      message_et.user(user_et);
+
+      const expectedBody = `${first_name} turned off the message timer`;
+      verify_notification_system(done, conversation_et, message_et, expectedBody);
     });
   });
 

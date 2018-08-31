@@ -36,18 +36,21 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
+    this.panelViewModel = mainViewModel.panel;
+
+    this.panelIsVisible = this.panelViewModel.isVisible;
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
-    window.setTimeout(() => $('.titlebar').remove(), 1000);
+    window.setTimeout(() => $('.titlebar').remove(), z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.remoteMediaStreams = this.callingRepository.remoteMediaStreams;
     this.selfStreamState = this.callingRepository.selfStreamState;
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
 
@@ -56,28 +59,25 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
     });
 
-    this.hasGuests = ko.pureComputed(() =>
-      this.conversationEntity()
-        .participating_user_ets()
-        .some(userEntity => userEntity.isGuest())
-    );
+    this.badgeLabelCopy = ko.pureComputed(() => {
+      let stringId;
 
-    this.hasOngoingCall = ko.computed(() => {
-      return this.hasCall() ? this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING : false;
-    });
-
-    this.showMaximizeControl = ko.pureComputed(() => {
-      if (!this.joinedCall()) {
-        return false;
+      if (this.conversationEntity().hasGuest()) {
+        stringId = this.conversationEntity().hasService()
+          ? z.string.guestRoomConversationBadgeGuestAndService
+          : z.string.guestRoomConversationBadge;
+      } else if (this.conversationEntity().hasService()) {
+        stringId = z.string.guestRoomConversationBadgeService;
       }
 
-      const hasLocalVideo = this.selfStreamState.videoSend() || this.selfStreamState.screenSend();
-      const hasRemoteVideoSetting = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-      const hasRemoteVideo = hasRemoteVideoSetting && this.remoteMediaStreams.video();
-      return this.hasOngoingCall() && this.multitasking.isMinimized() && hasLocalVideo && !hasRemoteVideo;
+      return stringId ? z.l10n.text(stringId) : '';
     });
 
-    this.showCallControls = ko.computed(() => {
+    this.hasOngoingCall = ko.computed(() => {
+      return this.hasCall() && this.joinedCall() ? this.joinedCall().isOngoing() : false;
+    });
+
+    this.showCallControls = ko.pureComputed(() => {
       if (!this.conversationEntity()) {
         return false;
       }
@@ -86,6 +86,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
       const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
+    });
+
+    this.supportsVideoCall = ko.pureComputed(() => {
+      return this.conversationEntity() && this.conversationEntity().supportsVideoCall(true);
     });
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
@@ -104,7 +108,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () => this.showDetails());
       amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () => {
         if (this.isActivatedAccount()) {
-          this.showDetails(true);
+          this.showAddParticipant();
         }
       });
     }, 50);
@@ -117,16 +121,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   clickOnCallButton() {
     amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
-  }
-
-  clickOnMaximize() {
-    this.multitasking.autoMinimize(false);
-    this.multitasking.isMinimized(false);
-    this.logger.info(`Maximizing call '${this.joinedCall().id}' on user click`);
-  }
-
-  clickOnDetails() {
-    this.showDetails();
   }
 
   onMouseDown(_, event) {
@@ -146,6 +140,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     }
   }
 
+  clickOnDetails() {
+    this.showDetails();
+  }
+
   onMouseUp() {
     this.preventPanelOpen = this.isMoved;
     this.isMoved = false;
@@ -160,9 +158,29 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
-  showDetails(addPeople) {
+  showAddParticipant() {
+    const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
+
+    if (!canAddPeople) {
+      return this.showDetails();
+    }
+
+    return this.conversationEntity().is_group()
+      ? this.showDetails(true)
+      : amplify.publish(
+          z.event.WebApp.CONVERSATION.CREATE_GROUP,
+          'conversation_details',
+          this.conversationEntity().firstUserEntity()
+        );
+  }
+
+  showDetails(addParticipants) {
     if (!this.preventPanelOpen) {
-      amplify.publish(z.event.WebApp.PEOPLE.TOGGLE, addPeople);
+      const panelId = addParticipants
+        ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
+        : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
+
+      this.panelViewModel.togglePanel(panelId);
     }
   }
 };

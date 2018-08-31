@@ -24,7 +24,6 @@ window.z.auth = z.auth || {};
 
 z.auth.SIGN_OUT_REASON = {
   ACCOUNT_DELETED: 'deleted',
-  ACCOUNT_REGISTRATION: 'registration',
   APP_INIT: 'app_init',
   CLIENT_REMOVED: 'client_removed',
   INDEXED_DB: 'indexedDb',

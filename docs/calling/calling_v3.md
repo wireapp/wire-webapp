@@ -4,8 +4,8 @@
 
 #### Alice calls Bob
 
-* Caller: Alice
-* Callee: Bob
+- Caller: Alice
+- Callee: Bob
 
 ##### Act 1: Alice
 

@@ -52,32 +52,6 @@ z.ui.Shortcut = (() => {
         },
       },
     },
-    [z.ui.ShortcutType.CALL_REJECT]: {
-      event: z.event.WebApp.SHORTCUT.CALL_REJECT,
-      shortcut: {
-        electron: {
-          macos: 'command + .',
-          pc: 'ctrl + .',
-        },
-        webapp: {
-          macos: 'command + alt + .',
-          pc: 'ctrl + alt + .',
-        },
-      },
-    },
-    [z.ui.ShortcutType.CALL_MUTE]: {
-      event: z.event.WebApp.SHORTCUT.CALL_MUTE,
-      shortcut: {
-        electron: {
-          macos: 'command + alt + m',
-          pc: 'ctrl + alt + m',
-        },
-        webapp: {
-          macos: 'command + alt + m',
-          pc: 'ctrl + alt + m',
-        },
-      },
-    },
     [z.ui.ShortcutType.PREV]: {
       event: z.event.WebApp.SHORTCUT.PREV,
       shortcut: {

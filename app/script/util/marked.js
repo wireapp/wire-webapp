@@ -3,6 +3,7 @@
  * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
  * https://github.com/chjj/marked
  */
+/*global define*/
 
 (function() {
   /**
@@ -14,13 +15,11 @@
     code: noop,
     def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
     fences: noop,
-    heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
     hr: /^( *[-*_]){3,} *(?:\n+|$)/,
     html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
-    lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
     list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
     newline: /^\n+/,
-    paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
+    paragraph: /^((?:[^\n]+\n?(?!hr|blockquote|tag|def))+)\n*/,
     text: /^[^\n]+/,
   };
 
@@ -46,11 +45,10 @@
     /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/
   )(/tag/g, block._tag)();
 
-  block.paragraph = replace(block.paragraph)(
-    // ('hr', block.hr)
-    'heading',
-    block.heading
-  )('lheading', block.lheading)('blockquote', block.blockquote)('tag', `<${block._tag}`)('def', block.def)();
+  block.paragraph = replace(block.paragraph)('blockquote', block.blockquote)('tag', `<${block._tag}`)(
+    'def',
+    block.def
+  )();
 
   /**
    * Normal Block Grammar
@@ -64,7 +62,6 @@
 
   block.gfm = merge({}, block.normal, {
     fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/,
-    heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/,
     paragraph: /^/,
   });
 
@@ -154,17 +151,6 @@
           lang: cap[2],
           text: cap[3] || '',
           type: 'code',
-        });
-        continue;
-      }
-
-      // lheading
-      if ((cap = this.rules.lheading.exec(src))) {
-        src = src.substring(cap[0].length);
-        this.tokens.push({
-          depth: cap[2] === '=' ? 1 : 2,
-          text: cap[1],
-          type: 'heading',
         });
         continue;
       }
@@ -387,7 +373,7 @@
           const cleanValue = escape(cap.value);
           out +=
             cap.type === 'email'
-              ? `${preString}<a href="${cleanHref}" onclick="z.util.safeMailtoOpen(event, '${cleanHref.replace(
+              ? `${preString}<a href="${cleanHref}" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, '${cleanHref.replace(
                   /^mailto:/,
                   ''
                 )}')">${cleanValue}</a>`
@@ -510,12 +496,6 @@
 
   Renderer.prototype.html = function(html) {
     return html;
-  };
-
-  Renderer.prototype.heading = function(text, level, raw) {
-    return `<h${level} id="${this.options.headerPrefix}${raw
-      .toLowerCase()
-      .replace(/[^\w]+/g, '-')}">${text}</h${level}>\n`;
   };
 
   Renderer.prototype.hr = function() {
@@ -670,9 +650,6 @@
       }
       case 'hr': {
         return this.renderer.hr();
-      }
-      case 'heading': {
-        return this.renderer.heading(this.inline.output(this.token.text), this.token.depth, this.token.text);
       }
       case 'code': {
         return this.renderer.code(this.token.text, this.token.lang, this.token.escaped);

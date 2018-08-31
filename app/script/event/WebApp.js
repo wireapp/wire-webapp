@@ -52,6 +52,7 @@ z.event.WebApp = {
     MEDIA: {
       ADD_STREAM: 'wire.webapp.call.media.add_stream',
       CHOOSE_SCREEN: 'wire.webapp.call.media.choose_screen',
+      CONNECTION_CLOSED: 'wire.webapp.call.media.connection_closed',
       MUTE_AUDIO: 'wire.webapp.call.media.mute_audio',
       TOGGLE: 'wire.webapp.call.media.toggle',
     },
@@ -125,7 +126,6 @@ z.event.WebApp = {
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update_last_call_status',
   },
   EVENT: {
-    INJECT: 'wire.webapp.event.inject',
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling',
     UPDATE_TIME_OFFSET: 'wire.webapp.event.update_time_offset',
   },
@@ -159,11 +159,6 @@ z.event.WebApp = {
   },
   PENDING: {
     SHOW: 'wire.webapp.pending.show',
-  },
-  PEOPLE: {
-    HIDE: 'wire.webapp.people.hide',
-    SHOW: 'wire.webapp.people.show',
-    TOGGLE: 'wire.webapp.people.toggle',
   },
   PREFERENCES: {
     MANAGE_ACCOUNT: 'wire.webapp.preferences.manage_account',

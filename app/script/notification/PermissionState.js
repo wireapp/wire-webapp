@@ -17,23 +17,16 @@
  *
  */
 
-import BackendError from '../BackendError';
+'use strict';
 
-export const TRACKING_ACTION_START = 'TRACKING_ACTION_START';
-export const TRACKING_ACTION_SUCCESS = 'TRACKING_ACTION_SUCCESS';
-export const TRACKING_ACTION_FAILED = 'TRACKING_ACTION_FAILED';
+window.z = window.z || {};
+window.z.notification = z.notification || {};
 
-export const startTrackingAction = params => ({
-  params,
-  type: TRACKING_ACTION_START,
-});
-
-export const successfulTrackingAction = trackingResult => ({
-  payload: trackingResult,
-  type: TRACKING_ACTION_SUCCESS,
-});
-
-export const failedTrackingAction = error => ({
-  payload: BackendError.handle(error),
-  type: TRACKING_ACTION_FAILED,
-});
+// https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
+z.notification.PermissionState = {
+  DEFAULT: 'default',
+  DENIED: 'denied',
+  GRANTED: 'granted',
+  IGNORED: 'ignored',
+  UNSUPPORTED: 'unsupported',
+};

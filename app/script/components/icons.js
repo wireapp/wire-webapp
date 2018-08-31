@@ -43,6 +43,14 @@ ko.components.register('arrow-left-icon', {
   `,
 });
 
+ko.components.register('attachment-icon', {
+  template: `
+  <svg width="14" height="16" viewBox="0 0 14 16">
+    <path d="M1.63 7.7l4.74-4.78a3.33 3.33 0 0 1 4.73 0 3.4 3.4 0 0 1 0 4.78L9.75 9.07l-4.4 4.43a1.9 1.9 0 0 1-2.7 0 1.94 1.94 0 0 1 0-2.73L4 9.41l4.4-4.45a.47.47 0 0 1 .68 0c.18.2.19.5 0 .69l-4.75 4.79a.97.97 0 0 0 0 1.36c.38.38.98.38 1.36 0l4.74-4.79c.94-.94.93-2.46 0-3.4a2.37 2.37 0 0 0-3.38-.01l-4.4 4.44-1.36 1.37a3.89 3.89 0 0 0 0 5.46 3.8 3.8 0 0 0 5.42 0l4.4-4.44 1.35-1.37a5.34 5.34 0 0 0 0-7.5 5.23 5.23 0 0 0-7.44 0L.28 6.32a.97.97 0 0 0 0 1.37c.37.38.98.38 1.35 0z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('block-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -51,10 +59,26 @@ ko.components.register('block-icon', {
   `,
 });
 
+ko.components.register('camera-icon', {
+  template: `
+  <svg width="16" height="12" viewBox="0 0 16 12">
+    <path id="a" d="M2.6 0h4.8c1 0 1.3 0 1.6.3.3.1.6.4.7.7.2.3.3.7.3 1.6v6.8c0 1 0 1.3-.3 1.6-.1.3-.4.6-.7.7-.3.2-.7.3-1.6.3H2.6c-1 0-1.3 0-1.6-.3-.3-.1-.6-.4-.7-.7-.2-.3-.3-.7-.3-1.6V2.6c0-1 0-1.3.3-1.6C.4.7.7.4 1 .3c.3-.2.7-.3 1.6-.3zm8.7 5.3l3-3A1 1 0 0 1 16 3v6a1 1 0 0 1-1.7.7l-3-3a1 1 0 0 1 0-1.4z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('check-icon', {
   template: `
   <svg width="16" height="12" viewBox="0 0 16 12">
     <path d="M5.7 11.9L16 1.4 14.6 0 5.7 9 1.4 4.8 0 6.2z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('chevron-icon', {
+  template: `
+  <svg width="7" height="4" viewBox="0 0 7 4">
+    <path d="M3.65 3.65L6.44.85A.5.5 0 0 0 6.09 0H.5a.5.5 0 0 0-.35.85l2.79 2.8c.2.2.51.2.7 0z"></path>
   </svg>
   `,
 });
@@ -107,6 +131,30 @@ ko.components.register('edit-icon', {
   `,
 });
 
+ko.components.register('file-icon', {
+  template: `
+  <svg  width="12" height="16" viewBox="0 0 12 16">
+    <path d="M1 0a1 1 0 0 0-1 1v14c0 .6.5 1 1 1h10c.6 0 1-.5 1-1V6H8a2 2 0 0 1-2-2V0H1zm11 5H8.4C7.7 5 7 4.4 7 3.7V0l5 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('fullscreen-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M16 7V0H9v2h3.6L8 6.6 9.4 8 14 3.4V7h2zM0 9v7h7v-2H3.4L8 9.4 6.6 8 2 12.6V9H0z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('gif-icon', {
+  template: `
+  <svg width="16" height="13" viewBox="0 0 16 13">
+    <path d="M12 7.2v5h-2V.2h6v2h-4v3h3v2h-3zm-5-7h2v12H7V.2zm-2 5h1v4.2a3 3 0 0 1-6 0V3a3 3 0 0 1 6 0v.2H4V3a1 1 0 0 0-1-1 1 1 0 0 0-1 1v6.4a1 1 0 0 0 1 1 1 1 0 0 0 1-1V7.2H3v-2h2z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('group-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -119,6 +167,30 @@ ko.components.register('guest-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
     <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('hangup-icon', {
+  template: `
+  <svg width="20" height="8" viewBox="0 0 20 8">
+    <path d="M.6 2.7C2.2 1.2 6 0 9.7 0c3.8 0 7.6 1.2 9 2.7 1 .9.9 2.9 0 4.6l-.3.3H18A216 216 0 0 0 14 6c-.4-.1-.3-.1-.3-.5V3.4l-1-.2a13 13 0 0 0-6.2 0l-.9.2V6l-.4.2a155.4 155.4 0 0 0-3.8 1.5c-.4.1-.4.1-.6-.3-1-1.7-1-3.7-.2-4.6z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('image-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v14c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm14 1H2v9l4-2 8 3.5V2zm-4 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('info-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path id="a" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm0-2A6 6 0 1 0 8 2a6 6 0 0 0 0 12zm0-7c.6 0 1 .4 1 1v3a1 1 0 0 1-2 0V8c0-.6.4-1 1-1zm0-1a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
   </svg>
   `,
 });
@@ -139,10 +211,34 @@ ko.components.register('leave-icon', {
   `,
 });
 
+ko.components.register('markdown-icon', {
+  template: `
+  <svg width="15" height="14" viewBox="0 0 15 14">
+    <path d="M3.1 0h1.66l3.1 13.88h-2l-.58-2.98h-2.7l-.6 2.98H0L3.1 0zm9.38 12.87h-.04c-.26.36-.52.64-.79.84-.27.2-.64.29-1.12.29-.23 0-.48-.04-.72-.1a1.8 1.8 0 0 1-.7-.4 2.04 2.04 0 0 1-.52-.8c-.14-.34-.2-.79-.2-1.33 0-.56.04-1.05.13-1.47.1-.43.26-.78.5-1.06s.56-.48.96-.62a4.88 4.88 0 0 1 1.97-.19l.53.04V7.04c0-.34-.07-.62-.22-.84-.14-.22-.4-.33-.78-.33-.26 0-.5.08-.7.25a1.2 1.2 0 0 0-.43.74H8.42c.07-.9.37-1.6.9-2.14.26-.26.57-.47.94-.62a3.45 3.45 0 0 1 2.4-.03 2.58 2.58 0 0 1 1.57 1.57c.16.39.24.84.24 1.36v6.88h-2v-1.01zm0-3.24c-.22-.04-.4-.06-.55-.06-.43 0-.8.1-1.1.3-.3.2-.46.57-.46 1.1 0 .38.1.69.28.92a.9.9 0 0 0 .76.36c.33 0 .6-.12.79-.34.18-.22.28-.53.28-.93V9.63zM3.94 4H3.9l-.98 5.03h2L3.93 4z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('message-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
-    <path d="M9.8 13h.2a6 6 0 0 0 6-6V6a6 6 0 0 0-6-6H6a6 6 0 0 0-6 6v1a6 6 0 0 0 6 6h.2L8 16l1.8-3z"></path>
+    <path d="M3 0h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2.1A1 1 0 0 1 0 15V3a3 3 0 0 1 3-3z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('message-unread-icon', {
+  template: `
+  <svg width="18" height="18" viewBox="0 0 18 18">
+    <path d="M12 2a4 4 0 0 0 4 4v6a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2A1 1 0 0 1 0 17V5a3 3 0 0 1 3-3h9zm4 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('micoff-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M3.2 14.5a8 8 0 0 0 10.7-1.1L12.4 12A6 6 0 0 1 5 13.2l-1.8 1.3zm8.7-6a4 4 0 0 1-5 3.4l5-3.4zm0-4.5a4 4 0 0 0-4-4 4 4 0 0 0-4 4v4c0 .5 0 1 .2 1.4L.8 11.7l-.8.5L1.1 14l.9-.6 13-9 .8-.5L14.6 2l-.8.6-2 1.3z"></path>
   </svg>
   `,
 });
@@ -171,6 +267,22 @@ ko.components.register('people-icon', {
   `,
 });
 
+ko.components.register('pickup-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M12.7 16c-2 0-5.6-1.8-8.2-4.5C1.8 9 0 5.3 0 3.3 0 2 1.4.6 3.4.1l.3-.1.3.3a216 216 0 0 0 1.7 3.8c.1.4.1.4-.1.6l-1 1-.5.6.4.7A13 13 0 0 0 9 11.5l.7.4 1.6-1.5.1-.1.1-.1.4.1a155.4 155.4 0 0 0 3.8 1.7c.4.2.3.2.2.6-.5 2-1.9 3.4-3.2 3.4z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('ping-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M5.95 4.273a1.016 1.016 0 0 0 1.963-.527L7.11.754a1.016 1.016 0 1 0-1.964.526l.802 2.993zm4.101 7.455a1.016 1.016 0 0 0-1.963.526l.802 2.993a1.016 1.016 0 1 0 1.963-.526l-.802-2.993zM3.746 7.913a1.016 1.016 0 0 0 .527-1.964L1.28 5.147a1.016 1.016 0 1 0-.526 1.964l2.992.802zm8.508.175a1.016 1.016 0 1 0-.526 1.963l2.992.802a1.016 1.016 0 0 0 .527-1.963l-2.993-.802zM5.798 11.64a1.016 1.016 0 1 0-1.438-1.437l-2.19 2.19a1.016 1.016 0 1 0 1.436 1.438l2.192-2.19zm4.405-7.28a1.016 1.016 0 1 0 1.437 1.438l2.191-2.191a1.016 1.016 0 0 0-1.437-1.438L10.203 4.36z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('plus-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -187,10 +299,42 @@ ko.components.register('profile-icon', {
   `,
 });
 
+ko.components.register('screenshare-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M5 14h6v2H5v-2zM0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v11c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm7 10h2V7h4L8 3 3 7h4v4z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('send-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M0 14.3c0 1.5 1 2.1 2.3 1.4L15 9.2c1.3-.7 1.3-1.7 0-2.4L2.3.3C1.1-.4 0 .3 0 1.7V8h12L0 10v4.3z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('service-icon', {
+  template: `
+  <svg width="32" height="32" viewBox="0 0 32 32">
+    <path d="M10.5 12A6.5 6.5 0 0 0 4 18.5V24a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-5.5a6.5 6.5 0 0 0-6.5-6.5h-11zm-7.12-1.22L.24 4.95a2 2 0 1 1 3.52-1.9L6.8 8.68C7.94 8.24 9.19 8 10.5 8h11C27.3 8 32 12.7 32 18.5V24a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5v-5.5c0-3.05 1.3-5.8 3.38-7.72zM11 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0m5 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5.26-9.55a2 2 0 0 1-3.52-1.9l3.5-6.5a2 2 0 0 1 3.52 1.9l-3.5 6.5z"></path>
+  </svg>
+`,
+});
+
 ko.components.register('settings-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M2.8 11a6 6 0 0 1-.6-1.5H0v-3h2.2c.1-.6.3-1 .6-1.5L1.3 3.4l2.1-2.1L5 2.8a6 6 0 0 1 1.5-.6V0h3v2.2c.6.1 1 .3 1.5.6l1.6-1.5 2.1 2.1L13.2 5c.3.4.5 1 .6 1.5H16v3h-2.2a6 6 0 0 1-.6 1.5l1.5 1.6-2.1 2.1-1.6-1.5a6 6 0 0 1-1.5.6V16h-3v-2.2a6 6 0 0 1-1.5-.6l-1.6 1.5-2.1-2.1L2.8 11zM8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('timer-icon', {
+  template: `
+  <svg width="15" height="16" viewBox="0 0 15 16">
+    <path d="M7.44 2v1.08a6.48 6.48 0 0 1 5.45 6.42c0 3.59-2.89 6.5-6.45 6.5A6.47 6.47 0 0 1 0 9.5a6.48 6.48 0 0 1 5.45-6.42V2h-.5a1 1 0 0 1-.98-1 1 1 0 0 1 .99-1h2.97a1 1 0 0 1 1 1 1 1 0 0 1-1 1h-.5zm-1 12a4.48 4.48 0 0 0 4.47-4.5c0-2.49-2-4.5-4.47-4.5a4.48 4.48 0 0 0-4.46 4.5c0 2.49 2 4.5 4.46 4.5zm0-1a3.49 3.49 0 0 1-3.47-3.5C2.97 7.57 4.53 6 6.44 6v3.5l2.47 2.47A3.44 3.44 0 0 1 6.44 13zm6.57-10.3l.7.71a1 1 0 0 1 0 1.42.99.99 0 0 1-1.4 0l-.7-.7a1 1 0 0 1 0-1.42.99.99 0 0 1 1.4 0z"></path>
   </svg>
   `,
 });

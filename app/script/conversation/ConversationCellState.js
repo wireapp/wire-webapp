@@ -30,30 +30,29 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _accumulateActivity = conversationEntity => {
-    const unreadEvents = conversationEntity.unread_events();
     const activities = {
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
       [ACTIVITY_TYPE.PING]: 0,
     };
 
-    for (const messageEntity of unreadEvents) {
-      if (messageEntity.is_call() && messageEntity.was_missed()) {
+    conversationEntity.unread_events().forEach(messageEntity => {
+      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+      if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
       } else if (messageEntity.is_content()) {
         activities[ACTIVITY_TYPE.MESSAGE] += 1;
       }
-    }
+    });
 
     return _generateActivityString(activities);
   };
 
   const _generateActivityString = activities => {
-    return Object.keys(activities)
-      .map(activity => {
-        const activityCount = activities[activity];
+    return Object.entries(activities)
+      .map(([activity, activityCount]) => {
         if (activityCount) {
           const activityCountIsOne = activityCount === 1;
           let stringId = undefined;
@@ -110,6 +109,19 @@ z.conversation.ConversationCellState = (() => {
     match: conversationEntity => {
       const hasUnreadEvents = conversationEntity.unread_event_count() > 0;
       return hasUnreadEvents && conversationEntity.unread_events().some(_isAlert);
+    },
+  };
+
+  const _getStateCall = {
+    description: conversationEntity => {
+      const creatorName = conversationEntity.call().creatingUser.first_name();
+      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, creatorName);
+    },
+    icon: () => z.conversation.ConversationStatusIcon.NONE,
+    match: conversationEntity => {
+      if (conversationEntity.call()) {
+        return conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined();
+      }
     },
   };
 
@@ -289,6 +301,7 @@ z.conversation.ConversationCellState = (() => {
   return {
     generate: conversationEntity => {
       const states = [
+        _getStateCall,
         _getStateRemoved,
         _getStateMuted,
         _getStateAlert,

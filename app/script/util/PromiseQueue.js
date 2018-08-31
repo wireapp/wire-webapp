@@ -25,7 +25,7 @@ window.z.util = z.util || {};
 z.util.PromiseQueue = class PromiseQueue {
   static get CONFIG() {
     return {
-      UNBLOCK_INTERVAL: 60 * 1000,
+      UNBLOCK_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 
@@ -42,7 +42,7 @@ z.util.PromiseQueue = class PromiseQueue {
   constructor(options = {}) {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
-    const loggerName = name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue';
+    const loggerName = `z.util.PromiseQueue${name ? ` (${name})` : ''}`;
     this.logger = new z.util.Logger(loggerName, z.config.LOGGER.OPTIONS);
 
     this._blocked = false;

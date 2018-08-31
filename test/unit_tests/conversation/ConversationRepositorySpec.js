@@ -78,19 +78,18 @@ describe('ConversationRepository', () => {
         );
         ({storageService: storage_service} = conversation_repository.conversation_service);
 
+        spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
         conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
         conversation_et.id = payload.conversations.knock.post.conversation;
 
-        const ping_url = `${test_factory.settings.connection.rest_url}/conversations/${conversation_et.id}/knock`;
+        const ping_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/knock`;
         server.respondWith('POST', ping_url, [
           201,
           {'Content-Type': 'application/json'},
           JSON.stringify(payload.conversations.knock.post),
         ]);
 
-        const mark_as_read_url = `${test_factory.settings.connection.rest_url}/conversations/${
-          conversation_et.id
-        }/self`;
+        const mark_as_read_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/self`;
         server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
 
         return conversation_repository.save_conversation(conversation_et);
@@ -120,9 +119,9 @@ describe('ConversationRepository', () => {
           message_et.assets.push(file_et);
           conversation_et.add_message(message_et);
 
-          spyOn(TestFactory.conversation_service, 'update_asset_as_uploaded_in_db');
-          spyOn(TestFactory.conversation_service, 'update_asset_as_failed_in_db');
-          spyOn(TestFactory.conversation_service, 'delete_message_from_db');
+          spyOn(TestFactory.event_service, 'updateEventAsUploadSucceeded');
+          spyOn(TestFactory.event_service, 'updateEventAsUploadFailed');
+          spyOn(TestFactory.event_service, 'deleteEvent');
           done();
         })
         .catch(done.fail);
@@ -148,7 +147,7 @@ describe('ConversationRepository', () => {
       TestFactory.conversation_repository
         ._on_asset_upload_complete(conversation_et, event)
         .then(() => {
-          expect(TestFactory.conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled();
+          expect(TestFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
           const [firstAsset] = message_et.assets();
           expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
@@ -183,23 +182,24 @@ describe('ConversationRepository', () => {
         });
     });
 
-    xit('should send delete and deletes message for own messages', done => {
-      const user_et = new z.entity.User();
-      user_et.is_me = true;
-      const message_to_delete_et = new z.entity.Message();
-      message_to_delete_et.id = z.util.createRandomUuid();
-      message_to_delete_et.user(user_et);
-      conversation_et.add_message(message_to_delete_et);
+    it('should send delete and deletes message for own messages', () => {
+      const userEntity = new z.entity.User();
+      userEntity.is_me = true;
+      const messageEntityToDelete = new z.entity.Message();
+      messageEntityToDelete.id = z.util.createRandomUuid();
+      messageEntityToDelete.user(userEntity);
+      conversation_et.add_message(messageEntityToDelete);
 
-      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined();
+      spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+        Promise.resolve(conversation_et)
+      );
+      expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
 
-      TestFactory.conversation_repository
-        .delete_message_everyone(conversation_et, message_to_delete_et)
+      return TestFactory.conversation_repository
+        .delete_message_everyone(conversation_et, messageEntityToDelete)
         .then(() => {
-          expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined();
-          done();
-        })
-        .catch(done.fail);
+          expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined();
+        });
     });
   });
 
@@ -282,35 +282,33 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_1to1_conversation', () => {
+  describe('get1To1Conversation', () => {
     beforeEach(() => TestFactory.conversation_repository.conversations([]));
 
-    it('finds an existing 1:1 conversation within a team', done => {
+    it('finds an existing 1:1 conversation within a team', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const team_1to1_conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
+      const team1to1Conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const [new_conversation_et] = TestFactory.conversation_repository.conversation_mapper.map_conversations([
-        team_1to1_conversation,
-      ]);
-      TestFactory.conversation_repository.conversations.push(new_conversation_et);
+      const conversationMapper = TestFactory.conversation_repository.conversation_mapper;
+      const [newConversationEntity] = conversationMapper.map_conversations([team1to1Conversation]);
+      TestFactory.conversation_repository.conversations.push(newConversationEntity);
 
-      const team_id = team_1to1_conversation.team;
-      const team_member_id = team_1to1_conversation.members.others[0].id;
-      const user_et = new z.entity.User(team_member_id);
+      const teamId = team1to1Conversation.team;
+      const teamMemberId = team1to1Conversation.members.others[0].id;
+      const userEntity = new z.entity.User(teamMemberId);
+      userEntity.inTeam(true);
+      userEntity.isTeamMember(true);
+      userEntity.teamId = teamId;
 
-      TestFactory.conversation_repository
-        .get_1to1_conversation(user_et, team_id)
-        .then(found_conversation_et => {
-          expect(found_conversation_et).toBe(new_conversation_et);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.get1To1Conversation(userEntity).then(conversationEntity => {
+        expect(conversationEntity).toBe(newConversationEntity);
+      });
     });
   });
 
-  describe('get_groups_by_name', () => {
+  describe('getGroupsByName', () => {
     beforeEach(done => {
       const group_a = _generate_conversation(z.conversation.ConversationType.REGULAR);
       group_a.name('Web Dudes');
@@ -345,29 +343,29 @@ describe('ConversationRepository', () => {
     });
 
     it('should return expected matches', () => {
-      let result = TestFactory.conversation_repository.get_groups_by_name('Web Dudes');
+      let result = TestFactory.conversation_repository.getGroupsByName('Web Dudes');
       expect(result.length).toBe(1);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('Dudes');
+      result = TestFactory.conversation_repository.getGroupsByName('Dudes');
       expect(result.length).toBe(1);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('e');
+      result = TestFactory.conversation_repository.getGroupsByName('e');
       expect(result.length).toBe(3);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('Rene');
+      result = TestFactory.conversation_repository.getGroupsByName('Rene');
       expect(result.length).toBe(1);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('John');
+      result = TestFactory.conversation_repository.getGroupsByName('John');
       expect(result.length).toBe(1);
     });
 
     it('should return a cleared group with the user still being member of it', () => {
-      const result = TestFactory.conversation_repository.get_groups_by_name('Cleared');
+      const result = TestFactory.conversation_repository.getGroupsByName('Cleared');
       expect(result.length).toBe(1);
     });
 
     it('should not return a cleared group that the user left', () => {
-      const result = TestFactory.conversation_repository.get_groups_by_name('Removed');
+      const result = TestFactory.conversation_repository.getGroupsByName('Removed');
       expect(result.length).toBe(0);
     });
   });
@@ -484,9 +482,34 @@ describe('ConversationRepository', () => {
   });
 
   describe('"_handleConversationEvent"', () => {
+    it('detects events send by a user not in the conversation', () => {
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const event = {
+        conversation: conversationEntity.id,
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
+        time: '2017-09-06T09:43:36.528Z',
+        data: {},
+        type: 'conversation.message-add',
+      };
+
+      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(
+        Promise.resolve(conversationEntity)
+      );
+      spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+        Promise.resolve(conversationEntity)
+      );
+
+      return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
+        expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(event.conversation, [
+          event.from,
+        ]);
+      });
+    });
+
     describe('"conversation.asset-add"', () => {
       beforeEach(() => {
-        const matchUsers = new RegExp(`${test_factory.settings.connection.rest_url}/users\\?ids=([a-z0-9-,]+)`);
+        const matchUsers = new RegExp(`${test_factory.settings.connection.restUrl}/users\\?ids=([a-z0-9-,]+)`);
         server.respondWith('GET', matchUsers, (xhr, ids) => {
           const users = [];
           for (const userId of ids.split(',')) {
@@ -536,9 +559,7 @@ describe('ConversationRepository', () => {
           xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(
-          `${test_factory.settings.connection.rest_url}/conversations/([a-z0-9-]+)`
-        );
+        const matchConversations = new RegExp(`${test_factory.settings.connection.restUrl}/conversations/([a-z0-9-]+)`);
         server.respondWith('GET', matchConversations, (xhr, conversationId) => {
           const conversation = {
             access: ['private'],
@@ -570,7 +591,7 @@ describe('ConversationRepository', () => {
         });
       });
 
-      it('removes a file upload from the messages list of the sender when the upload gets canceled', done => {
+      it('removes a file upload from the messages list of the sender when the upload gets canceled', () => {
         const conversation_id = z.util.createRandomUuid();
         const message_id = z.util.createRandomUuid();
         const sending_user_id = TestFactory.user_repository.self().id;
@@ -580,7 +601,7 @@ describe('ConversationRepository', () => {
         // prettier-ignore
         const upload_cancel = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
 
-        TestFactory.conversation_repository
+        return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
@@ -597,9 +618,7 @@ describe('ConversationRepository', () => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
             expect(number_of_messages).toBe(0);
-            done();
-          })
-          .catch(done.fail);
+          });
       });
 
       it('removes a file upload from the messages list of the receiver when the upload gets canceled', done => {
@@ -1035,6 +1054,48 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('send_text_with_link_preview', () => {
+    it('sends ephemeral message (within the range [1 second, 1 year])', () => {
+      const conversationRepository = TestFactory.conversation_repository;
+      const conversation = _generate_conversation();
+      conversationRepository.conversations([conversation]);
+      const conversationPromise = Promise.resolve(conversation);
+
+      const inBoundValues = [1000, 5000, 12341234, 31536000000];
+      const outOfBoundValues = [1, 999, 31536000001, 31557600000];
+      const expectedValues = inBoundValues
+        .map(val => val.toString())
+        .concat(['1000', '1000', '31536000000', '31536000000']);
+
+      spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
+        Promise.resolve(new z.entity.Message())
+      );
+      spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
+      spyOn(conversationRepository.conversation_mapper, 'map_conversations').and.returnValue(conversationPromise);
+      spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
+        (conversationId, genericMessage, payload, preconditionOption) => {
+          const {content, ephemeral} = genericMessage;
+          expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
+          expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
+          expect(ephemeral.expire_after_millis.toString()).toBe(expectedValues.shift());
+          return Promise.resolve({});
+        }
+      );
+
+      const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
+        conversation.localMessageTimer(expiration);
+        conversation.self = {id: 'felix'};
+        const message = 'hello there';
+        return conversationRepository.send_text_with_link_preview(message, conversation);
+      });
+      return Promise.all(sentPromises).then(sentMessages => {
+        expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
+          sentMessages.length
+        );
+      });
+    });
+  });
+
   describe('Encryption', () => {
     let anne;
     let bob;
@@ -1122,6 +1183,22 @@ describe('ConversationRepository', () => {
           done();
         })
         .catch(done.fail);
+    });
+  });
+
+  describe('addMissingMember', () => {
+    it('injects a member-join event if unknown user is detected', () => {
+      const conversationId = z.util.createRandomUuid();
+      const event = {conversation: conversationId, from: 'unknown-user-id'};
+      spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
+      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
+
+      return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
+        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
+          event,
+          z.event.EventRepository.SOURCE.INJECTED
+        );
+      });
     });
   });
 });

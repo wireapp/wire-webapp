@@ -4,16 +4,14 @@
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close-archive"></span>
   </div>
   <div class="left-list-center">
-    <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: archivedConversations">
-      <!-- ko foreach: archivedConversations -->
-        <li>
-          <conversation-list-cell
-            data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
-            data-uie-name="item-conversation-archived"
-            params="click: $parent.listViewModel.onContextMenu, conversation: $data">
-          </conversation-list-cell>
-        </li>
-      <!-- /ko -->
+    <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: archivedConversations, foreach: archivedConversations">
+      <li>
+        <conversation-list-cell
+          data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
+          data-uie-name="item-conversation-archived"
+          params="click: $parent.listViewModel.onContextMenu, conversation: $data">
+        </conversation-list-cell>
+      </li>
     </ul>
   </div>
 </div>

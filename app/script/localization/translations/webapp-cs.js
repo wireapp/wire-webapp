@@ -93,6 +93,9 @@ z.string.cs.callJoin = 'Vstoupit';
 z.string.cs.callChooseSharedScreen = 'Vybrat obrazovku ke sdílení';
 z.string.cs.callParticipants = '{{number}} se účastní hovoru';
 
+z.string.cs.videoCallOverlayMute = 'Ztlumit';
+z.string.cs.videoCallOverlayHangUp = 'Zavěsit';
+
 z.string.cs.modalAcknowledgeAction = 'Ok';
 z.string.cs.modalConfirmSecondary = 'Zrušit';
 z.string.cs.modalOptionSecondary = 'Zrušit';
@@ -190,12 +193,15 @@ z.string.cs.modalConversationRemoveAction = 'Odstranit';
 z.string.cs.modalConversationRemoveHeadline = 'Odstranit?';
 z.string.cs.modalConversationRemoveMessage = '{{user}} nebude moci odesílat nebo přijímat zprávy v této konverzaci.';
 
+z.string.cs.modalConversationRemoveGuestsAction = 'Odstranit';
 
 z.string.cs.modalConversationTooManyMembersHeadline = 'Přeplněné kupé';
 
 z.string.cs.modalIntegrationUnavailableHeadline = 'Roboti jsou momentálně nedostupní';
 z.string.cs.modalIntegrationUnavailableMessage = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
 
+
+z.string.cs.modalImproveWireAction = 'Přijmout';
 
 z.string.cs.modalSessionResetHeadline = 'Sezení bylo zresetováno';
 z.string.cs.modalSessionResetMessage1 = 'Pokud problém není vyřešen,';
@@ -225,8 +231,6 @@ z.string.cs.conversationYouAccusative = 'jste';
 z.string.cs.conversationConnectionAccepted = 'Připojeno';
 z.string.cs.conversationConnectionBlocked = 'Blokováno';
 z.string.cs.conversationConnectionCancelRequest = 'Zrušit žádost o připojení';
-z.string.cs.conversationCreate = ' zahájil(a) rozhovor s {{users}}';
-z.string.cs.conversationCreateYou = ' zahájil(a) rozhovor s {{users}}';
 z.string.cs.conversationDeviceStartedUsingOne = ' začal(a) používat';
 z.string.cs.conversationDeviceStartedUsingMany = ' začal(a) používat';
 z.string.cs.conversationDeviceUnverified = ' neověřen jeden ze';
@@ -237,17 +241,10 @@ z.string.cs.conversationDeviceNewDeviceMany = ' nové zařízení';
 z.string.cs.conversationDeviceNewPeopleJoinedVerify = ' ověřit zařízení';
 z.string.cs.conversationJustNow = 'Právě teď';
 z.string.cs.conversationLocationLink = 'Otevřít mapu';
-z.string.cs.conversationMemberJoin = ' přidal(a) {{users}}';
-z.string.cs.conversationMemberJoinYou = ' přidal(a) {{users}}';
-z.string.cs.conversationMemberLeaveLeft = ' opustil(a)';
-z.string.cs.conversationMemberLeaveLeftYou = ' opustil(a)';
-z.string.cs.conversationMemberLeaveRemoved = ' odstranil(a) {{users}}';
-z.string.cs.conversationMemberLeaveRemovedYou = ' odstranil(a) {{users}}';
 z.string.cs.conversationMessageDelivered = 'Doručeno';
 z.string.cs.conversationRename = ' přejmenoval(a) konverzaci';
 z.string.cs.conversationRenameYou = ' přejmenoval(a) konverzaci';
 z.string.cs.conversationResume = 'Začít konverzovat s {{users}}';
-z.string.cs.conversationTeamLeave = ' byl(a) odebrán(a) z týmu';
 z.string.cs.conversationPing = ' pingl(a)';
 z.string.cs.conversationPingYou = ' pingl(a)';
 z.string.cs.conversationToday = 'dnes';
@@ -263,6 +260,7 @@ z.string.cs.conversationMissedMessages = 'Toto zařízení jste nějakou dobu ne
 z.string.cs.conversationAssetDownloading = 'Stahování…';
 z.string.cs.conversationAssetUploadFailed = 'Nahrání selhalo';
 z.string.cs.conversationPlaybackError = 'Nelze přehrát';
+z.string.cs.conversationContextMenuCopy = 'Vložit';
 z.string.cs.conversationContextMenuEdit = 'Upravit';
 z.string.cs.conversationContextMenuDelete = 'Odstranit pro mě';
 z.string.cs.conversationContextMenuDeleteEveryone = 'Odstranit pro všechny';
@@ -298,10 +296,7 @@ z.string.cs.conversationsConnectionRequestOne = '1 čekající osoba';
 z.string.cs.conversationsEmptyConversation = 'Skupinová konverzace';
 z.string.cs.conversationsNoConversations = 'Zatím žádné konverzace';
 z.string.cs.conversationsPopoverArchive = 'Archivovat';
-z.string.cs.conversationsPopoverBlock = 'Blokovat';
 z.string.cs.conversationsPopoverCancel = 'Zrušit žádost';
-z.string.cs.conversationsPopoverClear = 'Smazat';
-z.string.cs.conversationsPopoverLeave = 'Odejít';
 z.string.cs.conversationsPopoverNotify = 'Zapnout zvuk';
 z.string.cs.conversationsPopoverSilence = 'Ztlumit';
 z.string.cs.conversationsPopoverUnarchive = 'Obnovit';
@@ -347,13 +342,18 @@ z.string.cs.addParticipantsSearchPlaceholder = 'Hledat podle jména';
 z.string.cs.addParticipantsTabsPeople = 'Kontakty';
 z.string.cs.addParticipantsTabsServices = 'Služby';
 
+z.string.cs.conversationDetailsActionArchive = 'Archivovat';
 z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
 z.string.cs.conversationDetailsActionDevices = 'Přístroje';
 z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
+z.string.cs.conversationDetailsOptions = 'Nastavení';
 z.string.cs.conversationDetailsParticipantsServicesMany = 'Služby';
 z.string.cs.conversationDetailsParticipantsUsersMany = 'Kontakty';
 z.string.cs.conversationDetailsPeople = 'Kontakty';
 z.string.cs.conversationDetailsServices = 'Služby';
+
+z.string.cs.conversationParticipantsTitle = 'Kontakty';
+z.string.cs.conversationParticipantsSearchPlaceholder = 'Hledat podle jména';
 
 z.string.cs.groupParticipantActionCancelRequest = 'Zrušit žádost';
 z.string.cs.groupParticipantActionDevices = 'Přístroje';
@@ -419,7 +419,6 @@ z.string.cs.preferencesDevicesCurrent = 'Aktuální';
 z.string.cs.preferencesDevicesFingerprint = 'Identifikátor klíče';
 z.string.cs.preferencesDevicesFingerprintDetail = 'Aplikace Wire přiděluje každému přístroji unikátní identifikátor. Jejich porovnáním ověříte své přístroje a konverzace.';
 z.string.cs.preferencesDevicesId = 'ID: ';
-z.string.cs.preferencesDevicesRemove = 'Odstranit';
 z.string.cs.preferencesDevicesRemoveCancel = 'Zrušit';
 z.string.cs.preferencesDevicesRemoveDetail = 'Jestliže jste přestali používat toto zařízení, odeberte jej. Poté z něj budete okamžitě odhlášeni.';
 z.string.cs.preferencesDevicesSessionConfirmation = 'Sezení bylo zresetováno.';
@@ -439,9 +438,6 @@ z.string.cs.preferencesOptionsContacts = 'Kontakty';
 z.string.cs.preferencesOptionsContactsGmail = 'Importovat ze služby Gmail';
 z.string.cs.preferencesOptionsContactsMacos = 'Import z kontaktů';
 z.string.cs.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
-z.string.cs.preferencesOptionsData = 'Použití a zprávy o pádech';
-z.string.cs.preferencesOptionsDataCheckbox = 'Použití a zprávy o pádech';
-z.string.cs.preferencesOptionsDataDetail = 'Přispějte k vylepšení aplikace Wire odesíláním anonymních informací.';
 z.string.cs.preferencesOptionsPopular = 'Podle popularity poptávky';
 z.string.cs.preferencesOptionsEmojiReplaceCheckbox = 'Nahradit psané emotikony pomocí emojis';
 z.string.cs.preferencesOptionsPreviewsSendCheckbox = 'Vytvořit náhledy pro odeslané odkazy';
@@ -451,6 +447,8 @@ z.string.cs.preferencesOptionsNotificationsNone = 'Vypnout';
 z.string.cs.preferencesOptionsNotificationsObfuscate = 'Skrýt detaily';
 z.string.cs.preferencesOptionsNotificationsObfuscateMessage = 'Zobrazit odesílatele';
 z.string.cs.preferencesOptionsNotificationsOn = 'Zobrazit odesílatele a zprávu';
+
+z.string.cs.backupCancel = 'Zrušit';
 
 z.string.cs.searchConnect = 'Připojit';
 z.string.cs.searchConnections = 'Kontakty';
@@ -559,13 +557,5 @@ z.string.cs.initReceivedUserData = 'Kontrola nových zpráv';
 z.string.cs.initDecryption = 'Dešifrovat zprávu';
 z.string.cs.initEvents = 'Zprávy se načítají';
 
-z.string.cs.ephememalUnitsNone = 'Vypnout';
-z.string.cs.ephememalUnitsSecond = 'sekunda';
-z.string.cs.ephememalUnitsSeconds = 'sekund(y)';
-z.string.cs.ephememalUnitsMinute = 'minuta';
-z.string.cs.ephememalUnitsMinutes = 'minut';
-z.string.cs.ephememalUnitsHour = 'hodina';
-z.string.cs.ephememalUnitsHours = 'hodin';
-z.string.cs.ephememalUnitsDay = 'den';
-z.string.cs.ephememalUnitsDays = 'dnů';
+z.string.cs.ephemeralUnitsNone = 'Vypnout';
 

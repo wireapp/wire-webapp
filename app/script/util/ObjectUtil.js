@@ -44,11 +44,9 @@ z.util.ObjectUtil = {
 
     const newObject = {};
 
-    for (const property in object) {
-      if (object.hasOwnProperty(property)) {
-        newObject[property] = z.util.ObjectUtil.mapRecursive(object[property], mappingFunction);
-      }
-    }
+    Object.entries(object).forEach(([propertyName, value]) => {
+      newObject[propertyName] = z.util.ObjectUtil.mapRecursive(value, mappingFunction);
+    });
 
     return newObject;
   },

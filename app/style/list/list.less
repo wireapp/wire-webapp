@@ -49,6 +49,7 @@
 
   position: relative;
   height: @left-list-header-height;
+  flex-shrink: 0;
 }
 .left-list-header-start-ui {
   background-color: rgba(255, 255, 255, 0.08);
@@ -131,6 +132,16 @@
     .flex-center;
 
     width: @left-list-item-left-width;
+    > svg {
+      max-width: 16px;
+      max-height: 16px;
+    }
+
+    &-dark {
+      path {
+        fill: @graphite-dark;
+      }
+    }
   }
 
   > .center-column {

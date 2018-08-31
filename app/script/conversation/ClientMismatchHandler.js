@@ -23,9 +23,10 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
-  constructor(conversationRepository, cryptographyRepository, userRepository) {
+  constructor(conversationRepository, cryptographyRepository, eventRepository, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
+    this.eventRepository = eventRepository;
     this.userRepository = userRepository;
 
     this.logger = new z.util.Logger('z.conversation.ClientMismatchHandler', z.config.LOGGER.OPTIONS);
@@ -47,7 +48,9 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     return Promise.resolve()
       .then(() => this._handleClientMismatchRedundant(redundantClients, payload, conversationId))
       .then(updatedPayload => this._handleClientMismatchDeleted(deletedClients, updatedPayload))
-      .then(updatedPayload => this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage));
+      .then(updatedPayload => {
+        return this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage, conversationId);
+      });
   }
 
   /**
@@ -93,17 +96,31 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
    * @param {z.proto.GenericMessage} genericMessage - Protobuffer message to be sent
+   * @param {string} conversationId - ID of conversation the message was sent in
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchMissing(recipients, payload, genericMessage) {
-    if (_.isEmpty(recipients)) {
+  _handleClientMismatchMissing(recipients, payload, genericMessage, conversationId) {
+    const missingUserIds = Object.keys(recipients);
+    if (!missingUserIds.length) {
       return Promise.resolve(payload);
     }
 
-    this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
+    this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
 
-    return this.cryptographyRepository
-      .encryptGenericMessage(recipients, genericMessage, payload)
+    const skipParticipantsCheck = !conversationId;
+    const participantsCheckPromise = skipParticipantsCheck
+      ? Promise.resolve()
+      : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+          const knownUserIds = conversationEntity.participating_user_ids();
+          const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingUserIds);
+
+          if (unknownUserIds.length) {
+            return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
+          }
+        });
+
+    return participantsCheckPromise
+      .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
       .then(updatedPayload => {
         payload = updatedPayload;
 
@@ -111,7 +128,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         return Promise.all(this._mapRecipients(recipients, _addMissingClient));
       })
       .then(() => {
-        this.conversationRepository.verification_state_handler.onClientAdd(Object.keys(recipients));
+        this.conversationRepository.verification_state_handler.onClientsAdded(Object.keys(recipients));
         return payload;
       });
   }
@@ -157,7 +174,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
             const timeOffset = this.conversationRepository.timeOffset;
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
 
-            amplify.publish(z.event.WebApp.EVENT.INJECT, event);
+            this.eventRepository.injectEvent(event);
           }
 
           delete payload.recipients[userId];
@@ -185,19 +202,14 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    */
   _mapRecipients(recipients, clientFn, userFn) {
     const result = [];
-    const userIds = Object.keys(recipients);
 
-    userIds.forEach(userId => {
-      if (recipients.hasOwnProperty(userId)) {
-        const clientIds = recipients[userId] || [];
+    Object.entries(recipients).forEach(([userId, clientIds = []]) => {
+      if (_.isFunction(clientFn)) {
+        clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
+      }
 
-        if (_.isFunction(clientFn)) {
-          clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
-        }
-
-        if (_.isFunction(userFn)) {
-          result.push(userFn(userId));
-        }
+      if (_.isFunction(userFn)) {
+        result.push(userFn(userId));
       }
     });
 

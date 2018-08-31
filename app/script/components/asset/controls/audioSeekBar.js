@@ -70,28 +70,28 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
     const number_of_levels_fit_on_screen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
     const scaled_loudness = z.util.ArrayUtil.interpolate(this.loudness, number_of_levels_fit_on_screen);
 
-    $(this.element).empty();
-    scaled_loudness.map(level => {
-      $('<span>')
-        .height(level)
-        .appendTo(this.element);
-    });
+    // eslint-disable-next-line no-unsanitized/property
+    this.element.innerHTML = scaled_loudness.map(level => `<span style="height: ${level}px"></span>`).join('');
   }
 
   _normalize_loudness(loudness, max) {
     const peak = Math.max(...loudness);
-    return peak > max ? loudness.map(level => level * max / peak) : loudness;
+    const scale = max / peak;
+    return peak > max ? loudness.map(level => level * scale) : loudness;
   }
 
   _on_level_click(event) {
     const mouse_x = event.pageX - $(event.currentTarget).offset().left;
-    this.audio_element.currentTime = this.audio_element.duration * mouse_x / event.currentTarget.clientWidth;
+    const calculatedTime = (this.audio_element.duration * mouse_x) / event.currentTarget.clientWidth;
+    const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
+
+    this.audio_element.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.audio_element.duration);
     this._on_time_update();
   }
 
   _on_time_update() {
     const $levels = this._clear_theme();
-    const index = Math.floor(this.audio_element.currentTime / this.audio_element.duration * $levels.length);
+    const index = Math.floor((this.audio_element.currentTime / this.audio_element.duration) * $levels.length);
     this._add_theme(index);
   }
 

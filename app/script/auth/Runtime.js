@@ -38,7 +38,7 @@ export const OS = {
   DESKTOP: {
     LINUX: ['linux', 'ubuntu', 'fedora', 'gentoo', 'debian', 'suse', 'centos', 'red hat', 'freebsd', 'openbsd'],
     MAC: ['os x', 'mac os'],
-    WINDOWS: ['windows'],
+    WINDOWS: ['windows', 'windows server 2008 r2 / 7', 'windows server 2008 / vista', 'windows xp'],
   },
   MOBILE: {
     ANDROID: ['android'],
@@ -48,7 +48,7 @@ export const OS = {
 
 export const SUPPORTED_BROWSERS = {
   [BROWSER.CHROME]: {major: 56, minor: 0},
-  [BROWSER.FIREFOX]: {major: 52, minor: 0},
+  [BROWSER.FIREFOX]: {major: 60, minor: 0},
   [BROWSER.EDGE]: {major: 15, minor: 0},
   [BROWSER.ELECTRON]: {major: 1, minor: 6},
   [BROWSER.OPERA]: {major: 43, minor: 0},
@@ -100,6 +100,8 @@ const isMobileOs = () => isAndroid() || isIOS();
 const isAndroid = () => OS.MOBILE.ANDROID.includes(getOsFamily());
 const isIOS = () => OS.MOBILE.IOS.includes(getOsFamily());
 
+const isSupportingClipboard = () => !!navigator.clipboard;
+
 export {
   getBrowserName,
   getOs,
@@ -121,4 +123,5 @@ export {
   isAndroid,
   isIOS,
   isSupportedBrowser,
+  isSupportingClipboard,
 };

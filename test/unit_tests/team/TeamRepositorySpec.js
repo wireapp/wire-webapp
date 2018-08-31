@@ -71,13 +71,13 @@ describe('z.team.TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams?size=100`, [
+    server.respondWith('GET', `${test_factory.settings.connection.restUrl}/teams?size=100`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(teams_data),
     ]);
 
-    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}/members`, [
+    server.respondWith('GET', `${test_factory.settings.connection.restUrl}/teams/${team_metadata.id}/members`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(team_members),
@@ -103,17 +103,13 @@ describe('z.team.TeamRepository', () => {
     });
   });
 
-  xdescribe('getTeamMembers()', () => {
-    it('returns team member entities', done => {
-      team_repository
-        .getTeamMembers(team_metadata.id)
-        .then(entities => {
-          expect(entities.length).toEqual(team_members.members.length);
-          expect(entities[0].user).toEqual(team_members.members[0].user);
-          expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
-          done();
-        })
-        .catch(done.fail);
+  describe('getTeamMembers()', () => {
+    it('returns team member entities', () => {
+      return team_repository.getTeamMembers(team_metadata.id).then(entities => {
+        expect(entities.length).toEqual(team_members.members.length);
+        expect(entities[0].userId).toEqual(team_members.members[0].user);
+        expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
+      });
     });
   });
 });

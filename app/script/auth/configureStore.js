@@ -45,9 +45,20 @@ export const configureStore = (thunkArguments = {}) => {
 
 const createMiddleware = thunkArguments => {
   const middlewares = [thunk.withExtraArgument(thunkArguments)];
-  window.localStorage.removeItem('debug');
+
+  let localStorage;
+  try {
+    localStorage = window.localStorage;
+  } catch (error) {}
+
+  if (localStorage) {
+    localStorage.removeItem('debug');
+  }
   if (!Environment.isEnvironment(Environment.PRODUCTION)) {
-    window.localStorage.setItem('debug', '@wireapp/*');
+    if (localStorage) {
+      localStorage.setItem('debug', '@wireapp/*');
+    }
+
     middlewares.push(
       createLogger({
         collapsed: true,

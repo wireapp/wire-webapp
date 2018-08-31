@@ -94,6 +94,9 @@ z.string.tr.callJoin = 'Katıl';
 z.string.tr.callChooseSharedScreen = 'Paylaşmak için bir ekran seçin';
 z.string.tr.callParticipants = '{{number}} çağrıda';
 
+z.string.tr.videoCallOverlayMute = 'Sustur';
+z.string.tr.videoCallOverlayHangUp = 'Kapat';
+
 z.string.tr.modalAcknowledgeAction = 'Tamam';
 z.string.tr.modalConfirmSecondary = 'İptal';
 z.string.tr.modalOptionSecondary = 'İptal';
@@ -156,8 +159,6 @@ z.string.tr.modalConnectAcceptHeadline = 'Kabul et?';
 z.string.tr.modalConnectAcceptMessage = 'Bu sizi {{user}} ile bağlayacak ve bir konuşma başlatacak.';
 z.string.tr.modalConnectAcceptSecondary = 'Görmezden gel';
 
-z.string.tr.modalConversationAddBotAction = 'Onay';
-
 z.string.tr.modalConversationClearAction = 'Sil';
 z.string.tr.modalConversationClearHeadline = 'İçerik silinsin?';
 z.string.tr.modalConversationClearOption = 'Ayrıca konuşmadan da ayrıl';
@@ -193,12 +194,15 @@ z.string.tr.modalConversationRemoveAction = 'Çıkart';
 z.string.tr.modalConversationRemoveHeadline = 'Çıkar?';
 z.string.tr.modalConversationRemoveMessage = '{{user}} bu konuşmaya mesaj gönderemeyecek ve bu konuşmadan mesaj alamayacak.';
 
+z.string.tr.modalConversationRemoveGuestsAction = 'Çıkart';
 
 z.string.tr.modalConversationTooManyMembersHeadline = 'Dolup taşmış';
 
 z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabilir değil';
 z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
 
+
+z.string.tr.modalImproveWireAction = 'Kabul et';
 
 z.string.tr.modalSessionResetHeadline = 'Oturum sıfırlandı';
 z.string.tr.modalSessionResetMessage1 = 'Eğer sorun çözülmemişse,';
@@ -228,8 +232,6 @@ z.string.tr.conversationYouAccusative = 'sen';
 z.string.tr.conversationConnectionAccepted = 'Bağlanıldı';
 z.string.tr.conversationConnectionBlocked = 'Engellendi';
 z.string.tr.conversationConnectionCancelRequest = 'Bağlantı isteğini iptal et';
-z.string.tr.conversationCreate = ' {{users}} ile bir konuşma başlattı';
-z.string.tr.conversationCreateYou = ' {{users}} ile bir konuşma başlattı';
 z.string.tr.conversationDeviceStartedUsingOne = ' kullanmaya başladı';
 z.string.tr.conversationDeviceStartedUsingMany = ' kullanmaya başladı';
 z.string.tr.conversationDeviceUnverified = ' doğrulanmamışlardan bir tane';
@@ -240,17 +242,10 @@ z.string.tr.conversationDeviceNewDeviceMany = ' yeni cihazlar';
 z.string.tr.conversationDeviceNewPeopleJoinedVerify = ' cihazları doğrula';
 z.string.tr.conversationJustNow = 'Şimdi';
 z.string.tr.conversationLocationLink = 'Haritayı Aç';
-z.string.tr.conversationMemberJoin = ' {{users}} eklendi';
-z.string.tr.conversationMemberJoinYou = ' {{users}} eklendi';
-z.string.tr.conversationMemberLeaveLeft = ' ayrıldı';
-z.string.tr.conversationMemberLeaveLeftYou = ' ayrıldı';
-z.string.tr.conversationMemberLeaveRemoved = ' {{users}}, attı';
-z.string.tr.conversationMemberLeaveRemovedYou = ' {{users}}, attı';
 z.string.tr.conversationMessageDelivered = 'Teslim edildi';
 z.string.tr.conversationRename = ' konuşmayı yeniden adlandırdı';
 z.string.tr.conversationRenameYou = ' konuşmayı yeniden adlandırdı';
 z.string.tr.conversationResume = '{{users}} ile bir görüşme başlat';
-z.string.tr.conversationTeamLeave = ' takımdan çıkartıldı';
 z.string.tr.conversationPing = ' pingledi';
 z.string.tr.conversationPingYou = ' pingledi';
 z.string.tr.conversationToday = 'bugün';
@@ -266,6 +261,7 @@ z.string.tr.conversationMissedMessages = 'Bir süredir bu cihazı kullanmıyorsu
 z.string.tr.conversationAssetDownloading = 'İndiriliyor…';
 z.string.tr.conversationAssetUploadFailed = 'Karşıya Yükleme Başarısız';
 z.string.tr.conversationPlaybackError = 'Oynatılamıyor';
+z.string.tr.conversationContextMenuCopy = 'Kopyala';
 z.string.tr.conversationContextMenuEdit = 'Düzenle';
 z.string.tr.conversationContextMenuDelete = 'Benim için sil';
 z.string.tr.conversationContextMenuDeleteEveryone = 'Herkes için sil';
@@ -302,10 +298,7 @@ z.string.tr.conversationsConnectionRequestOne = 'Bir kişi bekliyor';
 z.string.tr.conversationsEmptyConversation = 'Grup sohbeti';
 z.string.tr.conversationsNoConversations = 'Hiç konuşma yok';
 z.string.tr.conversationsPopoverArchive = 'Arşivle';
-z.string.tr.conversationsPopoverBlock = 'Engelle';
 z.string.tr.conversationsPopoverCancel = 'İsteği iptal et';
-z.string.tr.conversationsPopoverClear = 'Sil';
-z.string.tr.conversationsPopoverLeave = 'Ayrıl';
 z.string.tr.conversationsPopoverNotify = 'Susturmayı Aç';
 z.string.tr.conversationsPopoverSilence = 'Sustur';
 z.string.tr.conversationsPopoverUnarchive = 'Arşivden Çıkar';
@@ -351,13 +344,18 @@ z.string.tr.addParticipantsSearchPlaceholder = 'İsme göre ara';
 z.string.tr.addParticipantsTabsPeople = 'İnsanlar';
 z.string.tr.addParticipantsTabsServices = 'Servisler';
 
+z.string.tr.conversationDetailsActionArchive = 'Arşivle';
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
+z.string.tr.conversationDetailsOptions = 'Ayarlar';
 z.string.tr.conversationDetailsParticipantsServicesMany = 'Servisler';
 z.string.tr.conversationDetailsParticipantsUsersMany = 'İnsanlar';
 z.string.tr.conversationDetailsPeople = 'İnsanlar';
 z.string.tr.conversationDetailsServices = 'Servisler';
+
+z.string.tr.conversationParticipantsTitle = 'İnsanlar';
+z.string.tr.conversationParticipantsSearchPlaceholder = 'İsme göre ara';
 
 z.string.tr.groupParticipantActionCancelRequest = 'İsteği iptal et';
 z.string.tr.groupParticipantActionDevices = 'Cihazlar';
@@ -425,7 +423,6 @@ z.string.tr.preferencesDevicesCurrent = 'Mevcut';
 z.string.tr.preferencesDevicesFingerprint = 'Anahtar Parmak İzi';
 z.string.tr.preferencesDevicesFingerprintDetail = 'Wire her cihaza kendine has bir parmak izi verir. Cihazlarınızı ve konuşmalarınızı doğrulamak için parmak izlerinizi karşılaştırın.';
 z.string.tr.preferencesDevicesId = 'ID: ';
-z.string.tr.preferencesDevicesRemove = 'Çıkart';
 z.string.tr.preferencesDevicesRemoveCancel = 'İptal';
 z.string.tr.preferencesDevicesRemoveDetail = 'Eğer bu cihazı kullanmayı bıraktıysanız, cihazı kaldırın. Ardından cihazdan otomatik olarak çıkış yapılacaktır.';
 z.string.tr.preferencesDevicesSessionConfirmation = 'Oturum sıfırlandı.';
@@ -445,9 +442,6 @@ z.string.tr.preferencesOptionsContacts = 'Kişiler';
 z.string.tr.preferencesOptionsContactsGmail = 'Gmail’den içe aktar';
 z.string.tr.preferencesOptionsContactsMacos = 'Kişilerden içe aktar';
 z.string.tr.preferencesOptionsContactsDetail = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
-z.string.tr.preferencesOptionsData = 'Kullanım ve kilitlenme raporları';
-z.string.tr.preferencesOptionsDataCheckbox = 'Kullanım ve kilitlenme raporları';
-z.string.tr.preferencesOptionsDataDetail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.';
 z.string.tr.preferencesOptionsPopular = 'Yoğun istek üzerine';
 z.string.tr.preferencesOptionsEmojiReplaceCheckbox = 'Yazı halindeki emojileri, gerçek emojiler ile değiştir';
 z.string.tr.preferencesOptionsPreviewsSendCheckbox = 'Gönderdiğin bağlantılar için ön izlemeler oluştur';
@@ -457,6 +451,8 @@ z.string.tr.preferencesOptionsNotificationsNone = 'Yok';
 z.string.tr.preferencesOptionsNotificationsObfuscate = 'Ayrıntıyı gizle';
 z.string.tr.preferencesOptionsNotificationsObfuscateMessage = 'Göndereni göster';
 z.string.tr.preferencesOptionsNotificationsOn = 'Göndereni ve mesajı göster';
+
+z.string.tr.backupCancel = 'İptal';
 
 z.string.tr.searchConnect = 'Bağlan';
 z.string.tr.searchConnections = 'Bağlantılar';
@@ -574,13 +570,5 @@ z.string.tr.initEvents = 'İletiler yükleniyor';
 z.string.tr.initUpdatedFromNotifications = 'Neredeyse bitti - Wire’ın keyfini çıkarın';
 z.string.tr.initProgress = ' — {{number2}}’de/da {{number1}}';
 
-z.string.tr.ephememalUnitsNone = 'Yok';
-z.string.tr.ephememalUnitsSecond = 'saniye';
-z.string.tr.ephememalUnitsSeconds = 'saniye';
-z.string.tr.ephememalUnitsMinute = 'dakika';
-z.string.tr.ephememalUnitsMinutes = 'dakika';
-z.string.tr.ephememalUnitsHour = 'saat';
-z.string.tr.ephememalUnitsHours = 'saat';
-z.string.tr.ephememalUnitsDay = 'gün';
-z.string.tr.ephememalUnitsDays = 'gün';
+z.string.tr.ephemeralUnitsNone = 'Yok';
 

@@ -56,9 +56,18 @@
   &:hover .context-menu,
   .show-timestamp.time {
     background-color: @app-bg;
-    cursor: default;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  &.hover .time,
+  &:hover .time,
+  .show-timestamp.time {
+    cursor: default;
+  }
+
+  .context-menu {
+    cursor: pointer;
   }
 
   &:not(:hover) {
@@ -94,15 +103,33 @@
 .message-header {
   position: relative;
   display: flex;
+  padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
+
+  & > .message-body-actions {
+    top: 6px;
+  }
+
+  + .message-services-warning {
+    margin-left: 72px;
+  }
 }
 
 .message-header-icon {
   .flex-center;
 
   width: @conversation-message-sender-width;
+  max-height: @avatar-diameter-xs;
   color: @graphite-dark;
+
+  &--svg {
+    line-height: 0;
+
+    svg path {
+      fill: @graphite;
+    }
+  }
 }
 
 .message-header-label {
@@ -112,6 +139,11 @@
   align-items: center;
   font-size: 12px;
   font-weight: @font-weight-regular;
+  white-space: pre-wrap;
+
+  a {
+    cursor: pointer;
+  }
 
   .message-header-plain-sender-name {
     font-weight: @font-weight-bold;
@@ -120,6 +152,10 @@
   .message-header-sender-name {
     font-weight: @font-weight-bold;
     text-transform: capitalize;
+  }
+  & > hr {
+    align-self: flex-start;
+    margin-top: 12px;
   }
 }
 
@@ -153,11 +189,19 @@
   font-size: 8px;
 }
 
-.message-header-label-service {
-  margin-left: 4px;
-  color: fade(@graphite-dark, 40%);
-  font-size: 12px;
-  text-transform: uppercase;
+.message-header-icon-service {
+  display: inline-flex;
+  margin-top: -2px;
+  margin-left: 8px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: fade(@graphite-dark, 40%);
+    }
+  }
 }
 
 .message-header-line {
@@ -177,6 +221,10 @@
   margin-bottom: 16px;
   line-height: 40px;
   user-select: none;
+
+  .message-header-icon {
+    max-height: 40px;
+  }
 
   &:not(.message-timestamp-visible) {
     display: none;
@@ -253,6 +301,11 @@
       left: 0;
       max-width: 100%;
     }
+  }
+  .message-ephemeral-timer {
+    position: absolute;
+    top: 2px;
+    left: 32px;
   }
 }
 
@@ -415,17 +468,17 @@
     pointer-events: none;
     user-select: none;
   }
-
-  .message-ephemeral-timer {
-    position: absolute;
-    top: 0;
-    right: 8px;
-  }
 }
 
 .message-body-actions-large {
   position: relative;
   width: 160px;
+}
+
+.message-services-warning {
+  color: @w-red;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
 }
 
 // MEMBER MESSAGE
@@ -435,6 +488,10 @@
   align-items: center;
   margin-top: 32px;
   margin-bottom: 48px;
+
+  .message-services-warning {
+    margin-top: 32px;
+  }
 }
 
 .message-connected-header {
@@ -442,8 +499,9 @@
   line-height: 42px;
 }
 
-.message-connected-username,
-.message-connected-contacts {
+.message-connected-contacts,
+.message-connected-provider-name,
+.message-connected-username {
   color: @graphite;
   font-size: @font-size-xs;
   line-height: @line-height-sm;

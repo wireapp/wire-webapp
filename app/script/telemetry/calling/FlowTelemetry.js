@@ -33,11 +33,14 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @param {CallSetupTimings} timings - Timings of call setup steps
    */
   constructor(id, remote_user_id, call_et, timings) {
+    this.id = id;
     this.remote_user_id = remote_user_id;
     this.call_et = call_et;
-    this.logger = new z.util.Logger(`z.telemetry.calling.FlowTelemetry (${id})`, z.config.LOGGER.OPTIONS);
 
-    this.id = id;
+    const loggerId = this.id.substr(0, 8);
+    const loggerTimestamp = new Date().getMilliseconds();
+    const loggerName = `z.telemetry.calling.FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
+    this.logger = new z.util.Logger(loggerName, z.config.LOGGER.OPTIONS);
     this.is_answer = false;
     this.peer_connection = undefined;
 
@@ -85,18 +88,21 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         signaling_state: this.peer_connection.signalingState,
       };
 
-      if (this.peer_connection.localDescription) {
-        $.extend(report.rtc_peer_connection, {
-          local_SDP: this.peer_connection.localDescription.sdp,
-          local_SDP_type: this.peer_connection.localDescription.type,
-        });
-      }
+      const isSignalingStateClosed = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      if (!isSignalingStateClosed) {
+        if (this.peer_connection.localDescription) {
+          $.extend(report.rtc_peer_connection, {
+            local_SDP: this.peer_connection.localDescription.sdp,
+            local_SDP_type: this.peer_connection.localDescription.type,
+          });
+        }
 
-      if (this.peer_connection.remoteDescription) {
-        $.extend(report.rtc_peer_connection, {
-          remote_SDP: this.peer_connection.remoteDescription.sdp,
-          remote_SDP_type: this.peer_connection.remoteDescription.type,
-        });
+        if (this.peer_connection.remoteDescription) {
+          $.extend(report.rtc_peer_connection, {
+            remote_SDP: this.peer_connection.remoteDescription.sdp,
+            remote_SDP_type: this.peer_connection.remoteDescription.type,
+          });
+        }
       }
     }
 

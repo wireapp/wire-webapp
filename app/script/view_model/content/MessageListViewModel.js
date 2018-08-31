@@ -32,7 +32,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  */
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
-    this._on_message_add = this._on_message_add.bind(this);
+    this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
@@ -42,9 +42,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.onMessageUserClick = this.onMessageUserClick.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
+    this.bindShowMore = this.bindShowMore.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
+    this.integrationRepository = repositories.integration;
+    this.locationRepository = repositories.location;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
@@ -52,10 +55,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.selfUser = this.userRepository.self;
 
     this.conversation = ko.observable(new z.entity.Conversation());
-    this.center_messages = ko.pureComputed(() => {
-      const [firstVisibleMessage] = this.conversation().messages_visible();
-      if (firstVisibleMessage && firstVisibleMessage.is_member()) {
-        return this.conversation().messages_visible().length === 1 && firstVisibleMessage.isConnection();
+    this.verticallyCenterMessage = ko.pureComputed(() => {
+      if (this.conversation().messages_visible().length === 1) {
+        const [messageEntity] = this.conversation().messages_visible();
+        return messageEntity.is_member() && messageEntity.isConnection();
       }
     });
 
@@ -77,9 +80,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     // Store message subscription id
     this.messages_subscription = undefined;
 
-    this.viewport_changed = ko.observable(false);
-    this.viewport_changed.extend({rateLimit: 100});
-
     this.recalculate_timeout = undefined;
 
     // Should we scroll to bottom when new message comes in
@@ -97,8 +97,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.on_scroll = _.throttle((data, event) => {
       if (this.capture_scrolling_event) {
-        this.viewport_changed(!this.viewport_changed());
-
         const element = $(event.currentTarget);
 
         // On some HDPI screen scrollTop returns a floating point number instead of an integer
@@ -122,18 +120,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
     }, 100);
 
-    $(window)
-      .on('resize', () => {
-        this.viewport_changed(!this.viewport_changed());
-      })
-      .on('focus', () => {
-        if (this.mark_as_read_on_focus) {
-          window.setTimeout(() => {
-            this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
-            this.mark_as_read_on_focus = undefined;
-          }, 1000);
-        }
-      });
+    $(window).on('focus', () => {
+      if (this.mark_as_read_on_focus) {
+        window.setTimeout(() => {
+          this.conversation_repository.markAsRead(this.mark_as_read_on_focus);
+          this.mark_as_read_on_focus = undefined;
+        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+      }
+    });
 
     this.showInvitePeople = ko.pureComputed(() => {
       return (
@@ -151,7 +145,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   _mark_conversation_as_read_on_focus(conversation_et) {
     if (document.hasFocus()) {
-      return this.conversation_repository.mark_as_read(conversation_et);
+      return this.conversation_repository.markAsRead(conversation_et);
     }
     this.mark_as_read_on_focus = conversation_et;
   }
@@ -209,8 +203,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       })
       .then(() => {
         const lastMessageEntity = this.conversation().getLastMessage();
-        if (lastMessageEntity && lastMessageEntity.timestamp() === this.conversation().last_event_timestamp()) {
-          this.conversation_reached_bottom = true;
+        if (lastMessageEntity) {
+          const isLastConversationEvent = lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp();
+          const hasReachedBottom = isLastConversationEvent || !lastMessageEntity.timestamp();
+          if (hasReachedBottom) {
+            this.conversation_reached_bottom = true;
+          }
         }
         conversationEntity.is_loaded(true);
         return this._render_conversation(conversationEntity);
@@ -258,14 +256,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
             messages_container.scrollToBottom();
           }
         } else {
-          this.conversation_repository.mark_as_read(conversation_et);
+          this.conversation_repository.markAsRead(conversation_et);
         }
 
         $('.conversation').css({opacity: 1});
 
         // Subscribe for incoming messages
         this.messages_subscription = conversation_et.messages_visible.subscribe(
-          this._on_message_add,
+          this._scrollAddedMessagesIntoView,
           null,
           'arrayChange'
         );
@@ -276,27 +274,31 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Checks how to scroll message list and if conversation should be marked as unread.
-   * @param {Array} messages - Message entities
+   * @param {Array} changedMessages - List of the messages that were added or removed from the list
    * @returns {undefined} No return value
    */
-  _on_message_add(messages) {
+  _scrollAddedMessagesIntoView(changedMessages) {
     const messages_container = $('.messages-wrap');
-    const last_item = messages[messages.length - 1];
-    const last_message = last_item.value;
+    const lastAddedItem = changedMessages
+      .slice()
+      .reverse()
+      .find(changedMessage => changedMessage.status === 'added');
 
     // We are only interested in items that were added
-    if (last_item.status !== 'added') {
+    if (!lastAddedItem) {
       return;
     }
 
-    if (last_message) {
+    const lastMessage = lastAddedItem.value;
+
+    if (lastMessage) {
       // Message was prepended
-      if (last_message.timestamp() < this.conversation().last_event_timestamp()) {
+      if (lastMessage.timestamp() < this.conversation().last_event_timestamp()) {
         return;
       }
 
       // Scroll to bottom if self user send the message
-      if (last_message.from === this.selfUser().id) {
+      if (lastMessage.from === this.selfUser().id) {
         window.requestAnimationFrame(() => messages_container.scrollToBottom());
         return;
       }
@@ -307,7 +309,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
-        this.conversation_repository.mark_as_read(this.conversation());
+        this.conversation_repository.markAsRead(this.conversation());
       }
     }
 
@@ -322,15 +324,19 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _pull_messages() {
-    if (!this.conversation().is_pending() && this.conversation().hasAdditionalMessages()) {
-      const inner_container = $('.messages-wrap').children()[0];
-      const old_list_height = inner_container.scrollHeight;
+    const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
+    const [messagesContainer] = $('.messages-wrap').children();
+
+    if (shouldPullMessages && messagesContainer) {
+      const initialListHeight = messagesContainer.scrollHeight;
 
       this.capture_scrolling_event = false;
       this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
-        const new_list_height = inner_container.scrollHeight;
-        $('.messages-wrap').scrollTop(new_list_height - old_list_height);
-        this.capture_scrolling_event = true;
+        if (messagesContainer) {
+          const newListHeight = messagesContainer.scrollHeight;
+          $('.messages-wrap').scrollTop(newListHeight - initialListHeight);
+          this.capture_scrolling_event = true;
+        }
       });
     }
   }
@@ -392,7 +398,20 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   onMessageUserClick(userEntity) {
-    amplify.publish(z.event.WebApp.PEOPLE.SHOW, userEntity);
+    userEntity = ko.unwrap(userEntity);
+    const conversationEntity = this.conversation_repository.active_conversation();
+    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+
+    if (isSingleModeConversation && !userEntity.is_me) {
+      return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    }
+
+    const params = {entity: userEntity};
+    const panelId = userEntity.isService
+      ? z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
+      : z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+
+    this.mainViewModel.panel.togglePanel(panelId, params);
   }
 
   /**
@@ -414,33 +433,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .catch(() => reset_progress());
   }
 
-  /**
-   * Gets CSS class that will be applied to the message div in order to style.
-   * @param {z.entity.Message} message - Message entity for generating css class
-   * @returns {string} CSS class that is applied to the element
-   */
-  get_css_class(message) {
-    switch (message.super_type) {
-      case z.message.SuperType.CALL:
-        return 'message-system message-call';
-      case z.message.SuperType.CONTENT:
-        return 'message-normal';
-      case z.message.SuperType.MEMBER:
-        return 'message message-system message-member';
-      case z.message.SuperType.PING:
-        return 'message-ping';
-      case z.message.SuperType.SYSTEM:
-        if (message.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME) {
-          return 'message-system message-rename';
-        }
-        break;
-      case z.message.SuperType.UNABLE_TO_DECRYPT:
-        return 'message-system';
-      case z.message.SuperType.VERIFICATION:
-        return 'message-system';
-      default:
-        break;
-    }
+  getSystemMessageIconComponent(message) {
+    const iconComponents = {
+      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+    };
+    return iconComponents[message.system_message_type];
   }
 
   /**
@@ -516,7 +514,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {boolean} Message is last delivered one
    */
   is_last_delivered_message(message_et) {
-    return this.conversation().get_last_delivered_message() === message_et;
+    return this.conversation().getLastDeliveredMessage() === message_et;
   }
 
   click_on_cancel_request(messageEntity) {
@@ -530,38 +528,37 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   clickOnInvitePeople() {
-    this.mainViewModel.panel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   /**
    * Message appeared in viewport.
-   * @param {z.entity.Message} message_et - Message to check
+   * @param {z.entity.Message} messageEntity - Message to check
    * @returns {boolean} Message is in viewport
    */
-  message_in_viewport(message_et) {
-    if (!message_et.is_ephemeral()) {
-      return true;
+  getInViewportCallback(messageEntity) {
+    if (!messageEntity.is_ephemeral()) {
+      const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
+      if (this.conversation().is_one2one() && isCreationMessage) {
+        this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
+      }
+      return null;
     }
 
-    if (document.hasFocus()) {
-      this.conversation_repository.check_ephemeral_timer(message_et);
-    } else {
-      const start_timer_on_focus = this.conversation.id;
-
-      $(window).one('focus', () => {
-        if (start_timer_on_focus === this.conversation.id) {
-          this.conversation_repository.check_ephemeral_timer(message_et);
+    return () => {
+      const startTimer = () => {
+        if (messageEntity.conversation_id === this.conversation().id) {
+          this.conversation_repository.checkMessageTimer(messageEntity);
         }
-      });
-    }
-
-    return true;
+      };
+      return document.hasFocus() ? startTimer() : $(window).one('focus', startTimer);
+    };
   }
 
   on_context_menu_click(message_et, event) {
     const entries = [];
 
-    if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
+    if (message_et.is_downloadable()) {
       entries.push({
         click: () => message_et.download(),
         label: z.l10n.text(z.string.conversationContextMenuDownload),
@@ -586,6 +583,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
 
+    if (message_et.has_asset_text()) {
+      entries.push({
+        click: () => message_et.copy(),
+        label: z.l10n.text(z.string.conversationContextMenuCopy),
+      });
+    }
+
     if (message_et.is_deletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), message_et),
@@ -603,5 +607,21 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     z.ui.Context.from(event, entries, 'message-options-menu');
+  }
+
+  bindShowMore(elements, message) {
+    const label = elements.find(element => element.className === 'message-header-label');
+    if (!label) {
+      return;
+    }
+    const link = label.querySelector('.message-header-show-more');
+    if (link) {
+      link.addEventListener('click', () =>
+        this.mainViewModel.panel.togglePanel(
+          z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
+          message.highlightedUsers()
+        )
+      );
+    }
   }
 };

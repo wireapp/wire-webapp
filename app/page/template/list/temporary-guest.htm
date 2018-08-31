@@ -1,6 +1,10 @@
 <div id="temporary-guest" class="temporary-guest left-list left-list-is-visible" data-bind="with: $root.temporaryGuest">
   <!-- ko foreach: callConversations -->
-    <conversation-list-calling-cell class="dark-bg" params="conversation: $data, calling_repository: $parent.callingRepository, is_selected: $parent.isSelectedConversation, temporaryUserStyle: true"></conversation-list-calling-cell>
+    <conversation-list-calling-cell
+      class="temporary-user-style"
+      data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
+      params="conversation: $data, callingRepository: $parent.callingRepository, mediaRepository: $parent.mediaRepository, multitasking: $parent.multitasking, temporaryUserStyle: true, videoGridRepository: $parent.videoGridRepository"
+      data-uie-name="item-call"></conversation-list-calling-cell>
   <!-- /ko -->
   <div class="temporary-guest__content">
     <wire-logo></wire-logo>

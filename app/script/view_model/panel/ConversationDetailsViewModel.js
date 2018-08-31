@@ -23,93 +23,86 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {
+z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
+  static get CONFIG() {
+    return {
+      MAX_USERS_VISIBLE: 7,
+      REDUCED_USERS_COUNT: 5,
+    };
+  }
+
+  constructor(params) {
+    super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
-    this.elementId = 'conversation-details';
-    this.mainViewModel = mainViewModel;
-    this.panelViewModel = panelViewModel;
+    this.conversationRepository = this.repositories.conversation;
+    this.teamRepository = this.repositories.team;
+    this.integrationRepository = this.repositories.integration;
 
-    this.conversationRepository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.actionsViewModel = this.mainViewModel.actions;
-    this.conversationEntity = this.conversationRepository.active_conversation;
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
-    this.isTeamOnly = this.panelViewModel.isTeamOnly;
-    this.showIntegrations = this.panelViewModel.showIntegrations;
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
-
-    this.isVisible = ko.pureComputed(() => {
-      return this.conversationEntity() && this.panelViewModel.conversationDetailsVisible();
-    });
-
-    this.availabilityLabel = ko.pureComputed(() => {
-      if (this.isVisible() && this.isTeam() && this.conversationEntity().is_one2one()) {
-        const userAvailability = this.firstParticipant() && this.firstParticipant().availability();
-        const availabilitySetToNone = userAvailability === z.user.AvailabilityType.NONE;
-
-        if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(userAvailability);
-        }
-      }
-    });
+    this.showAllUsersCount = ko.observable(0);
+    this.selectedService = ko.observable();
 
     ko.computed(() => {
-      if (this.conversationEntity()) {
+      if (this.activeConversation()) {
         this.serviceParticipants.removeAll();
         this.userParticipants.removeAll();
 
-        this.conversationEntity()
+        this.activeConversation()
           .participating_user_ets()
           .map(userEntity => {
-            if (userEntity.isBot) {
+            if (userEntity.isService) {
               return this.serviceParticipants.push(userEntity);
             }
             this.userParticipants.push(userEntity);
           });
+
+        const userCount = this.userParticipants().length;
+        const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
+        if (exceedsMaxUserCount) {
+          this.userParticipants.splice(ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT);
+        }
+        this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
       }
     });
 
     this.firstParticipant = ko.pureComputed(() => {
-      return this.conversationEntity() && this.conversationEntity().firstUserEntity();
+      return this.activeConversation() && this.activeConversation().firstUserEntity();
     });
-    this.isSingleUserMode = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        return this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
-      }
-    });
-    this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
 
-    this.isGuest = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isGuest();
+    this.isSingleUserMode = ko.pureComputed(() => {
+      return this.activeConversation()
+        ? this.activeConversation().is_one2one() || this.activeConversation().is_request()
+        : false;
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().isActiveParticipant() : false;
+      return this.activeConversation() && this.activeConversation().isActiveParticipant();
     });
 
     this.isNameEditable = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
-      }
+      return this.activeConversation()
+        ? this.activeConversation().is_group() && this.activeConversation().isActiveParticipant()
+        : false;
     });
 
     this.isVerified = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        return this.conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED;
-      }
+      return this.activeConversation()
+        ? this.activeConversation().verification_state() === z.conversation.ConversationVerificationState.VERIFIED
+        : false;
     });
 
     this.isEditingName = ko.observable(false);
+
     this.isEditingName.subscribe(isEditing => {
       if (isEditing) {
         return window.setTimeout(() => $('.conversation-details__name--input').focus(), 0);
@@ -118,21 +111,51 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
-    this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
+    this.isServiceMode = ko.pureComputed(() => {
+      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
+    });
+
+    this.showActionAddParticipants = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().is_group();
+    });
+
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
         return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
       }
     });
-    this.showActionCreateGroup = ko.pureComputed(() => this.conversationEntity().is_one2one());
-    this.showActionCancelRequest = ko.pureComputed(() => this.conversationEntity().is_request());
+
+    this.showActionCreateGroup = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().is_one2one() && !this.isServiceMode();
+    });
+
+    this.showActionCancelRequest = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().is_request();
+    });
+
     this.showActionClear = ko.pureComputed(() => {
-      return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
+      return this.activeConversation()
+        ? !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
+        : false;
     });
-    this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
+
     this.showActionLeave = ko.pureComputed(() => {
-      return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+      return this.activeConversation()
+        ? this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation()
+        : false;
     });
+
+    this.showActionGuestOptions = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().inTeam();
+    });
+
+    this.showActionTimedMessages = ko.pureComputed(() => {
+      return this.activeConversation()
+        ? this.activeConversation().is_group() && !this.activeConversation().isGuest()
+        : false;
+    });
+
+    this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
 
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
@@ -140,32 +163,56 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         ? z.string.conversationDetailsParticipantsUsersMany
         : z.string.conversationDetailsParticipantsUsersOne;
     });
+
     this.participantsServiceText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.serviceParticipants().length > 1;
       return hasMultipleParticipants
         ? z.string.conversationDetailsParticipantsServicesMany
         : z.string.conversationDetailsParticipantsServicesOne;
     });
+
     this.guestOptionsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
+    });
+
+    this.timedMessagesText = ko.pureComputed(() => {
+      const conversation = this.activeConversation();
+      const hasMessageTimeSet = conversation && conversation.messageTimer() && conversation.hasGlobalMessageTimer();
+      return hasMessageTimeSet
+        ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
+        : z.l10n.text(z.string.ephemeralUnitsNone);
+    });
+
+    const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.addPeopleTooltip = ko.pureComputed(() => {
+      return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
     });
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
-    const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
-    this.addPeopleTooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
+    this.isServiceMode.subscribe(isService => {
+      if (isService) {
+        const entity = this.firstParticipant();
+        this.integrationRepository.getServiceFromUser(entity).then(serviceEntity => {
+          this.selectedService(serviceEntity);
+          this.integrationRepository.addProviderNameToParticipant(serviceEntity);
+        });
+      }
     });
   }
 
-  clickOnAddParticipants() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS, false, true);
+  getElementId() {
+    return 'conversation-details';
   }
 
-  clickOnClose() {
-    this.panelViewModel.closePanel();
+  clickOnAddParticipants() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
+  }
+
+  clickOnShowAll() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
   }
 
   clickOnCreateGroup() {
@@ -173,41 +220,49 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickOnDevices() {
-    this.panelViewModel.showParticipantDevices(this.firstParticipant());
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
   }
 
   clickOnGuestOptions() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+  }
+
+  clickOnTimedMessages() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
   clickOnShowUser(userEntity) {
-    this.panelViewModel.showGroupParticipantUser(userEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
   clickOnShowService(serviceEntity) {
-    this.panelViewModel.showGroupParticipantService(serviceEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
   }
 
   clickToArchive() {
-    this.actionsViewModel.archiveConversation(this.conversationEntity());
+    this.actionsViewModel.archiveConversation(this.activeConversation());
   }
 
   clickToBlock() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
+    if (this.activeConversation()) {
+      const userEntity = this.activeConversation().firstUserEntity();
+      const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
-    this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
+      this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
+    }
   }
 
   clickToCancelRequest() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
+    if (this.activeConversation()) {
+      const userEntity = this.activeConversation().firstUserEntity();
+      const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
-    this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
+      this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
+    }
   }
 
   clickToClear() {
-    this.actionsViewModel.clearConversation(this.conversationEntity());
+    this.actionsViewModel.clearConversation(this.activeConversation());
   }
 
   clickToEditGroupName() {
@@ -217,25 +272,27 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToLeave() {
-    this.actionsViewModel.leaveConversation(this.conversationEntity());
+    this.actionsViewModel.leaveConversation(this.activeConversation());
   }
 
   clickToToggleMute() {
-    this.actionsViewModel.toggleMuteConversation(this.conversationEntity());
+    this.actionsViewModel.toggleMuteConversation(this.activeConversation());
   }
 
   renameConversation(data, event) {
-    const currentConversationName = this.conversationEntity()
-      .display_name()
-      .trim();
+    if (this.activeConversation()) {
+      const currentConversationName = this.activeConversation()
+        .display_name()
+        .trim();
 
-    const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
+      const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
 
-    this.isEditingName(false);
-    const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
-    if (hasNameChanged) {
-      event.target.value = currentConversationName;
-      this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
+      this.isEditingName(false);
+      const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
+      if (hasNameChanged) {
+        event.target.value = currentConversationName;
+        this.conversationRepository.renameConversation(this.activeConversation(), newConversationName);
+      }
     }
   }
 };

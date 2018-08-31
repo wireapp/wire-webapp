@@ -1,10 +1,13 @@
 <!-- Utilities -->
 <script src="/script/util/ArrayUtil.js"></script>
+<script src="/script/util/ClipboardUtil.js"></script>
 <script src="/script/util/Crypto.js"></script>
 <script src="/script/util/DebugUtil.js"></script>
 <script src="/script/util/EmojiUtil.js"></script>
 <script src="/script/util/Environment.js"></script>
 <script src="/script/util/util.js"></script>
+<script src="/script/util/SanitizationUtil.js"></script>
+<script src="/script/util/TimeUtil.js"></script>
 <script src="/script/util/protobuf.js"></script>
 <script src="/script/util/KeyboardUtil.js"></script>
 <script src="/script/util/LocalizerUtil.js"></script>
@@ -16,7 +19,6 @@
 <script src="/script/util/scroll-helpers.js"></script>
 <script src="/script/util/StorageUtil.js"></script>
 <script src="/script/util/StringUtil.js"></script>
-<script src="/script/util/TimeUtil.js"></script>
 <script src="/script/util/CountryCodes.js"></script>
 <script src="/script/util/worker.js"></script>
 <script src="/script/util/URLUtil.js"></script>
@@ -113,7 +115,6 @@
 <script src="/script/calling/enum/SDPNegotiationMode.js"></script>
 <script src="/script/calling/enum/SDPSource.js"></script>
 <script src="/script/calling/enum/TerminationReason.js"></script>
-<script src="/script/calling/enum/VideoOrientation.js"></script>
 <!-- Calling: Rtc -->
 <script src="/script/calling/rtc/DataChannelState.js"></script>
 <script src="/script/calling/rtc/ICEConnectionState.js"></script>
@@ -134,6 +135,7 @@
 <script src="/script/calling/CallMessageBuilder.js"></script>
 <script src="/script/calling/CallMessageMapper.js"></script>
 <script src="/script/calling/SDPMapper.js"></script>
+<script src="/script/calling/VideoGridRepository.js"></script>
 <!-- Connect -->
 <script src="/script/connect/ConnectError.js"></script>
 <script src="/script/connect/ConnectGoogleService.js"></script>
@@ -149,16 +151,17 @@
 <script src="/script/client/ClientService.js"></script>
 <script src="/script/client/ClientType.js"></script>
 <!-- Conversation -->
+<script src="/script/conversation/AbstractConversationEventHandler.js"></script>
 <script src="/script/conversation/AccessMode.js"></script>
 <script src="/script/conversation/AccessRole.js"></script>
 <script src="/script/conversation/AccessState.js"></script>
 <script src="/script/conversation/ClientMismatchHandler.js"></script>
 <script src="/script/conversation/ConversationCellState.js"></script>
+<script src="/script/conversation/ConversationEphemeralHandler.js"></script>
 <script src="/script/conversation/ConversationError.js"></script>
 <script src="/script/conversation/ConversationMapper.js"></script>
 <script src="/script/conversation/ConversationRepository.js"></script>
 <script src="/script/conversation/ConversationService.js"></script>
-<script src="/script/conversation/ConversationServiceNoCompound.js"></script>
 <script src="/script/conversation/ConversationStateHandler.js"></script>
 <script src="/script/conversation/ConversationStatus.js"></script>
 <script src="/script/conversation/ConversationStatusIcon.js"></script>
@@ -181,10 +184,13 @@
 <script src="/script/event/Client.js"></script>
 <script src="/script/event/EventError.js"></script>
 <script src="/script/event/EventRepository.js"></script>
+<script src="/script/event/EventService.js"></script>
+<script src="/script/event/EventServiceNoCompound.js"></script>
 <script src="/script/event/EventType.js"></script>
 <script src="/script/event/EventTypeHandling.js"></script>
 <script src="/script/event/NotificationHandlingState.js"></script>
 <script src="/script/event/NotificationService.js"></script>
+<script src="/script/event/preprocessor/ServiceMiddleware.js"></script>
 <script src="/script/event/WebApp.js"></script>
 <script src="/script/event/WebSocketService.js"></script>
 <!-- Extensions -->
@@ -210,7 +216,8 @@
 <script src="/script/links/LinkPreviewRepository.js"></script>
 <script src="/script/links/LinkPreviewBlackList.js"></script>
 <!-- GeoLocation -->
-<script src="/script/location/GeoLocation.js"></script>
+<script src="/script/location/LocationService.js"></script>
+<script src="/script/location/LocationRepository.js"></script>
 <!-- Media -->
 <script src="/script/media/MediaConstraintsHandler.js"></script>
 <script src="/script/media/MediaDevicesHandler.js"></script>
@@ -230,10 +237,15 @@
 <!-- Motion -->
 <script src="/script/motion/MotionDuration.js"></script>
 <!-- Notification -->
-<script src="/script/notification/PermissionStatusState.js"></script>
+<script src="/script/notification/PermissionState.js"></script>
 <script src="/script/notification/NotificationError.js"></script>
 <script src="/script/notification/NotificationPreference.js"></script>
 <script src="/script/notification/NotificationRepository.js"></script>
+<!-- Permission -->
+<script src="/script/permission/PermissionError.js"></script>
+<script src="/script/permission/PermissionRepository.js"></script>
+<script src="/script/permission/PermissionStatusState.js"></script>
+<script src="/script/permission/PermissionType.js"></script>
 <!-- Properties -->
 <script src="/script/properties/PropertiesEntity.js"></script>
 <script src="/script/properties/PropertiesRepository.js"></script>
@@ -269,6 +281,8 @@
 <script src="/script/user/AvailabilityMapper.js"></script>
 <script src="/script/user/AvailabilityType.js"></script>
 <script src="/script/user/ConnectionStatus.js"></script>
+<script src="/script/user/ConsentType.js"></script>
+<script src="/script/user/ConsentValue.js"></script>
 <script src="/script/user/UserError.js"></script>
 <script src="/script/user/UserService.js"></script>
 <script src="/script/user/UserMapper.js"></script>
@@ -313,11 +327,14 @@
 <script src="/script/view_model/content/TitleBarViewModel.js"></script>
 <!-- View Models: Panel -->
 <script src="/script/view_model/PanelViewModel.js"></script>
+<script src="/script/view_model/panel/BasePanelViewModel.js"></script>
 <script src="/script/view_model/panel/AddParticipantsViewModel.js"></script>
 <script src="/script/view_model/panel/ConversationDetailsViewModel.js"></script>
+<script src="/script/view_model/panel/ConversationParticipantsViewModel.js"></script>
 <script src="/script/view_model/panel/GroupParticipantUserViewModel.js"></script>
 <script src="/script/view_model/panel/GroupParticipantServiceViewModel.js"></script>
-<script src="/script/view_model/panel/GuestOptionsViewModel.js"></script>
+<script src="/script/view_model/panel/GuestsAndServicesViewModel.js"></script>
+<script src="/script/view_model/panel/TimedMessagesViewModel.js"></script>
 <script src="/script/view_model/panel/ParticipantDevicesViewModel.js"></script>
 <!-- View Models: List -->
 <script src="/script/view_model/ListViewModel.js"></script>
@@ -330,14 +347,17 @@
 <!-- Knockout components -->
 <script src="/script/components/accentColorPicker.js"></script>
 <script src="/script/components/availabilityState.js"></script>
+<script src="/script/components/copyToClipboard.js"></script>
 <script src="/script/components/deviceCard.js"></script>
 <script src="/script/components/deviceRemove.js"></script>
 <script src="/script/components/ephemeralTimer.js"></script>
 <script src="/script/components/fullSearch.js"></script>
 <script src="/script/components/groupList.js"></script>
+<script src="/script/components/groupVideoGrid.js"></script>
 <script src="/script/components/image.js"></script>
 <script src="/script/components/inputElement.js"></script>
 <script src="/script/components/inputLevel.js"></script>
+<script src="/script/components/messageTimerButton.js"></script>
 <script src="/script/components/serviceList.js"></script>
 <script src="/script/components/topPeople.js"></script>
 <script src="/script/components/participantAvatar.js"></script>
@@ -363,6 +383,8 @@
 <script src="/script/components/list/conversationListCallingCell.js"></script>
 <script src="/script/components/list/conversationListCell.js"></script>
 <script src="/script/components/list/groupAvatar.js"></script>
+<script src="/script/components/panel/userDetails.js"></script>
+<script src="/script/components/panel/serviceDetails.js"></script>
 <!-- Entities -->
 <script src="/script/message/CallMessageType.js"></script>
 <script src="/script/message/MessageCategory.js"></script>
@@ -385,6 +407,7 @@
 <script src="/script/entity/message/MemberMessage.js"></script>
 <script src="/script/entity/message/MissedMessage.js"></script>
 <script src="/script/entity/message/ContentMessage.js"></script>
+<script src="/script/entity/message/MessageTimerUpdateMessage.js"></script>
 <script src="/script/entity/message/RenameMessage.js"></script>
 <script src="/script/entity/message/PingMessage.js"></script>
 <script src="/script/entity/message/CallMessage.js"></script>
@@ -396,8 +419,11 @@
 <!-- View -->
 <script src="/script/ui/AvailabilityContextMenu.js"></script>
 <script src="/script/ui/ContextMenu.js"></script>
+<script src="/script/ui/OverlayedObserver.js"></script>
 <script src="/script/ui/ShortcutType.js"></script>
 <script src="/script/ui/Shortcut.js"></script>
+<script src="/script/ui/ViewportObserver.js"></script>
 <script src="/script/ui/WindowHandler.js"></script>
 <!-- Main -->
+<script src="/script/main/SingleInstanceHandler.js"></script>
 <script src="/script/main/app.js"></script>

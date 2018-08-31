@@ -53,7 +53,7 @@ module.exports = grunt => {
   }
 
   grunt.registerTask('scripts', () => {
-    const dist_path = grunt.config('dir.app.template_dist');
+    const dist_path = grunt.config('dir.app.templateDist');
 
     const directories = {
       app: [],

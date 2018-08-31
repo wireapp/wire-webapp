@@ -228,7 +228,7 @@ ko.bindingHandlers.file_select = {
         // wait before clearing to fix autotests
         window.setTimeout(() => {
           $(event.target).val(null);
-        }, 1000);
+        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
       }
     };
 
@@ -386,13 +386,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
-  window.setInterval(() => {
-    timestamps.map(timestamp_func => timestamp_func());
-  }, 60 * 1000);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / 1000);
+    const date = moment.unix(timestamp / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     const now = moment().local();
     const today = now.format('YYMMDD');
@@ -441,7 +439,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
  */
 ko.bindingHandlers.hide_controls = {
   init(element, valueAccessor) {
-    const timeout = valueAccessor();
+    const {timeout = valueAccessor(), skipClass} = valueAccessor();
     let hide_timeout = undefined;
 
     element.onmouseenter = function() {
@@ -454,12 +452,20 @@ ko.bindingHandlers.hide_controls = {
       }
     };
 
-    element.onmousemove = function() {
+    element.onmousemove = function({target}) {
       if (hide_timeout) {
         window.clearTimeout(hide_timeout);
       }
 
       element.classList.remove('hide-controls');
+
+      let node = target;
+      while (node && node !== element) {
+        if (node.classList.contains(skipClass)) {
+          return;
+        }
+        node = node.parentNode;
+      }
 
       hide_timeout = window.setTimeout(() => {
         element.classList.add('hide-controls');
@@ -489,55 +495,32 @@ ko.bindingHandlers.removed_from_view = {
 };
 
 /**
- * Element is in viewport. return true within the callback to dispose the subscription
+ * Adds a callback called whenever an element is in viewport and not overlayed by another element.
  */
-ko.bindingHandlers.in_viewport = (function() {
-  const listeners = [];
-
-  // listeners can be deleted during iteration
-  const notifyListeners = _.throttle(event => {
-    for (let index = listeners.length; index--; ) {
-      listeners[index](event);
+ko.bindingHandlers.in_viewport = {
+  init(element, valueAccessor) {
+    const onElementVisible = valueAccessor();
+    if (!onElementVisible) {
+      return;
     }
-  }, 300);
+    z.ui.ViewportObserver.addElement(element, () => {
+      return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
+    });
 
-  window.addEventListener('scroll', notifyListeners, true);
-  notifyListeners();
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      z.ui.OverlayedObserver.removeElement(element);
+      z.ui.ViewportObserver.removeElement(element);
+    });
+  },
+};
 
-  return {
-    init(element, valueAccessor, allBindingsAccessor) {
-      function _inView(domElement) {
-        const box = domElement.getBoundingClientRect();
-        const isInRightPanel = document.querySelector('#right-column').contains(domElement);
-        return (
-          box.right >= 0 &&
-          box.bottom >= 0 &&
-          (isInRightPanel || box.left <= document.documentElement.clientWidth) &&
-          box.top <= document.documentElement.clientHeight
-        );
-      }
-
-      function _dispose() {
-        z.util.ArrayUtil.removeElement(listeners, _checkElement);
-      }
-
-      function _checkElement(event) {
-        const isChild = event ? event.target.contains(element) : true;
-
-        if (isChild && _inView(element)) {
-          const callback = valueAccessor();
-          const dispose = callback && callback();
-
-          if (dispose) {
-            _dispose();
-          }
-        }
-      }
-
-      listeners.push(_checkElement);
-      window.setTimeout(_checkElement, allBindingsAccessor.get('delay') || 0);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, _dispose);
-    },
-  };
-})();
+ko.bindingHandlers.tooltip = {
+  update(element, valueAccessor) {
+    const {text = valueAccessor(), position, disabled} = valueAccessor();
+    if (!disabled) {
+      const {id = text, substitute} = text;
+      element.classList.add('with-tooltip', `with-tooltip--${position === 'bottom' ? 'bottom' : 'top'}`);
+      element.setAttribute('data-tooltip', z.l10n.text(id, substitute));
+    }
+  },
+};

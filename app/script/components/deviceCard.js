@@ -25,6 +25,7 @@ window.z.components = z.components || {};
 z.components.DeviceCard = class DeviceCard {
   constructor(params, componentInfo) {
     this.device = ko.unwrap(params.device) || {};
+    this.locationRepository = params.locationRepository;
 
     const {class: deviceClass, id, label, location = {}, model} = this.device;
     this.class = deviceClass || '?';
@@ -42,7 +43,9 @@ z.components.DeviceCard = class DeviceCard {
     this.activationLocation = ko.observableArray([]);
 
     this._updateActivationLocation('?');
-    this._updateLocation(location);
+    if (this.detailed) {
+      this._updateLocation(location);
+    }
 
     if (this.detailed || !this.click) {
       $(componentInfo.element).addClass('device-card-no-hover');
@@ -66,7 +69,7 @@ z.components.DeviceCard = class DeviceCard {
 
   _updateLocation({lat: latitude, lon: longitude}) {
     if (latitude && longitude) {
-      z.location.getLocation(latitude, longitude).then(mappedLocation => {
+      this.locationRepository.getLocation(latitude, longitude).then(mappedLocation => {
         if (mappedLocation) {
           const {countryCode, place} = mappedLocation;
           this._updateActivationLocation(`${place}, ${countryCode}`);

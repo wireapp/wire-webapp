@@ -201,9 +201,10 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openConversations() {
-    if (this.isActivatedAccount()) {
-      this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
-    }
+    const newState = this.isActivatedAccount()
+      ? ListViewModel.STATE.CONVERSATIONS
+      : ListViewModel.STATE.TEMPORARY_GUEST;
+    this.switchList(newState, false);
   }
 
   _hideList() {
@@ -395,7 +396,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToUnarchive(conversationEntity) {
-    this.conversationRepository.unarchive_conversation(conversationEntity, 'manual un-archive').then(() => {
+    this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationRepository.conversations_archived().length) {
         this.switchList(ListViewModel.STATE.CONVERSATIONS);
       }

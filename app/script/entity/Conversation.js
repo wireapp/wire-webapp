@@ -62,6 +62,7 @@ z.entity.Conversation = class Conversation {
     this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
@@ -78,6 +79,11 @@ z.entity.Conversation = class Conversation {
     });
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
+
+    this.hasGuest = ko.pureComputed(() => {
+      return this.is_group() && this.participating_user_ets().some(userEntity => userEntity.isGuest());
+    });
+    this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
@@ -104,10 +110,14 @@ z.entity.Conversation = class Conversation {
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_muted = this.muted_state;
     this.is_verified = ko.pureComputed(() => {
-      if (this.self && (this.participating_user_ets().length || !this.participating_user_ids().length)) {
-        const all_users = [this.self].concat(this.participating_user_ets());
-        return all_users.every(user_et => user_et.is_verified());
+      const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
+      const isInitialized = this.self && hasMappedUsers;
+      if (!isInitialized) {
+        return undefined;
       }
+
+      const allUserEntities = [this.self].concat(this.participating_user_ets());
+      return allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -123,7 +133,11 @@ z.entity.Conversation = class Conversation {
     });
 
     // Messages
-    this.ephemeral_timer = ko.observable(false);
+    this.localMessageTimer = ko.observable(null);
+    this.globalMessageTimer = ko.observable(null);
+
+    this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
+    this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
@@ -140,13 +154,10 @@ z.entity.Conversation = class Conversation {
 
     // Calling
     this.call = ko.observable(undefined);
-    this.has_local_call = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
-    this.has_active_call = ko.pureComputed(() => {
-      return this.has_local_call() ? !z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.call().state()) : false;
-    });
-    this.has_joinable_call = ko.pureComputed(() => {
-      return this.has_local_call() ? z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.call().state()) : false;
-    });
+    this.hasLocalCall = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
+
+    this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
+    this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
     this.unread_events = ko.pureComputed(() => {
       const unread_event = [];
@@ -205,9 +216,9 @@ z.entity.Conversation = class Conversation {
 
         const hasUserEntities = !!this.participating_user_ets().length;
         if (hasUserEntities) {
-          const isJustBots = this.participating_user_ets().every(userEntity => userEntity.isBot);
+          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
           const joinedNames = this.participating_user_ets()
-            .filter(userEntity => isJustBots || !userEntity.isBot)
+            .filter(userEntity => isJustServices || !userEntity.isService)
             .map(userEntity => userEntity.first_name())
             .join(', ');
 
@@ -224,15 +235,18 @@ z.entity.Conversation = class Conversation {
       return '…';
     });
 
-    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+    this.shouldPersistStateChanges = false;
+    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+
+    this._initSubscriptions();
   }
 
-  subscribe_to_state_updates() {
+  _initSubscriptions() {
     [
       this.archived_state,
       this.archived_timestamp,
       this.cleared_timestamp,
-      this.ephemeral_timer,
+      this.messageTimer,
       this.isGuest,
       this.last_event_timestamp,
       this.last_read_timestamp,
@@ -244,7 +258,17 @@ z.entity.Conversation = class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => property.subscribe(this.persist_state));
+    ].forEach(property => property.subscribe(this.persistState.bind(this)));
+  }
+
+  persistState() {
+    if (this.shouldPersistStateChanges) {
+      this.publishPersistState();
+    }
+  }
+
+  setStateChangePersistence(persistChanges) {
+    this.shouldPersistStateChanges = persistChanges;
   }
 
   /**
@@ -264,9 +288,10 @@ z.entity.Conversation = class Conversation {
    * @note This will only increment timestamps
    * @param {string|number} timestamp - Timestamp to be set
    * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
+   * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  set_timestamp(timestamp, type) {
+  set_timestamp(timestamp, type, forceUpdate = false) {
     let entity_timestamp;
     if (_.isString(timestamp)) {
       timestamp = window.parseInt(timestamp, 10);
@@ -295,11 +320,12 @@ z.entity.Conversation = class Conversation {
         break;
     }
 
-    const updated_timestamp = this._increment_time_only(entity_timestamp(), timestamp);
-    if (updated_timestamp) {
-      entity_timestamp(updated_timestamp);
+    const updatedTimestamp = forceUpdate ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+
+    if (updatedTimestamp !== false) {
+      entity_timestamp(updatedTimestamp);
     }
-    return updated_timestamp;
+    return updatedTimestamp;
   }
 
   /**
@@ -317,15 +343,26 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Adds a single message to the conversation.
-   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
-   * @returns {undefined} No return value
+   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
+   * @param {boolean} replaceDuplicate - If a duplicate (or a message that should be replaced) already exists, replace it with the new entity.
+   * @returns {undefined} No return value.
    */
-  add_message(message_et) {
-    message_et = this._checkForDuplicate(message_et);
-    if (message_et) {
-      this.update_timestamps(message_et);
-      this.messages_unordered.push(message_et);
-      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
+  add_message(messageEntity, replaceDuplicate = false) {
+    if (messageEntity) {
+      const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
+      const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
+      const entityToReplace = messageWithLinkPreview() || editedMessage();
+      this.update_timestamps(messageEntity);
+      if (entityToReplace) {
+        if (replaceDuplicate) {
+          const duplicateIndex = this.messages_unordered.indexOf(entityToReplace);
+          this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
+        }
+        // The duplicated message has been treated (either replaced or ignored). Our job here is done.
+        return;
+      }
+      this.messages_unordered.push(messageEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
     }
   }
 
@@ -366,29 +403,24 @@ z.entity.Conversation = class Conversation {
     return new Date(timestamp).toISOString();
   }
 
-  getNumberOfBots() {
-    return this.participating_user_ets().filter(userEntity => userEntity.isBot).length;
+  getNumberOfServices() {
+    return this.participating_user_ets().filter(userEntity => userEntity.isService).length;
   }
 
-  getNumberOfParticipants(countSelf = true, countBots = true) {
+  getNumberOfParticipants(countSelf = true, countServices = true) {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
+    const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    if (!countBots) {
-      const numberOfParticipants = this.participating_user_ets().filter(userEntity => !userEntity.isBot).length;
-      return numberOfParticipants + adjustCountForSelf;
-    }
-
-    return this.participating_user_ids().length + adjustCountForSelf;
+    return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
   }
 
   getNumberOfClients() {
     const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
     if (participantsMapped) {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
-        if (userEntity.devices().length) {
-          return accumulator + userEntity.devices().length;
-        }
-        return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+        return userEntity.devices().length
+          ? accumulator + userEntity.devices().length
+          : accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.self.devices().length);
     }
 
@@ -427,11 +459,15 @@ z.entity.Conversation = class Conversation {
     this.messages_unordered.removeAll();
   }
 
-  should_unarchive() {
+  shouldUnarchive() {
     if (this.archived_state()) {
-      const has_new_event = this.last_event_timestamp() > this.archived_timestamp();
+      const hasNewerMessage = this.last_event_timestamp() > this.archived_timestamp();
 
-      return has_new_event && !this.is_muted();
+      const lastMessageEntity = this.getLastMessage();
+      const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
+
+      const hasUpdate = hasNewerMessage || hasNewerCall;
+      return hasUpdate && !this.is_muted();
     }
     return false;
   }
@@ -440,24 +476,29 @@ z.entity.Conversation = class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {z.entity.Message} messageEt - Message entity to be added to the conversation
+   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation
    * @returns {z.entity.Message|undefined} Message if it is not a duplicate
    */
-  _checkForDuplicate(messageEt) {
-    if (messageEt) {
-      for (const existingMessageEt of this.messages_unordered()) {
-        const duplicateMessageId = messageEt.id && existingMessageEt.id === messageEt.id;
-        const fromSameSender = existingMessageEt.from === messageEt.from;
-
-        if (duplicateMessageId && fromSameSender) {
-          const logData = {additionalMessage: messageEt, existingMessage: existingMessageEt};
-          this.logger.warn(`Filtered message '${messageEt.id}' as duplicate in view`, logData);
-          return undefined;
-        }
+  _checkForDuplicate(messageEntity) {
+    if (messageEntity) {
+      const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
+      if (existingMessageEntity) {
+        const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+        return undefined;
       }
+      return messageEntity;
     }
+  }
 
-    return messageEt;
+  _findDuplicate(messageId, from) {
+    if (messageId) {
+      return this.messages_unordered().find(messageEntity => {
+        const sameId = messageEntity.id === messageId;
+        const sameSender = messageEntity.from === from;
+        return sameId && sameSender;
+      });
+    }
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
@@ -549,14 +590,14 @@ z.entity.Conversation = class Conversation {
    * Get the last delivered message.
    * @returns {z.entity.Message} Last delivered message
    */
-  get_last_delivered_message() {
-    const messages = this.messages();
-    for (let index = messages.length - 1; index >= 0; index--) {
-      const message_et = messages[index];
-      if (message_et.status() === z.message.StatusType.DELIVERED) {
-        return message_et;
-      }
-    }
+  getLastDeliveredMessage() {
+    return this.messages()
+      .slice()
+      .reverse()
+      .find(messageEntity => {
+        const isDelivered = messageEntity.status() === z.message.StatusType.DELIVERED;
+        return isDelivered && messageEntity.user().is_me;
+      });
   }
 
   /**
@@ -605,25 +646,34 @@ z.entity.Conversation = class Conversation {
   }
 
   /**
-   * Check whether the conversation is held with a service bot like Anna or Otto.
-   * @returns {boolean} True, if conversation with a bot
+   * Check whether the conversation is held with a service.
+   * @returns {boolean} True, if conversation with a service
    */
-  isWithBot() {
-    for (const user_et of this.participating_user_ets()) {
-      if (user_et.isBot) {
-        return true;
-      }
+  isWithService() {
+    return this.participating_user_ets().some(userEntity => userEntity.isService);
+  }
+
+  supportsVideoCall(isCreatingUser = false) {
+    if (this.is_one2one()) {
+      return true;
     }
 
-    if (!this.is_one2one()) {
+    const participantCount = this.getNumberOfParticipants(true, false);
+    const passesParticipantLimit = participantCount <= z.calling.CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
+
+    if (!passesParticipantLimit) {
       return false;
     }
 
-    if (!(this.firstUserEntity() && this.firstUserEntity().username())) {
+    if (this.self.inTeam()) {
+      return true;
+    }
+
+    if (isCreatingUser) {
       return false;
     }
 
-    return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
+    return this.call() && this.call().isRemoteVideoCall();
   }
 
   serialize() {
@@ -631,7 +681,8 @@ z.entity.Conversation = class Conversation {
       archived_state: this.archived_state(),
       archived_timestamp: this.archived_timestamp(),
       cleared_timestamp: this.cleared_timestamp(),
-      ephemeral_timer: this.ephemeral_timer(),
+      ephemeral_timer: this.localMessageTimer(),
+      global_message_timer: this.globalMessageTimer(),
       id: this.id,
       is_guest: this.isGuest(),
       is_managed: this.isManaged,

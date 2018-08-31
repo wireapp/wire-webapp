@@ -23,52 +23,25 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor(params) {
-    this.destroy = this.destroy.bind(this);
-
-    this.message_et = params.message;
-
-    this.ephemeral_duration = ko.computed(() => {
-      return this.message_et.ephemeral_expires() - this.message_et.ephemeral_started();
-    });
-
-    this.progress = ko.observable(0);
-    this.remaining_time = ko.observable(0);
-
-    this.remaining_subscription = this.message_et.ephemeral_remaining.subscribe(remaining_time => {
-      if (Date.now() >= this.message_et.ephemeral_expires()) {
-        return this.progress(1);
-      }
-      const elapsed_time = this.ephemeral_duration() - remaining_time;
-      return this.progress(elapsed_time / this.ephemeral_duration());
-    });
-
-    this.bullet_count = [0, 1, 2, 3, 4];
+  constructor({message: messageEntity}) {
+    this.started = messageEntity.ephemeral_started();
+    this.duration = (messageEntity.ephemeral_expires() - this.started) / 1000;
   }
 
-  is_bullet_active(index) {
-    const passed_index = this.progress() > (index + 1) / this.bullet_count.length;
-    if (passed_index) {
-      return 'ephemeral-timer-bullet-inactive';
-    }
-  }
-
-  destroy() {
-    this.remaining_subscription.dispose();
-    window.clearInterval(this.message_et.ephemeral_interval_id);
-    this.message_et.ephemeral_interval_id = undefined;
-    window.clearTimeout(this.message_et.ephemeral_timeout_id);
-    this.message_et.ephemeral_timeout_id = undefined;
+  setAnimationDelay(data, event) {
+    // every time the component gets rendered, the animation delay gets set
+    // to accomodate for the passed lifetime of the timed message
+    event.target.style.animationDelay = `${(this.started - Date.now()) / 1000}s`;
   }
 };
 
 ko.components.register('ephemeral-timer', {
   template: `
-    <ul class="ephemeral-timer">
-      <!-- ko foreach: bullet_count -->
-       <li class="ephemeral-timer-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
-      <!-- /ko -->
-    </ul>
+    <svg class="ephemeral-timer" viewBox="0 0 8 8" width="8" height="8">
+      <circle class="ephemeral-timer__background" cx="4" cy="4" r="3.5"></circle>
+      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" transform="rotate(-90 4 4)" data-bind="style: {'animation-duration': duration + 's'}, event: {animationstart: setAnimationDelay}">
+      </circle>
+    </svg>
   `,
   viewModel: z.components.EphemeralTimer,
 });

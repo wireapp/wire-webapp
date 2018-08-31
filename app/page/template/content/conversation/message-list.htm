@@ -1,12 +1,11 @@
  <div id="message-list" class="message-list" data-bind="with: $root.messageList, show_all_timestamps: true">
    <div class="messages-wrap" data-bind="antiscroll, event: {scroll: on_scroll}">
      <div class="messages"
-          data-bind="css: {'flex-center': center_messages},
+          data-bind="css: {'flex-center': verticallyCenterMessage},
                      foreach: {data: conversation().messages_visible, as: 'message'}">
       <div class="message"
-           data-bind="css: $parent.get_css_class(message),
-                      css: {'message-marked': message.equals($parent.marked_message())},
-                      in_viewport: function() {$parent.message_in_viewport(message)},
+           data-bind="css: {'message-marked': message.equals($parent.marked_message())},
+                      in_viewport: $parent.getInViewportCallback(message),
                       attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
            data-uie-name="item-message">
         <div data-bind="template: {name: 'timestamp'}"></div>

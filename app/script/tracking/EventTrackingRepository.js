@@ -34,7 +34,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return {
       ERROR_REPORTING: {
         API_KEY: RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: 60 * 1000, // milliseconds
+        REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
         API_KEY: MIXPANEL_TOKEN,
@@ -69,14 +69,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     this.last_report = undefined;
     this.mixpanel = undefined;
-    this.privacy_preference = false;
+    this.privacy_preference = undefined;
 
     this.is_error_reporting_activated = false;
     this.is_user_analytics_activated = false;
-
-    if (!this.conversation_repository || !this.team_repository || !this.user_repository) {
-      this.init_without_user_analytics();
-    }
   }
 
   /**
@@ -98,23 +94,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       })
       .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance))
       .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.update_privacy_preference));
-  }
-
-  /**
-   * Initialize the repository without user analytics but with error reporting (used for "auth" page).
-   * @note Mode for auth page
-   * @returns {Promise} Resolves after initialization
-   */
-  init_without_user_analytics() {
-    return Promise.resolve()
-      .then(() => {
-        if (this._is_domain_allowed_for_tracking()) {
-          this._enable_error_reporting();
-          return this._init_tracking();
-        }
-        return undefined;
-      })
-      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance));
   }
 
   update_privacy_preference(privacy_preference) {
@@ -193,11 +172,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _track_event(event_name, attributes) {
-    if (attributes) {
-      this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
-    } else {
-      this.logger.info(`Tracking event '${event_name}' without attributes`);
-    }
+    const logMessage = attributes
+      ? `Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`
+      : `Tracking event '${event_name}' without attributes`;
+    this.logger.info(logMessage);
 
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(event_name);
     if (!isDisabledEvent) {
@@ -210,9 +188,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.is_user_analytics_activated = false;
 
     this._unsubscribe_from_tracking_events();
-    this._track_event(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
 
     if (this.mixpanel) {
+      this._track_event(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
       this.mixpanel.register({
         $ignore: true,
       });
@@ -284,32 +262,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   //##############################################################################
 
   /**
-   * Attach to rejected Promises.
-   * @returns {undefined} No return value
-   */
-  _attach_promise_rejection_handler() {
-    window.onunhandledrejection = ({reason: error, promise: rejected_promise}) => {
-      if (window.onerror) {
-        if (error) {
-          if (_.isString(error)) {
-            window.onerror.call(this, error, null, null, null);
-          } else if (error.message) {
-            window.onerror.call(this, error.message, error.fileName, error.lineNumber, error.columnNumber, error);
-          }
-        }
-
-        if (rejected_promise) {
-          window.setTimeout(() => {
-            rejected_promise.catch(promise_error => {
-              this.logger.log(this.logger.levels.OFF, 'Handled uncaught Promise in error reporting', promise_error);
-            });
-          }, 0);
-        }
-      }
-    };
-  }
-
-  /**
    * Checks if a Raygun payload should be reported.
    *
    * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
@@ -331,16 +283,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return false;
   }
 
-  _detach_promise_rejection_handler() {
-    window.onunhandledrejection = undefined;
-  }
-
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
     this.is_error_reporting_activated = false;
     Raygun.detach();
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
-    this._detach_promise_rejection_handler();
   }
 
   _enable_error_reporting() {
@@ -372,6 +319,5 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));
-    this._attach_promise_rejection_handler();
   }
 };

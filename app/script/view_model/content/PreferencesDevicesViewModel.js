@@ -29,6 +29,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
     this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
+    this.locationRepository = repositories.location;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
@@ -68,7 +69,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   _updateLocation({lat: latitude, lon: longitude}) {
     if (latitude && longitude) {
-      z.location.getLocation(latitude, longitude).then(mappedLocation => {
+      this.locationRepository.getLocation(latitude, longitude).then(mappedLocation => {
         if (mappedLocation) {
           const {countryCode, place} = mappedLocation;
           this._updateActivationLocation(`${place}, ${countryCode}`);

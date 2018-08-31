@@ -27,18 +27,18 @@ describe('z.message.MessageCategorization', () => {
       expect(z.message.MessageCategorization.categoryFromEvent()).toBe(z.message.MessageCategory.UNDEFINED);
     });
 
-    it('ephemeral message should have category of type NONE', () => {
+    it('ephemeral message should have category of type TEXT', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"0004ebd7-1ba9-4747-b880-e63504595cc7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:31:01.003Z","status":2,"data":{"content":"test","nonce":"0004ebd7-1ba9-4747-b880-e63504595cc7","previews":[]},"type":"conversation.message-add","ephemeral_expires":"1483968961027","ephemeral_started":"1483968661027"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
-      expect(category).toBe(z.message.MessageCategory.NONE);
+      expect(category).toBe(z.message.MessageCategory.TEXT);
     });
 
-    it('expired message should have category of type NONE', () => {
+    it('expired message should have category of type TEXT', () => {
       const event =
         '{"conversation":"c499f282-2d79-4188-9808-8b63444194f8","id":"9ba0f061-0159-492b-8e6f-ba31d37ad962","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:07:47.096Z","status":2,"data":{"content":"aqgxjp","nonce":"9ba0f061-0159-492b-8e6f-ba31d37ad962"},"type":"conversation.message-add","ephemeral_expires":true,"ephemeral_started":"1483967267134"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
-      expect(category).toBe(z.message.MessageCategory.NONE);
+      expect(category).toBe(z.message.MessageCategory.TEXT);
     });
 
     it('text message should have category of type TEXT', () => {

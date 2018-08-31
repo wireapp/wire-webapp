@@ -17,27 +17,32 @@
  *
  */
 
+@strokewidth: 4;
+@strokelength: @strokewidth * pi();
+
 .ephemeral-timer {
-  display: inline-block;
-  padding: 3px;
-  margin: 0;
-  background-color: #fff;
-  border-radius: 4px;
-  list-style: none;
+  &__background {
+    fill: fade(@graphite, 16%);
+    stroke: @graphite;
+    stroke-width: 1px;
+  }
+
+  &__dial {
+    animation-name: dial-animation;
+    animation-timing-function: steps(40);
+    fill: none;
+    stroke: @graphite;
+    stroke-dasharray: @strokelength;
+    stroke-dashoffset: @strokelength;
+    stroke-width: @strokewidth;
+  }
 }
 
-.ephemeral-timer-bullet::before {
-  .circle(3px);
-
-  display: block;
-  content: '';
-  .accent-background-color;
-}
-
-.ephemeral-timer-bullet-inactive::before {
-  opacity: 0.24;
-}
-
-.ephemeral-timer-bullet + .ephemeral-timer-bullet {
-  margin-top: 2px;
+@keyframes dial-animation {
+  0% {
+    stroke-dashoffset: @strokelength * 2;
+  }
+  100% {
+    stroke-dashoffset: @strokelength;
+  }
 }

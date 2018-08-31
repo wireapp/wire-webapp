@@ -22,41 +22,50 @@ import {
   H1,
   Text,
   ContainerXS,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
   Form,
+  Muted,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {pathWithParams} from '../util/urlUtil';
+import {getAppPath} from '../util/urlUtil';
 import Page from './Page';
 import React from 'react';
 import {createSuggestions} from '../util/handleUtil';
 import {checkHandles} from '../module/action/UserAction';
-import {setHandle} from '../module/action/SelfAction';
+import {setHandle, doGetConsents, doSetConsent} from '../module/action/SelfAction';
 import {connect} from 'react-redux';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import {withRouter} from 'react-router';
+import AcceptNewsModal from '../component/AcceptNewsModal';
+import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
 
 class ChooseHandle extends React.PureComponent {
-  state = {
-    error: null,
-    handle: '',
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: null,
+      handle: '',
+    };
+  }
 
   componentDidMount() {
     const suggestions = createSuggestions(this.props.name);
     this.props
-      .checkHandles(suggestions)
+      .doGetConsents()
+      .then(() => this.props.checkHandles(suggestions))
       .then(handle => this.setState({handle}))
       .catch(error => this.setState({error}));
   }
+
+  updateConsent = (consentType, value) => this.props.doSetConsent(consentType, value);
 
   onSetHandle = event => {
     event.preventDefault();
@@ -66,7 +75,7 @@ class ChooseHandle extends React.PureComponent {
         if (this.props.isTeamFlow) {
           this.props.history.push(ROUTE.INITIAL_INVITE);
         } else {
-          window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+          window.location.replace(getAppPath());
         }
       })
       .catch(error => {
@@ -86,7 +95,7 @@ class ChooseHandle extends React.PureComponent {
       <Page isAuthenticated>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
           <H1 center>{_(chooseHandleStrings.headline)}</H1>
-          <Text center>{_(chooseHandleStrings.subhead)}</Text>
+          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
           <Form style={{marginTop: 30}} onSubmit={this.onSetHandle}>
             <InputSubmitCombo style={{paddingLeft: 0}}>
               <Text center style={{minWidth: 38}}>
@@ -104,6 +113,7 @@ class ChooseHandle extends React.PureComponent {
               <RoundIconButton
                 disabled={!this.state.handle || isFetching}
                 type="submit"
+                icon={ICON_NAME.ARROW}
                 data-uie-name="do-send-handle"
                 formNoValidate
               />
@@ -111,6 +121,13 @@ class ChooseHandle extends React.PureComponent {
           </Form>
           <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
         </ContainerXS>
+        {!this.props.isFetching &&
+          this.props.hasUnsetMarketingConsent && (
+            <AcceptNewsModal
+              onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
+              onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
+            />
+          )}
       </Page>
     );
   }
@@ -120,12 +137,15 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
+        hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
         isFetching: SelfSelector.isFetching(state),
         isTeamFlow: AuthSelector.isTeamFlow(state),
         name: SelfSelector.getSelfName(state),
       }),
       {
         checkHandles,
+        doGetConsents,
+        doSetConsent,
         setHandle,
       }
     )(ChooseHandle)

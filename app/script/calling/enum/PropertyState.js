@@ -25,5 +25,6 @@ window.z.calling.enum = z.calling.enum || {};
 
 z.calling.enum.PROPERTY_STATE = {
   FALSE: 'false',
+  PAUSED: 'paused',
   TRUE: 'true',
 };

@@ -97,6 +97,9 @@ z.string.ro.callJoin = 'Alătură-te';
 z.string.ro.callChooseSharedScreen = 'Alege un ecran pentru a partaja';
 z.string.ro.callParticipants = '{{number}} în apel';
 
+z.string.ro.videoCallOverlayMute = 'Mutizează';
+z.string.ro.videoCallOverlayHangUp = 'Închide';
+
 z.string.ro.modalAcknowledgeAction = 'Ok';
 z.string.ro.modalAcknowledgeHeadline = 'Ceva nu a mers bine';
 z.string.ro.modalConfirmSecondary = 'Renunță';
@@ -166,10 +169,6 @@ z.string.ro.modalConnectAcceptHeadline = 'Acceptă?';
 z.string.ro.modalConnectAcceptMessage = 'Aceasta te va conecta și va deschide o conversație cu {{user}}.';
 z.string.ro.modalConnectAcceptSecondary = 'Ignoră';
 
-z.string.ro.modalConversationAddBotAction = 'Confirmă';
-z.string.ro.modalConversationAddBotHeadline = 'Adaugă serviciul';
-z.string.ro.modalConversationAddBotMessage = 'Sigur dorești să pornești o nouă conversație cu {{name}}?';
-
 z.string.ro.modalConversationClearAction = 'Șterge';
 z.string.ro.modalConversationClearHeadline = 'Ștergeți conținutul?';
 z.string.ro.modalConversationClearOption = 'Părăsește conversația';
@@ -205,12 +204,15 @@ z.string.ro.modalConversationRemoveAction = 'Șterge';
 z.string.ro.modalConversationRemoveHeadline = 'Șterge?';
 z.string.ro.modalConversationRemoveMessage = '{{user}} nu va mai putea trimite sau primi mesaje în această conversație.';
 
+z.string.ro.modalConversationRemoveGuestsAction = 'Șterge';
 
 z.string.ro.modalConversationTooManyMembersHeadline = 'Canalul este plin';
 
 z.string.ro.modalIntegrationUnavailableHeadline = 'Roboții nu sunt momentan disponibili';
 z.string.ro.modalIntegrationUnavailableMessage = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
 
+
+z.string.ro.modalImproveWireAction = 'Acceptă';
 
 z.string.ro.modalServiceUnavailableHeadline = 'Adăugarea serviciului nu este posibilă';
 z.string.ro.modalServiceUnavailableMessage = 'Acest serviciu este indisponibil momentan.';
@@ -240,15 +242,10 @@ z.string.ro.conversationYouNominative = 'tu';
 z.string.ro.conversationYouDative = 'tu';
 z.string.ro.conversationYouAccusative = 'tu';
 
-z.string.ro.conversationBotUser = 'Bot';
 z.string.ro.conversationConnectionAccepted = 'Conectat';
 z.string.ro.conversationConnectionBlocked = 'Blocat';
 z.string.ro.conversationConnectionCancelRequest = 'Anulează cererea de conectare';
-z.string.ro.conversationCreate = 'a început o conversație cu {{users}}';
-z.string.ro.conversationCreateName = '{{user}} a început conversația';
-z.string.ro.conversationCreateNameYou = '{{user}} a început conversația';
 z.string.ro.conversationCreateWith = 'grosime {{users}}';
-z.string.ro.conversationCreateYou = 'a început o conversație cu {{users}}';
 z.string.ro.conversationDeviceStartedUsingOne = ' a început să folosească';
 z.string.ro.conversationDeviceStartedUsingMany = ' a început să folosească';
 z.string.ro.conversationDeviceUnverified = ' unul dintre dispozitivele';
@@ -259,19 +256,10 @@ z.string.ro.conversationDeviceNewDeviceMany = ' dispozitive noi';
 z.string.ro.conversationDeviceNewPeopleJoinedVerify = ' verifică dispozitivele';
 z.string.ro.conversationJustNow = 'Chiar acum';
 z.string.ro.conversationLocationLink = 'Deschide harta';
-z.string.ro.conversationMemberJoin = ' ai adăuga pe {{users}}';
-z.string.ro.conversationMemberJoinYou = ' ai adăuga pe {{users}}';
-z.string.ro.conversationMemberJoinSelf = ' s-a alăturat';
-z.string.ro.conversationMemberJoinSelfYou = ' s-a alăturat';
-z.string.ro.conversationMemberLeaveLeft = ' stânga';
-z.string.ro.conversationMemberLeaveLeftYou = ' stânga';
-z.string.ro.conversationMemberLeaveRemoved = ' ai șters pe {{users}}';
-z.string.ro.conversationMemberLeaveRemovedYou = ' ai șters pe {{users}}';
 z.string.ro.conversationMessageDelivered = 'Livrat';
 z.string.ro.conversationRename = ' ai redenumit conversația';
 z.string.ro.conversationRenameYou = ' ai redenumit conversația';
 z.string.ro.conversationResume = 'Începe o conversație cu {{users}}';
-z.string.ro.conversationTeamLeave = ' a fost scos din echipă';
 z.string.ro.conversationPing = ' pinguit';
 z.string.ro.conversationPingYou = ' pinguit';
 z.string.ro.conversationToday = 'azi';
@@ -288,6 +276,7 @@ z.string.ro.conversationAssetUploading = 'Se încarcă…';
 z.string.ro.conversationAssetDownloading = 'Se descarcă…';
 z.string.ro.conversationAssetUploadFailed = 'Încărcarea a eșuat';
 z.string.ro.conversationPlaybackError = 'Nu se poate reda';
+z.string.ro.conversationContextMenuCopy = 'Copiază';
 z.string.ro.conversationContextMenuEdit = 'Editează';
 z.string.ro.conversationContextMenuDelete = 'Șterge pentru mine';
 z.string.ro.conversationContextMenuDeleteEveryone = 'Șterge pentru toată lumea';
@@ -329,10 +318,7 @@ z.string.ro.conversationsConnectionRequestOne = '1 persoană așteaptă';
 z.string.ro.conversationsEmptyConversation = 'Conversație de grup';
 z.string.ro.conversationsNoConversations = 'Nu sunt încă conversații';
 z.string.ro.conversationsPopoverArchive = 'Arhivă';
-z.string.ro.conversationsPopoverBlock = 'Blochează';
 z.string.ro.conversationsPopoverCancel = 'Anulează cererea';
-z.string.ro.conversationsPopoverClear = 'Șterge';
-z.string.ro.conversationsPopoverLeave = 'Ieși';
 z.string.ro.conversationsPopoverNotify = 'Demutizează';
 z.string.ro.conversationsPopoverSilence = 'Mutizează';
 z.string.ro.conversationsPopoverUnarchive = 'Dezarhivează';
@@ -380,14 +366,19 @@ z.string.ro.addParticipantsServiceConfirmButton = 'Adaugă serviciu';
 z.string.ro.addParticipantsTabsPeople = 'Persoane';
 z.string.ro.addParticipantsTabsServices = 'Servicii';
 
+z.string.ro.conversationDetailsActionArchive = 'Arhivă';
 z.string.ro.conversationDetailsActionCancelRequest = 'Anulează cererea';
 z.string.ro.conversationDetailsActionCreateGroup = 'Grup nou';
 z.string.ro.conversationDetailsActionDevices = 'Dispozitive';
 z.string.ro.conversationDetailsGuestsOff = 'Închis';
+z.string.ro.conversationDetailsOptions = 'Opțiuni';
 z.string.ro.conversationDetailsParticipantsServicesMany = 'Servicii';
 z.string.ro.conversationDetailsParticipantsUsersMany = 'Persoane';
 z.string.ro.conversationDetailsPeople = 'Persoane';
 z.string.ro.conversationDetailsServices = 'Servicii';
+
+z.string.ro.conversationParticipantsTitle = 'Persoane';
+z.string.ro.conversationParticipantsSearchPlaceholder = 'Caută după nume';
 
 z.string.ro.groupParticipantActionCancelRequest = 'Anulează cererea';
 z.string.ro.groupParticipantActionDevices = 'Dispozitive';
@@ -455,7 +446,6 @@ z.string.ro.preferencesDevicesCurrent = 'Curent';
 z.string.ro.preferencesDevicesFingerprint = 'Amprentă cheie';
 z.string.ro.preferencesDevicesFingerprintDetail = 'Wire generează câte o amprentă unică pentru fiecare dispozitiv. Compară-le și verifică dispozitivele și conversațiile tale.';
 z.string.ro.preferencesDevicesId = 'ID: ';
-z.string.ro.preferencesDevicesRemove = 'Șterge';
 z.string.ro.preferencesDevicesRemoveCancel = 'Renunță';
 z.string.ro.preferencesDevicesRemoveDetail = 'Elimină acest dispozitiv dacă nu-l mai folosești. Vei fi deconectat de pe acest dispozitiv imediat.';
 z.string.ro.preferencesDevicesSessionConfirmation = 'Sesiunea a fost resetată.';
@@ -475,9 +465,6 @@ z.string.ro.preferencesOptionsContacts = 'Contacte';
 z.string.ro.preferencesOptionsContactsGmail = 'Importă din Gmail';
 z.string.ro.preferencesOptionsContactsMacos = 'Importă din contacte';
 z.string.ro.preferencesOptionsContactsDetail = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
-z.string.ro.preferencesOptionsData = 'Rapoarte de folosire și de avarie';
-z.string.ro.preferencesOptionsDataCheckbox = 'Rapoarte de folosire și de avarie';
-z.string.ro.preferencesOptionsDataDetail = 'Ajută la îmbunătățirea Wire prin trimiterea de informații anonime.';
 z.string.ro.preferencesOptionsPopular = 'În urma cererilor populare';
 z.string.ro.preferencesOptionsEmojiReplaceCheckbox = 'Înlocuiește emoticoanele cu emoji';
 z.string.ro.preferencesOptionsPreviewsSendCheckbox = 'Creează previzualizări pentru linkurile pe care le trimiți';
@@ -487,6 +474,9 @@ z.string.ro.preferencesOptionsNotificationsNone = 'Închis';
 z.string.ro.preferencesOptionsNotificationsObfuscate = 'Ascunde detaliile';
 z.string.ro.preferencesOptionsNotificationsObfuscateMessage = 'Arată expeditorul';
 z.string.ro.preferencesOptionsNotificationsOn = 'Arată expeditorul și mesajul';
+
+z.string.ro.backupImportGenericErrorHeadline = 'Ceva nu a mers bine';
+z.string.ro.backupCancel = 'Renunță';
 
 z.string.ro.searchConnect = 'Conectare';
 z.string.ro.searchConnections = 'Conexiuni';
@@ -606,13 +596,5 @@ z.string.ro.initEvents = 'Se încarcă mesaje';
 z.string.ro.initUpdatedFromNotifications = 'Aproape gata - Bucură-te de Wire';
 z.string.ro.initProgress = ' — {{number1}} din {{number2}}';
 
-z.string.ro.ephememalUnitsNone = 'Închis';
-z.string.ro.ephememalUnitsSecond = 'secundă';
-z.string.ro.ephememalUnitsSeconds = 'secunde';
-z.string.ro.ephememalUnitsMinute = 'minut';
-z.string.ro.ephememalUnitsMinutes = 'minute';
-z.string.ro.ephememalUnitsHour = 'oră';
-z.string.ro.ephememalUnitsHours = 'ore';
-z.string.ro.ephememalUnitsDay = 'zi';
-z.string.ro.ephememalUnitsDays = 'zile';
+z.string.ro.ephemeralUnitsNone = 'Închis';
 

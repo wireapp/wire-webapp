@@ -104,6 +104,7 @@ z.user.UserMapper = class UserMapper {
       phone,
       picture,
       service,
+      sso_id: ssoId,
       team,
     } = userData;
 
@@ -141,9 +142,14 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (service) {
-      userEntity.isBot = true;
+      userEntity.isService = true;
       userEntity.providerId = service.provider;
+      userEntity.providerName = ko.observable('');
       userEntity.serviceId = service.id;
+    }
+
+    if (ssoId && Object.keys(ssoId).length) {
+      userEntity.isSingleSignOn = true;
     }
 
     if (team) {

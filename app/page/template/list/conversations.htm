@@ -14,8 +14,9 @@
   <!-- ko if: showCalls() -->
     <!-- ko foreach: callConversations -->
       <conversation-list-calling-cell
-        data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
-        params="conversation: $data, is_selected: $parent.isSelectedConversation, calling_repository: $parent.callingRepository">
+        data-bind="click: $parent.clickOnConversation, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
+        params="conversation: $data, callingRepository: $parent.callingRepository, mediaRepository: $parent.mediaRepository, multitasking: $parent.multitasking, videoGridRepository: $parent.videoGridRepository"
+        data-uie-name="item-call">
       </conversation-list-calling-cell>
     <!-- /ko -->
   <!-- /ko -->
@@ -63,7 +64,7 @@
         <div class="conversations-hint" data-uie-name="status-start-conversation-hint">
           <div class="conversations-hint-text" data-bind="l10n_text: z.string.conversationsNoConversations"></div>
           <svg class="conversations-hint-arrow" width="16" height="53" viewBox="0 0 16 53">
-            <path d="M13.9 43l1.414 1.414-7.657 7.657L0 44.414 1.414 43l5.24 5.24V0h2v48.246z" fill="#FFF" fill-rule="evenodd"/>
+            <path d="M13.9 43l1.414 1.414-7.657 7.657L0 44.414 1.414 43l5.24 5.24V0h2v48.246z" fill="#FFF" fill-rule="evenodd"></path>
           </svg>
         </div>
       <!-- /ko -->

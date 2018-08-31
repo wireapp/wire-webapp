@@ -95,6 +95,11 @@ z.tracking.helpers = {
         user_type: _getUserType(conversationEntity),
       };
     }
+
+    return {
+      is_allow_guests: false,
+      user_type: z.tracking.attribute.UserType.USER,
+    };
   },
 
   getParticipantTypes(userEntities, countSelf) {

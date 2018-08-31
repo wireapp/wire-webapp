@@ -40,7 +40,7 @@
 
   global.addEventListener('install', event => event.waitUntil(global.skipWaiting()));
   global.addEventListener('activate', event => {
-    const expectedCacheNames = Object.keys(CURRENT_CACHES).map(key => CURRENT_CACHES[key]);
+    const expectedCacheNames = Object.values(CURRENT_CACHES);
 
     return event.waitUntil(
       caches.keys().then(cacheNames => {

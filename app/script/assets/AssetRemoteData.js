@@ -137,7 +137,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return this.generateUrl()
       .then(generatedUrl => {
         return z.util.loadUrlBuffer(generatedUrl, xhr => {
-          xhr.onprogress = event => this.downloadProgress(Math.round(event.loaded / event.total * 100));
+          xhr.onprogress = event => this.downloadProgress(Math.round((event.loaded / event.total) * 100));
           this.cancelDownload = () => xhr.abort.call(xhr);
         });
       })

@@ -50,11 +50,11 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
     this.isService = ko.pureComputed(() => {
-      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isBot;
+      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isService;
     });
 
     this.isUser = ko.pureComputed(() => {
-      return this.participant() instanceof z.entity.User && !this.participant().isBot;
+      return this.participant() instanceof z.entity.User && !this.participant().isService;
     });
 
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
@@ -69,7 +69,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     const borderScale = 0.9916;
     const finalBorderWidth = this.size === ParticipantAvatar.SIZE.X_LARGE ? 4 : 1;
-    this.borderWidth = finalBorderWidth / ParticipantAvatar.DIAMETER[this.size] * 32;
+    this.borderWidth = (finalBorderWidth / ParticipantAvatar.DIAMETER[this.size]) * 32;
     this.borderRadius = (16 - this.borderWidth / 2) * borderScale;
     this.timerLength = this.borderRadius * Math.PI * 2;
     this.timerOffset = ko.observable();
@@ -97,10 +97,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       if (this.isService()) {
         return '';
       }
-      if (this.element.hasClass('avatar-xs')) {
-        return z.util.StringUtil.getFirstChar(this.participant().initials());
-      }
-      return this.participant().initials();
+
+      return this.element.hasClass('avatar-xs')
+        ? z.util.StringUtil.getFirstChar(this.participant().initials())
+        : this.participant().initials();
     });
 
     this.state = ko.pureComputed(() => {
@@ -128,12 +128,12 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     this.cssClasses = ko.pureComputed(() => {
       if (this.isService()) {
-        return 'accent-color-bot';
+        return 'accent-color-service';
       }
-      if (this.isTemporaryGuest()) {
-        return 'accent-color-temporary';
-      }
-      return `accent-color-${this.participant().accent_id()} ${this.state()}`;
+
+      return this.isTemporaryGuest()
+        ? 'accent-color-temporary'
+        : `accent-color-${this.participant().accent_id()} ${this.state()}`;
     });
 
     this.onClick = (data, event) => {
@@ -142,21 +142,19 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    this.onInViewport = () => {
-      this.avatarEnteredViewport = true;
-      this._loadAvatarPicture();
-      return true;
-    };
-
-    this._loadAvatarPicture = () => {
+    const _loadAvatarPicture = () => {
       this.element.find('.avatar-image').html('');
       this.element.removeClass('avatar-image-loaded avatar-loading-transition');
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
 
-        const pictureResource = this.participant().previewPictureResource();
+        const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
+        const loadHiRes = !isSmall && window.devicePixelRatio > 1;
+        const pictureResource = loadHiRes
+          ? this.participant().mediumPictureResource()
+          : this.participant().previewPictureResource();
+
         if (pictureResource) {
-          const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
           const isCached = pictureResource.downloadProgress() === 100;
 
           pictureResource.getObjectUrl().then(url => {
@@ -174,24 +172,32 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
+    const _onInViewport = () => {
+      this.avatarEnteredViewport = true;
+      _loadAvatarPicture();
+    };
+
+    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
+
+    this.pictureSubscription = this.participant().mediumPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
-        this._loadAvatarPicture();
+        _loadAvatarPicture();
       }
     });
 
-    this.participantSubscription = this.participant.subscribe(() => this._loadAvatarPicture());
+    this.participantSubscription = this.participant.subscribe(() => _loadAvatarPicture());
   }
 
   dispose() {
+    z.ui.ViewportObserver.removeElement(this.element[0]);
     this.participantSubscription.dispose();
-    this.picturePreviewSubscription.dispose();
+    this.pictureSubscription.dispose();
   }
 };
 
 ko.components.register('participant-avatar', {
   template: `
-    <div class="participant-avatar" data-bind="attr: {title: participant().name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
+    <div class="participant-avatar" data-bind="attr: {title: participant().name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, delay: delay">
       <div class="avatar-background"></div>
       <!-- ko if: isUser -->
         <div class="avatar-initials" data-bind="text: initials()"></div>

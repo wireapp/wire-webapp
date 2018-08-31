@@ -23,7 +23,6 @@
 
 describe('User Mapper', () => {
   const mapper = new z.user.UserMapper();
-  mapper.logger.level = z.util.Logger.prototype.levels.ERROR;
 
   let self_user_payload = null;
 

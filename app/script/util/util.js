@@ -205,7 +205,7 @@ z.util.base64ToArray = base64 => bazinga64.Decoder.fromBase64(z.util.stripDataUr
  * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
  * @returns {string} Base64-encoded string
  */
-z.util.arrayToBase64 = array => bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString;
+z.util.arrayToBase64 = array => bazinga64.Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
@@ -233,28 +233,43 @@ z.util.base64ToBlob = base64 => {
  * Downloads blob using a hidden link element.
  * @param {Blob} blob - Blob to store
  * @param {string} filename - Data will be saved under this name
- * @param {string} mimeType - the mime type of the generated download
+ * @param {string} [mimeType] - Mime type of the generated download
  * @returns {number} Timeout identifier
  */
 
 z.util.downloadBlob = (blob, filename, mimeType) => {
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  // firefox needs the element to be in the DOM for the download to start
-  // see https://stackoverflow.com/a/32226068
-  document.body.appendChild(link);
-  link.href = url;
-  link.download = filename;
-  link.style = 'display: none';
-  if (mimeType) {
-    link.type = mimeType;
+  if (blob) {
+    const url = window.URL.createObjectURL(blob);
+    return z.util.downloadFile(url, filename, mimeType);
   }
-  link.click();
 
-  // Wait before removing resource and link. Needed in FF
+  throw new Error('Failed to download blob: Resource not provided');
+};
+
+z.util.downloadText = (text, filename = 'default.txt') => {
+  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+  return z.util.downloadFile(url, filename);
+};
+
+z.util.downloadFile = (url, fileName, mimeType) => {
+  const anchor = document.createElement('a');
+  anchor.download = fileName;
+  anchor.href = url;
+  anchor.style = 'display: none';
+  if (mimeType) {
+    anchor.type = mimeType;
+  }
+
+  // Firefox needs the element to be in the DOM for the download to start:
+  // @see https://stackoverflow.com/a/32226068
+  document.body.appendChild(anchor);
+  anchor.click();
+
+  // Wait before removing resource and link. Needed in FF.
   return window.setTimeout(() => {
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    const objectURL = anchor.href;
+    document.body.removeChild(anchor);
+    window.URL.revokeObjectURL(objectURL);
   }, 100);
 };
 
@@ -268,47 +283,9 @@ z.util.encodeBase64 = text => window.btoa(text);
 
 z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
-z.util.escapeHtml = html => _.escape(html);
-
-z.util.escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 // Note IE10 listens to "transitionend" instead of "animationend"
 z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-/**
- * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
- * @see https://mathiasbynens.github.io/rel-noopener/
- * @param {string} url - URL you want to open in a new browser tab
- * @param {boolean} focus - True, if the new windows should get browser focus
- * @returns {Object} New window handle
- */
-z.util.safeWindowOpen = (url, focus = true) => {
-  const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-  if (newWindow) {
-    newWindow.opener = null;
-    if (focus) {
-      newWindow.focus();
-    }
-  }
-
-  return newWindow;
-};
-
-z.util.safeMailtoOpen = (event, email) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  if (!z.util.isValidEmail(email)) {
-    return;
-  }
-
-  const newWindow = window.open(`mailto:${email}`);
-  if (newWindow) {
-    window.setTimeout(() => newWindow.close(), 10);
-  }
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
@@ -369,7 +346,8 @@ z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
  * @returns {string} Input value with leading zeros (padding)
  */
 z.util.zeroPadding = (value, length = 2) => {
-  return value.toString().length < length ? z.util.zeroPadding(`0${value}`, length) : `${value}`;
+  const zerosNeeded = Math.max(0, length - value.toString().length);
+  return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
 /**
@@ -384,25 +362,18 @@ z.util.isIsoString = dateString => {
 z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
 z.util.sortObjectByKeys = (object, reverse) => {
-  const sortedObject = {};
   const keys = Object.keys(object);
   keys.sort();
 
   if (reverse) {
-    for (let index = keys.length - 1; index >= 0; index--) {
-      const key = keys[index];
-      const value = object[key];
-      sortedObject[key] = value;
-    }
-  } else {
-    for (const key of keys) {
-      const value = object[key];
-      sortedObject[key] = value;
-    }
+    keys.reverse();
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return sortedObject;
+  return keys.reduce((sortedObject, key) => {
+    sortedObject[key] = object[key];
+    return sortedObject;
+  }, {});
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
@@ -500,41 +471,16 @@ z.util.murmurhash3 = (key, seed) => {
   return h1 >>> 0;
 };
 
-z.util.getFirstName = (userEt, declension = z.string.Declension.NOMINATIVE) => {
-  if (userEt.is_me) {
-    let stringId;
-
-    switch (declension) {
-      case z.string.Declension.NOMINATIVE:
-        stringId = z.string.conversationYouNominative;
-        break;
-      case z.string.Declension.DATIVE:
-        stringId = z.string.conversationYouDative;
-        break;
-      case z.string.Declension.ACCUSATIVE:
-        stringId = z.string.conversationYouAccusative;
-        break;
-    }
-
-    return z.l10n.text(stringId);
-  }
-
-  return userEt.first_name();
-};
-
 z.util.printDevicesId = id => {
   if (!id) {
     return '';
   }
 
   const idWithPadding = z.util.zeroPadding(id, 16);
-  let prettifiedId = '';
+  const parts = idWithPadding.match(/.{1,2}/g) || [];
+  const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
 
-  for (const part of idWithPadding.match(/.{1,2}/g)) {
-    prettifiedId += `<span class='device-id-part'>${part}</span>`;
-  }
-
-  return prettifiedId;
+  return prettifiedId.join('');
 };
 
 /**
@@ -559,31 +505,6 @@ z.util.bucketValues = (value, bucketLimits) => {
 
   const last_limit = bucketLimits[bucketLimits.length - 1];
   return `${last_limit + 1}-`;
-};
-
-z.util.formatTimeRemaining = timeRemaining => {
-  const momentDuration = moment.duration(timeRemaining);
-
-  let title = '';
-  if (momentDuration.asHours() === 1) {
-    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
-  } else if (momentDuration.asHours() > 1) {
-    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
-  }
-
-  if (momentDuration.asMinutes() === 1) {
-    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
-  } else if (momentDuration.asMinutes() > 1) {
-    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(z.string.and)} `;
-  }
-
-  if (momentDuration.asSeconds() === 1) {
-    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
-  } else if (momentDuration.asSeconds() > 1) {
-    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
-  }
-
-  return title || '';
 };
 
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers

@@ -66,14 +66,15 @@ class AccountForm extends PureComponent {
     event.preventDefault();
     const validInputs = this.state.validInputs;
     const errors = [];
-    for (const inputKey of Object.keys(this.inputs)) {
-      const currentInput = this.inputs[inputKey];
+
+    Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       currentInput.value = currentInput.value.trim();
       if (!currentInput.checkValidity()) {
         errors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
       }
       validInputs[inputKey] = currentInput.validity.valid;
-    }
+    });
+
     this.setState({validInputs, validationErrors: errors});
     const isPersonalInvitation = this.props.isPersonalInvitationFlow && this.state.email === this.props.account.email;
     return Promise.resolve()

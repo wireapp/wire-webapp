@@ -93,11 +93,8 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _initSounds() {
-    Object.keys(z.audio.AudioType).forEach(type => {
-      if (z.audio.AudioType.hasOwnProperty(type)) {
-        const audioId = z.audio.AudioType[type];
-        this.audioElements[audioId] = this._createAudioElement(`/audio/${audioId}.mp3`);
-      }
+    Object.values(z.audio.AudioType).forEach(audioId => {
+      this.audioElements[audioId] = this._createAudioElement(`/audio/${audioId}.mp3`);
     });
 
     this.logger.info('Initialized sounds');
@@ -152,12 +149,9 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _preLoad() {
-    Object.keys(this.audioElements).forEach(audioId => {
-      if (this.audioElements.hasOwnProperty(audioId)) {
-        const audioElement = this.audioElements[audioId];
-        audioElement.preload = 'auto';
-        audioElement.load();
-      }
+    Object.values(this.audioElements).forEach(audioElement => {
+      audioElement.preload = 'auto';
+      audioElement.load();
     });
 
     this.logger.info('Pre-loading audio files for immediate playback');

@@ -34,13 +34,22 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.error_code = '';
     this.client_id = '';
 
-    this.caption = ko.pureComputed(() => {
-      const content = `<span class='label-bold-xs'>${z.util.escapeHtml(this.user().first_name())}</span>`;
-      const string_id = this.is_remote_identity_changed()
+    this.htmlCaption = ko.pureComputed(() => {
+      const stringId = this.is_remote_identity_changed()
         ? z.string.conversationUnableToDecrypt2
         : z.string.conversationUnableToDecrypt1;
 
-      return z.l10n.text(string_id, content);
+      const substitutions = {
+        replace: {
+          user: this.user().first_name(),
+        },
+        replaceDangerously: {
+          '/highlight': '</span>',
+          highlight: '<span class="label-bold-xs">',
+        },
+      };
+
+      return z.l10n.safeHtml(stringId, substitutions);
     });
 
     this.link = ko.pureComputed(() => {
@@ -50,12 +59,12 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       return z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
     });
 
-    this.is_recoverable = ko.pureComputed(
-      () => this.error_code.toString().startsWith('2') && !this.is_remote_identity_changed()
-    );
-    this.is_remote_identity_changed = ko.pureComputed(
-      () => this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR
-    );
+    this.is_recoverable = ko.pureComputed(() => {
+      return this.error_code.toString().startsWith('2') && !this.is_remote_identity_changed();
+    });
+    this.is_remote_identity_changed = ko.pureComputed(() => {
+      return this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR;
+    });
     this.is_resetting_session = ko.observable(false);
 
     this.error_message = ko.pureComputed(() => {
@@ -63,7 +72,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
       if (this.error_code) {
         const error_text = z.l10n.text(z.string.conversationUnableToDecryptErrorMessage);
-        parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span>`);
+        parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span> `);
       }
 
       if (this.client_id) {
@@ -71,8 +80,10 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       }
 
       if (parts.length) {
-        return `(${parts.join(' ')})`;
+        return `(${parts.join('')})`;
       }
     });
+
+    this.htmlErrorMessage = this.error_message;
   }
 };

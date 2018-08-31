@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Text, Link, ContainerXS} from '@wireapp/react-ui-kit';
+import {H1, Muted, Link, ContainerXS} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import Page from './Page';
 import React from 'react';
@@ -38,7 +38,9 @@ class ClientManager extends React.Component {
       .then(() => this.props.history.push(ROUTE.LOGIN));
 
   render() {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       <Page>
         <ContainerXS
@@ -49,9 +51,9 @@ class ClientManager extends React.Component {
           <H1 center style={{marginTop: '140px'}}>
             {_(clientManagerStrings.headline)}
           </H1>
-          <Text center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
+          <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
             {_(clientManagerStrings.subhead)}
-          </Text>
+          </Muted>
           <ClientList />
           <Link
             onClick={this.logout}
@@ -66,4 +68,9 @@ class ClientManager extends React.Component {
   }
 }
 
-export default injectIntl(connect(null, {...AuthAction, ...ClientAction})(ClientManager));
+export default injectIntl(
+  connect(
+    null,
+    {...AuthAction, ...ClientAction}
+  )(ClientManager)
+);

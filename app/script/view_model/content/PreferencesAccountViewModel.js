@@ -51,6 +51,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
+    this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
@@ -85,10 +86,18 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.team = this.teamRepository.team;
     this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
 
+    this.optionPrivacy = ko.observable();
+    this.optionPrivacy.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
+    });
+
+    this.optionMarketingConsent = this.userRepository.marketingConsent;
+
     this._initSubscriptions();
   }
 
   _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
@@ -211,7 +220,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnCreate() {
     const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   clickOnDeleteAccount() {
@@ -244,12 +253,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnManage() {
     const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
   clickOnResetPassword() {
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET);
+    z.util.SanitizationUtil.safeWindowOpen(url);
   }
 
   onClientAdd(userId, clientEntity) {
@@ -369,5 +379,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
+  }
+
+  updateProperties(properties) {
+    this.optionPrivacy(properties.settings.privacy.improve_wire);
   }
 };

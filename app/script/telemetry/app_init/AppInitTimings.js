@@ -40,46 +40,36 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
   get() {
     const timings = {};
 
-    for (const key in this) {
-      if (this.hasOwnProperty(key)) {
-        const value = this[key];
-
-        if (key.toString() !== 'init' && _.isNumber(value)) {
-          timings[key] = value;
-        }
+    Object.entries(this).forEach(([key, value]) => {
+      if (key.toString() !== 'init' && _.isNumber(value)) {
+        timings[key] = value;
       }
-    }
+    });
 
     return timings;
   }
 
   get_app_load() {
-    const app_loaded_in_seconds = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED] / 1000;
-    return (
-      (Math.floor(app_loaded_in_seconds / AppInitTimings.CONFIG.BUCKET_SIZE) + 1) * AppInitTimings.CONFIG.BUCKET_SIZE
-    );
+    const {CONFIG} = AppInitTimings;
+    const appLoaded = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED];
+    const appLoadedInSeconds = appLoaded / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+
+    return (Math.floor(appLoadedInSeconds / CONFIG.BUCKET_SIZE) + 1) * CONFIG.BUCKET_SIZE;
   }
 
   log() {
     this.logger.debug('App initialization step durations');
 
-    for (const key in this) {
-      if (this.hasOwnProperty(key)) {
-        const value = this[key];
+    Object.entries(this).forEach(([key, value]) => {
+      if (key.toString() !== 'init' && _.isNumber(value)) {
+        const placeholderKeyLength = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
+        const placeholderKey = new Array(placeholderKeyLength).join(' ');
+        const placeholderValueLength = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+        const placeholderValue = new Array(placeholderValueLength).join(' ');
 
-        if (key.toString() !== 'init' && _.isNumber(value)) {
-          const placeholder_key_length = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
-          const placeholder_key = new Array(placeholder_key_length).join(' ');
-          const placeholder_value_length = Math.max(
-            AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length,
-            1
-          );
-          const placeholder_value = new Array(placeholder_value_length).join(' ');
-
-          this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}ms`);
-        }
+        this.logger.info(`${placeholderKey}'${key}':${placeholderValue}${value}ms`);
       }
-    }
+    });
   }
 
   time_step(step) {

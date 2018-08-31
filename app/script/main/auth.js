@@ -28,8 +28,8 @@ z.main.Auth = class Auth {
    *
    * @param {Object} settings - Collection of URL settings
    * @param {string} settings.environment - Handle of the backend environment (staging, etc.)
-   * @param {string} settings.web_socket_url - URL to the backend's WebSocket
-   * @param {string} settings.rest_url - URL to the backend's REST service
+   * @param {string} settings.webSocketUrl - URL to the backend's WebSocket
+   * @param {string} settings.restUrl - URL to the backend's REST service
    * @param {string} settings.parameter - Additional parameters for the webapp's login URL
    * @returns {Auth} New authentication object
    */
@@ -56,13 +56,13 @@ $(() => {
   const settings = isStaging
     ? {
         environment: z.service.BackendEnvironment.STAGING,
-        rest_url: 'https://staging-nginz-https.zinfra.io',
-        web_socket_url: 'wss://staging-nginz-ssl.zinfra.io',
+        restUrl: 'https://staging-nginz-https.zinfra.io',
+        webSocketUrl: 'wss://staging-nginz-ssl.zinfra.io',
       }
     : {
         environment: z.service.BackendEnvironment.PRODUCTION,
-        rest_url: 'https://prod-nginz-https.wire.com',
-        web_socket_url: 'wss://prod-nginz-ssl.wire.com',
+        restUrl: 'https://prod-nginz-https.wire.com',
+        webSocketUrl: 'wss://prod-nginz-ssl.wire.com',
       };
 
   window.wire = {

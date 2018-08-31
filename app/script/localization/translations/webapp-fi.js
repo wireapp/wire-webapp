@@ -93,6 +93,9 @@ z.string.fi.callJoin = 'Liity';
 z.string.fi.callChooseSharedScreen = 'Valitse näyttö jonka haluat jakaa';
 z.string.fi.callParticipants = '{{number}} puhelussa';
 
+z.string.fi.videoCallOverlayMute = 'Mykistä';
+z.string.fi.videoCallOverlayHangUp = 'Katkaise puhelu';
+
 z.string.fi.modalAcknowledgeAction = 'Ok';
 z.string.fi.modalConfirmSecondary = 'Peruuta';
 z.string.fi.modalOptionSecondary = 'Peruuta';
@@ -155,8 +158,6 @@ z.string.fi.modalConnectAcceptHeadline = 'Hyväksy?';
 z.string.fi.modalConnectAcceptMessage = 'Tämä yhdistää teidät ja avaa keskustelun {{user}} kanssa.';
 z.string.fi.modalConnectAcceptSecondary = 'Hylkää';
 
-z.string.fi.modalConversationAddBotAction = 'Vahvista';
-
 z.string.fi.modalConversationClearAction = 'Poista';
 z.string.fi.modalConversationClearHeadline = 'Poista sisältö?';
 z.string.fi.modalConversationClearOption = 'Poistu myös keskustelusta';
@@ -192,12 +193,15 @@ z.string.fi.modalConversationRemoveAction = 'Poista';
 z.string.fi.modalConversationRemoveHeadline = 'Poista?';
 z.string.fi.modalConversationRemoveMessage = '{{user}} ei pysty lähettämään tai vastaanottamaan viestejä tässä keskustelussa.';
 
+z.string.fi.modalConversationRemoveGuestsAction = 'Poista';
 
 z.string.fi.modalConversationTooManyMembersHeadline = 'Kaikki puhelukanavat varattuja';
 
 z.string.fi.modalIntegrationUnavailableHeadline = 'Botit eivät käytettävissä';
 z.string.fi.modalIntegrationUnavailableMessage = 'Kiitos mielenkiinnostasi botteihin. Tämä palvelu on väliaikaisesti pois käytöstä, koska työstämme seuraavaa versiota.';
 
+
+z.string.fi.modalImproveWireAction = 'Hyväksy';
 
 z.string.fi.modalSessionResetHeadline = 'Istunto on nollattu';
 z.string.fi.modalSessionResetMessage1 = 'Jos ongelma ei ole ratkennut';
@@ -227,8 +231,6 @@ z.string.fi.conversationYouAccusative = 'sinä';
 z.string.fi.conversationConnectionAccepted = 'Yhdistetty';
 z.string.fi.conversationConnectionBlocked = 'Estetty';
 z.string.fi.conversationConnectionCancelRequest = 'Peruuta yhteyspyyntö';
-z.string.fi.conversationCreate = ' aloitti keskustelun {{users}} kanssa';
-z.string.fi.conversationCreateYou = ' aloitti keskustelun {{users}} kanssa';
 z.string.fi.conversationDeviceStartedUsingOne = ' aloitti käyttämään';
 z.string.fi.conversationDeviceStartedUsingMany = ' aloitti käyttämään';
 z.string.fi.conversationDeviceUnverified = ' vahvistamattomia yksi';
@@ -239,17 +241,10 @@ z.string.fi.conversationDeviceNewDeviceMany = ' uusia laitteita';
 z.string.fi.conversationDeviceNewPeopleJoinedVerify = ' vahvista laitteet';
 z.string.fi.conversationJustNow = 'Juuri nyt';
 z.string.fi.conversationLocationLink = 'Avaa kartta';
-z.string.fi.conversationMemberJoin = ' lisättiin {{users}}';
-z.string.fi.conversationMemberJoinYou = ' lisättiin {{users}}';
-z.string.fi.conversationMemberLeaveLeft = ' on lähtenyt';
-z.string.fi.conversationMemberLeaveLeftYou = ' on lähtenyt';
-z.string.fi.conversationMemberLeaveRemoved = ' poistettu {{users}}';
-z.string.fi.conversationMemberLeaveRemovedYou = ' poistettu {{users}}';
 z.string.fi.conversationMessageDelivered = 'Toimitettu';
 z.string.fi.conversationRename = ' keskustelun nimi vaihdettu';
 z.string.fi.conversationRenameYou = ' keskustelun nimi vaihdettu';
 z.string.fi.conversationResume = 'Aloita keskustelu {{users}} n kanssa';
-z.string.fi.conversationTeamLeave = ' poistettiin tiimistä';
 z.string.fi.conversationPing = ' pinggasi';
 z.string.fi.conversationPingYou = ' pinggasi';
 z.string.fi.conversationToday = 'tänään';
@@ -257,7 +252,7 @@ z.string.fi.conversationVoiceChannelDeactivate = ' soitti';
 z.string.fi.conversationVoiceChannelDeactivateYou = ' soitti';
 z.string.fi.conversationYesterday = 'Eilen';
 z.string.fi.conversationUnableToDecrypt1 = 'Käyttäjän {{user}} viesti ei tullut perille.';
-z.string.fi.conversationUnableToDecrypt2 = '{{user}} n laitteen identiteetti muuttui. Perilletoimittamaton viesti.';
+z.string.fi.conversationUnableToDecrypt2 = 'Käyttäjän {{user}} laitteen identiteetti muuttui. Viestiä ei toimitettu.';
 z.string.fi.conversationUnableToDecryptLink = 'Miksi?';
 z.string.fi.conversationUnableToDecryptErrorMessage = 'Virhe';
 z.string.fi.conversationUnableToDecryptResetSession = 'Nollaa istunto';
@@ -265,6 +260,7 @@ z.string.fi.conversationMissedMessages = 'Et ole käyttänyt tätä laitetta pit
 z.string.fi.conversationAssetDownloading = 'Ladataan…';
 z.string.fi.conversationAssetUploadFailed = 'Lähetys epäonnistui';
 z.string.fi.conversationPlaybackError = 'Toisto epäonnistui';
+z.string.fi.conversationContextMenuCopy = 'Kopioi';
 z.string.fi.conversationContextMenuEdit = 'Muokkaa';
 z.string.fi.conversationContextMenuDelete = 'Poista minulta';
 z.string.fi.conversationContextMenuDeleteEveryone = 'Poista kaikilta';
@@ -301,10 +297,7 @@ z.string.fi.conversationsConnectionRequestOne = '1 ihminen odottaa';
 z.string.fi.conversationsEmptyConversation = 'Ryhmäkeskustelu';
 z.string.fi.conversationsNoConversations = 'Ei vielä keskusteluita';
 z.string.fi.conversationsPopoverArchive = 'Arkistoi';
-z.string.fi.conversationsPopoverBlock = 'Estä';
 z.string.fi.conversationsPopoverCancel = 'Peru pyyntö';
-z.string.fi.conversationsPopoverClear = 'Poista';
-z.string.fi.conversationsPopoverLeave = 'Poistu';
 z.string.fi.conversationsPopoverNotify = 'Poista mykistys';
 z.string.fi.conversationsPopoverSilence = 'Mykistä';
 z.string.fi.conversationsPopoverUnarchive = 'Palauta arkistosta';
@@ -350,13 +343,18 @@ z.string.fi.addParticipantsSearchPlaceholder = 'Hae nimellä';
 z.string.fi.addParticipantsTabsPeople = 'Ihmiset';
 z.string.fi.addParticipantsTabsServices = 'Palvelut';
 
+z.string.fi.conversationDetailsActionArchive = 'Arkistoi';
 z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
 z.string.fi.conversationDetailsActionDevices = 'Laitteet';
 z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
+z.string.fi.conversationDetailsOptions = 'Valinnat';
 z.string.fi.conversationDetailsParticipantsServicesMany = 'Palvelut';
 z.string.fi.conversationDetailsParticipantsUsersMany = 'Ihmiset';
 z.string.fi.conversationDetailsPeople = 'Ihmiset';
 z.string.fi.conversationDetailsServices = 'Palvelut';
+
+z.string.fi.conversationParticipantsTitle = 'Ihmiset';
+z.string.fi.conversationParticipantsSearchPlaceholder = 'Hae nimellä';
 
 z.string.fi.groupParticipantActionCancelRequest = 'Peru pyyntö';
 z.string.fi.groupParticipantActionDevices = 'Laitteet';
@@ -423,7 +421,6 @@ z.string.fi.preferencesDevicesCurrent = 'Nykyinen';
 z.string.fi.preferencesDevicesFingerprint = 'Sormenjälki avain';
 z.string.fi.preferencesDevicesFingerprintDetail = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä ja varmenna laitteesi ja keskustelusi.';
 z.string.fi.preferencesDevicesId = 'ID: ';
-z.string.fi.preferencesDevicesRemove = 'Poista';
 z.string.fi.preferencesDevicesRemoveCancel = 'Peruuta';
 z.string.fi.preferencesDevicesRemoveDetail = 'Poista tämä laite jos olet lakannut käyttämästä sitä. Sinut kirjataan ulos tästä laitteesta välittömästi.';
 z.string.fi.preferencesDevicesSessionConfirmation = 'Istunto on nollattu.';
@@ -443,9 +440,6 @@ z.string.fi.preferencesOptionsContacts = 'Yhteystiedot';
 z.string.fi.preferencesOptionsContactsGmail = 'Tuo Gmailista';
 z.string.fi.preferencesOptionsContactsMacos = 'Tuo Yhteystiedoista';
 z.string.fi.preferencesOptionsContactsDetail = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
-z.string.fi.preferencesOptionsData = 'Käyttö- ja vikaraportit';
-z.string.fi.preferencesOptionsDataCheckbox = 'Käyttö- ja vikaraportit';
-z.string.fi.preferencesOptionsDataDetail = 'Tee Wirestä parempi lähetämällä anonyymiä tietoa.';
 z.string.fi.preferencesOptionsPopular = 'Yleisön pyynnöstä';
 z.string.fi.preferencesOptionsEmojiReplaceCheckbox = 'Korvaa tekstihymiöt emojeilla';
 z.string.fi.preferencesOptionsPreviewsSendCheckbox = 'Luo esikatselut lähettämillesi linkeille';
@@ -455,6 +449,8 @@ z.string.fi.preferencesOptionsNotificationsNone = 'Pois päältä';
 z.string.fi.preferencesOptionsNotificationsObfuscate = 'Piilota yksityiskohdat';
 z.string.fi.preferencesOptionsNotificationsObfuscateMessage = 'Näytä lähettäjä';
 z.string.fi.preferencesOptionsNotificationsOn = 'Näytä lähettäjä ja viesti';
+
+z.string.fi.backupCancel = 'Peruuta';
 
 z.string.fi.searchConnect = 'Yhdistä';
 z.string.fi.searchConnections = 'Yhteydet';
@@ -566,13 +562,5 @@ z.string.fi.initEvents = 'Ladataan viestejä';
 z.string.fi.initUpdatedFromNotifications = 'Melkein valmista - nauti Wirestä';
 z.string.fi.initProgress = ' — {{number1}} / {{number2}}';
 
-z.string.fi.ephememalUnitsNone = 'Pois päältä';
-z.string.fi.ephememalUnitsSecond = 'sekunti';
-z.string.fi.ephememalUnitsSeconds = 'sekuntia';
-z.string.fi.ephememalUnitsMinute = 'minuutti';
-z.string.fi.ephememalUnitsMinutes = 'minuutia';
-z.string.fi.ephememalUnitsHour = 'tunti';
-z.string.fi.ephememalUnitsHours = 'tuntia';
-z.string.fi.ephememalUnitsDay = 'päivä';
-z.string.fi.ephememalUnitsDays = 'päivää';
+z.string.fi.ephemeralUnitsNone = 'Pois päältä';
 

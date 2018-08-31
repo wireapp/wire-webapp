@@ -39,7 +39,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   archiveConversation(conversationEntity) {
     if (conversationEntity) {
-      return this.conversationRepository.archive_conversation(conversationEntity);
+      return this.conversationRepository.archiveConversation(conversationEntity);
     }
   }
 
@@ -92,21 +92,27 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   deleteClient(clientEntity) {
-    // @todo Add failure case ux WEBAPP-3570
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
-      action: password => {
-        this.clientRepository.deleteClient(clientEntity.id, password).catch(error => {
-          amplify.subscribe(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-        });
-      },
-      preventClose: true,
-      text: {
-        action: z.l10n.text(z.string.modalAccountRemoveDeviceAction),
-        input: z.l10n.text(z.string.modalAccountRemoveDevicePlaceholder),
-        message: z.l10n.text(z.string.modalAccountRemoveDeviceMessage),
-        title: z.l10n.text(z.string.modalAccountRemoveDeviceHeadline, clientEntity.model),
-      },
-      warning: false,
+    return new Promise((resolve, reject) => {
+      // @todo Add failure case ux WEBAPP-3570
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
+        action: password => {
+          this.clientRepository
+            .deleteClient(clientEntity.id, password)
+            .then(resolve)
+            .catch(error => {
+              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+              reject(error);
+            });
+        },
+        preventClose: true,
+        text: {
+          action: z.l10n.text(z.string.modalAccountRemoveDeviceAction),
+          input: z.l10n.text(z.string.modalAccountRemoveDevicePlaceholder),
+          message: z.l10n.text(z.string.modalAccountRemoveDeviceMessage),
+          title: z.l10n.text(z.string.modalAccountRemoveDeviceHeadline, clientEntity.model),
+        },
+        warning: false,
+      });
     });
   }
 
@@ -168,7 +174,15 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   open1to1Conversation(userEntity) {
     if (userEntity) {
       return this.conversationRepository
-        .get_1to1_conversation(userEntity)
+        .get1To1Conversation(userEntity)
+        .then(conversationEntity => this._openConversation(conversationEntity));
+    }
+  }
+
+  open1to1ConversationWithService(serviceEntity) {
+    if (serviceEntity) {
+      return this.integrationRepository
+        .get1To1ConversationWithService(serviceEntity)
         .then(conversationEntity => this._openConversation(conversationEntity));
     }
   }
@@ -180,20 +194,22 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   _openConversation(conversationEntity) {
-    if (conversationEntity.is_archived()) {
-      this.conversationRepository.unarchive_conversation(conversationEntity);
-    }
+    if (conversationEntity) {
+      if (conversationEntity.is_archived()) {
+        this.conversationRepository.unarchiveConversation(conversationEntity, true);
+      }
 
-    if (conversationEntity.is_cleared()) {
-      conversationEntity.cleared_timestamp(0);
-    }
+      if (conversationEntity.is_cleared()) {
+        conversationEntity.cleared_timestamp(0);
+      }
 
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    }
   }
 
   removeFromConversation(conversationEntity, userEntity) {
     if (conversationEntity && userEntity) {
-      if (userEntity.isBot) {
+      if (userEntity.isService) {
         return this.integrationRepository.removeService(conversationEntity, userEntity);
       }
 
@@ -231,7 +247,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         action: () => {
           this.userRepository
             .unblockUser(userEntity, showConversation)
-            .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
+            .then(() => this.conversationRepository.get1To1Conversation(userEntity))
             .then(conversationEntity => {
               return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             });

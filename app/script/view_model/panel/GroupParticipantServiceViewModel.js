@@ -23,95 +23,79 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServiceViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {
-    this.mainViewModel = mainViewModel;
-    this.panelViewModel = panelViewModel;
-    this.conversationRepository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
+z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServiceViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
+  constructor(params) {
+    super(params);
 
-    this.actionsViewModel = this.mainViewModel.actions;
-    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationRepository = this.repositories.conversation;
+    this.integrationRepository = this.repositories.integration;
+    this.userRepository = this.repositories.user;
+
+    this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
 
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
 
-    this.isVisible = ko.pureComputed(() => {
-      return this.panelViewModel.groupParticipantServiceVisible() && this.selectedParticipant();
-    });
+    this.isAddMode = ko.observable(false);
 
-    this.isAddMode = ko.pureComputed(() => {
-      return this.panelViewModel._isStateVisible(z.viewModel.PanelViewModel.STATE.ADD_SERVICE);
-    });
+    this.conversationInTeam = ko.pureComputed(() => this.activeConversation() && this.activeConversation().inTeam());
 
-    this.selectedIsInConversation = ko.pureComputed(() => {
-      if (this.isVisible()) {
-        const participatingUserIds = this.conversationEntity().participating_user_ids();
+    this.selectedInConversation = ko.pureComputed(() => {
+      if (this.isVisible() && this.activeConversation()) {
+        const participatingUserIds = this.activeConversation().participating_user_ids();
         return participatingUserIds.some(id => this.selectedParticipant().id === id);
       }
     });
 
     this.selfIsActiveParticipant = ko.pureComputed(() => {
-      return this.isVisible() ? this.conversationEntity().isActiveParticipant() : false;
+      return this.isVisible() ? this.activeConversation().isActiveParticipant() : false;
     });
-    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
-    this.showGroupParticipant = this.showGroupParticipant.bind(this);
+
+    this.showActions = ko.pureComputed(() => {
+      return this.selfIsActiveParticipant() && this.selectedInConversation() && this.conversationInTeam();
+    });
+
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedService() && this.isVisible())
+      .computed(() => this.selectedService() && this.selectedService().providerName() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
-  clickOnBack() {
-    const newState = this.isAddMode()
-      ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
-      : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
-    this.panelViewModel.switchState(newState, true);
+  getElementId() {
+    return 'group-participant-service';
   }
 
-  clickOnClose() {
-    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
+  getEntityId() {
+    return this.selectedParticipant().id;
   }
 
   clickOnAdd() {
-    this.panelViewModel.addParticipants.clickToAddParticipants();
-    this.clickOnBack();
+    this.integrationRepository.addService(this.activeConversation(), this.selectedService(), 'conversation_details');
+    this.onGoToRoot();
+  }
+
+  clickToOpen() {
+    this.actionsViewModel.open1to1ConversationWithService(this.selectedService());
   }
 
   clickToRemove() {
     this.actionsViewModel
-      .removeFromConversation(this.conversationEntity(), this.selectedParticipant())
-      .then(() => this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS));
+      .removeFromConversation(this.activeConversation(), this.selectedParticipant())
+      .then(this.onGoBack);
   }
 
-  resetView() {
-    this.selectedParticipant(undefined);
+  initView({entity: service, addMode = false}) {
+    const serviceEntity = ko.unwrap(service);
+    this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);
-  }
-
-  showGroupParticipant(serviceEntity) {
-    this.selectedParticipant(ko.unwrap(serviceEntity));
+    this.isAddMode(addMode);
     this._showService(this.selectedParticipant());
   }
 
   _showService(entity) {
-    if (entity instanceof z.integration.ServiceEntity) {
-      this.selectedService(entity);
-      this.integrationRepository
-        .getProviderById(entity.providerId)
-        .then(providerEntity => this.selectedService().providerName(providerEntity.name));
-      return;
-    }
-
-    const {providerId, serviceId} = entity;
-
-    this.integrationRepository
-      .getServiceById(providerId, serviceId)
-      .then(serviceEntity => {
-        this.selectedService(serviceEntity);
-        return this.integrationRepository.getProviderById(providerId);
-      })
-      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
+    this.integrationRepository.getServiceFromUser(entity).then(serviceEntity => {
+      this.selectedService(serviceEntity);
+      this.integrationRepository.addProviderNameToParticipant(serviceEntity);
+    });
   }
 };

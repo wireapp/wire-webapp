@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import * as TrackingAction from '../module/action/TrackingAction';
 import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
@@ -28,16 +27,17 @@ import {
   COLOR,
   CheckIcon,
   ContainerXS,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
   Form,
+  Muted,
   ButtonLink,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {pathWithParams} from '../util/urlUtil';
-import EXTERNAL_ROUTE from '../externalRoute';
+import {getAppPath} from '../util/urlUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -56,16 +56,7 @@ class InitialInvite extends React.PureComponent {
     this.props.fetchSelf();
   }
 
-  onInviteDone = () => {
-    const {invites} = this.props;
-    const invited = !!invites.length;
-    return this.props
-      .trackEvent({
-        attributes: {invited, invites: invites.length},
-        name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
-      })
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
-  };
+  onInviteDone = () => window.location.replace(getAppPath());
 
   renderEmail = email => (
     <div
@@ -120,7 +111,7 @@ class InitialInvite extends React.PureComponent {
         >
           <div>
             <H1 center>{_(inviteStrings.headline)}</H1>
-            <Text>{_(inviteStrings.subhead)}</Text>
+            <Muted>{_(inviteStrings.subhead)}</Muted>
           </div>
           <div style={{margin: '18px 0', minHeight: 220}}>
             {invites.map(({email}) => this.renderEmail(email))}
@@ -140,8 +131,8 @@ class InitialInvite extends React.PureComponent {
                 />
                 <RoundIconButton
                   disabled={isFetching || !enteredEmail}
-                  icon="plane"
                   type="submit"
+                  icon={ICON_NAME.PLANE}
                   data-uie-name="do-send-invite"
                   formNoValidate
                 />
@@ -180,7 +171,6 @@ export default injectIntl(
       fetchSelf,
       invite,
       resetError,
-      ...TrackingAction,
     }
   )(InitialInvite)
 );

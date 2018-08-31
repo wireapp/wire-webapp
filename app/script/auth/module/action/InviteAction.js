@@ -38,7 +38,7 @@ export function invite(invitation) {
         message: 'This email has already been invited',
       });
       dispatch(InviteActionCreator.failedAddInvite(error));
-      throw BackendError.handle(error);
+      throw error;
     }
 
     invitation.locale = languageSelector.getLanguage(state);
@@ -49,7 +49,7 @@ export function invite(invitation) {
       .then(createdInvite => dispatch(InviteActionCreator.successfulAddInvite(createdInvite)))
       .catch(error => {
         dispatch(InviteActionCreator.failedAddInvite(error));
-        throw BackendError.handle(error);
+        throw error;
       });
   };
 }

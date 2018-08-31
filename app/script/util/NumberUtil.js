@@ -25,6 +25,10 @@ z.util.NumberUtil = {
     return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
   },
 
+  clamp: (value, min, max) => {
+    return Math.max(min, Math.min(max, value));
+  },
+
   getRandomNumber: (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum),
 
   inRange: (value, lowerBound, upperBound) => value >= lowerBound && value <= upperBound,

@@ -94,6 +94,9 @@ z.string.pt.callJoin = 'Juntar-se';
 z.string.pt.callChooseSharedScreen = 'Escolher um ecrã para partilhar';
 z.string.pt.callParticipants = '{{number}} na chamada';
 
+z.string.pt.videoCallOverlayMute = 'Desativar som';
+z.string.pt.videoCallOverlayHangUp = 'Desligar';
+
 z.string.pt.modalAcknowledgeAction = 'Ok';
 z.string.pt.modalConfirmSecondary = 'Cancelar';
 z.string.pt.modalOptionSecondary = 'Cancelar';
@@ -156,8 +159,6 @@ z.string.pt.modalConnectAcceptHeadline = 'Aceitar?';
 z.string.pt.modalConnectAcceptMessage = 'Isto irá ligá-lo e criar uma conversa com {{user}}.';
 z.string.pt.modalConnectAcceptSecondary = 'Ignorar';
 
-z.string.pt.modalConversationAddBotAction = 'Confirmar';
-
 z.string.pt.modalConversationClearAction = 'Eliminar';
 z.string.pt.modalConversationClearHeadline = 'Apagar conteúdo?';
 z.string.pt.modalConversationClearOption = 'Também abandona a conversa';
@@ -193,12 +194,15 @@ z.string.pt.modalConversationRemoveAction = 'Remover';
 z.string.pt.modalConversationRemoveHeadline = 'Remover?';
 z.string.pt.modalConversationRemoveMessage = '{{user}} não será capaz de enviar ou receber mensagens nesta conversa.';
 
+z.string.pt.modalConversationRemoveGuestsAction = 'Remover';
 
 z.string.pt.modalConversationTooManyMembersHeadline = 'Casa cheia';
 
 z.string.pt.modalIntegrationUnavailableHeadline = 'Atualmente os "bots" não estão disponíveis';
 z.string.pt.modalIntegrationUnavailableMessage = 'Obrigado pelo seu interesse nos "bots". Atualmente o serviço está suspenso enquanto preparamos a nova versão. Fique atento.';
 
+
+z.string.pt.modalImproveWireAction = 'Aceitar';
 
 z.string.pt.modalSessionResetHeadline = 'A sessão foi reposta';
 z.string.pt.modalSessionResetMessage1 = 'Se o problema não está resolvido,';
@@ -228,8 +232,6 @@ z.string.pt.conversationYouAccusative = 'você';
 z.string.pt.conversationConnectionAccepted = 'Ligado';
 z.string.pt.conversationConnectionBlocked = 'Bloqueado';
 z.string.pt.conversationConnectionCancelRequest = 'Cancelar pedido de ligação';
-z.string.pt.conversationCreate = ' começou uma conversa com {{users}}';
-z.string.pt.conversationCreateYou = ' começou uma conversa com {{users}}';
 z.string.pt.conversationDeviceStartedUsingOne = ' começou a usar';
 z.string.pt.conversationDeviceStartedUsingMany = ' começou a usar';
 z.string.pt.conversationDeviceUnverified = ' retirou a verificação de um de';
@@ -240,17 +242,10 @@ z.string.pt.conversationDeviceNewDeviceMany = ' novos dispositivos';
 z.string.pt.conversationDeviceNewPeopleJoinedVerify = ' verificar dispositivos';
 z.string.pt.conversationJustNow = 'Agora mesmo';
 z.string.pt.conversationLocationLink = 'Abrir Mapa';
-z.string.pt.conversationMemberJoin = ' adicionou {{users}}';
-z.string.pt.conversationMemberJoinYou = ' adicionou {{users}}';
-z.string.pt.conversationMemberLeaveLeft = ' deixou';
-z.string.pt.conversationMemberLeaveLeftYou = ' deixou';
-z.string.pt.conversationMemberLeaveRemoved = ' removeu {{users}}';
-z.string.pt.conversationMemberLeaveRemovedYou = ' removeu {{users}}';
 z.string.pt.conversationMessageDelivered = 'Entregue';
 z.string.pt.conversationRename = ' renomeou a conversa';
 z.string.pt.conversationRenameYou = ' renomeou a conversa';
 z.string.pt.conversationResume = 'Iniciar uma conversa com {{users}}';
-z.string.pt.conversationTeamLeave = ' foi removido da equipa';
 z.string.pt.conversationPing = ' pingou';
 z.string.pt.conversationPingYou = ' pingou';
 z.string.pt.conversationToday = 'hoje';
@@ -266,6 +261,7 @@ z.string.pt.conversationMissedMessages = 'Não usou este dispositivo durante alg
 z.string.pt.conversationAssetDownloading = 'A descarregar…';
 z.string.pt.conversationAssetUploadFailed = 'O carregamento falhou';
 z.string.pt.conversationPlaybackError = 'Incapaz de reproduzir';
+z.string.pt.conversationContextMenuCopy = 'Copiar';
 z.string.pt.conversationContextMenuEdit = 'Editar';
 z.string.pt.conversationContextMenuDelete = 'Eliminar para mim';
 z.string.pt.conversationContextMenuDeleteEveryone = 'Eliminar para todos';
@@ -302,10 +298,7 @@ z.string.pt.conversationsConnectionRequestOne = '1 pessoa em espera';
 z.string.pt.conversationsEmptyConversation = 'Conversa em grupo';
 z.string.pt.conversationsNoConversations = 'Ainda não existem conversas';
 z.string.pt.conversationsPopoverArchive = 'Arquivar';
-z.string.pt.conversationsPopoverBlock = 'Bloquear';
 z.string.pt.conversationsPopoverCancel = 'Cancelar pedido';
-z.string.pt.conversationsPopoverClear = 'Eliminar';
-z.string.pt.conversationsPopoverLeave = 'Sair';
 z.string.pt.conversationsPopoverNotify = 'Activar som';
 z.string.pt.conversationsPopoverSilence = 'Desativar som';
 z.string.pt.conversationsPopoverUnarchive = 'Retirar do arquivo';
@@ -351,13 +344,18 @@ z.string.pt.addParticipantsSearchPlaceholder = 'Pesquisar por nome';
 z.string.pt.addParticipantsTabsPeople = 'Pessoas';
 z.string.pt.addParticipantsTabsServices = 'Serviços';
 
+z.string.pt.conversationDetailsActionArchive = 'Arquivar';
 z.string.pt.conversationDetailsActionCancelRequest = 'Cancelar pedido';
 z.string.pt.conversationDetailsActionDevices = 'Dispositivos';
 z.string.pt.conversationDetailsGuestsOff = 'Desligado';
+z.string.pt.conversationDetailsOptions = 'Opções';
 z.string.pt.conversationDetailsParticipantsServicesMany = 'Serviços';
 z.string.pt.conversationDetailsParticipantsUsersMany = 'Pessoas';
 z.string.pt.conversationDetailsPeople = 'Pessoas';
 z.string.pt.conversationDetailsServices = 'Serviços';
+
+z.string.pt.conversationParticipantsTitle = 'Pessoas';
+z.string.pt.conversationParticipantsSearchPlaceholder = 'Pesquisar por nome';
 
 z.string.pt.groupParticipantActionCancelRequest = 'Cancelar pedido';
 z.string.pt.groupParticipantActionDevices = 'Dispositivos';
@@ -424,7 +422,6 @@ z.string.pt.preferencesDevicesCurrent = 'Atual';
 z.string.pt.preferencesDevicesFingerprint = 'Impressão digital da chave';
 z.string.pt.preferencesDevicesFingerprintDetail = 'O Wire gera em cada dispositivo uma impressão digital única. Compare-os e verifique se seus dispositivos e conversas.';
 z.string.pt.preferencesDevicesId = 'ID: ';
-z.string.pt.preferencesDevicesRemove = 'Remover';
 z.string.pt.preferencesDevicesRemoveCancel = 'Cancelar';
 z.string.pt.preferencesDevicesRemoveDetail = 'Remove este dispositivo se tiver parado de o usar. Terminará a sua sessão neste dispositivo imediatamente.';
 z.string.pt.preferencesDevicesSessionConfirmation = 'A sessão foi reposta.';
@@ -444,9 +441,6 @@ z.string.pt.preferencesOptionsContacts = 'Contactos';
 z.string.pt.preferencesOptionsContactsGmail = 'Importar do Gmail';
 z.string.pt.preferencesOptionsContactsMacos = 'Importar dos Contactos';
 z.string.pt.preferencesOptionsContactsDetail = 'Usamos seus dados de contacto para liga-lo aos outros. Nós anonimizamos toda a informação e não a partilhamos com outras entidades.';
-z.string.pt.preferencesOptionsData = 'Relatórios de uso e falhas';
-z.string.pt.preferencesOptionsDataCheckbox = 'Enviar dados anónimos';
-z.string.pt.preferencesOptionsDataDetail = 'Melhorar o Wire através do envio de informações anónimas.';
 z.string.pt.preferencesOptionsPopular = 'A pedido popular';
 z.string.pt.preferencesOptionsEmojiReplaceCheckbox = 'Substituir emoticons por emojis';
 z.string.pt.preferencesOptionsPreviewsSendCheckbox = 'Criar pré-visualizações para ligações que enviar';
@@ -456,6 +450,8 @@ z.string.pt.preferencesOptionsNotificationsNone = 'Desligado';
 z.string.pt.preferencesOptionsNotificationsObfuscate = 'Ocultar detalhes';
 z.string.pt.preferencesOptionsNotificationsObfuscateMessage = 'Mostrar remetente';
 z.string.pt.preferencesOptionsNotificationsOn = 'Mostrar o remetente e a mensagem';
+
+z.string.pt.backupCancel = 'Cancelar';
 
 z.string.pt.searchConnect = 'Ligar';
 z.string.pt.searchConnections = 'Ligações';
@@ -572,13 +568,5 @@ z.string.pt.initEvents = 'A carregar mensagens';
 z.string.pt.initUpdatedFromNotifications = 'Quase pronto - Desfrute do Wire';
 z.string.pt.initProgress = ' — {{number1}} de {{number2}}';
 
-z.string.pt.ephememalUnitsNone = 'Desligado';
-z.string.pt.ephememalUnitsSecond = 'segundo';
-z.string.pt.ephememalUnitsSeconds = 'segundos';
-z.string.pt.ephememalUnitsMinute = 'minuto';
-z.string.pt.ephememalUnitsMinutes = 'minutos';
-z.string.pt.ephememalUnitsHour = 'hora';
-z.string.pt.ephememalUnitsHours = 'horas';
-z.string.pt.ephememalUnitsDay = 'dia';
-z.string.pt.ephememalUnitsDays = 'dias';
+z.string.pt.ephemeralUnitsNone = 'Desligado';
 

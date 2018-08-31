@@ -17,35 +17,128 @@
  *
  */
 
+//@ts-check
+
 'use strict';
+
+/**
+ * @typedef {object} DiscreteTimeUnit
+ * @property {string} longUnit
+ * @property {string} symbol
+ * @property {number} value
+ */
+
+/**
+ * @typedef {object} DurationUnit
+ * @property {string} text
+ * @property {string} symbol
+ * @property {number} value
+ */
 
 window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.TimeUtil = {
+  UNITS_IN_MILLIS: {
+    DAY: 1000 * 60 * 60 * 24,
+    HOUR: 1000 * 60 * 60,
+    MINUTE: 1000 * 60,
+    SECOND: 1000,
+    WEEK: 1000 * 60 * 60 * 24 * 7,
+    YEAR: 1000 * 60 * 60 * 24 * 365,
+  },
+
   adjustCurrentTimestamp: function(timeOffset) {
     timeOffset = _.isNumber(timeOffset) ? timeOffset : 0;
     return Date.now() - timeOffset;
   },
 
-  /**
-   * Format seconds into 15s, 2m.
-   * @param {number} duration - Duration to format in seconds
-   * @returns {Object} Unit and value
-   */
-  formatMilliseconds: duration => {
-    const seconds = Math.floor(duration / 1000);
+  durationUnits: () => {
+    return [
+      {
+        plural: 'ephemeralUnitsYears',
+        singular: 'ephemeralUnitsYear',
+        symbol: 'y',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
+      },
+      {
+        plural: 'ephemeralUnitsWeeks',
+        singular: 'ephemeralUnitsWeek',
+        symbol: 'w',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
+      },
+      {
+        plural: 'ephemeralUnitsDays',
+        singular: 'ephemeralUnitsDay',
+        symbol: 'd',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+      },
+      {
+        plural: 'ephemeralUnitsHours',
+        singular: 'ephemeralUnitsHour',
+        symbol: 'h',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
+      },
+      {
+        plural: 'ephemeralUnitsMinutes',
+        singular: 'ephemeralUnitsMinute',
+        symbol: 'm',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      },
+      {
+        plural: 'ephemeralUnitsSeconds',
+        singular: 'ephemeralUnitsSecond',
+        symbol: 's',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      },
+    ];
+  },
 
-    switch (false) {
-      case !(seconds < 60):
-        return {unit: 's', value: seconds};
-      case !(seconds < 60 * 60):
-        return {unit: 'm', value: Math.floor(seconds / 60)};
-      case !(seconds < 60 * 60 * 24):
-        return {unit: 'h', value: Math.floor(seconds / 60 / 60)};
-      default:
-        return {unit: 'd', value: Math.floor(seconds / 60 / 60 / 24)};
+  /**
+   * Format milliseconds into 15s, 2m.
+   * @param {number} duration - Duration to format in milliseconds
+   * @returns {DurationUnit} Unit, value and localized string
+   */
+  formatDuration: duration => {
+    const mappedUnits = z.util.TimeUtil.mapUnits(duration, true);
+    const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+    return {
+      symbol: firstNonZeroUnit.symbol,
+      text: `${firstNonZeroUnit.value} ${z.l10n.text(firstNonZeroUnit.longUnit)}`,
+      value: firstNonZeroUnit.value,
+    };
+  },
+
+  /**
+   * Generate a human readable string of the remaining time
+   * @param {number} duration - the remaining time in milliseconds
+   * @returns {string} readable representation of the remaining time
+   */
+  formatDurationCaption: duration => {
+    const mappedUnits = z.util.TimeUtil.mapUnits(duration, false);
+    const hours = mappedUnits.find(unit => unit.symbol === 'h');
+    const minutes = mappedUnits.find(unit => unit.symbol === 'm');
+    const hasHours = hours.value > 0;
+    const validUnitStrings = [];
+    for (let index = 0; index < mappedUnits.length; index++) {
+      const unit = mappedUnits[index];
+      if (unit === hours && hasHours) {
+        validUnitStrings.push(`${z.util.zeroPadding(hours.value)}:${z.util.zeroPadding(minutes.value)}`);
+        break;
+      }
+      if (unit.value > 0) {
+        validUnitStrings.push(`${unit.value} ${unit.longUnit}`);
+      }
+      if (validUnitStrings.length === 2) {
+        break;
+      }
+      const nextUnit = mappedUnits[index + 1];
+      if (validUnitStrings.length > 0 && nextUnit && nextUnit.value === 0) {
+        break;
+      }
     }
+    const joiner = ` ${z.l10n.text(z.string.and)} `;
+    return `${validUnitStrings.join(joiner)} ${z.l10n.text(z.string.ephemeralRemaining)}`;
   },
 
   /**
@@ -91,5 +184,32 @@ z.util.TimeUtil = {
     return time.format(format);
   },
 
-  getUnixTimestamp: () => Math.floor(Date.now() / 1000),
+  getCurrentDate: () => new Date().toISOString().substring(0, 10),
+
+  getUnixTimestamp: () => Math.floor(Date.now() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
+
+  /**
+   * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
+   * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
+   * @param {number} duration - duration in milliseconds
+   * @param {boolean} rounded - should the units be rounded as opposed to floored
+   * @returns {DiscreteTimeUnit[]} calculated time units
+   */
+  mapUnits: (duration, rounded) => {
+    const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index, units) => {
+      let value = duration;
+      if (index > 0) {
+        value %= units[index - 1].value;
+      }
+      value /= unit.value;
+      value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
+      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
+      return {
+        longUnit,
+        symbol: unit.symbol,
+        value,
+      };
+    });
+    return mappedUnits;
+  },
 };

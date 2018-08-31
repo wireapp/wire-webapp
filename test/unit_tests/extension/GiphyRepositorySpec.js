@@ -24,7 +24,7 @@
 describe('Giphy Repository', () => {
   let server = null;
   const urls = {
-    rest_url: 'http://localhost',
+    restUrl: 'http://localhost',
     websocket_url: 'wss://localhost',
   };
 
@@ -36,7 +36,6 @@ describe('Giphy Repository', () => {
     server = sinon.fakeServer.create();
 
     client = new z.service.BackendClient(urls);
-    client.logger.level = client.logger.levels.OFF;
 
     giphy_service = new z.extension.GiphyService(client);
     giphy_repository = new z.extension.GiphyRepository(giphy_service);
@@ -44,7 +43,7 @@ describe('Giphy Repository', () => {
     spyOn(giphy_service, 'getRandom').and.callThrough();
     spyOn(giphy_service, 'getById').and.callThrough();
 
-    const random_foo_gif = `${urls.rest_url}/proxy/giphy/v1/gifs/random?tag=foo`;
+    const random_foo_gif = `${urls.restUrl}/proxy/giphy/v1/gifs/random?tag=foo`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
     server.respondWith('GET', random_foo_gif, [
       200,
@@ -80,7 +79,7 @@ describe('Giphy Repository', () => {
     ]);
     /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
 
-    const random_foo_gif_data = `${urls.rest_url}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
+    const random_foo_gif_data = `${urls.restUrl}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
     server.respondWith('GET', random_foo_gif_data, [
       200,

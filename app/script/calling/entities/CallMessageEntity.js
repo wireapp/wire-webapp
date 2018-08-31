@@ -26,6 +26,25 @@ window.z.calling.entities = z.calling.entities || {};
 z.calling.entities.CallMessageEntity = class CallMessageEntity {
   static get CONFIG() {
     return {
+      PAYLOAD_TYPES: {
+        PROPS: [
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
+          z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
+          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
+        ],
+        SDP: [
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
+        ],
+        TARGETED: [
+          z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
+        ],
+      },
       SESSION_ID_LENGTH: 4,
       VERSION: '3.0',
     };
@@ -51,11 +70,7 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
    * @returns {undefined} No return value
    */
   addProperties(additionalProperties = {}) {
-    for (const key in additionalProperties) {
-      if (additionalProperties.hasOwnProperty(key)) {
-        this[key] = additionalProperties[key];
-      }
-    }
+    Object.entries(additionalProperties).forEach(([key, value]) => (this[key] = value));
   }
 
   /**
@@ -70,14 +85,8 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
       version: CallMessageEntity.CONFIG.VERSION,
     };
 
-    const extendedMessageTypes = [
-      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-      z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
-      z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
-      z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
-    ];
-
-    if (extendedMessageTypes.includes(this.type)) {
+    const isPropsMessageType = CallMessageEntity.CONFIG.PAYLOAD_TYPES.PROPS.includes(this.type);
+    if (isPropsMessageType) {
       json_payload.props = this.properties;
       const isTypePropSync = this.type === z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC;
       if (!isTypePropSync) {
@@ -85,13 +94,12 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
       }
     }
 
-    const targetedMessageTypes = [
-      z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
-      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-      z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
-    ];
+    const isSdpMessageType = CallMessageEntity.CONFIG.PAYLOAD_TYPES.SDP.includes(this.type);
+    if (isSdpMessageType) {
+      json_payload.sdp = this.sdp;
+    }
 
-    const isTargetedMessageType = targetedMessageTypes.includes(this.type);
+    const isTargetedMessageType = CallMessageEntity.CONFIG.PAYLOAD_TYPES.TARGETED.includes(this.type);
     if (isTargetedMessageType) {
       json_payload.dest_clientid = this.remoteClientId;
       json_payload.dest_userid = this.remoteUserId;

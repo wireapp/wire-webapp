@@ -34,6 +34,7 @@ module.exports = Object.assign({}, prodConfig, {
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true,
   }),
+  mode: 'production',
   plugins: [
     ...commonConfig.plugins,
     new webpack.DefinePlugin({

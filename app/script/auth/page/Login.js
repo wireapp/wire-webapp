@@ -24,6 +24,7 @@ import {
   Columns,
   Column,
   Form,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   InputBlock,
@@ -31,9 +32,10 @@ import {
   Checkbox,
   CheckboxLabel,
   H1,
-  Text,
+  Muted,
   Small,
   Link,
+  Loading,
   ArrowIcon,
   COLOR,
   ErrorMessage,
@@ -60,6 +62,7 @@ import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -68,6 +71,7 @@ class Login extends React.PureComponent {
     conversationCode: null,
     conversationKey: null,
     email: '',
+    hideSSOLogin: false,
     isValidLink: true,
     logoutReason: null,
     password: '',
@@ -113,6 +117,8 @@ class Login extends React.PureComponent {
           }));
         });
     }
+
+    this.setState((state, props) => ({hideSSOLogin: URLUtil.hasURLParameter(QUERY_KEY.HIDE_SSO)}));
   };
 
   componentDidMount = () => {
@@ -126,17 +132,21 @@ class Login extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
+  componentWillUnmount = () => {
+    this.props.resetError();
+  };
+
   immediateLogin = () => {
     return Promise.resolve()
       .then(() => this.props.doInit({isImmediateLogin: true}))
-      .then(() => this.props.doInitializeClient(true, undefined))
+      .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
       .then(this.navigateChooseHandleOrWebapp)
       .catch(() => {});
   };
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      ? window.location.replace(URLUtil.getAppPath())
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
@@ -150,13 +160,14 @@ class Login extends React.PureComponent {
     this.inputs.email.value = this.inputs.email.value.trim();
     const validationErrors = [];
     const validInputs = this.state.validInputs;
-    for (const inputKey of Object.keys(this.inputs)) {
-      const currentInput = this.inputs[inputKey];
+
+    Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.checkValidity()) {
         validationErrors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
       }
       validInputs[inputKey] = currentInput.validity.valid;
-    }
+    });
+
     this.setState({validInputs, validationErrors});
     return Promise.resolve(validationErrors)
       .then(errors => {
@@ -165,8 +176,9 @@ class Login extends React.PureComponent {
         }
       })
       .then(() => {
-        const {email, password, persist} = this.state;
-        const login = {password, persist};
+        const {password, persist} = this.state;
+        const email = this.state.email.trim();
+        const login = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
         if (this.isValidEmail(email)) {
           login.email = email;
@@ -236,7 +248,16 @@ class Login extends React.PureComponent {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
+    const {
+      logoutReason,
+      isValidLink,
+      hideSSOLogin,
+      email,
+      password,
+      persist,
+      validInputs,
+      validationErrors,
+    } = this.state;
     return (
       <Page>
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -257,7 +278,7 @@ class Login extends React.PureComponent {
               >
                 <div>
                   <H1 center>{_(loginStrings.headline)}</H1>
-                  <Text>{_(loginStrings.subhead)}</Text>
+                  <Muted>{_(loginStrings.subhead)}</Muted>
                   <Form style={{marginTop: 30}} data-uie-name="login">
                     <InputBlock>
                       <Input
@@ -281,7 +302,7 @@ class Login extends React.PureComponent {
                       />
                       <InputSubmitCombo>
                         <Input
-                          name="password"
+                          name="password-login"
                           tabIndex="2"
                           onChange={event =>
                             this.setState({
@@ -301,25 +322,31 @@ class Login extends React.PureComponent {
                           required
                           data-uie-name="enter-password"
                         />
-                        <RoundIconButton
-                          tabIndex="4"
-                          disabled={!email || !password}
-                          type="submit"
-                          formNoValidate
-                          onClick={this.handleSubmit}
-                          data-uie-name="do-sign-in"
-                        />
+                        {this.props.isFetching ? (
+                          <Loading size={32} />
+                        ) : (
+                          <RoundIconButton
+                            tabIndex="4"
+                            disabled={!email || !password}
+                            type="submit"
+                            formNoValidate
+                            icon={ICON_NAME.ARROW}
+                            onClick={this.handleSubmit}
+                            data-uie-name="do-sign-in"
+                          />
+                        )}
                       </InputSubmitCombo>
                     </InputBlock>
                     {validationErrors.length ? (
                       parseValidationErrors(validationErrors)
                     ) : loginError ? (
                       <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                    ) : null}
-                    {logoutReason && (
+                    ) : logoutReason ? (
                       <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
                         <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
                       </Small>
+                    ) : (
+                      <div style={{marginTop: '4px'}}>&nbsp;</div>
                     )}
                     {!isDesktopApp() && (
                       <Checkbox
@@ -327,25 +354,48 @@ class Login extends React.PureComponent {
                         onChange={event => this.setState({persist: !event.target.checked})}
                         checked={!persist}
                         data-uie-name="enter-public-computer-sign-in"
-                        style={{justifyContent: 'center'}}
+                        style={{justifyContent: 'center', marginTop: '12px'}}
                       >
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
                   </Form>
                 </div>
-                <Columns>
-                  <Column>
-                    <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
+                {Environment.isInternalEnvironment() && !isDesktopApp() && !hideSSOLogin ? (
+                  <div style={{marginTop: '36px'}}>
+                    <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                  </Column>
-                  <Column>
-                    <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
-                      {_(loginStrings.phoneLogin)}
-                    </Link>
-                  </Column>
-                </Columns>
+                    <Columns style={{marginTop: '36px'}}>
+                      <Column>
+                        <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
+                          {_(loginStrings.ssoLogin)}
+                        </Link>
+                      </Column>
+                      <Column>
+                        <Link
+                          href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search}
+                          data-uie-name="go-sign-in-phone"
+                        >
+                          {_(loginStrings.phoneLogin)}
+                        </Link>
+                      </Column>
+                    </Columns>
+                  </div>
+                ) : (
+                  <Columns>
+                    <Column>
+                      <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
+                        {_(loginStrings.forgotPassword)}
+                      </Link>
+                    </Column>
+                    <Column>
+                      <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
+                        {_(loginStrings.phoneLogin)}
+                      </Link>
+                    </Column>
+                  </Columns>
+                )}
               </ContainerXS>
             </Column>
             <Column />
@@ -360,7 +410,6 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
-        clients: ClientSelector.getClients(state),
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),

@@ -96,6 +96,9 @@ z.string.nl.callJoin = 'Deelnemen';
 z.string.nl.callChooseSharedScreen = 'Kies een scherm om te delen';
 z.string.nl.callParticipants = '{{number}} bellen';
 
+z.string.nl.videoCallOverlayMute = 'Dempen';
+z.string.nl.videoCallOverlayHangUp = 'Ophangen';
+
 z.string.nl.modalAcknowledgeAction = 'Ok';
 z.string.nl.modalConfirmSecondary = 'Annuleer';
 z.string.nl.modalOptionSecondary = 'Annuleer';
@@ -158,10 +161,6 @@ z.string.nl.modalConnectAcceptHeadline = 'Accepteren?';
 z.string.nl.modalConnectAcceptMessage = 'Dit zal een verbinding met {{user}} maken en een gesprek openen.';
 z.string.nl.modalConnectAcceptSecondary = 'Negeer';
 
-z.string.nl.modalConversationAddBotAction = 'Bevestig';
-z.string.nl.modalConversationAddBotHeadline = 'Service toevoegen';
-z.string.nl.modalConversationAddBotMessage = 'Weet je zeker dat je een nieuw gesprek met {{name}} wil beginnen?';
-
 z.string.nl.modalConversationClearAction = 'Verwijderen';
 z.string.nl.modalConversationClearHeadline = 'Inhoud verwijderen?';
 z.string.nl.modalConversationClearOption = 'Ook het gesprek verlaten';
@@ -197,12 +196,15 @@ z.string.nl.modalConversationRemoveAction = 'Verwijderen';
 z.string.nl.modalConversationRemoveHeadline = 'Verwijder?';
 z.string.nl.modalConversationRemoveMessage = '{{user}} zal geen berichten kunnen versturen of ontvangen in dit gesprek.';
 
+z.string.nl.modalConversationRemoveGuestsAction = 'Verwijderen';
 
 z.string.nl.modalConversationTooManyMembersHeadline = 'Full house';
 
 z.string.nl.modalIntegrationUnavailableHeadline = 'Bots zijn nu niet beschikbaar';
 z.string.nl.modalIntegrationUnavailableMessage = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
 
+
+z.string.nl.modalImproveWireAction = 'Neem op';
 
 z.string.nl.modalServiceUnavailableHeadline = 'Toevoegen van de service niet mogelijk';
 z.string.nl.modalServiceUnavailableMessage = 'De service is op dit moment niet beschikbaar.';
@@ -232,15 +234,10 @@ z.string.nl.conversationYouNominative = 'jij';
 z.string.nl.conversationYouDative = 'jij';
 z.string.nl.conversationYouAccusative = 'jij';
 
-z.string.nl.conversationBotUser = 'Bot';
 z.string.nl.conversationConnectionAccepted = 'Verbonden';
 z.string.nl.conversationConnectionBlocked = 'Geblokkeerd';
 z.string.nl.conversationConnectionCancelRequest = 'Stop verzoek tot connectie';
-z.string.nl.conversationCreate = 'begon een gesprek met {{users}}';
-z.string.nl.conversationCreateName = '{{user}} is een gesprek begonnen';
-z.string.nl.conversationCreateNameYou = '{{user}} is een gesprek begonnen';
 z.string.nl.conversationCreateWith = 'met {{users}}';
-z.string.nl.conversationCreateYou = 'begon een gesprek met {{users}}';
 z.string.nl.conversationDeviceStartedUsingOne = ' begon met het gebruik van';
 z.string.nl.conversationDeviceStartedUsingMany = ' begon met het gebruik van';
 z.string.nl.conversationDeviceUnverified = ' unverified een van';
@@ -251,17 +248,10 @@ z.string.nl.conversationDeviceNewDeviceMany = ' nieuw apparaaten';
 z.string.nl.conversationDeviceNewPeopleJoinedVerify = ' controleer apparaten';
 z.string.nl.conversationJustNow = 'Zojuist';
 z.string.nl.conversationLocationLink = 'Open kaart';
-z.string.nl.conversationMemberJoin = '{{users}} toegevoegd';
-z.string.nl.conversationMemberJoinYou = '{{users}} toegevoegd';
-z.string.nl.conversationMemberLeaveLeft = ' links';
-z.string.nl.conversationMemberLeaveLeftYou = ' links';
-z.string.nl.conversationMemberLeaveRemoved = '{{users}} verwijderd';
-z.string.nl.conversationMemberLeaveRemovedYou = '{{users}} verwijderd';
 z.string.nl.conversationMessageDelivered = 'Afgeleverd';
 z.string.nl.conversationRename = ' je hebt de conversatie hernoemt';
 z.string.nl.conversationRenameYou = ' je hebt de conversatie hernoemt';
 z.string.nl.conversationResume = 'Begin een gesprek met {{users}}';
-z.string.nl.conversationTeamLeave = 'is verwijderd uit het team';
 z.string.nl.conversationPing = ' pinged';
 z.string.nl.conversationPingYou = ' pinged';
 z.string.nl.conversationToday = 'vandaag';
@@ -277,6 +267,7 @@ z.string.nl.conversationMissedMessages = 'Je hebt dit apparaat een tijdje niet g
 z.string.nl.conversationAssetDownloading = 'Downloaden…';
 z.string.nl.conversationAssetUploadFailed = 'Uploaden mislukt';
 z.string.nl.conversationPlaybackError = 'Niet in staat om te af te spelen';
+z.string.nl.conversationContextMenuCopy = 'Kopiëren';
 z.string.nl.conversationContextMenuEdit = 'Bewerken';
 z.string.nl.conversationContextMenuDelete = 'Verwijderen voor mij';
 z.string.nl.conversationContextMenuDeleteEveryone = 'Verwijderen voor iedereen';
@@ -319,10 +310,7 @@ z.string.nl.conversationsConnectionRequestOne = '1 persoon wacht';
 z.string.nl.conversationsEmptyConversation = 'Groepsgesprek';
 z.string.nl.conversationsNoConversations = 'Nog geen gesprekken';
 z.string.nl.conversationsPopoverArchive = 'Archiveren';
-z.string.nl.conversationsPopoverBlock = 'Blokkeren';
 z.string.nl.conversationsPopoverCancel = 'Annuleer verzoek';
-z.string.nl.conversationsPopoverClear = 'Verwijderen';
-z.string.nl.conversationsPopoverLeave = 'Verlaten';
 z.string.nl.conversationsPopoverNotify = 'Dempen opheffen';
 z.string.nl.conversationsPopoverSilence = 'Dempen';
 z.string.nl.conversationsPopoverUnarchive = 'Terugzetten';
@@ -370,14 +358,19 @@ z.string.nl.addParticipantsServiceConfirmButton = 'Service toevoegen';
 z.string.nl.addParticipantsTabsPeople = 'Deelnemers';
 z.string.nl.addParticipantsTabsServices = 'Services';
 
+z.string.nl.conversationDetailsActionArchive = 'Archiveren';
 z.string.nl.conversationDetailsActionCancelRequest = 'Annuleer verzoek';
 z.string.nl.conversationDetailsActionCreateGroup = 'Nieuwe groep';
 z.string.nl.conversationDetailsActionDevices = 'Apparaten';
 z.string.nl.conversationDetailsGuestsOff = 'Uit';
+z.string.nl.conversationDetailsOptions = 'Opties';
 z.string.nl.conversationDetailsParticipantsServicesMany = 'Services';
 z.string.nl.conversationDetailsParticipantsUsersMany = 'Deelnemers';
 z.string.nl.conversationDetailsPeople = 'Deelnemers';
 z.string.nl.conversationDetailsServices = 'Services';
+
+z.string.nl.conversationParticipantsTitle = 'Deelnemers';
+z.string.nl.conversationParticipantsSearchPlaceholder = 'Zoeken op naam';
 
 z.string.nl.groupParticipantActionCancelRequest = 'Annuleer verzoek';
 z.string.nl.groupParticipantActionDevices = 'Apparaten';
@@ -445,7 +438,6 @@ z.string.nl.preferencesDevicesCurrent = 'Huidig';
 z.string.nl.preferencesDevicesFingerprint = 'Digitale vingerafdruk';
 z.string.nl.preferencesDevicesFingerprintDetail = 'Wire geeft elk apparaat een eigen vingerafdruk. Vergelijk deze en verifieer je apparaten en gesprekken.';
 z.string.nl.preferencesDevicesId = 'ID: ';
-z.string.nl.preferencesDevicesRemove = 'Verwijderen';
 z.string.nl.preferencesDevicesRemoveCancel = 'Annuleer';
 z.string.nl.preferencesDevicesRemoveDetail = 'Verwijder dit apparaat als je het niet meer gebruikt. Je berichtengeschiedenis wordt verwijderd op dit apparaat en je wordt uitgelogd.';
 z.string.nl.preferencesDevicesSessionConfirmation = 'De sessie is gereset.';
@@ -465,9 +457,6 @@ z.string.nl.preferencesOptionsContacts = 'Contacten';
 z.string.nl.preferencesOptionsContactsGmail = 'Importeren uit Gmail';
 z.string.nl.preferencesOptionsContactsMacos = 'Importeren uit contacten';
 z.string.nl.preferencesOptionsContactsDetail = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
-z.string.nl.preferencesOptionsData = 'Diagnose en gebruik reporten';
-z.string.nl.preferencesOptionsDataCheckbox = 'Anoniem gegevens delen';
-z.string.nl.preferencesOptionsDataDetail = 'Maak Wire beter door anoniem data te versturen.';
 z.string.nl.preferencesOptionsPopular = 'Op veler verzoek';
 z.string.nl.preferencesOptionsEmojiReplaceCheckbox = 'Getypte emoticons vervangen door emojis';
 z.string.nl.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -478,6 +467,8 @@ z.string.nl.preferencesOptionsNotificationsNone = 'Uit';
 z.string.nl.preferencesOptionsNotificationsObfuscate = 'Details verbergen';
 z.string.nl.preferencesOptionsNotificationsObfuscateMessage = 'Toon zender';
 z.string.nl.preferencesOptionsNotificationsOn = 'Toon verzender en bericht';
+
+z.string.nl.backupCancel = 'Annuleer';
 
 z.string.nl.searchConnect = 'Verbind';
 z.string.nl.searchConnections = 'Contacten';
@@ -598,13 +589,5 @@ z.string.nl.initEvents = 'Berichten laden';
 z.string.nl.initUpdatedFromNotifications = 'Bijna klaar - Geniet van Wire';
 z.string.nl.initProgress = ' — {{number1}} van {{number2}}';
 
-z.string.nl.ephememalUnitsNone = 'Uit';
-z.string.nl.ephememalUnitsSecond = 'seconde';
-z.string.nl.ephememalUnitsSeconds = 'secondes';
-z.string.nl.ephememalUnitsMinute = 'minuut';
-z.string.nl.ephememalUnitsMinutes = 'minuten';
-z.string.nl.ephememalUnitsHour = 'uur';
-z.string.nl.ephememalUnitsHours = 'uren';
-z.string.nl.ephememalUnitsDay = 'dag';
-z.string.nl.ephememalUnitsDays = 'dagen';
+z.string.nl.ephemeralUnitsNone = 'Uit';
 

@@ -17,13 +17,11 @@
  *
  */
 
-import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import {ROUTE} from '../route';
 import {
   Link,
-  Paragraph,
   Text,
   Bold,
   ProfileIcon,
@@ -41,22 +39,15 @@ import {injectIntl} from 'react-intl';
 import Page from './Page';
 
 class Index extends Component {
-  componentDidMount() {
-    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
-  }
-
   onRegisterPersonalClick = () => {
-    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
     this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };
 
   onRegisterTeamClick = () => {
-    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION});
     this.props.history.push(ROUTE.CREATE_TEAM);
   };
 
   onLoginClick = () => {
-    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
     this.props.history.push(ROUTE.LOGIN);
   };
 
@@ -68,7 +59,6 @@ class Index extends Component {
       <Page>
         <ContainerXS centerText verticalCenter>
           <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-          <Paragraph center>{_(indexStrings.claim)}</Paragraph>
           <Columns style={{margin: '70px auto'}}>
             <Column>
               <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
@@ -110,4 +100,9 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(state => ({language: getLanguage(state)}), {...TrackingAction})(Index));
+export default injectIntl(
+  connect(
+    state => ({language: getLanguage(state)}),
+    null
+  )(Index)
+);

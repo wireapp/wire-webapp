@@ -19,11 +19,11 @@
 
 /* eslint no-undef: "off" */
 
-// grunt test_init && grunt test_run:location/GeoLocation
+// grunt test_init && grunt test_run:location/LocationService
 
 'use strict';
 
-describe('z.location', () => {
+describe('z.location.LocationService', () => {
   describe('getLocation', () => {
     it('resolves a latitude & longitude via Google Maps API into a location name', done => {
       // prettier-ignore
@@ -31,17 +31,13 @@ describe('z.location', () => {
 
       const latitude = 52.5233;
       const longitude = 13.4138;
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo`;
 
-      const server = sinon.fakeServer.create();
-      server.autoRespond = true;
-      server.respondWith('GET', url, [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify({results: locations, status: 'OK'}),
-      ]);
-
-      z.location
+      const backendClientMock = {
+        create_url: () => {},
+        send_request: () => Promise.resolve({results: locations, status: 'OK'}),
+      };
+      const locationService = new z.location.LocationService(backendClientMock);
+      locationService
         .getLocation(latitude, longitude)
         .then(location => {
           expect(location.countryCode).toBe('DE');
@@ -56,17 +52,14 @@ describe('z.location', () => {
       const locations = [{'address_components': [{'long_name': '2', 'short_name': '2', 'types': ['street_number']}, {'long_name': 'Alexanderstraße', 'short_name': 'Alexanderstraße', 'types': ['route']}, {'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': '<script>alert("malicious")</script>', 'types': ['country', 'political']}, {'long_name': '10178', 'short_name': '10178', 'types': ['postal_code']}], 'formatted_address': 'Alexanderstraße 2, 10178 Berlin, Deutschland', 'geometry': {'location': {'lat': 52.523824, 'lng': 13.4145348}, 'location_type': 'ROOFTOP', 'viewport': {'northeast': {'lat': 52.52517298029149, 'lng': 13.4158837802915}, 'southwest': {'lat': 52.52247501970849, 'lng': 13.4131858197085}}}, 'place_id': 'ChIJ7xU9wx5OqEcRbjo-v63nALk', 'types': ['street_address']}];
       const latitude = 52.5233;
       const longitude = 13.4138;
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo`;
 
-      const server = sinon.fakeServer.create();
-      server.autoRespond = true;
-      server.respondWith('GET', url, [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify({results: locations, status: 'OK'}),
-      ]);
+      const backendClientMock = {
+        create_url: () => {},
+        send_request: () => Promise.resolve({results: locations, status: 'OK'}),
+      };
 
-      z.location
+      const locationService = new z.location.LocationService(backendClientMock);
+      locationService
         .getLocation(latitude, longitude)
         .then(location => {
           expect(location.countryCode).toBe('&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;');
@@ -79,10 +72,11 @@ describe('z.location', () => {
 
   describe('getMapsUrl', () => {
     it('should return the proper urls', () => {
-      expect(z.location.getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
-      expect(z.location.getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
-      expect(z.location.getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
-      expect(z.location.getMapsUrl(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
+      const locationService = new z.location.LocationService({});
+      expect(locationService.getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
+      expect(locationService.getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
+      expect(locationService.getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
+      expect(locationService.getMapsUrl(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
     });
   });
 });

@@ -32,12 +32,10 @@ z.components.ChooseScreen = class ChooseScreen {
 
 ko.components.register('choose-screen', {
   template: `
-    <div class="choose-screen-list">
-      <!-- ko foreach: screens -->
-        <div  class="choose-screen-list-item" data-bind="click: $parent.on_choose">
-          <image class="choose-screen-list-image" data-bind="attr: {src: $data.thumbnail.toDataURL()}">
-        </div>
-      <!-- /ko -->
+    <div class="choose-screen-list" data-bind="foreach: screens">
+      <div  class="choose-screen-list-item" data-bind="click: $parent.on_choose">
+        <image class="choose-screen-list-image" data-bind="attr: {src: $data.thumbnail.toDataURL()}">
+      </div>
     </div>
     <div class="label-xs text-white" data-bind="l10n_text: z.string.callChooseSharedScreen"></div>
     <div id="choose-screen-controls" class="choose-screen-controls">
