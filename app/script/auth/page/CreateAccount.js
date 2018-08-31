@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, mediaMatcher} from '@wireapp/react-ui-kit';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, IsMobile} from '@wireapp/react-ui-kit';
 import {createAccountStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
@@ -27,63 +27,41 @@ import React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 
-class CreateAccount extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isMobile: mediaMatcher.isMobile(),
-    };
-  }
-  componentDidMount() {
-    window.addEventListener('resize', this.updateIsMobile);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateIsMobile);
-  }
-
-  updateIsMobile = () => this.setState({isMobile: mediaMatcher.isMobile()});
-
-  render() {
-    const {
-      history,
-      intl: {formatMessage: _},
-    } = this.props;
-
-    const {isMobile} = this.state;
-    const backArrow = (
-      <Link to={ROUTE.CREATE_TEAM} component={RRLink} data-uie-name="go-register-team">
-        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
-    );
-    return (
-      <Page hasTeamData>
-        {isMobile && <div style={{margin: 16}}>{backArrow}</div>}
-        <Container centerText verticalCenter style={{width: '100%'}}>
-          <Columns>
-            {!isMobile && (
-              <Column style={{display: 'flex'}}>
-                <div style={{margin: 'auto'}}>{backArrow}</div>
-              </Column>
-            )}
-            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-              <ContainerXS
-                centerText
-                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-              >
-                <H1 center>{_(createAccountStrings.headLine)}</H1>
-                <AccountForm
-                  onSubmit={() => history.push(ROUTE.VERIFY)}
-                  submitText={_(createAccountStrings.submitButton)}
-                />
-              </ContainerXS>
+const CreateAccount = ({history, intl: {formatMessage: _}}) => {
+  const backArrow = (
+    <Link to={ROUTE.CREATE_TEAM} component={RRLink} data-uie-name="go-register-team">
+      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+    </Link>
+  );
+  return (
+    <Page hasTeamData>
+      <IsMobile>
+        <div style={{margin: 16}}>{backArrow}</div>
+      </IsMobile>
+      <Container centerText verticalCenter style={{width: '100%'}}>
+        <Columns>
+          <IsMobile not>
+            <Column style={{display: 'flex'}}>
+              <div style={{margin: 'auto'}}>{backArrow}</div>
             </Column>
-            <Column />
-          </Columns>
-        </Container>
-      </Page>
-    );
-  }
-}
+          </IsMobile>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+            <ContainerXS
+              centerText
+              style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
+            >
+              <H1 center>{_(createAccountStrings.headLine)}</H1>
+              <AccountForm
+                onSubmit={() => history.push(ROUTE.VERIFY)}
+                submitText={_(createAccountStrings.submitButton)}
+              />
+            </ContainerXS>
+          </Column>
+          <Column />
+        </Columns>
+      </Container>
+    </Page>
+  );
+};
 
 export default withRouter(injectIntl(CreateAccount));
