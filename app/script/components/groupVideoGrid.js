@@ -76,7 +76,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
       const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const forceClass = hasFitSet ? streamInfo.fitContain : isVeryDifferent || isScreenSend;
+      const shouldBeContain = isVeryDifferent || isScreenSend === z.calling.enum.PROPERTY_STATE.TRUE;
+      const forceClass = hasFitSet ? streamInfo.fitContain : shouldBeContain;
       videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, forceClass);
     };
 
@@ -94,7 +95,11 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     const childVideo = currentTarget.querySelector('video');
     const streamId = currentTarget.dataset.streamId;
     const streamInfo = this.getStreamInfo(streamId);
-    streamInfo.fitContain = !streamInfo.fitContain;
+
+    const hasFitProperty = streamInfo.hasOwnProperty('fitContain');
+    const hasFitClass = childVideo.classList.contains(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
+    streamInfo.fitContain = hasFitProperty ? !streamInfo.fitContain : !hasFitClass;
+
     childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, streamInfo.fitContain);
   }
 
