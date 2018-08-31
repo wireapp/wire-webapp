@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.9.0...@wireapp/react-ui-kit@3.0.0) (2018-08-31)
+
+
+*  refactor(react-ui-kit): New MatchMedia components (#1067) ([ae02c6b](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/ae02c6b)), closes [#1067](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1067)
+
+
+### BREAKING CHANGES
+
+* The MediaMatcher is not a function anymore. It is now a stateful component.
+
+
+
+
+
 <a name="2.9.0"></a>
 # [2.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@2.8.0...@wireapp/react-ui-kit@2.9.0) (2018-08-29)
 
