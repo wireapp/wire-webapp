@@ -66,6 +66,7 @@ import {
   Input,
   InputBlock,
   InputSubmitCombo,
+  IsMobile,
   Label,
   LabelLink,
   Large,
@@ -311,6 +312,10 @@ class Demo extends React.PureComponent {
         </HeaderMenu>
 
         <Content>
+          <ContainerXS centerText>
+            <IsMobile>This is the mobile view</IsMobile>
+            <IsMobile not>This is not the mobile view</IsMobile>
+          </ContainerXS>
           <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
             <Tooltip light right text="This is our logo with a whole bunch of text in here">
               <Logo scale={3} color={COLOR.BLUE} />
