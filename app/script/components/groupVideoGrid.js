@@ -153,7 +153,7 @@ ko.components.register('group-video-grid', {
               <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: streamInfo.stream, muteMediaElement: streamInfo.stream">
               </video>
               <!-- ko if: streamInfo.isSelf && !streamInfo.audioSend() && !$parent.minimized -->
-                <div class="group-video-grid__mute-overlay">
+                <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
                   <micoff-icon></micoff-icon>
                 </div>
               <!-- /ko -->
