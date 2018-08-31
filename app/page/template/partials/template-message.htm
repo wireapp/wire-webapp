@@ -269,7 +269,7 @@
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
     <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
-      <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.unsafe_sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">

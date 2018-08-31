@@ -38,10 +38,11 @@ z.util.SanitizationUtil = (() => {
 
     escapeString: string => _.escape(string),
 
-    getEscapedFirstName: (userEntity, declension) => {
-      return userEntity.is_me
-        ? _getEscapedSelfName(declension)
-        : z.util.SanitizationUtil.escapeString(userEntity.first_name());
+    getEscapedFirstName: (userEntity, declension, escaped = true) => {
+      if (userEntity.is_me) {
+        return _getEscapedSelfName(declension);
+      }
+      return escaped ? z.util.SanitizationUtil.escapeString(userEntity.first_name()) : userEntity.first_name();
     },
 
     getEscapedSelfName: _getEscapedSelfName,
