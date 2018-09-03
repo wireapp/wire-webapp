@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/node": "10.9.3",
-    "pure-uuid": "1.5.3"
+    "pure-uuid": "1.5.4"
   },
   "devDependencies": {
     "cross-env": "5.2.0",
