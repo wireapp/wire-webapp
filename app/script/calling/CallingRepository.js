@@ -936,6 +936,15 @@ z.calling.CallingRepository = class CallingRepository {
       .catch(error => {
         const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
         if (!isNotFound) {
+          if (mediaType === z.media.MediaType.VIDEO) {
+            const modalOptions = {
+              text: {
+                htmlMessage: z.l10n.text(z.string.modalNoCameraMessage),
+                title: z.l10n.text(z.string.modalNoCameraTitle),
+              },
+            };
+            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+          }
           this.callLogger.error(`Failed to toggle media of type '${mediaType}'`, error);
         }
       });
