@@ -120,15 +120,7 @@ class AccountForm extends PureComponent {
     } = this.props;
     const {name, email, password, termsAccepted, validInputs} = this.state;
     return (
-      <Form
-        onSubmit={this.handleSubmit}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1,
-          justifyContent: 'space-between',
-        }}
-      >
+      <Form onSubmit={this.handleSubmit} style={{display: 'flex', flexDirection: 'column'}}>
         <div>
           <InputBlock>
             <Input
@@ -226,7 +218,7 @@ class AccountForm extends PureComponent {
           disabled={!(email && name && password && termsAccepted) || isFetching}
           formNoValidate
           type="submit"
-          style={{margin: '0 auto -16px'}}
+          style={{margin: '16px auto'}}
           data-uie-name="do-next"
         >
           {submitText || _(accountFormStrings.submitButton)}
