@@ -147,11 +147,15 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalAcknowledge(options, titleElement, messageElement, actionElement) {
-    const {action: actionText, message: messageText, title: titleText} = options.text;
+    const {
+      action: actionText = z.l10n.text(z.string.modalAcknowledgeAction),
+      message: messageText = '',
+      title: titleText = z.l10n.text(z.string.modalAcknowledgeHeadline),
+    } = options.text;
 
-    actionElement.text(actionText || z.l10n.text(z.string.modalAcknowledgeAction));
-    messageElement.text(messageText || '');
-    titleElement.text(titleText || z.l10n.text(z.string.modalAcknowledgeHeadline));
+    actionElement.text(actionText);
+    messageElement.text(messageText);
+    titleElement.text(titleText);
 
     if (options.warning !== false) {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
@@ -160,14 +164,17 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
   _showModalConfirm(options, titleElement, messageElement, actionElement) {
     const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal-secondary');
-    const {action: actionText, message: messageText, secondary, title: titleText} = options.text;
+    const {
+      action: actionText = '',
+      message: messageText = '',
+      secondary: secondaryText = z.l10n.text(z.string.modalConfirmSecondary),
+      title: titleText = '',
+    } = options.text;
 
-    const secondaryText = secondary || z.l10n.text(z.string.modalConfirmSecondary);
-
-    actionElement.text(actionText || '');
-    messageElement.text(messageText || '');
+    actionElement.text(actionText);
+    messageElement.text(messageText);
     secondaryElement.text(secondaryText);
-    titleElement.text(titleText || '');
+    titleElement.text(titleText);
 
     if (options.warning !== false) {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
@@ -193,15 +200,19 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   _showModalOption(options, titleElement, messageElement, actionElement) {
     const secondaryElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-secondary');
     const optionElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-option-text');
-    const {action: actionText, message: messageText, option: optionText, secondary, title: titleText} = options.text;
+    const {
+      action: actionText = '',
+      message: messageText = '',
+      option: optionText = '',
+      secondary: secondaryText = z.l10n.text(z.string.modalOptionSecondary),
+      title: titleText = '',
+    } = options.text;
 
-    const secondaryText = secondary || z.l10n.text(z.string.modalOptionSecondary);
-
-    actionElement.text(actionText || '');
-    messageElement.text(messageText || '');
-    optionElement.text(optionText || '');
+    actionElement.text(actionText);
+    messageElement.text(messageText);
+    optionElement.text(optionText);
     secondaryElement.text(secondaryText);
-    titleElement.text(titleText || '');
+    titleElement.text(titleText);
 
     if (options.warning !== false) {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
@@ -210,12 +221,17 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
   _showModalInput(options, titleElement, messageElement, actionElement) {
     const inputElement = $(ModalsViewModel.TYPE.INPUT).find('.modal-input');
-    const {action: actionText, input: inputText, message: messageText, title: titleText} = options.text;
+    const {
+      action: actionText = '',
+      input: inputText = '',
+      message: messageText = '',
+      title: titleText = '',
+    } = options.text;
 
-    actionElement.text(actionText || '');
-    messageElement.text(messageText || '');
-    inputElement.attr('placeholder', inputText || '');
-    titleElement.text(titleText || '');
+    actionElement.text(actionText);
+    messageElement.text(messageText);
+    inputElement.attr('placeholder', inputText);
+    titleElement.text(titleText);
 
     if (options.warning !== false) {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
