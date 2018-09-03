@@ -89,4 +89,14 @@ z.media.MediaRepository = class MediaRepository {
     this.logger.error('The flow audio cannot use the Web Audio API as it is unavailable.');
     return undefined;
   }
+
+  showNoCameraModal() {
+    const modalOptions = {
+      text: {
+        htmlMessage: z.l10n.text(z.string.modalNoCameraMessage),
+        title: z.l10n.text(z.string.modalNoCameraTitle),
+      },
+    };
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+  }
 };
