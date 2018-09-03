@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, IsMobile} from '@wireapp/react-ui-kit';
 import {createPersonalAccountStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -81,18 +81,24 @@ class CreatePersonalAccount extends React.PureComponent {
         <AccountForm onSubmit={this.handleSubmit} submitText={_(createPersonalAccountStrings.submitButton)} />
       </ContainerXS>
     );
+    const backArrow = (
+      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      </Link>
+    );
     return (
       <Page>
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
         {isPersonalFlow ? (
           <Container centerText verticalCenter style={{width: '100%'}}>
             <Columns>
-              <Column style={{display: 'flex'}}>
-                <div style={{margin: 'auto'}}>
-                  <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
-                    <ArrowIcon direction="left" color={COLOR.GRAY} />
-                  </Link>
-                </div>
-              </Column>
+              <IsMobile not>
+                <Column style={{display: 'flex'}}>
+                  <div style={{margin: 'auto'}}>{backArrow}</div>
+                </Column>
+              </IsMobile>
               <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
               <Column />
             </Columns>
