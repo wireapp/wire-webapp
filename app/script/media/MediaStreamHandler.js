@@ -664,7 +664,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _showPermissionDeniedHint(mediaType) {
     if (mediaType === z.media.MediaType.AUDIO_VIDEO || mediaType === z.media.MediaType.VIDEO) {
-      this.mediaRepository.showNoCameraModal();
+      return this.mediaRepository.showNoCameraModal();
     }
     const warningType = this._selectPermissionDeniedWarningType(mediaType);
     amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
