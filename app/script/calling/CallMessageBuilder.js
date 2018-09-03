@@ -107,16 +107,7 @@ z.calling.CallMessageBuilder = (() => {
           break;
         }
 
-        case z.media.MediaType.SCREEN: {
-          const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
-
-          payload.properties = {
-            screensend: `${screenSelfState()}`,
-            videosend: `${videoSelfState()}`,
-          };
-          break;
-        }
-
+        case z.media.MediaType.SCREEN:
         case z.media.MediaType.VIDEO: {
           const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
 
