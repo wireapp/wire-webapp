@@ -39,6 +39,7 @@ import {
   ArrowIcon,
   COLOR,
   ErrorMessage,
+  IsMobile,
 } from '@wireapp/react-ui-kit';
 import * as Environment from '../Environment';
 import {ROUTE, QUERY_KEY} from '../route';
@@ -258,19 +259,25 @@ class Login extends React.PureComponent {
       validInputs,
       validationErrors,
     } = this.state;
+    const backArrow = (
+      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      </Link>
+    );
     return (
       <Page>
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
           <AppAlreadyOpen />
           <Columns>
-            <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>
-                <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
-                  <ArrowIcon direction="left" color={COLOR.GRAY} />
-                </Link>
-              </div>
-            </Column>
+            <IsMobile not>
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              </Column>
+            </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
