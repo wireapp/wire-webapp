@@ -63,12 +63,14 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     const setScale = (videoElement, wrapper) => {
       const streamId = wrapper.dataset.streamId;
       const streamInfo = this.getStreamInfo(streamId);
-      const isScreenSend = streamInfo.screenSend();
-      updateContainClass(videoElement, wrapper, isScreenSend, streamInfo);
-      streamInfo.screenSend.subscribe(screenSend => {
-        delete streamInfo.fitContain;
-        updateContainClass(videoElement, wrapper, screenSend, streamInfo);
-      });
+      if (streamInfo) {
+        const isScreenSend = streamInfo.screenSend();
+        updateContainClass(videoElement, wrapper, isScreenSend, streamInfo);
+        streamInfo.screenSend.subscribe(screenSend => {
+          delete streamInfo.fitContain;
+          updateContainClass(videoElement, wrapper, screenSend, streamInfo);
+        });
+      }
     };
 
     const updateContainClass = (videoElement, wrapper, isScreenSend, streamInfo) => {
