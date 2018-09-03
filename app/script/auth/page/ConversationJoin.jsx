@@ -194,8 +194,10 @@ class ConversationJoin extends Component {
             <FormattedHTMLMessage {...conversationJoinStrings.headline} />
           )}
         </H2>
-        <Text style={{fontSize: '16px', marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</Text>
-        <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
+        <Text block style={{fontSize: '16px', marginTop: '10px'}}>
+          {_(conversationJoinStrings.existentAccountSubhead)}
+        </Text>
+        <Button style={{marginTop: 16}} onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
         <ErrorMessage data-uie-name="error-message">
