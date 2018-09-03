@@ -265,7 +265,7 @@ z.conversation.ConversationCellState = (() => {
         }
 
         if (stateText) {
-          return conversationEntity.is_group() ? `${messageEntity.sender_name()}: ${stateText}` : stateText;
+          return conversationEntity.is_group() ? `${messageEntity.unsafe_sender_name()}: ${stateText}` : stateText;
         }
       }
     },
