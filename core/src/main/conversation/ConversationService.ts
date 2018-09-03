@@ -223,7 +223,6 @@ class ConversationService {
       replacingMessageId: originalMessageId,
       text: textMessage,
     });
-    console.log({editedMessage});
 
     const genericMessage = GenericMessage.create({
       [GenericMessageType.EDITED]: editedMessage,

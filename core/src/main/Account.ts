@@ -351,10 +351,7 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.HIDDEN: {
-        const {
-          conversationId,
-          hidden: {messageId},
-        } = genericMessage[GenericMessageType.HIDDEN];
+        const {conversationId, messageId} = genericMessage[GenericMessageType.HIDDEN];
 
         const content: HiddenContent = {
           conversationId,
