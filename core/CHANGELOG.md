@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.9.17"></a>
+## [5.9.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.9.16...@wireapp/core@5.9.17) (2018-09-03)
+
+
+### Bug Fixes
+
+* **core:** Get correct hidden message ID ([#1071](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1071)) ([c5a55bf](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/c5a55bf))
+
+
+
+
+
 <a name="5.9.16"></a>
 ## [5.9.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.9.15...@wireapp/core@5.9.16) (2018-08-31)
 
