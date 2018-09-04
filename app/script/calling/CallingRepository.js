@@ -27,7 +27,7 @@ z.calling.CallingRepository = class CallingRepository {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
-      MAX_FIREFOX_TURN_COUNT: 4,
+      MAX_FIREFOX_TURN_COUNT: 3,
       MAX_VIDEO_PARTICIPANTS: 4,
       PROTOCOL_VERSION: '3.0',
     };
