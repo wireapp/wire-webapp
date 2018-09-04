@@ -20,6 +20,7 @@
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import {ROUTE} from '../route';
+import {isDesktopApp, isMacOS} from '../Runtime';
 import {
   Link,
   Text,
@@ -55,12 +56,13 @@ class Index extends Component {
     const {
       intl: {formatMessage: _},
     } = this.props;
+    const isMacOsWrapper = isDesktopApp() && isMacOS();
     return (
       <Page>
         <ContainerXS centerText verticalCenter>
           <Logo scale={1.68} data-uie-name="ui-wire-logo" />
           <Columns style={{margin: '70px auto'}}>
-            <Column>
+            <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
               <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
                 <RoundContainer style={{marginBottom: 12}}>
                   <ProfileIcon color={COLOR.WHITE} />
@@ -74,20 +76,22 @@ class Index extends Component {
                 </Text>
               </Link>
             </Column>
-            <Column>
-              <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
-                <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
-                  <TeamIcon color={COLOR.WHITE} />
-                </RoundContainer>
-                <Bold fontSize="24px" color={COLOR.LINK}>
-                  {_(indexStrings.createAccountForOrganizations)}
-                </Bold>
-                <br />
-                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                  {_(indexStrings.createTeam)}
-                </Text>
-              </Link>
-            </Column>
+            {!isMacOsWrapper && (
+              <Column>
+                <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
+                  <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
+                    <TeamIcon color={COLOR.WHITE} />
+                  </RoundContainer>
+                  <Bold fontSize="24px" color={COLOR.LINK}>
+                    {_(indexStrings.createAccountForOrganizations)}
+                  </Bold>
+                  <br />
+                  <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                    {_(indexStrings.createTeam)}
+                  </Text>
+                </Link>
+              </Column>
+            )}
           </Columns>
           <Text>{_(indexStrings.loginInfo)}</Text>
           <br />

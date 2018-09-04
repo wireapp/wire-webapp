@@ -92,6 +92,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     });
 
     this.optionMarketingConsent = this.userRepository.marketingConsent;
+    this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
 
     this._initSubscriptions();
   }
@@ -219,13 +220,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnCreate() {
-    const isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
-    const path = `${
-      isMacOsWrapper ? '/create/' : z.l10n.text(z.string.urlWebsiteCreateTeam)
-    }?pk_campaign=client&pk_kwd=desktop`;
-
-    const basePath = isMacOsWrapper ? z.util.URLUtil.TYPE.TEAM_SETTINGS : z.util.URLUtil.TYPE.WEBSITE;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(basePath, path));
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   clickOnDeleteAccount() {
