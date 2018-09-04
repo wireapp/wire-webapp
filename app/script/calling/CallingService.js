@@ -35,7 +35,7 @@ z.calling.CallingService = class CallingService {
    * Retrieves a calling config from the backend.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCallsConfigV2
-   * @see https://github.com/wearezeta/documentation/blob/master/topics/web/calling/calling-v3.md#limiting
+   * @see ./documentation/blob/master/topics/web/calling/calling-v3.md#limiting
    *
    * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
    * @returns {Promise} Resolves with call config information
