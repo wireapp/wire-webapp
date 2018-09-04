@@ -91,13 +91,13 @@ z.calling.CallMessageBuilder = (() => {
    *
    * @param {Object} selfState - Current self state
    * @param {Object} additionalPayload - Optional additional payload to be added
-   * @param {boolean|undefined} forceVideoState - Forces the videosend property to be this value instead of the one in the selfState
+   * @param {boolean} [videoStateOverwrite] - Forces the videosend property to be this value instead of the one in the selfState
    * @returns {Object} call message props object
    */
-  const _createPropSync = (selfState, additionalPayload, forceVideoState) => {
+  const _createPropSync = (selfState, additionalPayload, videoStateOverwrite) => {
     const payload = {};
     const {audioSend: audioState, videoSend: videoState, screenSend: screenState} = selfState;
-    const videoSend = _.isBoolean(forceVideoState) ? forceVideoState : videoState();
+    const videoSend = _.isBoolean(videoStateOverwrite) ? videoStateOverwrite : videoState();
 
     payload.properties = {
       audiosend: `${audioState()}`,
