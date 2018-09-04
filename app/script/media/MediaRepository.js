@@ -89,4 +89,21 @@ z.media.MediaRepository = class MediaRepository {
     this.logger.error('The flow audio cannot use the Web Audio API as it is unavailable.');
     return undefined;
   }
+
+  showNoCameraModal() {
+    const modalOptions = {
+      text: {
+        htmlMessage: z.l10n.safeHtml(z.string.modalNoCameraMessage, {
+          replaceDangerously: {
+            '/faqLink': '</a>',
+            br: '<br>',
+            faqLink:
+              '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
+          },
+        }),
+        title: z.l10n.text(z.string.modalNoCameraTitle),
+      },
+    };
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+  }
 };
