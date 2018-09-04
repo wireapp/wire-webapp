@@ -289,6 +289,9 @@ z.string.modalUserUnblockAction = 'Unblock';
 z.string.modalUserUnblockHeadline = 'Unblock?';
 z.string.modalUserUnblockMessage = '{{user}} will be able to contact you and add you to group conversations again.';
 
+z.string.modalNoCameraTitle = 'No camera access';
+z.string.modalNoCameraMessage = 'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
+
 // Connection requests
 z.string.connectionRequestConnect = 'Connect';
 z.string.connectionRequestIgnore = 'Ignore';
@@ -611,6 +614,9 @@ z.string.preferencesAVMicrophone = 'Microphone';
 z.string.preferencesAVPermissionDetail = 'Enable from your browser Preferences';
 z.string.preferencesAVSpeakers = 'Speakers';
 z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferences. Select the camera to use if you join one.';
+z.string.preferencesAVNoCamera = 'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
+z.string.preferencesAVTryAgain= 'Try Again';
+
 
 z.string.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';
