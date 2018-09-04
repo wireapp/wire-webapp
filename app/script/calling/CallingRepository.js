@@ -1158,7 +1158,7 @@ z.calling.CallingRepository = class CallingRepository {
   _initiateOutgoingCall(conversationId, mediaType, callState) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
-    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, payload);
+    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
     const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
   }
