@@ -36,7 +36,6 @@ import {
   IsMobile,
 } from '@wireapp/react-ui-kit';
 import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -146,13 +145,11 @@ class TeamName extends Component {
                     </ErrorMessage>
                   </Form>
                 </div>
-                {!(isDesktopApp() && isMacOS()) && (
-                  <div>
-                    <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
-                      {_(teamNameStrings.whatIsWireTeamsLink)}
-                    </Link>
-                  </div>
-                )}
+                <div>
+                  <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
+                    {_(teamNameStrings.whatIsWireTeamsLink)}
+                  </Link>
+                </div>
               </ContainerXS>
             </Column>
             <Column />
