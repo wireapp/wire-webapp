@@ -524,3 +524,39 @@ ko.bindingHandlers.tooltip = {
     }
   },
 };
+
+ko.bindingHandlers.macOsDrag = {
+  init(element) {
+    const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    if (!isMacDesktop) {
+      return;
+    }
+    const DRAG_THRESHOLD = 2;
+    let isDragged = false;
+    let startX = 0;
+    let startY = 0;
+    let isMoved = false;
+
+    element.addEventListener('mousedown', event => {
+      isDragged = true;
+      startX = event.screenX;
+      startY = event.screenY;
+    });
+
+    element.addEventListener('mousemove', event => {
+      if (isDragged && !isMoved) {
+        const distanceX = Math.abs(event.screenX - startX);
+        const distanceY = Math.abs(event.screenY - startY);
+        this.isMoved = distanceX > DRAG_THRESHOLD || distanceY > DRAG_THRESHOLD;
+      }
+    });
+
+    element.addEventListener('mouseup', event => {
+      if (isMoved) {
+        event.preventDefault();
+      }
+      isMoved = false;
+      isDragged = false;
+    });
+  },
+};
