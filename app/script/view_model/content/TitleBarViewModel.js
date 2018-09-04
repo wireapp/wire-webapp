@@ -25,12 +25,6 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: z.viewModel.ContentViewModel
 z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
-  static get CONFIG() {
-    return {
-      DRAG_THRESHOLD: 2,
-    };
-  }
-
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
@@ -94,13 +88,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
     this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
-
-    this.isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
-    this.isDragged = false;
-    this.startX = 0;
-    this.startY = 0;
-    this.isMoved = false;
-    this.preventPanelOpen = false;
   }
 
   addedToView() {
@@ -123,31 +110,8 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
   }
 
-  onMouseDown(_, event) {
-    if (this.isMacDesktop) {
-      this.isDragged = true;
-      this.startX = event.screenX;
-      this.startY = event.screenY;
-    }
-  }
-
-  onMouseMove(_, event) {
-    if (this.isDragged && !this.isMoved) {
-      const distanceX = Math.abs(event.screenX - this.startX);
-      const distanceY = Math.abs(event.screenY - this.startY);
-      this.isMoved =
-        distanceX > TitleBarViewModel.CONFIG.DRAG_THRESHOLD || distanceY > TitleBarViewModel.CONFIG.DRAG_THRESHOLD;
-    }
-  }
-
   clickOnDetails() {
     this.showDetails();
-  }
-
-  onMouseUp() {
-    this.preventPanelOpen = this.isMoved;
-    this.isMoved = false;
-    this.isDragged = false;
   }
 
   clickOnVideoButton() {
@@ -175,12 +139,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   showDetails(addParticipants) {
-    if (!this.preventPanelOpen) {
-      const panelId = addParticipants
-        ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
-        : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
+    const panelId = addParticipants
+      ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
+      : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
 
-      this.panelViewModel.togglePanel(panelId);
-    }
+    this.panelViewModel.togglePanel(panelId);
   }
 };

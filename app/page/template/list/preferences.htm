@@ -1,7 +1,7 @@
 <div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
   <div class="left-list-header">
     <span class="left-list-header-text" data-bind="l10n_text: z.string.preferencesHeadline"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: clickOnClosePreferences, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close-preferences"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="macOsDragClick: clickOnClosePreferences, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close-preferences"></span>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items preferences-list-items">

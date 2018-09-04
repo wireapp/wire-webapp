@@ -525,38 +525,29 @@ ko.bindingHandlers.tooltip = {
   },
 };
 
-ko.bindingHandlers.macOsDrag = {
-  init(element) {
+ko.bindingHandlers.macOsDragClick = {
+  init(element, valueAccessor, allBindings, viewModel, bindingContext) {
     const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    const context = bindingContext.$data;
+    const callback = valueAccessor().bind(context);
     if (!isMacDesktop) {
-      return;
+      return element.addEventListener('click', callback);
     }
-    const DRAG_THRESHOLD = 2;
-    let isDragged = false;
-    let startX = 0;
-    let startY = 0;
+
     let isMoved = false;
 
-    element.addEventListener('mousedown', event => {
-      isDragged = true;
-      startX = event.screenX;
-      startY = event.screenY;
-    });
-
-    element.addEventListener('mousemove', event => {
-      if (isDragged && !isMoved) {
-        const distanceX = Math.abs(event.screenX - startX);
-        const distanceY = Math.abs(event.screenY - startY);
-        this.isMoved = distanceX > DRAG_THRESHOLD || distanceY > DRAG_THRESHOLD;
-      }
-    });
-
-    element.addEventListener('mouseup', event => {
-      if (isMoved) {
-        event.preventDefault();
-      }
+    element.addEventListener('mousedown', () => {
       isMoved = false;
-      isDragged = false;
+    });
+
+    element.addEventListener('mousemove', () => {
+      isMoved = true;
+    });
+
+    element.addEventListener('mouseup', () => {
+      if (!isMoved) {
+        callback();
+      }
     });
   },
 };
