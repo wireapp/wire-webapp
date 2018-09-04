@@ -219,8 +219,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnCreate() {
-    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+    const isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    const path = `${
+      isMacOsWrapper ? '/create/' : z.l10n.text(z.string.urlWebsiteCreateTeam)
+    }?pk_campaign=client&pk_kwd=desktop`;
+
+    const basePath = isMacOsWrapper ? z.util.URLUtil.TYPE.TEAM_SETTINGS : z.util.URLUtil.TYPE.WEBSITE;
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(basePath, path));
   }
 
   clickOnDeleteAccount() {
