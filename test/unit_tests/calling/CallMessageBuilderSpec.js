@@ -56,12 +56,13 @@ describe('z.calling.CallMessageBuilder', () => {
     });
 
     it('forces video state if given', () => {
-      const state = {audioSend: () => true, screenSend: () => false, videoSend: () => false};
+      const noVideoState = {audioSend: () => true, screenSend: () => false, videoSend: () => false};
 
-      const propSyncMessageWithVideo = callMessageBuilder.createPropSync(state, {}, true);
+      const propSyncMessageWithVideo = callMessageBuilder.createPropSync(noVideoState, {}, true);
       expect(propSyncMessageWithVideo.properties.videosend).toEqual('true');
 
-      const propSyncMessageWithoutVideo = callMessageBuilder.createPropSync(state, {}, false);
+      const videoState = {audioSend: () => true, screenSend: () => false, videoSend: () => true};
+      const propSyncMessageWithoutVideo = callMessageBuilder.createPropSync(videoState, {}, false);
       expect(propSyncMessageWithoutVideo.properties.videosend).toEqual('false');
     });
   });
