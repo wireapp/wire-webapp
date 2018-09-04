@@ -535,19 +535,32 @@ ko.bindingHandlers.macOsDragClick = {
     }
 
     let isMoved = false;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
 
-    element.addEventListener('mousedown', () => {
+    element.addEventListener('mousedown', ({screenX, screenY}) => {
+      isDragging = true;
       isMoved = false;
+      startX = screenX;
+      startY = screenY;
     });
 
-    element.addEventListener('mousemove', () => {
-      isMoved = true;
+    element.addEventListener('mousemove', ({screenX, screenY}) => {
+      if (isDragging && !isMoved) {
+        const diffX = Math.abs(startX - screenX);
+        const diffY = Math.abs(startY - screenY);
+        if (diffX > 0 || diffY > 0) {
+          isMoved = true;
+        }
+      }
     });
 
     element.addEventListener('mouseup', () => {
       if (!isMoved) {
         callback();
       }
+      isDragging = false;
     });
   },
 };
