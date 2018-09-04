@@ -74,7 +74,10 @@ def join():
 
 @application.route('/robots.txt')
 def robots_txt():
-  response = flask.make_response(flask.render_template('robots.txt'))
+  if flask.request.url_root == 'https://app.wire.com':
+    response = flask.make_response(flask.render_template('robots.txt'))
+  else:
+    response = flask.make_response(flask.render_template('robots-disallow.txt'))
   response.headers['Content-Type'] = 'text/plain'
   return response
 
