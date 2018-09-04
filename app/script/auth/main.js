@@ -17,7 +17,6 @@
  *
  */
 
-import 'babel-polyfill'; // Polyfill needs to be imported first
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';

@@ -78,7 +78,7 @@ export function doInitializeClient(clientType, password) {
   };
 }
 
-export function generateClientPayload(clientType: ClientType) {
+export function generateClientPayload(clientType) {
   if (clientType === ClientType.NONE) {
     return undefined;
   }
