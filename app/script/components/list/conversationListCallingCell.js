@@ -91,6 +91,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.showNoCameraPreview = ko.computed(() => {
       const permissionRepository = this.mediaRepository.streamHandler.permissionRepository;
       return (
+        this.call().isRemoteVideoCall() &&
         !this.showVideoPreview() &&
         !this.isConnected() &&
         permissionRepository.permissionState.camera() !== z.notification.PermissionState.GRANTED
