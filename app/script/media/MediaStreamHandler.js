@@ -214,7 +214,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const newMediaStream = newMediaStreamInfo.stream;
       const newMediaStreamType = newMediaStreamInfo.getType();
 
-      this._releaseMediaStream(this.localMediaStream());
+      this._releaseMediaStream(this.localMediaStream(), mediaStreamInfo.getType());
       this._setStreamState(newMediaStream, newMediaStreamType);
       this.localMediaStream(newMediaStream);
     };
