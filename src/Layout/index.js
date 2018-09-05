@@ -29,7 +29,7 @@ export * from './FlexBox';
 export * from './Footer';
 export * from './Header';
 export * from './HeaderMenu';
-export * from './matchMedia';
+export * from './MatchMedia';
 export * from './Spacer';
 export * from './StyledApp';
 export * from './sizes';
