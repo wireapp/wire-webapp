@@ -64,7 +64,7 @@ class Index extends Component {
           <Columns style={{margin: '70px auto'}}>
             <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
               <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
-                <RoundContainer style={{marginBottom: 12}}>
+                <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
                   <ProfileIcon color={COLOR.WHITE} />
                 </RoundContainer>
                 <Bold fontSize="24px" color={COLOR.LINK}>
@@ -79,7 +79,7 @@ class Index extends Component {
             {!isMacOsWrapper && (
               <Column>
                 <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
-                  <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
+                  <RoundContainer style={{marginBottom: 12}}>
                     <TeamIcon color={COLOR.WHITE} />
                   </RoundContainer>
                   <Bold fontSize="24px" color={COLOR.LINK}>
