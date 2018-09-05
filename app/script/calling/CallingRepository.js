@@ -1708,6 +1708,10 @@ z.calling.CallingRepository = class CallingRepository {
       log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
     }
 
+    if (callMessageEntity.properties) {
+      log = log.concat(`: ${JSON.stringify(callMessageEntity.properties)}`);
+    }
+
     this.callLogger.info(log, callMessageEntity);
   }
 
