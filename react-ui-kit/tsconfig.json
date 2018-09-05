@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": false,
+    "declaration": true,
+    "noImplicitAny": false,
+    "noEmitOnError": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "exclude": ["dist", "node_modules"],
+  "extends": "../../tsconfig.json"
+}

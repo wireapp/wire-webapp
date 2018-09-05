@@ -46,6 +46,20 @@ module.exports = {
           },
         ],
       },
+      {
+        exclude: /node_modules/,
+        test: /\.ts(x?)$/,
+        use: [
+          {
+            loader: 'awesome-typescript-loader',
+            options: {
+              sourceMap: true,
+              useBabel: true,
+              useCache: true,
+            },
+          },
+        ],
+      },
     ],
   },
   output: {
@@ -57,6 +71,6 @@ module.exports = {
     alias: {
       '@wireapp/react-ui-kit': path.resolve(__dirname, 'src'),
     },
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
 };
