@@ -712,11 +712,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return firstFlowEntity
       .supportsTrackReplacement(mediaStreamInfo.getType())
-      .then(replace => {
-        const replacePromise = replace
+      .then(canReplaceTracks => {
+        const replacePromise = canReplaceTracks
           ? replaceMediaTrackInFlows(mediaStreamInfo, flowEntities)
           : replaceMediaStreamInFlows(mediaStreamInfo, flowEntities);
-        return replacePromise.then(streamInfo => ({replace, streamInfo}));
+        return replacePromise.then(streamInfo => ({replace: !canReplaceTracks, streamInfo}));
       })
       .catch(error => {
         const message = `Failed to update call with '${mediaStreamInfo.getType()}': ${error.name} - ${error.message}`;
