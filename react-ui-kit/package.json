@@ -25,9 +25,9 @@
     "react-hot-loader": "4.3.5",
     "rimraf": "2.6.2",
     "typescript": "3.0.1",
+    "webpack": "4.17.2",
     "webpack-cli": "3.1.0",
-    "webpack-dev-server": "3.1.7",
-    "webpack": "4.17.2"
+    "webpack-dev-server": "3.1.7"
   },
   "license": "GPL-3.0",
   "main": "dist/index.js",
@@ -45,5 +45,5 @@
     "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0"
   },
-  "version": "3.0.2"
+  "version": "4.0.0"
 }
