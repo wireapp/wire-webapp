@@ -147,10 +147,14 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalAcknowledge(options, titleElement, messageElement, actionElement) {
-    const {action: actionText, message: messageText, title: titleText} = options.text;
+    const {action: actionText, htmlMessage, message: messageText, title: titleText} = options.text;
 
     actionElement.text(actionText || z.l10n.text(z.string.modalAcknowledgeAction));
-    messageElement.text(messageText || '');
+    if (htmlMessage) {
+      messageElement.html(htmlMessage);
+    } else {
+      messageElement.text(messageText || '');
+    }
     titleElement.text(titleText || z.l10n.text(z.string.modalAcknowledgeHeadline));
 
     if (options.warning !== false) {

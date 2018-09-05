@@ -319,7 +319,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
 
     const response = !this.isOutgoing();
-    const propSync = z.calling.CallMessageBuilder.createPropSync(this.selfState, videoSend, additionalPayload);
+    const propSync = z.calling.CallMessageBuilder.createPropSync(this.selfState, additionalPayload, videoSend);
 
     const callMessageEntity = z.calling.CallMessageBuilder.buildGroupStart(response, this.sessionId, propSync);
     this.sendCallMessage(callMessageEntity);
@@ -447,7 +447,7 @@ z.calling.entities.CallEntity = class CallEntity {
         remoteUserId,
         remoteClientId
       );
-      const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, mediaType, payload);
+      const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, payload);
 
       const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, this.sessionId, propSyncPayload);
       return this.sendCallMessage(callMessageEntity);
@@ -567,8 +567,7 @@ z.calling.entities.CallEntity = class CallEntity {
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const mediaType = z.media.MediaType.VIDEO;
-        const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, mediaType, payload);
+        const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, payload);
 
         callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(true, this.sessionId, propSyncPayload);
         break;

@@ -27,6 +27,7 @@ z.calling.CallingRepository = class CallingRepository {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
+      MAX_FIREFOX_TURN_COUNT: 3,
       MAX_VIDEO_PARTICIPANTS: 4,
       PROTOCOL_VERSION: '3.0',
     };
@@ -936,6 +937,9 @@ z.calling.CallingRepository = class CallingRepository {
       .catch(error => {
         const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
         if (!isNotFound) {
+          if (mediaType === z.media.MediaType.VIDEO || mediaType === z.media.MediaType.AUDIO_VIDEO) {
+            this.mediaRepository.showNoCameraModal();
+          }
           this.callLogger.error(`Failed to toggle media of type '${mediaType}'`, error);
         }
       });
@@ -1155,7 +1159,7 @@ z.calling.CallingRepository = class CallingRepository {
   _initiateOutgoingCall(conversationId, mediaType, callState) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
-    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, payload);
+    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
     const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
   }
@@ -1589,7 +1593,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the updated calling config
    */
   _getConfigFromBackend() {
-    return this.callingService.getConfig().then(callingConfig => {
+    const limit = z.util.Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+
+    return this.callingService.getConfig(limit).then(callingConfig => {
       if (callingConfig) {
         this._clearConfigTimeout();
 

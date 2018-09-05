@@ -33,10 +33,9 @@ import {
   Input,
   RoundIconButton,
   ErrorMessage,
-  mediaMatcher,
+  IsMobile,
 } from '@wireapp/react-ui-kit';
 import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -56,20 +55,12 @@ class TeamName extends Component {
   state = {
     enteredTeamName: this.props.teamName || '',
     error: null,
-    isMobile: mediaMatcher.isMobile(),
     isValidTeamName: !!this.props.teamName,
   };
 
   componentDidMount() {
     this.props.enterTeamCreationFlow();
-    window.addEventListener('resize', this.updateIsMobile);
   }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateIsMobile);
-  }
-
-  updateIsMobile = () => this.setState({isMobile: mediaMatcher.isMobile()});
 
   handleSubmit = event => {
     event.preventDefault();
@@ -97,7 +88,7 @@ class TeamName extends Component {
     const {
       intl: {formatMessage: _},
     } = this.props;
-    const {enteredTeamName, isValidTeamName, isMobile, error} = this.state;
+    const {enteredTeamName, isValidTeamName, error} = this.state;
     const backArrow = (
       <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -105,14 +96,16 @@ class TeamName extends Component {
     );
     return (
       <Page>
-        {isMobile && <div style={{margin: 16}}>{backArrow}</div>}
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
         <Container centerText verticalCenter style={{width: '100%'}}>
           <Columns>
-            {!isMobile && (
+            <IsMobile not>
               <Column style={{display: 'flex'}}>
                 <div style={{margin: 'auto'}}>{backArrow}</div>
               </Column>
-            )}
+            </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
@@ -152,13 +145,11 @@ class TeamName extends Component {
                     </ErrorMessage>
                   </Form>
                 </div>
-                {!(isDesktopApp() && isMacOS()) && (
-                  <div>
-                    <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
-                      {_(teamNameStrings.whatIsWireTeamsLink)}
-                    </Link>
-                  </div>
-                )}
+                <div>
+                  <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
+                    {_(teamNameStrings.whatIsWireTeamsLink)}
+                  </Link>
+                </div>
               </ContainerXS>
             </Column>
             <Column />

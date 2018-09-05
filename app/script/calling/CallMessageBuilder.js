@@ -90,47 +90,20 @@ z.calling.CallMessageBuilder = (() => {
    * Create properties payload for call events.
    *
    * @param {Object} selfState - Current self state
-   * @param {z.media.MediaType|boolean} payloadType - Media type of property change or forced videosend state
    * @param {Object} additionalPayload - Optional additional payload to be added
+   * @param {boolean} [videoStateOverwrite] - Forces the videosend property to be this value instead of the one in the selfState
    * @returns {Object} call message props object
    */
-  const _createPropSync = (selfState, payloadType, additionalPayload) => {
+  const _createPropSync = (selfState, additionalPayload, videoStateOverwrite) => {
     const payload = {};
+    const {audioSend: audioState, videoSend: videoState, screenSend: screenState} = selfState;
+    const videoSend = _.isBoolean(videoStateOverwrite) ? videoStateOverwrite : videoState();
 
-    if (_.isBoolean(payloadType)) {
-      payload.properties = {videosend: `${payloadType}`};
-    } else {
-      switch (payloadType) {
-        case z.media.MediaType.AUDIO: {
-          const {audioSend: audioSelfState} = selfState;
-          payload.properties = {audiosend: `${audioSelfState()}`};
-          break;
-        }
-
-        case z.media.MediaType.SCREEN: {
-          const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
-
-          payload.properties = {
-            screensend: `${screenSelfState()}`,
-            videosend: `${videoSelfState()}`,
-          };
-          break;
-        }
-
-        case z.media.MediaType.VIDEO: {
-          const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
-
-          payload.properties = {
-            screensend: `${screenSelfState()}`,
-            videosend: `${videoSelfState()}`,
-          };
-          break;
-        }
-
-        default:
-          throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
-      }
-    }
+    payload.properties = {
+      audiosend: `${audioState()}`,
+      screensend: `${screenState()}`,
+      videosend: `${videoSend}`,
+    };
 
     return additionalPayload ? Object.assign(payload, additionalPayload) : payload;
   };

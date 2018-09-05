@@ -63,12 +63,14 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     const setScale = (videoElement, wrapper) => {
       const streamId = wrapper.dataset.streamId;
       const streamInfo = this.getStreamInfo(streamId);
-      const isScreenSend = streamInfo.screenSend();
-      updateContainClass(videoElement, wrapper, isScreenSend, streamInfo);
-      streamInfo.screenSend.subscribe(screenSend => {
-        delete streamInfo.fitContain;
-        updateContainClass(videoElement, wrapper, screenSend, streamInfo);
-      });
+      if (streamInfo) {
+        const isScreenSend = streamInfo.screenSend();
+        updateContainClass(videoElement, wrapper, isScreenSend, streamInfo);
+        streamInfo.screenSend.subscribe(screenSend => {
+          delete streamInfo.fitContain;
+          updateContainClass(videoElement, wrapper, screenSend, streamInfo);
+        });
+      }
     };
 
     const updateContainClass = (videoElement, wrapper, isScreenSend, streamInfo) => {
@@ -76,7 +78,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
       const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const forceClass = hasFitSet ? streamInfo.fitContain : isVeryDifferent || isScreenSend;
+      const shouldBeContain = isVeryDifferent || isScreenSend === z.calling.enum.PROPERTY_STATE.TRUE;
+      const forceClass = hasFitSet ? streamInfo.fitContain : shouldBeContain;
       videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, forceClass);
     };
 
@@ -94,7 +97,11 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     const childVideo = currentTarget.querySelector('video');
     const streamId = currentTarget.dataset.streamId;
     const streamInfo = this.getStreamInfo(streamId);
-    streamInfo.fitContain = !streamInfo.fitContain;
+
+    const hasFitProperty = streamInfo.hasOwnProperty('fitContain');
+    const hasFitClass = childVideo.classList.contains(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
+    streamInfo.fitContain = hasFitProperty ? !streamInfo.fitContain : !hasFitClass;
+
     childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, streamInfo.fitContain);
   }
 
@@ -174,7 +181,7 @@ ko.components.register('group-video-grid', {
             <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailStream().videoSend()}, sourceStream: thumbnailStream().stream, muteMediaElement: thumbnailStream().stream">
             </video>
             <!-- ko if: !thumbnailStream().audioSend() && !minimized -->
-              <div class="group-video-grid__mute-overlay">
+              <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
                 <micoff-icon></micoff-icon>
               </div>
             <!-- /ko -->
