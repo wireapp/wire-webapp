@@ -535,6 +535,7 @@ z.string.hu.preferencesAVCamera = 'Kamera';
 z.string.hu.preferencesAVMicrophone = 'Mikrofon';
 z.string.hu.preferencesAVPermissionDetail = 'Engedélyezze a böngésző Beállításainál';
 z.string.hu.preferencesAVSpeakers = 'Hangszórók';
+z.string.hu.preferencesAVTryAgain = 'Próbáld újra';
 
 z.string.hu.preferencesDevicesActivatedIn = 'itt: {{location}}';
 z.string.hu.preferencesDevicesActivatedOn = 'Legutóbb aktiválva: {{date}}';
