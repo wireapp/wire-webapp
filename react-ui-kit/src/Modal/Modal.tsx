@@ -88,8 +88,8 @@ const noop = () => {};
 
 interface ModalProps {
   fullscreen?: boolean;
-  onBackgroundClick: () => void;
-  onClose: () => void;
+  onBackgroundClick?: () => void;
+  onClose?: () => void;
 }
 
 const Modal: React.SFC<ModalProps & React.HTMLAttributes<HTMLDivElement>> = ({
