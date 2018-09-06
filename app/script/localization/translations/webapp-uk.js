@@ -99,12 +99,14 @@ z.string.uk.callJoin = 'Приєднатись';
 z.string.uk.callChooseSharedScreen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
 z.string.uk.callParticipants = '{{number}} учасників';
 
+z.string.uk.videoCallOverlayFitVideoLabel = 'Подвійний клік, щоб припасувати розмір відео до контейнера';
 z.string.uk.videoCallOverlayConversations = 'Розмови';
 z.string.uk.videoCallOverlayMute = 'Вимкнути звук';
 z.string.uk.videoCallOverlayVideo = 'Відео';
 z.string.uk.videoCallOverlayShareScreen = 'Показати свій екран';
 z.string.uk.videoCallOverlayHangUp = 'Завершити';
 z.string.uk.videoCallPaused = 'Відео призупинене';
+z.string.uk.videoCallScreenShareNotSupported = 'Ваш браузер не підтримує спільний доступ до екрану';
 
 z.string.uk.modalAcknowledgeAction = 'ОК';
 z.string.uk.modalAcknowledgeHeadline = 'Щось пішло не так';
@@ -231,7 +233,7 @@ z.string.uk.modalConversationGuestOptionsRequestCodeMessage = 'Не вдалос
 z.string.uk.modalConversationGuestOptionsRevokeCodeMessage = 'Не вдалося видправити запит на видкликання лінка. Будь ласка, спробуйте ще раз.';
 z.string.uk.modalConversationGuestOptionsToggleGuestsMessage = 'Не вдалося змінити гостьові налаштування.';
 
-z.string.uk.modalConversationTooManyMembersHeadline = 'Голосовий канал переповнений';
+z.string.uk.modalConversationTooManyMembersHeadline = 'Розмова переповнена';
 z.string.uk.modalConversationTooManyMembersMessage = 'До розмови може приєднатися до {{number1}} учаснків. В даний час є місце тільки для {{number2}} учасників.';
 
 z.string.uk.modalGifTooLargeHeadline = 'Вибрана анімація завелика';
@@ -571,6 +573,7 @@ z.string.uk.preferencesAVMicrophone = 'Мікрофон';
 z.string.uk.preferencesAVPermissionDetail = 'Увімкніть в налаштуваннях свого браузера';
 z.string.uk.preferencesAVSpeakers = 'Гучномовець';
 z.string.uk.preferencesAVTemporaryDisclaimer = 'Гості не можуть розпочинати відеоконференції. Оберіть, яку з камер ви хотіли б використовувати при підключенні до відеоконференції.';
+z.string.uk.preferencesAVTryAgain = 'Спробувати ще раз';
 
 z.string.uk.preferencesDevicesActivatedIn = 'в {{location}}';
 z.string.uk.preferencesDevicesActivatedOn = 'Активований: {{date}}';
