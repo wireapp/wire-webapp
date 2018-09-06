@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="4.0.2"></a>
+## [4.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.1...@wireapp/react-ui-kit@4.0.2) (2018-09-06)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Typed props ([#1082](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1082)) ([873322f](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/873322f))
+
+
+
+
+
 <a name="4.0.1"></a>
 ## [4.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.0...@wireapp/react-ui-kit@4.0.1) (2018-09-06)
 
