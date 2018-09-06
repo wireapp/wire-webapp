@@ -525,7 +525,10 @@ ko.bindingHandlers.tooltip = {
   },
 };
 
-ko.bindingHandlers.macOsDragClick = {
+/**
+ * Suppresses the click event if we are in the macOs wrapper and are dragging the window
+ */
+ko.bindingHandlers.clickOrDrag = {
   init(element, valueAccessor, allBindings, viewModel, bindingContext) {
     const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
     const context = bindingContext.$data;

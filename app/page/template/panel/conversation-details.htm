@@ -1,9 +1,9 @@
 <div id="conversation-details" class="panel__page conversation-details" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS]">
   <!-- ko if: isVisible() -->
     <div class="panel__header panel__header--reverse">
-      <close-icon class="right-panel-close icon-button" data-bind="macOsDragClick: onClose" data-uie-name="do-close"></close-icon>
+      <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
       <!-- ko if: activeConversation() && !activeConversation().is_request() && !activeConversation().removed_from_conversation() -->
-        <mute-icon class="right-panel-mute icon-button" data-bind="macOsDragClick: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().is_muted()} " data-uie-name="do-mute"></mute-icon>
+        <mute-icon class="right-panel-mute icon-button" data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().is_muted()} " data-uie-name="do-mute"></mute-icon>
       <!-- /ko -->
     </div>
     <div class="panel__content">
