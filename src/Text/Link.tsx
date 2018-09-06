@@ -28,7 +28,7 @@ interface LinkProps extends TextProps {
   component?: React.ComponentType;
 }
 
-const Link: React.SFC<LinkProps & React.HTMLAttributes<HTMLAnchorElement>> = ({color, component, ...props}) => {
+const Link: React.SFC<LinkProps & any> = ({color, component, ...props}) => {
   const darker = 0.16;
   const hoverColor = Color(color)
     .mix(Color(COLOR.BLACK), darker)

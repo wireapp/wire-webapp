@@ -37,7 +37,7 @@ import {
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
 
-export interface RoundIconButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface RoundIconButtonProps {
   color?: string;
   icon?: ICON_NAME;
   iconColor?: string;
@@ -46,14 +46,18 @@ export interface RoundIconButtonProps extends React.HTMLAttributes<HTMLButtonEle
   size?: number;
 }
 
-export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps {
   disabled?: boolean;
   size?: number;
 }
 
+type HTMLButtonType = React.HTMLAttributes<HTMLButtonElement> & {type: string; formNoValidate: boolean};
+
 const darkenAmount = 0.08;
 
-const Button = styled<ButtonProps>(RoundContainer.withComponent('button'))`
+const Button = styled<ButtonProps & HTMLButtonType>(RoundContainer.withComponent(styled.button<HTMLButtonType>``))<
+  ButtonProps
+>`
   background-color: ${props => (props.disabled ? COLOR.DISABLED : props.color)};
   min-width: ${props => props.size}px;
   outline: none;
@@ -80,7 +84,7 @@ enum ICON_NAME {
   TRASH = 'trash',
 }
 
-const RoundIconButton: React.SFC<RoundIconButtonProps> = ({
+const RoundIconButton: React.SFC<RoundIconButtonProps & HTMLButtonType> = ({
   icon,
   iconColor,
   iconHeight,

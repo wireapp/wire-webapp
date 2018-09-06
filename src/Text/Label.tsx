@@ -31,6 +31,6 @@ Label.defaultProps = {
   fontSize: '12px',
 };
 
-const LabelLink = Label.withComponent<React.HTMLAttributes<HTMLAnchorElement>>(Link);
+const LabelLink = Label.withComponent<any>(Link);
 
 export {Label, LabelLink};

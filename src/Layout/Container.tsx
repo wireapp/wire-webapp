@@ -34,7 +34,7 @@ interface Level {
 
 interface ContainerProps {
   centerText?: boolean;
-  level: keyof Level;
+  level?: keyof Level;
   verticalCenter?: boolean;
 }
 
@@ -55,7 +55,7 @@ const Container = styled.div<HTMLContainerProps>`
   width: 100%;
 
   ${({level}) =>
-    LEVEL[level] ||
+    LEVEL[level!] ||
     `${media.desktop`
             padding: 0;
             width: ${WIDTH.DESKTOP_MIN - GUTTER * 2}px;

@@ -21,8 +21,9 @@ import {Encoder} from 'bazinga64';
 import * as React from 'react';
 import styled, {css} from 'styled-components';
 import {COLOR} from '../Identity';
+import {TextProps} from '../Text';
 
-export interface InputProps {
+export interface InputProps extends TextProps {
   markInvalid?: boolean;
   placeholderTextTransform?: string;
 }
