@@ -213,7 +213,7 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
     <!-- /ko -->
     <!-- ko if: showNoCameraPreview() -->
-      <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="l10n_text: z.string.callNoCameraAccess"></div>
+      <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="l10n_text: z.string.callNoCameraAccess" data-uie-name="label-no-camera-access-preview"></div>
     <!-- /ko -->
 
     <!-- ko ifnot: canJoin() -->

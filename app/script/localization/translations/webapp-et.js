@@ -99,12 +99,14 @@ z.string.et.callJoin = 'Liitu';
 z.string.et.callChooseSharedScreen = 'Vali ekraan, mida jagada';
 z.string.et.callParticipants = '{{number}} kõnes';
 
+z.string.et.videoCallOverlayFitVideoLabel = 'Topeltklõpsa, et mahutada video ekraanialasse';
 z.string.et.videoCallOverlayConversations = 'Vestlused';
 z.string.et.videoCallOverlayMute = 'Vaigista';
 z.string.et.videoCallOverlayVideo = 'Video';
 z.string.et.videoCallOverlayShareScreen = 'Jaga ekraani';
 z.string.et.videoCallOverlayHangUp = 'Lõpeta kõne';
 z.string.et.videoCallPaused = 'Video pausil';
+z.string.et.videoCallScreenShareNotSupported = 'Sinu brauser ei toeta ekraanijagamist';
 
 z.string.et.modalAcknowledgeAction = 'Ok';
 z.string.et.modalAcknowledgeHeadline = 'Midagi läks valesti';
@@ -571,6 +573,7 @@ z.string.et.preferencesAVMicrophone = 'Mikrofon';
 z.string.et.preferencesAVPermissionDetail = 'Luba oma brauseri Eelistustest';
 z.string.et.preferencesAVSpeakers = 'Kõlarid';
 z.string.et.preferencesAVTemporaryDisclaimer = 'Külalised ei saa alustada videokonverentse. Vali kasutatav kaamera, kui liitud mõnega.';
+z.string.et.preferencesAVTryAgain = 'Proovi uuesti';
 
 z.string.et.preferencesDevicesActivatedIn = 'kohas {{location}}';
 z.string.et.preferencesDevicesActivatedOn = 'Aktiveeritud kuupäeval {{date}}';

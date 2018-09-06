@@ -1129,6 +1129,15 @@ z.calling.CallingRepository = class CallingRepository {
         const logMessage = `Failed to join call in '${callEntity.state()}' conversation '${conversationId}'`;
         this.callLogger.warn(logMessage, joinError);
 
+        const accessErrors = [
+          z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE,
+          z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
+        ];
+        const isAccessError = accessErrors.includes(joinError.type);
+        if (isAccessError) {
+          this.mediaRepository.showNoCameraModal();
+        }
+
         return isOutgoingCall ? this._deleteCall(callEntity) : this._rejectCall(callEntity, true);
       })
       .catch(error => this._handleNotFoundError(error));
@@ -1706,6 +1715,10 @@ z.calling.CallingRepository = class CallingRepository {
       }
 
       log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
+    }
+
+    if (callMessageEntity.properties) {
+      log = log.concat(`: ${JSON.stringify(callMessageEntity.properties)}`);
     }
 
     this.callLogger.info(log, callMessageEntity);
