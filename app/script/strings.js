@@ -45,11 +45,11 @@ export const cookiePolicyStrings = defineMessages({
 export const indexStrings = defineMessages({
   createAccountForPersonalUse: {
     id: 'index.createAccountForPersonalUse',
-    defaultMessage: 'For personal use',
+    defaultMessage: 'Personal',
   },
   createAccountForOrganizations: {
     id: 'index.createAccountForOrganizations',
-    defaultMessage: 'For organizations',
+    defaultMessage: 'Pro',
   },
   createPersonalAccount: {
     id: 'index.createPersonalAccount',

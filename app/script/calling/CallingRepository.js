@@ -27,6 +27,7 @@ z.calling.CallingRepository = class CallingRepository {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
+      MAX_FIREFOX_TURN_COUNT: 3,
       MAX_VIDEO_PARTICIPANTS: 4,
       PROTOCOL_VERSION: '3.0',
     };
@@ -1128,6 +1129,15 @@ z.calling.CallingRepository = class CallingRepository {
         const logMessage = `Failed to join call in '${callEntity.state()}' conversation '${conversationId}'`;
         this.callLogger.warn(logMessage, joinError);
 
+        const accessErrors = [
+          z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE,
+          z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
+        ];
+        const isAccessError = accessErrors.includes(joinError.type);
+        if (isAccessError) {
+          this.mediaRepository.showNoCameraModal();
+        }
+
         return isOutgoingCall ? this._deleteCall(callEntity) : this._rejectCall(callEntity, true);
       })
       .catch(error => this._handleNotFoundError(error));
@@ -1592,7 +1602,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the updated calling config
    */
   _getConfigFromBackend() {
-    return this.callingService.getConfig().then(callingConfig => {
+    const limit = z.util.Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+
+    return this.callingService.getConfig(limit).then(callingConfig => {
       if (callingConfig) {
         this._clearConfigTimeout();
 
@@ -1703,6 +1715,10 @@ z.calling.CallingRepository = class CallingRepository {
       }
 
       log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
+    }
+
+    if (callMessageEntity.properties) {
+      log = log.concat(`: ${JSON.stringify(callMessageEntity.properties)}`);
     }
 
     this.callLogger.info(log, callMessageEntity);
