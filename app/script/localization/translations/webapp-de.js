@@ -105,7 +105,7 @@ z.string.de.videoCallOverlayVideo = 'Video';
 z.string.de.videoCallOverlayShareScreen = 'Bildschirm teilen';
 z.string.de.videoCallOverlayHangUp = 'Beenden';
 z.string.de.videoCallPaused = 'Video wurde angehalten';
-z.string.de.videoCallScreenShareNotSupported = 'Bildschirm teilen ist in diesem Browser nicht verfügbar';
+z.string.de.videoCallScreenShareNotSupported = 'Bildschirmfreigabe wird von diesem Browser nicht unterstützt';
 
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
@@ -572,6 +572,7 @@ z.string.de.preferencesAVMicrophone = 'Mikrofon';
 z.string.de.preferencesAVPermissionDetail = 'In deinen Browser-Einstellungen aktivieren';
 z.string.de.preferencesAVSpeakers = 'Lautsprecher';
 z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen nicht selbst starten. Wähle die Kamera aus, die bei der Teilnahme verwendet werden soll.';
+z.string.de.preferencesAVTryAgain = 'Erneut versuchen';
 
 z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.de.preferencesDevicesActivatedOn = 'Aktiviert am {{date}}';
@@ -713,7 +714,7 @@ z.string.de.warningNotFoundCamera = 'Du kannst nicht anrufen, da dein Computer k
 z.string.de.warningNotFoundMicrophone = 'Du kannst nicht anrufen, da dein Computer kein Mikrofon hat.';
 z.string.de.warningPermissionDeniedCamera = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf die Kamera hat.';
 z.string.de.warningPermissionDeniedMicrophone = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf das Mikrofon hat.';
-z.string.de.warningPermissionDeniedScreen = 'Der Browser braucht die Berechtigung deinen Bildschirm zu teilen.';
+z.string.de.warningPermissionDeniedScreen = 'Der Browser braucht die Berechtigung zur Bildschirmfreigabe.';
 z.string.de.warningPermissionRequestCamera = '[icon] Zugriff auf Kamera gewähren';
 z.string.de.warningPermissionRequestMicrophone = '[icon] Zugriff auf Mikrofon gewähren';
 z.string.de.warningPermissionRequestNotification = '[icon] Benachrichtigungen zulassen';

@@ -564,6 +564,7 @@ z.string.lt.preferencesAVMicrophone = 'Mikrofonas';
 z.string.lt.preferencesAVPermissionDetail = 'Įjunkite savo naršyklės nuostatose';
 z.string.lt.preferencesAVSpeakers = 'Garsiakalbiai';
 z.string.lt.preferencesAVTemporaryDisclaimer = 'Svečiai negali pradėti vaizdo konferencijų. Pasirinkite norimą kamerą jei prisijungiate.';
+z.string.lt.preferencesAVTryAgain = 'Bandykite dar kartą';
 
 z.string.lt.preferencesDevicesActivatedIn = 'šalia {{location}}';
 z.string.lt.preferencesDevicesActivatedOn = 'Aktyvuotas {{date}}';
