@@ -74,7 +74,7 @@
     "babel-preset-react": "6.24.1",
     "concurrently": "4.0.1",
     "cssnano": "4.1.0",
-    "enzyme-adapter-react-16": "1.4.0",
+    "enzyme-adapter-react-16": "1.5.0",
     "enzyme-to-json": "3.3.4",
     "enzyme": "3.6.0",
     "eslint-config-prettier": "3.0.1",
