@@ -53,14 +53,13 @@ export default class TransientStore extends EventEmitter {
 
         return Promise.all(readBundles);
       })
-      .then((bundles: TransientBundle[]) => {
+      .then(async (bundles: TransientBundle[]) => {
         for (const index in bundles) {
           const bundle = bundles[index];
           const cacheKey = cacheKeys[index];
 
-          this.startTimer(cacheKey).then(() => {
-            this.bundles[cacheKey] = bundle;
-          });
+          await this.startTimer(cacheKey);
+          this.bundles[cacheKey] = bundle;
         }
 
         return bundles;
@@ -119,23 +118,23 @@ export default class TransientStore extends EventEmitter {
   public set<T>(primaryKey: string, record: T, ttl: number): Promise<TransientBundle> {
     const bundle: TransientBundle = this.createTransientBundle(record, ttl);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
       this.getFromCache(primaryKey).then((cachedBundle: TransientBundle) => {
         if (cachedBundle) {
           const message = `Record with primary key "${primaryKey}" already exists in table "${
             this.tableName
           }" of database "${this.engine.storeName}".`;
-          reject(new RecordAlreadyExistsError(message));
+          return reject(new RecordAlreadyExistsError(message));
         } else {
-          this.save(primaryKey, bundle)
+          return this.save(primaryKey, bundle)
             .then((cacheKey: string) => Promise.all([cacheKey, this.startTimer(cacheKey)]))
             .then(([cacheKey, bundle]: [string, TransientBundle]) => {
               // Note: Save bundle with timeoutID in cache (not in persistent storage)
               resolve(this.saveInCache(cacheKey, bundle));
             });
         }
-      });
-    });
+      })
+    );
   }
 
   private save<TransientBundle>(primaryKey: string, bundle: TransientBundle): Promise<string> {
@@ -184,7 +183,7 @@ export default class TransientStore extends EventEmitter {
   // TODO: Change method signature to "cacheKey: string, bundle: TransientBundle"
   private startTimer(cacheKey: string): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
-    return this.get(primaryKey).then((bundle: TransientBundle | undefined) => {
+    return this.get(primaryKey).then(async (bundle: TransientBundle | undefined) => {
       if (!bundle) {
         bundle = new TransientBundle();
         bundle.expires = 0;
@@ -195,12 +194,11 @@ export default class TransientStore extends EventEmitter {
       const timespan: number = expires - Date.now();
 
       if (expires <= 0) {
-        this.expireBundle(cacheKey);
+        await this.expireBundle(cacheKey);
       } else if (!timeoutID) {
-        bundle.timeoutID = setTimeout(() => {
-          this.expireBundle(cacheKey).then((expiredBundle: ExpiredBundle) => {
-            this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);
-          });
+        bundle.timeoutID = setTimeout(async () => {
+          const expiredBundle: ExpiredBundle = await this.expireBundle(cacheKey);
+          this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);
         }, timespan);
       }
 

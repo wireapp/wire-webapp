@@ -89,6 +89,7 @@ export default class PriorityQueue {
       return;
     }
 
+    /* tslint:disable:no-floating-promises */
     Promise.resolve(queueObject.fn())
       .then((result: any) => {
         return {shouldContinue: true, wrappedResolve: () => queueObject.resolve(result)};
@@ -116,6 +117,7 @@ export default class PriorityQueue {
           }
         }
       });
+    /* tslint:enable:no-floating-promises */
   }
 
   private run(): void {

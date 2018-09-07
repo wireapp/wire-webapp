@@ -148,7 +148,7 @@ class APIClient {
     const context = this.createContext(initialAccessToken.user, clientType);
 
     await this.initEngine(context);
-    this.accessTokenStore.updateToken(initialAccessToken);
+    await this.accessTokenStore.updateToken(initialAccessToken);
 
     return context;
   }

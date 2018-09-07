@@ -266,7 +266,7 @@ export class Session {
             if (msg.prekey_id !== PreKey.MAX_PREKEY_ID) {
               // TODO: Zeroize should be tested (and awaited) here!
               MemoryUtil.zeroize(await prekey_store.load_prekey(msg.prekey_id));
-              prekey_store.delete_prekey(msg.prekey_id);
+              await prekey_store.delete_prekey(msg.prekey_id);
             }
 
             this._insert_session_state(msg.message.session_tag, state);

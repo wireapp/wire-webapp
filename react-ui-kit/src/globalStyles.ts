@@ -24,7 +24,7 @@ let areGlobalStylesSet = false;
 
 export default function applyGlobalStyles() {
   if (!areGlobalStylesSet) {
-    // eslint-disable-next-line
+    /* tslint:disable:no-unused-expression */
     injectGlobal`
       ${styledNormalize}
 
@@ -32,6 +32,7 @@ export default function applyGlobalStyles() {
         margin-top: 0;
       }
     `;
+    /* tslint:enable:no-unused-expression */
     areGlobalStylesSet = true;
   }
 }

@@ -148,19 +148,20 @@ export default class FileEngine implements CRUDEngine {
   }
 
   readAll<T>(tableName: string): Promise<T[]> {
-    return this.resolvePath(tableName).then(directory => {
-      return new Promise<T[]>((resolve, reject) => {
-        fs.readdir(directory, (error: NodeJS.ErrnoException, files: string[]) => {
-          if (error) {
-            reject(error);
-          } else {
-            const recordNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
-            const promises: Promise<T>[] = recordNames.map(primaryKey => this.read(tableName, primaryKey));
-            Promise.all(promises).then((records: T[]) => resolve(records));
-          }
-        });
-      });
-    });
+    return this.resolvePath(tableName).then(
+      directory =>
+        new Promise<T[]>((resolve, reject) => {
+          fs.readdir(directory, (error: NodeJS.ErrnoException, files: string[]) => {
+            if (error) {
+              return reject(error);
+            } else {
+              const recordNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
+              const promises: Promise<T>[] = recordNames.map(primaryKey => this.read(tableName, primaryKey));
+              return Promise.all(promises).then((records: T[]) => resolve(records));
+            }
+          });
+        })
+    );
   }
 
   readAllPrimaryKeys(tableName: string): Promise<string[]> {
