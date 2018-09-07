@@ -30,8 +30,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       NEGOTIATION_THRESHOLD: 0.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RECONNECTION_TIMEOUT: 2.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RENEGOTIATION_TIMEOUT: 30 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
-      SDP_SEND_TIMEOUT: 5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
-      SDP_SEND_TIMEOUT_RESET: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      SDP_SEND_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
     };
   }
 
@@ -856,16 +855,39 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
-          if (!this._containsRelayCandidate(iceCandidates)) {
-            const logMessage = `No relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`;
-            this.callLogger.warn(logMessage, iceCandidates);
-            return this._setSendSdpTimeout(false);
+          const MIN_NUMBER_OF_RELAY_SERVERS = 2;
+          if (this._getNumberOfRelayCandidates(iceCandidates) < MIN_NUMBER_OF_RELAY_SERVERS) {
+            const logMessage = `Less than ${MIN_NUMBER_OF_RELAY_SERVERS} relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`;
+            this.callLogger.warn(logMessage);
+            return this._setSendSdpTimeout();
           }
         }
 
+        const iceCandidateTypes = iceCandidates.reduce((types, candidateStr) => {
+          const typeMatches = candidateStr.match(/typ (\w+)/);
+          if (!typeMatches) {
+            return types;
+          }
+          const candidateType = typeMatches[1];
+          types[candidateType] = types[candidateType] ? types[candidateType] + 1 : 1;
+          return types;
+        }, {});
+
+        const iceCandidateTypesLog = Object.keys(iceCandidateTypes)
+          .map(candidateType => {
+            return `${iceCandidateTypes[candidateType]} ${candidateType}`;
+          })
+          .join(', ');
+
         const logMessage = {
           data: {
-            default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
+            default: [
+              localSdp.type,
+              iceCandidates.length,
+              iceCandidateTypesLog,
+              this.remoteUser.name(),
+              this.localSdp().sdp,
+            ],
             obfuscated: [
               localSdp.type,
               iceCandidates.length,
@@ -873,7 +895,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
               this.callLogger.obfuscateSdp(this.localSdp().sdp),
             ],
           },
-          message: `Sending local '{0}' SDP containing '{1}' ICE candidates for flow with '{2}'\n{3}`,
+          message: `Sending local '{0}' SDP containing '{1}' ICE candidates ('{2}') for flow with '{3}'\n{4}`,
         };
         this.callLogger.debug(logMessage);
 
@@ -929,18 +951,17 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
-   * Check for relay candidate among given ICE candidates
+   * Counts the number of relay candidate in a list of ICE candidates.
    *
    * @private
    * @param {Array<string>} iceCandidates - ICE candidate strings from SDP
-   * @returns {boolean} True if relay candidate found
+   * @returns {number} The number of found relay ICE candidates
    */
-  _containsRelayCandidate(iceCandidates) {
-    for (const iceCandidate of iceCandidates) {
-      if (iceCandidate.toLowerCase().includes('relay')) {
-        return true;
-      }
-    }
+  _getNumberOfRelayCandidates(iceCandidates) {
+    return iceCandidates.reduce((count, iceCandidate) => {
+      const isRelay = iceCandidate.toLowerCase().includes('relay');
+      return isRelay ? count + 1 : count;
+    }, 0);
   }
 
   /**
@@ -1173,12 +1194,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Set the SDP send timeout.
    * @private
-   * @param {boolean} [initialTimeout=true] - Choose initial timeout length
    * @returns {undefined} No return value
    */
-  _setSendSdpTimeout(initialTimeout = true) {
-    const timeout = initialTimeout ? FlowEntity.CONFIG.SDP_SEND_TIMEOUT : FlowEntity.CONFIG.SDP_SEND_TIMEOUT_RESET;
-    this.sendSdpTimeout = window.setTimeout(() => this.sendLocalSdp(true), timeout);
+  _setSendSdpTimeout() {
+    this.sendSdpTimeout = window.setTimeout(() => this.sendLocalSdp(true), FlowEntity.CONFIG.SDP_SEND_TIMEOUT);
   }
 
   //##############################################################################
