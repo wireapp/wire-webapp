@@ -532,7 +532,7 @@ ko.bindingHandlers.clickOrDrag = {
   init(element, valueAccessor, allBindings, viewModel, bindingContext) {
     const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
     const context = bindingContext.$data;
-    const callback = valueAccessor().bind(context);
+    const callback = valueAccessor().bind(context, context);
     if (!isMacDesktop) {
       return element.addEventListener('click', callback);
     }
@@ -559,9 +559,9 @@ ko.bindingHandlers.clickOrDrag = {
       }
     });
 
-    element.addEventListener('mouseup', () => {
+    element.addEventListener('mouseup', event => {
       if (!isMoved) {
-        callback();
+        callback(event);
       }
       isDragging = false;
     });
