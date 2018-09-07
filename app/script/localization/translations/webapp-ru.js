@@ -98,6 +98,7 @@ z.string.ru.callAccept = 'Принять';
 z.string.ru.callJoin = 'Присоединиться';
 z.string.ru.callChooseSharedScreen = 'Выберите экран для совместного использования';
 z.string.ru.callParticipants = '{{number}} участников';
+z.string.ru.callNoCameraAccess = 'Нет доступа к камере';
 
 z.string.ru.videoCallOverlayConversations = 'Разговоры';
 z.string.ru.videoCallOverlayMute = 'Беззвучный';
@@ -105,6 +106,7 @@ z.string.ru.videoCallOverlayVideo = 'Видео';
 z.string.ru.videoCallOverlayShareScreen = 'Поделиться экраном';
 z.string.ru.videoCallOverlayHangUp = 'Завершить вызов';
 z.string.ru.videoCallPaused = 'Видео приостановлено';
+z.string.ru.videoCallScreenShareNotSupported = 'Ваш браузер не поддерживает совместное использование экрана';
 
 z.string.ru.modalAcknowledgeAction = 'Ok';
 z.string.ru.modalAcknowledgeHeadline = 'Что-то пошло не так';
@@ -164,7 +166,7 @@ z.string.ru.modalCallSecondOngoingAction = 'Завершить вызов';
 z.string.ru.modalCallSecondOngoingHeadline = 'Завершить звонок на другом устройстве?';
 z.string.ru.modalCallSecondOngoingMessage = 'Вы можете установить не более одного вызова.';
 
-z.string.ru.modalCallSecondOutgoingAction = 'Все равно позвонить';
+z.string.ru.modalCallSecondOutgoingAction = 'Позвонить';
 z.string.ru.modalCallSecondOutgoingHeadline = 'Завершить текущий вызов?';
 z.string.ru.modalCallSecondOutgoingMessage = 'Уже есть активный вызов в другом разговоре. Он будет завершен, если вы начнете новый.';
 
@@ -198,14 +200,14 @@ z.string.ru.modalConversationLeaveMessage = 'Вы не сможете отпра
 z.string.ru.modalConversationMessageTooLongHeadline = 'Сообщение слишком длинное';
 z.string.ru.modalConversationMessageTooLongMessage = 'Вы можете отправлять сообщения длиной до {{number}} символов.';
 
-z.string.ru.modalConversationNewDeviceAction = 'Все равно отправить';
+z.string.ru.modalConversationNewDeviceAction = 'Отправить';
 z.string.ru.modalConversationNewDeviceHeadlineOne = '{{user}} начал(а) использовать новое устройство';
 z.string.ru.modalConversationNewDeviceHeadlineMany = '{{users}} начали использовать новые устройства';
 z.string.ru.modalConversationNewDeviceHeadlineYou = '{{user}} начали использовать новое устройство';
 z.string.ru.modalConversationNewDeviceIncomingCallAction = 'Принять вызов';
 z.string.ru.modalConversationNewDeviceIncomingCallMessage = 'Вы действительно хотите принять вызов?';
 z.string.ru.modalConversationNewDeviceMessage = 'Вы все еще хотите отправить ваше сообщение?';
-z.string.ru.modalConversationNewDeviceOutgoingCallAction = 'Все равно позвонить';
+z.string.ru.modalConversationNewDeviceOutgoingCallAction = 'Позвонить';
 z.string.ru.modalConversationNewDeviceOutgoingCallMessage = 'Вы действительно хотите позвонить?';
 
 z.string.ru.modalConversationNotConnectedHeadline = 'Никто не был добавлен в разговор';
@@ -216,22 +218,21 @@ z.string.ru.modalConversationRemoveAction = 'Удалить';
 z.string.ru.modalConversationRemoveHeadline = 'Удалить?';
 z.string.ru.modalConversationRemoveMessage = '{{user}} больше не сможет отправлять и получать сообщения в этом разговоре.';
 
-z.string.ru.modalConversationRemoveGuestsAction = 'Удалить гостей';
-z.string.ru.modalConversationRemoveGuestsHeadline = 'Отключить доступ гостей?';
-z.string.ru.modalConversationRemoveGuestsMessage = 'Все гости будут удалены из разговора. Новые гости допущены не будут.';
+z.string.ru.modalConversationRemoveGuestsAction = 'Удалить';
+z.string.ru.modalConversationRemoveGuestsHeadline = 'Отключить доступ?';
+z.string.ru.modalConversationRemoveGuestsMessage = 'Все гости и сервисы будут удалены из разговора. Новые гости и сервисы допущены не будут.';
 
 z.string.ru.modalConversationRevokeLinkAction = 'Отозвать ссылку';
 z.string.ru.modalConversationRevokeLinkHeadline = 'Отозвать эту ссылку?';
 z.string.ru.modalConversationRevokeLinkMessage = 'Новые гости не смогут присоединиться по этой ссылке. На доступ текущих гостей это не повлияет.';
 
-z.string.ru.modalConversationGuestOptionsAllowGuestMessage = 'Не удалось активировать гостевой доступ. Попробуйте снова.';
-z.string.ru.modalConversationGuestOptionsDisableGuestMessage = 'Не удалось удалить гостей. Попробуйте снова.';
+z.string.ru.modalConversationGuestOptionsDisableGuestMessage = 'Не удалось удалить гостей и сервисы. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsGetCodeMessage = 'Не удалось получить доступ по ссылке.';
 z.string.ru.modalConversationGuestOptionsRequestCodeMessage = 'Не удалось запросить ссылку на доступ. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsRevokeCodeMessage = 'Не удалось отменить ссылку на доступ. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsToggleGuestsMessage = 'Не удалось изменить статус гостей.';
 
-z.string.ru.modalConversationTooManyMembersHeadline = 'Перегрузка';
+z.string.ru.modalConversationTooManyMembersHeadline = 'Эта группа заполнена';
 z.string.ru.modalConversationTooManyMembersMessage = 'К разговору может присоединиться до {{number1}} человек. На текущий момент в комнате есть места еще для {{number2}} человек.';
 
 z.string.ru.modalGifTooLargeHeadline = 'Выбранная анимация слишком большая';
@@ -273,6 +274,9 @@ z.string.ru.modalUserUnblockAction = 'Разблокировать';
 z.string.ru.modalUserUnblockHeadline = 'Разблокировать?';
 z.string.ru.modalUserUnblockMessage = '{{user}} вновь сможет связаться с вами и добавить вас в групповые разговоры.';
 
+z.string.ru.modalNoCameraTitle = 'Нет доступа к камере';
+z.string.ru.modalNoCameraMessage = 'У Wire нет доступа к камере.[br][faqLink]Прочтите эту статью[/faqLink], чтобы узнать, как это исправить.';
+
 z.string.ru.connectionRequestConnect = 'Связаться';
 z.string.ru.connectionRequestIgnore = 'Игнорировать';
 
@@ -297,7 +301,7 @@ z.string.ru.conversationDeviceUserDevices = ' устройства {{user}}';
 z.string.ru.conversationDeviceNewDeviceOne = ' новое устройство';
 z.string.ru.conversationDeviceNewDeviceMany = ' новые устройства';
 z.string.ru.conversationDeviceNewPeopleJoined = 'Присоединились новые участники.';
-z.string.ru.conversationDeviceNewPeopleJoinedVerify = ' верифицируйте устройства';
+z.string.ru.conversationDeviceNewPeopleJoinedVerify = 'Верифицируйте устройства';
 z.string.ru.conversationJustNow = 'Только что';
 z.string.ru.conversationLocationLink = 'Открыть карту';
 z.string.ru.conversationCreated = '[bold]{{name}}}[/bold] начал(а) разговор с {{users}}';
@@ -358,7 +362,7 @@ z.string.ru.conversationLikesCaption = '{{number}} участникам';
 z.string.ru.conversationSendPastedFile = 'Изображение добавлено {{date}}';
 z.string.ru.conversationSomeone = 'Кто-то';
 z.string.ru.conversationTweetAuthor = ' в Twitter';
-z.string.ru.conversationServicesWarning = 'Сервисы имеют доступ к содержимому разговора';
+z.string.ru.conversationServicesWarning = 'Сервисы имеют доступ к содержимому этого разговора';
 
 z.string.ru.groupCreationPreferencesAction = 'Вперед';
 z.string.ru.groupCreationPreferencesErrorNameShort = 'Не менее 1 символа';
@@ -374,7 +378,7 @@ z.string.ru.groupSizeInfo = 'К групповому разговору може
 
 z.string.ru.guestRoomConversationName = 'Гостевая комната';
 z.string.ru.guestRoomToggleName = 'Разрешить гостей и сервисы';
-z.string.ru.guestRoomToggleInfo = 'Открыть этот разговор для пользователей не из вашей команды.';
+z.string.ru.guestRoomToggleInfo = 'Открыть этот разговор для сервисов и людей не из вашей команды.';
 z.string.ru.guestRoomToggleInfoExtended = 'Открыть этот разговор для пользователей не из вашей команды. Вы всегда сможете изменить это позже.';
 
 z.string.ru.guestRoomConversationBadge = 'Присутствуют гости';
@@ -455,7 +459,7 @@ z.string.ru.addParticipantsHeaderWithCounter = 'Добавить участни�
 z.string.ru.addParticipantsManageServices = 'Управление сервисами';
 z.string.ru.addParticipantsManageServicesNoResults = 'Управление сервисами';
 z.string.ru.addParticipantsNoServicesManager = 'Сервисы - это помощники, которые могут улучшить ваш рабочий процесс.';
-z.string.ru.addParticipantsNoServicesMember = 'Сервисы - это помощники, которые могут улучшить ваш рабочий процесс. Чтобы добавить их в команду, обратитесь к администратору.';
+z.string.ru.addParticipantsNoServicesMember = 'Сервисы - это помощники, которые могут улучшить ваш рабочий процесс. Чтобы включить их, обратитесь к администратору.';
 z.string.ru.addParticipantsSearchPlaceholder = 'Поиск по имени';
 z.string.ru.addParticipantsServiceConfirmButton = 'Добавить службу';
 z.string.ru.addParticipantsTabsPeople = 'Участники';
@@ -469,7 +473,7 @@ z.string.ru.conversationDetailsActionClear = 'Удалить контент…';
 z.string.ru.conversationDetailsActionConversationParticipants = 'Показать все ({{number}})';
 z.string.ru.conversationDetailsActionCreateGroup = 'Создать группу';
 z.string.ru.conversationDetailsActionDevices = 'Устройства';
-z.string.ru.conversationDetailsActionGuestOptions = 'Гости';
+z.string.ru.conversationDetailsActionGuestOptions = 'Гости и сервисы';
 z.string.ru.conversationDetailsActionTimedMessages = 'Временные сообщения';
 z.string.ru.conversationDetailsActionLeave = 'Покинуть группу';
 z.string.ru.conversationDetailsGuestsOff = 'Выключен';
@@ -504,7 +508,7 @@ z.string.ru.guestOptionsCreateLink = 'Создать ссылку';
 z.string.ru.guestOptionsInfoHeader = 'Пригласить других пользователей ссылкой';
 z.string.ru.guestOptionsInfoText = 'Любой, у кого есть ссылка, может присоединиться к разговору в течение 24 часов, даже если у них нет Wire.';
 z.string.ru.guestOptionsRevokeLink = 'Отозвать ссылку…';
-z.string.ru.guestOptionsTitle = 'Опции гостей';
+z.string.ru.guestOptionsTitle = 'Гости и сервисы';
 
 z.string.ru.timedMessagesTitle = 'Временные сообщения';
 z.string.ru.timedMessageDisclaimer = 'Временные сообщения будут включены для всех участников этого разговора.';
@@ -569,6 +573,8 @@ z.string.ru.preferencesAVMicrophone = 'Микрофон';
 z.string.ru.preferencesAVPermissionDetail = 'Включите в настройках вашего браузера';
 z.string.ru.preferencesAVSpeakers = 'Динамики';
 z.string.ru.preferencesAVTemporaryDisclaimer = 'Гости не могут начинать видеоконференции. Выберите камеру, которая будет использоваться если вы к ней присоединитесь.';
+z.string.ru.preferencesAVNoCamera = 'У Wire нет доступа к камере.[br][faqLink]Прочтите эту статью[/faqLink], чтобы узнать, как это исправить.';
+z.string.ru.preferencesAVTryAgain = 'Повторить попытку';
 
 z.string.ru.preferencesDevicesActivatedIn = 'в {{location}}';
 z.string.ru.preferencesDevicesActivatedOn = 'Активирован {{date}}';
@@ -655,7 +661,7 @@ z.string.ru.searchServices = 'Сервисы';
 z.string.ru.searchManageServices = 'Управление сервисами';
 z.string.ru.searchManageServicesNoResults = 'Управление сервисами';
 z.string.ru.searchNoServicesManager = 'Сервисы - это помощники, которые могут улучшить ваш рабочий процесс.';
-z.string.ru.searchNoServicesMember = 'Сервисы - это помощники, которые могут улучшить ваш рабочий процесс. Чтобы добавить их в команду, обратитесь к администратору.';
+z.string.ru.searchNoServicesMember = 'Сервисы - это помощники, которые могут улучшить ваш рабочий процесс. Чтобы включить их, обратитесь к администратору.';
 z.string.ru.searchTeamGroups = 'Разговоры команды';
 z.string.ru.searchTeamMembers = 'Участники команды';
 z.string.ru.searchTopPeople = 'Топ-контакты';

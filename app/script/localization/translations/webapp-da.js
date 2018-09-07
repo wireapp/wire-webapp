@@ -513,6 +513,7 @@ z.string.da.preferencesAVCamera = 'Kamera';
 z.string.da.preferencesAVMicrophone = 'Mikrofon';
 z.string.da.preferencesAVPermissionDetail = 'Aktivér fra din browser indstillinger';
 z.string.da.preferencesAVSpeakers = 'Højtalere';
+z.string.da.preferencesAVTryAgain = 'Prøv Igen';
 
 z.string.da.preferencesDevicesActivatedIn = 'i {{location}}';
 z.string.da.preferencesDevicesActivatedOn = 'Aktiveret på {{date}}';

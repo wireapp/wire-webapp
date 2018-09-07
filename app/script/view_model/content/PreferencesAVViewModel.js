@@ -96,6 +96,11 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     });
   }
 
+  tryAgain() {
+    this.releaseDevices();
+    this.initiateDevices();
+  }
+
   /**
    * Release media devices.
    * @returns {undefined} No return value.

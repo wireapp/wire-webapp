@@ -97,15 +97,16 @@ z.string.de.callAccept = 'Annehmen';
 z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
 z.string.de.callParticipants = '{{number}} im Anruf';
+z.string.de.callNoCameraAccess = 'Kein Kamerazugriff';
 
-z.string.de.videoCallOverlayFitVideoLabel = 'Füllmodus der Videos kann per Doppelklick geändert werden';
+z.string.de.videoCallOverlayFitVideoLabel = 'Das Video per Doppelklick anpassen';
 z.string.de.videoCallOverlayConversations = 'Unterhaltungen';
 z.string.de.videoCallOverlayMute = 'Stummschalten';
 z.string.de.videoCallOverlayVideo = 'Video';
 z.string.de.videoCallOverlayShareScreen = 'Bildschirm teilen';
 z.string.de.videoCallOverlayHangUp = 'Beenden';
 z.string.de.videoCallPaused = 'Video wurde angehalten';
-z.string.de.videoCallScreenShareNotSupported = 'Bildschirm teilen ist in diesem Browser nicht verfügbar';
+z.string.de.videoCallScreenShareNotSupported = 'Bildschirmfreigabe wird von diesem Browser nicht unterstützt';
 
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
@@ -273,6 +274,9 @@ z.string.de.modalUserBlockMessage = '{{user}} wird dich nicht länger kontaktier
 z.string.de.modalUserUnblockAction = 'Freigeben';
 z.string.de.modalUserUnblockHeadline = 'Freigeben?';
 z.string.de.modalUserUnblockMessage = '{{user}} wird dich wieder kontaktieren und zu Gruppen hinzufügen können.';
+
+z.string.de.modalNoCameraTitle = 'Kein Kamerazugriff';
+z.string.de.modalNoCameraMessage = 'Wire hat keinen Zugriff auf die Kamera.[br][faqLink]Zur Behebung bitte diesen Support Artikel anschauen[/faqLink].';
 
 z.string.de.connectionRequestConnect = 'Kontakt hinzufügen';
 z.string.de.connectionRequestIgnore = 'Ignorieren';
@@ -572,6 +576,8 @@ z.string.de.preferencesAVMicrophone = 'Mikrofon';
 z.string.de.preferencesAVPermissionDetail = 'In deinen Browser-Einstellungen aktivieren';
 z.string.de.preferencesAVSpeakers = 'Lautsprecher';
 z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen nicht selbst starten. Wähle die Kamera aus, die bei der Teilnahme verwendet werden soll.';
+z.string.de.preferencesAVNoCamera = 'Wire hat keinen Zugriff auf die Kamera.[br][faqLink]Zur Behebung bitte diesen Support Artikel anschauen[/faqLink].';
+z.string.de.preferencesAVTryAgain = 'Erneut versuchen';
 
 z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.de.preferencesDevicesActivatedOn = 'Aktiviert am {{date}}';
@@ -713,7 +719,7 @@ z.string.de.warningNotFoundCamera = 'Du kannst nicht anrufen, da dein Computer k
 z.string.de.warningNotFoundMicrophone = 'Du kannst nicht anrufen, da dein Computer kein Mikrofon hat.';
 z.string.de.warningPermissionDeniedCamera = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf die Kamera hat.';
 z.string.de.warningPermissionDeniedMicrophone = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf das Mikrofon hat.';
-z.string.de.warningPermissionDeniedScreen = 'Der Browser braucht die Berechtigung deinen Bildschirm zu teilen.';
+z.string.de.warningPermissionDeniedScreen = 'Der Browser braucht die Berechtigung zur Bildschirmfreigabe.';
 z.string.de.warningPermissionRequestCamera = '[icon] Zugriff auf Kamera gewähren';
 z.string.de.warningPermissionRequestMicrophone = '[icon] Zugriff auf Mikrofon gewähren';
 z.string.de.warningPermissionRequestNotification = '[icon] Benachrichtigungen zulassen';

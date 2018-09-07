@@ -33,9 +33,9 @@ import {
   Input,
   RoundIconButton,
   ErrorMessage,
+  IsMobile,
 } from '@wireapp/react-ui-kit';
 import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -89,17 +89,23 @@ class TeamName extends Component {
       intl: {formatMessage: _},
     } = this.props;
     const {enteredTeamName, isValidTeamName, error} = this.state;
+    const backArrow = (
+      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
+        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      </Link>
+    );
     return (
       <Page>
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
         <Container centerText verticalCenter style={{width: '100%'}}>
           <Columns>
-            <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>
-                <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
-                  <ArrowIcon direction="left" color={COLOR.GRAY} />
-                </Link>
-              </div>
-            </Column>
+            <IsMobile not>
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              </Column>
+            </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
@@ -139,13 +145,11 @@ class TeamName extends Component {
                     </ErrorMessage>
                   </Form>
                 </div>
-                {!(isDesktopApp() && isMacOS()) && (
-                  <div>
-                    <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
-                      {_(teamNameStrings.whatIsWireTeamsLink)}
-                    </Link>
-                  </div>
-                )}
+                <div>
+                  <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
+                    {_(teamNameStrings.whatIsWireTeamsLink)}
+                  </Link>
+                </div>
               </ContainerXS>
             </Column>
             <Column />

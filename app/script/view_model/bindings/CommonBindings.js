@@ -439,7 +439,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
  */
 ko.bindingHandlers.hide_controls = {
   init(element, valueAccessor) {
-    const timeout = valueAccessor();
+    const {timeout = valueAccessor(), skipClass} = valueAccessor();
     let hide_timeout = undefined;
 
     element.onmouseenter = function() {
@@ -452,12 +452,20 @@ ko.bindingHandlers.hide_controls = {
       }
     };
 
-    element.onmousemove = function() {
+    element.onmousemove = function({target}) {
       if (hide_timeout) {
         window.clearTimeout(hide_timeout);
       }
 
       element.classList.remove('hide-controls');
+
+      let node = target;
+      while (node && node !== element) {
+        if (node.classList.contains(skipClass)) {
+          return;
+        }
+        node = node.parentNode;
+      }
 
       hide_timeout = window.setTimeout(() => {
         element.classList.add('hide-controls');
@@ -514,5 +522,48 @@ ko.bindingHandlers.tooltip = {
       element.classList.add('with-tooltip', `with-tooltip--${position === 'bottom' ? 'bottom' : 'top'}`);
       element.setAttribute('data-tooltip', z.l10n.text(id, substitute));
     }
+  },
+};
+
+/**
+ * Suppresses the click event if we are in the macOs wrapper and are dragging the window
+ */
+ko.bindingHandlers.clickOrDrag = {
+  init(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    const context = bindingContext.$data;
+    const callback = valueAccessor().bind(context, context);
+    if (!isMacDesktop) {
+      return element.addEventListener('click', callback);
+    }
+
+    let isMoved = false;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    element.addEventListener('mousedown', ({screenX, screenY}) => {
+      isDragging = true;
+      isMoved = false;
+      startX = screenX;
+      startY = screenY;
+    });
+
+    element.addEventListener('mousemove', ({screenX, screenY}) => {
+      if (isDragging && !isMoved) {
+        const diffX = Math.abs(startX - screenX);
+        const diffY = Math.abs(startY - screenY);
+        if (diffX > 0 || diffY > 0) {
+          isMoved = true;
+        }
+      }
+    });
+
+    element.addEventListener('mouseup', event => {
+      if (!isMoved) {
+        callback(event);
+      }
+      isDragging = false;
+    });
   },
 };

@@ -40,6 +40,7 @@ import {
   Link,
   ArrowIcon,
   COLOR,
+  IsMobile,
 } from '@wireapp/react-ui-kit';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -327,6 +328,11 @@ class SingleSignOn extends React.PureComponent {
       loginError,
     } = this.props;
     const {persist, code, isOverlayOpen, validInputs, validationErrors, ssoError} = this.state;
+    const backArrow = (
+      <Link to={ROUTE.LOGIN} component={RRLink} data-uie-name="go-login">
+        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      </Link>
+    );
     return (
       <Page>
         {isOverlayOpen && (
@@ -361,16 +367,17 @@ class SingleSignOn extends React.PureComponent {
             </Container>
           </Overlay>
         )}
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
         <Container centerText verticalCenter style={{width: '100%'}}>
           <AppAlreadyOpen />
           <Columns>
-            <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>
-                <Link to={ROUTE.LOGIN} component={RRLink} data-uie-name="go-login">
-                  <ArrowIcon direction="left" color={COLOR.GRAY} />
-                </Link>
-              </div>
-            </Column>
+            <IsMobile not>
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              </Column>
+            </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText

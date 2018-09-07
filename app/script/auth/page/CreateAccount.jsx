@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, IsMobile} from '@wireapp/react-ui-kit';
 import {createAccountStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
@@ -27,18 +27,24 @@ import React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 
-function CreateAccount({history, intl: {formatMessage: _}}) {
+const CreateAccount = ({history, intl: {formatMessage: _}}) => {
+  const backArrow = (
+    <Link to={ROUTE.CREATE_TEAM} component={RRLink} data-uie-name="go-register-team">
+      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+    </Link>
+  );
   return (
     <Page hasTeamData>
+      <IsMobile>
+        <div style={{margin: 16}}>{backArrow}</div>
+      </IsMobile>
       <Container centerText verticalCenter style={{width: '100%'}}>
         <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.CREATE_TEAM} component={RRLink} data-uie-name="go-register-team">
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
+          <IsMobile not>
+            <Column style={{display: 'flex'}}>
+              <div style={{margin: 'auto'}}>{backArrow}</div>
+            </Column>
+          </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
             <ContainerXS
               centerText
@@ -56,6 +62,6 @@ function CreateAccount({history, intl: {formatMessage: _}}) {
       </Container>
     </Page>
   );
-}
+};
 
 export default withRouter(injectIntl(CreateAccount));
