@@ -17,14 +17,12 @@
  *
  */
 
-export * from './InvoiceData';
-export * from './PaymentAPI';
-export * from './PaymentBillingData';
-export * from './PaymentData';
-export * from './PaymentDataUpdate';
-export * from './PaymentInterval';
-export * from './PaymentPlan';
-export * from './PaymentStripeCharge';
-export * from './PaymentStripeInvoice';
-export * from './PaymentStripeInvoices';
-export * from './PaymentStripePlan';
+import {PaymentStripeInvoice} from './PaymentStripeInvoice';
+
+// https://stripe.com/docs/api#invoice_object
+interface PaymentStripeInvoices {
+  has_more: boolean;
+  invoices: PaymentStripeInvoice[];
+}
+
+export {PaymentStripeInvoices};

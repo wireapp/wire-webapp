@@ -25,12 +25,13 @@ import {
   PaymentDataUpdate,
   PaymentPlan,
   PaymentStripeCharge,
-  PaymentStripeInvoice,
+  PaymentStripeInvoices,
   PaymentStripePlan,
 } from '.';
 import {HttpClient} from '../../http';
 
 class PaymentAPI {
+  static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
   constructor(private readonly client: HttpClient) {}
 
   static get URL() {
@@ -122,9 +123,17 @@ class PaymentAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
-  public getInvoices(teamId: string): Promise<PaymentStripeInvoice[]> {
+  public getInvoices(
+    teamId: string,
+    limit: number = PaymentAPI.DEFAULT_INVOICES_CHUNK_SIZE,
+    startAfterInvoiceId?: string
+  ): Promise<PaymentStripeInvoices> {
     const config: AxiosRequestConfig = {
       method: 'get',
+      params: {
+        size: limit,
+        start: startAfterInvoiceId,
+      },
       url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.INVOICES}`,
     };
 
