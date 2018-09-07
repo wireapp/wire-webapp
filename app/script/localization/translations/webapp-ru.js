@@ -98,6 +98,7 @@ z.string.ru.callAccept = 'Принять';
 z.string.ru.callJoin = 'Присоединиться';
 z.string.ru.callChooseSharedScreen = 'Выберите экран для совместного использования';
 z.string.ru.callParticipants = '{{number}} участников';
+z.string.ru.callNoCameraAccess = 'Нет доступа к камере';
 
 z.string.ru.videoCallOverlayConversations = 'Разговоры';
 z.string.ru.videoCallOverlayMute = 'Беззвучный';
@@ -272,6 +273,9 @@ z.string.ru.modalUserBlockMessage = '{{user}} больше не сможет с�
 z.string.ru.modalUserUnblockAction = 'Разблокировать';
 z.string.ru.modalUserUnblockHeadline = 'Разблокировать?';
 z.string.ru.modalUserUnblockMessage = '{{user}} вновь сможет связаться с вами и добавить вас в групповые разговоры.';
+
+z.string.ru.modalNoCameraTitle = 'Нет доступа к камере';
+z.string.ru.modalNoCameraMessage = 'У Wire нет доступа к камере.[br][faqLink]Прочтите эту статью[/faqLink], чтобы узнать, как это исправить.';
 
 z.string.ru.connectionRequestConnect = 'Связаться';
 z.string.ru.connectionRequestIgnore = 'Игнорировать';
@@ -569,6 +573,7 @@ z.string.ru.preferencesAVMicrophone = 'Микрофон';
 z.string.ru.preferencesAVPermissionDetail = 'Включите в настройках вашего браузера';
 z.string.ru.preferencesAVSpeakers = 'Динамики';
 z.string.ru.preferencesAVTemporaryDisclaimer = 'Гости не могут начинать видеоконференции. Выберите камеру, которая будет использоваться если вы к ней присоединитесь.';
+z.string.ru.preferencesAVNoCamera = 'У Wire нет доступа к камере.[br][faqLink]Прочтите эту статью[/faqLink], чтобы узнать, как это исправить.';
 z.string.ru.preferencesAVTryAgain = 'Повторить попытку';
 
 z.string.ru.preferencesDevicesActivatedIn = 'в {{location}}';
