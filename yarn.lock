@@ -8817,6 +8817,15 @@ react@16.4.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
+react@16.5.0:
+  version "16.5.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.5.0.tgz#f2c1e754bf9751a549d9c6d9aca41905beb56575"
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    schedule "^0.3.0"
+
 read-cache@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/read-cache/-/read-cache-1.0.0.tgz#e664ef31161166c9751cdbe8dbcf86b5fb58f774"
@@ -9429,6 +9438,12 @@ sax@0.4.2:
 sax@^1.2.4, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+
+schedule@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/schedule/-/schedule-0.3.0.tgz#1be2ab2fc2e768536269ce7326efb478d6c045e8"
+  dependencies:
+    object-assign "^4.1.1"
 
 schema-utils@^0.4.4, schema-utils@^0.4.5:
   version "0.4.5"
