@@ -97,8 +97,9 @@ z.string.de.callAccept = 'Annehmen';
 z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
 z.string.de.callParticipants = '{{number}} im Anruf';
+z.string.de.callNoCameraAccess = 'Kein Kamerazugriff';
 
-z.string.de.videoCallOverlayFitVideoLabel = 'Füllmodus der Videos kann per Doppelklick geändert werden';
+z.string.de.videoCallOverlayFitVideoLabel = 'Das Video per Doppelklick anpassen';
 z.string.de.videoCallOverlayConversations = 'Unterhaltungen';
 z.string.de.videoCallOverlayMute = 'Stummschalten';
 z.string.de.videoCallOverlayVideo = 'Video';
@@ -273,6 +274,9 @@ z.string.de.modalUserBlockMessage = '{{user}} wird dich nicht länger kontaktier
 z.string.de.modalUserUnblockAction = 'Freigeben';
 z.string.de.modalUserUnblockHeadline = 'Freigeben?';
 z.string.de.modalUserUnblockMessage = '{{user}} wird dich wieder kontaktieren und zu Gruppen hinzufügen können.';
+
+z.string.de.modalNoCameraTitle = 'Kein Kamerazugriff';
+z.string.de.modalNoCameraMessage = 'Wire hat keinen Zugriff auf die Kamera.[br][faqLink]Zur Behebung bitte diesen Support Artikel anschauen[/faqLink].';
 
 z.string.de.connectionRequestConnect = 'Kontakt hinzufügen';
 z.string.de.connectionRequestIgnore = 'Ignorieren';
@@ -572,6 +576,7 @@ z.string.de.preferencesAVMicrophone = 'Mikrofon';
 z.string.de.preferencesAVPermissionDetail = 'In deinen Browser-Einstellungen aktivieren';
 z.string.de.preferencesAVSpeakers = 'Lautsprecher';
 z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen nicht selbst starten. Wähle die Kamera aus, die bei der Teilnahme verwendet werden soll.';
+z.string.de.preferencesAVNoCamera = 'Wire hat keinen Zugriff auf die Kamera.[br][faqLink]Zur Behebung bitte diesen Support Artikel anschauen[/faqLink].';
 z.string.de.preferencesAVTryAgain = 'Erneut versuchen';
 
 z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
