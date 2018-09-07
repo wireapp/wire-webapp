@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.15.9"></a>
+## [1.15.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.8...@wireapp/api-client@1.15.9) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client,core:** Obfuscate access tokens and cookies, fix link previews [WEBFOUND-37] ([#1083](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1083)) ([bb9950d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/bb9950d))
+
+
+
+
+
 <a name="1.15.8"></a>
 ## [1.15.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.7...@wireapp/api-client@1.15.8) (2018-09-06)
 
