@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.12.13"></a>
+## [0.12.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.12.12...@wireapp/store-engine@0.12.13) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client,cli-client,proteus,store-engine,travis-bot:** Remove floating promises ([#1074](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1074)) ([b4947d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/b4947d2))
+
+
+
+
+
 <a name="0.12.12"></a>
 ## [0.12.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.12.11...@wireapp/store-engine@0.12.12) (2018-09-05)
 

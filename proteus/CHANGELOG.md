@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.3.24"></a>
+## [7.3.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.3.23...@wireapp/proteus@7.3.24) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client,cli-client,proteus,store-engine,travis-bot:** Remove floating promises ([#1074](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/1074)) ([b4947d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/b4947d2))
+
+
+
+
+
 <a name="7.3.23"></a>
 ## [7.3.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.3.22...@wireapp/proteus@7.3.23) (2018-09-05)
 

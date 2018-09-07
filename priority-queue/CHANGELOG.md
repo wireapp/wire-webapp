@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.13"></a>
+## [0.2.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.12...@wireapp/priority-queue@0.2.13) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client,cli-client,proteus,store-engine,travis-bot:** Remove floating promises ([#1074](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/1074)) ([b4947d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/b4947d2))
+
+
+
+
+
 <a name="0.2.12"></a>
 ## [0.2.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.11...@wireapp/priority-queue@0.2.12) (2018-09-05)
 

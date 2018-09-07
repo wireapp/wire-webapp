@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.198"></a>
+## [1.0.198](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@1.0.197...@wireapp/travis-bot@1.0.198) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client,cli-client,proteus,store-engine,travis-bot:** Remove floating promises ([#1074](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/1074)) ([b4947d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/b4947d2))
+
+
+
+
+
 <a name="1.0.197"></a>
 ## [1.0.197](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@1.0.196...@wireapp/travis-bot@1.0.197) (2018-09-07)
 
