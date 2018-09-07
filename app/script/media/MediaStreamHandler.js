@@ -663,11 +663,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _showPermissionDeniedHint(mediaType) {
-    if (mediaType === z.media.MediaType.AUDIO_VIDEO || mediaType === z.media.MediaType.VIDEO) {
-      return this.mediaRepository.showNoCameraModal();
+    const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+    if (!videoTypes.includes(mediaType)) {
+      const warningType = this._selectPermissionDeniedWarningType(mediaType);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
     }
-    const warningType = this._selectPermissionDeniedWarningType(mediaType);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
   }
 
   /**
@@ -712,11 +712,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return firstFlowEntity
       .supportsTrackReplacement(mediaStreamInfo.getType())
-      .then(replace => {
-        const replacePromise = replace
+      .then(canReplaceTracks => {
+        const replacePromise = canReplaceTracks
           ? replaceMediaTrackInFlows(mediaStreamInfo, flowEntities)
           : replaceMediaStreamInFlows(mediaStreamInfo, flowEntities);
-        return replacePromise.then(streamInfo => ({replace, streamInfo}));
+        return replacePromise.then(streamInfo => ({replace: !canReplaceTracks, streamInfo}));
       })
       .catch(error => {
         const message = `Failed to update call with '${mediaStreamInfo.getType()}': ${error.name} - ${error.message}`;

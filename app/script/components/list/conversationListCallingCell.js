@@ -88,6 +88,16 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return !hasOtherOngoingCalls && isInMinimizedState && (hasPreJoinVideo || isOngoingVideoCall);
     });
 
+    this.showNoCameraPreview = ko.computed(() => {
+      const permissionRepository = this.mediaRepository.streamHandler.permissionRepository;
+      return (
+        this.call().isRemoteVideoCall() &&
+        !this.showVideoPreview() &&
+        !this.isConnected() &&
+        permissionRepository.permissionState.camera() !== z.notification.PermissionState.GRANTED
+      );
+    });
+
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
 
     this.shouldUpdateScrollbar = ko
@@ -201,6 +211,9 @@ ko.components.register('conversation-list-calling-cell', {
           </div>
         <!-- /ko -->
       </div>
+    <!-- /ko -->
+    <!-- ko if: showNoCameraPreview() -->
+      <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="l10n_text: z.string.callNoCameraAccess" data-uie-name="label-no-camera-access-preview"></div>
     <!-- /ko -->
 
     <!-- ko ifnot: canJoin() -->
