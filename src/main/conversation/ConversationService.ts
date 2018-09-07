@@ -215,7 +215,7 @@ class ConversationService {
 
     const textMessage = Text.create({content: text});
 
-    if (linkPreviews) {
+    if (linkPreviews && linkPreviews.length) {
       textMessage.linkPreview = this.buildLinkPreviews(linkPreviews);
     }
 
@@ -628,9 +628,9 @@ class ConversationService {
         });
 
         linkPreviewMessage.image = assetMessage;
-
-        builtLinkPreviews.push(linkPreviewMessage);
       }
+
+      builtLinkPreviews.push(linkPreviewMessage);
     }
 
     return builtLinkPreviews;
