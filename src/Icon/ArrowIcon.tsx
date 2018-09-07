@@ -31,13 +31,14 @@ interface ArrowProps {
   direction?: keyof Rotation;
 }
 
+/* tslint:disable:object-literal-sort-keys */
 const rotation: Rotation = {
   right: 0,
-  //tslint:disable-next-line
   down: 90,
   left: 180,
   up: 270,
 };
+/* tslint:enable:object-literal-sort-keys */
 
 const size = 16;
 const arrow: React.SFC<ArrowProps> = ({direction = 'right'}) => (

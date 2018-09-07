@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable sort-keys, sort-vars, no-magic-numbers */
 import * as Color from 'color';
 
 export type ColorParam = Color | string | ArrayLike<number> | number | {[key: string]: any};

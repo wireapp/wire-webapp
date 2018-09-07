@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
 import {defaultProps} from 'recompose';
 import styled from 'styled-components';
 import media from '../mediaQueries';
