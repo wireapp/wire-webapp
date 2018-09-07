@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.15.11"></a>
+## [1.15.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.10...@wireapp/api-client@1.15.11) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client:** Paginated invoices endpoint ([#1088](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1088)) ([659dd12](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/659dd12))
+
+
+
+
+
 <a name="1.15.10"></a>
 ## [1.15.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.9...@wireapp/api-client@1.15.10) (2018-09-07)
 
