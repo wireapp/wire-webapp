@@ -24,6 +24,7 @@ import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
 import {BackendErrorLabel, BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
+import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 class HttpClient extends EventEmitter {
@@ -150,10 +151,10 @@ class HttpClient extends EventEmitter {
     }
 
     const accessToken = await this.postAccess(expiredAccessToken);
-    this.logger.info(`Saved updated access token. It will expire in "${accessToken.expires_in}" seconds.`, {
-      ...accessToken,
-      access_token: `${accessToken.access_token.substr(0, 10)}...`,
-    });
+    this.logger.info(
+      `Saved updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
+      ObfuscationUtil.obfuscateAccessToken(accessToken)
+    );
     return this.accessTokenStore.updateToken(accessToken);
   }
 
