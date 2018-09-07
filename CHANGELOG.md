@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.15.10"></a>
+## [1.15.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.9...@wireapp/api-client@1.15.10) (2018-09-07)
+
+
+### Bug Fixes
+
+* **api-client,cli-client,proteus,store-engine,travis-bot:** Remove floating promises ([#1074](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1074)) ([b4947d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b4947d2))
+
+
+
+
+
 <a name="1.15.9"></a>
 ## [1.15.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.8...@wireapp/api-client@1.15.9) (2018-09-07)
 
