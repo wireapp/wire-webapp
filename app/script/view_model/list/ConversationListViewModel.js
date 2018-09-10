@@ -38,10 +38,10 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;
     this.callingRepository = repositories.calling;
-    this.mediaRepository = repositories.media;
     this.conversationRepository = repositories.conversation;
+    this.permissionRepository = repositories.permission;
     this.teamRepository = repositories.team;
-    this.user_repository = repositories.user;
+    this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
 
     this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
@@ -55,11 +55,11 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.isTeam = this.teamRepository.isTeam;
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
 
-    this.selfUser = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
+    this.selfUser = ko.pureComputed(() => this.userRepository.self && this.userRepository.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
     this.selfUserName = ko.pureComputed(() => this.selfUser() && this.selfUser().name());
 
-    this.connectRequests = this.user_repository.connect_requests;
+    this.connectRequests = this.userRepository.connect_requests;
     this.connectRequestsText = ko.pureComputed(() => {
       const hasMultipleRequests = this.connectRequests().length > 1;
       const stringId = hasMultipleRequests
