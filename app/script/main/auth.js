@@ -55,9 +55,12 @@ $(() => {
   const isStaging = env === z.service.BackendEnvironment.STAGING;
   const settings = isStaging
     ? {
-        environment: z.service.BackendEnvironment.STAGING,
-        restUrl: 'https://staging-nginz-https.zinfra.io',
-        webSocketUrl: 'wss://staging-nginz-ssl.zinfra.io',
+          environment: z.service.BackendEnvironment.STAGING,
+//        restUrl: 'https://staging-nginz-https.zinfra.io',
+//        webSocketUrl: 'wss://staging-nginz-ssl.zinfra.io',
+// TODO:  Just an experiment
+          restUrl: 'https://kube-staging-nginz-https.zinfra.io',
+          webSocketUrl: 'wss://kube-staging-nginz-https.zinfra.io',
       }
     : {
         environment: z.service.BackendEnvironment.PRODUCTION,
