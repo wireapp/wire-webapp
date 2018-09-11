@@ -169,7 +169,7 @@
   },
   "231b": {
     "output": "231b",
-    "name": "hourglass",
+    "name": "hourglass done",
     "alpha_code": ":hourglass:",
     "aliases": ""
   },
@@ -205,7 +205,7 @@
   },
   "23f3": {
     "output": "23f3",
-    "name": "hourglass with flowing sand",
+    "name": "hourglass not done",
     "alpha_code": ":hourglass_flowing_sand:",
     "aliases": ""
   },
@@ -397,7 +397,7 @@
   },
   "264f": {
     "output": "264f",
-    "name": "Scorpius",
+    "name": "Scorpio",
     "alpha_code": ":scorpius:",
     "aliases": ""
   },
@@ -829,7 +829,7 @@
   },
   "2b50": {
     "output": "2b50",
-    "name": "white medium star",
+    "name": "star",
     "alpha_code": ":star:",
     "aliases": ""
   },
@@ -1309,7 +1309,7 @@
   },
   "1f31b": {
     "output": "1f31b",
-    "name": "first quarter moon with face",
+    "name": "first quarter moon face",
     "alpha_code": ":first_quarter_moon_with_face:",
     "aliases": ""
   },
@@ -3007,7 +3007,7 @@
   },
   "1f46f": {
     "output": "1f46f",
-    "name": "people with bunny ears partying",
+    "name": "people with bunny ears",
     "alpha_code": ":people_with_bunny_ears_partying:",
     "aliases": ":dancers:"
   },
@@ -3655,7 +3655,7 @@
   },
   "1f50d": {
     "output": "1f50d",
-    "name": "left-pointing magnifying glass",
+    "name": "magnifying glass tilted left",
     "alpha_code": ":mag:",
     "aliases": ""
   },
@@ -3673,7 +3673,7 @@
   },
   "1f50e": {
     "output": "1f50e",
-    "name": "right-pointing magnifying glass",
+    "name": "magnifying glass tilted right",
     "alpha_code": ":mag_right:",
     "aliases": ""
   },
@@ -3829,7 +3829,7 @@
   },
   "1f51f": {
     "output": "1f51f",
-    "name": "keycap 10",
+    "name": "keycap: 10",
     "alpha_code": ":keycap_ten:",
     "aliases": ""
   },
@@ -4105,7 +4105,7 @@
   },
   "1f53c": {
     "output": "1f53c",
-    "name": "up button",
+    "name": "upwards button",
     "alpha_code": ":arrow_up_small:",
     "aliases": ""
   },
@@ -4117,7 +4117,7 @@
   },
   "1f53d": {
     "output": "1f53d",
-    "name": "down button",
+    "name": "downwards button",
     "alpha_code": ":arrow_down_small:",
     "aliases": ""
   },
@@ -4291,7 +4291,7 @@
   },
   "1f601": {
     "output": "1f601",
-    "name": "grinning face with smiling eyes",
+    "name": "beaming face with smiling eyes",
     "alpha_code": ":grin:",
     "aliases": ""
   },
@@ -4303,7 +4303,7 @@
   },
   "1f603": {
     "output": "1f603",
-    "name": "smiling face with open mouth",
+    "name": "grinning face with big eyes",
     "alpha_code": ":smiley:",
     "aliases": ""
   },
@@ -4315,13 +4315,13 @@
   },
   "1f604": {
     "output": "1f604",
-    "name": "smiling face with open mouth & smiling eyes",
+    "name": "grinning face with smiling eyes",
     "alpha_code": ":smile:",
     "aliases": ""
   },
   "1f605": {
     "output": "1f605",
-    "name": "smiling face with open mouth & cold sweat",
+    "name": "grinning face with sweat",
     "alpha_code": ":sweat_smile:",
     "aliases": ""
   },
@@ -4333,7 +4333,7 @@
   },
   "1f606": {
     "output": "1f606",
-    "name": "smiling face with open mouth & closed eyes",
+    "name": "grinning squinting face",
     "alpha_code": ":laughing:",
     "aliases": ":satisfied:"
   },
@@ -4357,7 +4357,7 @@
   },
   "1f60b": {
     "output": "1f60b",
-    "name": "face savouring delicious food",
+    "name": "face savoring food",
     "alpha_code": ":yum:",
     "aliases": ""
   },
@@ -4405,7 +4405,7 @@
   },
   "1f613": {
     "output": "1f613",
-    "name": "face with cold sweat",
+    "name": "downcast face with sweat",
     "alpha_code": ":sweat:",
     "aliases": ""
   },
@@ -4453,7 +4453,7 @@
   },
   "1f61c": {
     "output": "1f61c",
-    "name": "face with stuck-out tongue & winking eye",
+    "name": "winking face with tongue",
     "alpha_code": ":stuck_out_tongue_winking_eye:",
     "aliases": ""
   },
@@ -4465,7 +4465,7 @@
   },
   "1f61d": {
     "output": "1f61d",
-    "name": "face with stuck-out tongue & closed eyes",
+    "name": "squinting face with tongue",
     "alpha_code": ":stuck_out_tongue_closed_eyes:",
     "aliases": ""
   },
@@ -4513,7 +4513,7 @@
   },
   "1f625": {
     "output": "1f625",
-    "name": "disappointed but relieved face",
+    "name": "sad but relieved face",
     "alpha_code": ":disappointed_relieved:",
     "aliases": ""
   },
@@ -4549,7 +4549,7 @@
   },
   "1f630": {
     "output": "1f630",
-    "name": "face with open mouth & cold sweat",
+    "name": "anxious face with sweat",
     "alpha_code": ":cold_sweat:",
     "aliases": ""
   },
@@ -4597,7 +4597,7 @@
   },
   "1f63a": {
     "output": "1f63a",
-    "name": "smiling cat face with open mouth",
+    "name": "grinning cat face",
     "alpha_code": ":smiley_cat:",
     "aliases": ""
   },
@@ -4615,7 +4615,7 @@
   },
   "1f63d": {
     "output": "1f63d",
-    "name": "kissing cat face with closed eyes",
+    "name": "kissing cat face",
     "alpha_code": ":kissing_cat:",
     "aliases": ""
   },
@@ -4735,7 +4735,7 @@
   },
   "1f685": {
     "output": "1f685",
-    "name": "high-speed train with bullet nose",
+    "name": "bullet train",
     "alpha_code": ":bullettrain_front:",
     "aliases": ""
   },
@@ -5011,7 +5011,7 @@
   },
   "1f61b": {
     "output": "1f61b",
-    "name": "face with stuck-out tongue",
+    "name": "face with tongue",
     "alpha_code": ":stuck_out_tongue:",
     "aliases": ""
   },
@@ -5359,13 +5359,13 @@
   },
   "1f31c": {
     "output": "1f31c",
-    "name": "last quarter moon with face",
+    "name": "last quarter moon face",
     "alpha_code": ":last_quarter_moon_with_face:",
     "aliases": ""
   },
   "1f31d": {
     "output": "1f31d",
-    "name": "full moon with face",
+    "name": "full moon face",
     "alpha_code": ":full_moon_with_face:",
     "aliases": ""
   },
@@ -5635,7 +5635,7 @@
   },
   "1f504": {
     "output": "1f504",
-    "name": "anticlockwise arrows button",
+    "name": "counterclockwise arrows button",
     "alpha_code": ":arrows_counterclockwise:",
     "aliases": ""
   },
@@ -7531,9 +7531,9 @@
   },
   "1f574": {
     "output": "1f574-fe0f",
-    "name": "man in business suit levitating",
-    "alpha_code": ":man_in_business_suit_levitating:",
-    "aliases": ""
+    "name": "man in suit levitating",
+    "alpha_code": ":levitate:",
+    "aliases": ":man_in_business_suit_levitating:"
   },
   "1f575": {
     "output": "1f575-fe0f",
@@ -7549,7 +7549,7 @@
   },
   "1f590": {
     "output": "1f590-fe0f",
-    "name": "raised hand with fingers splayed",
+    "name": "hand with fingers splayed",
     "alpha_code": ":hand_splayed:",
     "aliases": ":raised_hand_with_fingers_splayed:"
   },
@@ -9565,31 +9565,31 @@
   },
   "1f590-1f3fb": {
     "output": "1f590-1f3fb",
-    "name": "raised hand with fingers splayed: light skin tone",
+    "name": "hand with fingers splayed: light skin tone",
     "alpha_code": ":hand_splayed_tone1:",
     "aliases": ":raised_hand_with_fingers_splayed_tone1:"
   },
   "1f590-1f3fc": {
     "output": "1f590-1f3fc",
-    "name": "raised hand with fingers splayed: medium-light skin tone",
+    "name": "hand with fingers splayed: medium-light skin tone",
     "alpha_code": ":hand_splayed_tone2:",
     "aliases": ":raised_hand_with_fingers_splayed_tone2:"
   },
   "1f590-1f3fd": {
     "output": "1f590-1f3fd",
-    "name": "raised hand with fingers splayed: medium skin tone",
+    "name": "hand with fingers splayed: medium skin tone",
     "alpha_code": ":hand_splayed_tone3:",
     "aliases": ":raised_hand_with_fingers_splayed_tone3:"
   },
   "1f590-1f3fe": {
     "output": "1f590-1f3fe",
-    "name": "raised hand with fingers splayed: medium-dark skin tone",
+    "name": "hand with fingers splayed: medium-dark skin tone",
     "alpha_code": ":hand_splayed_tone4:",
     "aliases": ":raised_hand_with_fingers_splayed_tone4:"
   },
   "1f590-1f3ff": {
     "output": "1f590-1f3ff",
-    "name": "raised hand with fingers splayed: dark skin tone",
+    "name": "hand with fingers splayed: dark skin tone",
     "alpha_code": ":hand_splayed_tone5:",
     "aliases": ":raised_hand_with_fingers_splayed_tone5:"
   },
@@ -10933,13 +10933,13 @@
   },
   "1f46f-2642": {
     "output": "1f46f-200d-2642-fe0f",
-    "name": "men with bunny ears partying",
+    "name": "men with bunny ears",
     "alpha_code": ":men_with_bunny_ears_partying:",
     "aliases": ""
   },
   "1f46f-2640": {
     "output": "1f46f-200d-2640-fe0f",
-    "name": "women with bunny ears partying",
+    "name": "women with bunny ears",
     "alpha_code": ":women_with_bunny_ears_partying:",
     "aliases": ""
   },
@@ -13987,33 +13987,33 @@
   },
   "1f574-1f3fb": {
     "output": "1f574-1f3fb",
-    "name": "man in business suit levitating: light skin tone",
-    "alpha_code": ":man_in_business_suit_levitating_tone1:",
-    "aliases": ":man_in_business_suit_levitating_light_skin_tone:"
+    "name": "man in suit levitating: light skin tone",
+    "alpha_code": ":levitate_tone1:",
+    "aliases": ":man_in_business_suit_levitating_tone1:|:man_in_business_suit_levitating_light_skin_tone:"
   },
   "1f574-1f3fc": {
     "output": "1f574-1f3fc",
-    "name": "man in business suit levitating: medium-light skin tone",
-    "alpha_code": ":man_in_business_suit_levitating_tone2:",
-    "aliases": ":man_in_business_suit_levitating_medium_light_skin_tone:"
+    "name": "man in suit levitating: medium-light skin tone",
+    "alpha_code": ":levitate_tone2:",
+    "aliases": ":man_in_business_suit_levitating_tone2:|:man_in_business_suit_levitating_medium_light_skin_tone:"
   },
   "1f574-1f3fd": {
     "output": "1f574-1f3fd",
-    "name": "man in business suit levitating: medium skin tone",
-    "alpha_code": ":man_in_business_suit_levitating_tone3:",
-    "aliases": ":man_in_business_suit_levitating_medium_skin_tone:"
+    "name": "man in suit levitating: medium skin tone",
+    "alpha_code": ":levitate_tone3:",
+    "aliases": ":man_in_business_suit_levitating_tone3:|:man_in_business_suit_levitating_medium_skin_tone:"
   },
   "1f574-1f3fe": {
     "output": "1f574-1f3fe",
-    "name": "man in business suit levitating: medium-dark skin tone",
-    "alpha_code": ":man_in_business_suit_levitating_tone4:",
-    "aliases": ":man_in_business_suit_levitating_medium_dark_skin_tone:"
+    "name": "man in suit levitating: medium-dark skin tone",
+    "alpha_code": ":levitate_tone4:",
+    "aliases": ":man_in_business_suit_levitating_tone4:|:man_in_business_suit_levitating_medium_dark_skin_tone:"
   },
   "1f574-1f3ff": {
     "output": "1f574-1f3ff",
-    "name": "man in business suit levitating: dark skin tone",
-    "alpha_code": ":man_in_business_suit_levitating_tone5:",
-    "aliases": ":man_in_business_suit_levitating_dark_skin_tone:"
+    "name": "man in suit levitating: dark skin tone",
+    "alpha_code": ":levitate_tone5:",
+    "aliases": ":man_in_business_suit_levitating_tone5:|:man_in_business_suit_levitating_dark_skin_tone:"
   },
   "1f6cc-1f3fb": {
     "output": "1f6cc-1f3fb",
@@ -14593,8 +14593,8 @@
   },
   "1f92a": {
     "output": "1f92a",
-    "name": "crazy face",
-    "alpha_code": ":crazy_face:",
+    "name": "zany face",
+    "alpha_code": ":zany_face:",
     "aliases": ""
   },
   "1f92b": {
@@ -14605,7 +14605,7 @@
   },
   "1f92c": {
     "output": "1f92c",
-    "name": "face with symbols over mouth",
+    "name": "face with symbols on mouth",
     "alpha_code": ":face_with_symbols_over_mouth:",
     "aliases": ""
   },
@@ -15994,5 +15994,971 @@
     "name": "man in lotus position: dark skin tone",
     "alpha_code": ":man_in_lotus_position_tone5:",
     "aliases": ":man_in_lotus_position_dark_skin_tone:"
+  },
+  "265f": {
+    "output": "265f-fe0f",
+    "name": "chess pawn",
+    "alpha_code": ":chess_pawn:",
+    "aliases": ""
+  },
+  "267e": {
+    "output": "267e-fe0f",
+    "name": "infinity",
+    "alpha_code": ":infinity:",
+    "aliases": ""
+  },
+  "1f6f9": {
+    "output": "1f6f9",
+    "name": "skateboard",
+    "alpha_code": ":skateboard:",
+    "aliases": ""
+  },
+  "1f94d": {
+    "output": "1f94d",
+    "name": "lacrosse",
+    "alpha_code": ":lacrosse:",
+    "aliases": ""
+  },
+  "1f94e": {
+    "output": "1f94e",
+    "name": "softball",
+    "alpha_code": ":softball:",
+    "aliases": ""
+  },
+  "1f94f": {
+    "output": "1f94f",
+    "name": "flying disc",
+    "alpha_code": ":flying_disc:",
+    "aliases": ""
+  },
+  "1f96c": {
+    "output": "1f96c",
+    "name": "leafy green",
+    "alpha_code": ":leafy_green:",
+    "aliases": ""
+  },
+  "1f96d": {
+    "output": "1f96d",
+    "name": "mango",
+    "alpha_code": ":mango:",
+    "aliases": ""
+  },
+  "1f96e": {
+    "output": "1f96e",
+    "name": "moon cake",
+    "alpha_code": ":moon_cake:",
+    "aliases": ""
+  },
+  "1f96f": {
+    "output": "1f96f",
+    "name": "bagel",
+    "alpha_code": ":bagel:",
+    "aliases": ""
+  },
+  "1f970": {
+    "output": "1f970",
+    "name": "smiling face with 3 hearts",
+    "alpha_code": ":smiling_face_with_3_hearts:",
+    "aliases": ""
+  },
+  "1f973": {
+    "output": "1f973",
+    "name": "partying face",
+    "alpha_code": ":partying_face:",
+    "aliases": ""
+  },
+  "1f974": {
+    "output": "1f974",
+    "name": "woozy face",
+    "alpha_code": ":woozy_face:",
+    "aliases": ""
+  },
+  "1f975": {
+    "output": "1f975",
+    "name": "hot face",
+    "alpha_code": ":hot_face:",
+    "aliases": ""
+  },
+  "1f976": {
+    "output": "1f976",
+    "name": "cold face",
+    "alpha_code": ":cold_face:",
+    "aliases": ""
+  },
+  "1f97a": {
+    "output": "1f97a",
+    "name": "pleading face",
+    "alpha_code": ":pleading_face:",
+    "aliases": ""
+  },
+  "1f97c": {
+    "output": "1f97c",
+    "name": "lab coat",
+    "alpha_code": ":lab_coat:",
+    "aliases": ""
+  },
+  "1f97d": {
+    "output": "1f97d",
+    "name": "goggles",
+    "alpha_code": ":goggles:",
+    "aliases": ""
+  },
+  "1f97e": {
+    "output": "1f97e",
+    "name": "hiking boot",
+    "alpha_code": ":hiking_boot:",
+    "aliases": ""
+  },
+  "1f97f": {
+    "output": "1f97f",
+    "name": "woman\u2019s flat shoe",
+    "alpha_code": ":womans_flat_shoe:",
+    "aliases": ""
+  },
+  "1f998": {
+    "output": "1f998",
+    "name": "kangaroo",
+    "alpha_code": ":kangaroo:",
+    "aliases": ""
+  },
+  "1f999": {
+    "output": "1f999",
+    "name": "llama",
+    "alpha_code": ":llama:",
+    "aliases": ""
+  },
+  "1f99a": {
+    "output": "1f99a",
+    "name": "peacock",
+    "alpha_code": ":peacock:",
+    "aliases": ""
+  },
+  "1f99b": {
+    "output": "1f99b",
+    "name": "hippopotamus",
+    "alpha_code": ":hippopotamus:",
+    "aliases": ""
+  },
+  "1f99c": {
+    "output": "1f99c",
+    "name": "parrot",
+    "alpha_code": ":parrot:",
+    "aliases": ""
+  },
+  "1f99d": {
+    "output": "1f99d",
+    "name": "raccoon",
+    "alpha_code": ":raccoon:",
+    "aliases": ""
+  },
+  "1f99e": {
+    "output": "1f99e",
+    "name": "lobster",
+    "alpha_code": ":lobster:",
+    "aliases": ""
+  },
+  "1f99f": {
+    "output": "1f99f",
+    "name": "mosquito",
+    "alpha_code": ":mosquito:",
+    "aliases": ""
+  },
+  "1f9a0": {
+    "output": "1f9a0",
+    "name": "microbe",
+    "alpha_code": ":microbe:",
+    "aliases": ""
+  },
+  "1f9a1": {
+    "output": "1f9a1",
+    "name": "badger",
+    "alpha_code": ":badger:",
+    "aliases": ""
+  },
+  "1f9a2": {
+    "output": "1f9a2",
+    "name": "swan",
+    "alpha_code": ":swan:",
+    "aliases": ""
+  },
+  "1f9b0": {
+    "output": "1f9b0",
+    "name": "red-haired",
+    "alpha_code": ":red_haired:",
+    "aliases": ""
+  },
+  "1f9b1": {
+    "output": "1f9b1",
+    "name": "curly-haired",
+    "alpha_code": ":curly_haired:",
+    "aliases": ""
+  },
+  "1f9b2": {
+    "output": "1f9b2",
+    "name": "bald",
+    "alpha_code": ":bald:",
+    "aliases": ""
+  },
+  "1f9b3": {
+    "output": "1f9b3",
+    "name": "white-haired",
+    "alpha_code": ":white_haired:",
+    "aliases": ""
+  },
+  "1f9b4": {
+    "output": "1f9b4",
+    "name": "bone",
+    "alpha_code": ":bone:",
+    "aliases": ""
+  },
+  "1f9b5": {
+    "output": "1f9b5",
+    "name": "leg",
+    "alpha_code": ":leg:",
+    "aliases": ""
+  },
+  "1f9b6": {
+    "output": "1f9b6",
+    "name": "foot",
+    "alpha_code": ":foot:",
+    "aliases": ""
+  },
+  "1f9b7": {
+    "output": "1f9b7",
+    "name": "tooth",
+    "alpha_code": ":tooth:",
+    "aliases": ""
+  },
+  "1f9b8": {
+    "output": "1f9b8",
+    "name": "superhero",
+    "alpha_code": ":superhero:",
+    "aliases": ""
+  },
+  "1f9b9": {
+    "output": "1f9b9",
+    "name": "supervillain",
+    "alpha_code": ":supervillain:",
+    "aliases": ""
+  },
+  "1f9c1": {
+    "output": "1f9c1",
+    "name": "cupcake",
+    "alpha_code": ":cupcake:",
+    "aliases": ""
+  },
+  "1f9c2": {
+    "output": "1f9c2",
+    "name": "salt",
+    "alpha_code": ":salt:",
+    "aliases": ""
+  },
+  "1f9e7": {
+    "output": "1f9e7",
+    "name": "red envelope",
+    "alpha_code": ":red_envelope:",
+    "aliases": ""
+  },
+  "1f9e8": {
+    "output": "1f9e8",
+    "name": "firecracker",
+    "alpha_code": ":firecracker:",
+    "aliases": ""
+  },
+  "1f9e9": {
+    "output": "1f9e9",
+    "name": "jigsaw",
+    "alpha_code": ":jigsaw:",
+    "aliases": ""
+  },
+  "1f9ea": {
+    "output": "1f9ea",
+    "name": "test tube",
+    "alpha_code": ":test_tube:",
+    "aliases": ""
+  },
+  "1f9eb": {
+    "output": "1f9eb",
+    "name": "petri dish",
+    "alpha_code": ":petri_dish:",
+    "aliases": ""
+  },
+  "1f9ec": {
+    "output": "1f9ec",
+    "name": "dna",
+    "alpha_code": ":dna:",
+    "aliases": ""
+  },
+  "1f9ed": {
+    "output": "1f9ed",
+    "name": "compass",
+    "alpha_code": ":compass:",
+    "aliases": ""
+  },
+  "1f9ee": {
+    "output": "1f9ee",
+    "name": "abacus",
+    "alpha_code": ":abacus:",
+    "aliases": ""
+  },
+  "1f9ef": {
+    "output": "1f9ef",
+    "name": "fire extinguisher",
+    "alpha_code": ":fire_extinguisher:",
+    "aliases": ""
+  },
+  "1f9f0": {
+    "output": "1f9f0",
+    "name": "toolbox",
+    "alpha_code": ":toolbox:",
+    "aliases": ""
+  },
+  "1f9f1": {
+    "output": "1f9f1",
+    "name": "bricks",
+    "alpha_code": ":bricks:",
+    "aliases": ""
+  },
+  "1f9f2": {
+    "output": "1f9f2",
+    "name": "magnet",
+    "alpha_code": ":magnet:",
+    "aliases": ""
+  },
+  "1f9f3": {
+    "output": "1f9f3",
+    "name": "luggage",
+    "alpha_code": ":luggage:",
+    "aliases": ""
+  },
+  "1f9f4": {
+    "output": "1f9f4",
+    "name": "squeeze bottle",
+    "alpha_code": ":squeeze_bottle:",
+    "aliases": ""
+  },
+  "1f9f5": {
+    "output": "1f9f5",
+    "name": "thread",
+    "alpha_code": ":thread:",
+    "aliases": ""
+  },
+  "1f9f6": {
+    "output": "1f9f6",
+    "name": "yarn",
+    "alpha_code": ":yarn:",
+    "aliases": ""
+  },
+  "1f9f7": {
+    "output": "1f9f7",
+    "name": "safety pin",
+    "alpha_code": ":safety_pin:",
+    "aliases": ""
+  },
+  "1f9f8": {
+    "output": "1f9f8",
+    "name": "teddy bear",
+    "alpha_code": ":teddy_bear:",
+    "aliases": ""
+  },
+  "1f9f9": {
+    "output": "1f9f9",
+    "name": "broom",
+    "alpha_code": ":broom:",
+    "aliases": ""
+  },
+  "1f9fa": {
+    "output": "1f9fa",
+    "name": "basket",
+    "alpha_code": ":basket:",
+    "aliases": ""
+  },
+  "1f9fb": {
+    "output": "1f9fb",
+    "name": "roll of paper",
+    "alpha_code": ":roll_of_paper:",
+    "aliases": ""
+  },
+  "1f9fc": {
+    "output": "1f9fc",
+    "name": "soap",
+    "alpha_code": ":soap:",
+    "aliases": ""
+  },
+  "1f9fd": {
+    "output": "1f9fd",
+    "name": "sponge",
+    "alpha_code": ":sponge:",
+    "aliases": ""
+  },
+  "1f9fe": {
+    "output": "1f9fe",
+    "name": "receipt",
+    "alpha_code": ":receipt:",
+    "aliases": ""
+  },
+  "1f9ff": {
+    "output": "1f9ff",
+    "name": "nazar amulet",
+    "alpha_code": ":nazar_amulet:",
+    "aliases": ""
+  },
+  "1f9b5-1f3fb": {
+    "output": "1f9b5-1f3fb",
+    "name": "leg: light skin tone",
+    "alpha_code": ":leg_tone1:",
+    "aliases": ":leg_light_skin_tone:"
+  },
+  "1f9b5-1f3fc": {
+    "output": "1f9b5-1f3fc",
+    "name": "leg: medium-light skin tone",
+    "alpha_code": ":leg_tone2:",
+    "aliases": ":leg_medium_light_skin_tone:"
+  },
+  "1f9b5-1f3fd": {
+    "output": "1f9b5-1f3fd",
+    "name": "leg: medium skin tone",
+    "alpha_code": ":leg_tone3:",
+    "aliases": ":leg_medium_skin_tone:"
+  },
+  "1f9b5-1f3fe": {
+    "output": "1f9b5-1f3fe",
+    "name": "leg: medium-dark skin tone",
+    "alpha_code": ":leg_tone4:",
+    "aliases": ":leg_medium_dark_skin_tone:"
+  },
+  "1f9b5-1f3ff": {
+    "output": "1f9b5-1f3ff",
+    "name": "leg: dark skin tone",
+    "alpha_code": ":leg_tone5:",
+    "aliases": ":leg_dark_skin_tone:"
+  },
+  "1f9b6-1f3fb": {
+    "output": "1f9b6-1f3fb",
+    "name": "foot: light skin tone",
+    "alpha_code": ":foot_tone1:",
+    "aliases": ":foot_light_skin_tone:"
+  },
+  "1f9b6-1f3fc": {
+    "output": "1f9b6-1f3fc",
+    "name": "foot: medium-light skin tone",
+    "alpha_code": ":foot_tone2:",
+    "aliases": ":foot_medium_light_skin_tone:"
+  },
+  "1f9b6-1f3fd": {
+    "output": "1f9b6-1f3fd",
+    "name": "foot: medium skin tone",
+    "alpha_code": ":foot_tone3:",
+    "aliases": ":foot_medium_skin_tone:"
+  },
+  "1f9b6-1f3fe": {
+    "output": "1f9b6-1f3fe",
+    "name": "foot: medium-dark skin tone",
+    "alpha_code": ":foot_tone4:",
+    "aliases": ":foot_medium_dark_skin_tone:"
+  },
+  "1f9b6-1f3ff": {
+    "output": "1f9b6-1f3ff",
+    "name": "foot: dark skin tone",
+    "alpha_code": ":foot_tone5:",
+    "aliases": ":foot_dark_skin_tone:"
+  },
+  "1f9b8-1f3fb": {
+    "output": "1f9b8-1f3fb",
+    "name": "superhero: light skin tone",
+    "alpha_code": ":superhero_tone1:",
+    "aliases": ":superhero_light_skin_tone:"
+  },
+  "1f9b8-1f3fc": {
+    "output": "1f9b8-1f3fc",
+    "name": "superhero: medium-light skin tone",
+    "alpha_code": ":superhero_tone2:",
+    "aliases": ":superhero_medium_light_skin_tone:"
+  },
+  "1f9b8-1f3fd": {
+    "output": "1f9b8-1f3fd",
+    "name": "superhero: medium skin tone",
+    "alpha_code": ":superhero_tone3:",
+    "aliases": ":superhero_medium_skin_tone:"
+  },
+  "1f9b8-1f3fe": {
+    "output": "1f9b8-1f3fe",
+    "name": "superhero: medium-dark skin tone",
+    "alpha_code": ":superhero_tone4:",
+    "aliases": ":superhero_medium_dark_skin_tone:"
+  },
+  "1f9b8-1f3ff": {
+    "output": "1f9b8-1f3ff",
+    "name": "superhero: dark skin tone",
+    "alpha_code": ":superhero_tone5:",
+    "aliases": ":superhero_dark_skin_tone:"
+  },
+  "1f9b9-1f3fb": {
+    "output": "1f9b9-1f3fb",
+    "name": "supervillain: light skin tone",
+    "alpha_code": ":supervillain_tone1:",
+    "aliases": ":supervillain_light_skin_tone:"
+  },
+  "1f9b9-1f3fc": {
+    "output": "1f9b9-1f3fc",
+    "name": "supervillain: medium-light skin tone",
+    "alpha_code": ":supervillain_tone2:",
+    "aliases": ":supervillain_medium_light_skin_tone:"
+  },
+  "1f9b9-1f3fd": {
+    "output": "1f9b9-1f3fd",
+    "name": "supervillain: medium skin tone",
+    "alpha_code": ":supervillain_tone3:",
+    "aliases": ":supervillain_medium_skin_tone:"
+  },
+  "1f9b9-1f3fe": {
+    "output": "1f9b9-1f3fe",
+    "name": "supervillain: medium-dark skin tone",
+    "alpha_code": ":supervillain_tone4:",
+    "aliases": ":supervillain_medium_dark_skin_tone:"
+  },
+  "1f9b9-1f3ff": {
+    "output": "1f9b9-1f3ff",
+    "name": "supervillain: dark skin tone",
+    "alpha_code": ":supervillain_tone5:",
+    "aliases": ":supervillain_dark_skin_tone:"
+  },
+  "1f468-1f9b0": {
+    "output": "1f468-200d-1f9b0",
+    "name": "man, red haired",
+    "alpha_code": ":man_red_haired:",
+    "aliases": ""
+  },
+  "1f468-1f9b1": {
+    "output": "1f468-200d-1f9b1",
+    "name": "man, curly haired",
+    "alpha_code": ":man_curly_haired:",
+    "aliases": ""
+  },
+  "1f468-1f9b2": {
+    "output": "1f468-200d-1f9b2",
+    "name": "man, bald",
+    "alpha_code": ":man_bald:",
+    "aliases": ""
+  },
+  "1f468-1f9b3": {
+    "output": "1f468-200d-1f9b3",
+    "name": "man, white haired",
+    "alpha_code": ":man_white_haired:",
+    "aliases": ""
+  },
+  "1f468-1f3fb-1f9b0": {
+    "output": "1f468-1f3fb-200d-1f9b0",
+    "name": "man, red haired: light skin tone",
+    "alpha_code": ":man_red_haired_tone1:",
+    "aliases": ":man_red_haired_light_skin_tone:"
+  },
+  "1f468-1f3fb-1f9b1": {
+    "output": "1f468-1f3fb-200d-1f9b1",
+    "name": "man, curly haired: light skin tone",
+    "alpha_code": ":man_curly_haired_tone1:",
+    "aliases": ":man_curly_haired_light_skin_tone:"
+  },
+  "1f468-1f3fb-1f9b2": {
+    "output": "1f468-1f3fb-200d-1f9b2",
+    "name": "man, bald: light skin tone",
+    "alpha_code": ":man_bald_tone1:",
+    "aliases": ":man_bald_light_skin_tone:"
+  },
+  "1f468-1f3fb-1f9b3": {
+    "output": "1f468-1f3fb-200d-1f9b3",
+    "name": "man, white haired: light skin tone",
+    "alpha_code": ":man_white_haired_tone1:",
+    "aliases": ":man_white_haired_light_skin_tone:"
+  },
+  "1f468-1f3fc-1f9b0": {
+    "output": "1f468-1f3fc-200d-1f9b0",
+    "name": "man, red haired: medium-light skin tone",
+    "alpha_code": ":man_red_haired_tone2:",
+    "aliases": ":man_red_haired_medium_light_skin_tone:"
+  },
+  "1f468-1f3fc-1f9b1": {
+    "output": "1f468-1f3fc-200d-1f9b1",
+    "name": "man, curly haired: medium-light skin tone",
+    "alpha_code": ":man_curly_haired_tone2:",
+    "aliases": ":man_curly_haired_medium_light_skin_tone:"
+  },
+  "1f468-1f3fc-1f9b2": {
+    "output": "1f468-1f3fc-200d-1f9b2",
+    "name": "man, bald: medium-light skin tone",
+    "alpha_code": ":man_bald_tone2:",
+    "aliases": ":man_bald_medium_light_skin_tone:"
+  },
+  "1f468-1f3fc-1f9b3": {
+    "output": "1f468-1f3fc-200d-1f9b3",
+    "name": "man, white haired: medium-light skin tone",
+    "alpha_code": ":man_white_haired_tone2:",
+    "aliases": ":man_white_haired_medium_light_skin_tone:"
+  },
+  "1f468-1f3fd-1f9b0": {
+    "output": "1f468-1f3fd-200d-1f9b0",
+    "name": "man, red haired: medium skin tone",
+    "alpha_code": ":man_red_haired_tone3:",
+    "aliases": ":man_red_haired_medium_skin_tone:"
+  },
+  "1f468-1f3fd-1f9b1": {
+    "output": "1f468-1f3fd-200d-1f9b1",
+    "name": "man, curly haired: medium skin tone",
+    "alpha_code": ":man_curly_haired_tone3:",
+    "aliases": ":man_curly_haired_medium_skin_tone:"
+  },
+  "1f468-1f3fd-1f9b2": {
+    "output": "1f468-1f3fd-200d-1f9b2",
+    "name": "man, bald: medium skin tone",
+    "alpha_code": ":man_bald_tone3:",
+    "aliases": ":man_bald_medium_skin_tone:"
+  },
+  "1f468-1f3fd-1f9b3": {
+    "output": "1f468-1f3fd-200d-1f9b3",
+    "name": "man, white haired: medium skin tone",
+    "alpha_code": ":man_white_haired_tone3:",
+    "aliases": ":man_white_haired_medium_skin_tone:"
+  },
+  "1f468-1f3fe-1f9b0": {
+    "output": "1f468-1f3fe-200d-1f9b0",
+    "name": "man, red haired: medium-dark skin tone",
+    "alpha_code": ":man_red_haired_tone4:",
+    "aliases": ":man_red_haired_medium_dark_skin_tone:"
+  },
+  "1f468-1f3fe-1f9b1": {
+    "output": "1f468-1f3fe-200d-1f9b1",
+    "name": "man, curly haired: medium-dark skin tone",
+    "alpha_code": ":man_curly_haired_tone4:",
+    "aliases": ":man_curly_haired_medium_dark_skin_tone:"
+  },
+  "1f468-1f3fe-1f9b2": {
+    "output": "1f468-1f3fe-200d-1f9b2",
+    "name": "man, bald: medium-dark skin tone",
+    "alpha_code": ":man_bald_tone4:",
+    "aliases": ":man_bald_medium_dark_skin_tone:"
+  },
+  "1f468-1f3fe-1f9b3": {
+    "output": "1f468-1f3fe-200d-1f9b3",
+    "name": "man, white haired: medium-dark skin tone",
+    "alpha_code": ":man_white_haired_tone4:",
+    "aliases": ":man_white_haired_medium_dark_skin_tone:"
+  },
+  "1f468-1f3ff-1f9b0": {
+    "output": "1f468-1f3ff-200d-1f9b0",
+    "name": "man, red haired: dark skin tone",
+    "alpha_code": ":man_red_haired_tone5:",
+    "aliases": ":man_red_haired_dark_skin_tone:"
+  },
+  "1f468-1f3ff-1f9b1": {
+    "output": "1f468-1f3ff-200d-1f9b1",
+    "name": "man, curly haired: dark skin tone",
+    "alpha_code": ":man_curly_haired_tone5:",
+    "aliases": ":man_curly_haired_dark_skin_tone:"
+  },
+  "1f468-1f3ff-1f9b2": {
+    "output": "1f468-1f3ff-200d-1f9b2",
+    "name": "man, bald: dark skin tone",
+    "alpha_code": ":man_bald_tone5:",
+    "aliases": ":man_bald_dark_skin_tone:"
+  },
+  "1f468-1f3ff-1f9b3": {
+    "output": "1f468-1f3ff-200d-1f9b3",
+    "name": "man, white haired: dark skin tone",
+    "alpha_code": ":man_white_haired_tone5:",
+    "aliases": ":man_white_haired_dark_skin_tone:"
+  },
+  "1f469-1f9b0": {
+    "output": "1f469-200d-1f9b0",
+    "name": "woman, red haired",
+    "alpha_code": ":woman_red_haired:",
+    "aliases": ""
+  },
+  "1f469-1f9b1": {
+    "output": "1f469-200d-1f9b1",
+    "name": "woman, curly haired",
+    "alpha_code": ":woman_curly_haired:",
+    "aliases": ""
+  },
+  "1f469-1f9b2": {
+    "output": "1f469-200d-1f9b2",
+    "name": "woman, bald",
+    "alpha_code": ":woman_bald:",
+    "aliases": ""
+  },
+  "1f469-1f9b3": {
+    "output": "1f469-200d-1f9b3",
+    "name": "woman, white haired",
+    "alpha_code": ":woman_white_haired:",
+    "aliases": ""
+  },
+  "1f469-1f3fb-1f9b0": {
+    "output": "1f469-1f3fb-200d-1f9b0",
+    "name": "woman, red haired: light skin tone",
+    "alpha_code": ":woman_red_haired_tone1:",
+    "aliases": ":woman_red_haired_light_skin_tone:"
+  },
+  "1f469-1f3fb-1f9b1": {
+    "output": "1f469-1f3fb-200d-1f9b1",
+    "name": "woman, curly haired: light skin tone",
+    "alpha_code": ":woman_curly_haired_tone1:",
+    "aliases": ":woman_curly_haired_light_skin_tone:"
+  },
+  "1f469-1f3fb-1f9b2": {
+    "output": "1f469-1f3fb-200d-1f9b2",
+    "name": "woman, bald: light skin tone",
+    "alpha_code": ":woman_bald_tone1:",
+    "aliases": ":woman_bald_light_skin_tone:"
+  },
+  "1f469-1f3fb-1f9b3": {
+    "output": "1f469-1f3fb-200d-1f9b3",
+    "name": "woman, white haired: light skin tone",
+    "alpha_code": ":woman_white_haired_tone1:",
+    "aliases": ":woman_white_haired_light_skin_tone:"
+  },
+  "1f469-1f3fc-1f9b0": {
+    "output": "1f469-1f3fc-200d-1f9b0",
+    "name": "woman, red haired: medium-light skin tone",
+    "alpha_code": ":woman_red_haired_tone2:",
+    "aliases": ":woman_red_haired_medium_light_skin_tone:"
+  },
+  "1f469-1f3fc-1f9b1": {
+    "output": "1f469-1f3fc-200d-1f9b1",
+    "name": "woman, curly haired: medium-light skin tone",
+    "alpha_code": ":woman_curly_haired_tone2:",
+    "aliases": ":woman_curly_haired_medium_light_skin_tone:"
+  },
+  "1f469-1f3fc-1f9b2": {
+    "output": "1f469-1f3fc-200d-1f9b2",
+    "name": "woman, bald: medium-light skin tone",
+    "alpha_code": ":woman_bald_tone2:",
+    "aliases": ":woman_bald_medium_light_skin_tone:"
+  },
+  "1f469-1f3fc-1f9b3": {
+    "output": "1f469-1f3fc-200d-1f9b3",
+    "name": "woman, white haired: medium-light skin tone",
+    "alpha_code": ":woman_white_haired_tone2:",
+    "aliases": ":woman_white_haired_medium_light_skin_tone:"
+  },
+  "1f469-1f3fd-1f9b0": {
+    "output": "1f469-1f3fd-200d-1f9b0",
+    "name": "woman, red haired: medium skin tone",
+    "alpha_code": ":woman_red_haired_tone3:",
+    "aliases": ":woman_red_haired_medium_skin_tone:"
+  },
+  "1f469-1f3fd-1f9b1": {
+    "output": "1f469-1f3fd-200d-1f9b1",
+    "name": "woman, curly haired: medium skin tone",
+    "alpha_code": ":woman_curly_haired_tone3:",
+    "aliases": ":woman_curly_haired_medium_skin_tone:"
+  },
+  "1f469-1f3fd-1f9b2": {
+    "output": "1f469-1f3fd-200d-1f9b2",
+    "name": "woman, bald: medium skin tone",
+    "alpha_code": ":woman_bald_tone3:",
+    "aliases": ":woman_bald_medium_skin_tone:"
+  },
+  "1f469-1f3fd-1f9b3": {
+    "output": "1f469-1f3fd-200d-1f9b3",
+    "name": "woman, white haired: medium skin tone",
+    "alpha_code": ":woman_white_haired_tone3:",
+    "aliases": ":woman_white_haired_medium_skin_tone:"
+  },
+  "1f469-1f3fe-1f9b0": {
+    "output": "1f469-1f3fe-200d-1f9b0",
+    "name": "woman, red haired: medium-dark skin tone",
+    "alpha_code": ":woman_red_haired_tone4:",
+    "aliases": ":woman_red_haired_medium_dark_skin_tone:"
+  },
+  "1f469-1f3fe-1f9b1": {
+    "output": "1f469-1f3fe-200d-1f9b1",
+    "name": "woman, curly haired: medium-dark skin tone",
+    "alpha_code": ":woman_curly_haired_tone4:",
+    "aliases": ":woman_curly_haired_medium_dark_skin_tone:"
+  },
+  "1f469-1f3fe-1f9b2": {
+    "output": "1f469-1f3fe-200d-1f9b2",
+    "name": "woman, bald: medium-dark skin tone",
+    "alpha_code": ":woman_bald_tone4:",
+    "aliases": ":woman_bald_medium_dark_skin_tone:"
+  },
+  "1f469-1f3fe-1f9b3": {
+    "output": "1f469-1f3fe-200d-1f9b3",
+    "name": "woman, white haired: medium-dark skin tone",
+    "alpha_code": ":woman_white_haired_tone4:",
+    "aliases": ":woman_white_haired_medium_dark_skin_tone:"
+  },
+  "1f469-1f3ff-1f9b0": {
+    "output": "1f469-1f3ff-200d-1f9b0",
+    "name": "woman, red haired: dark skin tone",
+    "alpha_code": ":woman_red_haired_tone5:",
+    "aliases": ":woman_red_haired_dark_skin_tone:"
+  },
+  "1f469-1f3ff-1f9b1": {
+    "output": "1f469-1f3ff-200d-1f9b1",
+    "name": "woman, curly haired: dark skin tone",
+    "alpha_code": ":woman_curly_haired_tone5:",
+    "aliases": ":woman_curly_haired_dark_skin_tone:"
+  },
+  "1f469-1f3ff-1f9b2": {
+    "output": "1f469-1f3ff-200d-1f9b2",
+    "name": "woman, bald: dark skin tone",
+    "alpha_code": ":woman_bald_tone5:",
+    "aliases": ":woman_bald_dark_skin_tone:"
+  },
+  "1f469-1f3ff-1f9b3": {
+    "output": "1f469-1f3ff-200d-1f9b3",
+    "name": "woman, white haired: dark skin tone",
+    "alpha_code": ":woman_white_haired_tone5:",
+    "aliases": ":woman_white_haired_dark_skin_tone:"
+  },
+  "1f9b8-2640": {
+    "output": "1f9b8-200d-2640-fe0f",
+    "name": "woman superhero",
+    "alpha_code": ":woman_superhero:",
+    "aliases": ""
+  },
+  "1f9b8-2642": {
+    "output": "1f9b8-200d-2642-fe0f",
+    "name": "man superhero",
+    "alpha_code": ":man_superhero:",
+    "aliases": ""
+  },
+  "1f9b8-1f3fb-2640": {
+    "output": "1f9b8-1f3fb-200d-2640-fe0f",
+    "name": "woman superhero: light skin tone",
+    "alpha_code": ":woman_superhero_tone1:",
+    "aliases": ":woman_superhero_light_skin_tone:"
+  },
+  "1f9b8-1f3fb-2642": {
+    "output": "1f9b8-1f3fb-200d-2642-fe0f",
+    "name": "man superhero: light skin tone",
+    "alpha_code": ":man_superhero_tone1:",
+    "aliases": ":man_superhero_light_skin_tone:"
+  },
+  "1f9b8-1f3fc-2640": {
+    "output": "1f9b8-1f3fc-200d-2640-fe0f",
+    "name": "woman superhero: medium-light skin tone",
+    "alpha_code": ":woman_superhero_tone2:",
+    "aliases": ":woman_superhero_medium_light_skin_tone:"
+  },
+  "1f9b8-1f3fc-2642": {
+    "output": "1f9b8-1f3fc-200d-2642-fe0f",
+    "name": "man superhero: medium-light skin tone",
+    "alpha_code": ":man_superhero_tone2:",
+    "aliases": ":man_superhero_medium_light_skin_tone:"
+  },
+  "1f9b8-1f3fd-2640": {
+    "output": "1f9b8-1f3fd-200d-2640-fe0f",
+    "name": "woman superhero: medium skin tone",
+    "alpha_code": ":woman_superhero_tone3:",
+    "aliases": ":woman_superhero_medium_skin_tone:"
+  },
+  "1f9b8-1f3fd-2642": {
+    "output": "1f9b8-1f3fd-200d-2642-fe0f",
+    "name": "man superhero: medium skin tone",
+    "alpha_code": ":man_superhero_tone3:",
+    "aliases": ":man_superhero_medium_skin_tone:"
+  },
+  "1f9b8-1f3fe-2640": {
+    "output": "1f9b8-1f3fe-200d-2640-fe0f",
+    "name": "woman superhero: medium-dark skin tone",
+    "alpha_code": ":woman_superhero_tone4:",
+    "aliases": ":woman_superhero_medium_dark_skin_tone:"
+  },
+  "1f9b8-1f3fe-2642": {
+    "output": "1f9b8-1f3fe-200d-2642-fe0f",
+    "name": "man superhero: medium-dark skin tone",
+    "alpha_code": ":man_superhero_tone4:",
+    "aliases": ":man_superhero_medium_dark_skin_tone:"
+  },
+  "1f9b8-1f3ff-2640": {
+    "output": "1f9b8-1f3ff-200d-2640-fe0f",
+    "name": "woman superhero: dark skin tone",
+    "alpha_code": ":woman_superhero_tone5:",
+    "aliases": ":woman_superhero_dark_skin_tone:"
+  },
+  "1f9b8-1f3ff-2642": {
+    "output": "1f9b8-1f3ff-200d-2642-fe0f",
+    "name": "man superhero: dark skin tone",
+    "alpha_code": ":man_superhero_tone5:",
+    "aliases": ":man_superhero_dark_skin_tone:"
+  },
+  "1f9b9-2640": {
+    "output": "1f9b9-200d-2640-fe0f",
+    "name": "woman supervillain",
+    "alpha_code": ":woman_supervillain:",
+    "aliases": ""
+  },
+  "1f9b9-2642": {
+    "output": "1f9b9-200d-2642-fe0f",
+    "name": "man supervillain",
+    "alpha_code": ":man_supervillain:",
+    "aliases": ""
+  },
+  "1f9b9-1f3fb-2640": {
+    "output": "1f9b9-1f3fb-200d-2640-fe0f",
+    "name": "woman supervillain: light skin tone",
+    "alpha_code": ":woman_supervillain_tone1:",
+    "aliases": ":woman_supervillain_light_skin_tone:"
+  },
+  "1f9b9-1f3fb-2642": {
+    "output": "1f9b9-1f3fb-200d-2642-fe0f",
+    "name": "man supervillain: light skin tone",
+    "alpha_code": ":man_supervillain_tone1:",
+    "aliases": ":man_supervillain_light_skin_tone:"
+  },
+  "1f9b9-1f3fc-2640": {
+    "output": "1f9b9-1f3fc-200d-2640-fe0f",
+    "name": "woman supervillain: medium-light skin tone",
+    "alpha_code": ":woman_supervillain_tone2:",
+    "aliases": ":woman_supervillain_medium_light_skin_tone:"
+  },
+  "1f9b9-1f3fc-2642": {
+    "output": "1f9b9-1f3fc-200d-2642-fe0f",
+    "name": "man supervillain: medium-light skin tone",
+    "alpha_code": ":man_supervillain_tone2:",
+    "aliases": ":man_supervillain_medium_light_skin_tone:"
+  },
+  "1f9b9-1f3fd-2640": {
+    "output": "1f9b9-1f3fd-200d-2640-fe0f",
+    "name": "woman supervillain: medium skin tone",
+    "alpha_code": ":woman_supervillain_tone3:",
+    "aliases": ":woman_supervillain_medium_skin_tone:"
+  },
+  "1f9b9-1f3fd-2642": {
+    "output": "1f9b9-1f3fd-200d-2642-fe0f",
+    "name": "man supervillain: medium skin tone",
+    "alpha_code": ":man_supervillain_tone3:",
+    "aliases": ":man_supervillain_medium_skin_tone:"
+  },
+  "1f9b9-1f3fe-2640": {
+    "output": "1f9b9-1f3fe-200d-2640-fe0f",
+    "name": "woman supervillain: medium-dark skin tone",
+    "alpha_code": ":woman_supervillain_tone4:",
+    "aliases": ":woman_supervillain_medium_dark_skin_tone:"
+  },
+  "1f9b9-1f3fe-2642": {
+    "output": "1f9b9-1f3fe-200d-2642-fe0f",
+    "name": "man supervillain: medium-dark skin tone",
+    "alpha_code": ":man_supervillain_tone4:",
+    "aliases": ":man_supervillain_medium_dark_skin_tone:"
+  },
+  "1f9b9-1f3ff-2640": {
+    "output": "1f9b9-1f3ff-200d-2640-fe0f",
+    "name": "woman supervillain: dark skin tone",
+    "alpha_code": ":woman_supervillain_tone5:",
+    "aliases": ":woman_supervillain_dark_skin_tone:"
+  },
+  "1f9b9-1f3ff-2642": {
+    "output": "1f9b9-1f3ff-200d-2642-fe0f",
+    "name": "man supervillain: dark skin tone",
+    "alpha_code": ":man_supervillain_tone5:",
+    "aliases": ":man_supervillain_dark_skin_tone:"
+  },
+  "1f3f4-2620": {
+    "output": "1f3f4-200d-2620-fe0f",
+    "name": "pirate flag",
+    "alpha_code": ":pirate_flag:",
+    "aliases": ""
   }
 }

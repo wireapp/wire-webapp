@@ -326,7 +326,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     const {device} = this._getCurrentDevice(availableDevices, currentDeviceIdObservable());
     const nextIndex = z.util.ArrayUtil.iterateIndex(availableDevices, currentDeviceIndex);
 
-    const {deviceId, label} = availableDevices[nextIndex || 0];
+    const nextDevice = availableDevices[nextIndex || 0];
+    const deviceId = nextDevice.deviceId || nextDevice.id;
+    const label = nextDevice.label || nextDevice.name;
+
     currentDeviceIdObservable(deviceId);
 
     const deviceName = device ? device.label || device.deviceId : undefined;
