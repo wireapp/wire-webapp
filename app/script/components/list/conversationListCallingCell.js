@@ -25,13 +25,15 @@ window.z.components = z.components || {};
 z.components.ConversationListCallingCell = class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
-    this.callingRepository = params.callingRepository;
-    this.mediaRepository = params.mediaRepository;
+
+    const callingRepository = params.callingRepository;
+    const permissionRepository = params.permissionRepository;
+
     this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
     this.videoGridRepository = params.videoGridRepository;
 
-    this.calls = this.callingRepository.calls;
+    this.calls = callingRepository.calls;
     this.call = this.conversation.call;
     this.conversationParticipants = this.conversation.participating_user_ets;
     this.joinedCall = this.callingRepository.joinedCall;
@@ -89,13 +91,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     });
 
     this.showNoCameraPreview = ko.computed(() => {
-      const permissionRepository = this.mediaRepository.streamHandler.permissionRepository;
-      return (
-        this.call().isRemoteVideoCall() &&
-        !this.showVideoPreview() &&
-        !this.isConnected() &&
-        permissionRepository.permissionState.camera() !== z.notification.PermissionState.GRANTED
-      );
+      const isNotGranted = permissionRepository.permissionState.camera() !== z.notification.PermissionState.GRANTED;
+      return this.call().isRemoteVideoCall() && !this.showVideoPreview() && !this.isConnected() && isNotGranted;
     });
 
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
