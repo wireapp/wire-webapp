@@ -115,5 +115,28 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       const {sdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(sdp.sdp.match(/a=candidate/g).length).toEqual(8);
     });
+
+    it('changes the data channel and video channel port number for firefox only', () => {
+      const dataChannel = `m=application 0`;
+      const videoChannel = `m=video 0`;
+      const flowEntity = {
+        negotiationMode: () => '',
+      };
+
+      const rtcSdp = {
+        sdp: `${sdpStr}\r\n${dataChannel}\r\n${videoChannel}`,
+        type: z.calling.rtc.SDP_TYPE.OFFER,
+      };
+
+      z.util.Environment.browser.firefox = true;
+      const {sdp: firefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      expect(firefoxSdp.sdp).toContain('m=application 9');
+      expect(firefoxSdp.sdp).toContain('m=video 9');
+
+      z.util.Environment.browser.firefox = false;
+      const {sdp: noFirefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      expect(noFirefoxSdp.sdp).toContain('m=application 0');
+      expect(noFirefoxSdp.sdp).toContain('m=video 0');
+    });
   });
 });
