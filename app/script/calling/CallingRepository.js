@@ -596,9 +596,12 @@ z.calling.CallingRepository = class CallingRepository {
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
       if (!eventFromStream) {
+        const eventInfoEntity = new z.conversation.EventInfoEntity(undefined, conversationId, {recipients: [userId]});
+        eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE);
         const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
-        const promise = this.conversationRepository.grantMessage(conversationId, consentType, [userId], 'call');
-        promises.push(promise);
+        const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+
+        promises.push(grantPromise);
       }
 
       Promise.all(promises)
@@ -710,7 +713,7 @@ z.calling.CallingRepository = class CallingRepository {
           throw error;
         }
 
-        return this._limitMessageRecipients(callMessageEntity).then(({preconditionOption, recipients}) => {
+        return this._limitMessageRecipients(callMessageEntity).then(({precondition, recipients}) => {
           const isTypeHangup = type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP;
           if (isTypeHangup) {
             if (response) {
@@ -721,12 +724,15 @@ z.calling.CallingRepository = class CallingRepository {
           }
 
           this._logMessage(true, callMessageEntity);
-          return this.conversationRepository.send_e_call(
-            conversationEntity,
-            callMessageEntity,
-            recipients,
-            preconditionOption
-          );
+
+          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+          const calling = new z.proto.Calling(callMessageEntity.toContentString());
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, calling);
+
+          const options = {precondition, recipients};
+          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+
+          return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity);
         });
       });
   }
@@ -778,20 +784,20 @@ z.calling.CallingRepository = class CallingRepository {
     }
 
     return recipientsPromise.then(({remoteUserEntity, selfUserEntity}) => {
-      let preconditionOption;
+      let precondition;
       let recipients;
 
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
           if (response) {
             // Send to remote client that initiated call
-            preconditionOption = true;
+            precondition = true;
             recipients = {
               [remoteUserEntity.id]: [`${remoteClientId}`],
             };
           } else {
             // Send to all clients of remote user
-            preconditionOption = [remoteUserEntity.id];
+            precondition = [remoteUserEntity.id];
             recipients = {
               [remoteUserEntity.id]: remoteUserEntity.devices().map(device => device.id),
             };
@@ -805,7 +811,7 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
           // Send to remote client that call is connected with
           if (remoteClientId) {
-            preconditionOption = true;
+            precondition = true;
             recipients = {
               [remoteUserEntity.id]: [`${remoteClientId}`],
             };
@@ -815,7 +821,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
           // Send to all clients of self user
-          preconditionOption = [selfUserEntity.id];
+          precondition = [selfUserEntity.id];
           recipients = {
             [selfUserEntity.id]: selfUserEntity.devices().map(device => device.id),
           };
@@ -825,14 +831,14 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           if (response) {
             // Send to remote client that initiated call and all clients of self user
-            preconditionOption = [selfUserEntity.id];
+            precondition = [selfUserEntity.id];
             recipients = {
               [remoteUserEntity.id]: [`${remoteClientId}`],
               [selfUserEntity.id]: selfUserEntity.devices().map(device => device.id),
             };
           } else {
             // Send to all clients of remote user
-            preconditionOption = [remoteUserEntity.id];
+            precondition = [remoteUserEntity.id];
             recipients = {
               [remoteUserEntity.id]: remoteUserEntity.devices().map(device => device.id),
             };
@@ -845,7 +851,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
       }
 
-      return {preconditionOption, recipients};
+      return {precondition, recipients};
     });
   }
 

@@ -159,7 +159,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('delete_message_everyone', () => {
+  describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
       spyOn(TestFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
@@ -173,7 +173,7 @@ describe('ConversationRepository', () => {
       conversation_et.add_message(message_to_delete_et);
 
       TestFactory.conversation_repository
-        .delete_message_everyone(conversation_et, message_to_delete_et)
+        .deleteMessageForEveryone(conversation_et, message_to_delete_et)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
@@ -196,7 +196,7 @@ describe('ConversationRepository', () => {
       expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
 
       return TestFactory.conversation_repository
-        .delete_message_everyone(conversation_et, messageEntityToDelete)
+        .deleteMessageForEveryone(conversation_et, messageEntityToDelete)
         .then(() => {
           expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined();
         });
@@ -501,9 +501,11 @@ describe('ConversationRepository', () => {
       );
 
       return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
-        expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(event.conversation, [
-          event.from,
-        ]);
+        expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
+          event.conversation,
+          [event.from],
+          new Date(event.time).getTime() - 1
+        );
       });
     });
 
@@ -1004,53 +1006,39 @@ describe('ConversationRepository', () => {
   });
 
   describe('_shouldSendAsExternal', () => {
-    it('should return true for big payload', done => {
-      const external_conversation_et = _generate_conversation();
-      external_conversation_et.participating_user_ids(_.range(128));
+    it('should return true for big payload', () => {
+      const largeConversationEntity = _generate_conversation();
+      largeConversationEntity.participating_user_ids(_.range(128));
 
-      TestFactory.conversation_repository
-        .save_conversation(external_conversation_et)
+      return TestFactory.conversation_repository
+        .save_conversation(largeConversationEntity)
         .then(() => {
-          const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-          generic_message.set(
-            z.cryptography.GENERIC_MESSAGE_TYPE.TEXT,
-            new z.proto.Text(
-              'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
-            )
+          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+          const text = new z.proto.Text(
+            'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
           );
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, text);
 
-          return TestFactory.conversation_repository._shouldSendAsExternal(
-            external_conversation_et.id,
-            generic_message
-          );
+          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
+          return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(should_send_as_external => {
-          expect(should_send_as_external).toBeTruthy();
-          done();
-        })
-        .catch(done.fail);
+        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeTruthy());
     });
 
-    it('should return false for small payload', done => {
-      const external_conversation_et = _generate_conversation();
-      external_conversation_et.participating_user_ids([0, 1]);
+    it('should return false for small payload', () => {
+      const smallConversationEntity = _generate_conversation();
+      smallConversationEntity.participating_user_ids([0, 1]);
 
-      TestFactory.conversation_repository
-        .save_conversation(external_conversation_et)
+      return TestFactory.conversation_repository
+        .save_conversation(smallConversationEntity)
         .then(() => {
-          const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
+          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
 
-          return TestFactory.conversation_repository._shouldSendAsExternal(
-            external_conversation_et.id,
-            generic_message
-          );
+          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
+          return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(should_send_as_external => {
-          expect(should_send_as_external).toBeFalsy();
-          done();
-        })
-        .catch(done.fail);
+        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeFalsy());
     });
   });
 

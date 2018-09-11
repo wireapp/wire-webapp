@@ -36,21 +36,18 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * Handle client mismatch response from backend.
    *
    * @note As part of 412 or general response when sending encrypted message
+   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about message
    * @param {Object} clientMismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {z.proto.GenericMessage} genericMessage - GenericMessage that was sent
    * @param {Object} payload - Initial payload resulting in a 412
-   * @param {string} conversationId - ID of conversation message was sent int
    * @returns {Promise} Resolve when mismatch was handled
    */
-  onClientMismatch(clientMismatch, genericMessage, payload, conversationId) {
+  onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted: deletedClients, missing: missingClients, redundant: redundantClients} = clientMismatch;
 
     return Promise.resolve()
-      .then(() => this._handleClientMismatchRedundant(redundantClients, payload, conversationId))
+      .then(() => this._handleClientMismatchRedundant(redundantClients, payload, eventInfoEntity))
       .then(updatedPayload => this._handleClientMismatchDeleted(deletedClients, updatedPayload))
-      .then(updatedPayload => {
-        return this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage, conversationId);
-      });
+      .then(updatedPayload => this._handleClientMismatchMissing(missingClients, updatedPayload, eventInfoEntity));
   }
 
   /**
@@ -95,17 +92,17 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @private
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
-   * @param {z.proto.GenericMessage} genericMessage - Protobuffer message to be sent
-   * @param {string} conversationId - ID of conversation the message was sent in
+   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchMissing(recipients, payload, genericMessage, conversationId) {
+  _handleClientMismatchMissing(recipients, payload, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
     if (!missingUserIds.length) {
       return Promise.resolve(payload);
     }
 
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
+    const {conversationId, genericMessage, timestamp} = eventInfoEntity;
 
     const skipParticipantsCheck = !conversationId;
     const participantsCheckPromise = skipParticipantsCheck
@@ -115,7 +112,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
           const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingUserIds);
 
           if (unknownUserIds.length) {
-            return this.conversationRepository.addMissingMember(conversationId, unknownUserIds);
+            return this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
           }
         });
 
@@ -143,14 +140,15 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    *
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
-   * @param {string} [conversationId] - ID of conversation the message was sent in
+   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchRedundant(recipients, payload, conversationId) {
+  _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
     if (_.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
+    const conversationId = eventInfoEntity.conversationId;
 
     const conversationPromise = conversationId
       ? this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
