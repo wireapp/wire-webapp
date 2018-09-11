@@ -36,7 +36,7 @@ s=
 c=IN IP4 host.atlanta.example.com
 t=0 0
 m=audio 49170 RTP/AVP 97
-a=rtpmap:97 iLBC/8000
+a=rtpmap:97 iLBC/8000 opus
 a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
 
   describe('rewriteSdp', () => {
@@ -153,7 +153,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       checkUntouchedLines(rtcSdp.sdp, noFirefoxSdp.sdp);
     });
 
-    it('adds audio bitrate for group and restarted ICE', () => {
+    it('adds audio bitrate and PTime for group and restarted ICE', () => {
       const groupFlowEntity = {
         isGroup: true,
         negotiationMode: () => '',
@@ -171,6 +171,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       [groupFlowEntity, restartedICEFlowEntity].forEach(flowEntity => {
         const {sdp: groupSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
         expect(groupSdp.sdp).toContain('b=AS:');
+        expect(groupSdp.sdp).toContain('a=ptime:');
         checkUntouchedLines(rtcSdp.sdp, groupSdp.sdp);
       });
     });
@@ -182,6 +183,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
         .replace(/UDP\/TLS\//g, '')
         .replace(/a=tool:(electron|webapp).*?(\r\n|$)/g, '')
         .replace(/b=AS:.*?(\r\n|$)/g, '')
+        .replace(/a=ptime:.*?(\r\n|$)/g, '')
         .replace(/m=(application|video).*?(\r\n|$)/g, '')
         .replace(/a=rtpmap.*?(\r\n|$)/g, '');
     };
