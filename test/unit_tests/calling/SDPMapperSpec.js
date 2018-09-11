@@ -22,6 +22,12 @@
 // grunt test_init && grunt test_run:calling/SDPMapper
 
 describe('z.calling.SDPMapper', () => {
+  const envInitialState = Object.assign({}, z.util.Environment);
+
+  afterEach(() => {
+    z.util.Environment = Object.assign({}, envInitialState);
+  });
+
   const sdpMapper = z.calling.SDPMapper;
 
   const sdpStr = `v=0
