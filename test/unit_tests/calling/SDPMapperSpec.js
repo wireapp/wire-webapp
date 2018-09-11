@@ -152,6 +152,28 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       expect(noFirefoxSdp.sdp).toContain('m=video 0');
       checkUntouchedLines(rtcSdp.sdp, noFirefoxSdp.sdp);
     });
+
+    it('adds audio bitrate for group and restarted ICE', () => {
+      const groupFlowEntity = {
+        isGroup: true,
+        negotiationMode: () => '',
+      };
+
+      const restartedICEFlowEntity = {
+        negotiationMode: () => z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART,
+      };
+
+      const rtcSdp = {
+        sdp: sdpStr,
+        type: z.calling.rtc.SDP_TYPE.OFFER,
+      };
+
+      [groupFlowEntity, restartedICEFlowEntity].forEach(flowEntity => {
+        const {sdp: groupSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+        expect(groupSdp.sdp).toContain('b=AS:');
+        checkUntouchedLines(rtcSdp.sdp, groupSdp.sdp);
+      });
+    });
   });
 
   function checkUntouchedLines(sourceSdp, transformedSdp) {
@@ -159,6 +181,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       return sdp
         .replace(/UDP\/TLS\//g, '')
         .replace(/a=tool:(electron|webapp).*?(\r\n|$)/g, '')
+        .replace(/b=AS:.*?(\r\n|$)/g, '')
         .replace(/m=(application|video).*?(\r\n|$)/g, '')
         .replace(/a=rtpmap.*?(\r\n|$)/g, '');
     };
