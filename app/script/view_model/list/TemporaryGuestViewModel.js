@@ -36,7 +36,7 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
     this.userRepository = repositories.user;
     this.callingRepository = repositories.calling;
     this.multitasking = mainViewModel.content.multitasking;
-    this.permissionRepository = repositories.media;
+    this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
 
     this.logger = new z.util.Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
