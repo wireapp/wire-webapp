@@ -1,6 +1,7 @@
 {
   "plugins": [
-    "@babel/plugin-proposal-class-properties",
+    "transform-object-rest-spread",
+    "transform-class-properties",
     [
       "react-intl",
       {
@@ -9,33 +10,33 @@
     ]
   ],
   "presets": [
-    "@babel/preset-react",
+    "react",
     [
-      "@babel/preset-env",
+      "env",
       {
         "debug": true,
         "modules": false,
         "targets": {
           "browsers": ["chrome >= 56", "firefox >= 60", "edge >= 15", "opera >= 43"]
         },
-        "useBuiltIns": "usage"
+        "useBuiltIns": true
       }
     ]
   ],
   "env": {
     "test": {
-      "plugins": ["@babel/plugin-proposal-class-properties"],
+      "plugins": ["transform-object-rest-spread", "transform-class-properties"],
       "presets": [
-        "@babel/preset-react",
+        "react",
         [
-          "@babel/preset-env",
+          "env",
           {
             "debug": false,
             "modules": "commonjs",
             "targets": {
               "browsers": ["chrome >= 56", "firefox >= 60", "edge >= 14", "opera >= 43"]
             },
-            "useBuiltIns": "usage"
+            "useBuiltIns": true
           }
         ]
       ]
