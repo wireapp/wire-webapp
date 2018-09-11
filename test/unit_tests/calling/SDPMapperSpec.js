@@ -53,10 +53,12 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
       const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(localSdp.sdp).not.toContain('UDP/TLS/');
       expect(localSdp.sdp).toContain('RTP/SAVP');
+      checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
 
       // remote SDP
       const {sdp: remoteSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, flowEntity);
       expect(remoteSdp.sdp).toContain('UDP/TLS/');
+      checkUntouchedLines(rtcSdp.sdp, remoteSdp.sdp);
     });
 
     it('adds the browser name and app version for local SDP', () => {
@@ -81,6 +83,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
       const {sdp: browserSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(browserSdp.sdp).toContain('a=tool:webapp 4.4.4 (firefox 12)');
       expect(browserSdp.sdp).toContain('t=0 0');
+      checkUntouchedLines(rtcSdp.sdp, browserSdp.sdp);
 
       z.util.Environment.desktop = true;
       z.util.Environment.browser = {
@@ -90,6 +93,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
       const {sdp: electronSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(electronSdp.sdp).toContain('a=tool:electron 5.5.5 4.4.4 (chrome 12)');
       expect(electronSdp.sdp).toContain('t=0 0');
+      checkUntouchedLines(rtcSdp.sdp, electronSdp.sdp);
     });
 
     it('keeps all the ice candidates', () => {
@@ -114,6 +118,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
 
       const {sdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(sdp.sdp.match(/a=candidate/g).length).toEqual(8);
+      checkUntouchedLines(rtcSdp.sdp, sdp.sdp);
     });
 
     it('changes the data channel and video channel port number for firefox only', () => {
@@ -132,11 +137,25 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       const {sdp: firefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(firefoxSdp.sdp).toContain('m=application 9');
       expect(firefoxSdp.sdp).toContain('m=video 9');
+      checkUntouchedLines(rtcSdp.sdp, firefoxSdp.sdp);
 
       z.util.Environment.browser.firefox = false;
       const {sdp: noFirefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(noFirefoxSdp.sdp).toContain('m=application 0');
       expect(noFirefoxSdp.sdp).toContain('m=video 0');
+      checkUntouchedLines(rtcSdp.sdp, noFirefoxSdp.sdp);
     });
   });
+
+  function checkUntouchedLines(sourceSdp, transformedSdp) {
+    const normalize = sdp => {
+      return sdp
+        .replace(/UDP\/TLS\//g, '')
+        .replace(/a=tool:(electron|webapp).*?(\r\n|$)/g, '')
+        .replace(/m=(application|video).*?(\r\n|$)/g, '')
+        .replace(/a=rtpmap.*?(\r\n|$)/g, '');
+    };
+
+    expect(normalize(sourceSdp)).toBe(normalize(transformedSdp));
+  }
 });
