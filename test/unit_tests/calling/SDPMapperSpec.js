@@ -112,7 +112,8 @@ a=candidate:1853887674 1 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.16
 a=candidate:1853887674 2 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
 a=candidate:750991856 2 udp 25108222 237.30.30.30 51472 typ relay raddr 47.61.61.61 rport 54763 generation 0
 a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61.61 rport 54761 generation 0
-`;
+`.replace(/\n/g, '\r\n');
+
       const flowEntity = {
         negotiationMode: () => '',
       };
