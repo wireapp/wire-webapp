@@ -140,7 +140,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    *
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity]- Info about event
+   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
