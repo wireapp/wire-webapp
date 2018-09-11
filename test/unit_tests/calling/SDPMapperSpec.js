@@ -31,8 +31,7 @@ c=IN IP4 host.atlanta.example.com
 t=0 0
 m=audio 49170 RTP/AVP 97
 a=rtpmap:97 iLBC/8000
-a=tcap:5 UDP/TLS/RTP/SAVP
-`.replace('\n', '\r\n');
+a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
 
   describe('rewriteSdp', () => {
     it('fails if no SDP given', () => {
@@ -70,7 +69,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP
         negotiationMode: () => '',
       };
 
-      spyOn(z.util.Environment, 'version').and.callFake(webapp => (webapp ? '5.5.5' : '4.4.4'));
+      spyOn(z.util.Environment, 'version').and.callFake(isDesktop => (isDesktop ? '5.5.5' : '4.4.4'));
 
       // webapp
       z.util.Environment.desktop = false;
@@ -79,8 +78,42 @@ a=tcap:5 UDP/TLS/RTP/SAVP
         version: '12',
       };
 
-      const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
-      expect(localSdp.sdp).toContain('a=tool:webapp 5.5.5 (firefox 12)');
+      const {sdp: browserSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      expect(browserSdp.sdp).toContain('a=tool:webapp 4.4.4 (firefox 12)');
+      expect(browserSdp.sdp).toContain('t=0 0');
+
+      z.util.Environment.desktop = true;
+      z.util.Environment.browser = {
+        name: 'chrome',
+        version: '12',
+      };
+      const {sdp: electronSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      expect(electronSdp.sdp).toContain('a=tool:electron 5.5.5 4.4.4 (chrome 12)');
+      expect(electronSdp.sdp).toContain('t=0 0');
+    });
+
+    it('keeps all the ice candidates', () => {
+      const candidates = `
+a=candidate:1467250027 1 udp 2122260223 192.168.0.196 46243 typ host generation 0
+a=candidate:1467250027 2 udp 2122260222 192.168.0.196 56280 typ host generation 0
+a=candidate:435653019 1 tcp 1845501695 192.168.0.196 0 typ host tcptype active generation 0
+a=candidate:435653019 2 tcp 1845501695 192.168.0.196 0 typ host tcptype active generation 0
+a=candidate:1853887674 1 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
+a=candidate:1853887674 2 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
+a=candidate:750991856 2 udp 25108222 237.30.30.30 51472 typ relay raddr 47.61.61.61 rport 54763 generation 0
+a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61.61 rport 54761 generation 0
+`;
+      const flowEntity = {
+        negotiationMode: () => '',
+      };
+
+      const rtcSdp = {
+        sdp: sdpStr + candidates,
+        type: z.calling.rtc.SDP_TYPE.OFFER,
+      };
+
+      const {sdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      expect(sdp.sdp.match(/a=candidate/g).length).toEqual(8);
     });
   });
 });
