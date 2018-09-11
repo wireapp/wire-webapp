@@ -93,10 +93,12 @@ module.exports = function(config) {
       reporters: [
         {
           dir: '../docs/coverage',
-          type: 'html',
+          subdir: '.',
+          type: 'lcov',
         },
         {
           dir: '../docs/coverage',
+          subdir: '.',
           file: 'coverage-summary.txt',
           type: 'text-summary',
         },
