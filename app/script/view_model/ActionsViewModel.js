@@ -121,7 +121,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       return new Promise(resolve => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
-            this.conversationRepository.delete_message(conversationEntity, messageEntity);
+            this.conversationRepository.deleteMessage(conversationEntity, messageEntity);
             resolve();
           },
           text: {
@@ -139,7 +139,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       return new Promise(resolve => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
-            this.conversationRepository.delete_message_everyone(conversationEntity, messageEntity);
+            this.conversationRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
             resolve();
           },
           text: {

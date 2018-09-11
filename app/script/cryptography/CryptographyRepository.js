@@ -349,7 +349,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
             messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
             clientIds.forEach(clientId => {
               const sessionId = this._constructSessionId(userId, clientId);
-              cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage));
+              const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage);
+
+              cipherPayloadPromises.push(encryptionPromise);
             });
           }
         });
@@ -372,7 +374,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
               if (preKeyPayload) {
                 const sessionId = this._constructSessionId(userId, clientId);
                 const preKeyBundle = z.util.base64ToArray(preKeyPayload.key).buffer;
-                cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle));
+                const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle);
+
+                cipherPayloadPromises.push(encryptionPromise);
               }
             });
           }

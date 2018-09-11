@@ -92,21 +92,16 @@ z.entity.Message = class Message {
       return date.local().format('HH:mm');
     };
 
-    this.sender_name = ko.pureComputed(() => z.util.SanitizationUtil.getEscapedFirstName(this.user()));
-    this.unsafe_sender_name = ko.pureComputed(() => {
-      return z.util.SanitizationUtil.getEscapedFirstName(this.user(), undefined, false);
-    });
+    this.unsafeSenderName = ko.pureComputed(() => z.util.SanitizationUtil.getFirstName(this.user(), undefined, true));
     this.headerSenderName = ko.pureComputed(() => {
       return this.user().isService ? this.user().name() : this.user().first_name();
     });
 
-    this.accent_color = ko.pureComputed(() => {
-      return `accent-color-${this.user().accent_id()}`;
-    });
+    this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  equals(message_et) {
-    return this.id === (message_et != null ? message_et.id : undefined);
+  equals(messageEntity) {
+    return messageEntity && this.id ? this.id === messageEntity.id : false;
   }
 
   /**

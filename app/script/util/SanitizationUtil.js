@@ -23,14 +23,15 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.SanitizationUtil = (() => {
-  const _getEscapedSelfName = (declension = z.string.Declension.NOMINATIVE) => {
+  const _getSelfName = (declension = z.string.Declension.NOMINATIVE, bypassSanitization = false) => {
     const selfNameDeclensions = {
       [z.string.Declension.NOMINATIVE]: z.string.conversationYouNominative,
       [z.string.Declension.DATIVE]: z.string.conversationYouDative,
       [z.string.Declension.ACCUSATIVE]: z.string.conversationYouAccusative,
     };
 
-    return z.l10n.text(selfNameDeclensions[declension]);
+    const selfName = z.l10n.text(selfNameDeclensions[declension]);
+    return bypassSanitization ? selfName : z.util.SanitizationUtil.escapeString(selfName);
   };
 
   return {
@@ -38,14 +39,16 @@ z.util.SanitizationUtil = (() => {
 
     escapeString: string => _.escape(string),
 
-    getEscapedFirstName: (userEntity, declension, escaped = true) => {
+    getFirstName: (userEntity, declension, bypassSanitization = false) => {
       if (userEntity.is_me) {
-        return _getEscapedSelfName(declension);
+        return _getSelfName(declension, bypassSanitization);
       }
-      return escaped ? z.util.SanitizationUtil.escapeString(userEntity.first_name()) : userEntity.first_name();
+      return bypassSanitization
+        ? userEntity.first_name()
+        : z.util.SanitizationUtil.escapeString(userEntity.first_name());
     },
 
-    getEscapedSelfName: _getEscapedSelfName,
+    getSelfName: _getSelfName,
 
     safeMailtoOpen: (event, email) => {
       event.preventDefault();

@@ -364,7 +364,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.cancelMessageEditing();
 
     if (!messageText.length) {
-      return this.conversationRepository.delete_message_everyone(this.conversationEntity(), messageEntity);
+      return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
     const isTextChange = messageText !== messageEntity.get_first_asset().text;

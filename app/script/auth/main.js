@@ -17,7 +17,9 @@
  *
  */
 
-import 'babel-polyfill'; // Polyfill needs to be imported first
+// We need to force babel to load the setImmediate and clearImmediate polyfill because only setImmediate is set on electron side which means the polyfill won't be loaded later on.
+// https://github.com/electron/electron/issues/2984
+import 'core-js/modules/web.immediate';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
