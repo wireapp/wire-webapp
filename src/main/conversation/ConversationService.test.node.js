@@ -203,7 +203,10 @@ describe('ConversationService', () => {
         url,
         urlOffset,
       });
-      const textMessage = account.service.conversation.createText(text, [linkPreview]);
+      const textMessage = account.service.conversation
+        .createText(text)
+        .withLinkPreviews([linkPreview])
+        .build();
 
       expect(textMessage.content.text).toEqual(text);
       expect(textMessage.content.linkPreviews).toEqual(jasmine.any(Array));
@@ -227,7 +230,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.createText(text);
+      const textMessage = account.service.conversation.createText(text).build();
 
       expect(textMessage.content.linkPreviews).toBeUndefined();
     });
@@ -258,7 +261,10 @@ describe('ConversationService', () => {
       const urlOffset = 0;
 
       const linkPreview = await account.service.conversation.createLinkPreview({image, url, urlOffset});
-      const textMessage = account.service.conversation.createText(text, [linkPreview]);
+      const textMessage = account.service.conversation
+        .createText(text)
+        .withLinkPreviews([linkPreview])
+        .build();
 
       expect(account.service.asset.uploadImageAsset).toHaveBeenCalledTimes(1);
 

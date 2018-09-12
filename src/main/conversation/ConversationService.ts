@@ -59,6 +59,7 @@ import {
   Text,
   Tweet,
 } from '@wireapp/protocol-messaging';
+
 import {
   ClientActionContent,
   ConfirmationContent,
@@ -77,6 +78,8 @@ import {
   RemoteData,
   TextContent,
 } from '../conversation/content/';
+
+import {TextContentBuilder} from './TextContentBuilder';
 
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
@@ -736,19 +739,14 @@ class ConversationService {
   public createEditedText(
     newMessageText: string,
     originalMessageId: string,
-    newLinkPreviews?: LinkPreviewUploadedContent[],
     messageId: string = ConversationService.createId()
-  ): PayloadBundleOutgoingUnsent {
+  ): TextContentBuilder {
     const content: EditedTextContent = {
       originalMessageId,
       text: newMessageText,
     };
 
-    if (newLinkPreviews) {
-      content.linkPreviews = newLinkPreviews;
-    }
-
-    return {
+    const payloadBundle: PayloadBundleOutgoingUnsent = {
       content,
       from: this.apiClient.context!.userId,
       id: messageId,
@@ -756,6 +754,8 @@ class ConversationService {
       timestamp: Date.now(),
       type: PayloadBundleType.MESSAGE_EDIT,
     };
+
+    return new TextContentBuilder(payloadBundle);
   }
 
   public async createFileData(file: FileContent, messageId: string): Promise<PayloadBundleOutgoingUnsent> {
@@ -886,18 +886,10 @@ class ConversationService {
     };
   }
 
-  public createText(
-    text: string,
-    linkPreviews?: LinkPreviewUploadedContent[],
-    messageId: string = ConversationService.createId()
-  ): PayloadBundleOutgoingUnsent {
+  public createText(text: string, messageId: string = ConversationService.createId()): TextContentBuilder {
     const content: TextContent = {text};
 
-    if (linkPreviews) {
-      content.linkPreviews = linkPreviews;
-    }
-
-    return {
+    const payloadBundle: PayloadBundleOutgoingUnsent = {
       content,
       from: this.apiClient.context!.userId,
       id: messageId,
@@ -905,6 +897,8 @@ class ConversationService {
       timestamp: Date.now(),
       type: PayloadBundleType.TEXT,
     };
+
+    return new TextContentBuilder(payloadBundle);
   }
 
   public createConfirmation(
