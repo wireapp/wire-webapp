@@ -105,7 +105,7 @@ storeEngine
         stdin.addListener('data', data => {
           const message = data.toString().trim();
           if (account.service) {
-            const payload = account.service.conversation.createText(message);
+            const payload = account.service.conversation.createText(message).build();
             return account.service.conversation.send(conversationID, payload);
           }
           return;

@@ -17,17 +17,24 @@
  *
  */
 
-export * from './AssetContent';
-export * from './ClientActionContent';
-export * from './ConfirmationContent';
-export * from './ConversationContent';
-export * from './DeletedContent';
-export * from './EditedTextContent';
-export * from './FileContent';
-export * from './HiddenContent';
-export * from './ImageContent';
-export * from './LinkPreviewContent';
-export * from './LocationContent';
-export * from './ReactionContent';
-export * from './TextContent';
-export * from './TweetContent';
+import {LinkPreviewUploadedContent, TextContent} from '../conversation/content/';
+import {PayloadBundleOutgoingUnsent} from '../conversation/root';
+
+class TextContentBuilder {
+  constructor(private readonly payloadBundle: PayloadBundleOutgoingUnsent) {
+    this.payloadBundle = payloadBundle;
+  }
+
+  build(): PayloadBundleOutgoingUnsent {
+    return this.payloadBundle;
+  }
+
+  public withLinkPreviews(linkPreviews: LinkPreviewUploadedContent[]): TextContentBuilder {
+    const content = this.payloadBundle.content as TextContent;
+    content.linkPreviews = linkPreviews;
+
+    return this;
+  }
+}
+
+export {TextContentBuilder};
