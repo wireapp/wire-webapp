@@ -4,17 +4,17 @@
   },
   "dependencies": {
     "@types/node": "10.9.4",
-    "@wireapp/api-client": "1.15.11",
-    "@wireapp/cryptobox": "8.7.13",
+    "@wireapp/api-client": "1.15.12",
+    "@wireapp/cryptobox": "8.7.14",
     "@wireapp/protocol-messaging": "1.20.1",
-    "@wireapp/store-engine": "0.12.13",
-    "bazinga64": "5.3.8",
+    "@wireapp/store-engine": "0.12.14",
+    "bazinga64": "5.3.9",
     "logdown": "3.2.7",
     "protobufjs": "6.8.8",
     "pure-uuid": "1.5.4"
   },
   "devDependencies": {
-    "@wireapp/commons": "0.6.13",
+    "@wireapp/commons": "0.6.14",
     "cross-env": "5.2.0",
     "dotenv": "6.0.0",
     "istanbul": "1.1.0-alpha.1",
@@ -56,5 +56,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "5.9.24"
+  "version": "5.9.25"
 }
