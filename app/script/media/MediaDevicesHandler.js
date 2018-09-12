@@ -173,6 +173,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       if (mediaDeviceId) {
         this._updateCurrentIndexFromId(z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
       }
+
       const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.SCREEN;
       const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
@@ -184,7 +185,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       if (mediaDeviceId) {
         this._updateCurrentIndexFromId(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
+
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+
       const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.VIDEO;
       const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
