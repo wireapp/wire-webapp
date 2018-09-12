@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.9.25...@wireapp/core@6.0.0) (2018-09-12)
+
+
+### Code Refactoring
+
+* **core:** Add TextContentBuilder ([#1099](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1099)) ([18848bd](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/18848bd))
+
+
+### BREAKING CHANGES
+
+* **core:** createText() now returns a TextContentBuilder. 
+
+
+
+
+
 <a name="5.9.25"></a>
 ## [5.9.25](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@5.9.24...@wireapp/core@5.9.25) (2018-09-12)
 
