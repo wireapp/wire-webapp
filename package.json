@@ -169,7 +169,7 @@
     "precommit": "lint-staged",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "concurrently \"yarn start:dev\" \"grunt\"",
-    "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
+    "start:dev": "webpack-dev-server --config webpack.config.dev.js",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:assets && yarn test:scripts && grunt check && grunt test",
     "test:assets": "yarn prettier --list-different",
