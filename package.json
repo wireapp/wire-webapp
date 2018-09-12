@@ -3,10 +3,14 @@
     "@types/color": "3.0.0",
     "bazinga64": "5.3.8",
     "color": "3.0.0",
+    "react": "16.5.0",
+    "react-dom": "16.5.0",
     "recompose": "0.30.0",
+    "styled-components": "3.4.6",
     "styled-normalize": "8.0.0"
   },
   "devDependencies": {
+    "@types/styled-components": "3.0.1",
     "awesome-typescript-loader": "5.2.1",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
@@ -15,27 +19,13 @@
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
-    "react": "16.5.0",
-    "react-dom": "16.5.0",
     "react-helmet": "5.2.0",
     "react-hot-loader": "4.3.6",
     "rimraf": "2.6.2",
-    "styled-components": "3.4.6",
     "typescript": "3.0.3",
     "webpack": "4.18.0",
     "webpack-cli": "3.1.0",
     "webpack-dev-server": "3.1.8"
-  },
-  "peerDependencies": {
-    "react": "16.4.2",
-    "react-dom": "16.4.2",
-    "styled-components": "3.4.5"
-  },
-  "optionalDependencies": {
-    "@types/react": "16.4.14",
-    "@types/react-dom": "16.0.7",
-    "@types/recompose": "0.26.4",
-    "@types/styled-components": "3.0.1"
   },
   "license": "GPL-3.0",
   "main": "dist/index.js",
