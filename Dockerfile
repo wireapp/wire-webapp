@@ -1,4 +1,4 @@
-FROM node:8.11.4-alpine
+FROM node:10-alpine
 
 # For some extra dependencies...
 RUN apk add --no-cache git python gcc make linux-headers libc6-compat bash

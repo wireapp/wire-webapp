@@ -60,7 +60,7 @@ $(() => {
 //        webSocketUrl: 'wss://staging-nginz-ssl.zinfra.io',
 // TODO:  Just an experiment
           restUrl: 'https://kube-staging-nginz-https.zinfra.io',
-          webSocketUrl: 'wss://kube-staging-nginz-https.zinfra.io',
+          webSocketUrl: 'wss://kube-staging-nginz-ssl.zinfra.io',
       }
     : {
         environment: z.service.BackendEnvironment.PRODUCTION,
