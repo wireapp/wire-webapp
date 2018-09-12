@@ -36,7 +36,11 @@ export const configureClient = () => {
       });
     },
     store: new StoreEngine.IndexedDBEngine(),
-    urls: BACKEND,
+    urls: {
+      name: 'staging',
+      rest: 'https://kube-staging-nginz-https.zinfra.io',
+      ws: 'wss://kube-staging-nginz-ssl.zinfra.io',
+    },
   });
 };
 
