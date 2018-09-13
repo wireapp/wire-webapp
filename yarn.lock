@@ -1611,15 +1611,15 @@ babel-loader@8.0.2:
     mkdirp "^0.5.1"
     util.promisify "^1.0.0"
 
-babel-plugin-react-intl@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-2.4.0.tgz#292fca8030603a9e0476973290836aa0c7da17e2"
+babel-plugin-react-intl@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-3.0.0.tgz#ea2152b1fe0a36be33b89f8cc8b961b8fd4cfaf8"
   dependencies:
-    babel-runtime "^6.2.0"
+    "@babel/runtime" "^7.0.0"
     intl-messageformat-parser "^1.2.0"
     mkdirp "^0.5.1"
 
-babel-runtime@^6.2.0, babel-runtime@^6.23.0:
+babel-runtime@^6.23.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
   dependencies:
