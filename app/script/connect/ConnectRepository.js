@@ -76,7 +76,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         return this._parseGoogleContacts(response);
       })
       .catch(error => {
-        this.logger.info('Google Contacts SDK error', error);
+        this.logger.info(`Google Contacts SDK error: ${error.message}`, error);
         throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
       });
   }
