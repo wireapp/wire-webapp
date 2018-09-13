@@ -867,20 +867,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
           }
         }
 
-        const iceCandidateTypes = iceCandidates.reduce((types, candidateStr) => {
-          const typeMatches = candidateStr.match(/typ (\w+)/);
-          if (!typeMatches) {
-            return types;
-          }
-          const candidateType = typeMatches[1];
-          types[candidateType] = types[candidateType] ? types[candidateType] + 1 : 1;
-          return types;
-        }, {});
+        const iceCandidateTypes = z.util.PeerConnectionUtil.getIceCandidatesTypes(iceCandidates);
 
         const iceCandidateTypesLog = Object.keys(iceCandidateTypes)
-          .map(candidateType => {
-            return `${iceCandidateTypes[candidateType]} ${candidateType}`;
-          })
+          .map(candidateType => `${iceCandidateTypes[candidateType]} ${candidateType}`)
           .join(', ');
 
         const logMessage = {
@@ -899,7 +889,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
               this.callLogger.obfuscateSdp(this.localSdp().sdp),
             ],
           },
-          message: `Sending local '{0}' SDP containing '{1}' ICE candidates ('{2}') for flow with '{3}'\n{4}`,
+          message: `Sending local '{0}' SDP containing '{1}' ICE candidates ({2}) for flow with '{3}'\n{4}`,
         };
         this.callLogger.debug(logMessage);
 

@@ -20,8 +20,20 @@
 'use strict';
 
 z.util.PeerConnectionUtil = {
+  getIceCandidatesTypes(iceCandidates) {
+    return iceCandidates.reduce((types, candidateStr) => {
+      const typeMatches = candidateStr.match(/typ (\w+)/);
+      if (!typeMatches) {
+        return types;
+      }
+      const candidateType = typeMatches[1];
+      types[candidateType] = types[candidateType] + 1 || 1;
+      return types;
+    }, {});
+  },
+
   /**
-   * Counts the number of relay candidate in a list of ICE candidates.
+   * Returns true if the number and types of ice candidates gathered are sufficient to start a call
    *
    * @param {RTCConfiguration} peerConnectionConfig - the configuration of the peerConnection that initiated the ICE candidate gathering
    * @param {Array<string>} iceCandidates - ICE candidate strings from SDP

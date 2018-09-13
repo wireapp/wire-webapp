@@ -78,4 +78,14 @@ describe('z.util.PeerConnectionUtil', () => {
       });
     });
   });
+
+  describe('getIceCandidatesTypes', () => {
+    it('detects types of candidates', () => {
+      const candidates = hostIceCandidates.concat(relayIceCandidates);
+      expect(z.util.PeerConnectionUtil.getIceCandidatesTypes(candidates)).toEqual({
+        host: hostIceCandidates.length,
+        relay: relayIceCandidates.length,
+      });
+    });
+  });
 });
