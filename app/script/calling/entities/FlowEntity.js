@@ -86,7 +86,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     //##############################################################################
 
     this.peerConnection = undefined;
-    this.iceCandidatesGatheringAttempts = 0;
+    this.iceCandidatesGatheringAttempts = 1;
     this.pcInitialized = ko.observable(false);
 
     this.mediaStream = this.callEntity.localMediaStream;
@@ -1481,7 +1481,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.disconnected();
 
       this.clearTimeouts();
-      this.iceCandidatesGatheringAttempts = 0;
+      this.iceCandidatesGatheringAttempts = 1;
       this._closeDataChannel();
       this._closePeerConnection();
       this._resetSignalingStates();
