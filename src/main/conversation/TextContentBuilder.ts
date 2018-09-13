@@ -17,7 +17,7 @@
  *
  */
 
-import {LinkPreviewUploadedContent, TextContent} from '../conversation/content/';
+import {LinkPreviewUploadedContent, MentionContent, TextContent} from '../conversation/content/';
 import {PayloadBundleOutgoingUnsent} from '../conversation/root';
 
 class TextContentBuilder {
@@ -25,13 +25,26 @@ class TextContentBuilder {
     this.payloadBundle = payloadBundle;
   }
 
-  build(): PayloadBundleOutgoingUnsent {
+  public build(): PayloadBundleOutgoingUnsent {
     return this.payloadBundle;
   }
 
-  public withLinkPreviews(linkPreviews: LinkPreviewUploadedContent[]): TextContentBuilder {
+  public withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]): TextContentBuilder {
     const content = this.payloadBundle.content as TextContent;
-    content.linkPreviews = linkPreviews;
+
+    if (linkPreviews && linkPreviews.length) {
+      content.linkPreviews = linkPreviews;
+    }
+
+    return this;
+  }
+
+  public withMentions(mentions?: MentionContent[]): TextContentBuilder {
+    const content = this.payloadBundle.content as TextContent;
+
+    if (mentions && mentions.length) {
+      content.mentions = mentions;
+    }
 
     return this;
   }

@@ -273,12 +273,16 @@ class Account extends EventEmitter {
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
-        const {content: text, linkPreview} = genericMessage[GenericMessageType.TEXT];
+        const {content: text, linkPreview: linkPreviews, mention: mentions} = genericMessage[GenericMessageType.TEXT];
 
         const content: TextContent = {text};
 
-        if (linkPreview.length) {
-          content.linkPreviews = linkPreview;
+        if (linkPreviews && linkPreviews.length) {
+          content.linkPreviews = linkPreviews;
+        }
+
+        if (mentions && mentions.length) {
+          content.mentions = mentions;
         }
 
         return {
@@ -326,7 +330,7 @@ class Account extends EventEmitter {
       }
       case GenericMessageType.EDITED: {
         const {
-          text: {content: editedText, linkPreview: editedLinkPreview},
+          text: {content: editedText, linkPreview: editedLinkPreviews, mention: editedMentions},
           replacingMessageId,
         } = genericMessage[GenericMessageType.EDITED];
 
@@ -335,8 +339,12 @@ class Account extends EventEmitter {
           text: editedText,
         };
 
-        if (editedLinkPreview.length) {
-          content.linkPreviews = editedLinkPreview;
+        if (editedLinkPreviews && editedLinkPreviews.length) {
+          content.linkPreviews = editedLinkPreviews;
+        }
+
+        if (editedMentions && editedMentions.length) {
+          content.mentions = editedMentions;
         }
 
         return {

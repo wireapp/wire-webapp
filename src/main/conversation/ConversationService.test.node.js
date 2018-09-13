@@ -224,7 +224,7 @@ describe('ConversationService', () => {
       );
     });
 
-    it('does not add link previews', async () => {
+    it('does not add link previews', () => {
       account.apiClient.context = {
         userId: new UUID(4).format(),
       };
@@ -277,6 +277,42 @@ describe('ConversationService', () => {
           urlOffset,
         })
       );
+    });
+
+    it('adds mentions correctly', () => {
+      account.apiClient.context = {
+        userId: new UUID(4).format(),
+      };
+
+      const text = 'Hello @user!';
+
+      const mention = {
+        end: 11,
+        start: 6,
+        userId: new UUID(4).format(),
+      };
+
+      const textMessage = account.service.conversation
+        .createText(text)
+        .withMentions([mention])
+        .build();
+
+      expect(textMessage.content.text).toEqual(text);
+      expect(textMessage.content.mentions).toEqual(jasmine.any(Array));
+      expect(textMessage.content.mentions.length).toBe(1);
+
+      expect(textMessage.content.mentions[0]).toEqual(jasmine.objectContaining(mention));
+    });
+
+    it('does not add mentions', () => {
+      account.apiClient.context = {
+        userId: new UUID(4).format(),
+      };
+
+      const text = 'Hello, world!';
+      const textMessage = account.service.conversation.createText(text).build();
+
+      expect(textMessage.content.mentions).toBeUndefined();
     });
   });
 });
