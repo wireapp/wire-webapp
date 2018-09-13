@@ -501,7 +501,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _createPeerConnection() {
     return this._createPeerConnectionConfiguration().then(pcConfiguration => {
       this.peerConnection = new window.RTCPeerConnection(pcConfiguration);
-      this.iceCandidatesGatheringAttempts = 0;
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
@@ -1482,6 +1481,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.disconnected();
 
       this.clearTimeouts();
+      this.iceCandidatesGatheringAttempts = 0;
       this._closeDataChannel();
       this._closePeerConnection();
       this._resetSignalingStates();
