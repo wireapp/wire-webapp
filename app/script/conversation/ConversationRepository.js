@@ -1849,7 +1849,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        amplify.publish(z.event.WebApp.CALL.STATE.DELETE, callMessageEntity.id);
+        amplify.publish(z.event.WebApp.CALL.STATE.DELETE, callMessageEntity.conversationId);
       });
   }
 
