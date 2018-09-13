@@ -71,13 +71,13 @@ z.connect.ConnectRepository = class ConnectRepository {
   _getGoogleContacts() {
     return this.connectGoogleService
       .getContacts()
-      .catch(error => {
-        this.logger.info('Google Contacts SDK error', error);
-        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
-      })
       .then(response => {
         amplify.publish(z.event.WebApp.SEARCH.SHOW);
         return this._parseGoogleContacts(response);
+      })
+      .catch(error => {
+        this.logger.info('Google Contacts SDK error', error);
+        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
       });
   }
 
