@@ -27,6 +27,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
+      MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS: 5,
       NEGOTIATION_THRESHOLD: 0.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RECONNECTION_TIMEOUT: 2.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RENEGOTIATION_TIMEOUT: 30 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
@@ -85,6 +86,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     //##############################################################################
 
     this.peerConnection = undefined;
+    this.iceCandidatesGatheringAttempts = 0;
     this.pcInitialized = ko.observable(false);
 
     this.mediaStream = this.callEntity.localMediaStream;
@@ -499,6 +501,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _createPeerConnection() {
     return this._createPeerConnectionConfiguration().then(pcConfiguration => {
       this.peerConnection = new window.RTCPeerConnection(pcConfiguration);
+      this.iceCandidatesGatheringAttempts = 0;
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
@@ -860,8 +863,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
             connectionConfig,
             iceCandidates
           );
-          if (!isValidGathering) {
-            const logMessage = `Not enough ICE candidates gathered. Restarting timeout\n${iceCandidates}`;
+          const attempts = this.iceCandidatesGatheringAttempts;
+          const hasReachMaxGatheringAttempts = attempts >= FlowEntity.CONFIG.MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS;
+          if (!hasReachMaxGatheringAttempts && !isValidGathering) {
+            const logMessage = `Not enough ICE candidates gathered (attempt '${attempts}'). Restarting timeout\n${iceCandidates}`;
+            this.iceCandidatesGatheringAttempts++;
             this.callLogger.warn(logMessage);
             return this._setSendSdpTimeout();
           }
