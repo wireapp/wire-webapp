@@ -356,8 +356,29 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText) {
     if (messageText.length) {
+      const mentions = this.parseForMentions(messageText, this.conversationEntity().participating_user_ets());
+      this.logger.info(`Found ${mentions.length} mentions in outgoing message.`);
       this.conversationRepository.send_text_with_link_preview(messageText, this.conversationEntity());
     }
+  }
+
+  parseForMentions(messageText, userEntities) {
+    const mentionRegexp = /\B@(.+?)\b/g;
+    const mentions = [];
+
+    let find;
+    while ((find = mentionRegexp.exec(messageText))) {
+      const name = find[1].toLowerCase();
+      const mentionedUser = userEntities.find(user => user.username() === name);
+      if (mentionedUser) {
+        const userId = mentionedUser.id;
+        const start = find.index;
+        const end = start + find[0].length;
+        mentions.push({end, start, userId});
+      }
+    }
+
+    return mentions;
   }
 
   sendMessageEdit(messageText, messageEntity) {
