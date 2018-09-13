@@ -4873,6 +4873,10 @@ hoist-non-react-statics@^2.3.1, hoist-non-react-statics@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.0.tgz#d2ca2dfc19c5a91c5a6615ce8e564ef0347e2a40"
 
+hoist-non-react-statics@^2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
+
 homedir-polyfill@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/homedir-polyfill/-/homedir-polyfill-1.0.1.tgz#4c2bbc8a758998feebf5ed68580f76d46768b4bc"
@@ -5184,7 +5188,7 @@ intl-messageformat@^2.0.0, intl-messageformat@^2.1.0:
   dependencies:
     intl-messageformat-parser "1.4.0"
 
-intl-relativeformat@^2.0.0:
+intl-relativeformat@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/intl-relativeformat/-/intl-relativeformat-2.1.0.tgz#010f1105802251f40ac47d0e3e1a201348a255df"
   dependencies:
@@ -8641,13 +8645,14 @@ react-intl-po@2.2.2:
     po2json "^0.4.5"
     ramda "^0.25.0"
 
-react-intl@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.4.0.tgz#66c14dc9df9a73b2fbbfbd6021726e80a613eb15"
+react-intl@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.5.0.tgz#776bc58a420b4408fae398387a56c0b26cb3f1e6"
   dependencies:
+    hoist-non-react-statics "^2.5.5"
     intl-format-cache "^2.0.5"
     intl-messageformat "^2.1.0"
-    intl-relativeformat "^2.0.0"
+    intl-relativeformat "^2.1.0"
     invariant "^2.1.1"
 
 react-is@^16.3.1:
