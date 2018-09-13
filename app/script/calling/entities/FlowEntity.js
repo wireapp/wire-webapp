@@ -851,7 +851,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
       return;
     }
 
-    z.calling.SDPMapper.rewriteSdp(this.peerConnection.localDescription, z.calling.enum.SDP_SOURCE.LOCAL, this)
+    const mappedSdp = z.calling.SDPMapper.rewriteSdp(
+      this.peerConnection.localDescription,
+      z.calling.enum.SDP_SOURCE.LOCAL,
+      this
+    );
+    Promise.resolve(mappedSdp)
       .then(({iceCandidates, sdp: localSdp}) => {
         this.localSdp(localSdp);
 
@@ -1015,9 +1020,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _createSdpSuccess(rctSdp) {
     this.callLogger.info(`Creating '${rctSdp.type}' successful`, rctSdp);
 
-    z.calling.SDPMapper.rewriteSdp(rctSdp, z.calling.enum.SDP_SOURCE.LOCAL, this).then(({sdp: localSdp}) => {
-      this.localSdp(localSdp);
-    });
+    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rctSdp, z.calling.enum.SDP_SOURCE.LOCAL, this);
+    this.localSdp(mappedSdp.sdp);
   }
 
   /**
