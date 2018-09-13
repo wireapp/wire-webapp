@@ -17,12 +17,10 @@
  *
  */
 
-import {LinkPreviewUploadedContent} from '../content/';
+import {TextContent} from '../content/';
 
-interface EditedTextContent {
+interface EditedTextContent extends TextContent {
   originalMessageId: string;
-  text: string;
-  linkPreviews?: LinkPreviewUploadedContent[];
 }
 
 export {EditedTextContent};

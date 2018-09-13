@@ -52,6 +52,7 @@ import {
   Knock,
   LinkPreview,
   Location,
+  Mention,
   MessageDelete,
   MessageEdit,
   MessageHide,
@@ -214,12 +215,16 @@ class ConversationService {
     payloadBundle: PayloadBundleOutgoingUnsent,
     userIds?: string[]
   ): Promise<PayloadBundleOutgoing> {
-    const {originalMessageId, text, linkPreviews} = payloadBundle.content as EditedTextContent;
+    const {originalMessageId, text, linkPreviews, mentions} = payloadBundle.content as EditedTextContent;
 
     const textMessage = Text.create({content: text});
 
     if (linkPreviews && linkPreviews.length) {
       textMessage.linkPreview = this.buildLinkPreviews(linkPreviews);
+    }
+
+    if (mentions && mentions.length) {
+      textMessage.mention = mentions.map(mention => Mention.create(mention));
     }
 
     const editedMessage = MessageEdit.create({
@@ -651,14 +656,18 @@ class ConversationService {
       state: PayloadBundleState.OUTGOING_SENT,
     };
 
-    const {text, linkPreviews} = payloadBundle.content as TextContent;
+    const {text, linkPreviews, mentions} = payloadBundle.content as TextContent;
 
     const textMessage = Text.create({
       content: text,
     });
 
-    if (linkPreviews) {
+    if (linkPreviews && linkPreviews.length) {
       textMessage.linkPreview = this.buildLinkPreviews(linkPreviews);
+    }
+
+    if (mentions && mentions.length) {
+      textMessage.mention = mentions.map(mention => Mention.create(mention));
     }
 
     let genericMessage = GenericMessage.create({

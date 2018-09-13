@@ -17,18 +17,10 @@
  *
  */
 
-export * from './AssetContent';
-export * from './ClientActionContent';
-export * from './ConfirmationContent';
-export * from './ConversationContent';
-export * from './DeletedContent';
-export * from './EditedTextContent';
-export * from './FileContent';
-export * from './HiddenContent';
-export * from './ImageContent';
-export * from './LinkPreviewContent';
-export * from './MentionContent';
-export * from './LocationContent';
-export * from './ReactionContent';
-export * from './TextContent';
-export * from './TweetContent';
+interface MentionContent {
+  end: number;
+  start: number;
+  userId?: string;
+}
+
+export {MentionContent};

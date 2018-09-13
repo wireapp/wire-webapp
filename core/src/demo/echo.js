@@ -53,7 +53,10 @@ const messageIdCache = {};
     const {conversation: conversationId, content, from, id: messageId, messageTimer = 0, type} = messageData;
 
     logger.log(
-      `Receiving: "${type}" ("${messageId}") in "${conversationId}" from "${from}":`,
+      `Receiving: "${type}" ("${messageId}") in "${conversationId}" from "${from}"`,
+      content.mentions && content.mentions.length
+        ? `mentioning "${content.mentions.map(mention => mention.userId).join(',')}"`
+        : '',
       messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : '',
       content
     );
@@ -122,12 +125,12 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {
-      content: {linkPreviews, text},
+      content: {linkPreviews, mentions, text},
       id: messageId,
     } = data;
     let textPayload;
 
-    if (linkPreviews) {
+    if (linkPreviews && linkPreviews.length) {
       const newLinkPreviews = await buildLinkPreviews(linkPreviews);
 
       await handleIncomingMessage(data);
@@ -142,10 +145,14 @@ const messageIdCache = {};
       textPayload = account.service.conversation
         .createText(text, cachedMessageId)
         .withLinkPreviews(newLinkPreviews)
+        .withMentions(mentions)
         .build();
     } else {
       await handleIncomingMessage(data);
-      textPayload = account.service.conversation.createText(text).build();
+      textPayload = account.service.conversation
+        .createText(text)
+        .withMentions(mentions)
+        .build();
     }
 
     messageIdCache[messageId] = textPayload.id;
@@ -310,7 +317,7 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.MESSAGE_EDIT, async data => {
     const {
-      content: {text, originalMessageId, linkPreviews},
+      content: {linkPreviews, mentions, originalMessageId, text},
       id: messageId,
     } = data;
     let editedPayload;
@@ -333,15 +340,17 @@ const messageIdCache = {};
         logger.warn(`Link preview for edited message ID "${messageId} was received before the original message."`);
         return;
       }
-      editedPayload = account.service.conversation.createEditedText(
-        text,
-        cachedOriginalMessageId,
-        newLinkPreviews,
-        cachedMessageId
-      );
+      editedPayload = account.service.conversation
+        .createEditedText(text, cachedOriginalMessageId, cachedMessageId)
+        .withLinkPreviews(newLinkPreviews)
+        .withMentions(mentions)
+        .build();
     } else {
       await handleIncomingMessage(data);
-      editedPayload = account.service.conversation.createEditedText(text, cachedOriginalMessageId);
+      editedPayload = account.service.conversation
+        .createEditedText(text, cachedOriginalMessageId)
+        .withMentions()
+        .build();
     }
 
     messageIdCache[messageId] = editedPayload.id;
