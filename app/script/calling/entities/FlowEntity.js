@@ -855,9 +855,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
-          const MIN_NUMBER_OF_RELAY_SERVERS = 2;
-          if (this._getNumberOfRelayCandidates(iceCandidates) < MIN_NUMBER_OF_RELAY_SERVERS) {
-            const logMessage = `Less than ${MIN_NUMBER_OF_RELAY_SERVERS} relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`;
+          const connectionConfig = this.peerConnection.getConfiguration();
+          const isValidGathering = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
+            connectionConfig,
+            iceCandidates
+          );
+          if (!isValidGathering) {
+            const logMessage = `Not enough ICE candidates gathered. Restarting timeout\n${iceCandidates}`;
             this.callLogger.warn(logMessage);
             return this._setSendSdpTimeout();
           }
@@ -948,20 +952,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
       window.clearTimeout(this.sendSdpTimeout);
       this.sendSdpTimeout = undefined;
     }
-  }
-
-  /**
-   * Counts the number of relay candidate in a list of ICE candidates.
-   *
-   * @private
-   * @param {Array<string>} iceCandidates - ICE candidate strings from SDP
-   * @returns {number} The number of found relay ICE candidates
-   */
-  _getNumberOfRelayCandidates(iceCandidates) {
-    return iceCandidates.reduce((count, iceCandidate) => {
-      const isRelay = iceCandidate.toLowerCase().includes('relay');
-      return isRelay ? count + 1 : count;
-    }, 0);
   }
 
   /**
