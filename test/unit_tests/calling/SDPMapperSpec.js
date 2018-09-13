@@ -55,13 +55,11 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
         negotiationMode: () => '',
       };
 
-      // local SDP
       const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
       expect(localSdp.sdp).not.toContain('UDP/TLS/');
       expect(localSdp.sdp).toContain('RTP/SAVP');
       checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
 
-      // remote SDP
       const {sdp: remoteSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, flowEntity);
       expect(remoteSdp.sdp).toContain('UDP/TLS/');
       checkUntouchedLines(rtcSdp.sdp, remoteSdp.sdp);
