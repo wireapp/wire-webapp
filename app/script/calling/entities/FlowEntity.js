@@ -27,11 +27,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
+      MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS: 5,
       NEGOTIATION_THRESHOLD: 0.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RECONNECTION_TIMEOUT: 2.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RENEGOTIATION_TIMEOUT: 30 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
-      SDP_SEND_TIMEOUT: 5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
-      SDP_SEND_TIMEOUT_RESET: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      SDP_SEND_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
     };
   }
 
@@ -86,6 +86,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     //##############################################################################
 
     this.peerConnection = undefined;
+    this.iceCandidatesGatheringAttempts = 1;
     this.pcInitialized = ko.observable(false);
 
     this.mediaStream = this.callEntity.localMediaStream;
@@ -856,16 +857,36 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
-          if (!this._containsRelayCandidate(iceCandidates)) {
-            const logMessage = `No relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`;
-            this.callLogger.warn(logMessage, iceCandidates);
-            return this._setSendSdpTimeout(false);
+          const connectionConfig = this.peerConnection.getConfiguration();
+          const isValidGathering = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
+            connectionConfig,
+            iceCandidates
+          );
+          const attempts = this.iceCandidatesGatheringAttempts;
+          const hasReachMaxGatheringAttempts = attempts >= FlowEntity.CONFIG.MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS;
+          if (!hasReachMaxGatheringAttempts && !isValidGathering) {
+            const logMessage = `Not enough ICE candidates gathered (attempt '${attempts}'). Restarting timeout\n${iceCandidates}`;
+            this.iceCandidatesGatheringAttempts++;
+            this.callLogger.warn(logMessage);
+            return this._setSendSdpTimeout();
           }
         }
 
+        const iceCandidateTypes = z.util.PeerConnectionUtil.getIceCandidatesTypes(iceCandidates);
+
+        const iceCandidateTypesLog = Object.keys(iceCandidateTypes)
+          .map(candidateType => `${iceCandidateTypes[candidateType]} ${candidateType}`)
+          .join(', ');
+
         const logMessage = {
           data: {
-            default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
+            default: [
+              localSdp.type,
+              iceCandidates.length,
+              iceCandidateTypesLog,
+              this.remoteUser.name(),
+              this.localSdp().sdp,
+            ],
             obfuscated: [
               localSdp.type,
               iceCandidates.length,
@@ -873,7 +894,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
               this.callLogger.obfuscateSdp(this.localSdp().sdp),
             ],
           },
-          message: `Sending local '{0}' SDP containing '{1}' ICE candidates for flow with '{2}'\n{3}`,
+          message: `Sending local '{0}' SDP containing '{1}' ICE candidates ({2}) for flow with '{3}'\n{4}`,
         };
         this.callLogger.debug(logMessage);
 
@@ -925,21 +946,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
     if (this.sendSdpTimeout) {
       window.clearTimeout(this.sendSdpTimeout);
       this.sendSdpTimeout = undefined;
-    }
-  }
-
-  /**
-   * Check for relay candidate among given ICE candidates
-   *
-   * @private
-   * @param {Array<string>} iceCandidates - ICE candidate strings from SDP
-   * @returns {boolean} True if relay candidate found
-   */
-  _containsRelayCandidate(iceCandidates) {
-    for (const iceCandidate of iceCandidates) {
-      if (iceCandidate.toLowerCase().includes('relay')) {
-        return true;
-      }
     }
   }
 
@@ -1173,12 +1179,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Set the SDP send timeout.
    * @private
-   * @param {boolean} [initialTimeout=true] - Choose initial timeout length
    * @returns {undefined} No return value
    */
-  _setSendSdpTimeout(initialTimeout = true) {
-    const timeout = initialTimeout ? FlowEntity.CONFIG.SDP_SEND_TIMEOUT : FlowEntity.CONFIG.SDP_SEND_TIMEOUT_RESET;
-    this.sendSdpTimeout = window.setTimeout(() => this.sendLocalSdp(true), timeout);
+  _setSendSdpTimeout() {
+    this.sendSdpTimeout = window.setTimeout(() => this.sendLocalSdp(true), FlowEntity.CONFIG.SDP_SEND_TIMEOUT);
   }
 
   //##############################################################################
@@ -1477,6 +1481,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.disconnected();
 
       this.clearTimeouts();
+      this.iceCandidatesGatheringAttempts = 1;
       this._closeDataChannel();
       this._closePeerConnection();
       this._resetSignalingStates();
