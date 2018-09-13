@@ -268,6 +268,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return constraintsPromise
       .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
+        // FIXME: the mediaStreamInUse should be more intelligent and handle all scenarios where the stream is actually needed
         if (!isPreferenceChange && !this.mediaStreamInUse()) {
           // in case the stream is returned after the call has actually ended, we need to release the stream right away
           this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
