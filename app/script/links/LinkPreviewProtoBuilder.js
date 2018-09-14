@@ -46,8 +46,8 @@ z.links.LinkPreviewProtoBuilder = {
           const username = data.url.match(/com\/([^/]*)\//)[1];
           const tweet = new z.proto.Tweet(author, username);
 
-          linkPreview.set('tweet', tweet);
-          linkPreview.set('title', data.description);
+          linkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.TWEET, tweet);
+          linkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE, data.description);
         }
 
         return linkPreview;

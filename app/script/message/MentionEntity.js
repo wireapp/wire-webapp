@@ -20,24 +20,33 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
+window.z.message = z.message || {};
 
-z.cryptography.GENERIC_MESSAGE_TYPE = {
-  ASSET: 'asset',
-  AVAILABILITY: 'availability',
-  CALLING: 'calling',
-  CLEARED: 'cleared',
-  CLIENT_ACTION: 'clientAction',
-  CONFIRMATION: 'confirmation',
-  DELETED: 'deleted',
-  EDITED: 'edited',
-  EPHEMERAL: 'ephemeral',
-  EXTERNAL: 'external',
-  HIDDEN: 'hidden',
-  IMAGE: 'image',
-  KNOCK: 'knock',
-  LAST_READ: 'lastRead',
-  LOCATION: 'location',
-  REACTION: 'reaction',
-  TEXT: 'text',
+z.message.Mention = class Mention {
+  constructor(start, end, userId = '') {
+    this.end = end;
+    this.start = start;
+
+    this.userId = userId;
+  }
+
+  getLength() {
+    return this.end - this.start;
+  }
+
+  toJSON() {
+    return {
+      end: this.end,
+      start: this.start,
+      userId: this.userId,
+    };
+  }
+
+  toProto() {
+    const mention = new z.proto.Mention(this.start, this.end);
+    if (this.userId) {
+      mention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_USER_ID, this.userId);
+    }
+    return mention;
+  }
 };

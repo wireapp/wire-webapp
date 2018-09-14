@@ -95,17 +95,22 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
-      const mentions = this.parseForMentions(input, this.conversationEntity().participating_user_ets());
-      const pieces = mentions.reverse().reduce(
-        (currentPieces, mention) => {
-          const currentPiece = currentPieces.shift();
-          currentPieces.unshift(currentPiece.substr(mention.end));
-          currentPieces.unshift(currentPiece.substr(mention.start, mention.end - mention.start));
-          currentPieces.unshift(currentPiece.substr(0, mention.start));
-          return currentPieces;
-        },
-        [input]
-      );
+      const participatingUserEntities = this.conversationEntity().participating_user_ets();
+
+      const pieces = this.parseForMentions(input, participatingUserEntities)
+        .reverse()
+        .reduce(
+          (currentPieces, mentionEntity) => {
+            const {end: mentionEnd, start: mentionStart} = mentionEntity;
+
+            const currentPiece = currentPieces.shift();
+            currentPieces.unshift(currentPiece.substr(mentionEnd));
+            currentPieces.unshift(currentPiece.substr(mentionStart, mentionEntity.getLength()));
+            currentPieces.unshift(currentPiece.substr(0, mentionStart));
+            return currentPieces;
+          },
+          [input]
+        );
       return pieces.map((piece, index) => `<span${index % 2 ? ' class="input-mention"' : ''}>${piece}</span>`).join('');
     });
 
@@ -372,9 +377,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText) {
     if (messageText.length) {
-      const mentions = this.parseForMentions(messageText, this.conversationEntity().participating_user_ets());
-      this.logger.info(`Found ${mentions.length} mentions in outgoing message.`);
-      this.conversationRepository.send_text_with_link_preview(messageText, this.conversationEntity());
+      const participatingUserEntities = this.conversationEntity().participating_user_ets();
+      const mentionEntities = this.parseForMentions(messageText, participatingUserEntities);
+      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
     }
   }
 
@@ -390,7 +395,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         const userId = mentionedUser.id;
         const start = find.index;
         const end = start + find[0].length;
-        mentions.push({end, start, userId});
+
+        const mention = new z.message.Mention(start, end, userId);
+        mentions.push(mention);
       }
     }
 

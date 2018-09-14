@@ -91,7 +91,9 @@ z.assets.AssetService = class AssetService {
       .then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction))
       .then(({key, keyBytes, sha256, token}) => {
         const asset = new z.proto.Asset();
-        asset.set('uploaded', new z.proto.Asset.RemoteData(keyBytes, sha256, key, token));
+        const assetRemoteData = new z.proto.Asset.RemoteData(keyBytes, sha256, key, token);
+
+        asset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED, assetRemoteData);
         return asset;
       });
   }
@@ -109,10 +111,14 @@ z.assets.AssetService = class AssetService {
   uploadImageAsset(image, options) {
     return this._compressImage(image).then(({compressedBytes, compressedImage}) => {
       return this._uploadAsset(compressedBytes, options).then(({key, keyBytes, sha256, token}) => {
-        const imageMetadata = new z.proto.Asset.ImageMetaData(compressedImage.width, compressedImage.height);
         const asset = new z.proto.Asset();
-        asset.set('original', new z.proto.Asset.Original(image.type, compressedBytes.length, null, imageMetadata));
-        asset.set('uploaded', new z.proto.Asset.RemoteData(keyBytes, sha256, key, token));
+
+        const assetImageMetadata = new z.proto.Asset.ImageMetaData(compressedImage.width, compressedImage.height);
+        const assetOriginal = new z.proto.Asset.Original(image.type, compressedBytes.length, null, assetImageMetadata);
+        const assetRemoteData = new z.proto.Asset.RemoteData(keyBytes, sha256, key, token);
+
+        asset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
+        asset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED, assetRemoteData);
         return asset;
       });
     });
