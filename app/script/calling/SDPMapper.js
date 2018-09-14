@@ -124,6 +124,6 @@ z.calling.SDPMapper = {
 
     sessionDescription = sdpLines.join('\r\n');
     const sdpInit = {sdp: sessionDescription, type};
-    return Promise.resolve({iceCandidates, sdp: sdpInit});
+    return {iceCandidates, sdp: sdpInit};
   },
 };
