@@ -41,7 +41,7 @@ z.message.Mention = class Mention {
   toProto() {
     const mention = new z.proto.Mention(this.start, this.end);
     if (this.userId) {
-      mention.set('user_id', this.userId);
+      mention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_USER_ID, this.userId);
     }
     return mention;
   }

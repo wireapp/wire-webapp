@@ -1693,15 +1693,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(metadata => {
         const asset = new z.proto.Asset();
 
+        let assetOriginal = undefined;
         if (z.assets.AssetMetaDataBuilder.isAudio(file)) {
-          asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata));
+          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata);
         } else if (z.assets.AssetMetaDataBuilder.isVideo(file)) {
-          asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata));
+          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata);
         } else if (z.assets.AssetMetaDataBuilder.isImage(file)) {
-          asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, metadata));
+          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, metadata);
         } else {
-          asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name));
+          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name);
         }
+        asset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
 
         return asset;
       })
@@ -1748,7 +1750,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-          asset.set('preview', assetPreview);
+          asset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
 
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
@@ -1774,7 +1776,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const wasCancelled = reason === z.assets.AssetUploadFailedReason.CANCELLED;
     const protoReason = wasCancelled ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
     const asset = new z.proto.Asset();
-    asset.set('not_uploaded', protoReason);
+    asset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED, protoReason);
 
     const generic_message = new z.proto.GenericMessage(messageId);
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
@@ -2001,10 +2003,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-    generic_message.set(
-      z.cryptography.GENERIC_MESSAGE_TYPE.EDITED,
-      new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message))
-    );
+    const messageEdit = new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, messageEdit);
 
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
@@ -2100,7 +2100,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const logMessage = `Adding '${mentionEntities.length}' mentions to message '${genericMessage.message_id}'`;
       this.logger.debug(logMessage, mentionEntities);
 
-      genericMessage.text.user_mentions = mentionEntities.map(mentionEntity => mentionEntity.toProto());
+      const mentions = mentionEntities.map(mentionEntity => mentionEntity.toProto());
+      genericMessage.text.set(z.cryptography.PROTO_MESSAGE_TYPE.METION, mentions);
     }
 
     if (conversationEntity.messageTimer()) {
@@ -2142,7 +2143,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _wrap_in_ephemeral_message(generic_message, millis) {
     const ephemeral = new z.proto.Ephemeral();
-    ephemeral.set('expire_after_millis', z.conversation.ConversationEphemeralHandler.validateTimer(millis));
+    const ephemeralExpiration = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
+
+    ephemeral.set(z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION, ephemeralExpiration);
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
 
     generic_message = new z.proto.GenericMessage(generic_message.message_id);
@@ -2278,7 +2281,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(({cipherText, keyBytes, sha256}) => {
         const genericMessageExternal = new z.proto.GenericMessage(z.util.createRandomUuid());
         const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
-        genericMessageExternal.set('external', externalMessage);
+        genericMessageExternal.set(z.cryptography.GENERIC_MESSAGE_TYPE.EXTERNAL, externalMessage);
 
         return this.cryptography_repository
           .encryptGenericMessage(options.recipients, genericMessageExternal)

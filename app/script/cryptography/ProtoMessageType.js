@@ -22,22 +22,16 @@
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
-z.cryptography.GENERIC_MESSAGE_TYPE = {
-  ASSET: 'asset',
-  AVAILABILITY: 'availability',
-  CALLING: 'calling',
-  CLEARED: 'cleared',
-  CLIENT_ACTION: 'clientAction',
-  CONFIRMATION: 'confirmation',
-  DELETED: 'deleted',
-  EDITED: 'edited',
-  EPHEMERAL: 'ephemeral',
-  EXTERNAL: 'external',
-  HIDDEN: 'hidden',
-  IMAGE: 'image',
-  KNOCK: 'knock',
-  LAST_READ: 'lastRead',
-  LOCATION: 'location',
-  REACTION: 'reaction',
-  TEXT: 'text',
+z.cryptography.PROTO_MESSAGE_TYPE = {
+  ASSET_NOT_UPLOADED: 'not_uploaded',
+  ASSET_ORIGINAL: 'original',
+  ASSET_PREVIEW: 'preview',
+  ASSET_UPLOADED: 'uploaded',
+  EPHEMERAL_EXPIRATION: 'expire_after_millis',
+  LINK_PREVIEW: 'link_preview',
+  LINK_PREVIEW_IMAGE: 'image',
+  LINK_PREVIEW_TITLE: 'title',
+  MENTION: 'mention',
+  MENTION_USER_ID: 'user_id',
+  TWEET: 'tweet',
 };
