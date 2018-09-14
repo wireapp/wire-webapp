@@ -30,6 +30,10 @@ z.message.Mention = class Mention {
     this.userId = userId;
   }
 
+  getLength() {
+    return this.end - this.start;
+  }
+
   toJSON() {
     return {
       end: this.end,

@@ -105,7 +105,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
             const currentPiece = currentPieces.shift();
             currentPieces.unshift(currentPiece.substr(mentionEnd));
-            currentPieces.unshift(currentPiece.substr(mentionStart, mentionEnd - mentionStart));
+            currentPieces.unshift(currentPiece.substr(mentionStart, mentionEntity.getLength()));
             currentPieces.unshift(currentPiece.substr(0, mentionStart));
             return currentPieces;
           },
