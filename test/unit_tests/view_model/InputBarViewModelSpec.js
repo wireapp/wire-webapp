@@ -56,7 +56,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
       expect(mention.toJSON()).toEqual({end: 12, start: 6, userId: userEntities[0].id});
     });
 
-    it('ignores mentions for unknown users  a message', () => {
+    it('ignores mentions for unknown users a message', () => {
       const mentions = viewModel.parseForMentions('Hello @user1 and @user3', userEntities);
       expect(mentions.length).toBe(1);
 
