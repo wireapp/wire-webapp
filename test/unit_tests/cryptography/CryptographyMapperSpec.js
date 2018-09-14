@@ -40,7 +40,7 @@ describe('z.cryptography.CryptographyMapper', () => {
   describe('"mapGenericMessage"', () => {
     beforeAll(done => {
       z.util.protobuf
-        .loadProtos('ext/proto/generic-message-proto/messages.proto')
+        .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
         .then(done)
         .catch(done.fail);
     });
