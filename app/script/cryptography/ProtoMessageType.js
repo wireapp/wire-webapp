@@ -31,7 +31,7 @@ z.cryptography.PROTO_MESSAGE_TYPE = {
   LINK_PREVIEW: 'link_preview',
   LINK_PREVIEW_IMAGE: 'image',
   LINK_PREVIEW_TITLE: 'title',
-  MENTION_USER_ID: 'user_id',
+  MENTION_TYPE_USER_ID: 'user_id',
   MENTIONS: 'mentions',
   TWEET: 'tweet',
 };

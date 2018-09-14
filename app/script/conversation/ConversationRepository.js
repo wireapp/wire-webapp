@@ -2089,7 +2089,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {string} textMessage - Plain text message
    * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {z.message.Mention} [mentionEntities] - Mentions as part of the message
+   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendText(textMessage, conversationEntity, mentionEntities) {
@@ -2116,7 +2116,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {string} textMessage - Plain text message
    * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {Array<z.message.Mention>} [mentionEntities] - Mentions part of the message
+   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendTextWithLinkPreview(textMessage, conversationEntity, mentionEntities) {

@@ -387,17 +387,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const mentionRegexp = /\B@(.+?)\b/g;
     const mentions = [];
 
-    let find;
-    while ((find = mentionRegexp.exec(messageText))) {
-      const name = find[1].toLowerCase();
-      const mentionedUser = userEntities.find(user => user.username() === name);
+    let match;
+    while ((match = mentionRegexp.exec(messageText))) {
+      const [textMatch, nameMatch] = match;
+      const username = nameMatch.toLowerCase();
+      const mentionedUser = userEntities.find(userEntity => userEntity.username() === username);
       if (mentionedUser) {
         const userId = mentionedUser.id;
-        const start = find.index;
-        const end = start + find[0].length;
+        const mentionStart = match.index;
+        const mentionEnd = mentionStart + textMatch.length;
 
-        const mention = new z.message.Mention(start, end, userId);
-        mentions.push(mention);
+        const mentionEntity = new z.message.MentionEntity().setUserIdMention(mentionStart, mentionEnd, userId);
+        mentions.push(mentionEntity);
       }
     }
 

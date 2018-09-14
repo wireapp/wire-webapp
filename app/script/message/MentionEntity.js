@@ -22,16 +22,41 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-z.message.Mention = class Mention {
-  constructor(start, end, userId = '') {
-    this.end = end;
-    this.start = start;
+z.message.MentionEntity = class Mention {
+  constructor(mention = {}) {
+    this.end = mention.end || 0;
+    this.start = mention.start || 0;
+    this.type = mention.mention_type || z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
 
-    this.userId = userId;
+    this.userId = mention.user_id || '';
   }
 
   getLength() {
     return this.end - this.start;
+  }
+
+  isValid(messageText = '') {
+    if (!typeof this.end === 'number' || !typeof this.start === 'number' || !typeof this.userId === 'string') {
+      return false;
+    }
+
+    const isValidStart = this.start >= 0 && this.start < this.end;
+    const isValidLength = this.getLength() >= 3;
+    const isValidEnd = this.end <= messageText.length - 1;
+    const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
+    if (!isValidStart || !isValidLength || !isValidEnd || !isValidUserId) {
+      return false;
+    }
+
+    return true;
+  }
+
+  setUserIdMention(start, end, userId) {
+    this.type = z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    this.start = start;
+    this.end = end;
+    this.userId = userId;
+    return this;
   }
 
   toJSON() {
@@ -44,8 +69,9 @@ z.message.Mention = class Mention {
 
   toProto() {
     const mention = new z.proto.Mention(this.start, this.end);
-    if (this.userId) {
-      mention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_USER_ID, this.userId);
+    const isUserIdMention = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    if (isUserIdMention) {
+      mention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID, this.userId);
     }
     return mention;
   }
