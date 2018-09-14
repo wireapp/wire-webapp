@@ -56,6 +56,15 @@ z.search.SearchRepository = class SearchRepository {
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
   }
 
+  searchUserInSet(name, userEntities) {
+    const userMatches = userEntity => {
+      const nameRegexp = new RegExp(`^${name}`);
+      const propertiesToCheck = ['username', 'first_name', 'last_name'];
+      return propertiesToCheck.some(property => (userEntity[property]() || '').match(nameRegexp));
+    };
+    return Promise.resolve(userEntities.filter(userMatches));
+  }
+
   /**
    * Search for users on the backend by name.
    * @note We skip a few results as connection changes need a while to reflect on the backend.

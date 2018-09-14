@@ -49,6 +49,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.mentionSuggestion = contentViewModel.mentionSuggestion;
 
     this.conversationRepository = repositories.conversation;
+    this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
 
@@ -95,8 +96,24 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     });
 
+    this.mentionSuggestions = ko.observable([]);
+
+    setTimeout(() => {
+      this.input.subscribe(inputValue => {
+        const incompleteMention = inputValue.match(/@(\w+)$/);
+        const candidates = this.conversationEntity().participating_user_ets();
+        if (incompleteMention) {
+          return this.searchRepository
+            .searchUserInSet(incompleteMention[1], candidates)
+            .then(suggestions => this.mentionSuggestions(suggestions));
+        }
+        this.mentionSuggestions([]);
+      });
+    });
+
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
+      const suggestions = this.mentionSuggestions();
       const participatingUserEntities = this.conversationEntity().participating_user_ets();
 
       const pieces = this.parseForMentions(input, participatingUserEntities)
