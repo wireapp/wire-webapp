@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-/* eslint-disable */
+
 'use strict';
 
 // grunt test_init && grunt test_run:media/MediaDevicesHandler
@@ -33,10 +33,12 @@ describe('z.media.MediaDevicesHandler', () => {
     devicesHandler = TestFactory.media_repository.devicesHandler;
     spyOn(devicesHandler, 'getScreenSources').and.callFake(() => {
       devicesHandler.availableDevices.screenInput(screens);
+      devicesHandler.currentDeviceId.screenInput(screens[0].id);
       return Promise.resolve();
     });
     spyOn(devicesHandler, 'getMediaDevices').and.callFake(() => {
       devicesHandler.availableDevices.videoInput(cameras);
+      devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
       return Promise.resolve();
     });
   });
@@ -61,12 +63,14 @@ describe('z.media.MediaDevicesHandler', () => {
   describe('toggleNextCamera', () => {
     it('returns second camera if the first is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
+      devicesHandler.currentDeviceIndex.videoInput(0);
       devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[1].deviceId);
       });
     });
     it('returns first camera if the second is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[1].deviceId);
+      devicesHandler.currentDeviceIndex.videoInput(1);
       devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[0].deviceId);
       });

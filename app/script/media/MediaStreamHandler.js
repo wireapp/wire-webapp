@@ -241,7 +241,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the input source has been replaced
    */
   replaceInputSource(mediaType) {
-    const isPreferenceChange = this.currentCalls.size === 0;
+    const isPreferenceChange = !this.mediaStreamInUse();
 
     let constraintsPromise;
     switch (mediaType) {
@@ -268,9 +268,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return constraintsPromise
       .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
-        // FIXME: the mediaStreamInUse should be more intelligent and handle all scenarios where the stream is actually needed
-        if (!isPreferenceChange && !this.mediaStreamInUse()) {
-          // in case the stream is returned after the call has actually ended, we need to release the stream right away
+        if (!this.mediaStreamInUse()) {
           this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
           return this._releaseMediaStream(mediaStreamInfo.stream);
         }
