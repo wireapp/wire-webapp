@@ -2101,7 +2101,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.logger.debug(logMessage, mentionEntities);
 
       const mentions = mentionEntities.map(mentionEntity => mentionEntity.toProto());
-      genericMessage.text.set(z.cryptography.PROTO_MESSAGE_TYPE.METION, mentions);
+      genericMessage.text.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION, mentions);
     }
 
     if (conversationEntity.messageTimer()) {
