@@ -93,6 +93,22 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     });
 
+    this.richTextInput = ko.pureComputed(() => {
+      const input = this.input();
+      const mentions = this.parseForMentions(input, this.conversationEntity().participating_user_ets());
+      const pieces = mentions.reverse().reduce(
+        (currentPieces, mention) => {
+          const currentPiece = currentPieces.shift();
+          currentPieces.unshift(currentPiece.substr(mention.end));
+          currentPieces.unshift(currentPiece.substr(mention.start, mention.end - mention.start));
+          currentPieces.unshift(currentPiece.substr(0, mention.start));
+          return currentPieces;
+        },
+        [input]
+      );
+      return pieces.map((piece, index) => `<span${index % 2 ? ' class="input-mention"' : ''}>${piece}</span>`).join('');
+    });
+
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
