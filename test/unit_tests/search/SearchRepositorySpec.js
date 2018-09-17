@@ -29,34 +29,38 @@ describe('z.search.SearchRepository', () => {
   });
 
   describe('searchUserInSet', () => {
-    const felix = generateUser('felix');
-    const felicien = generateUser('felicien');
-    const sabine = generateUser('sabine');
-    const janina = generateUser('janina');
+    const sabine = generateUser('jesuissabine', 'Sabine', 'Duchemin');
+    const janina = generateUser('ichbinjanina', 'Janina', 'Felix');
+    const felix = generateUser('iamfelix', 'Felix', 'Felicitation');
+    const felicien = generateUser('ichbinfelicien', 'Felicien', 'Delatour');
+    const users = [felix, felicien, sabine, janina];
 
-    it('matches the given name with usernames', () => {
-      const users = [felix, felicien, sabine, janina];
+    it('matches the given name with usernames and sorts results', () => {
       const tests = [
-        {expected: [felix, felicien], term: 'f'},
-        {expected: [felix, felicien], term: 'fel'},
-        {expected: [felix], term: 'felix'},
+        {expected: [janina, sabine], term: 'j'},
+        {expected: [janina], term: 'ja'},
+        {expected: [felix, felicien, janina], term: 'fel'},
+        {expected: [felix, janina], term: 'felix'},
+        {expected: [felicien, felix], term: 'felici'},
         {expected: [sabine], term: 's'},
         {expected: [sabine], term: 'sa'},
         {expected: [sabine], term: 'sabine'},
       ];
 
-      const expectPromises = tests.map(({expected, term}) => {
+      tests.forEach(({expected, term}) => {
         const suggestions = TestFactory.search_repository.searchUserInSet(term, users);
-        expect(suggestions).toEqual(expected);
+        expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
       });
-
-      return Promise.all(expectPromises);
     });
   });
 });
 
-function generateUser(namePattern) {
+function generateUser(handle, firstname = '', lastname = '') {
   const user = new z.entity.User();
-  user.username(namePattern);
+  user.username(handle);
+  user.name(`${firstname} ${lastname}`);
   return user;
+}
+function serializeUser(userEntity) {
+  return {name: userEntity.name(), username: userEntity.username()};
 }

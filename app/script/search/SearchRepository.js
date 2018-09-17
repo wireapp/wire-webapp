@@ -62,24 +62,35 @@ z.search.SearchRepository = class SearchRepository {
    * @param {string} term - the search term
    * @param {Array<z.entity.User>} userEntities - entities to match the search term against
    * @param {Array<string>} properties=['username', 'first_name', 'last_name'] - list of properties that will be matched against the search term
+   *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns {Array<z.entity.User>} the filtered list of users
    */
-  searchUserInSet(term, userEntities, properties = ['username', 'first_name', 'last_name']) {
-    const userMatches = userEntity => {
-      const excludedEmojis = Array.from(term).filter(char => {
-        return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
-      });
+  searchUserInSet(term, userEntities, properties = ['first_name', 'last_name', 'username']) {
+    const excludedEmojis = Array.from(term).filter(char => {
+      return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+    });
 
-      return properties.some(property => {
+    const weightedResults = userEntities.reduce((results, userEntity) => {
+      const matchedProperties = properties.filter(property => {
         const value = userEntity[property]() || '';
         return z.util.StringUtil.compareTransliteration(value, term, excludedEmojis);
       });
-    };
-    return userEntities.filter(userMatches);
-  }
 
-  sortSearchResults(term, userEntities) {
-    return userEntities;
+      if (!matchedProperties.length) {
+        return results;
+      }
+      const weight = matchedProperties.reduce((weightValue, property, index) => {
+        const propertyImportance = properties.length - properties.indexOf(property);
+        return weightValue + propertyImportance;
+      }, 0);
+
+      return results.concat({user: userEntity, weight});
+    }, []);
+
+    return weightedResults
+      .slice(0)
+      .sort((res1, res2) => res2.weight - res1.weight)
+      .map(result => result.user);
   }
 
   /**
