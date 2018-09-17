@@ -38,8 +38,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
     this.conversationRepository = this.repositories.conversation;
-    this.teamRepository = this.repositories.team;
     this.integrationRepository = this.repositories.integration;
+    this.searchRepository = params.repositories.search;
+    this.teamRepository = this.repositories.team;
 
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 

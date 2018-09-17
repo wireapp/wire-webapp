@@ -46,6 +46,7 @@ z.components.UserList = class UserList {
     this.filter = params.filter;
     this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
+    this.searchRepository = params.searchRepository;
     this.userEntities = params.user;
     const highlightedUsers = params.highlightedUsers ? params.highlightedUsers() : [];
     this.highlightedUserIds = highlightedUsers.map(user => user.id);
@@ -78,12 +79,8 @@ z.components.UserList = class UserList {
         if (normalizedQuery) {
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
-          const excludedEmojis = Array.from(normalizedQuery).filter(char => {
-            return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
-          });
-          return this.userEntities().filter(userEntity => {
-            return userEntity.matches(normalizedQuery, isHandle, excludedEmojis);
-          });
+          const properties = isHandle ? ['username'] : ['first_name', 'last_name'];
+          return this.searchRepository.searchUserInSet(trimmedQuery, this.userEntities(), properties);
         }
       }
       return this.userEntities();
