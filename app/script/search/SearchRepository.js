@@ -70,11 +70,13 @@ z.search.SearchRepository = class SearchRepository {
       return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
     });
 
+    const matches = (userEntity, property, fromStart) => {
+      const value = userEntity[property]() || '';
+      return z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, fromStart);
+    };
+
     const weightedResults = userEntities.reduce((results, userEntity) => {
-      const matchedProperties = properties.filter(property => {
-        const value = userEntity[property]() || '';
-        return z.util.StringUtil.compareTransliteration(value, term, excludedEmojis);
-      });
+      const matchedProperties = properties.filter(property => matches(userEntity, property, false));
 
       if (!matchedProperties.length) {
         return results;
@@ -84,7 +86,8 @@ z.search.SearchRepository = class SearchRepository {
         return weightValue + propertyImportance;
       }, 0);
 
-      return results.concat({user: userEntity, weight});
+      const positionBonus = matchedProperties.filter(property => matches(userEntity, property, true)).length * 100;
+      return results.concat({user: userEntity, weight: weight + positionBonus});
     }, []);
 
     return weightedResults

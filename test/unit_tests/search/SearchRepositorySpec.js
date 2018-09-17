@@ -33,26 +33,59 @@ describe('z.search.SearchRepository', () => {
     const janina = generateUser('yosoyjanina', 'Janina', 'Felix');
     const felix = generateUser('iamfelix', 'Felix', 'Felicitation');
     const felicien = generateUser('ichbinfelicien', 'Felicien', 'Delatour');
+    const lastguy = generateUser('lastfelicien', 'lastsabine', 'lastjanina');
     const noMatch1 = generateUser(undefined, 'yyy', 'yyy');
     const noMatch2 = generateUser('xxx', undefined, 'xxx');
     const noMatch3 = generateUser('zzz', 'zzz', undefined);
-    const users = [noMatch1, felix, felicien, sabine, janina, noMatch2, noMatch3];
+    const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, noMatch3];
 
-    it('matches the given name with usernames and sorts results', () => {
-      const tests = [
-        {expected: [janina, sabine], term: 'j'},
-        {expected: [janina], term: 'ja'},
-        {expected: [felix, felicien, janina], term: 'fel'},
-        {expected: [felix, janina], term: 'felix'},
-        {expected: [felicien, felix], term: 'felici'},
-        {expected: [sabine, janina], term: 's'},
-        {expected: [sabine], term: 'sa'},
-        {expected: [sabine], term: 'sabine'},
-        {expected: [sabine], term: 'sabine'},
-        {expected: [felicien, felix], term: 'ic'},
-      ];
+    const tests = [
+      {expected: [janina, sabine, lastguy], term: 'j', testCase: 'matches multiple results'},
+      {
+        expected: [janina, lastguy],
+        term: 'ja',
+        testCase: 'puts matches that start with the pattern on top of the list',
+      },
+      {
+        expected: [felix, felicien, janina, lastguy],
+        term: 'fel',
+        testCase: 'sorts by firstname, lastname, handle and inside match',
+      },
+      {
+        expected: [felix, janina],
+        term: 'felix',
+        testCase: 'sorts by firstname, lastname, handle and inside match',
+      },
+      {
+        expected: [felicien, felix, lastguy],
+        term: 'felici',
+        testCase: 'sorts by firstname, lastname, handle and inside match',
+      },
+      {
+        expected: [sabine, lastguy, janina],
+        term: 's',
+        testCase: 'sorts by firstname, lastname, handle and inside match',
+      },
+      {
+        expected: [sabine, lastguy],
+        term: 'sa',
+        testCase: 'puts matches that start with the pattern on top of the list',
+      },
+      {
+        expected: [sabine, lastguy],
+        term: 'sabine',
+        testCase: 'puts matches that start with the pattern on top of the list',
+      },
+      {
+        expected: [sabine, lastguy],
+        term: 'sabine',
+        testCase: 'puts matches that start with the pattern on top of the list',
+      },
+      {expected: [felicien, felix, lastguy], term: 'ic', testCase: 'matches inside the properties'},
+    ];
 
-      tests.forEach(({expected, term}) => {
+    tests.forEach(({expected, term, testCase}) => {
+      it(`${testCase} term: ${term}`, () => {
         const suggestions = TestFactory.search_repository.searchUserInSet(term, users);
         expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
       });

@@ -25,9 +25,11 @@ window.z.util = z.util || {};
 z.util.StringUtil = {
   capitalizeFirstChar: (string = '') => `${string.charAt(0).toUpperCase()}${string.substring(1)}`,
 
-  compareTransliteration: (nameA, nameB, excludedChars = []) => {
+  compareTransliteration: (name, query, excludedChars = [], fromStart = false) => {
     const options = {custom: excludedChars};
-    return z.util.StringUtil.includes(window.getSlug(nameA, options), window.getSlug(nameB, options));
+    const nameSlug = window.getSlug(name, options);
+    const querySlug = window.getSlug(query, options);
+    return fromStart ? nameSlug.startsWith(querySlug) : z.util.StringUtil.includes(nameSlug, querySlug);
   },
 
   cutLastChars: (string, length) => string.substring(0, string.length - length),
