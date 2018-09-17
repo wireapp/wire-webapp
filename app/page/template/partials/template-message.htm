@@ -15,7 +15,7 @@
         <span data-bind="l10n_text: z.string.tooltipConversationAllVerified"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeUnverified() -->
-        <span class="message-header-sender-name" data-bind="text: message.unsafe_sender_name()"></span>
+        <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceUnverified"></span>
         <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
@@ -43,7 +43,7 @@
       <!-- /ko -->
     </div>
     <div class="message-header-label">
-      <span class="message-header-sender-name" data-bind='text: message.unsafe_sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
@@ -58,7 +58,7 @@
       <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
-      <span class="message-header-label-sender" data-bind='text: message.unsafe_sender_name()'></span>
+      <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
@@ -269,7 +269,7 @@
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
     <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
-      <span class="message-header-sender-name" data-bind='text: message.unsafe_sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
@@ -284,7 +284,7 @@
       <span data-bind="component: $parent.getSystemMessageIconComponent(message)"></span>
     </div>
     <div class="message-header-label">
-      <span class="message-header-sender-name" data-bind='text: message.unsafe_sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
       <hr class="message-header-line" />
     </div>

@@ -85,7 +85,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : z.util.SanitizationUtil.getEscapedFirstName(this.user());
+      return isTeamMemberLeave ? this.name() : z.util.SanitizationUtil.getFirstName(this.user());
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);

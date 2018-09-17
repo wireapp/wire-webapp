@@ -37,7 +37,7 @@ z.util.LocalizerUtil = {
       .sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
-      firstNames.push(z.util.SanitizationUtil.getEscapedSelfName(declension));
+      firstNames.push(z.util.SanitizationUtil.getSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;

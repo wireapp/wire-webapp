@@ -50,7 +50,10 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     return this.conversationRepository.sending_queue.push(() => {
       return this._createBroadcastRecipients()
         .then(recipients => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage))
-        .then(payload => this._sendEncryptedMessage(genericMessage, payload));
+        .then(payload => {
+          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage);
+          this._sendEncryptedMessage(eventInfoEntity, payload);
+        });
     });
   }
 
@@ -78,19 +81,19 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {z.proto.GenericMessage} genericMessage - Protobuf message to be encrypted and send
+   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event to be broadcasted
    * @param {Object} payload - Payload
-   * @param {Array<string>|boolean} preconditionOption - Level that backend checks for missing clients
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
-  _sendEncryptedMessage(genericMessage, payload, preconditionOption = false) {
-    const messageType = genericMessage.content;
+  _sendEncryptedMessage(eventInfoEntity, payload) {
+    const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending '${messageType}' message as broadcast`, payload);
 
+    const options = eventInfoEntity.options;
     return this.broadcastService
-      .postBroadcastMessage(payload, preconditionOption)
+      .postBroadcastMessage(payload, options.precondition)
       .then(response => {
-        this.clientMismatchHandler.onClientMismatch(response, genericMessage, payload, undefined);
+        this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
       })
       .catch(error => {
@@ -103,12 +106,11 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
           throw error;
         }
 
-        return this.clientMismatchHandler
-          .onClientMismatch(error, genericMessage, payload, undefined)
-          .then(updatedPayload => {
-            this.logger.info(`Updated '${messageType}' message as broadcast`, updatedPayload);
-            return this._sendEncryptedMessage(genericMessage, updatedPayload, true);
-          });
+        return this.clientMismatchHandler.onClientMismatch(eventInfoEntity, error, payload).then(updatedPayload => {
+          this.logger.info(`Updated '${messageType}' message as broadcast`, updatedPayload);
+          eventInfoEntity.forceSending();
+          return this._sendEncryptedMessage(eventInfoEntity, updatedPayload);
+        });
       });
   }
 
