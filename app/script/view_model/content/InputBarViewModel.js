@@ -96,8 +96,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     });
 
+    this.mentionSuggestions = ko.pureComputed(() => {
+      const inputValue = this.input();
+      const incompleteMention = inputValue.match(/@(\w+)$/);
+      const candidates = this.conversationEntity().participating_user_ets();
+      if (incompleteMention) {
+        return this.searchRepository.searchUserInSet(incompleteMention[1], candidates);
+      }
+      return [];
+    });
+
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
+      const suggestions = this.mentionSuggestions();
       const participatingUserEntities = this.conversationEntity().participating_user_ets();
 
       const pieces = this.parseForMentions(input, participatingUserEntities)
@@ -113,7 +124,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           [input]
         );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
-      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
+      return (
+        pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('') +
+        suggestions.map(user => user.username()).join(', ')
+      );
     });
 
     this.isInMentionFlow = ko.observable(false);
