@@ -54,12 +54,12 @@ describe('z.search.SearchRepository', () => {
       {
         expected: [felix, janina],
         term: 'felix',
-        testCase: 'sorts by firstname, lastname, handle and inside match',
+        testCase: 'sorts by firstname and lastname',
       },
       {
         expected: [felicien, felix, lastguy],
         term: 'felici',
-        testCase: 'sorts by firstname, lastname, handle and inside match',
+        testCase: 'sorts by firstname, lastname and inside match',
       },
       {
         expected: [sabine, lastguy, janina],
