@@ -101,12 +101,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .reverse()
         .reduce(
           (currentPieces, mentionEntity) => {
-            const {end: mentionEnd, start: mentionStart} = mentionEntity;
-
             const currentPiece = currentPieces.shift();
-            currentPieces.unshift(currentPiece.substr(mentionEnd));
-            currentPieces.unshift(currentPiece.substr(mentionStart, mentionEntity.getLength()));
-            currentPieces.unshift(currentPiece.substr(0, mentionStart));
+            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex + 1));
+            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
+            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
           [input]
@@ -229,7 +227,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   clickToPing() {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.conversationRepository.send_knock(this.conversationEntity()).then(() => {
+      this.conversationRepository.sendKnock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
@@ -395,9 +393,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (mentionedUser) {
         const userId = mentionedUser.id;
         const mentionStart = match.index;
-        const mentionEnd = mentionStart + textMatch.length;
+        const mentionLength = textMatch.length;
 
-        const mentionEntity = new z.message.MentionEntity().setUserIdMention(mentionStart, mentionEnd, userId);
+        const mentionEntity = new z.message.MentionEntity().setUserIdMention(mentionStart, mentionLength, userId);
         mentions.push(mentionEntity);
       }
     }
@@ -412,9 +410,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    const isTextChange = messageText !== messageEntity.get_first_asset().text;
-    if (isTextChange) {
-      this.conversationRepository.send_message_edit(messageText, messageEntity, this.conversationEntity());
+    const hasTextChanged = messageText !== messageEntity.get_first_asset().text;
+    if (hasTextChanged) {
+      this.conversationRepository.sendMessageEdit(messageText, messageEntity, this.conversationEntity());
     }
   }
 

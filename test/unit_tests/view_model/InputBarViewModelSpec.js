@@ -49,27 +49,30 @@ describe('z.viewModel.content.InputBarViewModel', () => {
     ];
 
     it('finds an existing user mentioned in a message', () => {
-      const mentions = viewModel.parseForMentions('Hello @user1', userEntities);
-      expect(mentions.length).toBe(1);
+      const mentionEntities = viewModel.parseForMentions('Hello @user1', userEntities);
+      expect(mentionEntities.length).toBe(1);
 
-      const [mention] = mentions;
-      expect(mention.toJSON()).toEqual({end: 12, start: 6, userId: userEntities[0].id});
+      const [mentionEntity] = mentionEntities;
+      expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 6, userId: userEntities[0].id});
+      expect(mentionEntity.endIndex).toEqual(11);
     });
 
     it('ignores mentions for unknown users a message', () => {
-      const mentions = viewModel.parseForMentions('Hello @user1 and @user3', userEntities);
-      expect(mentions.length).toBe(1);
+      const mentionEntities = viewModel.parseForMentions('Hello @user1 and @user3', userEntities);
+      expect(mentionEntities.length).toBe(1);
 
-      const [mention] = mentions;
-      expect(mention.toJSON()).toEqual({end: 12, start: 6, userId: userEntities[0].id});
+      const [mentionEntity] = mentionEntities;
+      expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 6, userId: userEntities[0].id});
+      expect(mentionEntity.endIndex).toEqual(11);
     });
 
     it('ignores a mention that has no space before it', () => {
-      const mentions = viewModel.parseForMentions('Hello@user1 and @user2', userEntities);
-      expect(mentions.length).toBe(1);
+      const mentionEntities = viewModel.parseForMentions('Hello@user1 and @user2', userEntities);
+      expect(mentionEntities.length).toBe(1);
 
-      const [mention] = mentions;
-      expect(mention.toJSON()).toEqual({end: 22, start: 16, userId: userEntities[1].id});
+      const [mentionEntity] = mentionEntities;
+      expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 16, userId: userEntities[1].id});
+      expect(mentionEntity.endIndex).toEqual(21);
     });
   });
 });
