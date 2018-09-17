@@ -46,6 +46,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
 
     this.emojiInput = contentViewModel.emojiInput;
+    this.mentionSuggestion = contentViewModel.mentionSuggestion;
 
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
@@ -57,6 +58,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 
     this.editMessageEntity = ko.observable();
+    this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
     this.editInput = ko.observable('');
 
     this.pastedFile = ko.observable();
@@ -109,7 +111,17 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           },
           [input]
         );
-      return pieces.map((piece, index) => `<span${index % 2 ? ' class="input-mention"' : ''}>${piece}</span>`).join('');
+      const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
+      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
+    });
+
+    this.isInMentionFlow = ko.observable(false);
+    this.isInMentionFlow.subscribe(isInFlow => {
+      if (isInFlow) {
+        this.mentionSuggestion.show(document.querySelector('#conversation-input-bar-text'));
+      } else {
+        this.mentionSuggestion.hide();
+      }
     });
 
     this.inputPlaceholder = ko.pureComputed(() => {
@@ -131,8 +143,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return z.l10n.text(stringId);
     });
-
-    this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {
       if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
@@ -346,7 +356,65 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
+  handleMentions(data, event) {
+    const textarea = event.target;
+    const value = textarea.value;
+    const {selectionStart, selectionEnd} = textarea;
+    const text = value.substr(0, selectionEnd);
+    if (this.isInMentionFlow()) {
+      const endFlowRegexp = /\s$/;
+      const isStartOfInput = selectionEnd === 0;
+      const isOutsideOfMention = endFlowRegexp.test(text);
+      if (isStartOfInput || isOutsideOfMention) {
+        this.isInMentionFlow(false);
+      }
+    } else {
+      const mentions = this.parseForMentions(value, this.conversationEntity().participating_user_ets());
+      const mentionAtStart = this.findMentionAtPosition(selectionStart, mentions) || {};
+      const mentionAtEnd = this.findMentionAtPosition(selectionEnd, mentions) || {};
+      const newStart = Math.min(
+        mentionAtStart.startIndex || Infinity,
+        mentionAtEnd.startIndex || Infinity,
+        selectionStart
+      );
+      const newEnd = Math.max(mentionAtStart.endIndex || 0, mentionAtEnd.endIndex || 0, selectionEnd);
+
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newEnd;
+      const startFlowRegexp = /\B@$/;
+      if (startFlowRegexp.test(text)) {
+        this.isInMentionFlow(true);
+      }
+    }
+  }
+
+  findMentionAtPosition(position, mentions) {
+    return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
+  }
+
   onInputKeyUp(data, keyboardEvent) {
+    if (
+      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_LEFT ||
+      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_RIGHT
+    ) {
+      this.handleMentions(data, keyboardEvent);
+    }
+    if (this.isInMentionFlow) {
+      switch (keyboardEvent.key) {
+        case z.util.KeyboardUtil.KEY.ARROW_UP:
+          this.mentionSuggestion.selectPrevious();
+          break;
+
+        case z.util.KeyboardUtil.KEY.ARROW_DOWN:
+          this.mentionSuggestion.selectNext();
+          break;
+
+        case z.util.KeyboardUtil.KEY.ENTER:
+          this.mentionSuggestion.insertSelected(this.input);
+          break;
+      }
+    }
+
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
   }
 
