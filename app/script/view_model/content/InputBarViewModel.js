@@ -96,19 +96,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     });
 
-    this.mentionSuggestions = ko.observable([]);
-
-    setTimeout(() => {
-      this.input.subscribe(inputValue => {
-        const incompleteMention = inputValue.match(/@(\w+)$/);
-        const candidates = this.conversationEntity().participating_user_ets();
-        if (incompleteMention) {
-          return this.searchRepository
-            .searchUserInSet(incompleteMention[1], candidates)
-            .then(suggestions => this.mentionSuggestions(suggestions));
-        }
-        this.mentionSuggestions([]);
-      });
+    this.mentionSuggestions = ko.pureComputed(() => {
+      const inputValue = this.input();
+      const incompleteMention = inputValue.match(/@(\w+)$/);
+      const candidates = this.conversationEntity().participating_user_ets();
+      if (incompleteMention) {
+        return this.searchRepository.searchUserInSet(incompleteMention[1], candidates);
+      }
+      return [];
     });
 
     this.richTextInput = ko.pureComputed(() => {

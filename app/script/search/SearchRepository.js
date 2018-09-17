@@ -62,7 +62,7 @@ z.search.SearchRepository = class SearchRepository {
       const propertiesToCheck = ['username', 'first_name', 'last_name'];
       return propertiesToCheck.some(property => (userEntity[property]() || '').match(nameRegexp));
     };
-    return Promise.resolve(userEntities.filter(userMatches));
+    return userEntities.filter(userMatches);
   }
 
   /**

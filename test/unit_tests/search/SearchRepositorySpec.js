@@ -46,9 +46,8 @@ describe('z.search.SearchRepository', () => {
       ];
 
       const expectPromises = tests.map(({expected, term}) => {
-        return TestFactory.search_repository
-          .searchUserInSet(term, users)
-          .then(suggestions => expect(suggestions).toEqual(expected));
+        const suggestions = TestFactory.search_repository.searchUserInSet(term, users);
+        expect(suggestions).toEqual(expected);
       });
 
       return Promise.all(expectPromises);
