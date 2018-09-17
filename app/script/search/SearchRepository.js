@@ -56,19 +56,30 @@ z.search.SearchRepository = class SearchRepository {
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
   }
 
-  searchUserInSet(term, userEntities) {
+  /**
+   * Search for a user in the given user list and given a search term
+   * Doesn't sort the results and keep the initial order of the given user list
+   * @param {string} term - the search term
+   * @param {Array<z.entity.User>} userEntities - entities to match the search term against
+   * @param {Array<string>} properties=['username', 'first_name', 'last_name'] - list of properties that will be matched against the search term
+   * @returns {Array<z.entity.User>} the filtered list of users
+   */
+  searchUserInSet(term, userEntities, properties = ['username', 'first_name', 'last_name']) {
     const userMatches = userEntity => {
-      const propertiesToCheck = ['username', 'first_name', 'last_name'];
       const excludedEmojis = Array.from(term).filter(char => {
         return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
       });
 
-      return propertiesToCheck.some(property => {
+      return properties.some(property => {
         const value = userEntity[property]() || '';
         return z.util.StringUtil.compareTransliteration(value, term, excludedEmojis);
       });
     };
     return userEntities.filter(userMatches);
+  }
+
+  sortSearchResults(term, userEntities) {
+    return userEntities;
   }
 
   /**
