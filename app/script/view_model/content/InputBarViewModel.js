@@ -102,7 +102,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .reduce(
           (currentPieces, mentionEntity) => {
             const currentPiece = currentPieces.shift();
-            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex + 1));
+            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
             currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;

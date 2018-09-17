@@ -54,7 +54,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
 
       const [mentionEntity] = mentionEntities;
       expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 6, userId: userEntities[0].id});
-      expect(mentionEntity.endIndex).toEqual(11);
+      expect(mentionEntity.endIndex).toEqual(12);
     });
 
     it('ignores mentions for unknown users a message', () => {
@@ -63,7 +63,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
 
       const [mentionEntity] = mentionEntities;
       expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 6, userId: userEntities[0].id});
-      expect(mentionEntity.endIndex).toEqual(11);
+      expect(mentionEntity.endIndex).toEqual(12);
     });
 
     it('ignores a mention that has no space before it', () => {
@@ -72,7 +72,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
 
       const [mentionEntity] = mentionEntities;
       expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 16, userId: userEntities[1].id});
-      expect(mentionEntity.endIndex).toEqual(21);
+      expect(mentionEntity.endIndex).toEqual(22);
     });
   });
 });

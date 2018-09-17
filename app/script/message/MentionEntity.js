@@ -31,8 +31,9 @@ z.message.MentionEntity = class Mention {
     this.userId = mention.user_id || '';
   }
 
+  // Index of first char outside of mention
   get endIndex() {
-    return this.startIndex + this.length - 1;
+    return this.startIndex + this.length;
   }
 
   isValid(messageText = '') {
@@ -42,7 +43,7 @@ z.message.MentionEntity = class Mention {
 
     const isValidStartIndex = this.startIndex >= 0;
     const isValidLength = this.length >= 1;
-    const isValidEnd = messageText.length && this.endIndex <= messageText.length - 1;
+    const isValidEnd = messageText.length && this.endIndex <= messageText.length;
     const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
     if (!isValidStartIndex || !isValidLength || !isValidEnd || !isValidUserId) {
       return false;
