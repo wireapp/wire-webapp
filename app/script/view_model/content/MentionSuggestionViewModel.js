@@ -25,7 +25,9 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.MentionSuggestionViewModel = class MentionSuggestionViewModel {
   constructor() {
-    this.suggestionDiv = $('<div class="conversation-input-bar-mention-suggestion">mentions!</div>');
+    this.suggestionDiv = $(
+      '<div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions">mentions!</div>'
+    );
   }
 
   show(input) {
