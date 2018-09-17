@@ -30,10 +30,13 @@ describe('z.search.SearchRepository', () => {
 
   describe('searchUserInSet', () => {
     const sabine = generateUser('jesuissabine', 'Sabine', 'Duchemin');
-    const janina = generateUser('ichbinjanina', 'Janina', 'Felix');
+    const janina = generateUser('yosoyjanina', 'Janina', 'Felix');
     const felix = generateUser('iamfelix', 'Felix', 'Felicitation');
     const felicien = generateUser('ichbinfelicien', 'Felicien', 'Delatour');
-    const users = [felix, felicien, sabine, janina];
+    const noMatch1 = generateUser(undefined, 'yyy', 'yyy');
+    const noMatch2 = generateUser('xxx', undefined, 'xxx');
+    const noMatch3 = generateUser('zzz', 'zzz', undefined);
+    const users = [noMatch1, felix, felicien, sabine, janina, noMatch2, noMatch3];
 
     it('matches the given name with usernames and sorts results', () => {
       const tests = [
@@ -42,9 +45,11 @@ describe('z.search.SearchRepository', () => {
         {expected: [felix, felicien, janina], term: 'fel'},
         {expected: [felix, janina], term: 'felix'},
         {expected: [felicien, felix], term: 'felici'},
-        {expected: [sabine], term: 's'},
+        {expected: [sabine, janina], term: 's'},
         {expected: [sabine], term: 'sa'},
         {expected: [sabine], term: 'sabine'},
+        {expected: [sabine], term: 'sabine'},
+        {expected: [felicien, felix], term: 'ic'},
       ];
 
       tests.forEach(({expected, term}) => {
