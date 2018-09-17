@@ -38,19 +38,21 @@ z.links.LinkPreviewProtoBuilder = {
       data.url = data.url || url;
 
       if (data.title && data.url) {
-        const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
-        const linkPreview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
+        const protoArticle = new z.proto.Article(data.url, data.title, data.description); // deprecated format
+
+        const {description, title, url: dataUrl} = data;
+        const protoLinkPreview = new z.proto.LinkPreview(url, offset, protoArticle, dataUrl, title, description);
 
         if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.isTweet(data.url)) {
           const author = data.title.replace('on Twitter', '').trim();
           const username = data.url.match(/com\/([^/]*)\//)[1];
-          const tweet = new z.proto.Tweet(author, username);
+          const protoTweet = new z.proto.Tweet(author, username);
 
-          linkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.TWEET, tweet);
-          linkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE, data.description);
+          protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.TWEET, protoTweet);
+          protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE, data.description);
         }
 
-        return linkPreview;
+        return protoLinkPreview;
       }
     }
   },

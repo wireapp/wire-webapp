@@ -28,10 +28,10 @@ z.cryptography.PROTO_MESSAGE_TYPE = {
   ASSET_PREVIEW: 'preview',
   ASSET_UPLOADED: 'uploaded',
   EPHEMERAL_EXPIRATION: 'expire_after_millis',
-  LINK_PREVIEW: 'link_preview',
   LINK_PREVIEW_IMAGE: 'image',
   LINK_PREVIEW_TITLE: 'title',
-  MENTION_USER_ID: 'user_id',
+  LINK_PREVIEWS: 'link_preview',
+  MENTION_TYPE_USER_ID: 'user_id',
   MENTIONS: 'mentions',
   TWEET: 'tweet',
 };

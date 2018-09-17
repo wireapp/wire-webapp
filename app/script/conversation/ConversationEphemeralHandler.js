@@ -202,8 +202,8 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const obfuscatedAsset = new z.entity.Text(messageEntity.id);
     const obfuscatedPreviews = assetEntity.previews().map(linkPreview => {
       linkPreview.obfuscate();
-      const article = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
-      return new z.proto.LinkPreview(linkPreview.url, 0, article, linkPreview.url, linkPreview.title).encode64();
+      const protoArticle = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
+      return new z.proto.LinkPreview(linkPreview.url, 0, protoArticle, linkPreview.url, linkPreview.title).encode64();
     });
 
     obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);

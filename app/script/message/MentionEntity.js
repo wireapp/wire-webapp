@@ -22,31 +22,58 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-z.message.Mention = class Mention {
-  constructor(start, end, userId = '') {
-    this.end = end;
-    this.start = start;
+z.message.MentionEntity = class Mention {
+  constructor(mention = {}) {
+    this.startIndex = mention.start || 0;
+    this.length = mention.length || 1;
+    this.type = mention.mention_type || z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
 
-    this.userId = userId;
+    this.userId = mention.user_id || '';
   }
 
-  getLength() {
-    return this.end - this.start;
+  // Index of first char outside of mention
+  get endIndex() {
+    return this.startIndex + this.length;
+  }
+
+  isValid(messageText = '') {
+    if (!typeof this.startIndex === 'number' || !typeof this.length === 'number' || !typeof this.userId === 'string') {
+      return false;
+    }
+
+    const isValidStartIndex = this.startIndex >= 0;
+    const isValidLength = this.length >= 1;
+    const isValidEnd = messageText.length && this.endIndex <= messageText.length;
+    const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
+    if (!isValidStartIndex || !isValidLength || !isValidEnd || !isValidUserId) {
+      return false;
+    }
+
+    return true;
+  }
+
+  setUserIdMention(startIndex, length, userId) {
+    this.type = z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    this.startIndex = startIndex;
+    this.length = length;
+    this.userId = userId;
+    return this;
   }
 
   toJSON() {
     return {
-      end: this.end,
-      start: this.start,
+      length: this.length,
+      startIndex: this.startIndex,
       userId: this.userId,
     };
   }
 
   toProto() {
-    const mention = new z.proto.Mention(this.start, this.end);
-    if (this.userId) {
-      mention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_USER_ID, this.userId);
+    const protoMention = new z.proto.Mention(this.startIndex, this.length);
+    const isUserIdMention = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    if (isUserIdMention) {
+      protoMention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID, this.userId);
     }
-    return mention;
+    return protoMention;
   }
 };
