@@ -224,7 +224,7 @@ class ConversationService {
     }
 
     if (mentions && mentions.length) {
-      textMessage.mention = mentions.map(mention => Mention.create(mention));
+      textMessage.mentions = mentions.map(mention => Mention.create(mention));
     }
 
     const editedMessage = MessageEdit.create({
@@ -667,7 +667,7 @@ class ConversationService {
     }
 
     if (mentions && mentions.length) {
-      textMessage.mention = mentions.map(mention => Mention.create(mention));
+      textMessage.mentions = mentions.map(mention => Mention.create(mention));
     }
 
     let genericMessage = GenericMessage.create({

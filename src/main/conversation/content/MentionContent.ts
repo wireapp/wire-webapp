@@ -18,7 +18,7 @@
  */
 
 interface MentionContent {
-  end: number;
+  length: number;
   start: number;
   userId?: string;
 }
