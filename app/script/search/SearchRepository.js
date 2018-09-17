@@ -56,11 +56,17 @@ z.search.SearchRepository = class SearchRepository {
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
   }
 
-  searchUserInSet(name, userEntities) {
+  searchUserInSet(term, userEntities) {
     const userMatches = userEntity => {
-      const nameRegexp = new RegExp(`^${name}`);
       const propertiesToCheck = ['username', 'first_name', 'last_name'];
-      return propertiesToCheck.some(property => (userEntity[property]() || '').match(nameRegexp));
+      const excludedEmojis = Array.from(term).filter(char => {
+        return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+      });
+
+      return propertiesToCheck.some(property => {
+        const value = userEntity[property]() || '';
+        return z.util.StringUtil.compareTransliteration(value, term, excludedEmojis);
+      });
     };
     return userEntities.filter(userMatches);
   }
