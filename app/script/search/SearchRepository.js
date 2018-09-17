@@ -81,11 +81,14 @@ z.search.SearchRepository = class SearchRepository {
       if (!matchedProperties.length) {
         return results;
       }
+
+      // add weight to the result based on the properties that matched and the position of the property in the property list
       const weight = matchedProperties.reduce((weightValue, property, index) => {
         const propertyImportance = properties.length - properties.indexOf(property);
         return weightValue + propertyImportance;
       }, 0);
 
+      // add a weight bonus for properties that matched from the start
       const positionBonus = matchedProperties.filter(property => matches(userEntity, property, true)).length * 100;
       return results.concat({user: userEntity, weight: weight + positionBonus});
     }, []);
