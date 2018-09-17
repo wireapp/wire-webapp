@@ -121,7 +121,7 @@
     "prettier": "1.14.2",
     "raf": "3.4.0",
     "react-addons-test-utils": "15.6.2",
-    "react-hot-loader": "4.3.7",
+    "react-hot-loader": "4.3.8",
     "react-intl-po": "2.2.2",
     "redux-devtools-extension": "2.13.5",
     "redux-mock-store": "1.5.3",
