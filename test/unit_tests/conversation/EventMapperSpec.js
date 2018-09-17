@@ -28,7 +28,7 @@ describe('Event Mapper', () => {
 
   beforeAll(done => {
     z.util.protobuf
-      .loadProtos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
       .then(() => test_factory.exposeUserActors())
       .then(() => {
         wire.app = {

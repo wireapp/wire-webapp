@@ -33,6 +33,9 @@ z.entity.Text = class Text extends z.entity.Asset {
     // Can be used to theme media embeds
     this.theme_color = undefined;
 
+    // Array of z.message.MentionEntity instances
+    this.mentions = ko.observableArray();
+
     // Array of z.entity.LinkPreview instances
     this.previews = ko.observableArray();
 

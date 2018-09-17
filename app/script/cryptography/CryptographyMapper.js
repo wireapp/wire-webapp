@@ -52,55 +52,86 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     let specificContent;
 
     switch (genericMessage.content) {
-      case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
+      case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET: {
         specificContent = this._mapAsset(genericMessage.asset);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY: {
         specificContent = this._mapAvailability(genericMessage.availability);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling, event.data);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED: {
         specificContent = this._mapCleared(genericMessage.cleared);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION: {
         specificContent = this._mapConfirmation(genericMessage.confirmation);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED: {
         specificContent = this._mapDeleted(genericMessage.deleted);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED: {
         specificContent = this._mapEdited(genericMessage.edited, genericMessage.message_id);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL: {
         specificContent = this._mapEphemeral(genericMessage, event);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN: {
         specificContent = this._mapHidden(genericMessage.hidden);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE: {
         specificContent = this._mapImage(genericMessage.image, event.data.id);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
         specificContent = this._mapKnock();
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION: {
         specificContent = this._mapLocation(genericMessage.location);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction);
         break;
-      case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT:
+      }
+
+      case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT: {
         specificContent = this._mapText(genericMessage.text);
         break;
-      default:
+      }
+
+      default: {
         const logMessage = `Skipped event '${genericMessage.message_id}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+      }
     }
 
     const genericContent = {
@@ -382,9 +413,14 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapText(text) {
+    if (text.mentions && text.mentions.length > 500) {
+      text.mentions.length = 500;
+    }
+
     return {
       data: {
         content: `${text.content}`,
+        mentions: text.mentions.map(mention => mention.encode64()),
         previews: text.link_preview.map(preview => preview.encode64()),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,

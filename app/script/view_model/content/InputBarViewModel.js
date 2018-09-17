@@ -97,18 +97,20 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
-      const mentions = this.parseForMentions(input, this.conversationEntity().participating_user_ets());
-      const pieces = mentions.reverse().reduce(
-        (currentPieces, mention) => {
-          const currentPiece = currentPieces.shift();
-          currentPieces.unshift(currentPiece.substr(mention.end));
-          currentPieces.unshift(currentPiece.substr(mention.start, mention.end - mention.start));
-          currentPieces.unshift(currentPiece.substr(0, mention.start));
-          return currentPieces;
-        },
-        [input]
-      );
+      const participatingUserEntities = this.conversationEntity().participating_user_ets();
 
+      const pieces = this.parseForMentions(input, participatingUserEntities)
+        .reverse()
+        .reduce(
+          (currentPieces, mentionEntity) => {
+            const currentPiece = currentPieces.shift();
+            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
+            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
+            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
+            return currentPieces;
+          },
+          [input]
+        );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
       return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
@@ -235,7 +237,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   clickToPing() {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.conversationRepository.send_knock(this.conversationEntity()).then(() => {
+      this.conversationRepository.sendKnock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
@@ -370,8 +372,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const mentions = this.parseForMentions(value, this.conversationEntity().participating_user_ets());
       const mentionAtStart = this.findMentionAtPosition(selectionStart, mentions) || {};
       const mentionAtEnd = this.findMentionAtPosition(selectionEnd, mentions) || {};
-      const newStart = Math.min(mentionAtStart.start || Infinity, mentionAtEnd.start || Infinity, selectionStart);
-      const newEnd = Math.max(mentionAtStart.end || 0, mentionAtEnd.end || 0, selectionEnd);
+      const newStart = Math.min(
+        mentionAtStart.startIndex || Infinity,
+        mentionAtEnd.startIndex || Infinity,
+        selectionStart
+      );
+      const newEnd = Math.max(mentionAtStart.endIndex || 0, mentionAtEnd.endIndex || 0, selectionEnd);
 
       textarea.selectionStart = newStart;
       textarea.selectionEnd = newEnd;
@@ -383,7 +389,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   findMentionAtPosition(position, mentions) {
-    return mentions.find(({start, end}) => position > start && position < end);
+    return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
   }
 
   onInputKeyUp(data, keyboardEvent) {
@@ -437,9 +443,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText) {
     if (messageText.length) {
-      const mentions = this.parseForMentions(messageText, this.conversationEntity().participating_user_ets());
-      this.logger.info(`Found ${mentions.length} mentions in outgoing message.`);
-      this.conversationRepository.send_text_with_link_preview(messageText, this.conversationEntity());
+      const participatingUserEntities = this.conversationEntity().participating_user_ets();
+      const mentionEntities = this.parseForMentions(messageText, participatingUserEntities);
+      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
     }
   }
 
@@ -447,15 +453,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const mentionRegexp = /\B@(.+?)\b/g;
     const mentions = [];
 
-    let find;
-    while ((find = mentionRegexp.exec(messageText))) {
-      const name = find[1].toLowerCase();
-      const mentionedUser = userEntities.find(user => user.username() === name);
+    let match;
+    while ((match = mentionRegexp.exec(messageText))) {
+      const [textMatch, nameMatch] = match;
+      const username = nameMatch.toLowerCase();
+      const mentionedUser = userEntities.find(userEntity => userEntity.username() === username);
       if (mentionedUser) {
         const userId = mentionedUser.id;
-        const start = find.index;
-        const end = start + find[0].length;
-        mentions.push({end, start, userId});
+        const mentionStart = match.index;
+        const mentionLength = textMatch.length;
+
+        const mentionEntity = new z.message.MentionEntity().setUserIdMention(mentionStart, mentionLength, userId);
+        mentions.push(mentionEntity);
       }
     }
 
@@ -469,9 +478,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    const isTextChange = messageText !== messageEntity.get_first_asset().text;
-    if (isTextChange) {
-      this.conversationRepository.send_message_edit(messageText, messageEntity, this.conversationEntity());
+    const hasTextChanged = messageText !== messageEntity.get_first_asset().text;
+    if (hasTextChanged) {
+      this.conversationRepository.sendMessageEdit(messageText, messageEntity, this.conversationEntity());
     }
   }
 

@@ -63,7 +63,7 @@ describe('Event Repository', () => {
 
   beforeAll(() => {
     return z.util.protobuf
-      .loadProtos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
       .then(() => test_factory.exposeClientActors());
   });
 
