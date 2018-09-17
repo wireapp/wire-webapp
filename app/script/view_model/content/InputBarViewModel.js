@@ -357,25 +357,44 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   handleMentions(data, event) {
     const textarea = event.target;
     const value = textarea.value;
-    const caretPosition = textarea.selectionEnd;
-    const text = value.substr(0, caretPosition);
-    const startFlowRegexp = /\B@$/;
-    const endFlowRegexp = /\s$/;
-    if (this.isInMentionFlow() && (caretPosition === 0 || endFlowRegexp.test(text))) {
-      this.isInMentionFlow(false);
-    } else if (!this.isInMentionFlow() && startFlowRegexp.test(text)) {
-      this.isInMentionFlow(true);
+    const {selectionStart, selectionEnd} = textarea;
+    const text = value.substr(0, selectionEnd);
+    if (this.isInMentionFlow()) {
+      const endFlowRegexp = /\s$/;
+      const isStartOfInput = selectionEnd === 0;
+      const isOutsideOfMention = endFlowRegexp.test(text);
+      if (isStartOfInput || isOutsideOfMention) {
+        this.isInMentionFlow(false);
+      }
+    } else {
+      const mentions = this.parseForMentions(value, this.conversationEntity().participating_user_ets());
+      const mentionAtStart = this.findMentionAtPosition(selectionStart, mentions) || {};
+      const mentionAtEnd = this.findMentionAtPosition(selectionEnd, mentions) || {};
+      const newStart = Math.min(mentionAtStart.start || Infinity, mentionAtEnd.start || Infinity, selectionStart);
+      const newEnd = Math.max(mentionAtStart.end || 0, mentionAtEnd.end || 0, selectionEnd);
+
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newEnd;
+      const startFlowRegexp = /\B@$/;
+      if (startFlowRegexp.test(text)) {
+        this.isInMentionFlow(true);
+      }
     }
   }
 
+  findMentionAtPosition(position, mentions) {
+    return mentions.find(({start, end}) => position > start && position < end);
+  }
+
   onInputKeyUp(data, keyboardEvent) {
+    if (
+      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_LEFT ||
+      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_RIGHT
+    ) {
+      this.handleMentions(data, keyboardEvent);
+    }
     if (this.isInMentionFlow) {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ARROW_LEFT:
-        case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
-          this.handleMentions(data, keyboardEvent);
-          break;
-
         case z.util.KeyboardUtil.KEY.ARROW_UP:
           this.mentionSuggestion.selectPrevious();
           break;
