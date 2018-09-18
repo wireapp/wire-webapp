@@ -20,6 +20,7 @@
 import {
   CONVERSATION_TYPE,
   Conversation,
+  MemberUpdate,
   NewConversation,
   NewOTRMessage,
   OTRRecipients,
@@ -1127,12 +1128,33 @@ class ConversationService {
 
   public async toggleArchiveConversation(
     conversationId: string,
-    newState: boolean,
+    archived: boolean,
     archiveTimestamp: number | Date = new Date()
   ): Promise<void> {
-    const payload = {
-      otr_archived: newState,
-      otr_archived_ref: new Date(archiveTimestamp).toISOString(),
+    if (typeof archiveTimestamp === 'number') {
+      archiveTimestamp = new Date(archiveTimestamp);
+    }
+
+    const payload: MemberUpdate = {
+      otr_archived: archived,
+      otr_archived_ref: archiveTimestamp.toISOString(),
+    };
+
+    await this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+  }
+
+  public async toggleMuteConversation(
+    conversationId: string,
+    muted: boolean,
+    muteTimestamp: number | Date = new Date()
+  ): Promise<void> {
+    if (typeof muteTimestamp === 'number') {
+      muteTimestamp = new Date(muteTimestamp);
+    }
+
+    const payload: MemberUpdate = {
+      otr_muted: muted,
+      otr_muted_ref: muteTimestamp.toISOString(),
     };
 
     await this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
