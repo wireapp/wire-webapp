@@ -33,5 +33,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "dist/commonjs/LRUCache.d.ts",
-  "version": "2.1.54"
+  "version": "2.2.0"
 }
