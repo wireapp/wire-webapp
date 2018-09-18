@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.3.0"></a>
+# [6.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.2.1...@wireapp/core@6.3.0) (2018-09-18)
+
+
+### Features
+
+* **core:** Mute conversation ([#1128](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1128)) ([a3a6bd4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/a3a6bd4))
+
+
+
+
+
 <a name="6.2.1"></a>
 ## [6.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.2.0...@wireapp/core@6.2.1) (2018-09-18)
 
