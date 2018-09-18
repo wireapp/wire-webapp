@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.2.1"></a>
+## [6.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.2.0...@wireapp/core@6.2.1) (2018-09-18)
+
+
+### Bug Fixes
+
+* **core:** Incoming mentions ([#1127](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1127)) ([273eee3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/273eee3))
+
+
+
+
+
 <a name="6.2.0"></a>
 # [6.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.1.4...@wireapp/core@6.2.0) (2018-09-18)
 
