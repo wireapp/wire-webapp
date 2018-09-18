@@ -60,6 +60,31 @@ describe('LRUCache', () => {
     });
   });
 
+  describe('"deleteAll"', () => {
+    it('deletes all keys', () => {
+      const cache = new LRUCache(3);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      cache.set('3', 'Tomato');
+      cache.deleteAll();
+      expect(cache.size()).toBe(0);
+      expect(cache.keys()).toEqual([]);
+    });
+
+    it('deletes a Node and continues with normal operation', () => {
+      const cache = new LRUCache(3);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      cache.set('3', 'Tomato');
+      cache.deleteAll();
+      expect(cache.size()).toBe(0);
+      cache.set('4', 'Plum');
+      expect(cache.size()).toBe(1);
+      cache.set('5', 'Banana');
+      expect(cache.size()).toBe(2);
+    });
+  });
+
   describe('"get"', () => {
     it('returns "undefined" if a value is not available', () => {
       const cache = new LRUCache(3);

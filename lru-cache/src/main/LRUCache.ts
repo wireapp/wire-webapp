@@ -29,7 +29,7 @@ export interface Node<T> {
 }
 
 class LRUCache<T> {
-  private readonly map: NodeMap<T>;
+  private map: NodeMap<T>;
   private head: Node<T> | null;
   private end: Node<T> | null;
 
@@ -49,6 +49,12 @@ class LRUCache<T> {
     }
 
     return false;
+  }
+
+  public deleteAll(): void {
+    this.map = {};
+    this.head = null;
+    this.end = null;
   }
 
   public get(key: string): T | undefined {
@@ -132,7 +138,7 @@ class LRUCache<T> {
         value,
       };
 
-      const isOverCapacity = Object.keys(this.map).length >= this.capacity;
+      const isOverCapacity = this.size() >= this.capacity;
       if (isOverCapacity) {
         if (this.end) {
           delete this.map[this.end.key];
