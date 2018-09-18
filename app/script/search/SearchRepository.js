@@ -27,6 +27,11 @@ z.search.SearchRepository = class SearchRepository {
     return {
       MAX_DIRECTORY_RESULTS: 30,
       MAX_SEARCH_RESULTS: 10,
+      SEARCHABLE_FIELDS: {
+        FIRST_NAME: 'first_name',
+        LAST_NAME: 'last_name',
+        USERNAME: 'username',
+      },
     };
   }
 
@@ -54,6 +59,50 @@ z.search.SearchRepository = class SearchRepository {
     this.searchService = searchService;
     this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
+  }
+
+  /**
+   * Search for a user in the given user list and given a search term.
+   * Doesn't sort the results and keep the initial order of the given user list.
+   *
+   * @param {string} term - the search term
+   * @param {Array<z.entity.User>} userEntities - entities to match the search term against
+   * @param {Array<z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=['first_name', 'last_name', 'username'] - list of properties that will be matched against the search term
+   *    the order of the properties in the array indicates the priorities by which results will be sorted
+   * @returns {Array<z.entity.User>} the filtered list of users
+   */
+  searchUserInSet(term, userEntities, properties) {
+    const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+    properties = properties || [SEARCHABLE_FIELDS.FIRST_NAME, SEARCHABLE_FIELDS.LAST_NAME, SEARCHABLE_FIELDS.USERNAME];
+    const excludedEmojis = Array.from(term).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
+
+    const matches = (userEntity, property, fromStart) => {
+      const value = ko.unwrap(userEntity[property]);
+      return z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, fromStart);
+    };
+
+    const weightedResults = userEntities.reduce((results, userEntity) => {
+      const matchedProperties = properties.filter(property => matches(userEntity, property, false));
+
+      if (!matchedProperties.length) {
+        return results;
+      }
+
+      // add weight to the result based on the properties that matched and the position of the property in the property list
+      const weight = matchedProperties.reduce((weightValue, property) => {
+        const propertyImportance = properties.reverse().indexOf(property);
+        return weightValue + propertyImportance;
+      }, 0);
+
+      // add a weight bonus for properties that matched from the start
+      const positionBonus = matchedProperties.filter(property => matches(userEntity, property, true)).length * 100;
+      return results.concat({user: userEntity, weight: weight + positionBonus});
+    }, []);
+
+    return weightedResults
+      .slice()
+      .sort((res1, res2) => res2.weight - res1.weight)
+      .map(result => result.user);
   }
 
   /**
