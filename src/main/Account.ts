@@ -274,7 +274,7 @@ class Account extends EventEmitter {
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
-        const {content: text, linkPreview: linkPreviews, mention: mentions} = genericMessage[GenericMessageType.TEXT];
+        const {content: text, linkPreview: linkPreviews, mentions} = genericMessage[GenericMessageType.TEXT];
 
         const content: TextContent = {text};
 
@@ -345,7 +345,7 @@ class Account extends EventEmitter {
       }
       case GenericMessageType.EDITED: {
         const {
-          text: {content: editedText, linkPreview: editedLinkPreviews, mention: editedMentions},
+          text: {content: editedText, linkPreview: editedLinkPreviews, mentions: editedMentions},
           replacingMessageId,
         } = genericMessage[GenericMessageType.EDITED];
 
