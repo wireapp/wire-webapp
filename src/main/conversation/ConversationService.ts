@@ -452,10 +452,15 @@ class ConversationService {
       zoom,
     });
 
-    const genericMessage = GenericMessage.create({
+    let genericMessage = GenericMessage.create({
       [GenericMessageType.LOCATION]: locationMessage,
       messageId: payloadBundle.id,
     });
+
+    const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
+    if (expireAfterMillis > 0) {
+      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
+    }
 
     await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
 
