@@ -60,13 +60,13 @@
   }
 }
 
-@supports (caret-color: @graphite-dark) {
+@supports (caret-color: #000) {
   .conversation-input-bar-text {
     caret-color: @graphite-dark;
     color: transparent;
   }
 }
-@supports not (caret-color: @graphite-dark) {
+@supports not (caret-color: #000) {
   .conversation-input-bar-text {
     -webkit-text-fill-color: transparent;
   }
