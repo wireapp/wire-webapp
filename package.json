@@ -6,7 +6,7 @@
     "react": "16.5.1",
     "react-dom": "16.5.1",
     "recompose": "0.30.0",
-    "styled-components": "3.4.6",
+    "styled-components": "3.4.8",
     "styled-normalize": "8.0.1"
   },
   "devDependencies": {
