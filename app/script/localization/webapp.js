@@ -790,6 +790,7 @@ z.string.notificationMemberJoinMany = '{{user}} added {{number}} people to the c
 z.string.notificationMemberJoinSelf = '{{user}} joined the conversation';
 z.string.notificationMemberJoinOne = '{{user1}} added {{user2}} to the conversation';
 z.string.notificationMemberLeaveRemovedYou = '{{user}} removed you from the conversation';
+z.string.notificationMention = 'New mention:';
 z.string.notificationObfuscated = 'Sent you a message';
 z.string.notificationObfuscatedTitle = 'Someone';
 z.string.notificationPing = 'Pinged';

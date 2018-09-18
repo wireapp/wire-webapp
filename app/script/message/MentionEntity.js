@@ -29,6 +29,12 @@ z.message.MentionEntity = class Mention {
     this.type = mention.mention_type || z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
 
     this.userId = mention.user_id || '';
+    this.userEntity = ko.observable();
+
+    this.isSelfMentioned = ko.pureComputed(() => {
+      const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+      return isTypeUserId && this.userEntity().is_me;
+    });
   }
 
   // Index of first char outside of mention
