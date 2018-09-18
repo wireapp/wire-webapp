@@ -161,7 +161,7 @@ const messageIdCache = {};
     await sendMessageResponse(data, textPayload);
   });
 
-  account.on(PayloadBundleType.CONFIRMATION, data => handleIncomingMessage(data));
+  account.on(PayloadBundleType.CONFIRMATION, handleIncomingMessage);
 
   account.on(PayloadBundleType.ASSET, async data => {
     const {content, id: messageId} = data;
@@ -253,6 +253,8 @@ const messageIdCache = {};
     await handleIncomingMessage(data);
     await sendMessageResponse(data, imagePayload);
   });
+
+  account.on(PayloadBundleType.CLEARED, handleIncomingMessage);
 
   account.on(PayloadBundleType.LOCATION, async data => {
     const locationPayload = account.service.conversation.createLocation(data.content);
@@ -354,7 +356,7 @@ const messageIdCache = {};
     await sendMessageResponse(data, editedPayload);
   });
 
-  account.on(PayloadBundleType.MESSAGE_HIDE, data => handleIncomingMessage(data));
+  account.on(PayloadBundleType.MESSAGE_HIDE, handleIncomingMessage);
 
   account.on(PayloadBundleType.CONNECTION_REQUEST, async data => {
     await handleIncomingMessage(data);
