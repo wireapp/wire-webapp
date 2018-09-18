@@ -369,18 +369,20 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         this.isInMentionFlow(false);
       }
     } else {
+      const defaultRange = {endIndex: 0, startIndex: Infinity};
       const mentions = this.parseForMentions(value, this.conversationEntity().participating_user_ets());
-      const mentionAtStart = this.findMentionAtPosition(selectionStart, mentions) || {};
-      const mentionAtEnd = this.findMentionAtPosition(selectionEnd, mentions) || {};
-      const newStart = Math.min(
-        mentionAtStart.startIndex || Infinity,
-        mentionAtEnd.startIndex || Infinity,
-        selectionStart
-      );
-      const newEnd = Math.max(mentionAtStart.endIndex || 0, mentionAtEnd.endIndex || 0, selectionEnd);
+      const firstMention = this.findMentionAtPosition(selectionStart, mentions) || defaultRange;
+      const lastMention = this.findMentionAtPosition(selectionEnd, mentions) || defaultRange;
+      const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
+      const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
+      const newStart = Math.min(mentionStart, selectionStart);
+      const newEnd = Math.max(mentionEnd, selectionEnd);
 
-      textarea.selectionStart = newStart;
-      textarea.selectionEnd = newEnd;
+      if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
+        textarea.selectionStart = newStart;
+        textarea.selectionEnd = newEnd;
+      }
+
       const startFlowRegexp = /\B@$/;
       if (startFlowRegexp.test(text)) {
         this.isInMentionFlow(true);
@@ -389,7 +391,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   findMentionAtPosition(position, mentions) {
-    return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
+    return mentions.find(({startIndex, endIndex}) => position >= startIndex && position <= endIndex);
   }
 
   onInputKeyUp(data, keyboardEvent) {
