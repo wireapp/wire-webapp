@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/bro-fs": "0.4.1",
     "@types/filesystem": "0.0.29",
-    "@types/node": "10.9.4",
+    "@types/node": "10.10.1",
     "bro-fs": "0.4.0",
     "dexie": "2.0.4",
     "fs-extra": "7.0.0"
