@@ -25,9 +25,20 @@ window.z.util = z.util || {};
 z.util.StringUtil = {
   capitalizeFirstChar: (string = '') => `${string.charAt(0).toUpperCase()}${string.substring(1)}`,
 
-  compareTransliteration: (nameA, nameB, excludedChars = []) => {
+  /**
+   * Returns true if the string and the query match by applying transliteration first.
+   *
+   * @param {string} string - the string to compare the query against
+   * @param {string} query - the query to compare to the string
+   * @param {array<string>} excludedChars - extra characters to remove from both the query and the string
+   * @param {boolean} fromStart=false - should the query match the string from the beginning of the string
+   * @returns {boolean} does the string matches the query
+   */
+  compareTransliteration: (string, query, excludedChars = [], fromStart = false) => {
     const options = {custom: excludedChars};
-    return z.util.StringUtil.includes(window.getSlug(nameA, options), window.getSlug(nameB, options));
+    const nameSlug = window.getSlug(string, options);
+    const querySlug = window.getSlug(query, options);
+    return fromStart ? nameSlug.startsWith(querySlug) : z.util.StringUtil.includes(nameSlug, querySlug);
   },
 
   cutLastChars: (string, length) => string.substring(0, string.length - length),
