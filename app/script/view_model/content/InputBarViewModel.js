@@ -48,7 +48,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.selectionEnd = ko.observable(0);
 
     this.emojiInput = contentViewModel.emojiInput;
-    this.mentionSuggestion = new z.viewModel.content.MentionSuggestionViewModel();
 
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
@@ -99,6 +98,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.mentionSuggestions = ko.pureComputed(() => {
+      if (!this.isInMentionFlow()) {
+        return [];
+      }
       const inputValue = this.input();
       const incompleteMention = inputValue.match(/@(\w+)$/);
       const candidates = this.conversationEntity().participating_user_ets();
@@ -110,7 +112,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
-      const suggestions = this.mentionSuggestions();
       const participatingUserEntities = this.conversationEntity().participating_user_ets();
 
       const pieces = this.parseForMentions(input, participatingUserEntities)
@@ -126,20 +127,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           [input]
         );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
-      return (
-        pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('') +
-        suggestions.map(user => user.username()).join(', ')
-      );
+      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
 
     this.isInMentionFlow = ko.observable(false);
-    this.isInMentionFlow.subscribe(isInFlow => {
-      if (isInFlow) {
-        this.mentionSuggestion.show(document.querySelector('#conversation-input-bar-text'));
-      } else {
-        this.mentionSuggestion.hide();
-      }
-    });
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -444,19 +435,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.handleMentions(data, keyboardEvent);
     }
     if (this.isInMentionFlow) {
-      switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ARROW_UP:
-          this.mentionSuggestion.selectPrevious();
-          break;
-
-        case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-          this.mentionSuggestion.selectNext();
-          break;
-
-        case z.util.KeyboardUtil.KEY.ENTER:
-          this.mentionSuggestion.insertSelected(this.input);
-          break;
-      }
+      // ignore arrow keys, maybe?
     }
 
     this.emojiInput.onInputKeyUp(data, keyboardEvent);

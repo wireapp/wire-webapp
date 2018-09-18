@@ -4,6 +4,7 @@
      data-bind="with: $root.inputBar,
                 css: {'conversation-input-bar-editing': $root.inputBar.isEditing()}">
 
+  <mention-suggestions params="suggestions: mentionSuggestions, targetInput: '#conversation-input-bar-text'"></mention-suggestions>
   <!-- ko if: conversationEntity() && !conversationEntity().connection().is_outgoing_request() -->
     <div class="controls-left">
       <!-- ko if: input().length -->
