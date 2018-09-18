@@ -40,6 +40,7 @@ import {ClientInfo, ClientService} from './client/root';
 import {ConnectionService} from './connection/root';
 import {
   AssetContent,
+  ClearedContent,
   ConfirmationContent,
   DeletedContent,
   EditedTextContent,
@@ -312,6 +313,20 @@ class Account extends EventEmitter {
           type: PayloadBundleType.CONFIRMATION,
         };
       }
+      case GenericMessageType.CLEARED: {
+        const content: ClearedContent = genericMessage[GenericMessageType.CLEARED];
+
+        return {
+          content,
+          conversation: event.conversation,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: PayloadBundleType.CLEARED,
+        };
+      }
       case GenericMessageType.DELETED: {
         const originalMessageId = genericMessage[GenericMessageType.DELETED].messageId;
 
@@ -540,6 +555,7 @@ class Account extends EventEmitter {
       if (data) {
         switch (data.type) {
           case PayloadBundleType.ASSET_IMAGE:
+          case PayloadBundleType.CLEARED:
           case PayloadBundleType.CLIENT_ACTION:
           case PayloadBundleType.CONFIRMATION:
           case PayloadBundleType.CONNECTION_REQUEST:

@@ -62,6 +62,7 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {
+  ClearedContent,
   ClientActionContent,
   ConfirmationContent,
   EditedTextContent,
@@ -717,18 +718,19 @@ class ConversationService {
 
   public async clearConversation(
     conversationId: string,
-    timestamp: number | Date = new Date()
+    timestamp: number | Date = new Date(),
+    messageId: string = ConversationService.createId()
   ): Promise<PayloadBundleOutgoing> {
-    const messageId = ConversationService.createId();
-
     if (timestamp instanceof Date) {
       timestamp = timestamp.getTime();
     }
 
-    const clearedMessage = Cleared.create({
+    const content: ClearedContent = {
       clearedTimestamp: timestamp,
       conversationId,
-    });
+    };
+
+    const clearedMessage = Cleared.create(content);
 
     const genericMessage = GenericMessage.create({
       [GenericMessageType.CLEARED]: clearedMessage,
