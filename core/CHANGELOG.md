@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.2.0"></a>
+# [6.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.1.4...@wireapp/core@6.2.0) (2018-09-18)
+
+
+### Features
+
+* **core:** Emit "cleared" messages ([#1125](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1125)) ([887d053](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/887d053))
+
+
+
+
+
 <a name="6.1.4"></a>
 ## [6.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.1.3...@wireapp/core@6.1.4) (2018-09-18)
 
