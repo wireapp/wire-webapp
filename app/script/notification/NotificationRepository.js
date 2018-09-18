@@ -207,9 +207,13 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _createBodyContent(messageEntity) {
     if (messageEntity.has_asset_text()) {
-      for (const asset_et of messageEntity.assets()) {
-        if (asset_et.is_text()) {
-          return z.util.StringUtil.truncate(asset_et.text, NotificationRepository.CONFIG.BODY_LENGTH);
+      for (const assetEntity of messageEntity.assets()) {
+        if (assetEntity.is_text()) {
+          const notificationText = assetEntity.isSelfMentioned()
+            ? `${z.l10n.text(z.string.notificationMention)} ${assetEntity.text}`
+            : assetEntity.text;
+
+          return z.util.StringUtil.truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     }
@@ -223,16 +227,16 @@ z.notification.NotificationRepository = class NotificationRepository {
     }
 
     if (messageEntity.has_asset()) {
-      const [asset_et] = messageEntity.assets();
-      if (asset_et.is_audio()) {
+      const assetEntity = messageEntity.get_first_asset();
+      if (assetEntity.is_audio()) {
         return z.l10n.text(z.string.notificationSharedAudio);
       }
 
-      if (asset_et.is_video()) {
+      if (assetEntity.is_video()) {
         return z.l10n.text(z.string.notificationSharedVideo);
       }
 
-      if (asset_et.is_file()) {
+      if (assetEntity.is_file()) {
         return z.l10n.text(z.string.notificationSharedFile);
       }
     }
@@ -556,26 +560,31 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createTrigger(messageEntity, connectionEntity, conversationEntity) {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
-    if (messageEntity.is_member()) {
-      switch (messageEntity.memberMessageType) {
-        case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_CONNECTED: {
-          return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
-        }
+    if (messageEntity.is_content() && messageEntity.isSelfMentioned()) {
+      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity);
+    }
 
-        case z.message.SystemMessageType.CONNECTION_REQUEST: {
-          return () => {
-            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
-          };
-        }
+    if (!messageEntity.is_member()) {
+      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
+    }
 
-        default: {
-          const message = `No notification trigger for message '${messageEntity.id} in '${conversationId}'.`;
-          this.logger.log(this.logger.levels.OFF, message);
-        }
+    switch (messageEntity.memberMessageType) {
+      case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+      case z.message.SystemMessageType.CONNECTION_CONNECTED: {
+        return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
+      }
+
+      case z.message.SystemMessageType.CONNECTION_REQUEST: {
+        return () => {
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+        };
+      }
+
+      default: {
+        const message = `No notification trigger for message '${messageEntity.id} in '${conversationId}'.`;
+        this.logger.log(this.logger.levels.OFF, message);
       }
     }
-    return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
   }
 
   /**
@@ -701,12 +710,12 @@ z.notification.NotificationRepository = class NotificationRepository {
   /**
    * Should sender in a notification be obfuscated.
    * @private
-   * @param {z.entity.Message} message_et - Message entity
+   * @param {z.entity.Message} messageEntity - Message entity
    * @returns {boolean} Obfuscate sender in notification
    */
-  _shouldObfuscateNotificationSender(message_et) {
+  _shouldObfuscateNotificationSender(messageEntity) {
     const isSetToObfuscate = this.notificationsPreference() === z.notification.NotificationPreference.OBFUSCATE;
-    return isSetToObfuscate || message_et.is_ephemeral();
+    return isSetToObfuscate || messageEntity.is_ephemeral();
   }
 
   /**

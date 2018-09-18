@@ -3538,7 +3538,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       }
 
-      if (messageEntity.reactions) {
+      if (messageEntity.is_content()) {
         const userIds = Object.keys(messageEntity.reactions());
 
         messageEntity.reactions_user_ets.removeAll();
@@ -3548,14 +3548,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return messageEntity;
           });
         }
-      }
 
-      if (messageEntity.has_asset_text()) {
-        messageEntity.assets().forEach(assetEntity => {
-          if (assetEntity.is_text()) {
-            assetEntity.theme_color = messageEntity.user().accent_color();
+        if (messageEntity.has_asset_text()) {
+          messageEntity.assets().forEach(assetEntity => {
+            if (assetEntity.is_text()) {
+              assetEntity.theme_color = messageEntity.user().accent_color();
+            }
+          });
+
+          const textAsset = messageEntity.get_first_asset();
+          if (textAsset.mentions && textAsset.mentions().length) {
+            const mentionedUserIds = textAsset
+              .mentions()
+              .map(mentionEntity => mentionEntity.userId)
+              .filter(userId => userId);
+
+            if (mentionedUserIds.length) {
+              return this.user_repository.get_users_by_id(mentionedUserIds).then(mentionedUserEntities => {
+                mentionedUserEntities.forEach(mentionedUserEntity => {
+                  const mentionEntity = textAsset.mentions().find(({userId}) => mentionedUserEntity.id === userId);
+                  mentionEntity.userEntity(mentionedUserEntity);
+                });
+                return messageEntity;
+              });
+            }
           }
-        });
+        }
       }
 
       return messageEntity;
