@@ -17,26 +17,38 @@
  *
  */
 
+interface ErrorTypes {
+  PATTERN_MISMATCH: string;
+  RANGE_OVERFLOW: string;
+  RANGE_UNDERFLOW: string;
+  STEP_MISMATCH: string;
+  TOO_LONG: string;
+  TYPE_MISMATCH: string;
+  VALUE_MISSING: string;
+  [key: string]: string;
+}
+
 export default class ValidationError extends Error {
-  constructor(label) {
+  public label: string;
+  constructor(label: string) {
     super(label);
     this.name = this.constructor.name;
     this.label = label;
   }
 
-  is = label => {
+  is = (label: string) => {
     return this.label === label;
   };
 
-  static getAllPropertyNames(obj) {
-    let props = [];
+  static getAllPropertyNames(obj: {}) {
+    let props: string[] = [];
     do {
       props = props.concat(Object.getOwnPropertyNames(obj));
     } while ((obj = Object.getPrototypeOf(obj)));
     return props;
   }
 
-  static handleValidationState(fieldName, validationState) {
+  static handleValidationState(fieldName: string, validationState: ErrorTypes): ValidationError | null {
     const field = ValidationError.getFieldByName(fieldName);
     const validationStateKeys = ValidationError.getAllPropertyNames(validationState);
     for (const key of validationStateKeys) {
@@ -44,6 +56,7 @@ export default class ValidationError extends Error {
         return new ValidationError(field[ValidationError.getErrorKeyByValue(key)]);
       }
     }
+    return null;
   }
 
   static ERROR = {
@@ -56,14 +69,14 @@ export default class ValidationError extends Error {
     VALUE_MISSING: 'valueMissing',
   };
 
-  static getErrorKeyByValue = errorValue => {
+  static getErrorKeyByValue = (errorValue: string): string => {
     return Object.entries(ValidationError.ERROR).find(([key, value]) => value === errorValue)[0];
   };
 
-  static mapErrorsToField = fieldName => {
+  static mapErrorsToField = (fieldName: string) => {
     return Object.entries(ValidationError.ERROR).reduce(
       (errors, [key, value]) => ({...errors, [key]: `${fieldName}-${value}`}),
-      {}
+      ValidationError.ERROR,
     );
   };
 
@@ -75,7 +88,7 @@ export default class ValidationError extends Error {
     SSO_LOGIN: {...ValidationError.mapErrorsToField('sso-code'), name: 'sso-code'},
   };
 
-  static getFieldByName = fieldName => {
+  static getFieldByName = (fieldName: string): ErrorTypes => {
     return Object.entries(ValidationError.FIELD).find(([key, value]) => value.name === fieldName)[1];
   };
 }
