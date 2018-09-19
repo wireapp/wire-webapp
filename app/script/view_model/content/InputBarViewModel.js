@@ -99,12 +99,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.mentionSuggestions = ko.pureComputed(() => {
-      const searchTerm = this.mentionSearchTerm();
-      if (searchTerm === false) {
+      const editedMention = this.editedMention();
+      if (!editedMention) {
         return [];
       }
       const candidates = this.conversationEntity().participating_user_ets();
-      return this.searchRepository.searchUserInSet(searchTerm, candidates);
+      return this.searchRepository.searchUserInSet(editedMention.term, candidates);
     });
 
     this.richTextInput = ko.pureComputed(() => {
@@ -127,7 +127,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
 
-    this.mentionSearchTerm = ko.observable(false);
+    this.editedMention = ko.observable(undefined);
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -218,7 +218,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   addMention(userEntity) {
     //const mention = new z.message.MentionEntity({user_id: userEntity.id});
-    this.mentionSearchTerm(false);
+    this.editedMention(undefined);
   }
 
   addedToView() {
@@ -371,14 +371,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
     const text = value.substr(0, selectionEnd);
-    if (this.mentionSearchTerm() !== false) {
+    if (this.editedMention()) {
       // we check that the user is currently typing something that looks like a mention
       const editedMentionText = text.match(/@(\w*)$/);
       if (!editedMentionText) {
-        this.mentionSearchTerm(false);
+        this.editedMention(undefined);
       } else {
         const searchTerm = editedMentionText[1];
-        this.mentionSearchTerm(searchTerm);
+        const currentEditedMention = this.editedMention();
+        this.editedMention(Object.assign({}, currentEditedMention, {term: searchTerm}));
       }
     } else {
       const defaultRange = {endIndex: 0, startIndex: Infinity};
@@ -400,7 +401,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const startFlowRegexp = /\B@$/;
       if (startFlowRegexp.test(text)) {
-        this.mentionSearchTerm('');
+        this.editedMention({start: selectionStart - 1, term: ''});
       }
     }
   }
