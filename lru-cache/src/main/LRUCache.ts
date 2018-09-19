@@ -192,20 +192,13 @@ class LRUCache<T> {
     return `${string} (oldest)`;
   }
 
-  public [Symbol.iterator]() {
-    let node = this.head;
-    return {
-      next: () => {
-        if (node) {
-          const obj = {done: false, value: [node.key, node.value]};
-          node = node.next;
-          return obj;
-        } else {
-          node = this.head;
-          return {done: true};
-        }
-      },
-    };
+  public *[Symbol.iterator](): Iterator<T> {
+    let entry = this.head;
+
+    while (entry) {
+      yield entry.value;
+      entry = entry.next;
+    }
   }
 }
 

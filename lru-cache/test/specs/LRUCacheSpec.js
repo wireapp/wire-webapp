@@ -127,6 +127,8 @@ describe('LRUCache', () => {
       for (const value of cache) {
         expect(value).toBeDefined();
       }
+
+      expect([...cache].length).toBe(4);
     });
   });
 
