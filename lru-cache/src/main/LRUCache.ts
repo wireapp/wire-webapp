@@ -69,13 +69,12 @@ class LRUCache<T> {
     return undefined;
   }
 
-  public getAll(): {[id: string]: T}[] {
-    return Object.keys(this.map).map(id => {
+  public getAll(): {[id: string]: T} {
+    return Object.keys(this.map).reduce((accumulator: {[id: string]: T}, id) => {
       const node = this.map[id];
-      return {
-        [id]: node.value,
-      };
-    });
+      accumulator[id] = node.value;
+      return accumulator;
+    }, {});
   }
 
   public keys(): string[] {
@@ -191,6 +190,22 @@ class LRUCache<T> {
     }
 
     return `${string} (oldest)`;
+  }
+
+  public [Symbol.iterator]() {
+    let node = this.head;
+    return {
+      next: () => {
+        if (node) {
+          const obj = {done: false, value: [node.key, node.value]};
+          node = node.next;
+          return obj;
+        } else {
+          node = this.head;
+          return {done: true};
+        }
+      },
+    };
   }
 }
 

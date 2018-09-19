@@ -98,7 +98,35 @@ describe('LRUCache', () => {
       const cache = new LRUCache(4);
       cache.set('1', 'Apple');
       cache.set('2', 'Orange');
-      expect(cache.getAll()).toEqual([{'1': 'Apple'}, {'2': 'Orange'}]);
+      expect(cache.getAll()).toEqual({'1': 'Apple', '2': 'Orange'});
+    });
+
+    it('iterates over the keys', () => {
+      const cache = new LRUCache(4);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      cache.set('3', 'Tomato');
+      cache.set('4', 'Plum');
+
+      const nodes = cache.getAll();
+
+      for (const key in nodes) {
+        expect(key).toBeDefined();
+      }
+    });
+  });
+
+  describe('"iterator"', () => {
+    it('iterates over the values', () => {
+      const cache = new LRUCache(4);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      cache.set('3', 'Tomato');
+      cache.set('4', 'Plum');
+
+      for (const value of cache) {
+        expect(value).toBeDefined();
+      }
     });
   });
 

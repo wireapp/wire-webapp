@@ -15,7 +15,7 @@
       cache.set('3', 'Tomato');
       cache.delete('2');
       document.write(cache.size()); // "2"
-      document.write(JSON.stringify(cache.getAll())); // [{"1": "Apple"}, {"2": "Orange"}, {"3": "Tomato"}]
+      document.write(JSON.stringify(cache.getAll())); // {"1": "Apple", "2": "Orange", "3": "Tomato"}
     </script>
   </body>
 </html>
