@@ -71,7 +71,7 @@ export function doSetConsent(consentType, value) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetConsent());
     const consent = {
-      source: `${APP_NAME} ${z.util.Environment.version(false)}`,
+      source: `${APP_NAME} ${window.z.util.Environment.version(false)}`,
       type: consentType,
       value,
     };
