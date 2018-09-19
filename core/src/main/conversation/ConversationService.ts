@@ -44,6 +44,7 @@ import {
 } from '../conversation/root';
 
 import {
+  Article,
   Asset,
   Cleared,
   ClientAction,
@@ -644,6 +645,13 @@ class ConversationService {
 
         linkPreviewMessage.image = assetMessage;
       }
+
+      linkPreviewMessage.article = Article.create({
+        image: linkPreviewMessage.image,
+        permanentUrl: linkPreviewMessage.permanentUrl,
+        summary: linkPreviewMessage.summary,
+        title: linkPreviewMessage.title,
+      });
 
       builtLinkPreviews.push(linkPreviewMessage);
     }
