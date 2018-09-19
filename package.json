@@ -8,8 +8,8 @@
     "@types/node": "10.10.1",
     "@types/spark-md5": "3.0.1",
     "@types/tough-cookie": "2.3.3",
-    "@wireapp/priority-queue": "0.2.16",
-    "@wireapp/store-engine": "0.12.16",
+    "@wireapp/priority-queue": "0.2.17",
+    "@wireapp/store-engine": "0.12.17",
     "axios": "0.18.0",
     "html5-websocket": "2.0.3",
     "logdown": "3.2.7",
@@ -20,7 +20,7 @@
   "devDependencies": {
     "@babel/core": "7.1.0",
     "@babel/preset-react": "7.0.0",
-    "@wireapp/react-ui-kit": "4.0.8",
+    "@wireapp/react-ui-kit": "4.0.9",
     "babel-loader": "8.0.2",
     "browser-sync": "2.24.7",
     "concurrently": "4.0.1",
@@ -67,5 +67,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/Client.d.ts",
-  "version": "1.15.17"
+  "version": "1.15.18"
 }
