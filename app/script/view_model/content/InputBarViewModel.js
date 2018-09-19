@@ -99,16 +99,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.mentionSuggestions = ko.pureComputed(() => {
-      if (!this.isInMentionFlow()) {
+      const searchTerm = this.mentionSearchTerm();
+      if (searchTerm === false) {
         return [];
       }
-      const inputValue = this.input();
-      const incompleteMention = inputValue.match(/@(\w+)$/);
       const candidates = this.conversationEntity().participating_user_ets();
-      if (incompleteMention) {
-        return this.searchRepository.searchUserInSet(incompleteMention[1], candidates);
-      }
-      return [];
+      return this.searchRepository.searchUserInSet(searchTerm, candidates);
     });
 
     this.richTextInput = ko.pureComputed(() => {
@@ -131,7 +127,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
 
-    this.isInMentionFlow = ko.observable(false);
+    this.mentionSearchTerm = ko.observable(false);
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -221,7 +217,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   addMention(userEntity) {
-    this.isInMentionFlow(false);
+    //const mention = new z.message.MentionEntity({user_id: userEntity.id});
+    this.mentionSearchTerm(false);
   }
 
   addedToView() {
@@ -374,12 +371,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
     const text = value.substr(0, selectionEnd);
-    if (this.isInMentionFlow()) {
-      const endFlowRegexp = /\s$/;
-      const isStartOfInput = selectionEnd === 0;
-      const isOutsideOfMention = endFlowRegexp.test(text);
-      if (isStartOfInput || isOutsideOfMention) {
-        this.isInMentionFlow(false);
+    if (this.mentionSearchTerm() !== false) {
+      // we check that the user is currently typing something that looks like a mention
+      const editedMentionText = text.match(/@(\w*)$/);
+      if (!editedMentionText) {
+        this.mentionSearchTerm(false);
+      } else {
+        const searchTerm = editedMentionText[1];
+        this.mentionSearchTerm(searchTerm);
       }
     } else {
       const defaultRange = {endIndex: 0, startIndex: Infinity};
@@ -401,7 +400,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const startFlowRegexp = /\B@$/;
       if (startFlowRegexp.test(text)) {
-        this.isInMentionFlow(true);
+        this.mentionSearchTerm('');
       }
     }
   }
@@ -438,9 +437,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_RIGHT
     ) {
       this.handleMentions(data, keyboardEvent);
-    }
-    if (this.isInMentionFlow) {
-      // ignore arrow keys, maybe?
     }
 
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
