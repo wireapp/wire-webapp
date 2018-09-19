@@ -76,7 +76,7 @@ export const retrieveCookie = async (response: AxiosResponse, engine: CRUDEngine
     for (const cookie of cookies) {
       await setInternalCookie(new Cookie(cookie.value, cookie.expires), engine);
       logger.info(
-        `Saved internal cookie. It will expire in "${cookie.expires}" seconds.`,
+        `Saved internal cookie. It will expire on "${cookie.expires}".`,
         ObfuscationUtil.obfuscateCookie(cookie)
       );
     }
