@@ -24,22 +24,63 @@ window.z.components = z.components || {};
 
 z.components.MentionSuggestions = class MentionSuggestions {
   constructor(params) {
+    this.isVisible = ko.observable(false);
+    this.onSelectionValidated = params.onSelectionValidated || (() => {});
     this.suggestions = params.suggestions;
     this.targetInputSelector = params.targetInput;
     this.targetInput = undefined;
-    this.isVisible = ko.observable(false);
 
     this.positions = ko.observable({});
 
-    this.suggestions.subscribe(suggestions => {
-      const shouldReposition = !this.isVisible() && suggestions.length > 0;
-      this.isVisible(suggestions.length > 0);
-      return shouldReposition ? this.reposition() : undefined;
+    this.selectedSuggestionIndex = ko.observable(0);
+    this.selectedSuggestion = ko.pureComputed(() => {
+      const index = this.selectedSuggestionIndex();
+      const suggestions = this.suggestions();
+      return suggestions[index];
     });
+
+    this.suggestions.subscribe(suggestions => {
+      const shouldBeVisible = suggestions.length > 0;
+      if (shouldBeVisible && !this.isVisible()) {
+        this.initList();
+      } else if (!shouldBeVisible && this.isVisible()) {
+        this.teardownList();
+      }
+      this.isVisible(shouldBeVisible);
+    });
+
+    this.onInput = this.onInput.bind(this);
   }
 
-  reposition() {
-    this.targetInput = this.targetInput || document.querySelector(this.targetInputSelector);
+  onInput(keyboardEvent) {
+    const actions = {
+      [z.util.KeyboardUtil.KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
+      [z.util.KeyboardUtil.KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
+      [z.util.KeyboardUtil.KEY.ENTER]: this.validateSelection.bind(this),
+    };
+
+    const action = actions[keyboardEvent.key];
+    if (action) {
+      action();
+      keyboardEvent.preventDefault();
+      keyboardEvent.stopPropagation();
+    }
+  }
+
+  moveSelection(delta) {
+    const currentIndex = this.selectedSuggestionIndex();
+    const newIndex = Math.max(Math.min(currentIndex + delta, this.suggestions().length - 1), 0);
+    this.selectedSuggestionIndex(newIndex);
+  }
+
+  validateSelection() {
+    this.onSelectionValidated(this.selectedSuggestion());
+  }
+
+  initList() {
+    this.targetInput = this.initTargetInput();
+
+    this.selectedSuggestionIndex(0);
 
     const position = z.util.popup.getCursorPixelPosition(this.targetInput);
     const bottom = window.innerHeight - position.top + 8;
@@ -47,14 +88,27 @@ z.components.MentionSuggestions = class MentionSuggestions {
 
     this.positions({bottom: `${bottom}px`, left: `${left}px`});
   }
+
+  teardownList() {
+    this.targetInput.removeEventListener('keydown', this.onInput, true);
+  }
+
+  initTargetInput() {
+    const input = this.targetInput || document.querySelector(this.targetInputSelector);
+    input.addEventListener('keydown', this.onInput, true);
+    this.targetInput = input;
+    return input;
+  }
 };
 
 ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
     <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: positions()">
-      <ul data-bind="foreach: {data: suggestions, as: 'suggestion'}">
-        <li><span data-bind="text: suggestion.username()"></span></li>
+      <ul class="mention-suggestion-list" data-bind="foreach: {data: suggestions, as: 'suggestion'}">
+        <li data-bind="style: {color: suggestion === $parent.selectedSuggestion() ? 'green' : ''}">
+          <span data-bind="text: suggestion.username()"></span>
+        </li>
       </ul>
     </div>
   <!-- /ko -->`,
