@@ -40,6 +40,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
+    this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
@@ -217,6 +218,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
       window.requestAnimationFrame(() => this.conversationHasFocus(true))
     );
+  }
+
+  addMention(userEntity) {
+    this.isInMentionFlow(false);
   }
 
   addedToView() {
