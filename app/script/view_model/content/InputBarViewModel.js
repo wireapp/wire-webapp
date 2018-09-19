@@ -109,25 +109,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
-      const participatingUserEntities = this.conversationEntity().participating_user_ets();
 
-      const pieces = this.parseForMentions(input, participatingUserEntities)
-        .reverse()
-        .reduce(
-          (currentPieces, mentionEntity) => {
-            const currentPiece = currentPieces.shift();
-            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
-            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
-            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
-            return currentPieces;
-          },
-          [input]
-        );
+      const pieces = this.currentMentions.reverse().reduce(
+        (currentPieces, mentionEntity) => {
+          const currentPiece = currentPieces.shift();
+          currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
+          currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
+          currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
+          return currentPieces;
+        },
+        [input]
+      );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
       return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
 
     this.editedMention = ko.observable(undefined);
+    this.currentMentions = [];
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -217,8 +215,30 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   addMention(userEntity) {
-    // TODO
+    const editedMention = this.editedMention();
+    const mentionData = {
+      length: userEntity.name().length + 1,
+      start: editedMention.start,
+      user_id: userEntity.id,
+    };
+    const mention = new z.message.MentionEntity(mentionData);
+
+    const beforeMentionStr = this.input().slice(0, mention.startIndex);
+    const afterMentionStr = this.input().slice(mention.startIndex + mention.length, this.input().length);
+
+    /*
+      FIXME this is a naive implementation, we need to account for cases like:
+        - when the user.name() is shorter than what the user has typed (eg. a very long handle)
+        - if there is text after the mention
+        - if there is already a space after the mention, no need to add another one
+
+      Probably, being able to detect and remove the search query before inserting the mention would be a safer and
+      cleaner way to do that.
+    */
+    this.input(`${beforeMentionStr}@${userEntity.name()} ${afterMentionStr}`);
+
     this.editedMention(undefined);
+    this.currentMentions.push(mention);
   }
 
   addedToView() {
@@ -383,7 +403,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
     } else {
       const defaultRange = {endIndex: 0, startIndex: Infinity};
-      const mentions = this.parseForMentions(value, this.conversationEntity().participating_user_ets());
+      const mentions = this.currentMentions;
       const firstMention = this.findMentionAtPosition(selectionStart, mentions) || defaultRange;
       const lastMention = this.findMentionAtPosition(selectionEnd, mentions) || defaultRange;
       const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
@@ -410,7 +430,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const textarea = event.target;
     const value = textarea.value;
     const previousValue = this.input();
-    const mentions = this.parseForMentions(previousValue, this.conversationEntity().participating_user_ets());
+    const mentions = this.currentMentions;
     const lengthDifference = value.length - previousValue.length;
     this.logger.log(this.updateMentionRanges(mentions, this.selectionStart(), this.selectionEnd(), lengthDifference));
     this.handleMentions(data, event);
@@ -461,32 +481,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText) {
     if (messageText.length) {
-      const participatingUserEntities = this.conversationEntity().participating_user_ets();
-      const mentionEntities = this.parseForMentions(messageText, participatingUserEntities);
-      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
+      const mentionEntities = this.currentMentions;
+      this.conversationRepository
+        .sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities)
+        .then(() => {
+          this.currentMentions = [];
+        });
     }
-  }
-
-  parseForMentions(messageText, userEntities) {
-    const mentionRegexp = /\B@(.+?)\b/g;
-    const mentions = [];
-
-    let match;
-    while ((match = mentionRegexp.exec(messageText))) {
-      const [textMatch, nameMatch] = match;
-      const username = nameMatch.toLowerCase();
-      const mentionedUser = userEntities.find(userEntity => userEntity.username() === username);
-      if (mentionedUser) {
-        const userId = mentionedUser.id;
-        const mentionStartIndex = match.index;
-        const mentionLength = textMatch.length;
-
-        const mentionEntity = new z.message.MentionEntity(mentionStartIndex, mentionLength, userId);
-        mentions.push(mentionEntity);
-      }
-    }
-
-    return mentions;
   }
 
   sendMessageEdit(messageText, messageEntity) {
