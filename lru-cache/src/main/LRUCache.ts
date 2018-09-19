@@ -18,7 +18,7 @@
  */
 
 export interface NodeMap<T> {
-  [index: string]: Node<T>;
+  [index: string]: T;
 }
 
 export interface Node<T> {
@@ -29,7 +29,7 @@ export interface Node<T> {
 }
 
 class LRUCache<T> {
-  private map: NodeMap<T>;
+  private map: NodeMap<Node<T>>;
   private head: Node<T> | null;
   private end: Node<T> | null;
 
@@ -69,8 +69,8 @@ class LRUCache<T> {
     return undefined;
   }
 
-  public getAll(): {[id: string]: T} {
-    return Object.keys(this.map).reduce((accumulator: {[id: string]: T}, id) => {
+  public getAll(): NodeMap<T> {
+    return Object.keys(this.map).reduce((accumulator: NodeMap<T>, id) => {
       const node = this.map[id];
       accumulator[id] = node.value;
       return accumulator;
