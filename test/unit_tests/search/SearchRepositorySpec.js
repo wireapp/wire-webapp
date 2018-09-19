@@ -35,13 +35,15 @@ describe('z.search.SearchRepository', () => {
     const felix = generateUser('iamfelix', 'Felix Oulala');
     const felicien = generateUser('ichbinfelicien', 'Felicien Delatour');
     const lastguy = generateUser('lastfelicien', 'lastsabine lastjanina');
+    const jeanpierre = generateUser('jean-pierre', 'Jean-Pierre Sansbijou');
+    const pierre = generateUser('pierrot', 'Pierre Monsouci');
     const noMatch1 = generateUser(undefined, 'yyy yyy');
     const noMatch2 = generateUser('xxx', undefined);
-    const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, felixa];
+    const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, felixa, jeanpierre, pierre];
 
     const tests = [
       {expected: users, term: '', testCase: 'returns the whole user list if no term is given'},
-      {expected: [janina, sabine, lastguy], term: 'j', testCase: 'matches multiple results'},
+      {expected: [jeanpierre, janina, sabine, lastguy], term: 'j', testCase: 'matches multiple results'},
       {
         expected: [janina, lastguy],
         term: 'ja',
@@ -50,7 +52,7 @@ describe('z.search.SearchRepository', () => {
       {
         expected: [felicien, felixa, felix, janina, lastguy],
         term: 'fel',
-        testCase: 'sorts by firstname, lastname, handle, inside match and alphabetically',
+        testCase: 'sorts by name, handle, inside match and alphabetically',
       },
       {
         expected: [felixa, felix, janina],
@@ -60,15 +62,15 @@ describe('z.search.SearchRepository', () => {
       {
         expected: [felicien, lastguy],
         term: 'felici',
-        testCase: 'sorts by firstname, lastname and inside match',
+        testCase: 'sorts by name and inside match',
       },
       {
-        expected: [sabine, lastguy, janina],
+        expected: [sabine, jeanpierre, lastguy, pierre, janina],
         term: 's',
-        testCase: 'sorts by firstname, lastname, handle and inside match',
+        testCase: 'sorts by name, handle and inside match',
       },
       {
-        expected: [sabine, lastguy],
+        expected: [sabine, jeanpierre, lastguy],
         term: 'sa',
         testCase: 'puts matches that start with the pattern on top of the list',
       },
@@ -83,6 +85,16 @@ describe('z.search.SearchRepository', () => {
         testCase: 'puts matches that start with the pattern on top of the list',
       },
       {expected: [felicien, lastguy], term: 'ic', testCase: 'matches inside the properties'},
+      {
+        expected: [jeanpierre],
+        term: 'jean-pierre',
+        testCase: 'finds compound names',
+      },
+      {
+        expected: [pierre, jeanpierre],
+        term: 'pierre',
+        testCase: 'matches compound names and prioritize matches from start',
+      },
     ];
 
     tests.forEach(({expected, term, testCase}) => {

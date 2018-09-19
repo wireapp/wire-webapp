@@ -104,13 +104,26 @@ z.search.SearchRepository = class SearchRepository {
   _matches(term, property, userEntity) {
     const excludedEmojis = Array.from(term).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
     const value = ko.unwrap(userEntity[property]) || '';
+
+    const isStrictMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);
+    if (isStrictMatch) {
+      // if the pattern matches the raw text, give the maximum value to the match
+      return 100;
+    }
+    const isLoosyMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, false);
+    if (!isLoosyMatch) {
+      // if the pattern doesn't match loosely, then it's not a match at all
+      return 0;
+    }
+
     const tokens = z.util.StringUtil.computeTransliteration(value).split(/\W+/g);
+    // computing the match value by testing all components of the property
     return tokens.reverse().reduce((weight, token, index) => {
       const indexWeight = index + 1;
       let tokenWeight = 0;
 
       if (z.util.StringUtil.compareTransliteration(token, term, excludedEmojis, true)) {
-        tokenWeight = indexWeight * 100;
+        tokenWeight = indexWeight * 10;
       } else if (z.util.StringUtil.compareTransliteration(token, term, excludedEmojis, false)) {
         tokenWeight = indexWeight;
       }
