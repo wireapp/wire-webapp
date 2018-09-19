@@ -25,6 +25,23 @@ import inviteReducer from './inviteReducer';
 import languageReducer from './languageReducer';
 import runtimeReducer from './runtimeReducer';
 import selfReducer from './selfReducer';
+import {ThunkAction as ReduxThunkAction} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {APIClient} from '@wireapp/api-client';
+import {Account} from '@wireapp/core';
+import {CookiesStatic} from 'js-cookie';
+
+export type Api = {
+  apiClient: APIClient,
+  cookieStore: CookiesStatic,
+  localStorage: Storage;
+  core: Account;
+};
+
+export interface RootState {
+}
+
+export type ThunkAction<T = void> = ReduxThunkAction<Promise<T>, RootState, Api, AnyAction>;
 
 const reducers = {
   authState: authReducer,

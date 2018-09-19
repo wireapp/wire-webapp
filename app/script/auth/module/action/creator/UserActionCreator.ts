@@ -21,8 +21,7 @@ export const USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START'
 export const USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS';
 export const USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED';
 
-export const startSendActivationCode = params => ({
-  params,
+export const startSendActivationCode = () => ({
   type: USER_SEND_ACTIVATION_CODE_START,
 });
 

@@ -47,7 +47,24 @@ import {withRouter} from 'react-router';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
 
-class ChooseHandle extends React.PureComponent {
+interface Props extends React.HTMLAttributes<ChooseHandle> {}
+
+interface ConnectedProps {
+  name: string;
+  // language: string;
+}
+
+interface DispatchProps {
+  doGetConsents: () => Promise<any>;
+  // checkHandles: (handles) => void;
+  // startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<any>;
+  // safelyRemoveCookie: (name: string, value: string) => Promise<any>;
+  // stopPolling: (name?: string) => Promise<any>;
+}
+
+interface State {}
+
+class ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps, State> {
   constructor(props) {
     super(props);
     this.state = {

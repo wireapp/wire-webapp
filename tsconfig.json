@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "declaration": false,
+    "jsx": "react",
     "lib": ["dom", "es2017"],
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
     "outDir": "app/script/auth",
     "rootDir": "app/script/auth",
-    "target": "ES5",
     "sourceMap": true,
-    "jsx": "react",
-    "noImplicitAny": false,
-    "noImplicitReturns": true
+    "target": "ES5"
   },
   "exclude": ["node_modules"]
 }

@@ -19,23 +19,29 @@
 
 import * as UserActionCreator from './creator/UserActionCreator';
 import {currentLanguage} from '../../localeConfig';
+import {ThunkAction} from "../reducer";
 
-export function doSendActivationCode(email) {
-  const params = [...arguments];
-  return function(dispatch, getState, {apiClient}) {
-    dispatch(UserActionCreator.startSendActivationCode(params));
-    return Promise.resolve()
-      .then(() => apiClient.user.api.postActivationCode({email, locale: currentLanguage()}))
-      .then(activationResponse => dispatch(UserActionCreator.successfulSendActivationCode(activationResponse)))
-      .catch(error => {
-        dispatch(UserActionCreator.failedSendActivationCode(error));
-        throw error;
-      });
+export class UserAction {
+  checkHandles = (handles: string[]): ThunkAction<string> => {
+    return function (dispatch, getState, {apiClient}) {
+      return apiClient.user.api.postHandles({handles, return: 1}).then(result => result[0]);
+    };
   };
+
+  doSendActivationCode = (email: string): ThunkAction => {
+    return function (dispatch, getState, {apiClient}) {
+      dispatch(UserActionCreator.startSendActivationCode());
+      return Promise.resolve()
+        .then(() => apiClient.user.api.postActivationCode({email, locale: currentLanguage()}))
+        .then(activationResponse => {
+          dispatch(UserActionCreator.successfulSendActivationCode(activationResponse));
+        })
+        .catch(error => {
+          dispatch(UserActionCreator.failedSendActivationCode(error));
+          throw error;
+        });
+    };
+  }
 }
 
-export function checkHandles(handles) {
-  return function(dispatch, getState, {apiClient}) {
-    return apiClient.user.api.postHandles({handles, return: 1}).then(result => result[0]);
-  };
-}
+export const userAction = new UserAction();
