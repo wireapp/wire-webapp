@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.0.2"></a>
+## [3.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.0.1...@wireapp/lru-cache@3.0.2) (2018-09-19)
+
+
+### Bug Fixes
+
+* **lru-cache:** Use generator for iteration ([#1139](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/1139)) ([8dbf96f](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/8dbf96f))
+
+
+
+
+
 <a name="3.0.1"></a>
 ## [3.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.0.0...@wireapp/lru-cache@3.0.1) (2018-09-19)
 
