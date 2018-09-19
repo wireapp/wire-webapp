@@ -54,7 +54,7 @@ export function doRemoveClient(clientId, password) {
   };
 }
 
-export function doInitializeClient(clientType, password) {
+export function doInitializeClient(clientType: ClientType, password?: string) {
   return function(dispatch, getState, {core}) {
     dispatch(ClientActionCreator.startInitializeClient());
     return Promise.resolve()

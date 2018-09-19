@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "declaration": false,
+    "downlevelIteration": true,
     "jsx": "react",
     "lib": ["dom", "es2017"],
     "noImplicitAny": false,

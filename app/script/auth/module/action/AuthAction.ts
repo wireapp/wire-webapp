@@ -69,7 +69,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
-export function doFinalizeSSOLogin({clientType}) {
+export function doFinalizeSSOLogin({clientType}: {clientType: ClientType}) {
   return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startLogin());
     return Promise.resolve()

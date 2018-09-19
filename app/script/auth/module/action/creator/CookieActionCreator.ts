@@ -63,7 +63,7 @@ export const startSetCookie = ({cookie, name}) => ({
   type: COOKIE_SET_SUCCESS,
 });
 
-export const successfulSetCookie = ({cookie, name}) => ({
+export const successfulSetCookie = ({cookie, name}: {cookie?: string, name: string}) => ({
   payload: {cookie, name},
   type: COOKIE_SET_SUCCESS,
 });
@@ -78,8 +78,8 @@ export const startRemoveCookie = ({cookie, name}) => ({
   type: COOKIE_REMOVE_SUCCESS,
 });
 
-export const successfulRemoveCookie = ({cookie, name}) => ({
-  payload: {cookie, name},
+export const successfulRemoveCookie = (name: string) => ({
+  payload: {name},
   type: COOKIE_REMOVE_SUCCESS,
 });
 
