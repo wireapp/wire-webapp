@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import * as React from 'react';
 import {mockStore, mountWithStore} from '../util/TestUtil';
 import Root from './Root';
 

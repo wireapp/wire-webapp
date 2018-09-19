@@ -3,6 +3,7 @@
 !/aws/templates/base_error.html
 !/aws/templates/debug.html
 !/aws/templates/error.html
+.awcache
 .DS_Store
 .grunt
 .Icon

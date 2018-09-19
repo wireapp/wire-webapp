@@ -21,7 +21,7 @@ import {Link, Small, Logo, Header, Footer, Content, CloseIcon} from '@wireapp/re
 import {footerStrings, cookiePolicyStrings} from '../../strings';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
-import React from 'react';
+import * as React from 'react';
 
 export const WirelessContainer = ({
   showCookiePolicyBanner,

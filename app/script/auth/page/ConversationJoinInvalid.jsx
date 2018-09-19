@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import React from 'react';
+import * as React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {conversationJoinStrings} from '../../strings';

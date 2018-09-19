@@ -19,7 +19,7 @@
 
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
-import React from 'react';
+import * as React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
 import {resetError} from '../module/action/creator/ClientActionCreator';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';

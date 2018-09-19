@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import * as React from 'react';
 import {mockStore, mountWithIntl} from '../util/TestUtil';
 import AccountForm from './AccountForm';
 

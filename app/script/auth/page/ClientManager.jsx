@@ -20,7 +20,7 @@
 import {H1, Muted, Link, ContainerXS} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import Page from './Page';
-import React from 'react';
+import * as React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
 import ClientList from '../component/ClientList';
 import * as AuthAction from '../module/action/AuthAction';

@@ -29,7 +29,7 @@ import {REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
-import React from 'react';
+import * as React from 'react';
 import {ROUTE} from '../route';
 
 const changeEmailRedirect = {

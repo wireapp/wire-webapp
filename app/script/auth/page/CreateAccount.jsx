@@ -23,7 +23,7 @@ import {injectIntl} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import Page from './Page';
-import React from 'react';
+import * as React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 

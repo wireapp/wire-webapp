@@ -34,7 +34,7 @@ import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
 import {getAppPath} from '../util/urlUtil';
 import Page from './Page';
-import React from 'react';
+import * as React from 'react';
 import {createSuggestions} from '../util/handleUtil';
 import {checkHandles} from '../module/action/UserAction';
 import {setHandle, doGetConsents, doSetConsent} from '../module/action/SelfAction';

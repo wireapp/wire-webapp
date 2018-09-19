@@ -23,7 +23,7 @@ import {injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
-import React from 'react';
+import * as React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 import * as AuthSelector from '../module/selector/AuthSelector';

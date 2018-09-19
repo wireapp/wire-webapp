@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import * as React from 'react';
 import {StyledApp} from '@wireapp/react-ui-kit';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Index from './Index';

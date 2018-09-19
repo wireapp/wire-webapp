@@ -19,7 +19,7 @@
 
 import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
-import React from 'react';
+import * as React from 'react';
 import {Paragraph, Text, Logo, ContainerXS} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';

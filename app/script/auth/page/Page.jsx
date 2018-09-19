@@ -20,7 +20,7 @@
 import {connect} from 'react-redux';
 import {REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import React from 'react';
+import * as React from 'react';
 import {ROUTE} from '../route';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';

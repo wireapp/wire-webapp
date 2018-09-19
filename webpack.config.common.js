@@ -20,18 +20,13 @@
 const path = require('path');
 const webpack = require('webpack');
 
-// https://github.com/babel/babel-loader/issues/149
-const babelSettings = {
-  extends: path.join(__dirname, '/.babelrc'),
-};
-
 const dist = 'aws/static/';
 const srcScript = 'app/script/auth/';
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    script: path.resolve(__dirname, srcScript, 'main.js'),
+    script: path.resolve(__dirname, srcScript, 'main.tsx'),
   },
   externals: {
     'fs-extra': '{}',
@@ -41,10 +36,16 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        test: /\.jsx?$/,
+        test: /\.tsx?$/,
         use: [
           {
-            loader: `babel-loader?${JSON.stringify(babelSettings)}`,
+            loader: 'awesome-typescript-loader',
+            options: {
+              babelCore: '@babel/core',
+              sourceMap: true,
+              useBabel: true,
+              useCache: true,
+            },
           },
         ],
       },

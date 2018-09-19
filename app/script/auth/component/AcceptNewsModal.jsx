@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import * as React from 'react';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';

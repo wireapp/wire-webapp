@@ -26,8 +26,8 @@ import configureStore from './configureStore';
 import configureClient from './configureClient';
 import configureCore from './configureCore';
 import configureEnvironment from './configureEnvironment';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Root from './page/Root';
 import CookieStore from 'js-cookie';
 

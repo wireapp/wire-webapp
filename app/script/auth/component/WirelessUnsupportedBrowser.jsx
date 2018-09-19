@@ -24,7 +24,7 @@ import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {isMobileOs} from '../Runtime';
-import React from 'react';
+import * as React from 'react';
 
 export const WirelessUnsupportedBrowser = ({children, isSupportedBrowser, intl: {formatMessage: _}}) =>
   isSupportedBrowser ? (

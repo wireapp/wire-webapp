@@ -23,7 +23,7 @@ import WirelessContainer from '../component/WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import React from 'react';
+import * as React from 'react';
 
 const showUnsupportedMessage = (headline, subhead) => (
   <ContainerXS verticalCenter centerText>
