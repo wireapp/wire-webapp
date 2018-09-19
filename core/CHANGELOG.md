@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.3.6"></a>
+## [6.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.3.5...@wireapp/core@6.3.6) (2018-09-19)
+
+
+### Bug Fixes
+
+* **core:** Add Article for old iOS devices ([#1140](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1140)) ([f0a4535](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f0a4535))
+
+
+
+
+
 <a name="6.3.5"></a>
 ## [6.3.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.3.4...@wireapp/core@6.3.5) (2018-09-19)
 
