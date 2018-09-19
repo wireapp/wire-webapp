@@ -3,7 +3,7 @@
     "@types/color": "3.0.0",
     "bazinga64": "5.3.10",
     "color": "3.0.0",
-    "react": "16.5.1",
+    "react": "16.5.2",
     "react-dom": "16.5.2",
     "recompose": "0.30.0",
     "styled-components": "3.4.8",
