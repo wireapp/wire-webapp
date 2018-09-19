@@ -64,7 +64,7 @@ export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
 export const ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW';
 export const ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW';
 
-export const startLogin = params => ({
+export const startLogin = (params?: any) => ({
   params,
   type: LOGIN_START,
 });
@@ -73,12 +73,12 @@ export const successfulLogin = () => ({
   type: LOGIN_SUCCESS,
 });
 
-export const failedLogin = error => ({
+export const failedLogin = (error?: any) => ({
   payload: error,
   type: LOGIN_FAILED,
 });
 
-export const startRegisterTeam = params => ({
+export const startRegisterTeam = (params?: any) => ({
   params,
   type: REGISTER_TEAM_START,
 });
@@ -88,12 +88,12 @@ export const successfulRegisterTeam = authData => ({
   type: REGISTER_TEAM_SUCCESS,
 });
 
-export const failedRegisterTeam = error => ({
+export const failedRegisterTeam = (error?: any) => ({
   payload: error,
   type: REGISTER_TEAM_FAILED,
 });
 
-export const startRegisterPersonal = params => ({
+export const startRegisterPersonal = (params?: any) => ({
   params,
   type: REGISTER_PERSONAL_START,
 });
@@ -103,12 +103,12 @@ export const successfulRegisterPersonal = authData => ({
   type: REGISTER_PERSONAL_SUCCESS,
 });
 
-export const failedRegisterPersonal = error => ({
+export const failedRegisterPersonal = (error?: any) => ({
   payload: error,
   type: REGISTER_PERSONAL_FAILED,
 });
 
-export const startRegisterWireless = params => ({
+export const startRegisterWireless = (params?: any) => ({
   params,
   type: REGISTER_WIRELESS_START,
 });
@@ -118,12 +118,12 @@ export const successfulRegisterWireless = authData => ({
   type: REGISTER_WIRELESS_SUCCESS,
 });
 
-export const failedRegisterWireless = error => ({
+export const failedRegisterWireless = (error?: any) => ({
   payload: error,
   type: REGISTER_WIRELESS_FAILED,
 });
 
-export const startRegisterJoin = params => ({
+export const startRegisterJoin = (params?: any) => ({
   params,
   type: REGISTER_JOIN_START,
 });
@@ -133,7 +133,7 @@ export const successfulRegisterJoin = authData => ({
   type: REGISTER_JOIN_SUCCESS,
 });
 
-export const failedRegisterJoin = error => ({
+export const failedRegisterJoin = (error?: any) => ({
   payload: error,
   type: REGISTER_JOIN_FAILED,
 });
@@ -147,7 +147,7 @@ export const successfulRefresh = authData => ({
   type: REFRESH_SUCCESS,
 });
 
-export const failedRefresh = error => ({
+export const failedRefresh = (error?: any) => ({
   payload: error,
   type: REFRESH_FAILED,
 });
@@ -160,7 +160,7 @@ export const successfulValidateLocalClient = () => ({
   type: VALIDATE_LOCAL_CLIENT_SUCCESS,
 });
 
-export const failedValidateLocalClient = error => ({
+export const failedValidateLocalClient = (error?: any) => ({
   payload: error,
   type: VALIDATE_LOCAL_CLIENT_FAILED,
 });
@@ -177,7 +177,7 @@ export const successfulSilentLogout = () => ({
   type: SILENT_LOGOUT_SUCCESS,
 });
 
-export const failedLogout = error => ({
+export const failedLogout = (error?: any) => ({
   payload: error,
   type: LOGOUT_FAILED,
 });
@@ -220,7 +220,7 @@ export const successfulGetInvitationFromCode = invitation => ({
   type: GET_INVITATION_FROM_CODE_SUCCESS,
 });
 
-export const failedGetInvitationFromCode = error => ({
+export const failedGetInvitationFromCode = (error?: any) => ({
   payload: error,
   type: GET_INVITATION_FROM_CODE_FAILED,
 });

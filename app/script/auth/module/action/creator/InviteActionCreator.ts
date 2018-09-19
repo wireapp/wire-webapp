@@ -23,7 +23,7 @@ export const INVITE_ADD_FAILED = 'INVITE_ADD_FAILED';
 
 export const INVITE_RESET_ERROR = 'INVITE_RESET_ERROR';
 
-export const startAddInvite = params => ({
+export const startAddInvite = (params?: any) => ({
   params,
   type: INVITE_ADD_START,
 });
@@ -33,7 +33,7 @@ export const successfulAddInvite = invite => ({
   type: INVITE_ADD_SUCCESS,
 });
 
-export const failedAddInvite = error => ({
+export const failedAddInvite = (error?: any) => ({
   payload: error,
   type: INVITE_ADD_FAILED,
 });

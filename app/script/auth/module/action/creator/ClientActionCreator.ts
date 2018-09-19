@@ -40,12 +40,12 @@ export const successfulGetAllClients = clients => ({
   type: CLIENTS_FETCH_SUCCESS,
 });
 
-export const failedGetAllClients = error => ({
+export const failedGetAllClients = (error?: any) => ({
   payload: error,
   type: CLIENTS_FETCH_FAILED,
 });
 
-export const startRemoveClient = params => ({
+export const startRemoveClient = (params?: any) => ({
   params,
   type: CLIENT_REMOVE_START,
 });
@@ -55,12 +55,12 @@ export const successfulRemoveClient = deletedClientId => ({
   type: CLIENT_REMOVE_SUCCESS,
 });
 
-export const failedRemoveClient = error => ({
+export const failedRemoveClient = (error?: any) => ({
   payload: error,
   type: CLIENT_REMOVE_FAILED,
 });
 
-export const startInitializeClient = params => ({
+export const startInitializeClient = (params?: any) => ({
   params,
   type: CLIENT_INIT_START,
 });
@@ -70,7 +70,7 @@ export const successfulInitializeClient = creationStatus => ({
   type: CLIENT_INIT_SUCCESS,
 });
 
-export const failedInitializeClient = error => ({
+export const failedInitializeClient = (error?: any) => ({
   payload: error,
   type: CLIENT_INIT_FAILED,
 });

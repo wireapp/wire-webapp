@@ -33,7 +33,7 @@ export const SELF_FETCH_START = 'SELF_FETCH_START';
 export const SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS';
 export const SELF_FETCH_FAILED = 'SELF_FETCH_FAILED';
 
-export const startSetHandle = params => ({
+export const startSetHandle = (params?: any) => ({
   params,
   type: HANDLE_SET_START,
 });
@@ -43,12 +43,12 @@ export const successfulSetHandle = selfUser => ({
   type: HANDLE_SET_SUCCESS,
 });
 
-export const failedSetHandle = error => ({
+export const failedSetHandle = (error?: any) => ({
   payload: error,
   type: HANDLE_SET_FAILED,
 });
 
-export const startFetchSelf = params => ({
+export const startFetchSelf = (params?: any) => ({
   params,
   type: SELF_FETCH_START,
 });
@@ -58,12 +58,12 @@ export const successfulFetchSelf = selfUser => ({
   type: SELF_FETCH_SUCCESS,
 });
 
-export const failedFetchSelf = error => ({
+export const failedFetchSelf = (error?: any) => ({
   payload: error,
   type: SELF_FETCH_FAILED,
 });
 
-export const startGetConsents = params => ({
+export const startGetConsents = (params?: any) => ({
   params,
   type: CONSENT_GET_START,
 });
@@ -73,12 +73,12 @@ export const successfulGetConsents = consents => ({
   type: CONSENT_GET_SUCCESS,
 });
 
-export const failedGetConsents = error => ({
+export const failedGetConsents = (error?: any) => ({
   payload: error,
   type: CONSENT_GET_FAILED,
 });
 
-export const startSetConsent = params => ({
+export const startSetConsent = (params?: any) => ({
   params,
   type: CONSENT_SET_START,
 });
@@ -88,7 +88,7 @@ export const successfulSetConsent = consent => ({
   type: CONSENT_SET_SUCCESS,
 });
 
-export const failedSetConsent = error => ({
+export const failedSetConsent = (error?: any) => ({
   payload: error,
   type: CONSENT_SET_FAILED,
 });

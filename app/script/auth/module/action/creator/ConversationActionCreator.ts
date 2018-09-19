@@ -25,7 +25,7 @@ export const CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START';
 export const CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS';
 export const CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED';
 
-export const startConversationCodeCheck = params => ({
+export const startConversationCodeCheck = (params?: any) => ({
   params,
   type: CONVERSATION_CODE_CHECK_START,
 });
@@ -34,12 +34,12 @@ export const successfulConversationCodeCheck = () => ({
   type: CONVERSATION_CODE_CHECK_SUCCESS,
 });
 
-export const failedConversationCodeCheck = error => ({
+export const failedConversationCodeCheck = (error?: any) => ({
   payload: error,
   type: CONVERSATION_CODE_CHECK_FAILED,
 });
 
-export const startJoinConversationByCode = params => ({
+export const startJoinConversationByCode = (params?: any) => ({
   params,
   type: CONVERSATION_CODE_JOIN_START,
 });
@@ -49,7 +49,7 @@ export const successfulJoinConversationByCode = data => ({
   type: CONVERSATION_CODE_JOIN_SUCCESS,
 });
 
-export const failedJoinConversationByCode = error => ({
+export const failedJoinConversationByCode = (error?: any) => ({
   payload: error,
   type: CONVERSATION_CODE_JOIN_FAILED,
 });

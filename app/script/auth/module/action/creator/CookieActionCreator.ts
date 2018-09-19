@@ -43,7 +43,7 @@ export const startCookiePolling = ({name, timerId}) => ({
   type: COOKIE_POLLING_START,
 });
 
-export const failedCookiePolling = error => ({
+export const failedCookiePolling = (error?: any) => ({
   payload: error,
   type: COOKIE_POLLING_FAILED,
 });
@@ -53,7 +53,7 @@ export const successfulGetCookie = ({cookie, name}) => ({
   type: COOKIE_GET_SUCCESS,
 });
 
-export const failedGetCookie = error => ({
+export const failedGetCookie = (error?: any) => ({
   payload: error,
   type: COOKIE_GET_FAILED,
 });
@@ -68,7 +68,7 @@ export const successfulSetCookie = ({cookie, name}) => ({
   type: COOKIE_SET_SUCCESS,
 });
 
-export const failedSetCookie = error => ({
+export const failedSetCookie = (error?: any) => ({
   payload: error,
   type: COOKIE_SET_FAILED,
 });
@@ -83,7 +83,7 @@ export const successfulRemoveCookie = ({cookie, name}) => ({
   type: COOKIE_REMOVE_SUCCESS,
 });
 
-export const failedRemoveCookie = error => ({
+export const failedRemoveCookie = (error?: any) => ({
   payload: error,
   type: COOKIE_REMOVE_FAILED,
 });

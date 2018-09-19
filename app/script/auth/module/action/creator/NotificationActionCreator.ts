@@ -32,7 +32,7 @@ export const successfulCheckHistory = hasHistory => ({
   type: NOTIFICATION_CHECK_HISTORY_SUCCESS,
 });
 
-export const failedCheckHistory = error => ({
+export const failedCheckHistory = (error?: any) => ({
   payload: error,
   type: NOTIFICATION_CHECK_HISTORY_FAILED,
 });

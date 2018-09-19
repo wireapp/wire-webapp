@@ -30,7 +30,7 @@ export const successfulSendActivationCode = activationResponse => ({
   type: USER_SEND_ACTIVATION_CODE_SUCCESS,
 });
 
-export const failedSendActivationCode = error => ({
+export const failedSendActivationCode = (error?: any) => ({
   payload: error,
   type: USER_SEND_ACTIVATION_CODE_FAILED,
 });
