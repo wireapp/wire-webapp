@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "declaration": false,
     "lib": ["dom", "es2017"],
     "outDir": "app/script/auth",
