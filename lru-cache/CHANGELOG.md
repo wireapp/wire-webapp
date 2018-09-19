@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.2.0...@wireapp/lru-cache@3.0.0) (2018-09-19)
+
+
+### Code Refactoring
+
+* **lru-cache:** Implement iterator and getAll returns object ([#1126](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/1126)) ([60da2d0](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/60da2d0))
+
+
+### BREAKING CHANGES
+
+* **lru-cache:** getAll now returns an object instead of an array.
+
+
+
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.1.54...@wireapp/lru-cache@2.2.0) (2018-09-18)
 
