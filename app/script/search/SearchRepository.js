@@ -72,6 +72,9 @@ z.search.SearchRepository = class SearchRepository {
    * @returns {Array<z.entity.User>} the filtered list of users
    */
   searchUserInSet(term, userEntities, properties) {
+    if (term === '') {
+      return userEntities;
+    }
     const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
     properties = properties || [SEARCHABLE_FIELDS.FIRST_NAME, SEARCHABLE_FIELDS.LAST_NAME, SEARCHABLE_FIELDS.USERNAME];
     const excludedEmojis = Array.from(term).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
