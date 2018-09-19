@@ -23,7 +23,7 @@ import * as React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
 import {resetError} from '../module/action/creator/ClientActionCreator';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import ClientItem from '../component/ClientItem';
+import ClientItem from './ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
 import {ROUTE} from '../route';

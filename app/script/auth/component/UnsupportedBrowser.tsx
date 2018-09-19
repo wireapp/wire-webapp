@@ -19,7 +19,7 @@
 
 import {H1, H2, H3, Text, Container, ContainerXS, COLOR, Loading, Logo} from '@wireapp/react-ui-kit';
 import {unsupportedStrings} from '../../strings';
-import WirelessContainer from '../component/WirelessContainer';
+import WirelessContainer from './WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
