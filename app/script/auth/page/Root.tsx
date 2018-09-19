@@ -34,9 +34,9 @@ import Verify from './Verify';
 import HistoryInfo from './HistoryInfo';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
-import de from 'react-intl/locale-data/de';
+import * as de from 'react-intl/locale-data/de';
 import {ROUTE} from '../route';
-import SUPPORTED_LOCALE from '../supportedLocales';
+const SUPPORTED_LOCALE = require('../supportedLocales');
 import * as CookieAction from '../module/action/CookieAction';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {APP_INSTANCE_ID} from '../config';
@@ -44,7 +44,21 @@ import SingleSignOn from './SingleSignOn';
 
 addLocaleData([...de]);
 
-class Root extends React.Component {
+interface Props extends React.HTMLAttributes<Root> {}
+
+interface ConnectedProps {
+  language: string;
+}
+
+interface DispatchProps {
+  startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<any>;
+  safelyRemoveCookie: (name: string, value: string) => Promise<any>;
+  stopPolling: (name?: string) => Promise<any>;
+}
+
+interface State {}
+
+class Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
   componentDidMount = () => {
     this.props.startPolling();
     window.onbeforeunload = () => {
