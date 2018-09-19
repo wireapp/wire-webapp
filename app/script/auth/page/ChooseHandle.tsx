@@ -30,7 +30,7 @@ import {
   Muted,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {parseError} from '../util/errorUtil';
 import {getAppPath} from '../util/urlUtil';
 import Page from './Page';
@@ -43,29 +43,34 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
-import {withRouter} from 'react-router';
+import {withRouter, RouteComponentProps} from 'react-router';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
+import {RootState} from "../module/reducer";
 
-interface Props extends React.HTMLAttributes<ChooseHandle> {}
+interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
+  hasUnsetMarketingConsent: boolean;
+  isFetching: boolean;
+  isTeamFlow: boolean;
   name: string;
-  // language: string;
 }
 
 interface DispatchProps {
   doGetConsents: () => Promise<any>;
-  // checkHandles: (handles) => void;
-  // startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<any>;
-  // safelyRemoveCookie: (name: string, value: string) => Promise<any>;
-  // stopPolling: (name?: string) => Promise<any>;
+  checkHandles: (handles: string[]) => Promise<string>;
+  setHandle: (handle: string) => Promise<void>,
+  doSetConsent
 }
 
-interface State {}
+interface State {
+  error: Error,
+  handle: string,
+}
 
-class ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps, State> {
-  constructor(props) {
+class ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  constructor(props: Props & ConnectedProps & DispatchProps & InjectedIntlProps) {
     super(props);
     this.state = {
       error: null,
@@ -82,7 +87,7 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
       .catch(error => this.setState({error}));
   }
 
-  updateConsent = (consentType, value) => this.props.doSetConsent(consentType, value);
+  updateConsent = (consentType: ConsentType, value: number) => this.props.doSetConsent(consentType, value);
 
   onSetHandle = event => {
     event.preventDefault();
@@ -153,7 +158,7 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
         isFetching: SelfSelector.isFetching(state),
         isTeamFlow: AuthSelector.isTeamFlow(state),

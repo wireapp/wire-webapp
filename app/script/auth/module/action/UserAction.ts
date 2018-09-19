@@ -21,7 +21,7 @@ import * as UserActionCreator from './creator/UserActionCreator';
 import {currentLanguage} from '../../localeConfig';
 import {ThunkAction} from "../reducer";
 
-export function checkHandles(handles: string[]): ThunkAction<string> {
+export function checkHandles(handles: string[]): ThunkAction<Promise<string>> {
   return function (dispatch, getState, {apiClient}) {
     return apiClient.user.api.postHandles({handles, return: 1}).then(result => result[0]);
   };

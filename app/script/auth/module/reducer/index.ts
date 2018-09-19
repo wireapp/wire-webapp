@@ -41,7 +41,7 @@ export type Api = {
 export interface RootState {
 }
 
-export type ThunkAction<T = void> = ReduxThunkAction<Promise<T>, RootState, Api, AnyAction>;
+export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
 
 const reducers = {
   authState: authReducer,

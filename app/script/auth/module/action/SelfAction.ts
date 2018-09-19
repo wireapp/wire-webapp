@@ -19,9 +19,11 @@
 
 import * as SelfActionCreator from './creator/SelfActionCreator';
 import {APP_NAME} from '../../config';
+import {ThunkAction} from "../reducer";
+import {ConsentType} from '@wireapp/api-client/dist/commonjs/self';
 
 export function fetchSelf() {
-  return function(dispatch, getState, {apiClient}) {
+  return function (dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startFetchSelf());
     return apiClient.self.api
       .getSelf()
@@ -40,13 +42,15 @@ export function fetchSelf() {
   };
 }
 
-export function setHandle(handle) {
-  return function(dispatch, getState, {apiClient}) {
+export function setHandle(handle: string): ThunkAction {
+  return function (dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetHandle());
     return apiClient.self.api
       .putHandle({handle: handle.trim().toLowerCase()})
       .then(() => dispatch(fetchSelf()).then(action => action.payload))
-      .then(result => dispatch(SelfActionCreator.successfulSetHandle(result)))
+      .then(result => {
+        dispatch(SelfActionCreator.successfulSetHandle(result));
+      })
       .catch(error => {
         dispatch(SelfActionCreator.failedSetHandle(error));
         throw error;
@@ -54,12 +58,14 @@ export function setHandle(handle) {
   };
 }
 
-export function doGetConsents() {
-  return function(dispatch, getState, {apiClient}) {
+export function doGetConsents(): ThunkAction {
+  return function (dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startGetConsents());
     return apiClient.self.api
       .getConsents()
-      .then(({results}) => dispatch(SelfActionCreator.successfulGetConsents(results)))
+      .then(({results}) => {
+        dispatch(SelfActionCreator.successfulGetConsents(results));
+      })
       .catch(error => {
         dispatch(SelfActionCreator.failedGetConsents(error));
         throw error;
@@ -67,8 +73,8 @@ export function doGetConsents() {
   };
 }
 
-export function doSetConsent(consentType, value) {
-  return function(dispatch, getState, {apiClient}) {
+export function doSetConsent(consentType: ConsentType, value: number): ThunkAction {
+  return function (dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetConsent());
     const consent = {
       source: `${APP_NAME} ${window.z.util.Environment.version(false)}`,
@@ -77,7 +83,9 @@ export function doSetConsent(consentType, value) {
     };
     return apiClient.self.api
       .putConsent(consent)
-      .then(() => dispatch(SelfActionCreator.successfulSetConsent(consent)))
+      .then(() => {
+        dispatch(SelfActionCreator.successfulSetConsent(consent));
+      })
       .catch(error => {
         dispatch(SelfActionCreator.failedSetConsent(error));
         throw error;
