@@ -24,90 +24,98 @@ import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
 import * as NotificationAction from './NotificationAction';
 import {ClientType, RegisteredClient, ClientClassification} from '@wireapp/api-client/dist/commonjs/client/index';
-import {ThunkAction} from "../reducer";
+import {ThunkAction} from '../reducer';
 import {ClientInfo} from '@wireapp/core/dist/client/root';
 
-export function doGetAllClients(): ThunkAction<Promise<RegisteredClient[]>> {
-  return function(dispatch, getState, {apiClient}) {
-    dispatch(ClientActionCreator.startGetAllClients());
-    return Promise.resolve()
-      .then(() => apiClient.client.api.getClients())
-      .then(clients => {
-        dispatch(ClientActionCreator.successfulGetAllClients(clients));
-        return clients;
-      })
-      .catch(error => {
-        dispatch(ClientActionCreator.failedGetAllClients(error));
-        throw error;
-      });
+export class ClientAction {
+  doGetAllClients = (): ThunkAction<Promise<RegisteredClient[]>> => {
+    return function(dispatch, getState, {apiClient}) {
+      dispatch(ClientActionCreator.startGetAllClients());
+      return Promise.resolve()
+        .then(() => apiClient.client.api.getClients())
+        .then(clients => {
+          dispatch(ClientActionCreator.successfulGetAllClients(clients));
+          return clients;
+        })
+        .catch(error => {
+          dispatch(ClientActionCreator.failedGetAllClients(error));
+          throw error;
+        });
+    };
   };
-}
 
-export function doRemoveClient(clientId, password): ThunkAction {
-  return function(dispatch, getState, {apiClient}) {
-    dispatch(ClientActionCreator.startRemoveClient());
-    return Promise.resolve()
-      .then(() => apiClient.client.api.deleteClient(clientId, password))
-      .then(clients => {
-        dispatch(ClientActionCreator.successfulRemoveClient(clientId));
-      })
-      .catch(error => {
-        dispatch(ClientActionCreator.failedRemoveClient(error));
-        throw error;
-      });
+  doRemoveClient = (clientId, password): ThunkAction => {
+    return function(dispatch, getState, {apiClient}) {
+      dispatch(ClientActionCreator.startRemoveClient());
+      return Promise.resolve()
+        .then(() => apiClient.client.api.deleteClient(clientId, password))
+        .then(clients => {
+          dispatch(ClientActionCreator.successfulRemoveClient(clientId));
+        })
+        .catch(error => {
+          dispatch(ClientActionCreator.failedRemoveClient(error));
+          throw error;
+        });
+    };
   };
-}
 
-export function doInitializeClient(clientType: ClientType, password?: string): ThunkAction {
-  return function(dispatch, getState, {core}) {
-    dispatch(ClientActionCreator.startInitializeClient());
-    return Promise.resolve()
-      .then(() => core.initClient({clientType, password}, generateClientPayload(clientType)))
-      .then(creationStatus =>
-        Promise.resolve()
-          .then(() => dispatch(ClientActionCreator.successfulInitializeClient(creationStatus)))
-          .then(() => creationStatus)
-      )
-      .then(creationStatus => {
-        const isNewSubsequentClient = password && creationStatus.isNewClient;
-        if (isNewSubsequentClient) {
-          dispatch(NotificationAction.checkHistory());
-          throw new BackendError({code: 201, label: BackendError.LABEL.NEW_CLIENT, message: 'New client is created.'});
-        }
-      })
-      .catch(error => {
-        dispatch(ClientActionCreator.failedInitializeClient(error));
-        throw error;
-      });
+  doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
+    return function(dispatch, getState, {core, actions: {clientAction}}) {
+      dispatch(ClientActionCreator.startInitializeClient());
+      return Promise.resolve()
+        .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))
+        .then(creationStatus =>
+          Promise.resolve()
+            .then(() => dispatch(ClientActionCreator.successfulInitializeClient(creationStatus)))
+            .then(() => creationStatus)
+        )
+        .then(creationStatus => {
+          const isNewSubsequentClient = password && creationStatus.isNewClient;
+          if (isNewSubsequentClient) {
+            dispatch(NotificationAction.checkHistory());
+            throw new BackendError({
+              code: 201,
+              label: BackendError.LABEL.NEW_CLIENT,
+              message: 'New client is created.',
+            });
+          }
+        })
+        .catch(error => {
+          dispatch(ClientActionCreator.failedInitializeClient(error));
+          throw error;
+        });
+    };
   };
-}
 
-export function generateClientPayload(clientType: ClientType): ClientInfo {
-  if (clientType === ClientType.NONE) {
-    return undefined;
-  }
-  const deviceLabel = `${Runtime.getOsFamily()}${Runtime.getOs().version ? ` ${Runtime.getOs().version}` : ''}`;
-  let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
-
-  if (Runtime.isElectron()) {
-    if (Runtime.isMacOS()) {
-      deviceModel = 'Wire macOS';
-    } else if (Runtime.isWindows()) {
-      deviceModel = 'Wire Windows';
-    } else {
-      deviceModel = 'Wire Linux';
+  generateClientPayload = (clientType: ClientType): ClientInfo => {
+    if (clientType === ClientType.NONE) {
+      return undefined;
     }
-    if (!Environment.isEnvironment(Environment.PRODUCTION)) {
-      deviceModel = `${deviceModel} (Internal)`;
-    }
-  } else if (clientType === ClientType.TEMPORARY) {
-    deviceModel = `${deviceModel} (Temporary)`;
-  }
+    const deviceLabel = `${Runtime.getOsFamily()}${Runtime.getOs().version ? ` ${Runtime.getOs().version}` : ''}`;
+    let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
 
-  return {
-    classification: ClientClassification.DESKTOP,
-    cookieLabel: undefined,
-    label: deviceLabel,
-    model: deviceModel,
+    if (Runtime.isElectron()) {
+      if (Runtime.isMacOS()) {
+        deviceModel = 'Wire macOS';
+      } else if (Runtime.isWindows()) {
+        deviceModel = 'Wire Windows';
+      } else {
+        deviceModel = 'Wire Linux';
+      }
+      if (!Environment.isEnvironment(Environment.PRODUCTION)) {
+        deviceModel = `${deviceModel} (Internal)`;
+      }
+    } else if (clientType === ClientType.TEMPORARY) {
+      deviceModel = `${deviceModel} (Temporary)`;
+    }
+
+    return {
+      classification: ClientClassification.DESKTOP,
+      cookieLabel: undefined,
+      label: deviceLabel,
+      model: deviceModel,
+    };
   };
 }
+
+export const clientAction = new ClientAction();
