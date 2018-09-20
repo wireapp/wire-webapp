@@ -157,9 +157,10 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    *
    * @param {z.entity.Conversation|string} conversation - Conversation entity or conversation ID
    * @param {z.entity.Message} [messageEntity] - Message to scroll to
+   * @param {boolean} [openFirstSelfMention=false] - Open first self mention instead of passed message
    * @returns {undefined} No return value
    */
-  showConversation(conversation, messageEntity) {
+  showConversation(conversation, messageEntity, openFirstSelfMention = false) {
     if (!conversation) {
       return this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
@@ -188,6 +189,10 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
       if (!isActiveConversation) {
         this.conversationRepository.active_conversation(conversationEntity);
+      }
+
+      if (openFirstSelfMention) {
+        messageEntity = conversationEntity.getFirstUnreadSelfMention();
       }
 
       this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
