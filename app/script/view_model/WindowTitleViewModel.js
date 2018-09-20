@@ -55,7 +55,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
           .conversations_unarchived()
           .filter(conversationEntity => {
             const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
-            const hasActions = conversationEntity.unread_message_count() || conversationEntity.hasJoinableCall();
+            const hasActions = conversationEntity.unreadMessagesCount() || conversationEntity.hasJoinableCall();
             return hasActions && !isIgnored;
           }).length;
 

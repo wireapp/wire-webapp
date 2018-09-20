@@ -1036,7 +1036,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   markAsRead(conversationEntity) {
     if (conversationEntity) {
       const hasUnreadEvents = conversationEntity.last_read_timestamp() < conversationEntity.last_server_timestamp();
-      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unread_event_count();
+      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadEventsCount();
       if (isNotMarkedAsRead && !this.block_event_handling()) {
         this._updateLastReadTimestamp(conversationEntity);
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);

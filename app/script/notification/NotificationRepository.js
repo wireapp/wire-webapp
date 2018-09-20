@@ -561,7 +561,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
     if (messageEntity.is_content() && messageEntity.isSelfMentioned()) {
-      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity);
+      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity, true);
     }
 
     if (!messageEntity.is_member()) {
