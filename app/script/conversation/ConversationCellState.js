@@ -44,7 +44,7 @@ z.conversation.ConversationCellState = (() => {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
-      } else if (messageEntity.isMention()) {
+      } else if (messageEntity.isSelfMentioned()) {
         activities[ACTIVITY_TYPE.MENTION] += 1;
       } else if (messageEntity.is_content()) {
         activities[ACTIVITY_TYPE.MESSAGE] += 1;

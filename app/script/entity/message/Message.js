@@ -202,12 +202,6 @@ z.entity.Message = class Message {
     );
   }
 
-  isMention() {
-    return (
-      this.has_asset_text() && this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.mentions().length)
-    );
-  }
-
   /**
    * Check if message is a member message.
    * @returns {boolean} Is message of type member

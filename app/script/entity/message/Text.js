@@ -54,10 +54,6 @@ z.entity.Text = class Text extends z.entity.Asset {
     return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, this.theme_color) : message;
   }
 
-  hasMentions() {
-    return !!this.mentions().length;
-  }
-
   isSelfMentioned() {
     return this.mentions().some(mentionEntity => mentionEntity.isSelfMentioned());
   }
