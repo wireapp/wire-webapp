@@ -325,11 +325,15 @@ z.notification.NotificationRepository = class NotificationRepository {
 
   /**
    * Creates the notification body for obfuscated messages.
+   *
    * @private
+   * @param {z.entity.Message} messageEntity - Message to obfuscate body for
    * @returns {string} Notification message body
    */
-  _createBodyObfuscated() {
-    return z.l10n.text(z.string.notificationObfuscated);
+  _createBodyObfuscated(messageEntity) {
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    const stringId = isSelfMentioned ? z.string.notificationObfuscatedMention : z.string.notificationObfuscated;
+    return z.l10n.text(stringId);
   }
 
   /**
@@ -411,7 +415,7 @@ z.notification.NotificationRepository = class NotificationRepository {
           const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
           return {
             options: {
-              body: shouldObfuscateMessage ? this._createBodyObfuscated() : optionsBody,
+              body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : optionsBody,
               data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
               icon: iconUrl,
               silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
