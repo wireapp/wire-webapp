@@ -22,7 +22,7 @@ import {APP_NAME} from '../../config';
 import {ThunkAction} from "../reducer";
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self';
 
-export function fetchSelf() {
+export function fetchSelf(): ThunkAction<Promise<any>> {
   return function (dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startFetchSelf());
     return apiClient.self.api

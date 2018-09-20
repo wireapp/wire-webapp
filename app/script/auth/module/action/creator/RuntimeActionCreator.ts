@@ -27,7 +27,7 @@ export const startCheckIndexedDb = () => ({
   type: RUNTIME_CHECK_INDEXEDDB_START,
 });
 
-export const finishCheckIndexedDb = result => ({
+export const finishCheckIndexedDb = (result: boolean) => ({
   payload: result,
   type: RUNTIME_CHECK_INDEXEDDB_FINISH,
 });
@@ -36,7 +36,7 @@ export const startCheckCookie = () => ({
   type: RUNTIME_CHECK_COOKIE_START,
 });
 
-export const finishCheckCookie = result => ({
+export const finishCheckCookie = (result: boolean) => ({
   payload: result,
   type: RUNTIME_CHECK_COOKIE_FINISH,
 });

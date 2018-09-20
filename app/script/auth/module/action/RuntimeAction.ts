@@ -22,8 +22,10 @@ import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
 import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime';
 import {hasURLParameter} from '../../util/urlUtil';
 import {QUERY_KEY} from '../../route';
+import {Cookies} from 'js-cookie';
+import {ThunkAction} from "../reducer";
 
-export function checkSupportedBrowser() {
+export function checkSupportedBrowser(): ThunkAction<void> {
   return function(dispatch) {
     const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
     const isPwaSupportedBrowser = Environment.onEnvironment({
@@ -36,25 +38,33 @@ export function checkSupportedBrowser() {
   };
 }
 
-export function checkIndexedDbSupport() {
+export function checkIndexedDbSupport(): ThunkAction<void> {
   return function(dispatch) {
     dispatch(RuntimeActionCreator.startCheckIndexedDb());
     hasIndexedDbSupport()
-      .then(() => dispatch(RuntimeActionCreator.finishCheckIndexedDb(true)))
-      .catch(() => dispatch(RuntimeActionCreator.finishCheckIndexedDb(false)));
+      .then(() => {
+        dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
+      })
+      .catch(() => {
+        dispatch(RuntimeActionCreator.finishCheckIndexedDb(false));
+      });
   };
 }
 
-export function checkCookieSupport() {
+export function checkCookieSupport(): ThunkAction<void> {
   return function(dispatch) {
     dispatch(RuntimeActionCreator.startCheckCookie());
     hasCookieSupport()
-      .then(() => dispatch(RuntimeActionCreator.finishCheckCookie(true)))
-      .catch(() => dispatch(RuntimeActionCreator.finishCheckCookie(false)));
+      .then(() => {
+        dispatch(RuntimeActionCreator.finishCheckCookie(true));
+      })
+      .catch(() => {
+        dispatch(RuntimeActionCreator.finishCheckCookie(false));
+      });
   };
 }
 
-function hasCookieSupport() {
+function hasCookieSupport(): Promise<void> {
   const cookieName = 'cookie_supported';
 
   return new Promise((resolve, reject) => {
@@ -74,7 +84,7 @@ function hasCookieSupport() {
   });
 }
 
-function hasIndexedDbSupport() {
+function hasIndexedDbSupport(): Promise<void> {
   let supportIndexedDb;
   try {
     supportIndexedDb = !!window.indexedDB;

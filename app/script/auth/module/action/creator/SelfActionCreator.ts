@@ -17,6 +17,8 @@
  *
  */
 
+import {Self} from "@wireapp/api-client/dist/commonjs/self";
+
 export const CONSENT_GET_START = 'CONSENT_GET_START';
 export const CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS';
 export const CONSENT_GET_FAILED = 'CONSENT_GET_FAILED';
@@ -38,7 +40,7 @@ export const startSetHandle = (params?: any) => ({
   type: HANDLE_SET_START,
 });
 
-export const successfulSetHandle = selfUser => ({
+export const successfulSetHandle = (selfUser: Self) => ({
   payload: selfUser,
   type: HANDLE_SET_SUCCESS,
 });
@@ -53,7 +55,7 @@ export const startFetchSelf = (params?: any) => ({
   type: SELF_FETCH_START,
 });
 
-export const successfulFetchSelf = selfUser => ({
+export const successfulFetchSelf = (selfUser: Self) => ({
   payload: selfUser,
   type: SELF_FETCH_SUCCESS,
 });
