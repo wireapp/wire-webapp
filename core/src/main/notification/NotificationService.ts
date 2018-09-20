@@ -51,12 +51,12 @@ export default class NotificationService {
     return this.getNotificationEventList().then(notificationEvents => !!notificationEvents.length);
   }
 
-  private getNotificationEventList(): Promise<NotificationEvent[]> {
+  public getNotificationEventList(): Promise<NotificationEvent[]> {
     this.logger.log('getNotificationEventList');
     return this.database.getNotificationEventList();
   }
 
-  private setLastEventDate(eventDate: Date): Promise<Date> {
+  public setLastEventDate(eventDate: Date): Promise<Date> {
     this.logger.log('setLastEventDate');
     return this.database
       .getLastEventDate()
@@ -74,7 +74,7 @@ export default class NotificationService {
       });
   }
 
-  private setLastNotificationId(lastNotification: Notification): Promise<string> {
+  public setLastNotificationId(lastNotification: Notification): Promise<string> {
     this.logger.log('setLastNotificationId');
     return this.database
       .getLastNotificationId()
