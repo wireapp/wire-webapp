@@ -216,12 +216,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   addMention(userEntity, inputElement) {
     const editedMention = this.editedMention();
-    const mentionData = {
-      length: userEntity.name().length + 1,
-      start: editedMention.start,
-      user_id: userEntity.id,
-    };
-    const mentionEntity = new z.message.MentionEntity(mentionData);
+    const mentionEntity = new z.message.MentionEntity(editedMention.start, userEntity.name().length + 1, userEntity.id);
     this.currentMentions.push(mentionEntity);
 
     // keep track of what is before and after the mention being edited
