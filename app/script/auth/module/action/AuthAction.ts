@@ -157,7 +157,8 @@ export function doRegisterTeam(registration: RegisterData): ThunkAction {
     registration.team.icon = 'default';
     registration.team.binding = true;
     // TODO: Fixed once core v6 is inside
-    registration.team.currency = currentCurrency();
+    // eslint-disable-next-line dot-notation
+    registration.team['currency'] = currentCurrency();
     registration.team.name = registration.team.name.trim();
 
     let createdAccount;
@@ -238,7 +239,8 @@ export function doRegisterWireless(
     const obfuscatedRegistrationData = {
       accent_id: registrationData.accent_id,
       // TODO: Apply method call once core v6 is in
-      expires_in: registrationData.expires_in,
+      // eslint-disable-next-line dot-notation
+      expires_in: registrationData['expires_in'],
       locale: registrationData.locale,
       name: registrationData.name,
     };
