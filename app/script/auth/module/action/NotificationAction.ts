@@ -18,13 +18,16 @@
  */
 
 import * as NotificationActionCreator from './creator/NotificationActionCreator';
+import {ThunkAction} from "../reducer";
 
-export function checkHistory() {
-  return function(dispatch, getState, {core}) {
+export function checkHistory(): ThunkAction {
+  return function (dispatch, getState, {core}) {
     dispatch(NotificationActionCreator.startCheckHistory());
     return Promise.resolve()
       .then(() => core.service.notification.hasHistory())
-      .then(hasHistory => dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory)))
+      .then(hasHistory => {
+        dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory))
+      })
       .catch(error => {
         dispatch(NotificationActionCreator.failedCheckHistory(error));
         throw error;
@@ -32,14 +35,19 @@ export function checkHistory() {
   };
 }
 
-export function resetHistoryCheck() {
-  return function(dispatch) {
-    return Promise.resolve().then(() => dispatch(NotificationActionCreator.resetHistoryCheck()));
+export function resetHistoryCheck(): ThunkAction {
+  return function (dispatch) {
+    return Promise.resolve().then(() => {
+      dispatch(NotificationActionCreator.resetHistoryCheck());
+    });
   };
 }
 
-export function setLastEventDate(lastEventDate) {
-  return function(dispatch, getState, {core}) {
-    return Promise.resolve().then(() => core.service.notification.setLastEventDate(lastEventDate));
+export function setLastEventDate(lastEventDate): ThunkAction {
+  return function (dispatch, getState, {core}) {
+    return Promise.resolve().then(() => {
+      // TODO: Update call to private method once core v6 is inside!
+      core.service.notification['setLastEventDate'](lastEventDate);
+    });
   };
 }

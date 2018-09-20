@@ -49,7 +49,7 @@ export const startLocalStorageGet = (params?: any) => ({
   type: LOCAL_STORAGE_GET_START,
 });
 
-export const successfulLocalStorageGet = (key, value) => ({
+export const successfulLocalStorageGet = (key: string, value: string) => ({
   payload: {key, value},
   type: LOCAL_STORAGE_GET_SUCCESS,
 });
@@ -64,8 +64,8 @@ export const startLocalStorageDelete = (params?: any) => ({
   type: LOCAL_STORAGE_DELETE_START,
 });
 
-export const successfulLocalStorageDelete = (key, value) => ({
-  payload: {key, value},
+export const successfulLocalStorageDelete = (key: string) => ({
+  payload: {key},
   type: LOCAL_STORAGE_DELETE_SUCCESS,
 });
 

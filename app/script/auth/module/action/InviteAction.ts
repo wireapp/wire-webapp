@@ -22,10 +22,11 @@ import * as InviteSelector from '../selector/InviteSelector';
 import * as selfSelector from '../selector/SelfSelector';
 import * as languageSelector from '../selector/LanguageSelector';
 import BackendError from './BackendError';
+import {ThunkAction} from "../reducer";
 
-export function invite(invitation) {
+export function invite(invitation: { email: string, locale: string, inviter_name: string }): ThunkAction {
   const params = [...arguments];
-  return function(dispatch, getState, {apiClient}) {
+  return function (dispatch, getState, {apiClient}) {
     dispatch(InviteActionCreator.startAddInvite(params));
     const state = getState();
     const inviteList = InviteSelector.getInvites(state);
@@ -46,7 +47,9 @@ export function invite(invitation) {
     const teamId = selfSelector.getSelfTeamId(state);
     return Promise.resolve()
       .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
-      .then(createdInvite => dispatch(InviteActionCreator.successfulAddInvite(createdInvite)))
+      .then(createdInvite => {
+        dispatch(InviteActionCreator.successfulAddInvite(createdInvite))
+      })
       .catch(error => {
         dispatch(InviteActionCreator.failedAddInvite(error));
         throw error;

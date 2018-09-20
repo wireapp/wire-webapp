@@ -18,6 +18,7 @@
  */
 
 import * as LocalStorageActionCreator from './creator/LocalStorageActionCreator';
+import {ThunkAction} from "../reducer";
 
 export const LocalStorageKey = {
   AUTH: {
@@ -32,12 +33,14 @@ export const LocalStorageKey = {
   },
 };
 
-export function setLocalStorage(key, value) {
-  return function(dispatch, getState, {localStorage}) {
+export function setLocalStorage(key, value): ThunkAction {
+  return function (dispatch, getState, {localStorage}) {
     dispatch(LocalStorageActionCreator.startLocalStorageSet());
     return Promise.resolve()
       .then(() => localStorage.setItem(key, JSON.stringify({data: value})))
-      .then(() => dispatch(LocalStorageActionCreator.successfulLocalStorageSet(key, value)))
+      .then(() => {
+        dispatch(LocalStorageActionCreator.successfulLocalStorageSet(key, value))
+      })
       .catch(error => {
         dispatch(LocalStorageActionCreator.failedLocalStorageSet(error));
         throw error;
@@ -45,13 +48,15 @@ export function setLocalStorage(key, value) {
   };
 }
 
-export function getLocalStorage(key) {
-  return function(dispatch, getState, {localStorage}) {
+export function getLocalStorage(key): ThunkAction {
+  return function (dispatch, getState, {localStorage}) {
     dispatch(LocalStorageActionCreator.startLocalStorageGet());
     let data;
     return Promise.resolve()
       .then(() => (data = JSON.parse(localStorage.getItem(key)).data))
-      .then(() => dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data)))
+      .then(() => {
+        dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data))
+      })
       .then(() => data)
       .catch(error => {
         dispatch(LocalStorageActionCreator.failedLocalStorageGet(error));
@@ -60,12 +65,14 @@ export function getLocalStorage(key) {
   };
 }
 
-export function deleteLocalStorage(key) {
-  return function(dispatch, getState, {localStorage}) {
+export function deleteLocalStorage(key): ThunkAction {
+  return function (dispatch, getState, {localStorage}) {
     dispatch(LocalStorageActionCreator.startLocalStorageDelete());
     return Promise.resolve()
       .then(() => localStorage.removeItem(key))
-      .then(() => dispatch(LocalStorageActionCreator.successfulLocalStorageDelete(key)))
+      .then(() => {
+        dispatch(LocalStorageActionCreator.successfulLocalStorageDelete(key))
+      })
       .catch(error => {
         dispatch(LocalStorageActionCreator.failedLocalStorageDelete(error));
         throw error;
