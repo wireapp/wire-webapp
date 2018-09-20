@@ -217,7 +217,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   addMention(userEntity) {
-    //const mention = new z.message.MentionEntity({user_id: userEntity.id});
+    // TODO
     this.editedMention(undefined);
   }
 
@@ -433,13 +433,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyUp(data, keyboardEvent) {
-    if (
-      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_LEFT ||
-      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_RIGHT
-    ) {
-      this.handleMentions(data, keyboardEvent);
-    }
-
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
   }
 
