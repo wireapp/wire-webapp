@@ -792,6 +792,7 @@ z.string.notificationMemberJoinOne = '{{user1}} added {{user2}} to the conversat
 z.string.notificationMemberLeaveRemovedYou = '{{user}} removed you from the conversation';
 z.string.notificationMention = 'New mention:';
 z.string.notificationObfuscated = 'Sent you a message';
+z.string.noficicationObfuscatedMention = 'Mentioned you';
 z.string.notificationObfuscatedTitle = 'Someone';
 z.string.notificationPing = 'Pinged';
 z.string.notificationReaction = '{{reaction}} your message';
