@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.MentionEntity = class Mention {
-  constructor(startIndex = 0, length = 1, userId = '') {
+  constructor(startIndex, length, userId) {
     this.startIndex = startIndex;
     this.length = length;
     this.type = z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
@@ -42,9 +42,9 @@ z.message.MentionEntity = class Mention {
     return this.startIndex + this.length;
   }
 
-  isValid(messageText = '') {
+  validate(messageText = '') {
     if (!typeof this.startIndex === 'number' || !typeof this.length === 'number' || !typeof this.userId === 'string') {
-      return false;
+      throw new Error('Invalid mention: Missing property');
     }
 
     const isValidStartIndex = this.startIndex >= 0;
@@ -52,7 +52,7 @@ z.message.MentionEntity = class Mention {
     const isValidEnd = messageText.length && this.endIndex <= messageText.length;
     const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
     if (!isValidStartIndex || !isValidLength || !isValidEnd || !isValidUserId) {
-      return false;
+      throw new Error('Invalid mention: Failed consistency check');
     }
 
     return true;
