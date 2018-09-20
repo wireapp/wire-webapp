@@ -159,27 +159,27 @@ z.entity.Conversation = class Conversation {
     this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
-    this.unread_events = ko.pureComputed(() => {
-      const unread_event = [];
+    this.unreadEvents = ko.pureComputed(() => {
+      const unreadEvents = [];
       const messages = this.messages();
 
       for (let index = messages.length - 1; index >= 0; index--) {
-        const message_et = messages[index];
-        if (message_et.visible()) {
-          if (message_et.timestamp() <= this.last_read_timestamp() || message_et.user().is_me) {
+        const messageEntity = messages[index];
+        if (messageEntity.visible()) {
+          if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
             break;
           }
-          unread_event.push(message_et);
+          unreadEvents.push(messageEntity);
         }
       }
 
-      return unread_event;
+      return unreadEvents;
     });
 
-    this.unread_event_count = ko.pureComputed(() => this.unread_events().length);
+    this.unreadEventsCount = ko.pureComputed(() => this.unreadEvents().length);
 
-    this.unread_message_count = ko.pureComputed(() => {
-      return this.unread_events().filter(message_et => {
+    this.unreadMessagesCount = ko.pureComputed(() => {
+      return this.unreadEvents().filter(message_et => {
         const is_missed_call = message_et.is_call() && message_et.was_missed();
         return is_missed_call || message_et.is_ping() || message_et.is_content();
       }).length;
@@ -276,7 +276,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   release() {
-    if (!this.unread_event_count()) {
+    if (!this.unreadEventsCount()) {
       this.remove_messages();
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
@@ -385,6 +385,13 @@ z.entity.Conversation = class Conversation {
     }
 
     z.util.koArrayPushAll(this.messages_unordered, message_ets);
+  }
+
+  getFirstUnreadSelfMention() {
+    return this.unreadEvents()
+      .slice()
+      .reverse()
+      .find(messageEntity => messageEntity.visible() && messageEntity.is_content() && messageEntity.isSelfMentioned());
   }
 
   get_last_known_timestamp(time_offset) {

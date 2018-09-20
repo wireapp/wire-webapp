@@ -36,7 +36,7 @@ z.conversation.ConversationCellState = (() => {
       [ACTIVITY_TYPE.PING]: 0,
     };
 
-    conversationEntity.unread_events().forEach(messageEntity => {
+    conversationEntity.unreadEvents().forEach(messageEntity => {
       const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
       if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
@@ -93,7 +93,7 @@ z.conversation.ConversationCellState = (() => {
   const _getStateAlert = {
     description: conversationEntity => _accumulateActivity(conversationEntity),
     icon: conversationEntity => {
-      const lastAlertMessage = conversationEntity.unread_events().find(_isAlert);
+      const lastAlertMessage = conversationEntity.unreadEvents().find(_isAlert);
 
       if (lastAlertMessage) {
         if (lastAlertMessage.is_ping()) {
@@ -107,8 +107,8 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match: conversationEntity => {
-      const hasUnreadEvents = conversationEntity.unread_event_count() > 0;
-      return hasUnreadEvents && conversationEntity.unread_events().some(_isAlert);
+      const hasUnreadEvents = conversationEntity.unreadEventsCount() > 0;
+      return hasUnreadEvents && conversationEntity.unreadEvents().some(_isAlert);
     },
   };
 
@@ -202,7 +202,7 @@ z.conversation.ConversationCellState = (() => {
       const lastMessageEntity = conversationEntity.getLastMessage();
       const isExpectedType = lastMessageEntity ? lastMessageEntity.is_member() || lastMessageEntity.is_system() : false;
 
-      return conversationEntity.is_group() && conversationEntity.unread_event_count() > 0 && isExpectedType;
+      return conversationEntity.is_group() && conversationEntity.unreadEventsCount() > 0 && isExpectedType;
     },
   };
 
@@ -236,7 +236,7 @@ z.conversation.ConversationCellState = (() => {
 
   const _getStateUnreadMessage = {
     description: conversationEntity => {
-      for (const messageEntity of conversationEntity.unread_events()) {
+      for (const messageEntity of conversationEntity.unreadEvents()) {
         let stateText;
 
         if (messageEntity.is_ephemeral()) {
@@ -270,7 +270,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     icon: () => z.conversation.ConversationStatusIcon.UNREAD_MESSAGES,
-    match: conversationEntity => conversationEntity.unread_event_count() > 0,
+    match: conversationEntity => conversationEntity.unreadEventsCount() > 0,
   };
 
   const _getStateUserName = {
