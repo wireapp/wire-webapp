@@ -22,37 +22,40 @@ import * as InviteSelector from '../selector/InviteSelector';
 import * as selfSelector from '../selector/SelfSelector';
 import * as languageSelector from '../selector/LanguageSelector';
 import BackendError from './BackendError';
-import {ThunkAction} from "../reducer";
+import {ThunkAction} from '../reducer';
 
-export function invite(invitation: { email: string, locale: string, inviter_name: string }): ThunkAction {
-  const params = [...arguments];
-  return function (dispatch, getState, {apiClient}) {
-    dispatch(InviteActionCreator.startAddInvite(params));
-    const state = getState();
-    const inviteList = InviteSelector.getInvites(state);
-    const invitationEmail = invitation.email && invitation.email.toLowerCase();
-    const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
-    if (alreadyInvited) {
-      const error = new BackendError({
-        code: 409,
-        label: BackendError.LABEL.ALREADY_INVITED,
-        message: 'This email has already been invited',
-      });
-      dispatch(InviteActionCreator.failedAddInvite(error));
-      throw error;
-    }
-
-    invitation.locale = languageSelector.getLanguage(state);
-    invitation.inviter_name = selfSelector.getSelfName(state);
-    const teamId = selfSelector.getSelfTeamId(state);
-    return Promise.resolve()
-      .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
-      .then(createdInvite => {
-        dispatch(InviteActionCreator.successfulAddInvite(createdInvite))
-      })
-      .catch(error => {
+export class InvitationAction {
+  invite = (invitation: {email: string; locale: string; inviter_name: string}): ThunkAction => {
+    return function(dispatch, getState, {apiClient}) {
+      dispatch(InviteActionCreator.startAddInvite());
+      const state = getState();
+      const inviteList = InviteSelector.getInvites(state);
+      const invitationEmail = invitation.email && invitation.email.toLowerCase();
+      const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
+      if (alreadyInvited) {
+        const error = new BackendError({
+          code: 409,
+          label: BackendError.LABEL.ALREADY_INVITED,
+          message: 'This email has already been invited',
+        });
         dispatch(InviteActionCreator.failedAddInvite(error));
         throw error;
-      });
+      }
+
+      invitation.locale = languageSelector.getLanguage(state);
+      invitation.inviter_name = selfSelector.getSelfName(state);
+      const teamId = selfSelector.getSelfTeamId(state);
+      return Promise.resolve()
+        .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
+        .then(createdInvite => {
+          dispatch(InviteActionCreator.successfulAddInvite(createdInvite));
+        })
+        .catch(error => {
+          dispatch(InviteActionCreator.failedAddInvite(error));
+          throw error;
+        });
+    };
   };
 }
+
+export const invitationAction = new InvitationAction();

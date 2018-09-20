@@ -23,9 +23,8 @@ import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
 
 export class ConversationAction {
   doCheckConversationCode = (key, code, uri): ThunkAction => {
-    const params = [...arguments];
     return function(dispatch, getState, {apiClient}) {
-      dispatch(ConversationActionCreator.startConversationCodeCheck(params));
+      dispatch(ConversationActionCreator.startConversationCodeCheck());
       return Promise.resolve()
         .then(() => apiClient.conversation.api.postConversationCodeCheck({code, key, uri}))
         .then(() => {
@@ -39,9 +38,8 @@ export class ConversationAction {
   };
 
   doJoinConversationByCode = (key: string, code: string, uri: string): ThunkAction<Promise<ConversationEvent>> => {
-    const params = [...arguments];
     return function(dispatch, getState, {apiClient}) {
-      dispatch(ConversationActionCreator.startJoinConversationByCode(params));
+      dispatch(ConversationActionCreator.startJoinConversationByCode());
       return Promise.resolve()
         .then(() => apiClient.conversation.api.postJoinByCode({code, key, uri}))
         .then(conversationEvent => {

@@ -40,6 +40,7 @@ export type Api = {
     authAction: any;
     clientAction: any;
     cookieAction: any;
+    conversationAction: any;
   };
 };
 
