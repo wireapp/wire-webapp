@@ -65,7 +65,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new z.viewModel.content.EmojiInputViewModel(mainViewModel, this, repositories);
-    this.mentionSuggestion = new z.viewModel.content.MentionSuggestionViewModel(mainViewModel, this, repositories);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
     this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
     this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);

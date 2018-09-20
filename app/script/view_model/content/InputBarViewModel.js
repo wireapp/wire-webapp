@@ -44,9 +44,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
+    this.selectionStart = ko.observable(0);
+    this.selectionEnd = ko.observable(0);
 
     this.emojiInput = contentViewModel.emojiInput;
-    this.mentionSuggestion = contentViewModel.mentionSuggestion;
+    this.mentionSuggestion = new z.viewModel.content.MentionSuggestionViewModel();
 
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
@@ -398,6 +400,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         textarea.selectionEnd = newEnd;
       }
 
+      this.selectionStart(newStart);
+      this.selectionEnd(newEnd);
+
       const startFlowRegexp = /\B@$/;
       if (startFlowRegexp.test(text)) {
         this.isInMentionFlow(true);
@@ -405,8 +410,30 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
+  updateMentions(data, event) {
+    const textarea = event.target;
+    const value = textarea.value;
+    const previousValue = this.input();
+    const mentions = this.parseForMentions(previousValue, this.conversationEntity().participating_user_ets());
+    const lengthDifference = value.length - previousValue.length;
+    this.logger.log(this.updateMentionRanges(mentions, this.selectionStart(), this.selectionEnd(), lengthDifference));
+    this.handleMentions(data, event);
+  }
+
+  updateMentionRanges(mentions, start, end, difference) {
+    const remainingMentions = mentions.filter(({startIndex, endIndex}) => endIndex <= start || startIndex >= end);
+
+    remainingMentions.forEach(mention => {
+      if (mention.startIndex >= end) {
+        mention.startIndex += difference;
+      }
+    });
+
+    return remainingMentions;
+  }
+
   findMentionAtPosition(position, mentions) {
-    return mentions.find(({startIndex, endIndex}) => position >= startIndex && position <= endIndex);
+    return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
   }
 
   onInputKeyUp(data, keyboardEvent) {
