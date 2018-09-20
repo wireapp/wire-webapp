@@ -36,6 +36,10 @@ export type Api = {
   cookieStore: CookiesStatic;
   localStorage: Storage;
   core: Account;
+  actions: {
+    authAction: any;
+    clientAction: any;
+  };
 };
 
 export interface RootState {

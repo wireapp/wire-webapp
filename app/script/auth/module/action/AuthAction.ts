@@ -34,342 +34,343 @@ import {Api, RootState, ThunkAction} from '../reducer';
 
 type LoginLifecycleFunction = (dispatch: Dispatch, getState: () => RootState, global: Api) => void;
 
-export const doLogin = (loginData: LoginData): ThunkAction => {
-  const onBeforeLogin = dispatch => dispatch(doSilentLogout());
-  return doLoginPlain(loginData, onBeforeLogin);
-};
-
-export const doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri: string): ThunkAction => {
-  const onBeforeLogin = dispatch => dispatch(doSilentLogout());
-  const onAfterLogin = dispatch => dispatch(ConversationAction.doJoinConversationByCode(key, code, uri));
-
-  return doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
-};
-
-function doLoginPlain(
-  loginData: LoginData,
-  onBeforeLogin: LoginLifecycleFunction = () => {},
-  onAfterLogin: LoginLifecycleFunction = () => {}
-): ThunkAction {
-  return function(dispatch, getState, global) {
-    const {core} = global;
-
-    const obfuscatedLoginData = {...loginData, password: '********'};
-    dispatch(AuthActionCreator.startLogin(obfuscatedLoginData));
-
-    return Promise.resolve()
-      .then(() => onBeforeLogin(dispatch, getState, global))
-      .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.clientType)))
-      .then(() => persistAuthData(loginData.clientType, core, dispatch))
-      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => onAfterLogin(dispatch, getState, global))
-      .then(() => dispatch(ClientAction.doInitializeClient(loginData.clientType, String(loginData.password))))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulLogin());
-      })
-      .catch(error => {
-        if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          dispatch(AuthActionCreator.successfulLogin());
-        } else {
-          dispatch(AuthActionCreator.failedLogin(error));
-        }
-        throw error;
-      });
+export class AuthAction {
+  doLogin = (loginData: LoginData): ThunkAction => {
+    const onBeforeLogin = dispatch => dispatch(this.doSilentLogout());
+    return this.doLoginPlain(loginData, onBeforeLogin);
   };
-}
 
-export function doFinalizeSSOLogin({clientType}: {clientType: ClientType}): ThunkAction {
-  return function(dispatch, getState, {apiClient, core}) {
-    dispatch(AuthActionCreator.startLogin());
-    return Promise.resolve()
-      .then(() => apiClient.init(clientType))
-      .then(() => core.init())
-      .then(() => persistAuthData(clientType, core, dispatch))
-      .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulLogin());
-      })
-      .catch(error => {
-        if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          dispatch(AuthActionCreator.successfulLogin());
-        } else {
-          dispatch(AuthActionCreator.failedLogin(error));
-        }
-        throw error;
-      });
+  doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri: string): ThunkAction => {
+    const onBeforeLogin = dispatch => dispatch(this.doSilentLogout());
+    const onAfterLogin = dispatch => dispatch(ConversationAction.doJoinConversationByCode(key, code, uri));
+
+    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
   };
-}
 
-export function validateSSOCode(code): ThunkAction {
-  return function(dispatch, getState, {apiClient}) {
-    const mapError = error => {
-      const statusCode = error && error.response && error.response.status;
-      if (statusCode === 404) {
-        return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
-      }
-      if (statusCode >= 500) {
-        return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
-      }
-      return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+  doLoginPlain = (
+    loginData: LoginData,
+    onBeforeLogin: LoginLifecycleFunction = () => {},
+    onAfterLogin: LoginLifecycleFunction = () => {}
+  ): ThunkAction => {
+    return function(dispatch, getState, global) {
+      const {core} = global;
+
+      const obfuscatedLoginData = {...loginData, password: '********'};
+      dispatch(AuthActionCreator.startLogin(obfuscatedLoginData));
+
+      return Promise.resolve()
+        .then(() => onBeforeLogin(dispatch, getState, global))
+        .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.clientType)))
+        .then(() => this.persistAuthData(loginData.clientType, core, dispatch))
+        .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(SelfAction.fetchSelf()))
+        .then(() => onAfterLogin(dispatch, getState, global))
+        .then(() => dispatch(ClientAction.doInitializeClient(loginData.clientType, String(loginData.password))))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulLogin());
+        })
+        .catch(error => {
+          if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+            dispatch(AuthActionCreator.successfulLogin());
+          } else {
+            dispatch(AuthActionCreator.failedLogin(error));
+          }
+          throw error;
+        });
     };
-    return apiClient.auth.api.headInitiateLogin(code).catch(error => {
-      const mappedError = mapError(error);
-      dispatch(AuthActionCreator.failedLogin(mappedError));
-      throw mappedError;
-    });
   };
-}
 
-function persistAuthData(clientType, core, dispatch): Promise<void[]> {
-  const persist = clientType === ClientType.PERMANENT;
-  const accessToken = core.apiClient.accessTokenStore.accessToken;
-  const expiresMillis = accessToken.expires_in * 1000;
-  const expireTimestamp = Date.now() + expiresMillis;
-  const saveTasks = [
-    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
-    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
-    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
-    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
-  ];
-  if (clientType !== ClientType.NONE) {
-    saveTasks.push(dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)));
-  }
-  return Promise.all(saveTasks);
-}
-
-export function pushAccountRegistrationData(registration): ThunkAction {
-  return function(dispatch) {
-    return Promise.resolve().then(() => {
-      dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
-    });
+  doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
+    return function(dispatch, getState, {apiClient, core}) {
+      dispatch(AuthActionCreator.startLogin());
+      return Promise.resolve()
+        .then(() => apiClient.init(clientType))
+        .then(() => core.init())
+        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => dispatch(SelfAction.fetchSelf()))
+        .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulLogin());
+        })
+        .catch(error => {
+          if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+            dispatch(AuthActionCreator.successfulLogin());
+          } else {
+            dispatch(AuthActionCreator.failedLogin(error));
+          }
+          throw error;
+        });
+    };
   };
-}
 
-export function doRegisterTeam(registration: RegisterData): ThunkAction {
-  return function(dispatch, getState, {apiClient, core}) {
-    const clientType = ClientType.PERMANENT;
-    registration.locale = currentLanguage();
-    registration.name = registration.name.trim();
-    registration.email = registration.email.trim();
-    registration.team.icon = 'default';
-    registration.team.binding = true;
-    // TODO: Fixed once core v6 is inside
-    // eslint-disable-next-line dot-notation
-    registration.team['currency'] = currentCurrency();
-    registration.team.name = registration.team.name.trim();
-
-    let createdAccount;
-    dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
-    return Promise.resolve()
-      .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration, clientType))
-      .then(newAccount => (createdAccount = newAccount))
-      .then(() => core.init())
-      .then(() => persistAuthData(clientType, core, dispatch))
-      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
-      })
-      .catch(error => {
-        if (error.label === BackendError.LABEL.NEW_CLIENT) {
-          dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
-        } else {
-          dispatch(AuthActionCreator.failedRegisterTeam(error));
+  validateSSOCode = (code): ThunkAction => {
+    return function(dispatch, getState, {apiClient}) {
+      const mapError = error => {
+        const statusCode = error && error.response && error.response.status;
+        if (statusCode === 404) {
+          return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
         }
-        throw error;
-      });
-  };
-}
-
-export function doRegisterPersonal(registration: RegisterData): ThunkAction {
-  return function(dispatch, getState, {apiClient, core}) {
-    const clientType = ClientType.PERMANENT;
-    registration.locale = currentLanguage();
-    registration.name = registration.name.trim();
-    registration.email = registration.email.trim();
-
-    let createdAccount;
-    dispatch(
-      AuthActionCreator.startRegisterPersonal({
-        accent_id: registration.accent_id,
-        email: registration.email,
-        locale: registration.locale,
-        name: registration.name,
-        password: '******',
-      })
-    );
-    return Promise.resolve()
-      .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration, clientType))
-      .then(newAccount => (createdAccount = newAccount))
-      .then(() => core.init())
-      .then(() => persistAuthData(clientType, core, dispatch))
-      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
-      })
-      .catch(error => {
-        if (error.label === BackendError.LABEL.NEW_CLIENT) {
-          dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
-        } else {
-          dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        if (statusCode >= 500) {
+          return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
         }
-        throw error;
+        return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+      };
+      return apiClient.auth.api.headInitiateLogin(code).catch(error => {
+        const mappedError = mapError(error);
+        dispatch(AuthActionCreator.failedLogin(mappedError));
+        throw mappedError;
       });
+    };
   };
-}
 
-export function doRegisterWireless(
-  registrationData: RegisterData,
-  options = {shouldInitializeClient: true}
-): ThunkAction {
-  return function(dispatch, getState, {apiClient, core}) {
-    const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
-    registrationData.locale = currentLanguage();
-    registrationData.name = registrationData.name.trim();
+  persistAuthData = (clientType, core, dispatch): Promise<void[]> => {
+    const persist = clientType === ClientType.PERMANENT;
+    const accessToken = core.apiClient.accessTokenStore.accessToken;
+    const expiresMillis = accessToken.expires_in * 1000;
+    const expireTimestamp = Date.now() + expiresMillis;
+    const saveTasks = [
+      dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
+      dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
+      dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
+      dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
+    ];
+    if (clientType !== ClientType.NONE) {
+      saveTasks.push(dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)));
+    }
+    return Promise.all(saveTasks);
+  };
 
-    let createdAccount;
-    const obfuscatedRegistrationData = {
-      accent_id: registrationData.accent_id,
-      // TODO: Apply method call once core v6 is in
+  pushAccountRegistrationData = (registration): ThunkAction => {
+    return function(dispatch) {
+      return Promise.resolve().then(() => {
+        dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
+      });
+    };
+  };
+
+  doRegisterTeam = (registration: RegisterData): ThunkAction => {
+    return function(dispatch, getState, {apiClient, core}) {
+      const clientType = ClientType.PERMANENT;
+      registration.locale = currentLanguage();
+      registration.name = registration.name.trim();
+      registration.email = registration.email.trim();
+      registration.team.icon = 'default';
+      registration.team.binding = true;
+      // TODO: Fixed once core v6 is inside
       // eslint-disable-next-line dot-notation
-      expires_in: registrationData['expires_in'],
-      locale: registrationData.locale,
-      name: registrationData.name,
+      registration.team['currency'] = currentCurrency();
+      registration.team.name = registration.team.name.trim();
+
+      let createdAccount;
+      dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
+      return Promise.resolve()
+        .then(() => dispatch(this.doSilentLogout()))
+        .then(() => apiClient.register(registration, clientType))
+        .then(newAccount => (createdAccount = newAccount))
+        .then(() => core.init())
+        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(SelfAction.fetchSelf()))
+        .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
+        })
+        .catch(error => {
+          if (error.label === BackendError.LABEL.NEW_CLIENT) {
+            dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
+          } else {
+            dispatch(AuthActionCreator.failedRegisterTeam(error));
+          }
+          throw error;
+        });
     };
-    dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
+  };
 
-    return Promise.resolve()
-      .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registrationData, clientType))
-      .then(newAccount => (createdAccount = newAccount))
-      .then(() => core.init())
-      .then(() => persistAuthData(clientType, core, dispatch))
-      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => clientType !== ClientType.NONE && dispatch(ClientAction.doInitializeClient(clientType)))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
-      })
-      .catch(error => {
-        if (error.label === BackendError.LABEL.NEW_CLIENT) {
+  doRegisterPersonal = (registration: RegisterData): ThunkAction => {
+    return function(dispatch, getState, {apiClient, core, actions: {authAction}}) {
+      const clientType = ClientType.PERMANENT;
+      registration.locale = currentLanguage();
+      registration.name = registration.name.trim();
+      registration.email = registration.email.trim();
+
+      let createdAccount;
+      dispatch(
+        AuthActionCreator.startRegisterPersonal({
+          accent_id: registration.accent_id,
+          email: registration.email,
+          locale: registration.locale,
+          name: registration.name,
+          password: '******',
+        })
+      );
+      return Promise.resolve()
+        .then(() => dispatch(authAction.doSilentLogout()))
+        .then(() => apiClient.register(registration, clientType))
+        .then(newAccount => (createdAccount = newAccount))
+        .then(() => core.init())
+        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(SelfAction.fetchSelf()))
+        .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
+        })
+        .catch(error => {
+          if (error.label === BackendError.LABEL.NEW_CLIENT) {
+            dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
+          } else {
+            dispatch(AuthActionCreator.failedRegisterPersonal(error));
+          }
+          throw error;
+        });
+    };
+  };
+
+  doRegisterWireless = (registrationData: RegisterData, options = {shouldInitializeClient: true}): ThunkAction => {
+    return function(dispatch, getState, {apiClient, core, actions: {authAction}}) {
+      const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
+      registrationData.locale = currentLanguage();
+      registrationData.name = registrationData.name.trim();
+
+      let createdAccount;
+      const obfuscatedRegistrationData = {
+        accent_id: registrationData.accent_id,
+        // TODO: Apply method call once core v6 is in
+        // eslint-disable-next-line dot-notation
+        expires_in: registrationData['expires_in'],
+        locale: registrationData.locale,
+        name: registrationData.name,
+      };
+      dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
+
+      return Promise.resolve()
+        .then(() => dispatch(authAction.doSilentLogout()))
+        .then(() => apiClient.register(registrationData, clientType))
+        .then(newAccount => (createdAccount = newAccount))
+        .then(() => core.init())
+        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(SelfAction.fetchSelf()))
+        .then(() => clientType !== ClientType.NONE && dispatch(ClientAction.doInitializeClient(clientType)))
+        .then(() => {
           dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
-        } else {
-          dispatch(AuthActionCreator.failedRegisterWireless(error));
-        }
-        throw error;
-      });
+        })
+        .catch(error => {
+          if (error.label === BackendError.LABEL.NEW_CLIENT) {
+            dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
+          } else {
+            dispatch(AuthActionCreator.failedRegisterWireless(error));
+          }
+          throw error;
+        });
+    };
+  };
+
+  doInit = (options = {isImmediateLogin: false, shouldValidateLocalClient: false}): ThunkAction => {
+    return function(dispatch, getState, {apiClient, core, actions: {authAction, clientAction}}) {
+      let clientType;
+      dispatch(AuthActionCreator.startRefresh());
+      return Promise.resolve()
+        .then(() => {
+          if (options.isImmediateLogin) {
+            return dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
+          }
+          return undefined;
+        })
+        .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
+        .then((persist: boolean) => {
+          if (persist === undefined) {
+            throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
+          }
+          clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+          return apiClient.init(clientType);
+        })
+        .then(() => core.init())
+        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => {
+          if (options.shouldValidateLocalClient) {
+            return dispatch(clientAction.validateLocalClient());
+          }
+          return undefined;
+        })
+        .then(() => dispatch(SelfAction.fetchSelf()))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulRefresh());
+        })
+        .catch(error => {
+          if (options.shouldValidateLocalClient) {
+            dispatch(authAction.doLogout());
+          }
+          if (options.isImmediateLogin) {
+            dispatch(deleteLocalStorage(LocalStorageKey.AUTH.PERSIST));
+          }
+          dispatch(AuthActionCreator.failedRefresh(error));
+        });
+    };
+  };
+
+  validateLocalClient = (): ThunkAction => {
+    return function(dispatch, getState, {core}) {
+      dispatch(AuthActionCreator.startValidateLocalClient());
+      return Promise.resolve()
+        .then(() => core.loadAndValidateLocalClient())
+        .then(() => {
+          dispatch(AuthActionCreator.successfulValidateLocalClient());
+        })
+        .catch(error => {
+          dispatch(AuthActionCreator.failedValidateLocalClient(error));
+          throw error;
+        });
+    };
+  };
+
+  doLogout = (): ThunkAction => {
+    return function(dispatch, getState, {core}) {
+      dispatch(AuthActionCreator.startLogout());
+      return core
+        .logout()
+        .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+        .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulLogout());
+        })
+        .catch(error => {
+          dispatch(AuthActionCreator.failedLogout(error));
+        });
+    };
+  };
+
+  doSilentLogout = (): ThunkAction => {
+    return function(dispatch, getState, {core}) {
+      dispatch(AuthActionCreator.startLogout());
+      return core
+        .logout()
+        .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+        .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
+        .then(() => {
+          dispatch(AuthActionCreator.successfulSilentLogout());
+        })
+        .catch(error => {
+          dispatch(AuthActionCreator.failedLogout(error));
+        });
+    };
+  };
+
+  getInvitationFromCode = (invitationCode: string): ThunkAction => {
+    return function(dispatch, getState, {apiClient}) {
+      dispatch(AuthActionCreator.startGetInvitationFromCode());
+      return apiClient.invitation.api
+        .getInvitationInfo(invitationCode)
+        .then(invitation => {
+          dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation));
+        })
+        .catch(error => {
+          dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
+          throw error;
+        });
+    };
   };
 }
 
-export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}): ThunkAction {
-  return function(dispatch, getState, {apiClient, core}) {
-    let clientType;
-    dispatch(AuthActionCreator.startRefresh());
-    return Promise.resolve()
-      .then(() => {
-        if (options.isImmediateLogin) {
-          return dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
-        }
-        return undefined;
-      })
-      .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-      .then((persist: boolean) => {
-        if (persist === undefined) {
-          throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
-        }
-        clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-        return apiClient.init(clientType);
-      })
-      .then(() => core.init())
-      .then(() => persistAuthData(clientType, core, dispatch))
-      .then(() => {
-        if (options.shouldValidateLocalClient) {
-          return dispatch(validateLocalClient());
-        }
-        return undefined;
-      })
-      .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulRefresh());
-      })
-      .catch(error => {
-        if (options.shouldValidateLocalClient) {
-          dispatch(doLogout());
-        }
-        if (options.isImmediateLogin) {
-          dispatch(deleteLocalStorage(LocalStorageKey.AUTH.PERSIST));
-        }
-        dispatch(AuthActionCreator.failedRefresh(error));
-      });
-  };
-}
-
-function validateLocalClient(): ThunkAction {
-  return function(dispatch, getState, {core}) {
-    dispatch(AuthActionCreator.startValidateLocalClient());
-    return Promise.resolve()
-      .then(() => core.loadAndValidateLocalClient())
-      .then(() => {
-        dispatch(AuthActionCreator.successfulValidateLocalClient());
-      })
-      .catch(error => {
-        dispatch(AuthActionCreator.failedValidateLocalClient(error));
-        throw error;
-      });
-  };
-}
-
-export function doLogout(): ThunkAction {
-  return function(dispatch, getState, {core}) {
-    dispatch(AuthActionCreator.startLogout());
-    return core
-      .logout()
-      .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
-      .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulLogout());
-      })
-      .catch(error => {
-        dispatch(AuthActionCreator.failedLogout(error));
-      });
-  };
-}
-
-export function doSilentLogout(): ThunkAction {
-  return function(dispatch, getState, {core}) {
-    dispatch(AuthActionCreator.startLogout());
-    return core
-      .logout()
-      .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
-      .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
-      .then(() => {
-        dispatch(AuthActionCreator.successfulSilentLogout());
-      })
-      .catch(error => {
-        dispatch(AuthActionCreator.failedLogout(error));
-      });
-  };
-}
-
-export function getInvitationFromCode(invitationCode: string): ThunkAction {
-  return function(dispatch, getState, {apiClient}) {
-    dispatch(AuthActionCreator.startGetInvitationFromCode());
-    return apiClient.invitation.api
-      .getInvitationInfo(invitationCode)
-      .then(invitation => {
-        dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation));
-      })
-      .catch(error => {
-        dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
-        throw error;
-      });
-  };
-}
+export const authAction = new AuthAction();
