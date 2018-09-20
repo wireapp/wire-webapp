@@ -46,7 +46,7 @@ import {ROUTE, QUERY_KEY} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -58,15 +58,53 @@ import {loginStrings, logoutReasonStrings} from '../../strings';
 import {isDesktopApp} from '../Runtime';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
-import {Redirect, withRouter} from 'react-router';
+import {Redirect, withRouter, RouteComponentProps} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
-class Login extends React.PureComponent {
-  inputs = {};
+interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
+
+interface ConnectedProps {
+  hasHistory: boolean;
+  hasSelfHandle: boolean;
+  isFetching: boolean;
+  loginError: Error;
+}
+
+interface DispatchProps {
+  doCheckConversationCode: (conversationKey: string, conversationCode: string) => Promise<void>;
+  resetError: () => Promise<void>;
+  doInitializeClient: (clientType: ClientType, any) => Promise<void>;
+  doInit: (options: {isImmediateLogin: boolean}) => Promise<void>;
+  doLoginAndJoin: (login: any, conversationKey: string, conversationCode: string) => Promise<void>;
+  doLogin: (login: any) => Promise<void>;
+  doGetAllClients: () => Promise<any[]>;
+}
+
+interface State {
+  conversationCode: string;
+  conversationKey: string;
+  email: string;
+  hideSSOLogin: boolean;
+  isValidLink: boolean;
+  logoutReason: string;
+  password: string;
+  persist: boolean;
+  validInputs: {
+    email: boolean;
+    password: boolean;
+  };
+  validationErrors: any[];
+}
+
+class Login extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  private inputs: {
+    email?: HTMLInputElement;
+    password?: HTMLInputElement;
+  } = {};
 
   state = {
     conversationCode: null,
@@ -290,7 +328,7 @@ class Login extends React.PureComponent {
                     <InputBlock>
                       <Input
                         name="email"
-                        tabIndex="1"
+                        tabIndex={1}
                         onChange={event =>
                           this.setState({
                             email: event.target.value,
@@ -302,7 +340,7 @@ class Login extends React.PureComponent {
                         value={email}
                         autoComplete="section-login email"
                         placeholder={_(loginStrings.emailPlaceholder)}
-                        maxLength="128"
+                        maxLength={128}
                         type="text"
                         required
                         data-uie-name="enter-email"
@@ -310,7 +348,7 @@ class Login extends React.PureComponent {
                       <InputSubmitCombo>
                         <Input
                           name="password-login"
-                          tabIndex="2"
+                          tabIndex={2}
                           onChange={event =>
                             this.setState({
                               password: event.target.value,
@@ -323,8 +361,8 @@ class Login extends React.PureComponent {
                           autoComplete="section-login password"
                           type="password"
                           placeholder={_(loginStrings.passwordPlaceholder)}
-                          maxLength="1024"
-                          minLength="8"
+                          maxLength={1024}
+                          minLength={8}
                           pattern=".{8,1024}"
                           required
                           data-uie-name="enter-password"
@@ -333,7 +371,7 @@ class Login extends React.PureComponent {
                           <Loading size={32} />
                         ) : (
                           <RoundIconButton
-                            tabIndex="4"
+                            tabIndex={4}
                             disabled={!email || !password}
                             type="submit"
                             formNoValidate
@@ -357,7 +395,7 @@ class Login extends React.PureComponent {
                     )}
                     {!isDesktopApp() && (
                       <Checkbox
-                        tabIndex="3"
+                        tabIndex={3}
                         onChange={event => this.setState({persist: !event.target.checked})}
                         checked={!persist}
                         data-uie-name="enter-public-computer-sign-in"

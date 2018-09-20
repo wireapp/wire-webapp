@@ -25,6 +25,20 @@ import {ROUTE} from '../route';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  hasAccountData: boolean;
+  hasTeamData: boolean;
+  isAuthenticated: boolean;
+}
+
+interface ConnectedProps {
+  account: any;
+  currentFlow: string;
+  isStateAuthenticated: boolean;
+}
+
+interface DispatchProps {}
+
 const hasInvalidAccountData = account => !account.name || !account.email || !account.password;
 
 const hasInvalidTeamData = ({team}) => !team || !team.name;
@@ -35,7 +49,15 @@ const redirects = {
   [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 
-function Page({hasAccountData, hasTeamData, currentFlow, isAuthenticated, isStateAuthenticated, account, children}) {
+const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
+  hasAccountData,
+  hasTeamData,
+  currentFlow,
+  isAuthenticated,
+  isStateAuthenticated,
+  account,
+  children,
+}) => {
   if (
     (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
@@ -44,7 +66,7 @@ function Page({hasAccountData, hasTeamData, currentFlow, isAuthenticated, isStat
     return <Redirect to={redirects[currentFlow] || ROUTE.INDEX} />;
   }
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
-}
+};
 
 export default connect(state => ({
   account: AuthSelector.getAccount(state),

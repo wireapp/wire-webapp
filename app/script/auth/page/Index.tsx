@@ -18,7 +18,7 @@
  */
 
 import {getLanguage} from '../module/selector/LanguageSelector';
-import React, {Component} from 'react';
+import * as React from 'react';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
 import {
@@ -36,10 +36,21 @@ import {
 } from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import Page from './Page';
+import {RouteComponentProps} from 'react-router';
 
-class Index extends Component {
+interface Props extends React.HTMLAttributes<Index>, RouteComponentProps {}
+
+interface ConnectedProps {
+  language: string;
+}
+
+interface DispatchProps {}
+
+interface State {}
+
+class Index extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   onRegisterPersonalClick = () => {
     this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };

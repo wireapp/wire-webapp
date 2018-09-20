@@ -40,19 +40,39 @@ import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {teamNameStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
-import {withRouter} from 'react-router';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
+import {withRouter, RouteComponentProps} from 'react-router';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/InviteActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
 import {enterTeamCreationFlow} from '../module/action/creator/AuthActionCreator';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
-import React, {Component} from 'react';
+import * as React from 'react';
 import Page from './Page';
 
-class TeamName extends Component {
-  state = {
+interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
+
+interface ConnectedProps {
+  error: Error;
+  teamName: string;
+}
+
+interface DispatchProps {
+  enterTeamCreationFlow: () => Promise<void>;
+  pushAccountRegistrationData: (teamData: {team: {name: string}}) => Promise<void>;
+  resetError: () => Promise<void>;
+}
+
+interface State {
+  enteredTeamName: string;
+  error: Error;
+  isValidTeamName: boolean;
+}
+
+class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  private teamNameInput: HTMLInputElement;
+  state: State = {
     enteredTeamName: this.props.teamName || '',
     error: null,
     isValidTeamName: !!this.props.teamName,
@@ -125,8 +145,8 @@ class TeamName extends Component {
                         }}
                         placeholder={_(teamNameStrings.teamNamePlaceholder)}
                         pattern=".{2,256}"
-                        maxLength="256"
-                        minLength="2"
+                        maxLength={256}
+                        minLength={2}
                         required
                         autoFocus
                         data-uie-name="enter-team-name"

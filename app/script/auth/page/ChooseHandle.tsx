@@ -46,9 +46,9 @@ import {ROUTE} from '../route';
 import {withRouter, RouteComponentProps} from 'react-router';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
-import {RootState} from "../module/reducer";
+import {RootState} from '../module/reducer';
 
-interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasUnsetMarketingConsent: boolean;
@@ -60,23 +60,20 @@ interface ConnectedProps {
 interface DispatchProps {
   doGetConsents: () => Promise<any>;
   checkHandles: (handles: string[]) => Promise<string>;
-  setHandle: (handle: string) => Promise<void>,
-  doSetConsent
+  setHandle: (handle: string) => Promise<void>;
+  doSetConsent: (consentType: ConsentType, value: number) => Promise<void>;
 }
 
 interface State {
-  error: Error,
-  handle: string,
+  error: Error;
+  handle: string;
 }
 
 class ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  constructor(props: Props & ConnectedProps & DispatchProps & InjectedIntlProps) {
-    super(props);
-    this.state = {
-      error: null,
-      handle: '',
-    };
-  }
+  state: State = {
+    error: null,
+    handle: '',
+  };
 
   componentDidMount() {
     const suggestions = createSuggestions(this.props.name);

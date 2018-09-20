@@ -45,12 +45,12 @@ import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
 import * as NotificationAction from '../module/action/NotificationAction';
 import * as StringUtil from '../util/stringUtil';
-import {Redirect} from 'react-router';
+import {Redirect, RouteComponentProps} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ROUTE, QUERY_KEY} from '../route';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {withRouter} from 'react-router';
-import React, {Component} from 'react';
+import * as React from 'react';
 import {getURLParameter, getAppPath, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -59,8 +59,41 @@ import WirelessContainer from '../component/WirelessContainer';
 import * as AccentColor from '../util/AccentColor';
 import EXTERNAL_ROUTE from '../externalRoute';
 
-class ConversationJoin extends Component {
-  state = {
+interface Props extends React.HTMLAttributes<ConversationJoin>, RouteComponentProps {}
+
+interface ConnectedProps {
+  error: Error;
+  isAuthenticated: boolean;
+  isFetching: boolean;
+  isTemporaryGuest: boolean;
+  selfName: string;
+}
+
+interface DispatchProps {
+  doCheckConversationCode: (conversationCode: string, conversationKey: string) => Promise<void>;
+  doJoinConversationByCode: (conversationKey: string, conversationCode: string) => Promise<void>;
+  doInit: (options: {}) => Promise<void>;
+  doRegisterWireless: (registrationData: {}, options: {}) => Promise<void>;
+  doLogout: () => Promise<void>;
+  setLastEventDate: (date: Date) => Promise<void>;
+}
+
+interface State {
+  accentColor: AccentColor.AccentColor;
+  conversationCode: string;
+  conversationKey: string;
+  enteredName: string;
+  error: Error;
+  expiresIn: number;
+  forceNewTemporaryGuestAccount: boolean;
+  isValidLink: boolean;
+  isValidName: boolean;
+  showCookiePolicyBanner: boolean;
+}
+
+class ConversationJoin extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  nameInput: HTMLInputElement;
+  state: State = {
     accentColor: AccentColor.random(),
     conversationCode: null,
     conversationKey: null,
@@ -244,8 +277,8 @@ class ConversationJoin extends Component {
               }}
               placeholder={_(conversationJoinStrings.namePlaceholder)}
               autoFocus
-              maxLength="64"
-              minLength="2"
+              maxLength={64}
+              minLength={2}
               pattern=".{2,64}"
               required
               data-uie-name="enter-name"

@@ -18,7 +18,7 @@
  */
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {inviteStrings} from '../../strings';
 import {
   H1,
@@ -45,9 +45,31 @@ import {resetError} from '../module/action/creator/InviteActionCreator';
 import {fetchSelf} from '../module/action/SelfAction';
 import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
+import {RouteComponentProps} from 'react-router';
 
-class InitialInvite extends React.PureComponent {
-  state = {
+interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
+
+interface ConnectedProps {
+  error: Error;
+  invites: any[];
+  isFetching: boolean;
+  language: string;
+}
+
+interface DispatchProps {
+  fetchSelf: () => Promise<void>;
+  resetError: () => Promise<void>;
+  invite: (inviteData: {email: string}) => Promise<void>;
+}
+
+interface State {
+  enteredEmail: string;
+  error: Error;
+}
+
+class InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  emailInput: HTMLInputElement;
+  state: State = {
     enteredEmail: '',
     error: null,
   };

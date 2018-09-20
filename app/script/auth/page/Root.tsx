@@ -51,9 +51,9 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<any>;
-  safelyRemoveCookie: (name: string, value: string) => Promise<any>;
-  stopPolling: (name?: string) => Promise<any>;
+  startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<void>;
+  safelyRemoveCookie: (name: string, value: string) => Promise<void>;
+  stopPolling: (name?: string) => Promise<void>;
 }
 
 interface State {}

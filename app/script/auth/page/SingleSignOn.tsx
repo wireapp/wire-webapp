@@ -56,22 +56,40 @@ import ValidationError from '../module/action/ValidationError';
 import {Link as RRLink} from 'react-router-dom';
 import {ROUTE} from '../route';
 import {connect} from 'react-redux';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {loginStrings, ssoLoginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
-import {withRouter} from 'react-router';
+import {withRouter, RouteComponentProps} from 'react-router';
 import {UUID_REGEX} from '../util/stringUtil';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {BACKEND} from '../Environment';
 
-class SingleSignOn extends React.PureComponent {
-  static SSO_CODE_PREFIX = 'wire-';
-  static SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
+interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
-  ssoWindow = undefined;
-  inputs = {};
+interface ConnectedProps {
+  hasHistory: boolean;
+  hasSelfHandle: boolean;
+  isFetching: boolean;
+  loginError: Error;
+}
+
+interface DispatchProps {
+  resetError: () => Promise<void>;
+  validateSSOCode: (code: string) => Promise<void>;
+  doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
+  doGetAllClients: () => Promise<any[]>;
+}
+
+interface State {}
+
+class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  private static SSO_CODE_PREFIX = 'wire-';
+  private static SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
+
+  private ssoWindow = undefined;
+  private inputs: {code?: HTMLInputElement} = {};
   state = {
     code: '',
     isOverlayOpen: false,
@@ -135,6 +153,7 @@ class SingleSignOn extends React.PureComponent {
           this.ssoWindow.close();
           return reject(
             new BackendError({
+              code: 500,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
               message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${BACKEND.rest}"`,
             })
@@ -153,6 +172,7 @@ class SingleSignOn extends React.PureComponent {
             this.ssoWindow.close();
             return reject(
               new BackendError({
+                code: 401,
                 label: event.data.payload.label,
                 message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
               })
@@ -163,6 +183,7 @@ class SingleSignOn extends React.PureComponent {
             this.ssoWindow.close();
             return reject(
               new BackendError({
+                code: 500,
                 label: BackendError.LABEL.SSO_GENERIC_ERROR,
                 message: `Unmatched event type: "${JSON.stringify(event)}"`,
               })
@@ -196,13 +217,13 @@ class SingleSignOn extends React.PureComponent {
         timerId = window.setInterval(() => {
           if (this.ssoWindow && this.ssoWindow.closed) {
             onChildWindowClose();
-            reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+            reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
           }
         }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
 
         onParentWindowClose = () => {
           this.ssoWindow.close();
-          reject(new BackendError({label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+          reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
         };
         window.addEventListener('unload', onParentWindowClose);
       }
@@ -342,7 +363,7 @@ class SingleSignOn extends React.PureComponent {
                 <Logo height={24} color={COLOR.WHITE} />
               </div>
               <Text
-                style={{fontSize: '14px', fontWeight: '400', marginTop: '32px'}}
+                style={{fontSize: '14px', fontWeight: 400, marginTop: '32px'}}
                 color={COLOR.WHITE}
                 data-uie-name="status-overlay-description"
               >
@@ -408,7 +429,7 @@ class SingleSignOn extends React.PureComponent {
                         )}
                       <Input
                         name="sso-code"
-                        tabIndex="1"
+                        tabIndex={1}
                         onChange={event =>
                           this.setState({
                             code: event.target.value,
@@ -420,7 +441,7 @@ class SingleSignOn extends React.PureComponent {
                         placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
                         value={code}
                         autoComplete="section-login sso-code"
-                        maxLength="1024"
+                        maxLength={1024}
                         pattern={`${SingleSignOn.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
                         autoFocus
                         type="text"
@@ -428,7 +449,7 @@ class SingleSignOn extends React.PureComponent {
                         data-uie-name="enter-code"
                       />
                       <RoundIconButton
-                        tabIndex="2"
+                        tabIndex={2}
                         disabled={!code}
                         type="submit"
                         formNoValidate
@@ -448,7 +469,7 @@ class SingleSignOn extends React.PureComponent {
                     )}
                     {!isDesktopApp() && (
                       <Checkbox
-                        tabIndex="3"
+                        tabIndex={3}
                         onChange={event => this.setState({persist: !event.target.checked})}
                         checked={!persist}
                         data-uie-name="enter-public-computer-sso-sign-in"

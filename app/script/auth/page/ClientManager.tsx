@@ -18,7 +18,7 @@
  */
 
 import {H1, Muted, Link, ContainerXS} from '@wireapp/react-ui-kit';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import Page from './Page';
 import * as React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
@@ -27,8 +27,20 @@ import * as AuthAction from '../module/action/AuthAction';
 import {connect} from 'react-redux';
 import {clientManagerStrings} from '../../strings';
 import {ROUTE} from '../route';
+import {RouteComponentProps} from 'react-router';
 
-class ClientManager extends React.Component {
+interface Props extends React.HTMLAttributes<ClientManager>, RouteComponentProps {}
+
+interface ConnectedProps {}
+
+interface DispatchProps {
+  doGetAllClients: () => Promise<void>;
+  doLogout: () => Promise<void>;
+}
+
+interface State {}
+
+class ClientManager extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   componentWillMount = () => this.props.doGetAllClients();
 
   logout = () =>

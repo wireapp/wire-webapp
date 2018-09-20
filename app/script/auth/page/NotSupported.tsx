@@ -17,16 +17,25 @@
  *
  */
 
-import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import * as React from 'react';
 import {Paragraph, Text, Logo, ContainerXS} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import Page from './Page';
 
-function NotSupported({intl: {formatMessage: _}}) {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+
+interface ConnectedProps {
+  language: string;
+}
+
+interface DispatchProps {}
+
+const NotSupported: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+  intl: {formatMessage: _},
+}) => {
   return (
     <Page>
       <ContainerXS centerText verticalCenter>
@@ -36,11 +45,11 @@ function NotSupported({intl: {formatMessage: _}}) {
       </ContainerXS>
     </Page>
   );
-}
+};
 
 export default injectIntl(
   connect(
     state => ({language: getLanguage(state)}),
-    {...TrackingAction}
+    {}
   )(NotSupported)
 );

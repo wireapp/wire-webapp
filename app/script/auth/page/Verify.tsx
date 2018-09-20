@@ -19,11 +19,11 @@
 
 import {H1, Muted, Link, ContainerXS, CodeInput, ErrorMessage} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {parseError} from '../util/errorUtil';
 import {verifyStrings} from '../../strings';
-import {withRouter} from 'react-router';
+import {withRouter, RouterProps} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import {REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -32,13 +32,34 @@ import Page from './Page';
 import * as React from 'react';
 import {ROUTE} from '../route';
 
+interface Props extends React.HTMLAttributes<HTMLDivElement>, RouterProps {}
+
+interface ConnectedProps {
+  account: any;
+  authError: Error;
+  currentFlow: string;
+}
+
+interface DispatchProps {
+  doRegisterTeam: (registrationData: any) => Promise<void>;
+  doRegisterPersonal: (registrationData: any) => Promise<void>;
+  doSendActivationCode: (code: string) => Promise<void>;
+}
+
 const changeEmailRedirect = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
   [REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
   [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const Verify = ({account, authError, history, currentFlow, intl: {formatMessage: _}, ...connected}) => {
+const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+  account,
+  authError,
+  history,
+  currentFlow,
+  intl: {formatMessage: _},
+  ...connected
+}) => {
   const createAccount = email_code => {
     switch (currentFlow) {
       case REGISTER_FLOW.TEAM: {

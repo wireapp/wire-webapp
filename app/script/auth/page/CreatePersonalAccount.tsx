@@ -19,10 +19,10 @@
 
 import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, IsMobile} from '@wireapp/react-ui-kit';
 import {createPersonalAccountStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
-import {withRouter} from 'react-router';
+import {withRouter, RouteComponentProps} from 'react-router';
 import * as React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
@@ -31,7 +31,33 @@ import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
 import Page from './Page';
 
-class CreatePersonalAccount extends React.PureComponent {
+interface URLParams {
+  invitationCode: string;
+}
+
+interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
+
+interface ConnectedProps {
+  account: any;
+  currentFlow: string;
+  isPersonalFlow: boolean;
+  isPersonalInvitationFlow: boolean;
+}
+
+interface DispatchProps {
+  getInvitationFromCode: (invitationCode: string) => Promise<void>;
+  enterPersonalInvitationCreationFlow: () => Promise<void>;
+  enterPersonalCreationFlow: () => Promise<void>;
+  enterGenericInviteCreationFlow: () => Promise<void>;
+  doRegisterPersonal: (registrationData: any) => Promise<void>;
+}
+
+interface State {}
+
+class CreatePersonalAccount extends React.PureComponent<
+  Props & ConnectedProps & DispatchProps & InjectedIntlProps,
+  State
+> {
   componentDidMount() {
     const {params, url} = this.props.match;
 

@@ -26,12 +26,12 @@ import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
 import ValidationError from '../module/action/ValidationError';
-import React, {PureComponent} from 'react';
+import * as React from 'react';
 import EXTERNAL_ROUTE from '../externalRoute';
 import BackendError from '../module/action/BackendError';
 import * as AccentColor from '../util/AccentColor';
 
-class AccountForm extends PureComponent {
+class AccountForm extends React.PureComponent {
   inputs = {};
   state = {
     accent_id: AccentColor.random().id,

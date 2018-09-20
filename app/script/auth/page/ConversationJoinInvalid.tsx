@@ -18,13 +18,24 @@
  */
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {conversationJoinStrings} from '../../strings';
 import {H2, Text, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 
-class ConversationJoinInvalid extends React.PureComponent {
+interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
+
+interface ConnectedProps {}
+
+interface DispatchProps {}
+
+interface State {}
+
+class ConversationJoinInvalid extends React.PureComponent<
+  Props & ConnectedProps & DispatchProps & InjectedIntlProps,
+  State
+> {
   state = {};
 
   render() {

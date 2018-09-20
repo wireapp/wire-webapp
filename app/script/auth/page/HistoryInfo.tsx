@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {historyInfoStrings} from '../../strings';
 import Page from './Page';
 import {H1, Link, ContainerXS, Button, Paragraph} from '@wireapp/react-ui-kit';
@@ -28,9 +28,26 @@ import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import * as NotificationAction from '../module/action/NotificationAction';
-import {withRouter} from 'react-router';
+import {withRouter, RouteComponentProps} from 'react-router';
 
-function HistoryInfo({hasHistory, hasSelfHandle, history, intl: {formatMessage: _}, ...connected}) {
+interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
+
+interface ConnectedProps {
+  hasHistory: boolean;
+  hasSelfHandle: boolean;
+}
+
+interface DispatchProps {
+  resetHistoryCheck: () => Promise<void>;
+}
+
+const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+  hasHistory,
+  hasSelfHandle,
+  history,
+  intl: {formatMessage: _},
+  ...connected
+}) => {
   const onContinue = () => {
     connected.resetHistoryCheck().then(() => {
       return hasSelfHandle ? window.location.replace(URLUtil.getAppPath()) : history.push(ROUTE.CHOOSE_HANDLE);
@@ -71,7 +88,7 @@ function HistoryInfo({hasHistory, hasSelfHandle, history, intl: {formatMessage: 
       </ContainerXS>
     </Page>
   );
-}
+};
 
 export default withRouter(
   injectIntl(
