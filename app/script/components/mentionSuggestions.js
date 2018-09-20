@@ -27,7 +27,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
     this.isVisible = ko.observable(false);
     this.onSelectionValidated = params.onSelectionValidated || (() => {});
     this.suggestions = params.suggestions;
-    this.targetInputSelector = params.targetInput;
+    this.targetInputSelector = params.targetInputSelector;
     this.targetInput = undefined;
 
     this.positions = ko.observable({});
