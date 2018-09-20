@@ -3719,31 +3719,29 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {
     let messageTimer;
-    let message;
-    let messageContentType;
-
     const isEphemeral = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+
     if (isEphemeral) {
-      message = genericMessage.ephemeral;
-      messageContentType = genericMessage.ephemeral.content;
-      messageTimer = genericMessage.ephemeral.expire_after_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
-    } else {
-      message = genericMessage;
-      messageContentType = genericMessage.content;
+      genericMessage = genericMessage.ephemeral;
+      messageTimer = genericMessage.expire_after_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     }
 
+    const messageContentType = genericMessage.content;
     let actionType;
+    let numberOfMentions;
     switch (messageContentType) {
       case 'asset': {
-        if (message.asset.original !== null) {
-          actionType = message.asset.original.image !== null ? 'photo' : 'file';
+        const protoAsset = genericMessage.asset;
+        if (protoAsset.original) {
+          actionType = protoAsset.original.image ? 'photo' : 'file';
         }
         break;
       }
 
       case 'calling': {
         const {properties} = callMessageEntity;
-        actionType = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
+        const isVideoCall = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+        actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;
       }
 
@@ -3758,8 +3756,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case 'text': {
-        if (!message.text.link_preview.length) {
+        const protoText = genericMessage.text;
+        if (!protoText.link_preview.length) {
           actionType = 'text';
+          numberOfMentions = protoText.mentions.length;
         }
         break;
       }
@@ -3775,6 +3775,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
+        mention_num: numberOfMentions,
         with_service: conversationEntity.isWithService(),
       };
 
