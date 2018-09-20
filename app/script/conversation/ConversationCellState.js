@@ -65,17 +65,17 @@ z.conversation.ConversationCellState = (() => {
               break;
             }
 
-            case ACTIVITY_TYPE.PING: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLinePing
-                : z.string.conversationsSecondaryLinePings;
-              break;
-            }
-
             case ACTIVITY_TYPE.MESSAGE: {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLineNewMessage
                 : z.string.conversationsSecondaryLineNewMessages;
+              break;
+            }
+
+            case ACTIVITY_TYPE.PING: {
+              stringId = activityCountIsOne
+                ? z.string.conversationsSecondaryLinePing
+                : z.string.conversationsSecondaryLinePings;
               break;
             }
 
