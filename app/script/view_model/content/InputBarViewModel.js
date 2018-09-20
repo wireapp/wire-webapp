@@ -222,6 +222,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       user_id: userEntity.id,
     };
     const mentionEntity = new z.message.MentionEntity(mentionData);
+    this.currentMentions.push(mentionEntity);
 
     // keep track of what is before and after the mention being edited
     const beforeMentionStr = this.input().slice(0, mentionEntity.startIndex);
@@ -237,7 +238,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     inputElement.selectionEnd = caretPosition;
 
     this.editedMention(undefined);
-    this.currentMentions.push(mentionEntity);
   }
 
   addedToView() {
