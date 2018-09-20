@@ -300,6 +300,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     return connectionMessageTypes.includes(this.memberMessageType);
   }
 
+  isConnectionRequest() {
+    return this.memberMessageType === z.message.SystemMessageType.CONNECTION_REQUEST;
+  }
+
   isCreation() {
     return [
       z.message.SystemMessageType.CONNECTION_ACCEPTED,
