@@ -142,8 +142,7 @@ export const startRefresh = () => ({
   type: REFRESH_START,
 });
 
-export const successfulRefresh = authData => ({
-  payload: authData,
+export const successfulRefresh = () => ({
   type: REFRESH_SUCCESS,
 });
 

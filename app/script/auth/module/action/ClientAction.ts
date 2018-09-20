@@ -23,9 +23,11 @@ import * as Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
 import * as NotificationAction from './NotificationAction';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType, RegisteredClient, ClientClassification} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ThunkAction} from "../reducer";
+import {ClientInfo} from '@wireapp/core/dist/client/root';
 
-export function doGetAllClients() {
+export function doGetAllClients(): ThunkAction<Promise<RegisteredClient[]>> {
   return function(dispatch, getState, {apiClient}) {
     dispatch(ClientActionCreator.startGetAllClients());
     return Promise.resolve()
@@ -41,12 +43,14 @@ export function doGetAllClients() {
   };
 }
 
-export function doRemoveClient(clientId, password) {
+export function doRemoveClient(clientId, password): ThunkAction {
   return function(dispatch, getState, {apiClient}) {
     dispatch(ClientActionCreator.startRemoveClient());
     return Promise.resolve()
       .then(() => apiClient.client.api.deleteClient(clientId, password))
-      .then(clients => dispatch(ClientActionCreator.successfulRemoveClient(clientId)))
+      .then(clients => {
+        dispatch(ClientActionCreator.successfulRemoveClient(clientId));
+      })
       .catch(error => {
         dispatch(ClientActionCreator.failedRemoveClient(error));
         throw error;
@@ -54,7 +58,7 @@ export function doRemoveClient(clientId, password) {
   };
 }
 
-export function doInitializeClient(clientType: ClientType, password?: string) {
+export function doInitializeClient(clientType: ClientType, password?: string): ThunkAction {
   return function(dispatch, getState, {core}) {
     dispatch(ClientActionCreator.startInitializeClient());
     return Promise.resolve()
@@ -78,7 +82,7 @@ export function doInitializeClient(clientType: ClientType, password?: string) {
   };
 }
 
-export function generateClientPayload(clientType) {
+export function generateClientPayload(clientType: ClientType): ClientInfo {
   if (clientType === ClientType.NONE) {
     return undefined;
   }
@@ -101,7 +105,8 @@ export function generateClientPayload(clientType) {
   }
 
   return {
-    classification: 'desktop',
+    classification: ClientClassification.DESKTOP,
+    cookieLabel: undefined,
     label: deviceLabel,
     model: deviceModel,
   };

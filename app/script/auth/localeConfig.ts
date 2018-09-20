@@ -3,6 +3,7 @@ import {QUERY_KEY} from './route';
 
 export const SUPPORTED_LANGUAGE = require('./supportedLocales');
 
+// TODO: Use "Currency.EUR" here once core v6 is in.
 export const DEFAULT_CURRENCY = 'EUR';
 export const DEFAULT_LANGUAGE = 'en';
 
