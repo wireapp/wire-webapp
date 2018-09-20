@@ -100,10 +100,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.mentionSuggestions = ko.pureComputed(() => {
       const editedMention = this.editedMention();
-      if (!editedMention) {
+      if (!editedMention || !this.conversationEntity()) {
         return [];
       }
-      const candidates = this.conversationEntity().participating_user_ets();
+      const candidates = this.conversationEntity()
+        .participating_user_ets()
+        .filter(userEntity => !userEntity.isService && !userEntity.isTemporaryGuest());
       return this.searchRepository.searchUserInSet(editedMention.term, candidates);
     });
 
