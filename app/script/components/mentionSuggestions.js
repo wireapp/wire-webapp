@@ -111,8 +111,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
 ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
-    <div class="
-    " data-uie-name="list-mention-suggestions" data-bind="style: positions()">
+    <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: positions()">
       <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions, as: 'suggestion'}">
         <div class="mention-suggestion-list__item" data-bind="css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()}">
           <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
