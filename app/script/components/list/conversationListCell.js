@@ -68,7 +68,7 @@ ko.components.register('conversation-list-cell', {
           </availability-state>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_one2one() && conversation.self.inTeam() -->
-          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
+          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation), 'conversation-list-cell-name--bold': !!cell_state().description}"></span>
         <!-- /ko -->
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
@@ -85,7 +85,7 @@ ko.components.register('conversation-list-cell', {
             <span class="conversation-list-cell-badge cell-badge-light icon-end-call" data-uie-name="status-missed-call"></span>
           <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
-            <span class="conversation-list-cell-badge cell-badge-dark icon-silence" data-uie-name="status-silence"></span>
+            <span class="conversation-list-cell-badge cell-badge-dark icon-silence conversation-muted" data-uie-name="status-silence"></span>
           <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadMessagesCount() > 0 -->
             <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadMessagesCount()" data-uie-name="status-unread"></span>
