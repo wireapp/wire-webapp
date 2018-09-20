@@ -107,13 +107,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
       return {reactions: this.reactions(), version: this.version};
     }
   }
-
-  isSelfMentioned() {
-    return this.has_asset_text()
-      ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isSelfMentioned())
-      : false;
-  }
-
   /**
    * Check whether the message was edited.
    * @returns {boolean} True, if message has been edited.
