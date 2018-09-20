@@ -478,10 +478,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const mentionedUser = userEntities.find(userEntity => userEntity.username() === username);
       if (mentionedUser) {
         const userId = mentionedUser.id;
-        const mentionStart = match.index;
+        const mentionStartIndex = match.index;
         const mentionLength = textMatch.length;
 
-        const mentionEntity = new z.message.MentionEntity().setUserIdMention(mentionStart, mentionLength, userId);
+        const mentionEntity = new z.message.MentionEntity(mentionStartIndex, mentionLength, userId);
         mentions.push(mentionEntity);
       }
     }
