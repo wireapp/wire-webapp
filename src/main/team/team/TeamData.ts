@@ -17,12 +17,15 @@
  *
  */
 
+import {SupportedCurrency} from '../payment';
+
 interface TeamData {
+  binding: boolean;
+  creator: string;
+  currency?: SupportedCurrency;
+  icon: string;
   id: string;
   name: string;
-  icon: string;
-  creator: string;
-  binding: boolean;
 }
 
 export {TeamData};
