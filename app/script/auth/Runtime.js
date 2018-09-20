@@ -55,10 +55,10 @@ export const SUPPORTED_BROWSERS = {
 };
 
 const getPlatform = () => platform;
-const getOs = () => getPlatform().os;
+const getOs = () => getPlatform().os || {};
 const getUserAgent = () => getPlatform().ua.toLowerCase();
 
-const getOsFamily = () => getOs().family.toLowerCase();
+const getOsFamily = () => (getOs().family || '').toLowerCase();
 const getBrowserName = () => getPlatform().name.toLowerCase();
 const getBrowserVersion = () => {
   const [majorVersion, minorVersion] = getPlatform().version.split('.');
