@@ -111,6 +111,10 @@ z.conversation.ConversationCellState = (() => {
           return z.conversation.ConversationStatusIcon.UNREAD_PING;
         }
 
+        if (lastAlertMessage.isMention()) {
+          return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+        }
+
         const isMissedCall = lastAlertMessage.is_call() && lastAlertMessage.was_missed();
         if (isMissedCall) {
           return z.conversation.ConversationStatusIcon.MISSED_CALL;
