@@ -227,13 +227,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     // keep track of what is before and after the mention being edited
     const beforeMentionStr = this.input().slice(0, mentionEntity.startIndex);
     const afterMentionStr = this.input()
-      .slice(mentionEntity.startIndex + editedMention.term.length + 1, this.input().length)
+      .slice(mentionEntity.startIndex + editedMention.term.length + 1)
       .replace(/^ /, '');
 
     // insert the mention in between
     this.input(`${beforeMentionStr}@${userEntity.name()} ${afterMentionStr}`);
 
-    const caretPosition = mentionEntity.startIndex + mentionEntity.length + 1;
+    const caretPosition = mentionEntity.endIndex + 1;
     inputElement.selectionStart = caretPosition;
     inputElement.selectionEnd = caretPosition;
 
@@ -344,6 +344,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.input('');
+    this.currentMentions = [];
     $(event.target).focus();
   }
 
@@ -481,9 +482,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   sendMessage(messageText) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions;
-      this.conversationRepository
-        .sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities)
-        .then(() => (this.currentMentions = []));
+      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
     }
   }
 
