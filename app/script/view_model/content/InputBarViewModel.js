@@ -40,6 +40,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
+    this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
@@ -48,7 +49,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.selectionEnd = ko.observable(0);
 
     this.emojiInput = contentViewModel.emojiInput;
-    this.mentionSuggestion = new z.viewModel.content.MentionSuggestionViewModel();
 
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
@@ -99,18 +99,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.mentionSuggestions = ko.pureComputed(() => {
-      const inputValue = this.input();
-      const incompleteMention = inputValue.match(/@(\w+)$/);
-      const candidates = this.conversationEntity().participating_user_ets();
-      if (incompleteMention) {
-        return this.searchRepository.searchUserInSet(incompleteMention[1], candidates);
+      const editedMention = this.editedMention();
+      if (!editedMention) {
+        return [];
       }
-      return [];
+      const candidates = this.conversationEntity().participating_user_ets();
+      return this.searchRepository.searchUserInSet(editedMention.term, candidates);
     });
 
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input();
-      const suggestions = this.mentionSuggestions();
       const participatingUserEntities = this.conversationEntity().participating_user_ets();
 
       const pieces = this.parseForMentions(input, participatingUserEntities)
@@ -126,20 +124,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           [input]
         );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
-      return (
-        pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('') +
-        suggestions.map(user => user.username()).join(', ')
-      );
+      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
 
-    this.isInMentionFlow = ko.observable(false);
-    this.isInMentionFlow.subscribe(isInFlow => {
-      if (isInFlow) {
-        this.mentionSuggestion.show(document.querySelector('#conversation-input-bar-text'));
-      } else {
-        this.mentionSuggestion.hide();
-      }
-    });
+    this.editedMention = ko.observable(undefined);
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -226,6 +214,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
       window.requestAnimationFrame(() => this.conversationHasFocus(true))
     );
+  }
+
+  addMention(userEntity) {
+    // TODO
+    this.editedMention(undefined);
   }
 
   addedToView() {
@@ -378,12 +371,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
     const text = value.substr(0, selectionEnd);
-    if (this.isInMentionFlow()) {
-      const endFlowRegexp = /\s$/;
-      const isStartOfInput = selectionEnd === 0;
-      const isOutsideOfMention = endFlowRegexp.test(text);
-      if (isStartOfInput || isOutsideOfMention) {
-        this.isInMentionFlow(false);
+    if (this.editedMention()) {
+      // we check that the user is currently typing something that looks like a mention
+      const editedMentionText = text.match(/@(\w*)$/);
+      if (!editedMentionText) {
+        this.editedMention(undefined);
+      } else {
+        const searchTerm = editedMentionText[1];
+        const currentEditedMention = this.editedMention();
+        this.editedMention(Object.assign({}, currentEditedMention, {term: searchTerm}));
       }
     } else {
       const defaultRange = {endIndex: 0, startIndex: Infinity};
@@ -405,7 +401,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const startFlowRegexp = /\B@$/;
       if (startFlowRegexp.test(text)) {
-        this.isInMentionFlow(true);
+        this.editedMention({start: selectionStart - 1, term: ''});
       }
     }
   }
@@ -437,28 +433,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyUp(data, keyboardEvent) {
-    if (
-      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_LEFT ||
-      keyboardEvent.key === z.util.KeyboardUtil.KEY.ARROW_RIGHT
-    ) {
-      this.handleMentions(data, keyboardEvent);
-    }
-    if (this.isInMentionFlow) {
-      switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ARROW_UP:
-          this.mentionSuggestion.selectPrevious();
-          break;
-
-        case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-          this.mentionSuggestion.selectNext();
-          break;
-
-        case z.util.KeyboardUtil.KEY.ENTER:
-          this.mentionSuggestion.insertSelected(this.input);
-          break;
-      }
-    }
-
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
   }
 
