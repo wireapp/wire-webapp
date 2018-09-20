@@ -34,8 +34,8 @@ z.conversation.ConversationCellState = (() => {
     const activities = {
       [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.CALL]: 0,
-      [ACTIVITY_TYPE.MESSAGE]: 0,
       [ACTIVITY_TYPE.PING]: 0,
+      [ACTIVITY_TYPE.MESSAGE]: 0,
     };
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
@@ -104,21 +104,20 @@ z.conversation.ConversationCellState = (() => {
   const _getStateAlert = {
     description: conversationEntity => _accumulateActivity(conversationEntity),
     icon: conversationEntity => {
-      const lastAlertMessage = conversationEntity.unreadEvents().find(_isAlert);
+      const hasSelfMention = conversationEntity.unreadEvents().some(messageEntity => messageEntity.isSelfMentioned());
+      if (hasSelfMention) {
+        return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+      }
 
-      if (lastAlertMessage) {
-        if (lastAlertMessage.is_ping()) {
-          return z.conversation.ConversationStatusIcon.UNREAD_PING;
-        }
-
-        if (lastAlertMessage.isSelfMentioned()) {
-          return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
-        }
-
-        const isMissedCall = lastAlertMessage.is_call() && lastAlertMessage.was_missed();
-        if (isMissedCall) {
-          return z.conversation.ConversationStatusIcon.MISSED_CALL;
-        }
+      const hasMissedCall = conversationEntity
+        .unreadEvents()
+        .some(messageEntity => messageEntity.is_call() && messageEntity.was_missed());
+      if (hasMissedCall) {
+        return z.conversation.ConversationStatusIcon.MISSED_CALL;
+      }
+      const hasPing = conversationEntity.unreadEvents().some(messageEntity => messageEntity.is_ping());
+      if (hasPing) {
+        return z.conversation.ConversationStatusIcon.UNREAD_PING;
       }
     },
     match: conversationEntity => {
