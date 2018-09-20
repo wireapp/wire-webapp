@@ -112,11 +112,16 @@ ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
     <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: positions()">
-      <ul class="mention-suggestion-list" data-bind="foreach: {data: suggestions, as: 'suggestion'}">
-        <li data-bind="style: {color: suggestion === $parent.selectedSuggestion() ? 'green' : ''}">
-          <span data-bind="text: suggestion.username()"></span>
-        </li>
-      </ul>
+      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions, as: 'suggestion'}">
+        <div class="mention-suggestion-list__item" data-bind="css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()}, attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === $parent.selectedSuggestion()}" data-uie-name="item-mention-suggestion">
+          <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
+          <div class="mention-suggestion-list__item__name" data-bind="text: suggestion.name()" data-uie-name="status-name"></div>
+          <div class="mention-suggestion-list__item__username"data-bind="text: suggestion.username()" data-uie-name="status-username"></div>
+          <!-- ko if: suggestion.isGuest() -->
+            <guest-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest"></guest-icon>
+          <!-- /ko -->
+        </div>
+      </div>
     </div>
   <!-- /ko -->`,
 
