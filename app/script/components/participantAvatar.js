@@ -31,6 +31,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       X_LARGE: 'avatar-xl',
       X_SMALL: 'avatar-xs',
       XX_SMALL: 'avatar-xxs',
+      XXX_SMALL: 'avatar-xxxs',
     };
   }
 
@@ -42,6 +43,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       [ParticipantAvatar.SIZE.X_LARGE]: 200,
       [ParticipantAvatar.SIZE.X_SMALL]: 24,
       [ParticipantAvatar.SIZE.XX_SMALL]: 20,
+      [ParticipantAvatar.SIZE.XXX_SMALL]: 16,
     };
   }
 
