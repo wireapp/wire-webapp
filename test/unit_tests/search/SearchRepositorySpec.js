@@ -29,46 +29,48 @@ describe('z.search.SearchRepository', () => {
   });
 
   describe('searchUserInSet', () => {
-    const sabine = generateUser('jesuissabine', 'Sabine', 'Duchemin');
-    const janina = generateUser('yosoyjanina', 'Janina', 'Felix');
-    const felix = generateUser('iamfelix', 'Felix', 'Felicitation');
-    const felicien = generateUser('ichbinfelicien', 'Felicien', 'Delatour');
-    const lastguy = generateUser('lastfelicien', 'lastsabine', 'lastjanina');
-    const noMatch1 = generateUser(undefined, 'yyy', 'yyy');
-    const noMatch2 = generateUser('xxx', undefined, 'xxx');
-    const noMatch3 = generateUser('zzz', 'zzz', undefined);
-    const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, noMatch3];
+    const sabine = generateUser('jesuissabine', 'Sabine Duchemin');
+    const janina = generateUser('yosoyjanina', 'Janina Felix');
+    const felixa = generateUser('iamfelix', 'Felix Abo');
+    const felix = generateUser('iamfelix', 'Felix Oulala');
+    const felicien = generateUser('ichbinfelicien', 'Felicien Delatour');
+    const lastguy = generateUser('lastfelicien', 'lastsabine lastjanina');
+    const jeanpierre = generateUser('jean-pierre', 'Jean-Pierre Sansbijou');
+    const pierre = generateUser('pierrot', 'Pierre Monsouci');
+    const noMatch1 = generateUser(undefined, 'yyy yyy');
+    const noMatch2 = generateUser('xxx', undefined);
+    const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, felixa, jeanpierre, pierre];
 
     const tests = [
       {expected: users, term: '', testCase: 'returns the whole user list if no term is given'},
-      {expected: [janina, sabine, lastguy], term: 'j', testCase: 'matches multiple results'},
+      {expected: [jeanpierre, janina, sabine, lastguy], term: 'j', testCase: 'matches multiple results'},
       {
         expected: [janina, lastguy],
         term: 'ja',
         testCase: 'puts matches that start with the pattern on top of the list',
       },
       {
-        expected: [felix, felicien, janina, lastguy],
+        expected: [felicien, felixa, felix, janina, lastguy],
         term: 'fel',
-        testCase: 'sorts by firstname, lastname, handle and inside match',
+        testCase: 'sorts by name, handle, inside match and alphabetically',
       },
       {
-        expected: [felix, janina],
+        expected: [felixa, felix, janina],
         term: 'felix',
         testCase: 'sorts by firstname and lastname',
       },
       {
-        expected: [felicien, felix, lastguy],
+        expected: [felicien, lastguy],
         term: 'felici',
-        testCase: 'sorts by firstname, lastname and inside match',
+        testCase: 'sorts by name and inside match',
       },
       {
-        expected: [sabine, lastguy, janina],
+        expected: [sabine, jeanpierre, lastguy, pierre, janina],
         term: 's',
-        testCase: 'sorts by firstname, lastname, handle and inside match',
+        testCase: 'sorts by name, handle and inside match',
       },
       {
-        expected: [sabine, lastguy],
+        expected: [sabine, jeanpierre, lastguy],
         term: 'sa',
         testCase: 'puts matches that start with the pattern on top of the list',
       },
@@ -82,7 +84,17 @@ describe('z.search.SearchRepository', () => {
         term: 'sabine',
         testCase: 'puts matches that start with the pattern on top of the list',
       },
-      {expected: [felicien, felix, lastguy], term: 'ic', testCase: 'matches inside the properties'},
+      {expected: [felicien, lastguy], term: 'ic', testCase: 'matches inside the properties'},
+      {
+        expected: [jeanpierre],
+        term: 'jean-pierre',
+        testCase: 'finds compound names',
+      },
+      {
+        expected: [pierre, jeanpierre],
+        term: 'pierre',
+        testCase: 'matches compound names and prioritize matches from start',
+      },
     ];
 
     tests.forEach(({expected, term, testCase}) => {
@@ -94,10 +106,10 @@ describe('z.search.SearchRepository', () => {
   });
 });
 
-function generateUser(handle, firstname = '', lastname = '') {
+function generateUser(handle, name) {
   const user = new z.entity.User();
   user.username(handle);
-  user.name(`${firstname} ${lastname}`);
+  user.name(name);
   return user;
 }
 function serializeUser(userEntity) {
