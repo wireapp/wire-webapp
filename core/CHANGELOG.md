@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.3.7"></a>
+## [6.3.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.3.6...@wireapp/core@6.3.7) (2018-09-20)
+
+
+### Bug Fixes
+
+* **core:** Make notification services public ([#1142](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1142)) ([d5e81d5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d5e81d5))
+
+
+
+
+
 <a name="6.3.6"></a>
 ## [6.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.3.5...@wireapp/core@6.3.6) (2018-09-19)
 
