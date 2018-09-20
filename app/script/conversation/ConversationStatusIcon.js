@@ -29,6 +29,7 @@ z.conversation.ConversationStatusIcon = {
   NONE: 'none',
   PENDING_CONNECTION: 'pending',
   TYPING: 'typing',
+  UNREAD_MENTION: 'mention',
   UNREAD_MESSAGES: 'messages',
   UNREAD_PING: 'ping',
 };

@@ -25,6 +25,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationCellState = (() => {
   const ACTIVITY_TYPE = {
     CALL: 'ConversationCellState.ACTIVITY_TYPE.CALL',
+    MENTION: 'ConversationCellState.ACTIVITY_TYPE.MENTION',
     MESSAGE: 'ConversationCellState.ACTIVITY_TYPE.MESSAGE',
     PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
   };
@@ -33,6 +34,7 @@ z.conversation.ConversationCellState = (() => {
     const activities = {
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
+      [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.PING]: 0,
     };
 
@@ -42,6 +44,8 @@ z.conversation.ConversationCellState = (() => {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
+      } else if (messageEntity.isMention()) {
+        activities[ACTIVITY_TYPE.MENTION] += 1;
       } else if (messageEntity.is_content()) {
         activities[ACTIVITY_TYPE.MESSAGE] += 1;
       }
@@ -72,6 +76,13 @@ z.conversation.ConversationCellState = (() => {
               break;
             }
 
+            case ACTIVITY_TYPE.MENTION: {
+              stringId = activityCountIsOne
+                ? z.string.conversationsSecondaryLineNewMention
+                : z.string.conversationsSecondaryLineNewMentions;
+              break;
+            }
+
             case ACTIVITY_TYPE.PING: {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLinePing
@@ -98,6 +109,10 @@ z.conversation.ConversationCellState = (() => {
       if (lastAlertMessage) {
         if (lastAlertMessage.is_ping()) {
           return z.conversation.ConversationStatusIcon.UNREAD_PING;
+        }
+
+        if (lastAlertMessage.isMention()) {
+          return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
         }
 
         const isMissedCall = lastAlertMessage.is_call() && lastAlertMessage.was_missed();

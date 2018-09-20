@@ -108,6 +108,10 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     }
   }
 
+  hasMentions() {
+    return this.has_asset_text() && this.get_first_asset().hasMentions();
+  }
+
   isSelfMentioned() {
     return this.has_asset_text() && this.get_first_asset().isSelfMentioned();
   }

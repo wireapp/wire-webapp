@@ -33,6 +33,7 @@ z.message.SuperType = {
   DEVICE: 'device',
   LOCATION: 'location',
   MEMBER: 'member',
+  MENTION: 'mention',
   MISSED: 'missed',
   PING: 'ping',
   REACTION: 'reaction',
