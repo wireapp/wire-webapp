@@ -18,8 +18,17 @@
  */
 
 import * as CookieActionCreator from '../action/creator/CookieActionCreator';
+import {AppActions} from '../action/creator';
 
-export const initialState = {
+export interface CookieState {
+  cookieTimer: any;
+  cookies: any;
+  error: Error;
+  fetched: boolean;
+  fetching: boolean;
+}
+
+export const initialState: CookieState = {
   cookieTimer: {},
   cookies: {},
   error: null,
@@ -27,7 +36,7 @@ export const initialState = {
   fetching: false,
 };
 
-export default function reducer(state = initialState, action) {
+export function cookieReducer(state: CookieState = initialState, action: AppActions): CookieState {
   switch (action.type) {
     case CookieActionCreator.COOKIE_POLLING_START: {
       const {name, timerId} = action.payload;

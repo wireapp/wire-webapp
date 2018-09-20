@@ -18,8 +18,17 @@
  */
 
 import * as RuntimeActionCreator from '../action/creator/RuntimeActionCreator';
+import {AppActions} from '../action/creator';
 
-const initialState = {
+export interface RuntimeState {
+  hasCookieSupport: boolean;
+  hasIndexedDbSupport: boolean;
+  isCheckingCookie: boolean;
+  isCheckingIndexedDb: boolean;
+  isSupportedBrowser: boolean;
+}
+
+const initialState: RuntimeState = {
   hasCookieSupport: false,
   hasIndexedDbSupport: false,
   isCheckingCookie: false,
@@ -27,7 +36,7 @@ const initialState = {
   isSupportedBrowser: false,
 };
 
-export default function reducer(state = initialState, action) {
+export function runtimeReducer(state: RuntimeState = initialState, action: AppActions): RuntimeState {
   switch (action.type) {
     case RuntimeActionCreator.RUNTIME_CHECK_INDEXEDDB_START:
       return {

@@ -18,14 +18,21 @@
  */
 
 import * as InviteActionCreator from '../action/creator/InviteActionCreator';
+import {AppActions} from '../action/creator';
 
-const initialState = {
+export interface InvitationState {
+  error: Error;
+  fetching: boolean;
+  invites: any[];
+}
+
+const initialState: InvitationState = {
   error: null,
   fetching: false,
   invites: [],
 };
 
-export default function inviteReducer(state = initialState, action) {
+export function invitationReducer(state: InvitationState = initialState, action: AppActions): InvitationState {
   switch (action.type) {
     case InviteActionCreator.INVITE_ADD_START: {
       return {

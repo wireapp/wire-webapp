@@ -20,8 +20,31 @@
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
 import * as UserActionCreator from '../action/creator/UserActionCreator';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
+import {AppActions} from '../action/creator';
 
-export const initialState = {
+export type AuthState = {
+  readonly account: {
+    accent_id: string;
+    assets: any;
+    email: string;
+    email_code: string;
+    invitation_code: string;
+    label: string;
+    locale: string;
+    name: string;
+    password: string;
+    phone: string;
+    phone_code: string;
+    team: any;
+  };
+  readonly currentFlow: string;
+  readonly error: Error;
+  readonly fetched: boolean;
+  readonly fetching: boolean;
+  readonly isAuthenticated: boolean;
+};
+
+export const initialState: AuthState = {
   account: {
     accent_id: null,
     assets: null,
@@ -43,7 +66,7 @@ export const initialState = {
   isAuthenticated: false,
 };
 
-export default function reducer(state = initialState, action) {
+export function authReducer(state: AuthState = initialState, action: AppActions): AuthState {
   switch (action.type) {
     case AuthActionCreator.LOGIN_START:
     case AuthActionCreator.REGISTER_JOIN_START:

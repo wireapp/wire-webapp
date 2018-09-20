@@ -20,15 +20,25 @@
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
 import * as ClientActionCreator from '../action/creator/ClientActionCreator';
 import * as NotificationActionCreator from '../action/creator/NotificationActionCreator';
+import {AppActions} from '../action/creator';
 
-const initialState = {
+export interface ClientState {
+  clients: any[];
+  error: Error;
+  fetching: boolean;
+  hasHistory: boolean;
+  isNewClient: boolean;
+}
+
+const initialState: ClientState = {
   clients: [],
   error: null,
   fetching: false,
   hasHistory: null,
+  isNewClient: null,
 };
 
-export default function clientReducer(state = initialState, action) {
+export function clientReducer(state: ClientState = initialState, action: AppActions): ClientState {
   switch (action.type) {
     case ClientActionCreator.CLIENT_INIT_SUCCESS: {
       return {

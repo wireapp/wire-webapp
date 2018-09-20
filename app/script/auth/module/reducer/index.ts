@@ -17,14 +17,14 @@
  *
  */
 
-import authReducer from './authReducer';
-import clientReducer from './clientReducer';
-import cookieReducer from './cookieReducer';
-import conversationReducer from './conversationReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import runtimeReducer from './runtimeReducer';
-import selfReducer from './selfReducer';
+import {AuthState, authReducer} from './authReducer';
+import {ClientState, clientReducer} from './clientReducer';
+import {CookieState, cookieReducer} from './cookieReducer';
+import {ConversationState, conversationReducer} from './conversationReducer';
+import {InvitationState, invitationReducer} from './inviteReducer';
+import {LanguageState, languageReducer} from './languageReducer';
+import {RuntimeState, runtimeReducer} from './runtimeReducer';
+import {SelfState, selfReducer} from './selfReducer';
 import {ThunkAction as ReduxThunkAction} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {APIClient} from '@wireapp/api-client';
@@ -32,13 +32,21 @@ import {Account} from '@wireapp/core';
 import {CookiesStatic} from 'js-cookie';
 
 export type Api = {
-  apiClient: APIClient,
-  cookieStore: CookiesStatic,
+  apiClient: APIClient;
+  cookieStore: CookiesStatic;
   localStorage: Storage;
   core: Account;
 };
 
 export interface RootState {
+  authState: AuthState;
+  clientState: ClientState;
+  conversationState: ConversationState;
+  cookieState: CookieState;
+  inviteState: InvitationState;
+  languageState: LanguageState;
+  runtimeState: RuntimeState;
+  selfState: SelfState;
 }
 
 export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
@@ -48,7 +56,7 @@ const reducers = {
   clientState: clientReducer,
   conversationState: conversationReducer,
   cookieState: cookieReducer,
-  inviteState: inviteReducer,
+  inviteState: invitationReducer,
   languageState: languageReducer,
   runtimeState: runtimeReducer,
   selfState: selfReducer,

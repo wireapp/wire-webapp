@@ -18,14 +18,21 @@
  */
 
 import * as ConversationActionCreator from '../action/creator/ConversationActionCreator';
+import {AppActions} from '../action/creator';
 
-export const initialState = {
+export interface ConversationState {
+  error: Error;
+  fetched: boolean;
+  fetching: boolean;
+}
+
+export const initialState: ConversationState = {
   error: null,
   fetched: false,
   fetching: false,
 };
 
-export default function reducer(state = initialState, action) {
+export function conversationReducer(state: ConversationState = initialState, action: AppActions): ConversationState {
   switch (action.type) {
     case ConversationActionCreator.CONVERSATION_CODE_CHECK_START:
     case ConversationActionCreator.CONVERSATION_CODE_JOIN_START: {

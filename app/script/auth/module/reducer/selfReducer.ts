@@ -18,8 +18,17 @@
  */
 
 import * as SelfActionCreator from '../action/creator/SelfActionCreator';
+import {AppActions} from '../action/creator';
 
-export const initialState = {
+export interface SelfState {
+  consents: any;
+  error: Error;
+  fetched: boolean;
+  fetching: boolean;
+  self: any;
+}
+
+export const initialState: SelfState = {
   consents: {},
   error: null,
   fetched: false,
@@ -27,7 +36,7 @@ export const initialState = {
   self: {name: null, team: null},
 };
 
-export default function reducer(state = initialState, action) {
+export function selfReducer(state: SelfState = initialState, action: AppActions): SelfState {
   switch (action.type) {
     case SelfActionCreator.CONSENT_GET_START:
     case SelfActionCreator.HANDLE_SET_START:
@@ -70,7 +79,7 @@ export default function reducer(state = initialState, action) {
     case SelfActionCreator.CONSENT_SET_SUCCESS: {
       return {
         ...state,
-        consents: {...state.constents, [action.payload.type]: action.payload.value},
+        consents: {...state.consents, [action.payload.type]: action.payload.value},
       };
     }
     default: {
