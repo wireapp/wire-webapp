@@ -18,38 +18,41 @@
  */
 
 import * as ConversationActionCreator from './creator/ConversationActionCreator';
-import {ThunkAction} from "../reducer";
+import {ThunkAction} from '../reducer';
 import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
 
-export function doCheckConversationCode(key, code, uri): ThunkAction {
-  const params = [...arguments];
-  return function (dispatch, getState, {apiClient}) {
-    dispatch(ConversationActionCreator.startConversationCodeCheck(params));
-    return Promise.resolve()
-      .then(() => apiClient.conversation.api.postConversationCodeCheck({code, key, uri}))
-      .then(() => {
-        dispatch(ConversationActionCreator.successfulConversationCodeCheck());
-      })
-      .catch(error => {
-        dispatch(ConversationActionCreator.failedConversationCodeCheck(error));
-        throw error;
-      });
+export class ConversationAction {
+  doCheckConversationCode = (key, code, uri): ThunkAction => {
+    const params = [...arguments];
+    return function(dispatch, getState, {apiClient}) {
+      dispatch(ConversationActionCreator.startConversationCodeCheck(params));
+      return Promise.resolve()
+        .then(() => apiClient.conversation.api.postConversationCodeCheck({code, key, uri}))
+        .then(() => {
+          dispatch(ConversationActionCreator.successfulConversationCodeCheck());
+        })
+        .catch(error => {
+          dispatch(ConversationActionCreator.failedConversationCodeCheck(error));
+          throw error;
+        });
+    };
   };
-}
 
-export function doJoinConversationByCode(key: string, code: string, uri: string): ThunkAction<Promise<ConversationEvent>> {
-  const params = [...arguments];
-  return function (dispatch, getState, {apiClient}) {
-    dispatch(ConversationActionCreator.startJoinConversationByCode(params));
-    return Promise.resolve()
-      .then(() => apiClient.conversation.api.postJoinByCode({code, key, uri}))
-      .then(conversationEvent => {
-        dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
-        return conversationEvent;
-      })
-      .catch(error => {
-        dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
-        throw error;
-      });
+  doJoinConversationByCode = (key: string, code: string, uri: string): ThunkAction<Promise<ConversationEvent>> => {
+    const params = [...arguments];
+    return function(dispatch, getState, {apiClient}) {
+      dispatch(ConversationActionCreator.startJoinConversationByCode(params));
+      return Promise.resolve()
+        .then(() => apiClient.conversation.api.postJoinByCode({code, key, uri}))
+        .then(conversationEvent => {
+          dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
+          return conversationEvent;
+        })
+        .catch(error => {
+          dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
+          throw error;
+        });
+    };
   };
 }
+export const conversationAction = new ConversationAction();

@@ -19,112 +19,116 @@
 
 import * as CookieActionCreator from './creator/CookieActionCreator';
 import * as CookieSelector from '../selector/CookieSelector';
-import {ThunkAction} from "../reducer";
+import {ThunkAction} from '../reducer';
 
 const COOKIE_POLL_INTERVAL = 1000;
 
-export function startPolling(
-  name = CookieSelector.COOKIE_NAME_APP_OPENED,
-  interval = COOKIE_POLL_INTERVAL,
-  asJSON = true
-): ThunkAction {
-  return function (dispatch, getState, {}) {
-    return Promise.resolve()
-      .then(() => dispatch(getCookie(name, asJSON)))
-      .then(() => setInterval(() => dispatch(getCookie(name, asJSON)), interval))
-      .then(timerId => {
-        dispatch(CookieActionCreator.startCookiePolling({name, timerId}));
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedCookiePolling(error))
-      });
+export class CookieAction {
+  startPolling = (
+    name = CookieSelector.COOKIE_NAME_APP_OPENED,
+    interval = COOKIE_POLL_INTERVAL,
+    asJSON = true
+  ): ThunkAction => {
+    return function(dispatch, getState, {actions: {cookieAction}}) {
+      return Promise.resolve()
+        .then(() => dispatch(cookieAction.getCookie(name, asJSON)))
+        .then(() => setInterval(() => dispatch(cookieAction.getCookie(name, asJSON)), interval))
+        .then(timerId => {
+          dispatch(CookieActionCreator.startCookiePolling({name, timerId}));
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedCookiePolling(error));
+        });
+    };
   };
-}
 
-export function stopPolling(name): ThunkAction {
-  return function (dispatch, getState, {}) {
-    return Promise.resolve()
-      .then(() => {
-        const timerId = getState().cookieState.cookieTimer[name];
-        if (timerId) {
-          clearTimeout(timerId);
-          dispatch(CookieActionCreator.stopCookiePolling({name, timerId}));
-        }
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedCookiePolling(error));
-      });
+  stopPolling = (name): ThunkAction => {
+    return function(dispatch, getState, {}) {
+      return Promise.resolve()
+        .then(() => {
+          const timerId = getState().cookieState.cookieTimer[name];
+          if (timerId) {
+            clearTimeout(timerId);
+            dispatch(CookieActionCreator.stopCookiePolling({name, timerId}));
+          }
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedCookiePolling(error));
+        });
+    };
   };
-}
 
-export function getCookie(name, asJSON = false): ThunkAction {
-  return function (dispatch, getState, {cookieStore}) {
-    return Promise.resolve(asJSON ? cookieStore.getJSON(name) : cookieStore.get(name))
-      .then(cookie => {
-        const previousCookie = CookieSelector.getCookies(getState())[name];
-        const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
-        if (isCookieModified) {
-          dispatch(CookieActionCreator.successfulGetCookie({cookie, name}));
-        }
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedGetCookie(error));
-      });
+  getCookie = (name, asJSON = false): ThunkAction => {
+    return function(dispatch, getState, {cookieStore}) {
+      return Promise.resolve(asJSON ? cookieStore.getJSON(name) : cookieStore.get(name))
+        .then(cookie => {
+          const previousCookie = CookieSelector.getCookies(getState())[name];
+          const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
+          if (isCookieModified) {
+            dispatch(CookieActionCreator.successfulGetCookie({cookie, name}));
+          }
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedGetCookie(error));
+        });
+    };
   };
-}
 
-export function safelyRemoveCookie(name, value): ThunkAction {
-  return function (dispatch, getState, {cookieStore}) {
-    return Promise.resolve()
-      .then(() => {
-        if (cookieStore.get(name).includes(value)) {
+  safelyRemoveCookie = (name, value): ThunkAction => {
+    return function(dispatch, getState, {cookieStore}) {
+      return Promise.resolve()
+        .then(() => {
+          if (cookieStore.get(name).includes(value)) {
+            cookieStore.remove(name);
+            dispatch(CookieActionCreator.successfulRemoveCookie(name));
+          }
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedRemoveCookie(error));
+        });
+    };
+  };
+
+  removeCookie = (name): ThunkAction => {
+    return function(dispatch, getState, {cookieStore}) {
+      return Promise.resolve()
+        .then(() => {
           cookieStore.remove(name);
           dispatch(CookieActionCreator.successfulRemoveCookie(name));
-        }
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedRemoveCookie(error));
-      });
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedRemoveCookie(error));
+        });
+    };
+  };
+
+  setCookie = (name, value): ThunkAction => {
+    return function(dispatch, getState, {cookieStore}) {
+      return Promise.resolve(cookieStore.set(name, value))
+        .then(() => {
+          dispatch(CookieActionCreator.successfulSetCookie({name}));
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedSetCookie(error));
+        });
+    };
+  };
+
+  setCookieIfAbsent = (name, value): ThunkAction => {
+    return function(dispatch, getState, {cookieStore}) {
+      return Promise.resolve()
+        .then(() => {
+          if (!cookieStore.get(name)) {
+            cookieStore.set(name, value);
+            const cookie = cookieStore.get(name);
+            dispatch(CookieActionCreator.successfulSetCookie({cookie, name}));
+          }
+        })
+        .catch(error => {
+          dispatch(CookieActionCreator.failedSetCookie(error));
+        });
+    };
   };
 }
 
-export function removeCookie(name): ThunkAction {
-  return function (dispatch, getState, {cookieStore}) {
-    return Promise.resolve()
-      .then(() => {
-        cookieStore.remove(name);
-        dispatch(CookieActionCreator.successfulRemoveCookie(name));
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedRemoveCookie(error))
-      });
-  };
-}
-
-export function setCookie(name, value): ThunkAction {
-  return function (dispatch, getState, {cookieStore}) {
-    return Promise.resolve(cookieStore.set(name, value))
-      .then(() => {
-        dispatch(CookieActionCreator.successfulSetCookie({name}))
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedSetCookie(error))
-      });
-  };
-}
-
-export function setCookieIfAbsent(name, value): ThunkAction {
-  return function (dispatch, getState, {cookieStore}) {
-    return Promise.resolve()
-      .then(() => {
-        if (!cookieStore.get(name)) {
-          cookieStore.set(name, value);
-          const cookie = cookieStore.get(name);
-          dispatch(CookieActionCreator.successfulSetCookie({cookie, name}));
-        }
-      })
-      .catch(error => {
-        dispatch(CookieActionCreator.failedSetCookie(error));
-      });
-  };
-}
+export const cookieAction = new CookieAction();
