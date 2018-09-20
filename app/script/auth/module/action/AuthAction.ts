@@ -30,7 +30,7 @@ import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {Dispatch} from 'redux';
-import {Api, RootState, ThunkAction} from "../reducer";
+import {Api, RootState, ThunkAction} from '../reducer';
 
 type LoginLifecycleFunction = (dispatch: Dispatch, getState: () => RootState, global: Api) => void;
 
@@ -46,10 +46,12 @@ export const doLoginAndJoin = (loginData: LoginData, key: string, code: string, 
   return doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
 };
 
-function doLoginPlain(loginData: LoginData, onBeforeLogin: LoginLifecycleFunction = () => {
-}, onAfterLogin: LoginLifecycleFunction = () => {
-}): ThunkAction {
-  return function (dispatch, getState, global) {
+function doLoginPlain(
+  loginData: LoginData,
+  onBeforeLogin: LoginLifecycleFunction = () => {},
+  onAfterLogin: LoginLifecycleFunction = () => {}
+): ThunkAction {
+  return function(dispatch, getState, global) {
     const {core} = global;
 
     const obfuscatedLoginData = {...loginData, password: '********'};
@@ -77,8 +79,8 @@ function doLoginPlain(loginData: LoginData, onBeforeLogin: LoginLifecycleFunctio
   };
 }
 
-export function doFinalizeSSOLogin({clientType}: { clientType: ClientType }): ThunkAction {
-  return function (dispatch, getState, {apiClient, core}) {
+export function doFinalizeSSOLogin({clientType}: {clientType: ClientType}): ThunkAction {
+  return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startLogin());
     return Promise.resolve()
       .then(() => apiClient.init(clientType))
@@ -102,7 +104,7 @@ export function doFinalizeSSOLogin({clientType}: { clientType: ClientType }): Th
 }
 
 export function validateSSOCode(code): ThunkAction {
-  return function (dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient}) {
     const mapError = error => {
       const statusCode = error && error.response && error.response.status;
       if (statusCode === 404) {
@@ -139,15 +141,15 @@ function persistAuthData(clientType, core, dispatch): Promise<void[]> {
 }
 
 export function pushAccountRegistrationData(registration): ThunkAction {
-  return function (dispatch) {
+  return function(dispatch) {
     return Promise.resolve().then(() => {
       dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
-    })
+    });
   };
 }
 
 export function doRegisterTeam(registration: RegisterData): ThunkAction {
-  return function (dispatch, getState, {apiClient, core}) {
+  return function(dispatch, getState, {apiClient, core}) {
     const clientType = ClientType.PERMANENT;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
@@ -155,7 +157,7 @@ export function doRegisterTeam(registration: RegisterData): ThunkAction {
     registration.team.icon = 'default';
     registration.team.binding = true;
     // TODO: Fixed once core v6 is inside
-    registration.team['currency'] = currentCurrency();
+    registration.team.currency = currentCurrency();
     registration.team.name = registration.team.name.trim();
 
     let createdAccount;
@@ -170,7 +172,7 @@ export function doRegisterTeam(registration: RegisterData): ThunkAction {
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => {
-        dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount))
+        dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
       })
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -184,7 +186,7 @@ export function doRegisterTeam(registration: RegisterData): ThunkAction {
 }
 
 export function doRegisterPersonal(registration: RegisterData): ThunkAction {
-  return function (dispatch, getState, {apiClient, core}) {
+  return function(dispatch, getState, {apiClient, core}) {
     const clientType = ClientType.PERMANENT;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
@@ -210,7 +212,7 @@ export function doRegisterPersonal(registration: RegisterData): ThunkAction {
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => {
-        dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount))
+        dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
       })
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -223,8 +225,11 @@ export function doRegisterPersonal(registration: RegisterData): ThunkAction {
   };
 }
 
-export function doRegisterWireless(registrationData: RegisterData, options = {shouldInitializeClient: true}): ThunkAction {
-  return function (dispatch, getState, {apiClient, core}) {
+export function doRegisterWireless(
+  registrationData: RegisterData,
+  options = {shouldInitializeClient: true}
+): ThunkAction {
+  return function(dispatch, getState, {apiClient, core}) {
     const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
     registrationData.locale = currentLanguage();
     registrationData.name = registrationData.name.trim();
@@ -233,7 +238,7 @@ export function doRegisterWireless(registrationData: RegisterData, options = {sh
     const obfuscatedRegistrationData = {
       accent_id: registrationData.accent_id,
       // TODO: Apply method call once core v6 is in
-      expires_in: registrationData['expires_in'],
+      expires_in: registrationData.expires_in,
       locale: registrationData.locale,
       name: registrationData.name,
     };
@@ -249,7 +254,7 @@ export function doRegisterWireless(registrationData: RegisterData, options = {sh
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => clientType !== ClientType.NONE && dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => {
-        dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount))
+        dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
       })
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -263,7 +268,7 @@ export function doRegisterWireless(registrationData: RegisterData, options = {sh
 }
 
 export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}): ThunkAction {
-  return function (dispatch, getState, {apiClient, core}) {
+  return function(dispatch, getState, {apiClient, core}) {
     let clientType;
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
@@ -274,7 +279,7 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
         return undefined;
       })
       .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-      .then(persist => {
+      .then((persist: boolean) => {
         if (persist === undefined) {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
@@ -291,7 +296,7 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
       })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => {
-        dispatch(AuthActionCreator.successfulRefresh())
+        dispatch(AuthActionCreator.successfulRefresh());
       })
       .catch(error => {
         if (options.shouldValidateLocalClient) {
@@ -306,7 +311,7 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
 }
 
 function validateLocalClient(): ThunkAction {
-  return function (dispatch, getState, {core}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startValidateLocalClient());
     return Promise.resolve()
       .then(() => core.loadAndValidateLocalClient())
@@ -321,7 +326,7 @@ function validateLocalClient(): ThunkAction {
 }
 
 export function doLogout(): ThunkAction {
-  return function (dispatch, getState, {core}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogout());
     return core
       .logout()
@@ -337,7 +342,7 @@ export function doLogout(): ThunkAction {
 }
 
 export function doSilentLogout(): ThunkAction {
-  return function (dispatch, getState, {core}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogout());
     return core
       .logout()
@@ -353,7 +358,7 @@ export function doSilentLogout(): ThunkAction {
 }
 
 export function getInvitationFromCode(invitationCode: string): ThunkAction {
-  return function (dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startGetInvitationFromCode());
     return apiClient.invitation.api
       .getInvitationInfo(invitationCode)
