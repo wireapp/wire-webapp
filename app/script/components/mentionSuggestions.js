@@ -45,6 +45,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
         this.initList();
       } else if (!shouldBeVisible && this.isVisible()) {
         this.teardownList();
+      } else if (this.isVisible()) {
+        this.updateSelectedIndexBoundaries(suggestions);
       }
       this.isVisible(shouldBeVisible);
     });
@@ -69,7 +71,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
 
   moveSelection(delta) {
     const currentIndex = this.selectedSuggestionIndex();
-    const newIndex = Math.max(Math.min(currentIndex + delta, this.suggestions().length - 1), 0);
+    const newIndex = z.util.NumberUtil.clamp(currentIndex + delta, 0, this.suggestions().length - 1);
     this.selectedSuggestionIndex(newIndex);
   }
 
@@ -87,6 +89,11 @@ z.components.MentionSuggestions = class MentionSuggestions {
     const left = position.left - 8;
 
     this.positions({bottom: `${bottom}px`, left: `${left}px`});
+  }
+
+  updateSelectedIndexBoundaries(suggestions) {
+    const currentIndex = this.selectedSuggestionIndex();
+    this.selectedSuggestionIndex(z.util.NumberUtil.clamp(currentIndex, 0, suggestions.length - 1));
   }
 
   teardownList() {
