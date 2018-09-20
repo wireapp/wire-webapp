@@ -661,7 +661,7 @@ z.conversation.EventMapper = class EventMapper {
   _mapAssetMentions(mentions, messageText) {
     return mentions
       .map(encodedMention => z.proto.Mention.decode64(encodedMention))
-      .map(mention => new z.message.MentionEntity(mention))
+      .map(protoMention => new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_Id))
       .filter(mentionEntity => mentionEntity && mentionEntity.isValid(messageText));
   }
 

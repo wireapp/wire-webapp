@@ -23,12 +23,12 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.MentionEntity = class Mention {
-  constructor(mention = {}) {
-    this.startIndex = mention.start || 0;
-    this.length = mention.length || 1;
-    this.type = mention.mention_type || z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+  constructor(startIndex = 0, length = 1, userId = '') {
+    this.startIndex = startIndex;
+    this.length = length;
+    this.type = z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
 
-    this.userId = mention.user_id || '';
+    this.userId = userId;
     this.userEntity = ko.observable();
 
     this.isSelfMentioned = ko.pureComputed(() => {
@@ -56,14 +56,6 @@ z.message.MentionEntity = class Mention {
     }
 
     return true;
-  }
-
-  setUserIdMention(startIndex, length, userId) {
-    this.type = z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-    this.startIndex = startIndex;
-    this.length = length;
-    this.userId = userId;
-    return this;
   }
 
   toJSON() {
