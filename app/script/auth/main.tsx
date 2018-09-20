@@ -42,7 +42,7 @@ try {
 } catch (error) {}
 
 const store = configureStore({
-  apiClient: core.apiClient,
+  apiClient,
   cookieStore,
   core,
   localStorage,
