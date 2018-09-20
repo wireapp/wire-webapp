@@ -74,8 +74,10 @@ z.search.SearchRepository = class SearchRepository {
     if (term === '') {
       return userEntities;
     }
-    const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-    properties = properties || [SEARCHABLE_FIELDS.NAME, SEARCHABLE_FIELDS.USERNAME];
+    properties = properties || [
+      SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME,
+      SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME,
+    ];
 
     const weightedResults = userEntities.reduce((results, userEntity) => {
       const matchWeight = properties
