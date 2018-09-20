@@ -214,31 +214,30 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     );
   }
 
-  addMention(userEntity) {
+  addMention(userEntity, inputElement) {
     const editedMention = this.editedMention();
     const mentionData = {
       length: userEntity.name().length + 1,
       start: editedMention.start,
       user_id: userEntity.id,
     };
-    const mention = new z.message.MentionEntity(mentionData);
+    const mentionEntity = new z.message.MentionEntity(mentionData);
 
-    const beforeMentionStr = this.input().slice(0, mention.startIndex);
-    const afterMentionStr = this.input().slice(mention.startIndex + mention.length, this.input().length);
+    // keep track of what is before and after the mention being edited
+    const beforeMentionStr = this.input().slice(0, mentionEntity.startIndex);
+    const afterMentionStr = this.input()
+      .slice(mentionEntity.startIndex + editedMention.term.length + 1, this.input().length)
+      .replace(/^ /, '');
 
-    /*
-      FIXME this is a naive implementation, we need to account for cases like:
-        - when the user.name() is shorter than what the user has typed (eg. a very long handle)
-        - if there is text after the mention
-        - if there is already a space after the mention, no need to add another one
-
-      Probably, being able to detect and remove the search query before inserting the mention would be a safer and
-      cleaner way to do that.
-    */
+    // insert the mention in between
     this.input(`${beforeMentionStr}@${userEntity.name()} ${afterMentionStr}`);
 
+    const caretPosition = mentionEntity.startIndex + mentionEntity.length + 1;
+    inputElement.selectionStart = caretPosition;
+    inputElement.selectionEnd = caretPosition;
+
     this.editedMention(undefined);
-    this.currentMentions.push(mention);
+    this.currentMentions.push(mentionEntity);
   }
 
   addedToView() {
