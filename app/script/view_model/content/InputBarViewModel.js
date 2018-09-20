@@ -483,9 +483,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const mentionEntities = this.currentMentions;
       this.conversationRepository
         .sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities)
-        .then(() => {
-          this.currentMentions = [];
-        });
+        .then(() => (this.currentMentions = []));
     }
   }
 
