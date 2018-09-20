@@ -144,6 +144,12 @@ z.entity.Message = class Message {
     return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_text()) : false;
   }
 
+  hasSelfMention() {
+    return (
+      this.has_asset_text() && this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isSelfMentioned())
+    );
+  }
+
   /**
    * Check if message is a call message.
    * @returns {boolean} Is message of type call
@@ -199,12 +205,6 @@ z.entity.Message = class Message {
   isLinkPreview() {
     return (
       this.has_asset_text() && this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.previews().length)
-    );
-  }
-
-  isMention() {
-    return (
-      this.has_asset_text() && this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.mentions().length)
     );
   }
 
