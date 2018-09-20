@@ -111,7 +111,7 @@ z.conversation.ConversationCellState = (() => {
           return z.conversation.ConversationStatusIcon.UNREAD_PING;
         }
 
-        if (lastAlertMessage.isMention()) {
+        if (lastAlertMessage.isSelfMentioned()) {
           return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
         }
 
@@ -310,7 +310,7 @@ z.conversation.ConversationCellState = (() => {
 
   const _isAlert = messageEntity => {
     const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-    return isMissedCall || messageEntity.is_ping();
+    return isMissedCall || messageEntity.is_ping() || messageEntity.isSelfMentioned();
   };
 
   return {
