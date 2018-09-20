@@ -32,8 +32,8 @@ z.conversation.ConversationCellState = (() => {
   const _accumulateActivity = conversationEntity => {
     const activities = {
       [ACTIVITY_TYPE.CALL]: 0,
-      [ACTIVITY_TYPE.MESSAGE]: 0,
       [ACTIVITY_TYPE.PING]: 0,
+      [ACTIVITY_TYPE.MESSAGE]: 0,
     };
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
@@ -96,13 +96,13 @@ z.conversation.ConversationCellState = (() => {
       const lastAlertMessage = conversationEntity.unreadEvents().find(_isAlert);
 
       if (lastAlertMessage) {
-        if (lastAlertMessage.is_ping()) {
-          return z.conversation.ConversationStatusIcon.UNREAD_PING;
-        }
-
         const isMissedCall = lastAlertMessage.is_call() && lastAlertMessage.was_missed();
         if (isMissedCall) {
           return z.conversation.ConversationStatusIcon.MISSED_CALL;
+        }
+
+        if (lastAlertMessage.is_ping()) {
+          return z.conversation.ConversationStatusIcon.UNREAD_PING;
         }
       }
     },
