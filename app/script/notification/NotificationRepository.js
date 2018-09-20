@@ -564,31 +564,19 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createTrigger(messageEntity, connectionEntity, conversationEntity) {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
-    if (messageEntity.is_content() && messageEntity.isSelfMentioned()) {
+    const containsSelfMention = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    if (containsSelfMention) {
       return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity, true);
     }
 
-    if (!messageEntity.is_member()) {
-      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
+    const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
+    if (isConnectionRequest) {
+      return () => {
+        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      };
     }
 
-    switch (messageEntity.memberMessageType) {
-      case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-      case z.message.SystemMessageType.CONNECTION_CONNECTED: {
-        return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
-      }
-
-      case z.message.SystemMessageType.CONNECTION_REQUEST: {
-        return () => {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
-        };
-      }
-
-      default: {
-        const message = `No notification trigger for message '${messageEntity.id} in '${conversationId}'.`;
-        this.logger.log(this.logger.levels.OFF, message);
-      }
-    }
+    return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
   }
 
   /**
