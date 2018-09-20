@@ -76,7 +76,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
   }
 
   validateSelection() {
-    this.onSelectionValidated(this.selectedSuggestion());
+    this.onSelectionValidated(this.selectedSuggestion(), this.targetInput);
   }
 
   initList() {

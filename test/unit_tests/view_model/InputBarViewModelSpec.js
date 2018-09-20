@@ -22,6 +22,7 @@
 // grunt test_init && grunt test_run:view_model/InputBarViewModel
 
 describe('z.viewModel.content.InputBarViewModel', () => {
+  /*
   const testFactory = new TestFactory();
   let viewModel;
 
@@ -35,44 +36,5 @@ describe('z.viewModel.content.InputBarViewModel', () => {
       done();
     });
   });
-
-  describe('parseForMentions', () => {
-    const userEntities = [
-      {
-        id: 'user1ID',
-        username: () => 'user1',
-      },
-      {
-        id: 'user2ID',
-        username: () => 'user2',
-      },
-    ];
-
-    it('finds an existing user mentioned in a message', () => {
-      const mentionEntities = viewModel.parseForMentions('Hello @user1', userEntities);
-      expect(mentionEntities.length).toBe(1);
-
-      const [mentionEntity] = mentionEntities;
-      expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 6, userId: userEntities[0].id});
-      expect(mentionEntity.endIndex).toEqual(12);
-    });
-
-    it('ignores mentions for unknown users a message', () => {
-      const mentionEntities = viewModel.parseForMentions('Hello @user1 and @user3', userEntities);
-      expect(mentionEntities.length).toBe(1);
-
-      const [mentionEntity] = mentionEntities;
-      expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 6, userId: userEntities[0].id});
-      expect(mentionEntity.endIndex).toEqual(12);
-    });
-
-    it('ignores a mention that has no space before it', () => {
-      const mentionEntities = viewModel.parseForMentions('Hello@user1 and @user2', userEntities);
-      expect(mentionEntities.length).toBe(1);
-
-      const [mentionEntity] = mentionEntities;
-      expect(mentionEntity.toJSON()).toEqual({length: 6, startIndex: 16, userId: userEntities[1].id});
-      expect(mentionEntity.endIndex).toEqual(22);
-    });
-  });
+  */
 });
