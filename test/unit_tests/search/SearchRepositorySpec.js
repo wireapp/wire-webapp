@@ -40,6 +40,7 @@ describe('z.search.SearchRepository', () => {
     const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, noMatch3];
 
     const tests = [
+      {expected: users, term: '', testCase: 'returns the whole user list if no term is given'},
       {expected: [janina, sabine, lastguy], term: 'j', testCase: 'matches multiple results'},
       {
         expected: [janina, lastguy],
