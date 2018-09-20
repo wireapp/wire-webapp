@@ -32,20 +32,20 @@ z.conversation.ConversationCellState = (() => {
 
   const _accumulateActivity = conversationEntity => {
     const activities = {
+      [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
-      [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.PING]: 0,
     };
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
       const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-      if (isMissedCall) {
+      if (messageEntity.isSelfMentioned()) {
+        activities[ACTIVITY_TYPE.MENTION] += 1;
+      } else if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
-      } else if (messageEntity.isSelfMentioned()) {
-        activities[ACTIVITY_TYPE.MENTION] += 1;
       } else if (messageEntity.is_content()) {
         activities[ACTIVITY_TYPE.MESSAGE] += 1;
       }
@@ -69,17 +69,17 @@ z.conversation.ConversationCellState = (() => {
               break;
             }
 
-            case ACTIVITY_TYPE.MESSAGE: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineNewMessage
-                : z.string.conversationsSecondaryLineNewMessages;
-              break;
-            }
-
             case ACTIVITY_TYPE.MENTION: {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLineNewMention
                 : z.string.conversationsSecondaryLineNewMentions;
+              break;
+            }
+
+            case ACTIVITY_TYPE.MESSAGE: {
+              stringId = activityCountIsOne
+                ? z.string.conversationsSecondaryLineNewMessage
+                : z.string.conversationsSecondaryLineNewMessages;
               break;
             }
 
