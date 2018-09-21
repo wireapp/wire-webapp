@@ -17,7 +17,7 @@
  *
  */
 
-import * as UserActionCreator from './creator/UserActionCreator';
+import {UserActionCreator} from './creator/';
 import {currentLanguage} from '../../localeConfig';
 import {ThunkAction} from '../reducer';
 
@@ -33,8 +33,8 @@ export class UserAction {
       dispatch(UserActionCreator.startSendActivationCode());
       return Promise.resolve()
         .then(() => apiClient.user.api.postActivationCode({email, locale: currentLanguage()}))
-        .then(activationResponse => {
-          dispatch(UserActionCreator.successfulSendActivationCode(activationResponse));
+        .then(() => {
+          dispatch(UserActionCreator.successfulSendActivationCode());
         })
         .catch(error => {
           dispatch(UserActionCreator.failedSendActivationCode(error));

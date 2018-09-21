@@ -17,20 +17,41 @@
  *
  */
 
-export const USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START';
-export const USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS';
-export const USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED';
+import {AppAction} from '.';
 
-export const startSendActivationCode = () => ({
-  type: USER_SEND_ACTIVATION_CODE_START,
-});
+export enum USER_ACTION {
+  USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START',
+  USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS',
+  USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED',
+}
 
-export const successfulSendActivationCode = activationResponse => ({
-  payload: activationResponse,
-  type: USER_SEND_ACTIVATION_CODE_SUCCESS,
-});
+export type UserActions =
+  | SendActivationCodeStartAction
+  | SendActivationCodeSuccessAction
+  | SendActivationCodeFailedAction;
 
-export const failedSendActivationCode = (error?: any) => ({
-  payload: error,
-  type: USER_SEND_ACTIVATION_CODE_FAILED,
-});
+export interface SendActivationCodeStartAction extends AppAction {
+  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START;
+}
+export interface SendActivationCodeSuccessAction extends AppAction {
+  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS;
+}
+export interface SendActivationCodeFailedAction extends AppAction {
+  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED;
+  readonly error: any;
+}
+
+export class UserActionCreator {
+  static startSendActivationCode = (): SendActivationCodeStartAction => ({
+    type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START,
+  });
+
+  static successfulSendActivationCode = (): SendActivationCodeSuccessAction => ({
+    type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS,
+  });
+
+  static failedSendActivationCode = (error: any): SendActivationCodeFailedAction => ({
+    error,
+    type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED,
+  });
+}

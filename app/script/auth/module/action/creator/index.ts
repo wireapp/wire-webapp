@@ -18,9 +18,12 @@
  */
 
 import {Action} from 'redux';
+import {UserActions} from './UserActionCreator';
 
 export interface AppAction extends Action {
   type: string;
 }
 
-export type AppActions = any;
+export type AppActions = UserActions;
+
+export * from './UserActionCreator';

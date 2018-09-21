@@ -18,9 +18,8 @@
  */
 
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
-import * as UserActionCreator from '../action/creator/UserActionCreator';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
-import {AppActions} from '../action/creator';
+import {AppActions, USER_ACTION} from '../action/creator/';
 
 export type AuthState = {
   readonly account: {
@@ -72,7 +71,7 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
     case AuthActionCreator.REGISTER_JOIN_START:
     case AuthActionCreator.REGISTER_PERSONAL_START:
     case AuthActionCreator.REGISTER_TEAM_START:
-    case UserActionCreator.USER_SEND_ACTIVATION_CODE_START: {
+    case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
         error: null,
@@ -98,10 +97,10 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
     case AuthActionCreator.REGISTER_JOIN_FAILED:
     case AuthActionCreator.REGISTER_PERSONAL_FAILED:
     case AuthActionCreator.REGISTER_TEAM_FAILED:
-    case UserActionCreator.USER_SEND_ACTIVATION_CODE_FAILED: {
+    case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
         isAuthenticated: false,
       };
@@ -153,7 +152,7 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
     case AuthActionCreator.ENTER_PERSONAL_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.PERSONAL_INVITATION};
     }
-    case UserActionCreator.USER_SEND_ACTIVATION_CODE_SUCCESS: {
+    case USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS: {
       return {
         ...state,
         fetching: false,
