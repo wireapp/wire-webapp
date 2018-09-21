@@ -25,7 +25,7 @@ window.z.conversation = z.conversation || {};
 // Enum of different conversation types.
 z.conversation.ConversationType = {
   CONNECT: 3,
+  GROUP: 0,
   ONE2ONE: 2,
-  REGULAR: 0,
   SELF: 1,
 };
