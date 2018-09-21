@@ -17,30 +17,36 @@
  *
  */
 
-export const RUNTIME_CHECK_INDEXEDDB_START = 'RUNTIME_CHECK_INDEXEDDB_START';
-export const RUNTIME_CHECK_INDEXEDDB_FINISH = 'RUNTIME_CHECK_INDEXEDDB_FINISH';
-export const RUNTIME_CHECK_COOKIE_START = 'RUNTIME_CHECK_COOKIE_START';
-export const RUNTIME_CHECK_COOKIE_FINISH = 'RUNTIME_CHECK_COOKIE_FINISH';
-export const RUNTIME_CONFIRM_SUPPORTED_BROWSER = 'RUNTIME_CONFIRM_SUPPORTED_BROWSER';
+export enum RUNTIME_ACTION {
+  RUNTIME_CHECK_INDEXEDDB_START = 'RUNTIME_CHECK_INDEXEDDB_START',
+  RUNTIME_CHECK_INDEXEDDB_FINISH = 'RUNTIME_CHECK_INDEXEDDB_FINISH',
+  RUNTIME_CHECK_COOKIE_START = 'RUNTIME_CHECK_COOKIE_START',
+  RUNTIME_CHECK_COOKIE_FINISH = 'RUNTIME_CHECK_COOKIE_FINISH',
+  RUNTIME_CONFIRM_SUPPORTED_BROWSER = 'RUNTIME_CONFIRM_SUPPORTED_BROWSER',
+}
 
-export const startCheckIndexedDb = () => ({
-  type: RUNTIME_CHECK_INDEXEDDB_START,
-});
+export type RuntimeActions = any;
 
-export const finishCheckIndexedDb = (result: boolean) => ({
-  payload: result,
-  type: RUNTIME_CHECK_INDEXEDDB_FINISH,
-});
+export class RuntimeActionCreator {
+  static startCheckIndexedDb = () => ({
+    type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_START,
+  });
 
-export const startCheckCookie = () => ({
-  type: RUNTIME_CHECK_COOKIE_START,
-});
+  static finishCheckIndexedDb = (result: boolean) => ({
+    payload: result,
+    type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_FINISH,
+  });
 
-export const finishCheckCookie = (result: boolean) => ({
-  payload: result,
-  type: RUNTIME_CHECK_COOKIE_FINISH,
-});
+  static startCheckCookie = () => ({
+    type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_START,
+  });
 
-export const confirmSupportedBrowser = () => ({
-  type: RUNTIME_CONFIRM_SUPPORTED_BROWSER,
-});
+  static finishCheckCookie = (result: boolean) => ({
+    payload: result,
+    type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_FINISH,
+  });
+
+  static confirmSupportedBrowser = () => ({
+    type: RUNTIME_ACTION.RUNTIME_CONFIRM_SUPPORTED_BROWSER,
+  });
+}

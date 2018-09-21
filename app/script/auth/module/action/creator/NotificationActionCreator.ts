@@ -17,26 +17,32 @@
  *
  */
 
-export const NOTIFICATION_CHECK_HISTORY_START = 'NOTIFICATION_CHECK_HISTORY_START';
-export const NOTIFICATION_CHECK_HISTORY_SUCCESS = 'NOTIFICATION_CHECK_HISTORY_SUCCESS';
-export const NOTIFICATION_CHECK_HISTORY_FAILED = 'NOTIFICATION_CHECK_HISTORY_FAILED';
+export enum NOTIFICATION_ACTION {
+  NOTIFICATION_CHECK_HISTORY_START = 'NOTIFICATION_CHECK_HISTORY_START',
+  NOTIFICATION_CHECK_HISTORY_SUCCESS = 'NOTIFICATION_CHECK_HISTORY_SUCCESS',
+  NOTIFICATION_CHECK_HISTORY_FAILED = 'NOTIFICATION_CHECK_HISTORY_FAILED',
 
-export const NOTIFICATION_CHECK_HISTORY_RESET = 'NOTIFICATION_CHECK_HISTORY_RESET';
+  NOTIFICATION_CHECK_HISTORY_RESET = 'NOTIFICATION_CHECK_HISTORY_RESET',
+}
 
-export const startCheckHistory = () => ({
-  type: NOTIFICATION_CHECK_HISTORY_START,
-});
+export type NotificationActions = any;
 
-export const successfulCheckHistory = hasHistory => ({
-  payload: hasHistory,
-  type: NOTIFICATION_CHECK_HISTORY_SUCCESS,
-});
+export class NotificationActionCreator {
+  static startCheckHistory = () => ({
+    type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_START,
+  });
 
-export const failedCheckHistory = (error?: any) => ({
-  payload: error,
-  type: NOTIFICATION_CHECK_HISTORY_FAILED,
-});
+  static successfulCheckHistory = hasHistory => ({
+    payload: hasHistory,
+    type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS,
+  });
 
-export const resetHistoryCheck = () => ({
-  type: NOTIFICATION_CHECK_HISTORY_RESET,
-});
+  static failedCheckHistory = (error?: any) => ({
+    payload: error,
+    type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_FAILED,
+  });
+
+  static resetHistoryCheck = () => ({
+    type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET,
+  });
+}
