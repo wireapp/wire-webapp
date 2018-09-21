@@ -330,8 +330,14 @@ z.util.renderMessage = (message, mentionEntities = []) => {
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
     const mentionData = mentionTexts[mentionHash];
-    const elementAttributes = mentionData.isSelfMentioned ? '' : ` data-user-id="${mentionData.userId}"`;
-    return text.replace(mentionHash, `<a${elementAttributes}>${mentionData.text}</a>`);
+    const elementClasses = mentionData.isSelfMentioned ? 'self-mention' : '';
+    const elementAttributes = mentionData.isSelfMentioned
+      ? ''
+      : `class="message-mention" data-user-id="${mentionData.userId}"`;
+    return text.replace(
+      mentionHash,
+      `<span class="message-mention ${elementClasses}" ${elementAttributes}>${mentionData.text}</span>`
+    );
   }, mentionlessText);
 
   return parsedText;

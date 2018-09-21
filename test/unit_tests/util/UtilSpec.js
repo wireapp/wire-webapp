@@ -156,31 +156,32 @@ describe('z.util.renderMessage', () => {
   describe('Mentions', () => {
     const tests = [
       {
-        expected: 'bonjour <a data-user-id="user-id">@felix</a>',
+        expected: 'bonjour <span data-user-id="user-id">@felix</span>',
         mentions: [{length: 6, startIndex: 8, userId: 'user-id'}],
         testCase: 'replaces single mention in simple text',
         text: 'bonjour @felix',
       },
       {
-        expected: 'bonjour <a data-user-id="user-id">@felix</a>, tu vas bien <a data-user-id="user-id">@felix</a>?',
+        expected:
+          'bonjour <span data-user-id="user-id">@felix</span>, tu vas bien <span data-user-id="user-id">@felix</span>?',
         mentions: [{length: 6, startIndex: 8, userId: 'user-id'}, {length: 6, startIndex: 28, userId: 'user-id'}],
         testCase: 'replaces two mentions to same user in simple text',
         text: 'bonjour @felix, tu vas bien @felix?',
       },
       {
-        expected: 'salut <a data-user-id="pain-id">@`I am a **pain** in the __a**__`</a>',
+        expected: 'salut <span data-user-id="pain-id">@`I am a **pain** in the __a**__`</span>',
         mentions: [{length: 33, startIndex: 6, userId: 'pain-id'}],
         testCase: "doesn't parse markdown in user names",
         text: 'salut @`I am a **pain** in the __a**__`',
       },
       {
-        expected: '<strong>salut</strong> <a data-user-id="pain-id">@you</a>',
+        expected: '<strong>salut</strong> <span data-user-id="pain-id">@you</span>',
         mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
         testCase: 'parses markdown outside of mentions',
         text: '**salut** @you',
       },
       {
-        expected: '<strong>salut</strong> <a>@you</a> and <a data-user-id="toi-id">@toi</a>',
+        expected: '<strong>salut</strong> <span>@you</span> and <span data-user-id="toi-id">@toi</span>',
         mentions: [
           {isSelfMentioned: true, length: 4, startIndex: 10, userId: 'you-id'},
           {length: 4, startIndex: 19, userId: 'toi-id'},

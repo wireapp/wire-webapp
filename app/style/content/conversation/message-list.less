@@ -79,6 +79,19 @@
   participant-avatar {
     cursor: pointer;
   }
+
+  .message-mention {
+    .accent-color;
+
+    font-weight: @font-weight-bold;
+    &::first-letter {
+      font-size: 14px;
+    }
+    &.self-mention {
+      color: @graphite-dark;
+      .accent-background-color(16%);
+    }
+  }
 }
 
 @keyframes marked-animation {
