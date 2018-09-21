@@ -75,6 +75,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationEntity() ? this.conversationEntity().input().text.length > 0 : false;
     });
 
+    this.inputTextOnly = ko.pureComputed({
+      read: () => this.input().text,
+      write: value => this.input({mentions: this.input().mentions, text: value}),
+    });
+
     this.input = ko.pureComputed({
       read: () => {
         if (this.isEditing()) {
