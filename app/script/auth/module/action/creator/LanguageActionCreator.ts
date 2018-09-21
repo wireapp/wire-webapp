@@ -17,9 +17,15 @@
  *
  */
 
-export const SWITCH_LANGUAGE = 'SWITCH_LANGUAGE';
+export enum LANGUAGE_ACTION {
+  SWITCH_LANGUAGE = 'SWITCH_LANGUAGE',
+}
 
-export const switchLanguage = language => ({
-  payload: language,
-  type: SWITCH_LANGUAGE,
-});
+export type LanguageActions = any;
+
+export class LanguageActionCreator {
+  static switchLanguage = language => ({
+    payload: language,
+    type: LANGUAGE_ACTION.SWITCH_LANGUAGE,
+  });
+}

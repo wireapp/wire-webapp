@@ -17,59 +17,65 @@
  *
  */
 
-export const LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START';
-export const LOCAL_STORAGE_SET_SUCCESS = 'LOCAL_STORAGE_SET_SUCCESS';
-export const LOCAL_STORAGE_SET_FAILED = 'LOCAL_STORAGE_SET_FAILED';
+export enum LOCAL_STORAGE_ACTION {
+  LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START',
+  LOCAL_STORAGE_SET_SUCCESS = 'LOCAL_STORAGE_SET_SUCCESS',
+  LOCAL_STORAGE_SET_FAILED = 'LOCAL_STORAGE_SET_FAILED',
 
-export const LOCAL_STORAGE_GET_START = 'LOCAL_STORAGE_GET_START';
-export const LOCAL_STORAGE_GET_SUCCESS = 'LOCAL_STORAGE_GET_SUCCESS';
-export const LOCAL_STORAGE_GET_FAILED = 'LOCAL_STORAGE_GET_FAILED';
+  LOCAL_STORAGE_GET_START = 'LOCAL_STORAGE_GET_START',
+  LOCAL_STORAGE_GET_SUCCESS = 'LOCAL_STORAGE_GET_SUCCESS',
+  LOCAL_STORAGE_GET_FAILED = 'LOCAL_STORAGE_GET_FAILED',
 
-export const LOCAL_STORAGE_DELETE_START = 'LOCAL_STORAGE_DELETE_START';
-export const LOCAL_STORAGE_DELETE_SUCCESS = 'LOCAL_STORAGE_DELETE_SUCCESS';
-export const LOCAL_STORAGE_DELETE_FAILED = 'LOCAL_STORAGE_DELETE_FAILED';
+  LOCAL_STORAGE_DELETE_START = 'LOCAL_STORAGE_DELETE_START',
+  LOCAL_STORAGE_DELETE_SUCCESS = 'LOCAL_STORAGE_DELETE_SUCCESS',
+  LOCAL_STORAGE_DELETE_FAILED = 'LOCAL_STORAGE_DELETE_FAILED',
+}
 
-export const startLocalStorageSet = (params?: any) => ({
-  params,
-  type: LOCAL_STORAGE_SET_START,
-});
+export type LocalStorageActions = any;
 
-export const successfulLocalStorageSet = (key, value) => ({
-  payload: {key, value},
-  type: LOCAL_STORAGE_SET_SUCCESS,
-});
+export class LocalStorageActionCreator {
+  static startLocalStorageSet = (params?: any) => ({
+    params,
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START,
+  });
 
-export const failedLocalStorageSet = (error?: any) => ({
-  payload: error,
-  type: LOCAL_STORAGE_SET_FAILED,
-});
+  static successfulLocalStorageSet = (key, value) => ({
+    payload: {key, value},
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
+  });
 
-export const startLocalStorageGet = (params?: any) => ({
-  params,
-  type: LOCAL_STORAGE_GET_START,
-});
+  static failedLocalStorageSet = (error?: any) => ({
+    payload: error,
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED,
+  });
 
-export const successfulLocalStorageGet = (key: string, value: string) => ({
-  payload: {key, value},
-  type: LOCAL_STORAGE_GET_SUCCESS,
-});
+  static startLocalStorageGet = (params?: any) => ({
+    params,
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START,
+  });
 
-export const failedLocalStorageGet = (error?: any) => ({
-  payload: error,
-  type: LOCAL_STORAGE_GET_FAILED,
-});
+  static successfulLocalStorageGet = (key: string, value: string) => ({
+    payload: {key, value},
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
+  });
 
-export const startLocalStorageDelete = (params?: any) => ({
-  params,
-  type: LOCAL_STORAGE_DELETE_START,
-});
+  static failedLocalStorageGet = (error?: any) => ({
+    payload: error,
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED,
+  });
 
-export const successfulLocalStorageDelete = (key: string) => ({
-  payload: {key},
-  type: LOCAL_STORAGE_DELETE_SUCCESS,
-});
+  static startLocalStorageDelete = (params?: any) => ({
+    params,
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_START,
+  });
 
-export const failedLocalStorageDelete = (error?: any) => ({
-  payload: error,
-  type: LOCAL_STORAGE_DELETE_FAILED,
-});
+  static successfulLocalStorageDelete = (key: string) => ({
+    payload: {key},
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS,
+  });
+
+  static failedLocalStorageDelete = (error?: any) => ({
+    payload: error,
+    type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED,
+  });
+}
