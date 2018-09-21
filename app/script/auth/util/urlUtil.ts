@@ -20,7 +20,7 @@
 import EXTERNAL_ROUTE from '../externalRoute';
 import {FORWARDED_QUERY_KEYS} from '../route';
 
-export function pathWithParams(path, additionalParams, whitelistParams) {
+export function pathWithParams(path, additionalParams, whitelistParams = FORWARDED_QUERY_KEYS) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
