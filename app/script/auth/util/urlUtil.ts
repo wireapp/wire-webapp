@@ -40,7 +40,7 @@ export function pathWithParams(
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
 }
 
-export function getURLParameter(parameterName) {
+export function getURLParameter(parameterName: string) {
   return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
 }
 
