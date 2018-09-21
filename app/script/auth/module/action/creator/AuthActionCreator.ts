@@ -17,9 +17,6 @@
  *
  */
 
-import {AppAction} from ".";
-import {RegisterData} from "@wireapp/api-client/dist/commonjs/auth";
-
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
@@ -69,57 +66,29 @@ export enum AUTH_ACTION {
   ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW',
 }
 
-export type AuthActions = StartLogin
-  | SuccessfulLogin
-  | FailedLogin
-  | StartRegisterTeam
-  | SuccessfulRegisterTeam;
-
-export interface StartLogin extends AppAction {
-  readonly params: any;
-  readonly type: AUTH_ACTION.LOGIN_START;
-}
-
-export interface SuccessfulLogin extends AppAction {
-  readonly type: AUTH_ACTION.LOGIN_SUCCESS;
-}
-
-export interface FailedLogin extends AppAction {
-  readonly type: AUTH_ACTION.LOGIN_FAILED;
-  readonly payload: any;
-}
-
-export interface StartRegisterTeam extends AppAction {
-  readonly type: AUTH_ACTION.REGISTER_TEAM_START;
-  readonly params: any;
-}
-
-export interface SuccessfulRegisterTeam extends AppAction {
-  readonly type: AUTH_ACTION.REGISTER_TEAM_SUCCESS;
-  readonly payload: RegisterData;
-}
+export type AuthActions = any;
 
 export class AuthActionCreator {
-  static startLogin = (params?: any): StartLogin => ({
+  static startLogin = (params?: any) => ({
     params,
     type: AUTH_ACTION.LOGIN_START,
   });
 
-  static successfulLogin = (): SuccessfulLogin => ({
+  static successfulLogin = () => ({
     type: AUTH_ACTION.LOGIN_SUCCESS,
   });
 
-  static failedLogin = (error?: any): FailedLogin => ({
+  static failedLogin = (error?: any) => ({
     payload: error,
     type: AUTH_ACTION.LOGIN_FAILED,
   });
 
-  static startRegisterTeam = (params?: any): StartRegisterTeam => ({
+  static startRegisterTeam = (params?: any) => ({
     params,
     type: AUTH_ACTION.REGISTER_TEAM_START,
   });
 
-  static successfulRegisterTeam = (authData: RegisterData): SuccessfulRegisterTeam => ({
+  static successfulRegisterTeam = authData => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
   });
