@@ -18,7 +18,7 @@
  */
 
 import {AppAction} from ".";
-import {RegisterData, Context} from "@wireapp/api-client/dist/commonjs/auth";
+import {RegisterData} from "@wireapp/api-client/dist/commonjs/auth";
 
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
@@ -149,7 +149,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_WIRELESS_START,
   });
 
-  static successfulRegisterWireless = (authData: Context) => ({
+  static successfulRegisterWireless = authData => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
   });
@@ -157,6 +157,21 @@ export class AuthActionCreator {
   static failedRegisterWireless = (error?: any) => ({
     payload: error,
     type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
+  });
+
+  static startRegisterJoin = (params?: any) => ({
+    params,
+    type: AUTH_ACTION.REGISTER_JOIN_START,
+  });
+
+  static successfulRegisterJoin = authData => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
+  });
+
+  static failedRegisterJoin = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.REGISTER_JOIN_FAILED,
   });
 
   static startRefresh = () => ({
@@ -202,9 +217,33 @@ export class AuthActionCreator {
     type: AUTH_ACTION.LOGOUT_FAILED,
   });
 
+  static resetError = () => ({
+    type: AUTH_ACTION.AUTH_RESET_ERROR,
+  });
+
+  static resetAccountData = () => ({
+    type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
+  });
+
   static pushAccountRegistrationData = accountData => ({
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
+  });
+
+  static enterTeamCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
+  });
+
+  static enterPersonalCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
+  });
+
+  static enterGenericInviteCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
+  });
+
+  static enterPersonalInvitationCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW,
   });
 
   static startGetInvitationFromCode = () => ({

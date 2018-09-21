@@ -23,7 +23,7 @@ import {LocalStorageKey} from './LocalStorageAction';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
-import {LoginData, RegisterData, Context} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {AnyAction} from 'redux';
 import {Api, RootState, ThunkAction} from '../reducer';
 import {ThunkDispatch} from 'redux-thunk';
@@ -252,7 +252,7 @@ export class AuthAction {
       registrationData.locale = currentLanguage();
       registrationData.name = registrationData.name.trim();
 
-      let createdAccount: Context;
+      let createdAccount;
       const obfuscatedRegistrationData = {
         accent_id: registrationData.accent_id,
         // TODO: Apply method call once core v6 is in

@@ -42,4 +42,8 @@ export class InvitationActionCreator {
     payload: error,
     type: INVITATION_ACTION.INVITE_ADD_FAILED,
   });
+
+  static resetError = () => ({
+    type: INVITATION_ACTION.INVITE_RESET_ERROR,
+  });
 }

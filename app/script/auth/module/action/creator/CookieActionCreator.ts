@@ -26,9 +26,11 @@ export enum COOKIE_ACTION {
   COOKIE_GET_SUCCESS = 'COOKIE_GET_SUCCESS',
   COOKIE_GET_FAILED = 'COOKIE_GET_FAILED',
 
+  COOKIE_SET_START = 'COOKIE_SET_START',
   COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS',
   COOKIE_SET_FAILED = 'COOKIE_SET_FAILED',
 
+  COOKIE_REMOVE_START = 'COOKIE_REMOVE_START',
   COOKIE_REMOVE_SUCCESS = 'COOKIE_REMOVE_SUCCESS',
   COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED',
 }
@@ -61,6 +63,11 @@ export class CookieActionCreator {
     type: COOKIE_ACTION.COOKIE_GET_FAILED,
   });
 
+  static startSetCookie = ({cookie, name}) => ({
+    payload: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
+  });
+
   static successfulSetCookie = ({cookie, name}: {cookie?: string; name: string}) => ({
     payload: {cookie, name},
     type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
@@ -69,6 +76,11 @@ export class CookieActionCreator {
   static failedSetCookie = (error?: any) => ({
     payload: error,
     type: COOKIE_ACTION.COOKIE_SET_FAILED,
+  });
+
+  static startRemoveCookie = ({cookie, name}) => ({
+    payload: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS,
   });
 
   static successfulRemoveCookie = (name: string) => ({
