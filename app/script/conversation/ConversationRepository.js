@@ -3398,7 +3398,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
         if (conversationEntity.removed_from_conversation()) {
-          return this.delete_message(conversationEntity, messageEntity);
+          return this.deleteMessage(conversationEntity, messageEntity);
         }
 
         const userIds = conversationEntity.is_group() ? [this.selfUser().id, messageEntity.from] : undefined;
