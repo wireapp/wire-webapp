@@ -73,7 +73,7 @@ export type AuthActions = StartLogin
   | SuccessfulLogin
   | FailedLogin
   | StartRegisterTeam
-  | typeof AuthActionCreator.successfulRegisterTeam;
+  | SuccessfulRegisterTeam;
 
 export interface StartLogin extends AppAction {
   readonly params: any;
@@ -119,7 +119,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_TEAM_START,
   });
 
-  static successfulRegisterTeam = (authData: RegisterData) => ({
+  static successfulRegisterTeam = (authData: RegisterData): SuccessfulRegisterTeam => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
   });
