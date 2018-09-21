@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import StoreEngine from '@wireapp/store-engine';
+import {IndexedDBEngine} from '@wireapp/store-engine';
 import {BACKEND} from './Environment';
 
 export const configureClient = () => {
@@ -32,10 +32,10 @@ export const configureClient = () => {
             .stores(schema)
             .upgrade(transaction => upgrade(transaction, db));
         }
-        db.version(version).stores(schema);
+        return db.version(version).stores(schema);
       });
     },
-    store: new StoreEngine.IndexedDBEngine(),
+    store: new IndexedDBEngine(),
     urls: BACKEND,
   });
 };
