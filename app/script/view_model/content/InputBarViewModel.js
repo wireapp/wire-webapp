@@ -84,15 +84,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.input = ko.pureComputed({
       read: () => {
+        let inputObject = {mentions: [], text: ''};
+
         if (this.isEditing()) {
-          return this.editInput();
+          inputObject = this.editInput();
+        } else if (this.conversationEntity() && this.conversationEntity().input()) {
+          inputObject = this.conversationEntity().input();
         }
 
-        if (this.conversationEntity()) {
-          return this.conversationEntity().input() || {mentions: [], text: ''};
-        }
+        this.currentMentions = inputObject.mentions.map(
+          mention => new z.message.MentionEntity(mention.startIndex, mention.length, mention.user_id)
+        );
 
-        return {mentions: [], text: ''};
+        return inputObject;
       },
       write: value => {
         if (this.isEditing()) {
@@ -117,7 +121,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput = ko.pureComputed(() => {
-      const input = this.input().text;
+      const text = this.input().text;
 
       const pieces = this.currentMentions
         .slice()
@@ -130,7 +134,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [input]
+          [text]
         );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
       return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
@@ -450,7 +454,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const lengthDifference = value.length - previousValue.length;
     const edgeMention = this.detectMentionEdgeDeletion(textarea, lengthDifference);
     if (edgeMention) {
-      textarea.value = this.input();
+      textarea.value = this.input().text;
       textarea.selectionStart = edgeMention.startIndex;
       textarea.selectionEnd = edgeMention.endIndex;
     } else {
