@@ -79,8 +79,4 @@ export class ClientActionCreator {
     payload: error,
     type: CLIENT_ACTION.CLIENT_INIT_FAILED,
   });
-
-  static resetError = () => ({
-    type: CLIENT_ACTION.CLIENT_RESET_ERROR,
-  });
 }

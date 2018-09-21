@@ -19,8 +19,6 @@
 
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
 
-import {AppAction} from '.';
-
 export enum SELF_ACTION {
   CONSENT_GET_START = 'CONSENT_GET_START',
   CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS',
