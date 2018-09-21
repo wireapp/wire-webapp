@@ -22,7 +22,6 @@ import * as ClientActionCreator from './creator/ClientActionCreator';
 import * as Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
-import * as NotificationAction from './NotificationAction';
 import {ClientType, RegisteredClient, ClientClassification} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ThunkAction} from '../reducer';
 import {ClientInfo} from '@wireapp/core/dist/client/root';
@@ -60,7 +59,7 @@ export class ClientAction {
   };
 
   doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
-    return function(dispatch, getState, {core, actions: {clientAction}}) {
+    return function(dispatch, getState, {core, actions: {clientAction, notificationAction}}) {
       dispatch(ClientActionCreator.startInitializeClient());
       return Promise.resolve()
         .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))
@@ -72,7 +71,7 @@ export class ClientAction {
         .then(creationStatus => {
           const isNewSubsequentClient = password && creationStatus.isNewClient;
           if (isNewSubsequentClient) {
-            dispatch(NotificationAction.checkHistory());
+            dispatch(notificationAction.checkHistory());
             throw new BackendError({
               code: 201,
               label: BackendError.LABEL.NEW_CLIENT,

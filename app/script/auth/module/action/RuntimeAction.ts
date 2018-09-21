@@ -23,116 +23,122 @@ import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime
 import {hasURLParameter} from '../../util/urlUtil';
 import {QUERY_KEY} from '../../route';
 import {Cookies} from 'js-cookie';
-import {ThunkAction} from "../reducer";
+import {ThunkAction} from '../reducer';
 
-export function checkSupportedBrowser(): ThunkAction<void> {
-  return function(dispatch) {
-    const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-    const isPwaSupportedBrowser = Environment.onEnvironment({
-      onProduction: false,
-      onStaging: pwaAware && (isMobileOs() || isSafari()),
-    });
-    if (isSupportedBrowser() || isPwaSupportedBrowser) {
-      dispatch(RuntimeActionCreator.confirmSupportedBrowser());
-    }
-  };
-}
-
-export function checkIndexedDbSupport(): ThunkAction<void> {
-  return function(dispatch) {
-    dispatch(RuntimeActionCreator.startCheckIndexedDb());
-    hasIndexedDbSupport()
-      .then(() => {
-        dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
-      })
-      .catch(() => {
-        dispatch(RuntimeActionCreator.finishCheckIndexedDb(false));
+export class RuntimeAction {
+  checkSupportedBrowser = (): ThunkAction<void> => {
+    return function(dispatch) {
+      const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
+      const isPwaSupportedBrowser = Environment.onEnvironment({
+        onProduction: false,
+        onStaging: pwaAware && (isMobileOs() || isSafari()),
       });
+      if (isSupportedBrowser() || isPwaSupportedBrowser) {
+        dispatch(RuntimeActionCreator.confirmSupportedBrowser());
+      }
+    };
   };
-}
 
-export function checkCookieSupport(): ThunkAction<void> {
-  return function(dispatch) {
-    dispatch(RuntimeActionCreator.startCheckCookie());
-    hasCookieSupport()
-      .then(() => {
-        dispatch(RuntimeActionCreator.finishCheckCookie(true));
-      })
-      .catch(() => {
-        dispatch(RuntimeActionCreator.finishCheckCookie(false));
-      });
+  checkIndexedDbSupport = (): ThunkAction<void> => {
+    return function(dispatch, getState, {actions: {runtimeAction}}) {
+      dispatch(RuntimeActionCreator.startCheckIndexedDb());
+      runtimeAction
+        .hasIndexedDbSupport()
+        .then(() => {
+          dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
+        })
+        .catch(() => {
+          dispatch(RuntimeActionCreator.finishCheckIndexedDb(false));
+        });
+    };
   };
-}
 
-function hasCookieSupport(): Promise<void> {
-  const cookieName = 'cookie_supported';
+  checkCookieSupport = (): ThunkAction<void> => {
+    return function(dispatch, getState, {actions: {runtimeAction}}) {
+      dispatch(RuntimeActionCreator.startCheckCookie());
+      runtimeAction
+        .hasCookieSupport()
+        .then(() => {
+          dispatch(RuntimeActionCreator.finishCheckCookie(true));
+        })
+        .catch(() => {
+          dispatch(RuntimeActionCreator.finishCheckCookie(false));
+        });
+    };
+  };
 
-  return new Promise((resolve, reject) => {
-    switch (navigator.cookieEnabled) {
-      case true:
-        return resolve();
-      case false:
-        return reject(new Error());
-      default:
-        Cookies.set(cookieName, 'yes');
-        if (Cookies.get(cookieName)) {
-          Cookies.remove(cookieName);
-          return resolve();
-        }
-        return reject(new Error());
-    }
-  });
-}
-
-function hasIndexedDbSupport(): Promise<void> {
-  let supportIndexedDb;
-  try {
-    supportIndexedDb = !!window.indexedDB;
-  } catch (error) {
-    supportIndexedDb = false;
-  }
-  if (!supportIndexedDb) {
-    return Promise.reject(new Error('IndexedDB not supported'));
-  }
-
-  if (isFirefox()) {
-    let dbOpenRequest;
-
-    try {
-      dbOpenRequest = window.indexedDB.open('test');
-      dbOpenRequest.onerror = event => {
-        if (dbOpenRequest.error) {
-          event.preventDefault();
-          Promise.reject(new Error('Error opening IndexedDB'));
-        }
-      };
-    } catch (error) {
-      return Promise.reject(new Error('Error initializing IndexedDB'));
-    }
+  hasCookieSupport = (): Promise<void> => {
+    const cookieName = 'cookie_supported';
 
     return new Promise((resolve, reject) => {
-      const interval = 10;
-      const maxRetry = 50;
+      switch (navigator.cookieEnabled) {
+        case true:
+          return resolve();
+        case false:
+          return reject(new Error());
+        default:
+          Cookies.set(cookieName, 'yes');
+          if (Cookies.get(cookieName)) {
+            Cookies.remove(cookieName);
+            return resolve();
+          }
+          return reject(new Error());
+      }
+    });
+  };
 
-      function checkDbRequest(currentAttempt = 0) {
-        const tooManyAttempts = currentAttempt >= maxRetry;
-        const isRequestDone = dbOpenRequest.readyState === 'done';
+  hasIndexedDbSupport = (): Promise<void> => {
+    let supportIndexedDb;
+    try {
+      supportIndexedDb = !!window.indexedDB;
+    } catch (error) {
+      supportIndexedDb = false;
+    }
+    if (!supportIndexedDb) {
+      return Promise.reject(new Error('IndexedDB not supported'));
+    }
 
-        if (isRequestDone) {
-          const hasResult = !!dbOpenRequest.result;
-          return hasResult ? resolve() : reject(new Error('Failed to open IndexedDb'));
-        }
+    if (isFirefox()) {
+      let dbOpenRequest;
 
-        if (tooManyAttempts) {
-          return reject(new Error('IndexedDb open request timed out'));
-        }
-
-        window.setTimeout(() => checkDbRequest(currentAttempt + 1), interval);
+      try {
+        dbOpenRequest = window.indexedDB.open('test');
+        dbOpenRequest.onerror = event => {
+          if (dbOpenRequest.error) {
+            event.preventDefault();
+            Promise.reject(new Error('Error opening IndexedDB'));
+          }
+        };
+      } catch (error) {
+        return Promise.reject(new Error('Error initializing IndexedDB'));
       }
 
-      checkDbRequest();
-    });
-  }
+      return new Promise((resolve, reject) => {
+        const interval = 10;
+        const maxRetry = 50;
 
-  return Promise.resolve();
+        function checkDbRequest(currentAttempt = 0) {
+          const tooManyAttempts = currentAttempt >= maxRetry;
+          const isRequestDone = dbOpenRequest.readyState === 'done';
+
+          if (isRequestDone) {
+            const hasResult = !!dbOpenRequest.result;
+            return hasResult ? resolve() : reject(new Error('Failed to open IndexedDb'));
+          }
+
+          if (tooManyAttempts) {
+            return reject(new Error('IndexedDb open request timed out'));
+          }
+
+          window.setTimeout(() => checkDbRequest(currentAttempt + 1), interval);
+        }
+
+        checkDbRequest();
+      });
+    }
+
+    return Promise.resolve();
+  };
 }
+
+export const runtimeAction = new RuntimeAction();

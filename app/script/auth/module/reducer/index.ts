@@ -30,18 +30,14 @@ import {AnyAction} from 'redux';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 import {CookiesStatic} from 'js-cookie';
+import {ActionRoot} from '../action';
 
 export type Api = {
   apiClient: APIClient;
   cookieStore: CookiesStatic;
   localStorage: Storage;
   core: Account;
-  actions: {
-    authAction: any;
-    clientAction: any;
-    cookieAction: any;
-    conversationAction: any;
-  };
+  actions: ActionRoot;
 };
 
 export interface RootState {

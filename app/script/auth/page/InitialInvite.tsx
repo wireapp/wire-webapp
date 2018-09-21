@@ -40,7 +40,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getAppPath} from '../util/urlUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
-import {invite} from '../module/action/InviteAction';
+import {invite} from '../module/action/InvitationAction';
 import {resetError} from '../module/action/creator/InviteActionCreator';
 import {fetchSelf} from '../module/action/SelfAction';
 import ValidationError from '../module/action/ValidationError';

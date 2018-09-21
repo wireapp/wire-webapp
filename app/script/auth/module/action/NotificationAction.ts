@@ -18,36 +18,41 @@
  */
 
 import * as NotificationActionCreator from './creator/NotificationActionCreator';
-import {ThunkAction} from "../reducer";
+import {ThunkAction} from '../reducer';
 
-export function checkHistory(): ThunkAction {
-  return function (dispatch, getState, {core}) {
-    dispatch(NotificationActionCreator.startCheckHistory());
-    return Promise.resolve()
-      .then(() => core.service.notification.hasHistory())
-      .then(hasHistory => {
-        dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory))
-      })
-      .catch(error => {
-        dispatch(NotificationActionCreator.failedCheckHistory(error));
-        throw error;
+export class NotificationAction {
+  checkHistory = (): ThunkAction => {
+    return function(dispatch, getState, {core}) {
+      dispatch(NotificationActionCreator.startCheckHistory());
+      return Promise.resolve()
+        .then(() => core.service.notification.hasHistory())
+        .then(hasHistory => {
+          dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory));
+        })
+        .catch(error => {
+          dispatch(NotificationActionCreator.failedCheckHistory(error));
+          throw error;
+        });
+    };
+  };
+
+  resetHistoryCheck = (): ThunkAction => {
+    return function(dispatch) {
+      return Promise.resolve().then(() => {
+        dispatch(NotificationActionCreator.resetHistoryCheck());
       });
+    };
+  };
+
+  setLastEventDate = (lastEventDate): ThunkAction => {
+    return function(dispatch, getState, {core}) {
+      return Promise.resolve().then(() => {
+        // TODO: Update call to private method once core v6 is inside!
+        // eslint-disable-next-line dot-notation
+        core.service.notification['setLastEventDate'](lastEventDate);
+      });
+    };
   };
 }
 
-export function resetHistoryCheck(): ThunkAction {
-  return function (dispatch) {
-    return Promise.resolve().then(() => {
-      dispatch(NotificationActionCreator.resetHistoryCheck());
-    });
-  };
-}
-
-export function setLastEventDate(lastEventDate): ThunkAction {
-  return function (dispatch, getState, {core}) {
-    return Promise.resolve().then(() => {
-      // TODO: Update call to private method once core v6 is inside!
-      core.service.notification['setLastEventDate'](lastEventDate);
-    });
-  };
-}
+export const notificationAction = new NotificationAction();
