@@ -28,7 +28,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
     this.onSuggestionClick = this.onSuggestionClick.bind(this);
 
     this.isVisible = ko.observable(false);
-    this.onSelectionValidated = params.onSelectionValidated || (() => {});
+    this.onSelectionValidated = params.onSelectionValidated || z.util.noop;
+    this.onEnd = params.onEnd || z.util.noop;
     this.suggestions = params.suggestions;
     this.targetInputSelector = params.targetInputSelector;
     this.targetInput = undefined;
@@ -61,6 +62,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
       [z.util.KeyboardUtil.KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
       [z.util.KeyboardUtil.KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
       [z.util.KeyboardUtil.KEY.ENTER]: this.validateSelection.bind(this),
+      [z.util.KeyboardUtil.KEY.ESC]: this.onEnd,
       [z.util.KeyboardUtil.KEY.TAB]: this.validateSelection.bind(this),
     };
 

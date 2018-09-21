@@ -42,6 +42,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.addedToView = this.addedToView.bind(this);
     this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
+    this.endMentionFlow = this.endMentionFlow.bind(this);
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
@@ -239,6 +240,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     inputElement.selectionStart = caretPosition;
     inputElement.selectionEnd = caretPosition;
 
+    this.endMentionFlow();
+  }
+
+  endMentionFlow() {
     this.editedMention(undefined);
     this.updateSelectionState();
   }
@@ -398,14 +403,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       // we check that the user is currently typing something that looks like a mention
       const editedMentionText = text.match(/@(\w*)$/);
       if (!editedMentionText) {
-        this.editedMention(undefined);
+        this.endMentionFlow();
       } else {
         const searchTerm = editedMentionText[1];
         const currentEditedMention = this.editedMention();
         this.editedMention(Object.assign({}, currentEditedMention, {term: searchTerm}));
       }
     } else {
-      const startFlowRegexp = /\B@$/;
+      const startFlowRegexp = /(^| )@$/;
       if (startFlowRegexp.test(text)) {
         this.editedMention({start: selectionStart - 1, term: ''});
       }
