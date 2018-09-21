@@ -594,9 +594,6 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.participating_user_ets().some(user => user.isGuest())).toBe(true);
-      expect(conversation_et.self.inTeam()).toBe(true);
-      expect(conversation_et.is_group()).toBe(true);
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
