@@ -289,8 +289,28 @@ z.util.alias = {
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.renderMessage = message => {
-  message = marked(message, {
+z.util.renderMessage = (message, mentionEntities = []) => {
+  const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const mentionTexts = {};
+
+  const sortedMentions = mentionEntities
+    .slice()
+    // sort mentions to start with the lastest mention first (in order not to have to recompute the index everytime we modify the original text)
+    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex);
+
+  let mentionlessText = sortedMentions.reduce((strippedText, mention) => {
+    const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
+    const mentionKey = createMentionHash(mention);
+    mentionTexts[mentionKey] = mentionText;
+    return z.util.StringUtil.replaceInRange(
+      strippedText,
+      mentionKey,
+      mention.startIndex,
+      mention.startIndex + mention.length
+    );
+  }, message);
+
+  mentionlessText = marked(mentionlessText, {
     highlight: function(code) {
       return hljs.highlightAuto(code).value;
     },
@@ -298,14 +318,18 @@ z.util.renderMessage = message => {
   });
 
   // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  message = message.replace(/\n/g, '<br />');
+  mentionlessText = mentionlessText.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message
-  if (z.util.StringUtil.getLastChars(message, '<br />'.length) === '<br />') {
-    message = z.util.StringUtil.cutLastChars(message, '<br />'.length);
+  if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
+    mentionlessText = z.util.StringUtil.cutLastChars(mentionlessText, '<br />'.length);
   }
 
-  return message;
+  const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
+    return text.replace(mentionHash, `<a>${mentionTexts[mentionHash]}</a>`);
+  }, mentionlessText);
+
+  return parsedText;
 };
 
 z.util.koArrayPushAll = (koArray, valuesToPush) => {

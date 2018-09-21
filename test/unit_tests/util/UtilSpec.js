@@ -152,6 +152,33 @@ describe('z.util.renderMessage', () => {
     expect(z.util.renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
   /* eslint-enable no-useless-escape */
+
+  describe('Mentions', () => {
+    const tests = [
+      {
+        expected: 'bonjour <a>@felix</a>',
+        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}],
+        testCase: 'replaces single mention in simple text',
+        text: 'bonjour @felix',
+      },
+      {
+        expected: 'bonjour <a>@felix</a>, tu vas bien <a>@felix</a>?',
+        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}, {length: 6, startIndex: 28, userId: 'user-id'}],
+        testCase: 'replaces two mentions to same user in simple text',
+        text: 'bonjour @felix, tu vas bien @felix?',
+      },
+      //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
+      //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
+      //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
+    ];
+
+    tests.forEach(({expected, mentions, testCase, text}) => {
+      it(testCase, () => {
+        const result = z.util.renderMessage(text, mentions);
+        expect(result).toEqual(expected);
+      });
+    });
+  });
 });
 
 describe('z.util.arrayToMd5Base64', () => {
