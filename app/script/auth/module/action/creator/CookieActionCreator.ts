@@ -35,7 +35,19 @@ export enum COOKIE_ACTION {
   COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED',
 }
 
-export type CookieActions = any;
+export type CookieActions =
+  | typeof CookieActionCreator.stopCookiePolling
+  | typeof CookieActionCreator.startCookiePolling
+  | typeof CookieActionCreator.failedCookiePolling
+  | typeof CookieActionCreator.successfulGetCookie
+  | typeof CookieActionCreator.failedGetCookie
+  | typeof CookieActionCreator.startSetCookie
+  | typeof CookieActionCreator.successfulSetCookie
+  | typeof CookieActionCreator.failedSetCookie
+  | typeof CookieActionCreator.startRemoveCookie
+  | typeof CookieActionCreator.successfulRemoveCookie
+  | typeof CookieActionCreator.failedRemoveCookie
+  ;
 
 export class CookieActionCreator {
   static stopCookiePolling = ({name, timerId}) => ({

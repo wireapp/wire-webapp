@@ -19,8 +19,6 @@
 
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
 
-import {AppAction} from '.';
-
 export enum SELF_ACTION {
   CONSENT_GET_START = 'CONSENT_GET_START',
   CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS',
@@ -39,7 +37,20 @@ export enum SELF_ACTION {
   SELF_FETCH_FAILED = 'SELF_FETCH_FAILED',
 }
 
-export type SelfActions = any;
+export type SelfActions =
+  | typeof SelfActionCreator.startSetHandle
+  | typeof SelfActionCreator.successfulSetHandle
+  | typeof SelfActionCreator.failedSetHandle
+  | typeof SelfActionCreator.startFetchSelf
+  | typeof SelfActionCreator.successfulFetchSelf
+  | typeof SelfActionCreator.failedFetchSelf
+  | typeof SelfActionCreator.startGetConsents
+  | typeof SelfActionCreator.successfulGetConsents
+  | typeof SelfActionCreator.failedGetConsents
+  | typeof SelfActionCreator.startSetConsent
+  | typeof SelfActionCreator.successfulSetConsent
+  | typeof SelfActionCreator.failedSetConsent
+  ;
 
 export class SelfActionCreator {
   static startSetHandle = (params?: any) => ({

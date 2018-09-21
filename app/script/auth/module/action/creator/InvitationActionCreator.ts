@@ -25,7 +25,12 @@ export enum INVITATION_ACTION {
   INVITE_RESET_ERROR = 'INVITE_RESET_ERROR',
 }
 
-export type InvitationActions = any;
+export type InvitationActions =
+  | typeof InvitationActionCreator.startAddInvite
+  | typeof InvitationActionCreator.successfulAddInvite
+  | typeof InvitationActionCreator.failedAddInvite
+  | typeof InvitationActionCreator.resetError
+  ;
 
 export class InvitationActionCreator {
   static startAddInvite = (params?: any) => ({

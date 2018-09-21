@@ -33,7 +33,18 @@ export enum CLIENT_ACTION {
   CLIENT_RESET_ERROR = 'CLIENT_RESET_ERROR',
 }
 
-export type ClientActions = any;
+export type ClientActions =
+  | typeof ClientActionCreator.startGetAllClients
+  | typeof ClientActionCreator.successfulGetAllClients
+  | typeof ClientActionCreator.failedGetAllClients
+  | typeof ClientActionCreator.startRemoveClient
+  | typeof ClientActionCreator.successfulRemoveClient
+  | typeof ClientActionCreator.failedRemoveClient
+  | typeof ClientActionCreator.startInitializeClient
+  | typeof ClientActionCreator.successfulInitializeClient
+  | typeof ClientActionCreator.failedInitializeClient
+  | typeof ClientActionCreator.resetError
+  ;
 
 export class ClientActionCreator {
   static startGetAllClients = () => ({

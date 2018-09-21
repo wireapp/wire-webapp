@@ -25,7 +25,12 @@ export enum NOTIFICATION_ACTION {
   NOTIFICATION_CHECK_HISTORY_RESET = 'NOTIFICATION_CHECK_HISTORY_RESET',
 }
 
-export type NotificationActions = any;
+export type NotificationActions =
+  | typeof NotificationActionCreator.startCheckHistory
+  | typeof NotificationActionCreator.successfulCheckHistory
+  | typeof NotificationActionCreator.failedCheckHistory
+  | typeof NotificationActionCreator.resetHistoryCheck
+  ;
 
 export class NotificationActionCreator {
   static startCheckHistory = () => ({

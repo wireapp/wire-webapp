@@ -21,7 +21,9 @@ export enum LANGUAGE_ACTION {
   SWITCH_LANGUAGE = 'SWITCH_LANGUAGE',
 }
 
-export type LanguageActions = any;
+export type LanguageActions =
+  | typeof LanguageActionCreator.switchLanguage
+  ;
 
 export class LanguageActionCreator {
   static switchLanguage = language => ({

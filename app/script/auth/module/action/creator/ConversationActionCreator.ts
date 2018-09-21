@@ -27,7 +27,14 @@ export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED',
 }
 
-export type ConversationActions = any;
+export type ConversationActions =
+  | typeof ConversationActionCreator.startConversationCodeCheck
+  | typeof ConversationActionCreator.successfulConversationCodeCheck
+  | typeof ConversationActionCreator.failedConversationCodeCheck
+  | typeof ConversationActionCreator.startJoinConversationByCode
+  | typeof ConversationActionCreator.successfulJoinConversationByCode
+  | typeof ConversationActionCreator.failedJoinConversationByCode
+  ;
 
 export class ConversationActionCreator {
   static startConversationCodeCheck = (params?: any) => ({

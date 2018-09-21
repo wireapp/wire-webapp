@@ -17,8 +17,6 @@
  *
  */
 
-import {AppAction} from '.';
-
 export enum USER_ACTION {
   USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START',
   USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS',
@@ -26,31 +24,21 @@ export enum USER_ACTION {
 }
 
 export type UserActions =
-  | SendActivationCodeStartAction
-  | SendActivationCodeSuccessAction
-  | SendActivationCodeFailedAction;
-
-export interface SendActivationCodeStartAction extends AppAction {
-  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START;
-}
-export interface SendActivationCodeSuccessAction extends AppAction {
-  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS;
-}
-export interface SendActivationCodeFailedAction extends AppAction {
-  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED;
-  readonly error: any;
-}
+  | typeof UserActionCreator.startSendActivationCode
+  | typeof UserActionCreator.successfulSendActivationCode
+  | typeof UserActionCreator.failedSendActivationCode
+  ;
 
 export class UserActionCreator {
-  static startSendActivationCode = (): SendActivationCodeStartAction => ({
+  static startSendActivationCode = () => ({
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START,
   });
 
-  static successfulSendActivationCode = (): SendActivationCodeSuccessAction => ({
+  static successfulSendActivationCode = () => ({
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS,
   });
 
-  static failedSendActivationCode = (error: any): SendActivationCodeFailedAction => ({
+  static failedSendActivationCode = (error: any) => ({
     error,
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED,
   });

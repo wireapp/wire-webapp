@@ -25,7 +25,13 @@ export enum RUNTIME_ACTION {
   RUNTIME_CONFIRM_SUPPORTED_BROWSER = 'RUNTIME_CONFIRM_SUPPORTED_BROWSER',
 }
 
-export type RuntimeActions = any;
+export type RuntimeActions =
+  | typeof RuntimeActionCreator.startCheckIndexedDb
+  | typeof RuntimeActionCreator.finishCheckIndexedDb
+  | typeof RuntimeActionCreator.startCheckCookie
+  | typeof RuntimeActionCreator.finishCheckCookie
+  | typeof RuntimeActionCreator.confirmSupportedBrowser
+  ;
 
 export class RuntimeActionCreator {
   static startCheckIndexedDb = () => ({

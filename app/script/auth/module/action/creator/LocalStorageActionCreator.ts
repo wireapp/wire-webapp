@@ -31,7 +31,17 @@ export enum LOCAL_STORAGE_ACTION {
   LOCAL_STORAGE_DELETE_FAILED = 'LOCAL_STORAGE_DELETE_FAILED',
 }
 
-export type LocalStorageActions = any;
+export type LocalStorageActions =
+  | typeof LocalStorageActionCreator.startLocalStorageSet
+  | typeof LocalStorageActionCreator.successfulLocalStorageSet
+  | typeof LocalStorageActionCreator.failedLocalStorageSet
+  | typeof LocalStorageActionCreator.startLocalStorageGet
+  | typeof LocalStorageActionCreator.successfulLocalStorageGet
+  | typeof LocalStorageActionCreator.failedLocalStorageGet
+  | typeof LocalStorageActionCreator.startLocalStorageDelete
+  | typeof LocalStorageActionCreator.successfulLocalStorageDelete
+  | typeof LocalStorageActionCreator.failedLocalStorageDelete
+  ;
 
 export class LocalStorageActionCreator {
   static startLocalStorageSet = (params?: any) => ({
