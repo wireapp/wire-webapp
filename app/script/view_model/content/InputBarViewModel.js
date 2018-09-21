@@ -62,7 +62,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editMessageEntity = ko.observable();
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
-    this.editInput = ko.observable('');
+    this.editInput = ko.observable({mentions: [], text: ''});
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -72,7 +72,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
+      return this.conversationEntity() ? this.conversationEntity().input().text.length > 0 : false;
     });
 
     this.input = ko.pureComputed({
@@ -82,10 +82,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         if (this.conversationEntity()) {
-          return this.conversationEntity().input() || '';
+          return this.conversationEntity().input() || {mentions: [], text: ''};
         }
 
-        return '';
+        return {mentions: [], text: ''};
       },
       write: value => {
         if (this.isEditing()) {
@@ -110,7 +110,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput = ko.pureComputed(() => {
-      const input = this.input();
+      const input = this.input().text;
 
       const pieces = this.currentMentions.reverse().reduce(
         (currentPieces, mentionEntity) => {
@@ -162,7 +162,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.showGiphyButton = ko.pureComputed(() => {
       if (this.conversationEntity() && this.hasTextInput()) {
-        return this.conversationEntity().input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
+        return this.conversationEntity().input().text.length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
       }
     });
 
@@ -219,16 +219,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   addMention(userEntity, inputElement) {
     const editedMention = this.editedMention();
     const mentionEntity = new z.message.MentionEntity(editedMention.start, userEntity.name().length + 1, userEntity.id);
+    const inputMentions = this.input().mentions;
+
     this.currentMentions.push(mentionEntity);
+    inputMentions.push(mentionEntity);
 
     // keep track of what is before and after the mention being edited
-    const beforeMentionPartial = this.input().slice(0, mentionEntity.startIndex);
+    const beforeMentionPartial = this.input().text.slice(0, mentionEntity.startIndex);
     const afterMentionPartial = this.input()
-      .slice(mentionEntity.startIndex + editedMention.term.length + 1)
+      .text.slice(mentionEntity.startIndex + editedMention.term.length + 1)
       .replace(/^ /, '');
 
     // insert the mention in between
-    this.input(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
+    this.input({mentions: inputMentions, text: `${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`});
 
     const caretPosition = mentionEntity.endIndex + 1;
     inputElement.selectionStart = caretPosition;
@@ -274,7 +277,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
-      this.input(this.editMessageEntity().get_first_asset().text);
+      this.input({
+        mentions: this.editMessageEntity().mentions(),
+        text: this.editMessageEntity().get_first_asset().text,
+      });
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -322,7 +328,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.sendPastedFile();
     }
 
-    const messageText = z.util.StringUtil.trimLineBreaks(this.input());
+    const messageText = z.util.StringUtil.trimLineBreaks(this.input().text);
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
@@ -340,7 +346,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.input('');
+    this.input({mentions: [], text: ''});
     this.currentMentions = [];
     $(event.target).focus();
   }
@@ -351,7 +357,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
-          if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
+          if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().text.length) {
             this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
           }
           break;
@@ -426,7 +432,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   updateMentions(data, event) {
     const textarea = event.target;
     const value = textarea.value;
-    const previousValue = this.input();
+    const previousValue = this.input().text;
     const mentions = this.currentMentions;
     const lengthDifference = value.length - previousValue.length;
     this.logger.log(this.updateMentionRanges(mentions, this.selectionStart(), this.selectionEnd(), lengthDifference));
@@ -472,7 +478,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendGiphy() {
     if (this.conversationEntity()) {
-      this.conversationEntity().input('');
+      this.conversationEntity().input({mentions: [], text: ''});
     }
   }
 

@@ -7,7 +7,7 @@
   <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
   <!-- ko if: conversationEntity() && !conversationEntity().connection().is_outgoing_request() -->
     <div class="controls-left">
-      <!-- ko if: input().length -->
+      <!-- ko if: input().text.length -->
         <participant-avatar class="cursor-default" params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       <!-- /ko -->
     </div>
@@ -20,8 +20,8 @@
                              focus_on_keydown: true,
                              enter: onInputEnter,
                              hasFocus: hasFocus,
-                             textInput: input,
-                             resize: input,
+                             textInput: input().text,
+                             resize: input().text,
                              resize_callback: scrollMessageList,
                              click: onInputClick,
                              attr: {'placeholder': inputPlaceholder},
@@ -42,7 +42,7 @@
             </gif-icon>
           <!-- /ko -->
 
-          <!-- ko ifnot: input().length -->
+          <!-- ko ifnot: input().text.length -->
             <message-timer-button params="conversation: conversationEntity"></message-timer-button>
 
             <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
