@@ -93,7 +93,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         this.currentMentions = inputObject.mentions.map(
-          mention => new z.message.MentionEntity(mention.startIndex, mention.length, mention.user_id)
+          mention => new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId)
         );
 
         return inputObject;
@@ -268,7 +268,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.editMessageEntity(undefined);
-    this.editInput('');
+    this.editInput({mentions: [], text: ''});
   }
 
   clickToCancelPastedFile() {
