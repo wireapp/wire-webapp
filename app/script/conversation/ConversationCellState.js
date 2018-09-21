@@ -124,8 +124,29 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match: conversationEntity => {
-      const hasUnreadEvents = conversationEntity.unreadEventsCount() > 0;
-      return hasUnreadEvents && conversationEntity.unreadEvents().some(_isAlert);
+      if (!conversationEntity.unreadEventsCount()) {
+        return false;
+      }
+
+      /**
+       * Move to single loop.
+       * - Filter for all alert types
+       * - check for length >= 2
+       * - otherwise check for some alert of type ping or missed call
+       */
+
+      const numberOfSelfMentions = conversationEntity
+        .unreadEvents()
+        .filter(messageEntity => messageEntity.is_content() && messageEntity.isSelfMentioned()).length;
+
+      if (numberOfSelfMentions >= 2) {
+        return true;
+      }
+
+      return conversationEntity.unreadEvents().some(messageEntity => {
+        const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+        return isMissedCall || messageEntity.is_ping();
+      });
     },
   };
 
@@ -286,7 +307,15 @@ z.conversation.ConversationCellState = (() => {
         }
       }
     },
-    icon: () => z.conversation.ConversationStatusIcon.UNREAD_MESSAGES,
+    icon: conversationEntity => {
+      const hasSelfMention = conversationEntity.unreadEvents().some(messageEntity => {
+        return messageEntity.is_content() && messageEntity.isSelfMentioned();
+      });
+
+      return hasSelfMention
+        ? z.conversation.ConversationStatusIcon.UNREAD_MENTION
+        : z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
+    },
     match: conversationEntity => conversationEntity.unreadEventsCount() > 0,
   };
 
@@ -308,12 +337,6 @@ z.conversation.ConversationCellState = (() => {
 
       return conversationEntity.is_request() || isEmpty1to1Conversation;
     },
-  };
-
-  const _isAlert = messageEntity => {
-    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
-    const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-    return isSelfMentioned || isMissedCall || messageEntity.is_ping();
   };
 
   return {
