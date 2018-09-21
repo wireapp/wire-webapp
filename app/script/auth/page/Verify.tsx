@@ -23,16 +23,19 @@ import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {parseError} from '../util/errorUtil';
 import {verifyStrings} from '../../strings';
-import {withRouter, RouterProps} from 'react-router';
-import * as AuthAction from '../module/action/AuthAction';
+import {withRouter, RouteComponentProps} from 'react-router';
 import {REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import * as React from 'react';
 import {ROUTE} from '../route';
+import {ThunkDispatch} from 'redux-thunk';
+import {RootState, Api} from '../module/reducer';
+import {AnyAction} from 'redux';
+import ROOT_ACTIONS from '../module/action/';
+import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement>, RouterProps {}
+interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   account: any;
@@ -122,12 +125,18 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
         currentFlow: AuthSelector.getCurrentFlow(state),
       }),
-      {...AuthAction, ...UserAction}
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        doRegisterTeam: (registrationData: RegisterData) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
+        doRegisterPersonal: (registrationData: RegisterData) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
+        doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
+      })
     )(Verify)
   )
 );

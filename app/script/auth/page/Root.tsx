@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {StyledApp} from '@wireapp/react-ui-kit';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Index from './Index';
@@ -37,10 +38,13 @@ import {connect} from 'react-redux';
 import * as de from 'react-intl/locale-data/de';
 import {ROUTE} from '../route';
 const SUPPORTED_LOCALE = require('../supportedLocales');
-import * as CookieAction from '../module/action/CookieAction';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {APP_INSTANCE_ID} from '../config';
 import SingleSignOn from './SingleSignOn';
+import {ThunkDispatch} from 'redux-thunk';
+import {Api, RootState} from '../module/reducer';
+import {AnyAction} from 'redux';
+import ROOT_ACTIONS from '../module/action/';
 
 addLocaleData([...de]);
 
@@ -102,6 +106,12 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
 }
 
 export default connect(
-  ({languageState}) => ({language: languageState.language}),
-  {...CookieAction}
+  (state: RootState) => ({language: LanguageSelector.getLanguage(state)}),
+  (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+    startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
+      dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
+    safelyRemoveCookie: (name: string, value: string) =>
+      dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
+    stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
+  })
 )(Root);

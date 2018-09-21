@@ -26,9 +26,9 @@ import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  hasAccountData: boolean;
-  hasTeamData: boolean;
-  isAuthenticated: boolean;
+  hasAccountData?: boolean;
+  hasTeamData?: boolean;
+  isAuthenticated?: boolean;
 }
 
 interface ConnectedProps {

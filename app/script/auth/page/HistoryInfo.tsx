@@ -27,9 +27,12 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
-import * as NotificationAction from '../module/action/NotificationAction';
 import {withRouter, RouteComponentProps} from 'react-router';
 import EXTERNAL_ROUTE from '../externalRoute';
+import ROOT_ACTIONS from '../module/action/';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -96,11 +99,13 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
       }),
-      {...NotificationAction}
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        resetHistoryCheck: () => dispatch(ROOT_ACTIONS.notificationAction.resetHistoryCheck()),
+      })
     )(HistoryInfo)
   )
 );

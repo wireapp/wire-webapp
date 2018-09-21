@@ -43,13 +43,14 @@ import {teamNameStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {withRouter, RouteComponentProps} from 'react-router';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {resetError} from '../module/action/creator/InvitationActionCreator';
-import * as AuthAction from '../module/action/AuthAction';
-import {enterTeamCreationFlow} from '../module/action/creator/AuthActionCreator';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as React from 'react';
 import Page from './Page';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import ROOT_ACTIONS from '../module/action/';
 
 interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
 
@@ -183,15 +184,16 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         error: AuthSelector.getError(state),
         teamName: AuthSelector.getAccountTeamName(state),
       }),
-      {
-        ...AuthAction,
-        enterTeamCreationFlow,
-        resetError,
-      }
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.cookieAction.enterTeamCreationFlow(name)),
+        pushAccountRegistrationData: (teamData: {team: {name: string}}) =>
+          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
+        resetError: () => dispatch(ROOT_ACTIONS.cookieAction.resetError(name)), // InvitationActionCreator
+      })
     )(TeamName)
   )
 );

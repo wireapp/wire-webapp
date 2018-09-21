@@ -60,12 +60,15 @@ import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {loginStrings, ssoLoginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
-import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter, RouteComponentProps} from 'react-router';
 import {UUID_REGEX} from '../util/stringUtil';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {BACKEND} from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
+import {Api, RootState} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import ROOT_ACTIONS from '../module/action/';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
@@ -494,13 +497,19 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
-      {resetError, ...AuthAction, ...ConversationAction, ...ClientAction}
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        resetError: () => dispatch(ROOT_ACTIONS.userAction.resetError()), //AuthActionCreator
+        validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
+        doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
+          dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
+        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+      })
     )(SingleSignOn)
   )
 );

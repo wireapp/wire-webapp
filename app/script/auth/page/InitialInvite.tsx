@@ -43,10 +43,14 @@ import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InvitationAction';
 import {resetError} from '../module/action/creator/InvitationActionCreator';
 import {fetchSelf} from '../module/action/SelfAction';
+import ROOT_ACTIONS from '../module/action/';
 import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 import {RouteComponentProps} from 'react-router';
 import EXTERNAL_ROUTE from '../externalRoute';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
 interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
 
@@ -184,16 +188,17 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
 export default injectIntl(
   connect(
-    state => ({
+    (state: RootState) => ({
       error: InviteSelector.getError(state),
       invites: InviteSelector.getInvites(state),
       isFetching: InviteSelector.isFetching(state),
       language: LanguageSelector.getLanguage(state),
     }),
-    {
-      fetchSelf,
-      invite,
-      resetError,
-    }
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
+      resetError: () => dispatch(ROOT_ACTIONS.invitationAction.resetError()), //Invite reset error
+      invite: (invitation: {email: string; locale: string; inviter_name: string}) =>
+        dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
+    })
   )(InitialInvite)
 );

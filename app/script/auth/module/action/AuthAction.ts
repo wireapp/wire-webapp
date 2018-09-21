@@ -42,7 +42,7 @@ export class AuthAction {
     return this.doLoginPlain(loginData, onBeforeLogin);
   };
 
-  doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri: string): ThunkAction => {
+  doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri?: string): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
     const onAfterLogin: LoginLifecycleFunction = (dispatch, getState, {actions: {conversationAction}}) =>

@@ -27,9 +27,12 @@ import * as React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
-import * as AuthAction from '../module/action/AuthAction';
 import Page from './Page';
+import {ThunkDispatch} from 'redux-thunk';
+import {RootState, Api} from '../module/reducer';
+import {AnyAction} from 'redux';
+import ROOT_ACTIONS from '../module/action/';
+import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 
 interface URLParams {
   invitationCode: string;
@@ -140,16 +143,22 @@ class CreatePersonalAccount extends React.PureComponent<
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         account: AuthSelector.getAccount(state),
         currentFlow: AuthSelector.getCurrentFlow(state),
         isPersonalFlow: AuthSelector.isPersonalFlow(state),
         isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
       }),
-      {
-        ...AuthAction,
-        ...AuthActionCreator,
-      }
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        getInvitationFromCode: (invitationCode: string) =>
+          dispatch(ROOT_ACTIONS.authAction.getInvitationFromCode(invitationCode)),
+        enterPersonalInvitationCreationFlow: () =>
+          dispatch(ROOT_ACTIONS.authAction.enterPersonalInvitationCreationFlow()),
+        enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
+        enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
+        doRegisterPersonal: (registrationData: RegisterData) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
+      })
     )(CreatePersonalAccount)
   )
 );

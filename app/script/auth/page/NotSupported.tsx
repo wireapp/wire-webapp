@@ -24,6 +24,9 @@ import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import Page from './Page';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -49,7 +52,7 @@ const NotSupported: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
 
 export default injectIntl(
   connect(
-    state => ({language: getLanguage(state)}),
-    {}
+    (state: RootState) => ({}),
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
   )(NotSupported)
 );

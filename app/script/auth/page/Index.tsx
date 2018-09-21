@@ -17,7 +17,7 @@
  *
  */
 
-import {getLanguage} from '../module/selector/LanguageSelector';
+import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as React from 'react';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
@@ -39,6 +39,9 @@ import {indexStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import Page from './Page';
 import {RouteComponentProps} from 'react-router';
+import {ThunkDispatch} from 'redux-thunk';
+import {RootState, Api} from '../module/reducer';
+import {AnyAction} from 'redux';
 
 interface Props extends React.HTMLAttributes<Index>, RouteComponentProps {}
 
@@ -117,7 +120,7 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
 
 export default injectIntl(
   connect(
-    state => ({language: getLanguage(state)}),
-    null
+    (state: RootState) => ({language: LanguageSelector.getLanguage(state)}),
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
   )(Index)
 );

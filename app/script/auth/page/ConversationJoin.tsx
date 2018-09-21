@@ -58,6 +58,12 @@ import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser'
 import WirelessContainer from '../component/WirelessContainer';
 import * as AccentColor from '../util/AccentColor';
 import EXTERNAL_ROUTE from '../externalRoute';
+import {RootState, Api} from '../module/reducer';
+import {AnyAction} from 'redux';
+import {ThunkDispatch} from 'redux-thunk';
+import ROOT_ACTIONS from '../module/action/';
+import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
 
 interface Props extends React.HTMLAttributes<ConversationJoin>, RouteComponentProps {}
 
@@ -71,7 +77,7 @@ interface ConnectedProps {
 
 interface DispatchProps {
   doCheckConversationCode: (conversationCode: string, conversationKey: string) => Promise<void>;
-  doJoinConversationByCode: (conversationKey: string, conversationCode: string) => Promise<void>;
+  doJoinConversationByCode: (conversationKey: string, conversationCode: string) => Promise<ConversationEvent>;
   doInit: (options: {}) => Promise<void>;
   doRegisterWireless: (registrationData: {}, options: {}) => Promise<void>;
   doLogout: () => Promise<void>;
@@ -364,18 +370,25 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
         isFetching: ConversationSelector.isFetching(state),
         isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
-      {
-        ...AuthAction,
-        ...ConversationAction,
-        ...NotificationAction,
-      }
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        doCheckConversationCode: (conversationCode: string, conversationKey: string) =>
+          dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationCode, conversationKey)),
+        doJoinConversationByCode: (conversationKey: string, conversationCode: string) =>
+          dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(conversationKey, conversationCode)),
+        doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
+          dispatch(ROOT_ACTIONS.authAction.doInit(options)),
+        doRegisterWireless: (registrationData: RegisterData, options: {shouldInitializeClient: boolean}) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(registrationData, options)),
+        doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
+        setLastEventDate: (date: Date) => dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(date)),
+      })
     )(ConversationJoin)
   )
 );

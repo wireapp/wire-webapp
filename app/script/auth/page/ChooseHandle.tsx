@@ -36,20 +36,21 @@ import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 import * as React from 'react';
 import {createSuggestions} from '../util/handleUtil';
-import {checkHandles} from '../module/action/UserAction';
-import {setHandle, doGetConsents, doSetConsent} from '../module/action/SelfAction';
 import {connect} from 'react-redux';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
+import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import {withRouter, RouteComponentProps} from 'react-router';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
-import {RootState} from '../module/reducer';
+import {RootState, Api} from '../module/reducer';
 import EXTERNAL_ROUTE from '../externalRoute';
+import {AnyAction} from 'redux';
+import {ThunkDispatch} from 'redux-thunk';
 
-interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   hasUnsetMarketingConsent: boolean;
@@ -153,8 +154,8 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
   }
 }
 
-export default withRouter(
-  injectIntl(
+export default injectIntl(
+  withRouter(
     connect(
       (state: RootState) => ({
         hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
@@ -162,12 +163,13 @@ export default withRouter(
         isTeamFlow: AuthSelector.isTeamFlow(state),
         name: SelfSelector.getSelfName(state),
       }),
-      {
-        checkHandles,
-        doGetConsents,
-        doSetConsent,
-        setHandle,
-      }
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        checkHandles: (handles: string[]) => dispatch(ROOT_ACTIONS.userAction.checkHandles(handles)),
+        doGetConsents: () => dispatch(ROOT_ACTIONS.selfAction.doGetConsents()),
+        doSetConsent: (consentType: ConsentType, value: number) =>
+          dispatch(ROOT_ACTIONS.selfAction.doSetConsent(consentType, value)),
+        setHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
+      })
     )(ChooseHandle)
   )
 );
