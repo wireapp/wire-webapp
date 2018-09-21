@@ -218,12 +218,6 @@ z.entity.Message = class Message {
     return this.super_type === z.message.SuperType.PING;
   }
 
-  isSelfMentioned() {
-    return this.has_asset_text()
-      ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isSelfMentioned())
-      : false;
-  }
-
   /**
    * Check if message is a system message.
    * @returns {boolean} Is message of type system

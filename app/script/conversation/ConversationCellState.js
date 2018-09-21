@@ -115,7 +115,6 @@ z.conversation.ConversationCellState = (() => {
       if (hasMissedCall) {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
-
       const hasPing = conversationEntity.unreadEvents().some(messageEntity => messageEntity.is_ping());
       if (hasPing) {
         return z.conversation.ConversationStatusIcon.UNREAD_PING;
