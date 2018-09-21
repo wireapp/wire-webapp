@@ -41,11 +41,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
     this.addMention = this.addMention.bind(this);
-    this.updateSelectionState = this.updateSelectionState.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
+    this.updateSelectionState = this.updateSelectionState.bind(this);
+
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
 
