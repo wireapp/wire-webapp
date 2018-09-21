@@ -18,7 +18,8 @@
  */
 
 import {Account} from '@wireapp/core';
+import {APIClient} from '@wireapp/api-client';
 
-export const configureCore = apiClient => new Account(apiClient);
+export const configureCore = (apiClient: APIClient) => new Account(apiClient);
 
 export default configureCore;
