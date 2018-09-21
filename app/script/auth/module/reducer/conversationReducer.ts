@@ -17,8 +17,7 @@
  *
  */
 
-import * as ConversationActionCreator from '../action/creator/ConversationActionCreator';
-import {AppActions} from '../action/creator';
+import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
 
 export interface ConversationState {
   error: Error;
@@ -34,24 +33,24 @@ export const initialState: ConversationState = {
 
 export function conversationReducer(state: ConversationState = initialState, action: AppActions): ConversationState {
   switch (action.type) {
-    case ConversationActionCreator.CONVERSATION_CODE_CHECK_START:
-    case ConversationActionCreator.CONVERSATION_CODE_JOIN_START: {
+    case CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START:
+    case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START: {
       return {
         ...state,
         error: null,
         fetching: true,
       };
     }
-    case ConversationActionCreator.CONVERSATION_CODE_CHECK_FAILED:
-    case ConversationActionCreator.CONVERSATION_CODE_JOIN_FAILED: {
+    case CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED:
+    case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case ConversationActionCreator.CONVERSATION_CODE_CHECK_SUCCESS:
-    case ConversationActionCreator.CONVERSATION_CODE_JOIN_SUCCESS: {
+    case CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS:
+    case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS: {
       return {
         ...state,
         fetching: false,

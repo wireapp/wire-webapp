@@ -18,12 +18,12 @@
  */
 
 import * as Environment from '../../Environment';
-import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
 import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime';
 import {hasURLParameter} from '../../util/urlUtil';
 import {QUERY_KEY} from '../../route';
 import {Cookies} from 'js-cookie';
 import {ThunkAction} from '../reducer';
+import {RuntimeActionCreator} from './creator/';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {

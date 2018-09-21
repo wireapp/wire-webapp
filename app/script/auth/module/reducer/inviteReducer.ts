@@ -17,8 +17,7 @@
  *
  */
 
-import * as InviteActionCreator from '../action/creator/InvitationActionCreator';
-import {AppActions} from '../action/creator';
+import {AppActions, INVITATION_ACTION} from '../action/creator/';
 
 export interface InvitationState {
   error: Error;
@@ -34,27 +33,27 @@ const initialState: InvitationState = {
 
 export function invitationReducer(state: InvitationState = initialState, action: AppActions): InvitationState {
   switch (action.type) {
-    case InviteActionCreator.INVITE_ADD_START: {
+    case INVITATION_ACTION.INVITE_ADD_START: {
       return {
         ...state,
         fetching: true,
       };
     }
-    case InviteActionCreator.INVITE_ADD_SUCCESS: {
+    case INVITATION_ACTION.INVITE_ADD_SUCCESS: {
       return {
         error: null,
         fetching: false,
         invites: [...state.invites, action.payload.invite],
       };
     }
-    case InviteActionCreator.INVITE_ADD_FAILED: {
+    case INVITATION_ACTION.INVITE_ADD_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case InviteActionCreator.INVITE_RESET_ERROR: {
+    case INVITATION_ACTION.INVITE_RESET_ERROR: {
       return {...state, error: null};
     }
     default:

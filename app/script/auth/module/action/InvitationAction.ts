@@ -17,17 +17,17 @@
  *
  */
 
-import * as InviteActionCreator from './creator/InvitationActionCreator';
 import * as InviteSelector from '../selector/InviteSelector';
 import * as selfSelector from '../selector/SelfSelector';
 import * as languageSelector from '../selector/LanguageSelector';
 import BackendError from './BackendError';
 import {ThunkAction} from '../reducer';
+import {InvitationActionCreator} from './creator/';
 
 export class InvitationAction {
   invite = (invitation: {email: string; locale: string; inviter_name: string}): ThunkAction => {
     return function(dispatch, getState, {apiClient}) {
-      dispatch(InviteActionCreator.startAddInvite());
+      dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
       const inviteList = InviteSelector.getInvites(state);
       const invitationEmail = invitation.email && invitation.email.toLowerCase();
@@ -38,7 +38,7 @@ export class InvitationAction {
           label: BackendError.LABEL.ALREADY_INVITED,
           message: 'This email has already been invited',
         });
-        dispatch(InviteActionCreator.failedAddInvite(error));
+        dispatch(InvitationActionCreator.failedAddInvite(error));
         throw error;
       }
 
@@ -48,10 +48,10 @@ export class InvitationAction {
       return Promise.resolve()
         .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
         .then(createdInvite => {
-          dispatch(InviteActionCreator.successfulAddInvite(createdInvite));
+          dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
         })
         .catch(error => {
-          dispatch(InviteActionCreator.failedAddInvite(error));
+          dispatch(InvitationActionCreator.failedAddInvite(error));
           throw error;
         });
     };

@@ -17,10 +17,10 @@
  *
  */
 
-import * as SelfActionCreator from './creator/SelfActionCreator';
 import {APP_NAME} from '../../config';
 import {ThunkAction} from '../reducer';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self';
+import {SelfActionCreator} from './creator/';
 
 export class SelfAction {
   fetchSelf = (): ThunkAction<Promise<any>> => {

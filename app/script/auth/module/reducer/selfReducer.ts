@@ -17,8 +17,7 @@
  *
  */
 
-import * as SelfActionCreator from '../action/creator/SelfActionCreator';
-import {AppActions} from '../action/creator';
+import {AppActions, SELF_ACTION} from '../action/creator/';
 
 export interface SelfState {
   consents: any;
@@ -38,25 +37,25 @@ export const initialState: SelfState = {
 
 export function selfReducer(state: SelfState = initialState, action: AppActions): SelfState {
   switch (action.type) {
-    case SelfActionCreator.CONSENT_GET_START:
-    case SelfActionCreator.HANDLE_SET_START:
-    case SelfActionCreator.SELF_FETCH_START: {
+    case SELF_ACTION.CONSENT_GET_START:
+    case SELF_ACTION.HANDLE_SET_START:
+    case SELF_ACTION.SELF_FETCH_START: {
       return {
         ...state,
         fetching: true,
       };
     }
-    case SelfActionCreator.CONSENT_GET_FAILED:
-    case SelfActionCreator.HANDLE_SET_FAILED:
-    case SelfActionCreator.SELF_FETCH_FAILED: {
+    case SELF_ACTION.CONSENT_GET_FAILED:
+    case SELF_ACTION.HANDLE_SET_FAILED:
+    case SELF_ACTION.SELF_FETCH_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case SelfActionCreator.HANDLE_SET_SUCCESS:
-    case SelfActionCreator.SELF_FETCH_SUCCESS: {
+    case SELF_ACTION.HANDLE_SET_SUCCESS:
+    case SELF_ACTION.SELF_FETCH_SUCCESS: {
       return {
         ...state,
         error: null,
@@ -65,7 +64,7 @@ export function selfReducer(state: SelfState = initialState, action: AppActions)
         self: action.payload,
       };
     }
-    case SelfActionCreator.CONSENT_GET_SUCCESS: {
+    case SELF_ACTION.CONSENT_GET_SUCCESS: {
       return {
         ...state,
         consents: action.payload.reduce((consentAccumulator, consent) => {
@@ -76,7 +75,7 @@ export function selfReducer(state: SelfState = initialState, action: AppActions)
         fetching: false,
       };
     }
-    case SelfActionCreator.CONSENT_SET_SUCCESS: {
+    case SELF_ACTION.CONSENT_SET_SUCCESS: {
       return {
         ...state,
         consents: {...state.consents, [action.payload.type]: action.payload.value},

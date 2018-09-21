@@ -19,11 +19,42 @@
 
 import {Action} from 'redux';
 import {UserActions} from './UserActionCreator';
+import {AuthActions} from './AuthActionCreator';
+import {ClientActions} from './ClientActionCreator';
+import {ConversationActions} from './ConversationActionCreator';
+import {CookieActions} from './CookieActionCreator';
+import {LanguageActions} from './LanguageActionCreator';
+import {LocalStorageActions} from './LocalStorageActionCreator';
+import {SelfActions} from './SelfActionCreator';
+import {InvitationActions} from './InvitationActionCreator';
+import {NotificationActions} from './NotificationActionCreator';
+import {RuntimeActions} from './RuntimeActionCreator';
 
 export interface AppAction extends Action {
   type: string;
 }
 
-export type AppActions = UserActions;
+export type AppActions =
+  | AuthActions
+  | ClientActions
+  | ConversationActions
+  | CookieActions
+  | InvitationActions
+  | LanguageActions
+  | LocalStorageActions
+  | NotificationActions
+  | RuntimeActions
+  | SelfActions
+  | UserActions;
 
+export * from './AuthActionCreator';
+export * from './ClientActionCreator';
+export * from './ConversationActionCreator';
+export * from './CookieActionCreator';
+export * from './InvitationActionCreator';
+export * from './LanguageActionCreator';
+export * from './LocalStorageActionCreator';
+export * from './NotificationActionCreator';
+export * from './RuntimeActionCreator';
+export * from './SelfActionCreator';
 export * from './UserActionCreator';

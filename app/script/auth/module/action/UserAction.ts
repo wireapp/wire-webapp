@@ -17,9 +17,9 @@
  *
  */
 
-import {UserActionCreator} from './creator/';
 import {currentLanguage} from '../../localeConfig';
 import {ThunkAction} from '../reducer';
+import {UserActionCreator} from './creator/';
 
 export class UserAction {
   checkHandles = (handles: string[]): ThunkAction<Promise<string>> => {

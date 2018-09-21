@@ -17,9 +17,8 @@
  *
  */
 
-import * as AuthActionCreator from '../action/creator/AuthActionCreator';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
-import {AppActions, USER_ACTION} from '../action/creator/';
+import {AppActions, USER_ACTION, AUTH_ACTION} from '../action/creator/';
 
 export type AuthState = {
   readonly account: {
@@ -67,10 +66,10 @@ export const initialState: AuthState = {
 
 export function authReducer(state: AuthState = initialState, action: AppActions): AuthState {
   switch (action.type) {
-    case AuthActionCreator.LOGIN_START:
-    case AuthActionCreator.REGISTER_JOIN_START:
-    case AuthActionCreator.REGISTER_PERSONAL_START:
-    case AuthActionCreator.REGISTER_TEAM_START:
+    case AUTH_ACTION.LOGIN_START:
+    case AUTH_ACTION.REGISTER_JOIN_START:
+    case AUTH_ACTION.REGISTER_PERSONAL_START:
+    case AUTH_ACTION.REGISTER_TEAM_START:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
@@ -79,24 +78,24 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
         isAuthenticated: false,
       };
     }
-    case AuthActionCreator.REFRESH_START: {
+    case AUTH_ACTION.REFRESH_START: {
       return {
         ...state,
         error: null,
         fetching: true,
       };
     }
-    case AuthActionCreator.REFRESH_FAILED: {
+    case AUTH_ACTION.REFRESH_FAILED: {
       return {
         ...state,
         fetching: false,
         isAuthenticated: false,
       };
     }
-    case AuthActionCreator.LOGIN_FAILED:
-    case AuthActionCreator.REGISTER_JOIN_FAILED:
-    case AuthActionCreator.REGISTER_PERSONAL_FAILED:
-    case AuthActionCreator.REGISTER_TEAM_FAILED:
+    case AUTH_ACTION.LOGIN_FAILED:
+    case AUTH_ACTION.REGISTER_JOIN_FAILED:
+    case AUTH_ACTION.REGISTER_PERSONAL_FAILED:
+    case AUTH_ACTION.REGISTER_TEAM_FAILED:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
         ...state,
@@ -105,11 +104,11 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
         isAuthenticated: false,
       };
     }
-    case AuthActionCreator.LOGIN_SUCCESS:
-    case AuthActionCreator.REFRESH_SUCCESS:
-    case AuthActionCreator.REGISTER_JOIN_SUCCESS:
-    case AuthActionCreator.REGISTER_PERSONAL_SUCCESS:
-    case AuthActionCreator.REGISTER_TEAM_SUCCESS: {
+    case AUTH_ACTION.LOGIN_SUCCESS:
+    case AUTH_ACTION.REFRESH_SUCCESS:
+    case AUTH_ACTION.REGISTER_JOIN_SUCCESS:
+    case AUTH_ACTION.REGISTER_PERSONAL_SUCCESS:
+    case AUTH_ACTION.REGISTER_TEAM_SUCCESS: {
       return {
         ...state,
         account: {...initialState.account},
@@ -119,16 +118,16 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
         isAuthenticated: true,
       };
     }
-    case AuthActionCreator.REGISTER_PUSH_ACCOUNT_DATA: {
+    case AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA: {
       return {...state, account: {...state.account, ...action.payload}, error: null};
     }
-    case AuthActionCreator.REGISTER_RESET_ACCOUNT_DATA: {
+    case AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA: {
       return {...state, account: {...initialState.account}, error: null};
     }
-    case AuthActionCreator.LOGOUT_SUCCESS: {
+    case AUTH_ACTION.LOGOUT_SUCCESS: {
       return {...initialState};
     }
-    case AuthActionCreator.SILENT_LOGOUT_SUCCESS: {
+    case AUTH_ACTION.SILENT_LOGOUT_SUCCESS: {
       return {
         ...state,
         error: null,
@@ -137,19 +136,19 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
         isAuthenticated: false,
       };
     }
-    case AuthActionCreator.AUTH_RESET_ERROR: {
+    case AUTH_ACTION.AUTH_RESET_ERROR: {
       return {...state, error: null};
     }
-    case AuthActionCreator.ENTER_TEAM_CREATION_FLOW: {
+    case AUTH_ACTION.ENTER_TEAM_CREATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.TEAM};
     }
-    case AuthActionCreator.ENTER_PERSONAL_CREATION_FLOW: {
+    case AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.PERSONAL};
     }
-    case AuthActionCreator.ENTER_GENERIC_INVITATION_FLOW: {
+    case AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};
     }
-    case AuthActionCreator.ENTER_PERSONAL_INVITATION_FLOW: {
+    case AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.PERSONAL_INVITATION};
     }
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS: {
@@ -158,7 +157,7 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
         fetching: false,
       };
     }
-    case AuthActionCreator.GET_INVITATION_FROM_CODE_SUCCESS: {
+    case AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS: {
       return {...state, account: {...state.account, email: action.payload.email, name: action.payload.name}};
     }
     default: {

@@ -18,13 +18,13 @@
  */
 
 import BackendError from './BackendError';
-import * as ClientActionCreator from './creator/ClientActionCreator';
 import * as Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
 import {ClientType, RegisteredClient, ClientClassification} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ThunkAction} from '../reducer';
 import {ClientInfo} from '@wireapp/core/dist/client/root';
+import {ClientActionCreator} from './creator/';
 
 export class ClientAction {
   doGetAllClients = (): ThunkAction<Promise<RegisteredClient[]>> => {

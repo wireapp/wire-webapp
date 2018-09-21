@@ -17,10 +17,7 @@
  *
  */
 
-import * as AuthActionCreator from '../action/creator/AuthActionCreator';
-import * as ClientActionCreator from '../action/creator/ClientActionCreator';
-import * as NotificationActionCreator from '../action/creator/NotificationActionCreator';
-import {AppActions} from '../action/creator';
+import {AppActions, CLIENT_ACTION, AUTH_ACTION, NOTIFICATION_ACTION} from '../action/creator/';
 
 export interface ClientState {
   clients: any[];
@@ -40,19 +37,19 @@ const initialState: ClientState = {
 
 export function clientReducer(state: ClientState = initialState, action: AppActions): ClientState {
   switch (action.type) {
-    case ClientActionCreator.CLIENT_INIT_SUCCESS: {
+    case CLIENT_ACTION.CLIENT_INIT_SUCCESS: {
       return {
         ...state,
         isNewClient: action.payload.isNewClient,
       };
     }
-    case ClientActionCreator.CLIENTS_FETCH_START: {
+    case CLIENT_ACTION.CLIENTS_FETCH_START: {
       return {
         ...state,
         fetching: true,
       };
     }
-    case ClientActionCreator.CLIENTS_FETCH_SUCCESS: {
+    case CLIENT_ACTION.CLIENTS_FETCH_SUCCESS: {
       return {
         ...state,
         clients: action.payload,
@@ -60,20 +57,20 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
         fetching: false,
       };
     }
-    case ClientActionCreator.CLIENTS_FETCH_FAILED: {
+    case CLIENT_ACTION.CLIENTS_FETCH_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case ClientActionCreator.CLIENT_REMOVE_START: {
+    case CLIENT_ACTION.CLIENT_REMOVE_START: {
       return {
         ...state,
         fetching: true,
       };
     }
-    case ClientActionCreator.CLIENT_REMOVE_SUCCESS: {
+    case CLIENT_ACTION.CLIENT_REMOVE_SUCCESS: {
       return {
         ...state,
         clients: [state.clients.filter(client => client.id === action.payload)],
@@ -81,23 +78,23 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
         fetching: false,
       };
     }
-    case ClientActionCreator.CLIENT_REMOVE_FAILED: {
+    case CLIENT_ACTION.CLIENT_REMOVE_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case NotificationActionCreator.NOTIFICATION_CHECK_HISTORY_SUCCESS: {
+    case NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS: {
       return {...state, hasHistory: action.payload};
     }
-    case NotificationActionCreator.NOTIFICATION_CHECK_HISTORY_RESET: {
+    case NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET: {
       return {...state, hasHistory: initialState.hasHistory};
     }
-    case ClientActionCreator.CLIENT_RESET_ERROR: {
+    case CLIENT_ACTION.CLIENT_RESET_ERROR: {
       return {...state, error: null};
     }
-    case AuthActionCreator.LOGOUT_SUCCESS: {
+    case AUTH_ACTION.LOGOUT_SUCCESS: {
       return {...initialState};
     }
     default:

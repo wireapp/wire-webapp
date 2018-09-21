@@ -17,9 +17,9 @@
  *
  */
 
-import * as ConversationActionCreator from './creator/ConversationActionCreator';
 import {ThunkAction} from '../reducer';
 import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {ConversationActionCreator} from './creator/';
 
 export class ConversationAction {
   doCheckConversationCode = (key, code, uri): ThunkAction => {

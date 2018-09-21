@@ -17,9 +17,8 @@
  *
  */
 
-import {SWITCH_LANGUAGE} from '../action/creator/LanguageActionCreator';
 import {DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE, currentLanguage} from '../../localeConfig';
-import {AppActions} from '../action/creator';
+import {AppActions, LANGUAGE_ACTION} from '../action/creator/';
 
 export interface LanguageState {
   language: string;
@@ -31,7 +30,7 @@ const initialState: LanguageState = {
 
 export function languageReducer(state: LanguageState = initialState, action: AppActions): LanguageState {
   switch (action.type) {
-    case SWITCH_LANGUAGE:
+    case LANGUAGE_ACTION.SWITCH_LANGUAGE:
       return {
         language: SUPPORTED_LANGUAGE.includes(action.payload) ? action.payload : state.language,
       };

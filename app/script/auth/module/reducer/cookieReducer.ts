@@ -17,8 +17,7 @@
  *
  */
 
-import * as CookieActionCreator from '../action/creator/CookieActionCreator';
-import {AppActions} from '../action/creator';
+import {AppActions, COOKIE_ACTION} from '../action/creator/';
 
 export interface CookieState {
   cookieTimer: any;
@@ -38,7 +37,7 @@ export const initialState: CookieState = {
 
 export function cookieReducer(state: CookieState = initialState, action: AppActions): CookieState {
   switch (action.type) {
-    case CookieActionCreator.COOKIE_POLLING_START: {
+    case COOKIE_ACTION.COOKIE_POLLING_START: {
       const {name, timerId} = action.payload;
       return {
         ...state,
@@ -49,7 +48,7 @@ export function cookieReducer(state: CookieState = initialState, action: AppActi
         error: null,
       };
     }
-    case CookieActionCreator.COOKIE_POLLING_STOP: {
+    case COOKIE_ACTION.COOKIE_POLLING_STOP: {
       const {name} = action.payload;
       const cookieTimerTemp = {...state.cookieTimer};
       delete cookieTimerTemp[name];
@@ -61,20 +60,20 @@ export function cookieReducer(state: CookieState = initialState, action: AppActi
         error: null,
       };
     }
-    case CookieActionCreator.COOKIE_POLLING_FAILED: {
+    case COOKIE_ACTION.COOKIE_POLLING_FAILED: {
       return {
         ...state,
         error: action.payload,
       };
     }
-    case CookieActionCreator.COOKIE_GET_START: {
+    case COOKIE_ACTION.COOKIE_GET_START: {
       return {
         ...state,
         error: null,
         fetching: true,
       };
     }
-    case CookieActionCreator.COOKIE_GET_SUCCESS: {
+    case COOKIE_ACTION.COOKIE_GET_SUCCESS: {
       const {name, cookie} = action.payload;
       return {
         ...state,
@@ -86,7 +85,7 @@ export function cookieReducer(state: CookieState = initialState, action: AppActi
         fetching: false,
       };
     }
-    case CookieActionCreator.COOKIE_GET_FAILED: {
+    case COOKIE_ACTION.COOKIE_GET_FAILED: {
       return {
         ...state,
         error: action.payload,

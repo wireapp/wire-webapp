@@ -17,8 +17,7 @@
  *
  */
 
-import * as RuntimeActionCreator from '../action/creator/RuntimeActionCreator';
-import {AppActions} from '../action/creator';
+import {AppActions, RUNTIME_ACTION} from '../action/creator/';
 
 export interface RuntimeState {
   hasCookieSupport: boolean;
@@ -38,29 +37,29 @@ const initialState: RuntimeState = {
 
 export function runtimeReducer(state: RuntimeState = initialState, action: AppActions): RuntimeState {
   switch (action.type) {
-    case RuntimeActionCreator.RUNTIME_CHECK_INDEXEDDB_START:
+    case RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_START:
       return {
         ...state,
         isCheckingIndexedDb: true,
       };
-    case RuntimeActionCreator.RUNTIME_CHECK_COOKIE_START:
+    case RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_START:
       return {
         ...state,
         isCheckingCookie: true,
       };
-    case RuntimeActionCreator.RUNTIME_CHECK_INDEXEDDB_FINISH:
+    case RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_FINISH:
       return {
         ...state,
         hasIndexedDbSupport: action.payload,
         isCheckingIndexedDb: false,
       };
-    case RuntimeActionCreator.RUNTIME_CHECK_COOKIE_FINISH:
+    case RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_FINISH:
       return {
         ...state,
         hasCookieSupport: action.payload,
         isCheckingCookie: false,
       };
-    case RuntimeActionCreator.RUNTIME_CONFIRM_SUPPORTED_BROWSER:
+    case RUNTIME_ACTION.RUNTIME_CONFIRM_SUPPORTED_BROWSER:
       return {
         ...state,
         isSupportedBrowser: true,
