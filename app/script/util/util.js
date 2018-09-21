@@ -291,6 +291,13 @@ z.util.alias = {
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.renderMessage = (message, mentionEntities = []) => {
   const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const renderMention = mentionData => {
+    const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
+    const elementAttributes = mentionData.isSelfMentioned ? '' : ` data-user-id="${mentionData.userId}"`;
+
+    const content = `<span class="mention-at-sign">@</span>${mentionData.text.replace(/^@/, '')}`;
+    return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
+  };
   const mentionTexts = {};
 
   let mentionlessText = mentionEntities
@@ -329,9 +336,9 @@ z.util.renderMessage = (message, mentionEntities = []) => {
   }
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
-    const mentionData = mentionTexts[mentionHash];
-    const elementAttributes = mentionData.isSelfMentioned ? '' : ` data-user-id="${mentionData.userId}"`;
-    return text.replace(mentionHash, `<a${elementAttributes}>${mentionData.text}</a>`);
+    const mentionMarkup = renderMention(mentionTexts[mentionHash]);
+
+    return text.replace(mentionHash, mentionMarkup);
   }, mentionlessText);
 
   return parsedText;
