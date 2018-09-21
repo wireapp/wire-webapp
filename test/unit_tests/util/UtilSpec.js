@@ -167,6 +167,12 @@ describe('z.util.renderMessage', () => {
         testCase: 'replaces two mentions to same user in simple text',
         text: 'bonjour @felix, tu vas bien @felix?',
       },
+      {
+        expected: 'salut <a>@`I am a **pain** in the __a**__`</a>',
+        mentions: [{length: 33, startIndex: 6, userId: 'lux-uuid'}],
+        testCase: "doesn't parse markdown in user names",
+        text: 'salut @`I am a **pain** in the __a**__`',
+      },
       //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
       //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
       //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
