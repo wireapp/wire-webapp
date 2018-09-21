@@ -27,13 +27,18 @@
 }
 
 .mention-suggestion-list {
+  position: relative;
   display: flex;
+  max-height: 148px;
+  flex: 1;
   flex-direction: column-reverse;
   padding: 4px 0;
+  cursor: pointer;
+  white-space: nowrap;
 
   &__item {
     display: flex;
-    height: 32px;
+    min-height: 32px;
     align-items: center;
     padding: 0 12px;
 
@@ -42,6 +47,7 @@
     }
 
     participant-avatar {
+      min-width: 16px;
       margin-right: 12px;
     }
 
@@ -52,7 +58,6 @@
     }
 
     &__username {
-      margin: 0 4px;
       color: fade(@graphite-dark, 40%);
       font-size: 12px;
       line-height: 14px;
@@ -64,6 +69,7 @@
     }
 
     &__guest-badge {
+      min-width: 12px;
       margin-left: 12px;
 
       svg {
