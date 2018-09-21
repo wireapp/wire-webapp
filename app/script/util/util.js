@@ -293,22 +293,25 @@ z.util.renderMessage = (message, mentionEntities = []) => {
   const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const mentionTexts = {};
 
-  const sortedMentions = mentionEntities
+  let mentionlessText = mentionEntities
     .slice()
     // sort mentions to start with the lastest mention first (in order not to have to recompute the index everytime we modify the original text)
-    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex);
-
-  let mentionlessText = sortedMentions.reduce((strippedText, mention) => {
-    const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
-    const mentionKey = createMentionHash(mention);
-    mentionTexts[mentionKey] = mentionText;
-    return z.util.StringUtil.replaceInRange(
-      strippedText,
-      mentionKey,
-      mention.startIndex,
-      mention.startIndex + mention.length
-    );
-  }, message);
+    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
+    .reduce((strippedText, mention) => {
+      const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
+      const mentionKey = createMentionHash(mention);
+      mentionTexts[mentionKey] = {
+        isSelfMentioned: mention.isSelfMentioned(),
+        text: mentionText,
+        userId: mention.userId,
+      };
+      return z.util.StringUtil.replaceInRange(
+        strippedText,
+        mentionKey,
+        mention.startIndex,
+        mention.startIndex + mention.length
+      );
+    }, message);
 
   mentionlessText = marked(mentionlessText, {
     highlight: function(code) {
@@ -326,7 +329,9 @@ z.util.renderMessage = (message, mentionEntities = []) => {
   }
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
-    return text.replace(mentionHash, `<a>${mentionTexts[mentionHash]}</a>`);
+    const mentionData = mentionTexts[mentionHash];
+    const elementAttributes = mentionData.isSelfMentioned ? '' : ` data-user-id="${mentionData.userId}"`;
+    return text.replace(mentionHash, `<a${elementAttributes}>${mentionData.text}</a>`);
   }, mentionlessText);
 
   return parsedText;
