@@ -61,6 +61,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
       [z.util.KeyboardUtil.KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
       [z.util.KeyboardUtil.KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
       [z.util.KeyboardUtil.KEY.ENTER]: this.validateSelection.bind(this),
+      [z.util.KeyboardUtil.KEY.TAB]: this.validateSelection.bind(this),
     };
 
     const action = actions[keyboardEvent.key];
