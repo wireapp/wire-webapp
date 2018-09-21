@@ -77,7 +77,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.inputTextOnly = ko.pureComputed({
       read: () => this.input().text,
-      write: value => this.input({mentions: this.input().mentions, text: value}),
+      write: value => this.input({mentions: this.currentMentions, text: value}),
     });
 
     this.input = ko.pureComputed({
@@ -224,10 +224,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   addMention(userEntity, inputElement) {
     const editedMention = this.editedMention();
     const mentionEntity = new z.message.MentionEntity(editedMention.start, userEntity.name().length + 1, userEntity.id);
-    const inputMentions = this.input().mentions;
 
     this.currentMentions.push(mentionEntity);
-    inputMentions.push(mentionEntity);
 
     // keep track of what is before and after the mention being edited
     const beforeMentionPartial = this.input().text.slice(0, mentionEntity.startIndex);
@@ -236,7 +234,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .replace(/^ /, '');
 
     // insert the mention in between
-    this.input({mentions: inputMentions, text: `${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`});
+    this.input({
+      mentions: this.currentMentions,
+      text: `${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`,
+    });
 
     const caretPosition = mentionEntity.endIndex + 1;
     inputElement.selectionStart = caretPosition;
@@ -283,7 +284,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
       this.input({
-        mentions: this.editMessageEntity().mentions(),
+        mentions: this.currentMentions,
         text: this.editMessageEntity().get_first_asset().text,
       });
       if (inputElement) {
