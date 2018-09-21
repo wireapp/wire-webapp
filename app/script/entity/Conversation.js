@@ -65,12 +65,12 @@ z.entity.Conversation = class Conversation {
     this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.is_group = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
     this.is_one2one = ko.pureComputed(() => {

@@ -60,7 +60,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name of the conversation (when the conversation is selected)', () => {
       const selected_conversation = new z.entity.Conversation(z.util.createRandomUuid());
       selected_conversation.name('Selected Conversation');
-      selected_conversation.type(z.conversation.ConversationType.REGULAR);
+      selected_conversation.type(z.conversation.ConversationType.GROUP);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const expected_title = `${selected_conversation.name()} · ${suffix}`;
@@ -76,7 +76,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       const conversation = new z.entity.Conversation(z.util.createRandomUuid());
       conversation.add_message(message);
       conversation.name('Birthday Bash');
-      conversation.type(z.conversation.ConversationType.REGULAR);
+      conversation.type(z.conversation.ConversationType.GROUP);
 
       title_view_model.conversationRepository.conversations_unarchived.push(conversation);
       title_view_model.conversationRepository.active_conversation(conversation);
@@ -89,13 +89,13 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('does not change the title if muted conversations receive messages', () => {
       const selected_conversation = new z.entity.Conversation(z.util.createRandomUuid());
       selected_conversation.name('Selected Conversation');
-      selected_conversation.type(z.conversation.ConversationType.REGULAR);
+      selected_conversation.type(z.conversation.ConversationType.GROUP);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const muted_conversation = new z.entity.Conversation(z.util.createRandomUuid());
       muted_conversation.muted_state(true);
       muted_conversation.name('Muted Conversation');
-      muted_conversation.type(z.conversation.ConversationType.REGULAR);
+      muted_conversation.type(z.conversation.ConversationType.GROUP);
 
       // Add conversations to conversation repository
       expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(0);
@@ -225,7 +225,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       const conversation = new z.entity.Conversation(z.util.createRandomUuid());
       conversation.add_message(message);
       conversation.name('Birthday Bash');
-      conversation.type(z.conversation.ConversationType.REGULAR);
+      conversation.type(z.conversation.ConversationType.GROUP);
 
       amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
         expect(badgeCount).toBe(1);
