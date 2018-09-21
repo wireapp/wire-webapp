@@ -302,7 +302,7 @@ z.util.renderMessage = (message, mentionEntities = []) => {
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
         isSelfMentioned: mention.isSelfMentioned(),
-        text: mentionText,
+        text: mentionText.replace(/^@/, ''),
         userId: mention.userId,
       };
       return z.util.StringUtil.replaceInRange(
@@ -334,9 +334,12 @@ z.util.renderMessage = (message, mentionEntities = []) => {
     const elementAttributes = mentionData.isSelfMentioned
       ? ''
       : `class="message-mention" data-user-id="${mentionData.userId}"`;
+
     return text.replace(
       mentionHash,
-      `<span class="message-mention ${elementClasses}" ${elementAttributes}>${mentionData.text}</span>`
+      `<span class="message-mention ${elementClasses}" ${elementAttributes}><span class="mention-at-sign">@</span>${
+        mentionData.text
+      }</span>`
     );
   }, mentionlessText);
 
