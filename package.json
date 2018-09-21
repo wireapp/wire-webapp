@@ -112,7 +112,7 @@
     "karma-jasmine": "1.1.2",
     "karma-sourcemap-loader": "0.3.7",
     "karma": "3.0.0",
-    "lint-staged": "7.2.2",
+    "lint-staged": "7.3.0",
     "load-grunt-tasks": "4.0.0",
     "node-sass": "4.9.3",
     "postcss-cssnext": "3.1.0",
