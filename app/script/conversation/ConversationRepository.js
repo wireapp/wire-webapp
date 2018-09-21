@@ -3737,7 +3737,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
-        with_service: conversationEntity.isWithService(),
+        with_service: conversationEntity.hasService(),
       };
 
       const isTeamConversation = !!conversationEntity.team_id;
