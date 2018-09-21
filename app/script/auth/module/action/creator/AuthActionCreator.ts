@@ -17,209 +17,215 @@
  *
  */
 
-export const LOGIN_START = 'LOGIN_START';
-export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
-export const LOGIN_FAILED = 'LOGIN_FAILED';
+export enum AUTH_ACTION {
+  LOGIN_START = 'LOGIN_START',
+  LOGIN_SUCCESS = 'LOGIN_SUCCESS',
+  LOGIN_FAILED = 'LOGIN_FAILED',
 
-export const REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA';
-export const REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA';
+  REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA',
+  REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA',
 
-export const REGISTER_TEAM_START = 'REGISTER_TEAM_START';
-export const REGISTER_TEAM_SUCCESS = 'REGISTER_TEAM_SUCCESS';
-export const REGISTER_TEAM_FAILED = 'REGISTER_TEAM_FAILED';
+  REGISTER_TEAM_START = 'REGISTER_TEAM_START',
+  REGISTER_TEAM_SUCCESS = 'REGISTER_TEAM_SUCCESS',
+  REGISTER_TEAM_FAILED = 'REGISTER_TEAM_FAILED',
 
-export const REGISTER_PERSONAL_START = 'REGISTER_PERSONAL_START';
-export const REGISTER_PERSONAL_SUCCESS = 'REGISTER_PERSONAL_SUCCESS';
-export const REGISTER_PERSONAL_FAILED = 'REGISTER_PERSONAL_FAILED';
+  REGISTER_PERSONAL_START = 'REGISTER_PERSONAL_START',
+  REGISTER_PERSONAL_SUCCESS = 'REGISTER_PERSONAL_SUCCESS',
+  REGISTER_PERSONAL_FAILED = 'REGISTER_PERSONAL_FAILED',
 
-export const REGISTER_WIRELESS_START = 'REGISTER_WIRELESS_START';
-export const REGISTER_WIRELESS_SUCCESS = 'REGISTER_WIRELESS_SUCCESS';
-export const REGISTER_WIRELESS_FAILED = 'REGISTER_WIRELESS_FAILED';
+  REGISTER_WIRELESS_START = 'REGISTER_WIRELESS_START',
+  REGISTER_WIRELESS_SUCCESS = 'REGISTER_WIRELESS_SUCCESS',
+  REGISTER_WIRELESS_FAILED = 'REGISTER_WIRELESS_FAILED',
 
-export const REGISTER_JOIN_START = 'REGISTER_JOIN_START';
-export const REGISTER_JOIN_SUCCESS = 'REGISTER_JOIN_SUCCESS';
-export const REGISTER_JOIN_FAILED = 'REGISTER_JOIN_FAILED';
+  REGISTER_JOIN_START = 'REGISTER_JOIN_START',
+  REGISTER_JOIN_SUCCESS = 'REGISTER_JOIN_SUCCESS',
+  REGISTER_JOIN_FAILED = 'REGISTER_JOIN_FAILED',
 
-export const LOGOUT_START = 'LOGOUT_START';
-export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
-export const LOGOUT_FAILED = 'LOGOUT_FAILED';
-export const SILENT_LOGOUT_SUCCESS = 'SILENT_LOGOUT_SUCCESS';
+  LOGOUT_START = 'LOGOUT_START',
+  LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
+  LOGOUT_FAILED = 'LOGOUT_FAILED',
+  SILENT_LOGOUT_SUCCESS = 'SILENT_LOGOUT_SUCCESS',
 
-export const REFRESH_START = 'REFRESH_START';
-export const REFRESH_SUCCESS = 'REFRESH_SUCCESS';
-export const REFRESH_FAILED = 'REFRESH_FAILED';
+  REFRESH_START = 'REFRESH_START',
+  REFRESH_SUCCESS = 'REFRESH_SUCCESS',
+  REFRESH_FAILED = 'REFRESH_FAILED',
 
-export const VALIDATE_LOCAL_CLIENT_START = 'VALIDATE_LOCAL_CLIENT_START';
-export const VALIDATE_LOCAL_CLIENT_SUCCESS = 'VALIDATE_LOCAL_CLIENT_SUCCESS';
-export const VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED';
+  VALIDATE_LOCAL_CLIENT_START = 'VALIDATE_LOCAL_CLIENT_START',
+  VALIDATE_LOCAL_CLIENT_SUCCESS = 'VALIDATE_LOCAL_CLIENT_SUCCESS',
+  VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED',
 
-export const GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START';
-export const GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS';
-export const GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED';
+  GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START',
+  GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS',
+  GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED',
 
-export const AUTH_RESET_ERROR = 'AUTH_RESET_ERROR';
+  AUTH_RESET_ERROR = 'AUTH_RESET_ERROR',
 
-export const ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW';
-export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
-export const ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW';
-export const ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW';
+  ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW',
+  ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW',
+  ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW',
+  ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW',
+}
 
-export const startLogin = (params?: any) => ({
-  params,
-  type: LOGIN_START,
-});
+export type AuthActions = any;
 
-export const successfulLogin = () => ({
-  type: LOGIN_SUCCESS,
-});
+export class AuthActionCreator {
+  static startLogin = (params?: any) => ({
+    params,
+    type: AUTH_ACTION.LOGIN_START,
+  });
 
-export const failedLogin = (error?: any) => ({
-  payload: error,
-  type: LOGIN_FAILED,
-});
+  static successfulLogin = () => ({
+    type: AUTH_ACTION.LOGIN_SUCCESS,
+  });
 
-export const startRegisterTeam = (params?: any) => ({
-  params,
-  type: REGISTER_TEAM_START,
-});
+  static failedLogin = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.LOGIN_FAILED,
+  });
 
-export const successfulRegisterTeam = authData => ({
-  payload: authData,
-  type: REGISTER_TEAM_SUCCESS,
-});
+  static startRegisterTeam = (params?: any) => ({
+    params,
+    type: AUTH_ACTION.REGISTER_TEAM_START,
+  });
 
-export const failedRegisterTeam = (error?: any) => ({
-  payload: error,
-  type: REGISTER_TEAM_FAILED,
-});
+  static successfulRegisterTeam = authData => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
+  });
 
-export const startRegisterPersonal = (params?: any) => ({
-  params,
-  type: REGISTER_PERSONAL_START,
-});
+  static failedRegisterTeam = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.REGISTER_TEAM_FAILED,
+  });
 
-export const successfulRegisterPersonal = authData => ({
-  payload: authData,
-  type: REGISTER_PERSONAL_SUCCESS,
-});
+  static startRegisterPersonal = (params?: any) => ({
+    params,
+    type: AUTH_ACTION.REGISTER_PERSONAL_START,
+  });
 
-export const failedRegisterPersonal = (error?: any) => ({
-  payload: error,
-  type: REGISTER_PERSONAL_FAILED,
-});
+  static successfulRegisterPersonal = authData => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
+  });
 
-export const startRegisterWireless = (params?: any) => ({
-  params,
-  type: REGISTER_WIRELESS_START,
-});
+  static failedRegisterPersonal = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
+  });
 
-export const successfulRegisterWireless = authData => ({
-  payload: authData,
-  type: REGISTER_WIRELESS_SUCCESS,
-});
+  static startRegisterWireless = (params?: any) => ({
+    params,
+    type: AUTH_ACTION.REGISTER_WIRELESS_START,
+  });
 
-export const failedRegisterWireless = (error?: any) => ({
-  payload: error,
-  type: REGISTER_WIRELESS_FAILED,
-});
+  static successfulRegisterWireless = authData => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
+  });
 
-export const startRegisterJoin = (params?: any) => ({
-  params,
-  type: REGISTER_JOIN_START,
-});
+  static failedRegisterWireless = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
+  });
 
-export const successfulRegisterJoin = authData => ({
-  payload: authData,
-  type: REGISTER_JOIN_SUCCESS,
-});
+  static startRegisterJoin = (params?: any) => ({
+    params,
+    type: AUTH_ACTION.REGISTER_JOIN_START,
+  });
 
-export const failedRegisterJoin = (error?: any) => ({
-  payload: error,
-  type: REGISTER_JOIN_FAILED,
-});
+  static successfulRegisterJoin = authData => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
+  });
 
-export const startRefresh = () => ({
-  type: REFRESH_START,
-});
+  static failedRegisterJoin = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.REGISTER_JOIN_FAILED,
+  });
 
-export const successfulRefresh = () => ({
-  type: REFRESH_SUCCESS,
-});
+  static startRefresh = () => ({
+    type: AUTH_ACTION.REFRESH_START,
+  });
 
-export const failedRefresh = (error?: any) => ({
-  payload: error,
-  type: REFRESH_FAILED,
-});
+  static successfulRefresh = () => ({
+    type: AUTH_ACTION.REFRESH_SUCCESS,
+  });
 
-export const startValidateLocalClient = () => ({
-  type: VALIDATE_LOCAL_CLIENT_START,
-});
+  static failedRefresh = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.REFRESH_FAILED,
+  });
 
-export const successfulValidateLocalClient = () => ({
-  type: VALIDATE_LOCAL_CLIENT_SUCCESS,
-});
+  static startValidateLocalClient = () => ({
+    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START,
+  });
 
-export const failedValidateLocalClient = (error?: any) => ({
-  payload: error,
-  type: VALIDATE_LOCAL_CLIENT_FAILED,
-});
+  static successfulValidateLocalClient = () => ({
+    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
+  });
 
-export const startLogout = () => ({
-  type: LOGOUT_START,
-});
+  static failedValidateLocalClient = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
+  });
 
-export const successfulLogout = () => ({
-  type: LOGOUT_SUCCESS,
-});
+  static startLogout = () => ({
+    type: AUTH_ACTION.LOGOUT_START,
+  });
 
-export const successfulSilentLogout = () => ({
-  type: SILENT_LOGOUT_SUCCESS,
-});
+  static successfulLogout = () => ({
+    type: AUTH_ACTION.LOGOUT_SUCCESS,
+  });
 
-export const failedLogout = (error?: any) => ({
-  payload: error,
-  type: LOGOUT_FAILED,
-});
+  static successfulSilentLogout = () => ({
+    type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
+  });
 
-export const resetError = () => ({
-  type: AUTH_RESET_ERROR,
-});
+  static failedLogout = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.LOGOUT_FAILED,
+  });
 
-export const resetAccountData = () => ({
-  type: REGISTER_RESET_ACCOUNT_DATA,
-});
+  static resetError = () => ({
+    type: AUTH_ACTION.AUTH_RESET_ERROR,
+  });
 
-export const pushAccountRegistrationData = accountData => ({
-  payload: accountData,
-  type: REGISTER_PUSH_ACCOUNT_DATA,
-});
+  static resetAccountData = () => ({
+    type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
+  });
 
-export const enterTeamCreationFlow = () => ({
-  type: ENTER_TEAM_CREATION_FLOW,
-});
+  static pushAccountRegistrationData = accountData => ({
+    payload: accountData,
+    type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
+  });
 
-export const enterPersonalCreationFlow = () => ({
-  type: ENTER_PERSONAL_CREATION_FLOW,
-});
+  static enterTeamCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
+  });
 
-export const enterGenericInviteCreationFlow = () => ({
-  type: ENTER_GENERIC_INVITATION_FLOW,
-});
+  static enterPersonalCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
+  });
 
-export const enterPersonalInvitationCreationFlow = () => ({
-  type: ENTER_PERSONAL_INVITATION_FLOW,
-});
+  static enterGenericInviteCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
+  });
 
-export const startGetInvitationFromCode = () => ({
-  type: GET_INVITATION_FROM_CODE_START,
-});
+  static enterPersonalInvitationCreationFlow = () => ({
+    type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW,
+  });
 
-export const successfulGetInvitationFromCode = invitation => ({
-  payload: invitation,
-  type: GET_INVITATION_FROM_CODE_SUCCESS,
-});
+  static startGetInvitationFromCode = () => ({
+    type: AUTH_ACTION.GET_INVITATION_FROM_CODE_START,
+  });
 
-export const failedGetInvitationFromCode = (error?: any) => ({
-  payload: error,
-  type: GET_INVITATION_FROM_CODE_FAILED,
-});
+  static successfulGetInvitationFromCode = invitation => ({
+    payload: invitation,
+    type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS,
+  });
+
+  static failedGetInvitationFromCode = (error?: any) => ({
+    payload: error,
+    type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED,
+  });
+}

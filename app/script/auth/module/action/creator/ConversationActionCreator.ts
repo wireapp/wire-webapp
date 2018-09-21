@@ -17,39 +17,45 @@
  *
  */
 
-export const CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START';
-export const CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS';
-export const CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED';
+export enum CONVERSATION_ACTION {
+  CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',
+  CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS',
+  CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED',
 
-export const CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START';
-export const CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS';
-export const CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED';
+  CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START',
+  CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS',
+  CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED',
+}
 
-export const startConversationCodeCheck = (params?: any) => ({
-  params,
-  type: CONVERSATION_CODE_CHECK_START,
-});
+export type ConversationActions = any;
 
-export const successfulConversationCodeCheck = () => ({
-  type: CONVERSATION_CODE_CHECK_SUCCESS,
-});
+export class ConversationActionCreator {
+  static startConversationCodeCheck = (params?: any) => ({
+    params,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START,
+  });
 
-export const failedConversationCodeCheck = (error?: any) => ({
-  payload: error,
-  type: CONVERSATION_CODE_CHECK_FAILED,
-});
+  static successfulConversationCodeCheck = () => ({
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
+  });
 
-export const startJoinConversationByCode = (params?: any) => ({
-  params,
-  type: CONVERSATION_CODE_JOIN_START,
-});
+  static failedConversationCodeCheck = (error?: any) => ({
+    payload: error,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
+  });
 
-export const successfulJoinConversationByCode = data => ({
-  payload: data,
-  type: CONVERSATION_CODE_JOIN_SUCCESS,
-});
+  static startJoinConversationByCode = (params?: any) => ({
+    params,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START,
+  });
 
-export const failedJoinConversationByCode = (error?: any) => ({
-  payload: error,
-  type: CONVERSATION_CODE_JOIN_FAILED,
-});
+  static successfulJoinConversationByCode = data => ({
+    payload: data,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
+  });
+
+  static failedJoinConversationByCode = (error?: any) => ({
+    payload: error,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,
+  });
+}

@@ -17,64 +17,70 @@
  *
  */
 
-export const CLIENTS_FETCH_START = 'CLIENTS_FETCH_START';
-export const CLIENTS_FETCH_SUCCESS = 'CLIENTS_FETCH_SUCCESS';
-export const CLIENTS_FETCH_FAILED = 'CLIENTS_FETCH_FAILED';
+export enum CLIENT_ACTION {
+  CLIENTS_FETCH_START = 'CLIENTS_FETCH_START',
+  CLIENTS_FETCH_SUCCESS = 'CLIENTS_FETCH_SUCCESS',
+  CLIENTS_FETCH_FAILED = 'CLIENTS_FETCH_FAILED',
 
-export const CLIENT_REMOVE_START = 'CLIENT_REMOVE_START';
-export const CLIENT_REMOVE_SUCCESS = 'CLIENT_REMOVE_SUCCESS';
-export const CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED';
+  CLIENT_REMOVE_START = 'CLIENT_REMOVE_START',
+  CLIENT_REMOVE_SUCCESS = 'CLIENT_REMOVE_SUCCESS',
+  CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED',
 
-export const CLIENT_INIT_START = 'CLIENT_INIT_START';
-export const CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS';
-export const CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED';
+  CLIENT_INIT_START = 'CLIENT_INIT_START',
+  CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS',
+  CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED',
 
-export const CLIENT_RESET_ERROR = 'CLIENT_RESET_ERROR';
+  CLIENT_RESET_ERROR = 'CLIENT_RESET_ERROR',
+}
 
-export const startGetAllClients = () => ({
-  type: CLIENTS_FETCH_START,
-});
+export type ClientActions = any;
 
-export const successfulGetAllClients = clients => ({
-  payload: clients,
-  type: CLIENTS_FETCH_SUCCESS,
-});
+export class ClientActionCreator {
+  static startGetAllClients = () => ({
+    type: CLIENT_ACTION.CLIENTS_FETCH_START,
+  });
 
-export const failedGetAllClients = (error?: any) => ({
-  payload: error,
-  type: CLIENTS_FETCH_FAILED,
-});
+  static successfulGetAllClients = clients => ({
+    payload: clients,
+    type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS,
+  });
 
-export const startRemoveClient = (params?: any) => ({
-  params,
-  type: CLIENT_REMOVE_START,
-});
+  static failedGetAllClients = (error?: any) => ({
+    payload: error,
+    type: CLIENT_ACTION.CLIENTS_FETCH_FAILED,
+  });
 
-export const successfulRemoveClient = deletedClientId => ({
-  payload: deletedClientId,
-  type: CLIENT_REMOVE_SUCCESS,
-});
+  static startRemoveClient = (params?: any) => ({
+    params,
+    type: CLIENT_ACTION.CLIENT_REMOVE_START,
+  });
 
-export const failedRemoveClient = (error?: any) => ({
-  payload: error,
-  type: CLIENT_REMOVE_FAILED,
-});
+  static successfulRemoveClient = deletedClientId => ({
+    payload: deletedClientId,
+    type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS,
+  });
 
-export const startInitializeClient = (params?: any) => ({
-  params,
-  type: CLIENT_INIT_START,
-});
+  static failedRemoveClient = (error?: any) => ({
+    payload: error,
+    type: CLIENT_ACTION.CLIENT_REMOVE_FAILED,
+  });
 
-export const successfulInitializeClient = creationStatus => ({
-  payload: creationStatus,
-  type: CLIENT_INIT_SUCCESS,
-});
+  static startInitializeClient = (params?: any) => ({
+    params,
+    type: CLIENT_ACTION.CLIENT_INIT_START,
+  });
 
-export const failedInitializeClient = (error?: any) => ({
-  payload: error,
-  type: CLIENT_INIT_FAILED,
-});
+  static successfulInitializeClient = creationStatus => ({
+    payload: creationStatus,
+    type: CLIENT_ACTION.CLIENT_INIT_SUCCESS,
+  });
 
-export const resetError = () => ({
-  type: CLIENT_RESET_ERROR,
-});
+  static failedInitializeClient = (error?: any) => ({
+    payload: error,
+    type: CLIENT_ACTION.CLIENT_INIT_FAILED,
+  });
+
+  static resetError = () => ({
+    type: CLIENT_ACTION.CLIENT_RESET_ERROR,
+  });
+}

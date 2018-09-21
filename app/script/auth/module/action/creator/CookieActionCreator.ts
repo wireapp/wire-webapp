@@ -17,73 +17,79 @@
  *
  */
 
-export const COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP';
-export const COOKIE_POLLING_START = 'COOKIE_POLLING_START';
-export const COOKIE_POLLING_FAILED = 'COOKIE_POLLING_FAILED';
+export enum COOKIE_ACTION {
+  COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP',
+  COOKIE_POLLING_START = 'COOKIE_POLLING_START',
+  COOKIE_POLLING_FAILED = 'COOKIE_POLLING_FAILED',
 
-export const COOKIE_GET_START = 'COOKIE_GET_START';
-export const COOKIE_GET_SUCCESS = 'COOKIE_GET_SUCCESS';
-export const COOKIE_GET_FAILED = 'COOKIE_GET_FAILED';
+  COOKIE_GET_START = 'COOKIE_GET_START',
+  COOKIE_GET_SUCCESS = 'COOKIE_GET_SUCCESS',
+  COOKIE_GET_FAILED = 'COOKIE_GET_FAILED',
 
-export const COOKIE_SET_START = 'COOKIE_SET_START';
-export const COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS';
-export const COOKIE_SET_FAILED = 'COOKIE_SET_FAILED';
+  COOKIE_SET_START = 'COOKIE_SET_START',
+  COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS',
+  COOKIE_SET_FAILED = 'COOKIE_SET_FAILED',
 
-export const COOKIE_REMOVE_START = 'COOKIE_REMOVE_START';
-export const COOKIE_REMOVE_SUCCESS = 'COOKIE_REMOVE_SUCCESS';
-export const COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED';
+  COOKIE_REMOVE_START = 'COOKIE_REMOVE_START',
+  COOKIE_REMOVE_SUCCESS = 'COOKIE_REMOVE_SUCCESS',
+  COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED',
+}
 
-export const stopCookiePolling = ({name, timerId}) => ({
-  payload: {name, timerId},
-  type: COOKIE_POLLING_STOP,
-});
+export type CookieActions = any;
 
-export const startCookiePolling = ({name, timerId}) => ({
-  payload: {name, timerId},
-  type: COOKIE_POLLING_START,
-});
+export class CookieActionCreator {
+  static stopCookiePolling = ({name, timerId}) => ({
+    payload: {name, timerId},
+    type: COOKIE_ACTION.COOKIE_POLLING_STOP,
+  });
 
-export const failedCookiePolling = (error?: any) => ({
-  payload: error,
-  type: COOKIE_POLLING_FAILED,
-});
+  static startCookiePolling = ({name, timerId}) => ({
+    payload: {name, timerId},
+    type: COOKIE_ACTION.COOKIE_POLLING_START,
+  });
 
-export const successfulGetCookie = ({cookie, name}) => ({
-  payload: {cookie, name},
-  type: COOKIE_GET_SUCCESS,
-});
+  static failedCookiePolling = (error?: any) => ({
+    payload: error,
+    type: COOKIE_ACTION.COOKIE_POLLING_FAILED,
+  });
 
-export const failedGetCookie = (error?: any) => ({
-  payload: error,
-  type: COOKIE_GET_FAILED,
-});
+  static successfulGetCookie = ({cookie, name}) => ({
+    payload: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_GET_SUCCESS,
+  });
 
-export const startSetCookie = ({cookie, name}) => ({
-  payload: {cookie, name},
-  type: COOKIE_SET_SUCCESS,
-});
+  static failedGetCookie = (error?: any) => ({
+    payload: error,
+    type: COOKIE_ACTION.COOKIE_GET_FAILED,
+  });
 
-export const successfulSetCookie = ({cookie, name}: {cookie?: string, name: string}) => ({
-  payload: {cookie, name},
-  type: COOKIE_SET_SUCCESS,
-});
+  static startSetCookie = ({cookie, name}) => ({
+    payload: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
+  });
 
-export const failedSetCookie = (error?: any) => ({
-  payload: error,
-  type: COOKIE_SET_FAILED,
-});
+  static successfulSetCookie = ({cookie, name}: {cookie?: string; name: string}) => ({
+    payload: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
+  });
 
-export const startRemoveCookie = ({cookie, name}) => ({
-  payload: {cookie, name},
-  type: COOKIE_REMOVE_SUCCESS,
-});
+  static failedSetCookie = (error?: any) => ({
+    payload: error,
+    type: COOKIE_ACTION.COOKIE_SET_FAILED,
+  });
 
-export const successfulRemoveCookie = (name: string) => ({
-  payload: {name},
-  type: COOKIE_REMOVE_SUCCESS,
-});
+  static startRemoveCookie = ({cookie, name}) => ({
+    payload: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS,
+  });
 
-export const failedRemoveCookie = (error?: any) => ({
-  payload: error,
-  type: COOKIE_REMOVE_FAILED,
-});
+  static successfulRemoveCookie = (name: string) => ({
+    payload: {name},
+    type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS,
+  });
+
+  static failedRemoveCookie = (error?: any) => ({
+    payload: error,
+    type: COOKIE_ACTION.COOKIE_REMOVE_FAILED,
+  });
+}
