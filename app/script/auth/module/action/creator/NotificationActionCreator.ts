@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum NOTIFICATION_ACTION {
   NOTIFICATION_CHECK_HISTORY_START = 'NOTIFICATION_CHECK_HISTORY_START',
   NOTIFICATION_CHECK_HISTORY_SUCCESS = 'NOTIFICATION_CHECK_HISTORY_SUCCESS',
@@ -26,10 +28,10 @@ export enum NOTIFICATION_ACTION {
 }
 
 export type NotificationActions =
-  | typeof NotificationActionCreator.startCheckHistory
-  | typeof NotificationActionCreator.successfulCheckHistory
-  | typeof NotificationActionCreator.failedCheckHistory
-  | typeof NotificationActionCreator.resetHistoryCheck
+  | typeof NotificationActionCreator.startCheckHistory & AppAction
+  | typeof NotificationActionCreator.successfulCheckHistory & AppAction
+  | typeof NotificationActionCreator.failedCheckHistory & AppAction
+  | typeof NotificationActionCreator.resetHistoryCheck & AppAction
   ;
 
 export class NotificationActionCreator {

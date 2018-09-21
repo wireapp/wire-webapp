@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum LOCAL_STORAGE_ACTION {
   LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START',
   LOCAL_STORAGE_SET_SUCCESS = 'LOCAL_STORAGE_SET_SUCCESS',
@@ -32,15 +34,15 @@ export enum LOCAL_STORAGE_ACTION {
 }
 
 export type LocalStorageActions =
-  | typeof LocalStorageActionCreator.startLocalStorageSet
-  | typeof LocalStorageActionCreator.successfulLocalStorageSet
-  | typeof LocalStorageActionCreator.failedLocalStorageSet
-  | typeof LocalStorageActionCreator.startLocalStorageGet
-  | typeof LocalStorageActionCreator.successfulLocalStorageGet
-  | typeof LocalStorageActionCreator.failedLocalStorageGet
-  | typeof LocalStorageActionCreator.startLocalStorageDelete
-  | typeof LocalStorageActionCreator.successfulLocalStorageDelete
-  | typeof LocalStorageActionCreator.failedLocalStorageDelete
+  | typeof LocalStorageActionCreator.startLocalStorageSet & AppAction
+  | typeof LocalStorageActionCreator.successfulLocalStorageSet & AppAction
+  | typeof LocalStorageActionCreator.failedLocalStorageSet & AppAction
+  | typeof LocalStorageActionCreator.startLocalStorageGet & AppAction
+  | typeof LocalStorageActionCreator.successfulLocalStorageGet & AppAction
+  | typeof LocalStorageActionCreator.failedLocalStorageGet & AppAction
+  | typeof LocalStorageActionCreator.startLocalStorageDelete & AppAction
+  | typeof LocalStorageActionCreator.successfulLocalStorageDelete & AppAction
+  | typeof LocalStorageActionCreator.failedLocalStorageDelete & AppAction
   ;
 
 export class LocalStorageActionCreator {

@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum USER_ACTION {
   USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START',
   USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS',
@@ -24,9 +26,9 @@ export enum USER_ACTION {
 }
 
 export type UserActions =
-  | typeof UserActionCreator.startSendActivationCode
-  | typeof UserActionCreator.successfulSendActivationCode
-  | typeof UserActionCreator.failedSendActivationCode
+  | typeof UserActionCreator.startSendActivationCode & AppAction
+  | typeof UserActionCreator.successfulSendActivationCode & AppAction
+  | typeof UserActionCreator.failedSendActivationCode & AppAction
   ;
 
 export class UserActionCreator {

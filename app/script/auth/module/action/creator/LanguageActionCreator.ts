@@ -17,12 +17,14 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum LANGUAGE_ACTION {
   SWITCH_LANGUAGE = 'SWITCH_LANGUAGE',
 }
 
 export type LanguageActions =
-  | typeof LanguageActionCreator.switchLanguage
+  | typeof LanguageActionCreator.switchLanguage & AppAction
   ;
 
 export class LanguageActionCreator {

@@ -18,6 +18,7 @@
  */
 
 import {RegisterData} from "@wireapp/api-client/dist/commonjs/auth";
+import {AppAction} from ".";
 
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
@@ -69,41 +70,41 @@ export enum AUTH_ACTION {
 }
 
 export type AuthActions =
-  | typeof AuthActionCreator.startLogin
-  | typeof AuthActionCreator.successfulLogin
-  | typeof AuthActionCreator.failedLogin
-  | typeof AuthActionCreator.startRegisterTeam
-  | typeof AuthActionCreator.successfulRegisterTeam
-  | typeof AuthActionCreator.failedRegisterTeam
-  | typeof AuthActionCreator.startRegisterPersonal
-  | typeof AuthActionCreator.successfulRegisterPersonal
-  | typeof AuthActionCreator.failedRegisterPersonal
-  | typeof AuthActionCreator.startRegisterWireless
-  | typeof AuthActionCreator.successfulRegisterWireless
-  | typeof AuthActionCreator.failedRegisterWireless
-  | typeof AuthActionCreator.startRegisterJoin
-  | typeof AuthActionCreator.successfulRegisterJoin
-  | typeof AuthActionCreator.failedRegisterJoin
-  | typeof AuthActionCreator.startRefresh
-  | typeof AuthActionCreator.successfulRefresh
-  | typeof AuthActionCreator.failedRefresh
-  | typeof AuthActionCreator.startValidateLocalClient
-  | typeof AuthActionCreator.successfulValidateLocalClient
-  | typeof AuthActionCreator.failedValidateLocalClient
-  | typeof AuthActionCreator.startLogout
-  | typeof AuthActionCreator.successfulLogout
-  | typeof AuthActionCreator.successfulSilentLogout
-  | typeof AuthActionCreator.failedLogout
-  | typeof AuthActionCreator.resetError
-  | typeof AuthActionCreator.resetAccountData
-  | typeof AuthActionCreator.pushAccountRegistrationData
-  | typeof AuthActionCreator.enterTeamCreationFlow
-  | typeof AuthActionCreator.enterPersonalCreationFlow
-  | typeof AuthActionCreator.enterGenericInviteCreationFlow
-  | typeof AuthActionCreator.enterPersonalInvitationCreationFlow
-  | typeof AuthActionCreator.startGetInvitationFromCode
-  | typeof AuthActionCreator.successfulGetInvitationFromCode
-  | typeof AuthActionCreator.failedGetInvitationFromCode
+  | typeof AuthActionCreator.startLogin & AppAction
+  | typeof AuthActionCreator.successfulLogin & AppAction
+  | typeof AuthActionCreator.failedLogin & AppAction
+  | typeof AuthActionCreator.startRegisterTeam & AppAction
+  | typeof AuthActionCreator.successfulRegisterTeam & AppAction
+  | typeof AuthActionCreator.failedRegisterTeam & AppAction
+  | typeof AuthActionCreator.startRegisterPersonal & AppAction
+  | typeof AuthActionCreator.successfulRegisterPersonal & AppAction
+  | typeof AuthActionCreator.failedRegisterPersonal & AppAction
+  | typeof AuthActionCreator.startRegisterWireless & AppAction
+  | typeof AuthActionCreator.successfulRegisterWireless & AppAction
+  | typeof AuthActionCreator.failedRegisterWireless & AppAction
+  | typeof AuthActionCreator.startRegisterJoin & AppAction
+  | typeof AuthActionCreator.successfulRegisterJoin & AppAction
+  | typeof AuthActionCreator.failedRegisterJoin & AppAction
+  | typeof AuthActionCreator.startRefresh & AppAction
+  | typeof AuthActionCreator.successfulRefresh & AppAction
+  | typeof AuthActionCreator.failedRefresh & AppAction
+  | typeof AuthActionCreator.startValidateLocalClient & AppAction
+  | typeof AuthActionCreator.successfulValidateLocalClient & AppAction
+  | typeof AuthActionCreator.failedValidateLocalClient & AppAction
+  | typeof AuthActionCreator.startLogout & AppAction
+  | typeof AuthActionCreator.successfulLogout & AppAction
+  | typeof AuthActionCreator.successfulSilentLogout & AppAction
+  | typeof AuthActionCreator.failedLogout & AppAction
+  | typeof AuthActionCreator.resetError & AppAction
+  | typeof AuthActionCreator.resetAccountData & AppAction
+  | typeof AuthActionCreator.pushAccountRegistrationData & AppAction
+  | typeof AuthActionCreator.enterTeamCreationFlow & AppAction
+  | typeof AuthActionCreator.enterPersonalCreationFlow & AppAction
+  | typeof AuthActionCreator.enterGenericInviteCreationFlow & AppAction
+  | typeof AuthActionCreator.enterPersonalInvitationCreationFlow & AppAction
+  | typeof AuthActionCreator.startGetInvitationFromCode & AppAction
+  | typeof AuthActionCreator.successfulGetInvitationFromCode & AppAction
+  | typeof AuthActionCreator.failedGetInvitationFromCode & AppAction
   ;
 
 export class AuthActionCreator {

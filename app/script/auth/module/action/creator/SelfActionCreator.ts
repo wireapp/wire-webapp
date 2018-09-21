@@ -18,6 +18,7 @@
  */
 
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import {AppAction} from ".";
 
 export enum SELF_ACTION {
   CONSENT_GET_START = 'CONSENT_GET_START',
@@ -38,18 +39,18 @@ export enum SELF_ACTION {
 }
 
 export type SelfActions =
-  | typeof SelfActionCreator.startSetHandle
-  | typeof SelfActionCreator.successfulSetHandle
-  | typeof SelfActionCreator.failedSetHandle
-  | typeof SelfActionCreator.startFetchSelf
-  | typeof SelfActionCreator.successfulFetchSelf
-  | typeof SelfActionCreator.failedFetchSelf
-  | typeof SelfActionCreator.startGetConsents
-  | typeof SelfActionCreator.successfulGetConsents
-  | typeof SelfActionCreator.failedGetConsents
-  | typeof SelfActionCreator.startSetConsent
-  | typeof SelfActionCreator.successfulSetConsent
-  | typeof SelfActionCreator.failedSetConsent
+  | typeof SelfActionCreator.startSetHandle & AppAction
+  | typeof SelfActionCreator.successfulSetHandle & AppAction
+  | typeof SelfActionCreator.failedSetHandle & AppAction
+  | typeof SelfActionCreator.startFetchSelf & AppAction
+  | typeof SelfActionCreator.successfulFetchSelf & AppAction
+  | typeof SelfActionCreator.failedFetchSelf & AppAction
+  | typeof SelfActionCreator.startGetConsents & AppAction
+  | typeof SelfActionCreator.successfulGetConsents & AppAction
+  | typeof SelfActionCreator.failedGetConsents & AppAction
+  | typeof SelfActionCreator.startSetConsent & AppAction
+  | typeof SelfActionCreator.successfulSetConsent & AppAction
+  | typeof SelfActionCreator.failedSetConsent & AppAction
   ;
 
 export class SelfActionCreator {

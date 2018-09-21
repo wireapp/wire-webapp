@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from "./index";
+
 export enum CLIENT_ACTION {
   CLIENTS_FETCH_START = 'CLIENTS_FETCH_START',
   CLIENTS_FETCH_SUCCESS = 'CLIENTS_FETCH_SUCCESS',
@@ -34,16 +36,16 @@ export enum CLIENT_ACTION {
 }
 
 export type ClientActions =
-  | typeof ClientActionCreator.startGetAllClients
-  | typeof ClientActionCreator.successfulGetAllClients
-  | typeof ClientActionCreator.failedGetAllClients
-  | typeof ClientActionCreator.startRemoveClient
-  | typeof ClientActionCreator.successfulRemoveClient
-  | typeof ClientActionCreator.failedRemoveClient
-  | typeof ClientActionCreator.startInitializeClient
-  | typeof ClientActionCreator.successfulInitializeClient
-  | typeof ClientActionCreator.failedInitializeClient
-  | typeof ClientActionCreator.resetError
+  | typeof ClientActionCreator.startGetAllClients & AppAction
+  | typeof ClientActionCreator.successfulGetAllClients & AppAction
+  | typeof ClientActionCreator.failedGetAllClients & AppAction
+  | typeof ClientActionCreator.startRemoveClient & AppAction
+  | typeof ClientActionCreator.successfulRemoveClient & AppAction
+  | typeof ClientActionCreator.failedRemoveClient & AppAction
+  | typeof ClientActionCreator.startInitializeClient & AppAction
+  | typeof ClientActionCreator.successfulInitializeClient & AppAction
+  | typeof ClientActionCreator.failedInitializeClient & AppAction
+  | typeof ClientActionCreator.resetError & AppAction
   ;
 
 export class ClientActionCreator {

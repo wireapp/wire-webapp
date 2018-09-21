@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum INVITATION_ACTION {
   INVITE_ADD_START = 'INVITE_ADD_START',
   INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS',
@@ -26,10 +28,10 @@ export enum INVITATION_ACTION {
 }
 
 export type InvitationActions =
-  | typeof InvitationActionCreator.startAddInvite
-  | typeof InvitationActionCreator.successfulAddInvite
-  | typeof InvitationActionCreator.failedAddInvite
-  | typeof InvitationActionCreator.resetError
+  | typeof InvitationActionCreator.startAddInvite & AppAction
+  | typeof InvitationActionCreator.successfulAddInvite & AppAction
+  | typeof InvitationActionCreator.failedAddInvite & AppAction
+  | typeof InvitationActionCreator.resetError & AppAction
   ;
 
 export class InvitationActionCreator {

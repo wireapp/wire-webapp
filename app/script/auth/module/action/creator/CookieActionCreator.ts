@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum COOKIE_ACTION {
   COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP',
   COOKIE_POLLING_START = 'COOKIE_POLLING_START',
@@ -36,17 +38,17 @@ export enum COOKIE_ACTION {
 }
 
 export type CookieActions =
-  | typeof CookieActionCreator.stopCookiePolling
-  | typeof CookieActionCreator.startCookiePolling
-  | typeof CookieActionCreator.failedCookiePolling
-  | typeof CookieActionCreator.successfulGetCookie
-  | typeof CookieActionCreator.failedGetCookie
-  | typeof CookieActionCreator.startSetCookie
-  | typeof CookieActionCreator.successfulSetCookie
-  | typeof CookieActionCreator.failedSetCookie
-  | typeof CookieActionCreator.startRemoveCookie
-  | typeof CookieActionCreator.successfulRemoveCookie
-  | typeof CookieActionCreator.failedRemoveCookie
+  | typeof CookieActionCreator.stopCookiePolling & AppAction
+  | typeof CookieActionCreator.startCookiePolling & AppAction
+  | typeof CookieActionCreator.failedCookiePolling & AppAction
+  | typeof CookieActionCreator.successfulGetCookie & AppAction
+  | typeof CookieActionCreator.failedGetCookie & AppAction
+  | typeof CookieActionCreator.startSetCookie & AppAction
+  | typeof CookieActionCreator.successfulSetCookie & AppAction
+  | typeof CookieActionCreator.failedSetCookie & AppAction
+  | typeof CookieActionCreator.startRemoveCookie & AppAction
+  | typeof CookieActionCreator.successfulRemoveCookie & AppAction
+  | typeof CookieActionCreator.failedRemoveCookie & AppAction
   ;
 
 export class CookieActionCreator {

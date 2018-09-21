@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',
   CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS',
@@ -28,12 +30,12 @@ export enum CONVERSATION_ACTION {
 }
 
 export type ConversationActions =
-  | typeof ConversationActionCreator.startConversationCodeCheck
-  | typeof ConversationActionCreator.successfulConversationCodeCheck
-  | typeof ConversationActionCreator.failedConversationCodeCheck
-  | typeof ConversationActionCreator.startJoinConversationByCode
-  | typeof ConversationActionCreator.successfulJoinConversationByCode
-  | typeof ConversationActionCreator.failedJoinConversationByCode
+  | typeof ConversationActionCreator.startConversationCodeCheck & AppAction
+  | typeof ConversationActionCreator.successfulConversationCodeCheck & AppAction
+  | typeof ConversationActionCreator.failedConversationCodeCheck & AppAction
+  | typeof ConversationActionCreator.startJoinConversationByCode & AppAction
+  | typeof ConversationActionCreator.successfulJoinConversationByCode & AppAction
+  | typeof ConversationActionCreator.failedJoinConversationByCode & AppAction
   ;
 
 export class ConversationActionCreator {

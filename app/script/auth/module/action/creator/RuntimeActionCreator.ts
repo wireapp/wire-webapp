@@ -17,6 +17,8 @@
  *
  */
 
+import {AppAction} from ".";
+
 export enum RUNTIME_ACTION {
   RUNTIME_CHECK_INDEXEDDB_START = 'RUNTIME_CHECK_INDEXEDDB_START',
   RUNTIME_CHECK_INDEXEDDB_FINISH = 'RUNTIME_CHECK_INDEXEDDB_FINISH',
@@ -26,11 +28,11 @@ export enum RUNTIME_ACTION {
 }
 
 export type RuntimeActions =
-  | typeof RuntimeActionCreator.startCheckIndexedDb
-  | typeof RuntimeActionCreator.finishCheckIndexedDb
-  | typeof RuntimeActionCreator.startCheckCookie
-  | typeof RuntimeActionCreator.finishCheckCookie
-  | typeof RuntimeActionCreator.confirmSupportedBrowser
+  | typeof RuntimeActionCreator.startCheckIndexedDb & AppAction
+  | typeof RuntimeActionCreator.finishCheckIndexedDb & AppAction
+  | typeof RuntimeActionCreator.startCheckCookie & AppAction
+  | typeof RuntimeActionCreator.finishCheckCookie & AppAction
+  | typeof RuntimeActionCreator.confirmSupportedBrowser & AppAction
   ;
 
 export class RuntimeActionCreator {
