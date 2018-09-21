@@ -152,6 +152,57 @@ describe('z.util.renderMessage', () => {
     expect(z.util.renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
   /* eslint-enable no-useless-escape */
+
+  describe('Mentions', () => {
+    const tests = [
+      {
+        expected: 'bonjour <a data-user-id="user-id">@felix</a>',
+        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}],
+        testCase: 'replaces single mention in simple text',
+        text: 'bonjour @felix',
+      },
+      {
+        expected: 'bonjour <a data-user-id="user-id">@felix</a>, tu vas bien <a data-user-id="user-id">@felix</a>?',
+        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}, {length: 6, startIndex: 28, userId: 'user-id'}],
+        testCase: 'replaces two mentions to same user in simple text',
+        text: 'bonjour @felix, tu vas bien @felix?',
+      },
+      {
+        expected: 'salut <a data-user-id="pain-id">@`I am a **pain** in the __a**__`</a>',
+        mentions: [{length: 33, startIndex: 6, userId: 'pain-id'}],
+        testCase: "doesn't parse markdown in user names",
+        text: 'salut @`I am a **pain** in the __a**__`',
+      },
+      {
+        expected: '<strong>salut</strong> <a data-user-id="pain-id">@you</a>',
+        mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
+        testCase: 'parses markdown outside of mentions',
+        text: '**salut** @you',
+      },
+      {
+        expected: '<strong>salut</strong> <a>@you</a> and <a data-user-id="toi-id">@toi</a>',
+        mentions: [
+          {isSelfMentioned: true, length: 4, startIndex: 10, userId: 'you-id'},
+          {length: 4, startIndex: 19, userId: 'toi-id'},
+        ],
+        testCase: 'displays self mentions differently',
+        text: '**salut** @you and @toi',
+      },
+    ];
+
+    tests.forEach(({expected, mentions, testCase, text}) => {
+      const mentionEntities = mentions.map(mention => {
+        const mentionEntity = new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+        mentionEntity.isSelfMentioned = () => mention.isSelfMentioned;
+        return mentionEntity;
+      });
+
+      it(testCase, () => {
+        const result = z.util.renderMessage(text, mentionEntities);
+        expect(result).toEqual(expected);
+      });
+    });
+  });
 });
 
 describe('z.util.arrayToMd5Base64', () => {
