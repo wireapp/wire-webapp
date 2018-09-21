@@ -311,9 +311,9 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _isAlert = messageEntity => {
-    const isSelfMenionted = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
     const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-    return isSelfMenionted || isMissedCall || messageEntity.is_ping();
+    return isSelfMentioned || isMissedCall || messageEntity.is_ping();
   };
 
   return {
