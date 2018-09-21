@@ -28,8 +28,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
     this.onSuggestionClick = this.onSuggestionClick.bind(this);
 
     this.isVisible = ko.observable(false);
-    this.onSelectionValidated = params.onSelectionValidated || (() => {});
-    this.onEnd = params.onEnd || (() => {});
+    this.onSelectionValidated = params.onSelectionValidated || z.util.noop;
+    this.onEnd = params.onEnd || z.util.noop;
     this.suggestions = params.suggestions;
     this.targetInputSelector = params.targetInputSelector;
     this.targetInput = undefined;
