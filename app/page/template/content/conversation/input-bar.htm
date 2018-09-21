@@ -16,7 +16,7 @@
       <div class="controls-center">
         <textarea id="conversation-input-bar-text"
                   class="conversation-input-bar-text border-theme"
-                  data-bind="event: {'keydown': onInputKeyDown, 'keyup': onInputKeyUp, 'select click': handleMentions, 'input': updateMentions},
+                  data-bind="event: {'keydown': onInputKeyDown, 'keyup': onInputKeyUp, 'select click': updateSelectionState, 'input': updateMentions},
                              focus_on_keydown: true,
                              enter: onInputEnter,
                              hasFocus: hasFocus,

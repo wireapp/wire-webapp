@@ -45,6 +45,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
+    this.updateSelectionState = this.updateSelectionState.bind(this);
+
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
 
@@ -117,16 +119,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.richTextInput = ko.pureComputed(() => {
       const input = this.input().text;
 
-      const pieces = this.currentMentions.reverse().reduce(
-        (currentPieces, mentionEntity) => {
-          const currentPiece = currentPieces.shift();
-          currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
-          currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
-          currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
-          return currentPieces;
-        },
-        [input]
-      );
+      const pieces = this.currentMentions
+        .slice()
+        .reverse()
+        .reduce(
+          (currentPieces, mentionEntity) => {
+            const currentPiece = currentPieces.shift();
+            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
+            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
+            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
+            return currentPieces;
+          },
+          [input]
+        );
       const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
       return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
     });
@@ -244,6 +249,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     inputElement.selectionEnd = caretPosition;
 
     this.editedMention(undefined);
+    this.updateSelectionState();
   }
 
   addedToView() {
@@ -395,8 +401,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  handleMentions(data, event) {
-    const textarea = event.target;
+  handleMentions() {
+    const textarea = document.querySelector('#conversation-input-bar-text');
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
     const text = value.substr(0, selectionEnd);
@@ -411,38 +417,65 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         this.editedMention(Object.assign({}, currentEditedMention, {term: searchTerm}));
       }
     } else {
-      const defaultRange = {endIndex: 0, startIndex: Infinity};
-      const mentions = this.currentMentions;
-      const firstMention = this.findMentionAtPosition(selectionStart, mentions) || defaultRange;
-      const lastMention = this.findMentionAtPosition(selectionEnd, mentions) || defaultRange;
-      const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
-      const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
-      const newStart = Math.min(mentionStart, selectionStart);
-      const newEnd = Math.max(mentionEnd, selectionEnd);
-
-      if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
-        textarea.selectionStart = newStart;
-        textarea.selectionEnd = newEnd;
-      }
-
-      this.selectionStart(newStart);
-      this.selectionEnd(newEnd);
-
       const startFlowRegexp = /\B@$/;
       if (startFlowRegexp.test(text)) {
         this.editedMention({start: selectionStart - 1, term: ''});
       }
+      this.updateSelectionState();
     }
+  }
+
+  updateSelectionState() {
+    const textarea = document.querySelector('#conversation-input-bar-text');
+    const {selectionStart, selectionEnd} = textarea;
+    const defaultRange = {endIndex: 0, startIndex: Infinity};
+    const firstMention = this.findMentionAtPosition(selectionStart, this.currentMentions) || defaultRange;
+    const lastMention = this.findMentionAtPosition(selectionEnd, this.currentMentions) || defaultRange;
+    const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
+    const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
+    const newStart = Math.min(mentionStart, selectionStart);
+    const newEnd = Math.max(mentionEnd, selectionEnd);
+    if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newEnd;
+    }
+    this.selectionStart(newStart);
+    this.selectionEnd(newEnd);
   }
 
   updateMentions(data, event) {
     const textarea = event.target;
     const value = textarea.value;
     const previousValue = this.input().text;
-    const mentions = this.currentMentions;
     const lengthDifference = value.length - previousValue.length;
-    this.logger.log(this.updateMentionRanges(mentions, this.selectionStart(), this.selectionEnd(), lengthDifference));
-    this.handleMentions(data, event);
+    const edgeMention = this.detectMentionEdgeDeletion(textarea, lengthDifference);
+    if (edgeMention) {
+      textarea.value = this.input();
+      textarea.selectionStart = edgeMention.startIndex;
+      textarea.selectionEnd = edgeMention.endIndex;
+    } else {
+      this.currentMentions = this.updateMentionRanges(
+        this.currentMentions,
+        this.selectionStart(),
+        this.selectionEnd(),
+        lengthDifference
+      );
+    }
+    this.handleMentions();
+  }
+
+  detectMentionEdgeDeletion(textarea, lengthDifference) {
+    const hadSelection = this.selectionStart() !== this.selectionEnd();
+    if (hadSelection) {
+      return null;
+    }
+    if (lengthDifference >= 0) {
+      return null;
+    }
+    const currentSelectionStart = textarea.selectionStart;
+    const forwardDeleted = currentSelectionStart === this.selectionStart();
+    const checkPosition = forwardDeleted ? currentSelectionStart + 1 : currentSelectionStart;
+    return this.findMentionAtPosition(checkPosition, this.currentMentions);
   }
 
   updateMentionRanges(mentions, start, end, difference) {
@@ -463,6 +496,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   onInputKeyUp(data, keyboardEvent) {
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
+    this.updateSelectionState();
   }
 
   removedFromView() {
