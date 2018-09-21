@@ -55,13 +55,13 @@ export const SUPPORTED_BROWSERS = {
 };
 
 const getPlatform = () => platform;
-const getOs = () => getPlatform().os;
-const getUserAgent = () => getPlatform().ua.toLowerCase();
+const getOs = () => getPlatform().os || {};
+const getUserAgent = () => (getPlatform().ua || '').toLowerCase();
 
-const getOsFamily = () => getOs().family.toLowerCase();
-const getBrowserName = () => getPlatform().name.toLowerCase();
+const getOsFamily = () => (getOs().family || '').toLowerCase();
+const getBrowserName = () => (getPlatform().name || '').toLowerCase();
 const getBrowserVersion = () => {
-  const [majorVersion, minorVersion] = getPlatform().version.split('.');
+  const [majorVersion, minorVersion] = (getPlatform().version || '0.0').split('.');
   return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
 };
 
