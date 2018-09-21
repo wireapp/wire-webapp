@@ -173,9 +173,12 @@ describe('z.util.renderMessage', () => {
         testCase: "doesn't parse markdown in user names",
         text: 'salut @`I am a **pain** in the __a**__`',
       },
-      //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
-      //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
-      //{expected: 'bonjour <a>@felix</a>', text: 'bonjour @felix', mentions: []},
+      {
+        expected: '<strong>salut</strong> <a>@you</a>',
+        mentions: [{length: 4, startIndex: 10, userId: 'lux-uuid'}],
+        testCase: 'parses markdown outside of mentions',
+        text: '**salut** @you',
+      },
     ];
 
     tests.forEach(({expected, mentions, testCase, text}) => {
