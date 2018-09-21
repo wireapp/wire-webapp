@@ -43,7 +43,7 @@ import {teamNameStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {withRouter, RouteComponentProps} from 'react-router';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {resetError} from '../module/action/creator/InviteActionCreator';
+import {resetError} from '../module/action/creator/InvitationActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
 import {enterTeamCreationFlow} from '../module/action/creator/AuthActionCreator';
 import * as AuthSelector from '../module/selector/AuthSelector';

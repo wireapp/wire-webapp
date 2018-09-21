@@ -17,7 +17,7 @@
  *
  */
 
-import * as InviteActionCreator from './creator/InviteActionCreator';
+import * as InviteActionCreator from './creator/InvitationActionCreator';
 import * as InviteSelector from '../selector/InviteSelector';
 import * as selfSelector from '../selector/SelfSelector';
 import * as languageSelector from '../selector/LanguageSelector';

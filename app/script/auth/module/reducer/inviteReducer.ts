@@ -17,7 +17,7 @@
  *
  */
 
-import * as InviteActionCreator from '../action/creator/InviteActionCreator';
+import * as InviteActionCreator from '../action/creator/InvitationActionCreator';
 import {AppActions} from '../action/creator';
 
 export interface InvitationState {
