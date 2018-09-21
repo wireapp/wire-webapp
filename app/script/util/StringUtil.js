@@ -95,6 +95,12 @@ z.util.StringUtil = {
 
   removeLineBreaks: (string = '') => string.replace(/(\r\n|\n|\r)/gm, ''),
 
+  replaceInRange(text, replacement, startIndex, endIndex) {
+    const beforePartial = text.slice(0, startIndex);
+    const afterPartial = text.slice(endIndex);
+    return `${beforePartial}${replacement}${afterPartial}`;
+  },
+
   sortByPriority: (stringA = '', stringB = '', query) => {
     stringA = stringA.toLowerCase();
     stringB = stringB.toLowerCase();
