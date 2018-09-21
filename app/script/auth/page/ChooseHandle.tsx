@@ -32,7 +32,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {parseError} from '../util/errorUtil';
-import {getAppPath} from '../util/urlUtil';
+import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 import * as React from 'react';
 import {createSuggestions} from '../util/handleUtil';
@@ -47,6 +47,7 @@ import {withRouter, RouteComponentProps} from 'react-router';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
 import {RootState} from '../module/reducer';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps {}
 
@@ -94,7 +95,7 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
         if (this.props.isTeamFlow) {
           this.props.history.push(ROUTE.INITIAL_INVITE);
         } else {
-          window.location.replace(getAppPath());
+          window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
         }
       })
       .catch(error => {

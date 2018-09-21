@@ -65,6 +65,7 @@ import {withRouter, RouteComponentProps} from 'react-router';
 import {UUID_REGEX} from '../util/stringUtil';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {BACKEND} from '../Environment';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
@@ -297,7 +298,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.getAppPath())
+      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 

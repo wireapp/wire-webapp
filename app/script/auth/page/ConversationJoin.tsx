@@ -51,7 +51,7 @@ import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {withRouter} from 'react-router';
 import * as React from 'react';
-import {getURLParameter, getAppPath, hasURLParameter, pathWithParams} from '../util/urlUtil';
+import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
@@ -166,7 +166,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
   routeToApp = () => {
     const redirectLocation = this.isPwaSupportedBrowser()
       ? pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, QUERY_KEY.IMMEDIATE_LOGIN)
-      : getAppPath();
+      : pathWithParams(EXTERNAL_ROUTE.WEBAPP);
     window.location.replace(redirectLocation);
   };
 

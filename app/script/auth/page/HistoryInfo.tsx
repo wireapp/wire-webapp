@@ -29,6 +29,7 @@ import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import * as NotificationAction from '../module/action/NotificationAction';
 import {withRouter, RouteComponentProps} from 'react-router';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -50,7 +51,9 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
 }) => {
   const onContinue = () => {
     connected.resetHistoryCheck().then(() => {
-      return hasSelfHandle ? window.location.replace(URLUtil.getAppPath()) : history.push(ROUTE.CHOOSE_HANDLE);
+      return hasSelfHandle
+        ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+        : history.push(ROUTE.CHOOSE_HANDLE);
     });
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;

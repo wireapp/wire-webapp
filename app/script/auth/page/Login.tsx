@@ -185,7 +185,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.getAppPath())
+      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 

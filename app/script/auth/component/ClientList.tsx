@@ -30,7 +30,8 @@ import {ROUTE} from '../route';
 import BackendError from '../module/action/BackendError';
 import {withRouter} from 'react-router';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
-import {getAppPath} from '../util/urlUtil';
+import {pathWithParams} from '../util/urlUtil';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 class ClientList extends React.Component {
   state = {
@@ -63,7 +64,7 @@ class ClientList extends React.Component {
         const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
         return this.props.doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
       })
-      .then(() => window.location.replace(getAppPath()))
+      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
           this.props.history.push(ROUTE.HISTORY_INFO);

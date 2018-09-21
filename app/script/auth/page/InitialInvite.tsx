@@ -37,7 +37,7 @@ import {
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {getAppPath} from '../util/urlUtil';
+import {pathWithParams} from '../util/urlUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InvitationAction';
@@ -46,6 +46,7 @@ import {fetchSelf} from '../module/action/SelfAction';
 import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 import {RouteComponentProps} from 'react-router';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
 
@@ -78,7 +79,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
     this.props.fetchSelf();
   }
 
-  onInviteDone = () => window.location.replace(getAppPath());
+  onInviteDone = () => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
 
   renderEmail = email => (
     <div

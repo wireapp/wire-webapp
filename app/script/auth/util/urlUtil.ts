@@ -17,17 +17,20 @@
  *
  */
 
-import EXTERNAL_ROUTE from '../externalRoute';
 import {FORWARDED_QUERY_KEYS} from '../route';
 
-export function pathWithParams(path, additionalParams, whitelistParams = FORWARDED_QUERY_KEYS) {
+export function pathWithParams(
+  path: string,
+  additionalParams?: string,
+  whitelistParams: string[] = FORWARDED_QUERY_KEYS
+) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
     .filter(searchParam => !!searchParam)
     .filter(searchParam => {
       const paramName = searchParam.split('=')[0];
-      return !whitelistParams || whitelistParams.includes(paramName);
+      return whitelistParams.includes(paramName);
     });
 
   if (additionalParams) {
@@ -35,10 +38,6 @@ export function pathWithParams(path, additionalParams, whitelistParams = FORWARD
   }
   const joinedParams = searchParams.join('&');
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
-}
-
-export function getAppPath() {
-  return pathWithParams(EXTERNAL_ROUTE.WEBAPP, undefined, FORWARDED_QUERY_KEYS);
 }
 
 export function getURLParameter(parameterName) {
