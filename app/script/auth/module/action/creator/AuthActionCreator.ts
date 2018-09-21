@@ -17,6 +17,8 @@
  *
  */
 
+import {RegisterData} from "@wireapp/api-client/dist/commonjs/auth";
+
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
@@ -66,7 +68,43 @@ export enum AUTH_ACTION {
   ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW',
 }
 
-export type AuthActions = any;
+export type AuthActions =
+  | typeof AuthActionCreator.startLogin
+  | typeof AuthActionCreator.successfulLogin
+  | typeof AuthActionCreator.failedLogin
+  | typeof AuthActionCreator.startRegisterTeam
+  | typeof AuthActionCreator.successfulRegisterTeam
+  | typeof AuthActionCreator.failedRegisterTeam
+  | typeof AuthActionCreator.startRegisterPersonal
+  | typeof AuthActionCreator.successfulRegisterPersonal
+  | typeof AuthActionCreator.failedRegisterPersonal
+  | typeof AuthActionCreator.startRegisterWireless
+  | typeof AuthActionCreator.successfulRegisterWireless
+  | typeof AuthActionCreator.failedRegisterWireless
+  | typeof AuthActionCreator.startRegisterJoin
+  | typeof AuthActionCreator.successfulRegisterJoin
+  | typeof AuthActionCreator.failedRegisterJoin
+  | typeof AuthActionCreator.startRefresh
+  | typeof AuthActionCreator.successfulRefresh
+  | typeof AuthActionCreator.failedRefresh
+  | typeof AuthActionCreator.startValidateLocalClient
+  | typeof AuthActionCreator.successfulValidateLocalClient
+  | typeof AuthActionCreator.failedValidateLocalClient
+  | typeof AuthActionCreator.startLogout
+  | typeof AuthActionCreator.successfulLogout
+  | typeof AuthActionCreator.successfulSilentLogout
+  | typeof AuthActionCreator.failedLogout
+  | typeof AuthActionCreator.resetError
+  | typeof AuthActionCreator.resetAccountData
+  | typeof AuthActionCreator.pushAccountRegistrationData
+  | typeof AuthActionCreator.enterTeamCreationFlow
+  | typeof AuthActionCreator.enterPersonalCreationFlow
+  | typeof AuthActionCreator.enterGenericInviteCreationFlow
+  | typeof AuthActionCreator.enterPersonalInvitationCreationFlow
+  | typeof AuthActionCreator.startGetInvitationFromCode
+  | typeof AuthActionCreator.successfulGetInvitationFromCode
+  | typeof AuthActionCreator.failedGetInvitationFromCode
+  ;
 
 export class AuthActionCreator {
   static startLogin = (params?: any) => ({
@@ -88,7 +126,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_TEAM_START,
   });
 
-  static successfulRegisterTeam = authData => ({
+  static successfulRegisterTeam = (authData: RegisterData) => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
   });
