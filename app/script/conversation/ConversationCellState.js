@@ -25,12 +25,14 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationCellState = (() => {
   const ACTIVITY_TYPE = {
     CALL: 'ConversationCellState.ACTIVITY_TYPE.CALL',
+    MENTION: 'ConversationCellState.ACTIVITY_TYPE.MENTION',
     MESSAGE: 'ConversationCellState.ACTIVITY_TYPE.MESSAGE',
     PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
   };
 
   const _accumulateActivity = conversationEntity => {
     const activities = {
+      [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.PING]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
@@ -38,7 +40,9 @@ z.conversation.ConversationCellState = (() => {
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
       const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-      if (isMissedCall) {
+      if (messageEntity.isSelfMentioned()) {
+        activities[ACTIVITY_TYPE.MENTION] += 1;
+      } else if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
@@ -62,6 +66,13 @@ z.conversation.ConversationCellState = (() => {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLineMissedCall
                 : z.string.conversationsSecondaryLineMissedCalls;
+              break;
+            }
+
+            case ACTIVITY_TYPE.MENTION: {
+              stringId = activityCountIsOne
+                ? z.string.conversationsSecondaryLineNewMention
+                : z.string.conversationsSecondaryLineNewMentions;
               break;
             }
 
@@ -93,6 +104,11 @@ z.conversation.ConversationCellState = (() => {
   const _getStateAlert = {
     description: conversationEntity => _accumulateActivity(conversationEntity),
     icon: conversationEntity => {
+      const hasSelfMention = conversationEntity.unreadEvents().some(messageEntity => messageEntity.isSelfMentioned());
+      if (hasSelfMention) {
+        return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+      }
+
       const hasMissedCall = conversationEntity
         .unreadEvents()
         .some(messageEntity => messageEntity.is_call() && messageEntity.was_missed());
@@ -294,7 +310,7 @@ z.conversation.ConversationCellState = (() => {
 
   const _isAlert = messageEntity => {
     const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-    return isMissedCall || messageEntity.is_ping();
+    return isMissedCall || messageEntity.is_ping() || messageEntity.isSelfMentioned();
   };
 
   return {
