@@ -17,7 +17,7 @@
  *
  */
 
-import {AppActions, INVITATION_ACTION} from '../action/creator/';
+import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
 
 export interface InvitationState {
   error: Error;
@@ -31,7 +31,7 @@ const initialState: InvitationState = {
   invites: [],
 };
 
-export function invitationReducer(state: InvitationState = initialState, action: AppActions): InvitationState {
+export function invitationReducer(state: InvitationState = initialState, action: InvitationActions): InvitationState {
   switch (action.type) {
     case INVITATION_ACTION.INVITE_ADD_START: {
       return {
