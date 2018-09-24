@@ -30,7 +30,7 @@ z.conversation.ConversationCellState = (() => {
     PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
   };
 
-  const _accumulateActivity = conversationEntity => {
+  const _accumulateSummary = conversationEntity => {
     const activities = {
       [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.CALL]: 0,
@@ -39,10 +39,14 @@ z.conversation.ConversationCellState = (() => {
     };
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
-      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-      if (messageEntity.is_content() && messageEntity.isSelfMentioned()) {
+      const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+      if (isSelfMentioned) {
         activities[ACTIVITY_TYPE.MENTION] += 1;
-      } else if (isMissedCall) {
+        return;
+      }
+
+      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+      if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
@@ -51,10 +55,10 @@ z.conversation.ConversationCellState = (() => {
       }
     });
 
-    return _generateActivityString(activities);
+    return _generateSummaryDescription(activities);
   };
 
-  const _generateActivityString = activities => {
+  const _generateSummaryDescription = activities => {
     return Object.entries(activities)
       .map(([activity, activityCount]) => {
         if (activityCount) {
@@ -102,7 +106,7 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateAlert = {
-    description: conversationEntity => _accumulateActivity(conversationEntity),
+    description: conversationEntity => _accumulateSummary(conversationEntity),
     icon: conversationEntity => {
       const hasSelfMention = conversationEntity
         .unreadEvents()
@@ -241,7 +245,7 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateMuted = {
-    description: conversationEntity => _accumulateActivity(conversationEntity),
+    description: conversationEntity => _accumulateSummary(conversationEntity),
     icon: () => z.conversation.ConversationStatusIcon.MUTED,
     match: conversationEntity => conversationEntity.is_muted(),
   };
