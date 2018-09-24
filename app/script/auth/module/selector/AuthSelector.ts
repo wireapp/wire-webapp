@@ -17,6 +17,8 @@
  *
  */
 
+import {RootState} from '../reducer';
+
 export const REGISTER_FLOW = {
   GENERIC_INVITATION: 'REGISTER_FLOW_GENERIC_INVITATION',
   PERSONAL: 'REGISTER_FLOW_PERSONAL',
@@ -24,16 +26,16 @@ export const REGISTER_FLOW = {
   TEAM: 'REGISTER_FLOW_TEAM',
 };
 
-export const getAccessToken = state => state.authState.accesstoken;
-export const isAuthenticated = state => state.authState.isAuthenticated;
-export const isFetching = state => state.authState.fetching;
-export const getError = state => state.authState.error;
-export const getCurrentFlow = state => state.authState.currentFlow;
-export const getAccount = state => state.authState.account || {};
-export const getAccountTeam = state => getAccount(state).team || {};
-export const getAccountTeamName = state => getAccountTeam(state).name;
+export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;
+export const isFetching = (state: RootState) => state.authState.fetching;
+export const getError = (state: RootState) => state.authState.error;
+export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
+export const getAccount = (state: RootState) => state.authState.account || {team: {}};
+export const getAccountTeam = (state: RootState) => getAccount(state).team || {};
+export const getAccountTeamName = (state: RootState) => getAccountTeam(state).name;
 
-export const isGenericInvitationFlow = state => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;
-export const isPersonalFlow = state => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL;
-export const isPersonalInvitationFlow = state => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL_INVITATION;
-export const isTeamFlow = state => getCurrentFlow(state) === REGISTER_FLOW.TEAM;
+export const isGenericInvitationFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;
+export const isPersonalFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL;
+export const isPersonalInvitationFlow = (state: RootState) =>
+  getCurrentFlow(state) === REGISTER_FLOW.PERSONAL_INVITATION;
+export const isTeamFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.TEAM;

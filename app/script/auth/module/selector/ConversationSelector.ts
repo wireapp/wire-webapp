@@ -17,5 +17,7 @@
  *
  */
 
-export const isFetching = state => state.conversationState.fetching;
-export const getError = state => state.conversationState.error;
+import {RootState} from '../reducer';
+
+export const isFetching = (state: RootState) => state.conversationState.fetching;
+export const getError = (state: RootState) => state.conversationState.error;

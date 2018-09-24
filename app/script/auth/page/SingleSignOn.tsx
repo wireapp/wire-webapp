@@ -88,7 +88,7 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  resetError: () => Promise<void>;
+  resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
   doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
   doGetAllClients: () => Promise<any[]>;
@@ -120,7 +120,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
   };
 
   componentWillUnmount = () => {
-    this.props.resetError();
+    this.props.resetAuthError();
   };
 
   calculateChildPosition = (childHeight, childWidth) => {
@@ -244,7 +244,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props.resetError();
+    this.props.resetAuthError();
     if (this.props.isFetching) {
       return;
     }
@@ -278,7 +278,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
-            this.props.resetError();
+            this.props.resetAuthError();
             /**
              * Show history screen if:
              *   1. database contains at least one event
@@ -293,7 +293,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            this.props.resetError();
+            this.props.resetAuthError();
             return this.props.history.push(ROUTE.CLIENTS);
           }
           case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
@@ -512,7 +512,7 @@ export default withRouter(
         loginError: AuthSelector.getError(state),
       }),
       (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
-        resetError: () => dispatch(ROOT_ACTIONS.userAction.resetError()), //AuthActionCreator
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
         doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
           dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),

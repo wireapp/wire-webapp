@@ -67,7 +67,7 @@ import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import ROOT_ACTIONS from '../module/action/';
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 
 interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
 
@@ -80,7 +80,7 @@ interface ConnectedProps {
 
 interface DispatchProps {
   doCheckConversationCode: (conversationKey: string, conversationCode: string) => Promise<void>;
-  resetError: () => Promise<void>;
+  resetAuthError: () => Promise<void>;
   doInitializeClient: (clientType: ClientType, password?: string) => Promise<void>;
   doInit: (options: {isImmediateLogin: boolean}) => Promise<void>;
   doLoginAndJoin: (login: any, conversationKey: string, conversationCode: string) => Promise<void>;
@@ -165,7 +165,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
   };
 
   componentDidMount = () => {
-    this.props.resetError();
+    this.props.resetAuthError();
     const immediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     if (immediateLogin) {
       return this.immediateLogin();
@@ -176,7 +176,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
   componentWillUnmount = () => {
-    this.props.resetError();
+    this.props.resetAuthError();
   };
 
   immediateLogin = () => {
@@ -221,7 +221,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
       .then(() => {
         const {password, persist} = this.state;
         const email = this.state.email.trim();
-        const login = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
+        const login: LoginData = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
         if (this.isValidEmail(email)) {
           login.email = email;
@@ -240,7 +240,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
-            this.props.resetError();
+            this.props.resetAuthError();
             /**
              * Show history screen if:
              *   1. database contains at least one event
@@ -255,7 +255,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            this.props.resetError();
+            this.props.resetAuthError();
             return this.props.history.push(ROUTE.CLIENTS);
           }
           default: {
@@ -467,7 +467,7 @@ export default withRouter(
       (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
         doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
           dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
-        resetError: () => dispatch(ROOT_ACTIONS.userAction.resetError()), //AuthActionCreator
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         doInitializeClient: (clientType: ClientType, password?: string) =>
           dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
         doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>

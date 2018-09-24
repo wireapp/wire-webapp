@@ -17,6 +17,8 @@
  *
  */
 
-export const getInvites = state => state.inviteState.invites;
-export const getError = state => state.inviteState.error;
-export const isFetching = state => state.inviteState.fetching;
+import {RootState} from '../reducer';
+
+export const getInvites = (state: RootState) => state.inviteState.invites;
+export const getError = (state: RootState) => state.inviteState.error;
+export const isFetching = (state: RootState) => state.inviteState.fetching;

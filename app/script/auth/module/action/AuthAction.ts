@@ -405,6 +405,12 @@ export class AuthAction {
       dispatch(AuthActionCreator.enterPersonalInvitationCreationFlow());
     };
   };
+
+  resetAuthError = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.resetError());
+    };
+  };
 }
 
 export const authAction = new AuthAction();
