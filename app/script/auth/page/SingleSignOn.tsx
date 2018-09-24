@@ -471,7 +471,9 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
                     {!isDesktopApp() && (
                       <Checkbox
                         tabIndex={3}
-                        onChange={event => this.setState({persist: !event.target.checked})}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                          this.setState({persist: !event.target.checked})
+                        }
                         checked={!persist}
                         data-uie-name="enter-public-computer-sso-sign-in"
                         style={{justifyContent: 'center', marginTop: '36px'}}
