@@ -261,6 +261,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editMessageEntity(undefined);
     this.editInput('');
+    this.currentMentions.length = 0;
   }
 
   clickToCancelPastedFile() {
@@ -286,6 +287,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
       this.input(this.editMessageEntity().get_first_asset().text);
+      this.currentMentions = this.editMessageEntity()
+        .get_first_asset()
+        .mentions();
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -364,6 +368,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
             this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
+            this.updateMentions(data, keyboardEvent);
           }
           break;
         }
@@ -532,7 +537,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const hasTextChanged = messageText !== messageEntity.get_first_asset().text;
     if (hasTextChanged) {
-      this.conversationRepository.sendMessageEdit(messageText, messageEntity, this.conversationEntity());
+      const mentionEntities = this.currentMentions;
+      this.conversationRepository.sendMessageEdit(
+        messageText,
+        messageEntity,
+        this.conversationEntity(),
+        mentionEntities
+      );
     }
   }
 
