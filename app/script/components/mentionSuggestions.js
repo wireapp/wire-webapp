@@ -52,9 +52,19 @@ z.components.MentionSuggestions = class MentionSuggestions {
         this.updatePosition();
       }
       this.isVisible(shouldBeVisible);
+      this.updateScrollPosition(this.selectedSuggestionIndex());
     });
 
     this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
+    this.shouldUpdateScrollbar.subscribe(() => {
+      z.util.afterRender(() => {
+        const item = document.querySelector('.mention-suggestion-list__item');
+        const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
+        if (item && wrapper) {
+          wrapper.style.width = `${item.offsetWidth}px`;
+        }
+      });
+    });
   }
 
   onInput(keyboardEvent) {
@@ -95,7 +105,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
     if (!suggestionList) {
       return;
     }
-    const selectedItem = suggestionList.querySelectorAll('.mention-suggestion-list__item')[selectedNumber];
+    const listItems = suggestionList.querySelectorAll('.mention-suggestion-list__item');
+    const selectedItem = listItems[listItems.length - 1 - selectedNumber];
     if (!selectedItem) {
       return;
     }
@@ -149,7 +160,7 @@ ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
     <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position()">
-      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions, as: 'suggestion'}, antiscroll: shouldUpdateScrollbar">
+      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion'}, antiscroll: shouldUpdateScrollbar">
         <div class="mention-suggestion-list__item" data-bind="click: $parent.onSuggestionClick, css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()}, attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === $parent.selectedSuggestion()}" data-uie-name="item-mention-suggestion">
           <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
           <div class="mention-suggestion-list__item__name" data-bind="text: suggestion.name()" data-uie-name="status-name"></div>
