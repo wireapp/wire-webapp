@@ -286,8 +286,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   editMessage(messageEntity, inputElement) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
+      messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
-      this.editMessageEntity().isEditing(true);
       this.currentMentions = messageEntity.get_first_asset().mentions();
       this.input(messageEntity.get_first_asset().text);
       if (inputElement) {
