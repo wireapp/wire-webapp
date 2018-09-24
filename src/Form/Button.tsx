@@ -29,7 +29,7 @@ interface ButtonProps extends TextProps {
   noCapital?: boolean;
 }
 
-type HTMLButtonProps = ButtonProps & React.HTMLAttributes<HTMLButtonElement>;
+type HTMLButtonProps = ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const darkenAmount = 0.06;
 const Button = styled<HTMLButtonProps>(Text.withComponent(styled.button<HTMLButtonProps>``))<HTMLButtonProps>`
