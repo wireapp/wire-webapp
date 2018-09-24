@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum NOTIFICATION_ACTION {
   NOTIFICATION_CHECK_HISTORY_START = 'NOTIFICATION_CHECK_HISTORY_START',
@@ -28,28 +28,43 @@ export enum NOTIFICATION_ACTION {
 }
 
 export type NotificationActions =
-  | typeof NotificationActionCreator.startCheckHistory & AppAction
-  | typeof NotificationActionCreator.successfulCheckHistory & AppAction
-  | typeof NotificationActionCreator.failedCheckHistory & AppAction
-  | typeof NotificationActionCreator.resetHistoryCheck & AppAction
-  ;
+  | HistoryCheckStartAction
+  | HistoryCheckSuccessAction
+  | HistoryCheckFailedAction
+  | HistoryCheckResetAction;
+
+export interface HistoryCheckStartAction extends AppAction {
+  readonly type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_START;
+}
+export interface HistoryCheckSuccessAction extends AppAction {
+  readonly payload: boolean;
+  readonly type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS;
+}
+export interface HistoryCheckFailedAction extends AppAction {
+  readonly type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_FAILED;
+  readonly error: any;
+}
+
+export interface HistoryCheckResetAction extends AppAction {
+  readonly type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET;
+}
 
 export class NotificationActionCreator {
-  static startCheckHistory = () => ({
+  static startCheckHistory = (): HistoryCheckStartAction => ({
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_START,
   });
 
-  static successfulCheckHistory = hasHistory => ({
+  static successfulCheckHistory = (hasHistory: boolean): HistoryCheckSuccessAction => ({
     payload: hasHistory,
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS,
   });
 
-  static failedCheckHistory = (error?: any) => ({
-    payload: error,
+  static failedCheckHistory = (error?: any): HistoryCheckFailedAction => ({
+    error,
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_FAILED,
   });
 
-  static resetHistoryCheck = () => ({
+  static resetHistoryCheck = (): HistoryCheckResetAction => ({
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET,
   });
 }

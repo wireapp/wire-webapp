@@ -17,19 +17,38 @@
  *
  */
 
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum LANGUAGE_ACTION {
-  SWITCH_LANGUAGE = 'SWITCH_LANGUAGE',
+  SWITCH_LANGUAGE_START = 'SWITCH_LANGUAGE_START',
+  SWITCH_LANGUAGE_SUCCESS = 'SWITCH_LANGUAGE_SUCCESS',
+  SWITCH_LANGUAGE_FAILED = 'SWITCH_LANGUAGE_FAILED',
 }
 
-export type LanguageActions =
-  | typeof LanguageActionCreator.switchLanguage & AppAction
-  ;
+export type LanguageActions = LanguageSwitchStartAction | LanguageSwitchSuccessAction | LanguageSwitchFailedAction;
+
+export interface LanguageSwitchStartAction extends AppAction {
+  readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_START;
+}
+export interface LanguageSwitchSuccessAction extends AppAction {
+  readonly payload: string;
+  readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS;
+}
+export interface LanguageSwitchFailedAction extends AppAction {
+  readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_FAILED;
+  readonly error: any;
+}
 
 export class LanguageActionCreator {
-  static switchLanguage = language => ({
+  static startSwitchLanguage = (): LanguageSwitchStartAction => ({
+    type: LANGUAGE_ACTION.SWITCH_LANGUAGE_START,
+  });
+  static successfulSwitchLanguage = (language: string): LanguageSwitchSuccessAction => ({
     payload: language,
-    type: LANGUAGE_ACTION.SWITCH_LANGUAGE,
+    type: LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS,
+  });
+  static failedSwitchLanguage = (error: Error): LanguageSwitchFailedAction => ({
+    error,
+    type: LANGUAGE_ACTION.SWITCH_LANGUAGE_FAILED,
   });
 }

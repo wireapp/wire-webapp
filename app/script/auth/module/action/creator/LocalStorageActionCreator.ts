@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum LOCAL_STORAGE_ACTION {
   LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START',
@@ -34,60 +34,92 @@ export enum LOCAL_STORAGE_ACTION {
 }
 
 export type LocalStorageActions =
-  | typeof LocalStorageActionCreator.startLocalStorageSet & AppAction
-  | typeof LocalStorageActionCreator.successfulLocalStorageSet & AppAction
-  | typeof LocalStorageActionCreator.failedLocalStorageSet & AppAction
-  | typeof LocalStorageActionCreator.startLocalStorageGet & AppAction
-  | typeof LocalStorageActionCreator.successfulLocalStorageGet & AppAction
-  | typeof LocalStorageActionCreator.failedLocalStorageGet & AppAction
-  | typeof LocalStorageActionCreator.startLocalStorageDelete & AppAction
-  | typeof LocalStorageActionCreator.successfulLocalStorageDelete & AppAction
-  | typeof LocalStorageActionCreator.failedLocalStorageDelete & AppAction
-  ;
+  | SetStartAction
+  | SetSuccessAction
+  | SetFailedAction
+  | GetStartAction
+  | GetSuccessAction
+  | GetFailedAction
+  | DeleteStartAction
+  | DeleteSuccessAction
+  | DeleteFailedAction;
+
+export interface SetStartAction extends AppAction {
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START;
+}
+export interface SetSuccessAction extends AppAction {
+  readonly payload: {key: string; value: string};
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS;
+}
+export interface SetFailedAction extends AppAction {
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED;
+  readonly error: any;
+}
+
+export interface GetStartAction extends AppAction {
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START;
+}
+export interface GetSuccessAction extends AppAction {
+  readonly payload: {key: string; value: string};
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS;
+}
+export interface GetFailedAction extends AppAction {
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED;
+  readonly error: any;
+}
+
+export interface DeleteStartAction extends AppAction {
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_START;
+}
+export interface DeleteSuccessAction extends AppAction {
+  readonly payload: {key: string};
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS;
+}
+export interface DeleteFailedAction extends AppAction {
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED;
+  readonly error: any;
+}
 
 export class LocalStorageActionCreator {
-  static startLocalStorageSet = (params?: any) => ({
-    params,
+  static startLocalStorageSet = (): SetStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START,
   });
 
-  static successfulLocalStorageSet = (key, value) => ({
+  static successfulLocalStorageSet = (key, value): SetSuccessAction => ({
     payload: {key, value},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
   });
 
-  static failedLocalStorageSet = (error?: any) => ({
-    payload: error,
+  static failedLocalStorageSet = (error?: any): SetFailedAction => ({
+    error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED,
   });
 
-  static startLocalStorageGet = (params?: any) => ({
-    params,
+  static startLocalStorageGet = (): GetStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START,
   });
 
-  static successfulLocalStorageGet = (key: string, value: string) => ({
+  static successfulLocalStorageGet = (key: string, value: string): GetSuccessAction => ({
     payload: {key, value},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
   });
 
-  static failedLocalStorageGet = (error?: any) => ({
-    payload: error,
+  static failedLocalStorageGet = (error?: any): GetFailedAction => ({
+    error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED,
   });
 
-  static startLocalStorageDelete = (params?: any) => ({
-    params,
+  static startLocalStorageDelete = (): DeleteStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_START,
   });
 
-  static successfulLocalStorageDelete = (key: string) => ({
+  static successfulLocalStorageDelete = (key: string): DeleteSuccessAction => ({
     payload: {key},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS,
   });
 
-  static failedLocalStorageDelete = (error?: any) => ({
-    payload: error,
+  static failedLocalStorageDelete = (error?: any): DeleteFailedAction => ({
+    error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED,
   });
 }

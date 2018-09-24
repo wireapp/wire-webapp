@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum COOKIE_ACTION {
   COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP',
@@ -38,72 +38,121 @@ export enum COOKIE_ACTION {
 }
 
 export type CookieActions =
-  | typeof CookieActionCreator.stopCookiePolling & AppAction
-  | typeof CookieActionCreator.startCookiePolling & AppAction
-  | typeof CookieActionCreator.failedCookiePolling & AppAction
-  | typeof CookieActionCreator.successfulGetCookie & AppAction
-  | typeof CookieActionCreator.failedGetCookie & AppAction
-  | typeof CookieActionCreator.startSetCookie & AppAction
-  | typeof CookieActionCreator.successfulSetCookie & AppAction
-  | typeof CookieActionCreator.failedSetCookie & AppAction
-  | typeof CookieActionCreator.startRemoveCookie & AppAction
-  | typeof CookieActionCreator.successfulRemoveCookie & AppAction
-  | typeof CookieActionCreator.failedRemoveCookie & AppAction
-  ;
+  | CookiePollingStartAction
+  | CookiePollingStopAction
+  | CookiePollingFailedAction
+  | CookieGetStartAction
+  | CookieGetSuccessAction
+  | CookieGetFailedAction
+  | CookieSetStartAction
+  | CookieSetSuccessAction
+  | CookieSetFailedAction
+  | CookieRemoveStartAction
+  | CookieRemoveSuccessAction
+  | CookieRemoveFailedAction;
+
+export interface CookiePollingStartAction extends AppAction {
+  readonly type: COOKIE_ACTION.COOKIE_POLLING_START;
+  readonly payload: {name: string; timerId: number};
+}
+export interface CookiePollingStopAction extends AppAction {
+  readonly type: COOKIE_ACTION.COOKIE_POLLING_STOP;
+  readonly payload: {name: string; timerId: number};
+}
+export interface CookiePollingFailedAction extends AppAction {
+  readonly type: COOKIE_ACTION.COOKIE_POLLING_FAILED;
+  readonly error: any;
+}
+
+export interface CookieGetStartAction extends AppAction {
+  readonly params: string;
+  readonly type: COOKIE_ACTION.COOKIE_GET_START;
+}
+export interface CookieGetSuccessAction extends AppAction {
+  payload: {cookie: string | object; name: string};
+  readonly type: COOKIE_ACTION.COOKIE_GET_SUCCESS;
+}
+export interface CookieGetFailedAction extends AppAction {
+  readonly type: COOKIE_ACTION.COOKIE_GET_FAILED;
+  readonly error: any;
+}
+
+export interface CookieSetStartAction extends AppAction {
+  readonly params: {cookie: string; name: string};
+  readonly type: COOKIE_ACTION.COOKIE_SET_START;
+}
+export interface CookieSetSuccessAction extends AppAction {
+  readonly payload: {cookie: string; name: string};
+  readonly type: COOKIE_ACTION.COOKIE_SET_SUCCESS;
+}
+export interface CookieSetFailedAction extends AppAction {
+  readonly type: COOKIE_ACTION.COOKIE_SET_FAILED;
+  readonly error: any;
+}
+
+export interface CookieRemoveStartAction extends AppAction {
+  readonly params: {cookie: string; name: string};
+  readonly type: COOKIE_ACTION.COOKIE_REMOVE_START;
+}
+export interface CookieRemoveSuccessAction extends AppAction {
+  readonly payload: {cookie: string; name: string};
+  readonly type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS;
+}
+export interface CookieRemoveFailedAction extends AppAction {
+  readonly type: COOKIE_ACTION.COOKIE_REMOVE_FAILED;
+  readonly error: any;
+}
 
 export class CookieActionCreator {
-  static stopCookiePolling = ({name, timerId}) => ({
-    payload: {name, timerId},
-    type: COOKIE_ACTION.COOKIE_POLLING_STOP,
-  });
-
-  static startCookiePolling = ({name, timerId}) => ({
+  static startCookiePolling = ({name, timerId}: {name: string; timerId: number}): CookiePollingStartAction => ({
     payload: {name, timerId},
     type: COOKIE_ACTION.COOKIE_POLLING_START,
   });
-
-  static failedCookiePolling = (error?: any) => ({
-    payload: error,
+  static stopCookiePolling = ({name, timerId}: {name: string; timerId: number}): CookiePollingStopAction => ({
+    payload: {name, timerId},
+    type: COOKIE_ACTION.COOKIE_POLLING_STOP,
+  });
+  static failedCookiePolling = (error: Error): CookiePollingFailedAction => ({
+    error,
     type: COOKIE_ACTION.COOKIE_POLLING_FAILED,
   });
 
-  static successfulGetCookie = ({cookie, name}) => ({
+  static startGetCookie = (name: string): CookieGetStartAction => ({
+    params: name,
+    type: COOKIE_ACTION.COOKIE_GET_START,
+  });
+  static successfulGetCookie = ({cookie, name}: {cookie: string | object; name: string}): CookieGetSuccessAction => ({
     payload: {cookie, name},
     type: COOKIE_ACTION.COOKIE_GET_SUCCESS,
   });
-
-  static failedGetCookie = (error?: any) => ({
-    payload: error,
+  static failedGetCookie = (error: Error): CookieGetFailedAction => ({
+    error,
     type: COOKIE_ACTION.COOKIE_GET_FAILED,
   });
 
-  static startSetCookie = ({cookie, name}) => ({
+  static startSetCookie = ({cookie, name}: {cookie: string; name: string}): CookieSetStartAction => ({
+    params: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_SET_START,
+  });
+  static successfulSetCookie = ({cookie, name}: {cookie: string; name: string}): CookieSetSuccessAction => ({
     payload: {cookie, name},
     type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
   });
-
-  static successfulSetCookie = ({cookie, name}: {cookie?: string; name: string}) => ({
-    payload: {cookie, name},
-    type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
-  });
-
-  static failedSetCookie = (error?: any) => ({
-    payload: error,
+  static failedSetCookie = (error: Error): CookieSetFailedAction => ({
+    error,
     type: COOKIE_ACTION.COOKIE_SET_FAILED,
   });
 
-  static startRemoveCookie = ({cookie, name}) => ({
+  static startRemoveCookie = ({cookie, name}: {cookie: string; name: string}): CookieRemoveStartAction => ({
+    params: {cookie, name},
+    type: COOKIE_ACTION.COOKIE_REMOVE_START,
+  });
+  static successfulRemoveCookie = ({cookie, name}: {cookie?: string; name: string}): CookieRemoveSuccessAction => ({
     payload: {cookie, name},
     type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS,
   });
-
-  static successfulRemoveCookie = (name: string) => ({
-    payload: {name},
-    type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS,
-  });
-
-  static failedRemoveCookie = (error?: any) => ({
-    payload: error,
+  static failedRemoveCookie = (error: Error): CookieRemoveFailedAction => ({
+    error,
     type: COOKIE_ACTION.COOKIE_REMOVE_FAILED,
   });
 }

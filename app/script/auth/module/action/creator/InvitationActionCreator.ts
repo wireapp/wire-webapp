@@ -26,48 +26,47 @@ export enum INVITATION_ACTION {
 }
 
 export type InvitationActions =
-  | ReturnType<typeof InvitationActionCreator.startAddInvite>
-  | ReturnType<typeof InvitationActionCreator.successfulAddInvite>
-  | ReturnType<typeof InvitationActionCreator.failedAddInvite>
-  | ReturnType<typeof InvitationActionCreator.resetError>
-  ;
+  | AddInviteStartAction
+  | AddInviteSuccessAction
+  | AddInviteFailedAction
+  | ResetInviteErrorAction;
 
-interface StartAddInvite {
+export interface AddInviteStartAction {
   type: INVITATION_ACTION.INVITE_ADD_START;
   params: any;
 }
 
-interface SuccessfulAddInvite {
+export interface AddInviteSuccessAction {
   type: INVITATION_ACTION.INVITE_ADD_SUCCESS;
-  payload: { invite: any };
+  payload: {invite: any};
 }
 
-interface FailedAddInvite {
+export interface AddInviteFailedAction {
   type: INVITATION_ACTION.INVITE_ADD_FAILED;
   payload: Error;
 }
 
-interface ResetError {
+export interface ResetInviteErrorAction {
   type: INVITATION_ACTION.INVITE_RESET_ERROR;
 }
 
 export class InvitationActionCreator {
-  static startAddInvite = (params?: any): StartAddInvite => ({
+  static startAddInvite = (params?: any): AddInviteStartAction => ({
     params,
     type: INVITATION_ACTION.INVITE_ADD_START,
   });
 
-  static successfulAddInvite = (invite: any): SuccessfulAddInvite => ({
+  static successfulAddInvite = (invite: any): AddInviteSuccessAction => ({
     payload: {invite},
     type: INVITATION_ACTION.INVITE_ADD_SUCCESS,
   });
 
-  static failedAddInvite = (error: Error): FailedAddInvite => ({
+  static failedAddInvite = (error: Error): AddInviteFailedAction => ({
     payload: error,
     type: INVITATION_ACTION.INVITE_ADD_FAILED,
   });
 
-  static resetError = (): ResetError => ({
+  static resetError = (): ResetInviteErrorAction => ({
     type: INVITATION_ACTION.INVITE_RESET_ERROR,
   });
 }
