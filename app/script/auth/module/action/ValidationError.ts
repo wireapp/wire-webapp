@@ -48,7 +48,7 @@ export default class ValidationError extends Error {
     return props;
   }
 
-  static handleValidationState(fieldName: string, validationState: ErrorTypes): ValidationError | null {
+  static handleValidationState(fieldName: string, validationState: ValidityState): ValidationError | null {
     const field = ValidationError.getFieldByName(fieldName);
     const validationStateKeys = ValidationError.getAllPropertyNames(validationState);
     for (const key of validationStateKeys) {
@@ -76,7 +76,7 @@ export default class ValidationError extends Error {
   static mapErrorsToField = (fieldName: string) => {
     return Object.entries(ValidationError.ERROR).reduce(
       (errors, [key, value]) => ({...errors, [key]: `${fieldName}-${value}`}),
-      ValidationError.ERROR,
+      ValidationError.ERROR
     );
   };
 
