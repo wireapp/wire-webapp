@@ -43,9 +43,15 @@ z.conversation.ConversationCellState = (() => {
       const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
       if (isSelfMentioned) {
         activities[ACTIVITY_TYPE.MENTION] += 1;
-        mentionText = conversationEntity.is_group()
-          ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
-          : messageEntity.get_first_asset().text;
+
+        if (!mentionText) {
+          const messageText = messageEntity.is_ephemeral()
+            ? z.l10n.text(z.string.conversationsSecondaryLineTimedMention)
+            : messageEntity.get_first_asset().text;
+          mentionText = conversationEntity.is_group()
+            ? `${messageEntity.unsafeSenderName()}: ${messageText}`
+            : messageText;
+        }
         return;
       }
 

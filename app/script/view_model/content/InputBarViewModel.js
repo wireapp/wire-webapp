@@ -74,9 +74,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.pingDisabled = ko.observable(false);
 
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
-    this.hasTextInput = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
-    });
+    this.hasTextInput = ko.pureComputed(() => this.input().length);
 
     this.input = ko.pureComputed({
       read: () => {
@@ -84,11 +82,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           return this.editInput();
         }
 
-        if (this.conversationEntity()) {
-          return this.conversationEntity().input() || '';
-        }
-
-        return '';
+        const textInput = this.conversationEntity() && this.conversationEntity().input().text;
+        return textInput || '';
       },
       write: value => {
         if (this.isEditing()) {
@@ -96,7 +91,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         if (this.conversationEntity()) {
-          this.conversationEntity().input(value);
+          const mentions = this.currentMentions;
+
+          this.conversationEntity().input({
+            mentions,
+            text: value,
+          });
         }
       },
     });
@@ -106,6 +106,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (!editedMention || !this.conversationEntity()) {
         return [];
       }
+
       const candidates = this.conversationEntity()
         .participating_user_ets()
         .filter(userEntity => !userEntity.isService && !userEntity.isTemporaryGuest());
@@ -113,8 +114,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput = ko.pureComputed(() => {
-      const input = this.input();
-
+      const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
       const pieces = this.currentMentions
         .slice()
         .reverse()
@@ -126,19 +126,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [input]
+          [this.input()]
         );
-      const mentionAttrs = ' class="input-mention" data-uie-name="item-input-mention"';
-      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttrs : ''}>${piece}</span>`).join('');
+
+      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttributes : ''}>${piece}</span>`).join('');
     });
 
     this.editedMention = ko.observable(undefined);
     this.currentMentions = [];
+    this.conversationEntity.subscribe(() => {
+      if (this.conversationEntity()) {
+        this.currentMentions = this.conversationEntity().input().mentions;
+      }
+    });
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
-
         const availabilityStrings = {
           [z.user.AvailabilityType.AVAILABLE]: z.string.tooltipConversationInputPlaceholderAvailable,
           [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAway,
@@ -166,11 +170,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return false;
     });
 
-    this.showGiphyButton = ko.pureComputed(() => {
-      if (this.conversationEntity() && this.hasTextInput()) {
-        return this.conversationEntity().input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
-      }
-    });
+    this.showGiphyButton = ko.pureComputed(() => this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH);
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
@@ -217,9 +217,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversationHasFocus(false));
-    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
-      window.requestAnimationFrame(() => this.conversationHasFocus(true))
-    );
+    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => {
+      window.requestAnimationFrame(() => this.conversationHasFocus(true));
+    });
   }
 
   addMention(userEntity, inputElement) {
@@ -351,8 +351,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
+    this.currentMentions.length = 0;
     this.input('');
-    this.currentMentions = [];
     $(event.target).focus();
   }
 
@@ -512,7 +512,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendGiphy() {
     if (this.conversationEntity()) {
-      this.conversationEntity().input('');
+      this.conversationEntity().input({mentions: [], text: ''});
     }
   }
 
