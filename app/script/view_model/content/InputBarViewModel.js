@@ -59,6 +59,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.logger = new z.util.Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.currentMentions = [];
     this.selfUser = this.userRepository.self;
 
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
@@ -80,7 +81,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.inputTextOnly = ko.pureComputed({
       read: () => this.input().text,
-      write: value => this.input({mentions: this.currentMentions, text: value}),
+      write: value => this.input(value),
     });
 
     this.input = ko.pureComputed({
@@ -92,21 +93,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         } else if (this.conversationEntity() && this.conversationEntity().input()) {
           inputObject = this.conversationEntity().input();
 
-          this.currentMentions = inputObject.mentions.map(
-            mention => new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId)
-          );
+          this.currentMentions = inputObject.mentions;
           this.updateSelectionState();
         }
 
         return inputObject;
       },
       write: value => {
+        const outputObject = {mentions: this.currentMentions, text: value};
+
         if (this.isEditing()) {
-          return this.editInput(value);
+          return this.editInput(outputObject);
         }
 
         if (this.conversationEntity()) {
-          this.conversationEntity().input(value);
+          this.conversationEntity().input(outputObject);
         }
       },
     });
@@ -143,7 +144,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.editedMention = ko.observable(undefined);
-    this.currentMentions = [];
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -245,10 +245,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .replace(/^ /, '');
 
     // insert the mention in between
-    this.input({
-      mentions: this.currentMentions,
-      text: `${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`,
-    });
+    this.input(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
 
     const caretPosition = mentionEntity.endIndex + 1;
     inputElement.selectionStart = caretPosition;
@@ -299,10 +296,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
-      this.input({
-        mentions: this.currentMentions,
-        text: this.editMessageEntity().get_first_asset().text,
-      });
+      this.input(this.editMessageEntity().get_first_asset().text);
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -368,8 +362,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.input({mentions: [], text: ''});
     this.currentMentions = [];
+    this.input('');
     $(event.target).focus();
   }
 
@@ -528,7 +522,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendGiphy() {
     if (this.conversationEntity()) {
-      this.conversationEntity().input({mentions: [], text: ''});
+      this.conversationEntity.currentMentions = [];
+      this.conversationEntity().input('');
     }
   }
 

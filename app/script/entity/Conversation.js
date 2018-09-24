@@ -43,7 +43,7 @@ z.entity.Conversation = class Conversation {
     const inputStorageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`;
     this.input = ko.observable(this._getStorageInputData(inputStorageKey));
     this.input.subscribe(({mentions, text}) => {
-      return z.util.StorageUtil.setValue(inputStorageKey, {mentions: mentions, text: text.trim()});
+      return z.util.StorageUtil.setValue(inputStorageKey, {mentions, text: text.trim()});
     });
 
     this.is_loaded = ko.observable(false);
@@ -520,6 +520,10 @@ z.entity.Conversation = class Conversation {
     if (typeof storageValue === 'string') {
       return {mentions: [], text: storageValue};
     }
+
+    storageValue.mentions = storageValue.mentions.map(mention => {
+      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+    });
 
     return storageValue;
   }

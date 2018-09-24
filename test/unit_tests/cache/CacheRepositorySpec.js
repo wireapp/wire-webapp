@@ -30,7 +30,7 @@ describe('z.cache.CacheRepository', () => {
       cache_repository.clearCache();
 
       const conversation = new z.entity.Conversation();
-      conversation.input({mentions: [], text: 'Hello World!'});
+      conversation.input('Hello World!');
 
       amplify.store(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
       amplify.store(TEMP_KEY, true);
