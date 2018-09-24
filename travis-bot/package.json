@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "@types/generate-changelog": "1.7.0",
-    "@types/node": "10.10.1",
+    "@types/node": "10.10.3",
     "@wireapp/core": "6.3.8",
     "generate-changelog": "1.7.1"
   },
