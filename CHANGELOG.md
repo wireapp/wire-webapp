@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="4.0.12"></a>
+## [4.0.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.11...@wireapp/react-ui-kit@4.0.12) (2018-09-24)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Checkbox types ([#1151](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1151)) ([422904e](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/422904e))
+
+
+
+
+
 <a name="4.0.11"></a>
 ## [4.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.10...@wireapp/react-ui-kit@4.0.11) (2018-09-24)
 
