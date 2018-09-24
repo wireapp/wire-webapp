@@ -22,7 +22,7 @@ import {NotificationActionCreator} from './creator/';
 
 export class NotificationAction {
   checkHistory = (): ThunkAction => {
-    return function(dispatch, getState, {core}) {
+    return (dispatch, getState, {core}) => {
       dispatch(NotificationActionCreator.startCheckHistory());
       return Promise.resolve()
         .then(() => core.service.notification.hasHistory())
@@ -37,7 +37,7 @@ export class NotificationAction {
   };
 
   resetHistoryCheck = (): ThunkAction => {
-    return function(dispatch) {
+    return dispatch => {
       return Promise.resolve().then(() => {
         dispatch(NotificationActionCreator.resetHistoryCheck());
       });
@@ -45,7 +45,7 @@ export class NotificationAction {
   };
 
   setLastEventDate = (lastEventDate): ThunkAction => {
-    return function(dispatch, getState, {core}) {
+    return (dispatch, getState, {core}) => {
       return Promise.resolve().then(() => {
         // TODO: Update call to private method once core v6 is inside!
         // eslint-disable-next-line dot-notation

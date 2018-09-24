@@ -28,7 +28,7 @@ import {ClientActionCreator} from './creator/';
 
 export class ClientAction {
   doGetAllClients = (): ThunkAction<Promise<RegisteredClient[]>> => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startGetAllClients());
       return Promise.resolve()
         .then(() => apiClient.client.api.getClients())
@@ -44,7 +44,7 @@ export class ClientAction {
   };
 
   doRemoveClient = (clientId, password): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startRemoveClient());
       return Promise.resolve()
         .then(() => apiClient.client.api.deleteClient(clientId, password))
@@ -59,7 +59,7 @@ export class ClientAction {
   };
 
   doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
-    return function(dispatch, getState, {core, actions: {clientAction, notificationAction}}) {
+    return (dispatch, getState, {core, actions: {clientAction, notificationAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
       return Promise.resolve()
         .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))

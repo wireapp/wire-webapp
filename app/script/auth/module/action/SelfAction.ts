@@ -24,7 +24,7 @@ import {SelfActionCreator} from './creator/';
 
 export class SelfAction {
   fetchSelf = (): ThunkAction<Promise<any>> => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startFetchSelf());
       return apiClient.self.api
         .getSelf()
@@ -44,7 +44,7 @@ export class SelfAction {
   };
 
   setHandle = (handle: string): ThunkAction => {
-    return function(dispatch, getState, {apiClient, actions: {selfAction}}) {
+    return (dispatch, getState, {apiClient, actions: {selfAction}}) => {
       dispatch(SelfActionCreator.startSetHandle());
       return apiClient.self.api
         .putHandle({handle: handle.trim().toLowerCase()})
@@ -60,7 +60,7 @@ export class SelfAction {
   };
 
   doGetConsents = (): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startGetConsents());
       return apiClient.self.api
         .getConsents()
@@ -75,7 +75,7 @@ export class SelfAction {
   };
 
   doSetConsent = (consentType: ConsentType, value: number): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startSetConsent());
       const consent = {
         source: `${APP_NAME} ${window.z.util.Environment.version(false)}`,

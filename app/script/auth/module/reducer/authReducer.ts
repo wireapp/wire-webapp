@@ -22,7 +22,7 @@ import {AppActions, USER_ACTION, AUTH_ACTION} from '../action/creator/';
 
 export type AuthState = {
   readonly account: {
-    accent_id: string;
+    accent_id: number;
     assets: any;
     email: string;
     email_code: string;

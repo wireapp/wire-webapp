@@ -29,7 +29,7 @@ export class CookieAction {
     interval = COOKIE_POLL_INTERVAL,
     asJSON = true
   ): ThunkAction => {
-    return function(dispatch, getState, {actions: {cookieAction}}) {
+    return (dispatch, getState, {actions: {cookieAction}}) => {
       return Promise.resolve()
         .then(() => dispatch(cookieAction.getCookie(name, asJSON)))
         .then(() => window.setInterval(() => dispatch(cookieAction.getCookie(name, asJSON)), interval))
@@ -43,7 +43,7 @@ export class CookieAction {
   };
 
   stopPolling = (name): ThunkAction => {
-    return function(dispatch, getState, {}) {
+    return (dispatch, getState, {}) => {
       return Promise.resolve()
         .then(() => {
           const timerId = getState().cookieState.cookieTimer[name];
@@ -59,7 +59,7 @@ export class CookieAction {
   };
 
   getCookie = (name, asJSON = false): ThunkAction => {
-    return function(dispatch, getState, {cookieStore}) {
+    return (dispatch, getState, {cookieStore}) => {
       return Promise.resolve(asJSON ? cookieStore.getJSON(name) : cookieStore.get(name))
         .then(cookie => {
           const previousCookie = CookieSelector.getCookies(getState())[name];
@@ -75,7 +75,7 @@ export class CookieAction {
   };
 
   safelyRemoveCookie = (name, value): ThunkAction => {
-    return function(dispatch, getState, {cookieStore}) {
+    return (dispatch, getState, {cookieStore}) => {
       return Promise.resolve()
         .then(() => {
           if (cookieStore.get(name).includes(value)) {
@@ -90,7 +90,7 @@ export class CookieAction {
   };
 
   removeCookie = (name): ThunkAction => {
-    return function(dispatch, getState, {cookieStore}) {
+    return (dispatch, getState, {cookieStore}) => {
       return Promise.resolve()
         .then(() => {
           cookieStore.remove(name);
@@ -103,7 +103,7 @@ export class CookieAction {
   };
 
   setCookie = (name, value): ThunkAction => {
-    return function(dispatch, getState, {cookieStore}) {
+    return (dispatch, getState, {cookieStore}) => {
       return Promise.resolve(cookieStore.set(name, value))
         .then(() => {
           dispatch(CookieActionCreator.successfulSetCookie({name}));
@@ -115,7 +115,7 @@ export class CookieAction {
   };
 
   setCookieIfAbsent = (name, value): ThunkAction => {
-    return function(dispatch, getState, {cookieStore}) {
+    return (dispatch, getState, {cookieStore}) => {
       return Promise.resolve()
         .then(() => {
           if (!cookieStore.get(name)) {

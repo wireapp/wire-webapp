@@ -27,7 +27,7 @@ import {RuntimeActionCreator} from './creator/';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
-    return function(dispatch) {
+    return dispatch => {
       const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
       const isPwaSupportedBrowser = Environment.onEnvironment({
         onProduction: false,
@@ -40,7 +40,7 @@ export class RuntimeAction {
   };
 
   checkIndexedDbSupport = (): ThunkAction<void> => {
-    return function(dispatch, getState, {actions: {runtimeAction}}) {
+    return (dispatch, getState, {actions: {runtimeAction}}) => {
       dispatch(RuntimeActionCreator.startCheckIndexedDb());
       runtimeAction
         .hasIndexedDbSupport()
@@ -54,7 +54,7 @@ export class RuntimeAction {
   };
 
   checkCookieSupport = (): ThunkAction<void> => {
-    return function(dispatch, getState, {actions: {runtimeAction}}) {
+    return (dispatch, getState, {actions: {runtimeAction}}) => {
       dispatch(RuntimeActionCreator.startCheckCookie());
       runtimeAction
         .hasCookieSupport()

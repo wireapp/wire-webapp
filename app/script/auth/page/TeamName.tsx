@@ -189,7 +189,7 @@ export default withRouter(
         teamName: AuthSelector.getAccountTeamName(state),
       }),
       (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
-        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.cookieAction.enterTeamCreationFlow(name)),
+        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
         pushAccountRegistrationData: (teamData: {team: {name: string}}) =>
           dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),

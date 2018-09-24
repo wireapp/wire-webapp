@@ -56,10 +56,10 @@ export class AuthAction {
     onBeforeLogin: LoginLifecycleFunction = () => {},
     onAfterLogin: LoginLifecycleFunction = () => {}
   ): ThunkAction => {
-    return function(dispatch, getState, global) {
+    return (dispatch, getState, global) => {
       const {
         core,
-        actions: {clientAction, cookieAction, selfAction},
+        actions: {clientAction, cookieAction, selfAction, localStorageAction},
       } = global;
 
       dispatch(AuthActionCreator.startLogin());
@@ -67,7 +67,7 @@ export class AuthAction {
       return Promise.resolve()
         .then(() => onBeforeLogin(dispatch, getState, global))
         .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
-        .then(() => this.persistAuthData(loginData.clientType, core, dispatch))
+        .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => onAfterLogin(dispatch, getState, global))
@@ -87,12 +87,16 @@ export class AuthAction {
   };
 
   doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
-    return function(dispatch, getState, {apiClient, core, actions: {cookieAction, clientAction, selfAction}}) {
+    return (
+      dispatch,
+      getState,
+      {apiClient, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
+    ) => {
       dispatch(AuthActionCreator.startLogin());
       return Promise.resolve()
         .then(() => apiClient.init(clientType))
         .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
@@ -111,7 +115,7 @@ export class AuthAction {
   };
 
   validateSSOCode = (code): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       const mapError = error => {
         const statusCode = error && error.response && error.response.status;
         if (statusCode === 404) {
@@ -148,7 +152,7 @@ export class AuthAction {
   };
 
   pushAccountRegistrationData = (registration): ThunkAction => {
-    return function(dispatch) {
+    return dispatch => {
       return Promise.resolve().then(() => {
         dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
       });
@@ -156,11 +160,11 @@ export class AuthAction {
   };
 
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
-    return function(
+    return (
       dispatch,
       getState,
       {apiClient, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
-    ) {
+    ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
@@ -198,11 +202,11 @@ export class AuthAction {
   };
 
   doRegisterPersonal = (registration: RegisterData): ThunkAction => {
-    return function(
+    return (
       dispatch,
       getState,
-      {apiClient, core, actions: {authAction, clientAction, cookieAction, selfAction}}
-    ) {
+      {apiClient, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}}
+    ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
@@ -215,7 +219,7 @@ export class AuthAction {
         .then(() => apiClient.register(registration, clientType))
         .then(newAccount => (createdAccount = newAccount))
         .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
@@ -234,11 +238,11 @@ export class AuthAction {
   };
 
   doRegisterWireless = (registrationData: RegisterData, options = {shouldInitializeClient: true}): ThunkAction => {
-    return function(
+    return (
       dispatch,
       getState,
-      {apiClient, core, actions: {authAction, cookieAction, clientAction, selfAction}}
-    ) {
+      {apiClient, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}}
+    ) => {
       const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
       registrationData.locale = currentLanguage();
       registrationData.name = registrationData.name.trim();
@@ -251,7 +255,7 @@ export class AuthAction {
         .then(() => apiClient.register(registrationData, clientType))
         .then(newAccount => (createdAccount = newAccount))
         .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch))
+        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)))
@@ -317,7 +321,7 @@ export class AuthAction {
   };
 
   validateLocalClient = (): ThunkAction => {
-    return function(dispatch, getState, {core}) {
+    return (dispatch, getState, {core}) => {
       dispatch(AuthActionCreator.startValidateLocalClient());
       return Promise.resolve()
         .then(() => core.loadAndValidateLocalClient())
@@ -332,7 +336,7 @@ export class AuthAction {
   };
 
   doLogout = (): ThunkAction => {
-    return function(dispatch, getState, {core, actions: {cookieAction, localStorageAction}}) {
+    return (dispatch, getState, {core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());
       return core
         .logout()
@@ -348,7 +352,7 @@ export class AuthAction {
   };
 
   doSilentLogout = (): ThunkAction => {
-    return function(dispatch, getState, {core, actions: {cookieAction, localStorageAction}}) {
+    return (dispatch, getState, {core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());
       return core
         .logout()
@@ -364,7 +368,7 @@ export class AuthAction {
   };
 
   getInvitationFromCode = (invitationCode: string): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startGetInvitationFromCode());
       return apiClient.invitation.api
         .getInvitationInfo(invitationCode)
@@ -375,6 +379,30 @@ export class AuthAction {
           dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
           throw error;
         });
+    };
+  };
+
+  enterPersonalCreationFlow = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.enterPersonalCreationFlow());
+    };
+  };
+
+  enterTeamCreationFlow = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.enterTeamCreationFlow());
+    };
+  };
+
+  enterGenericInviteCreationFlow = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.enterGenericInviteCreationFlow());
+    };
+  };
+
+  enterPersonalInvitationCreationFlow = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.enterPersonalInvitationCreationFlow());
     };
   };
 }

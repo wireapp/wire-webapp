@@ -23,7 +23,7 @@ import {ConversationActionCreator} from './creator/';
 
 export class ConversationAction {
   doCheckConversationCode = (key: string, code: string, uri?: string): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startConversationCodeCheck());
       return Promise.resolve()
         .then(() => apiClient.conversation.api.postConversationCodeCheck({code, key, uri}))
@@ -38,7 +38,7 @@ export class ConversationAction {
   };
 
   doJoinConversationByCode = (key: string, code: string, uri?: string): ThunkAction<Promise<ConversationEvent>> => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startJoinConversationByCode());
       return Promise.resolve()
         .then(() => apiClient.conversation.api.postJoinByCode({code, key, uri}))

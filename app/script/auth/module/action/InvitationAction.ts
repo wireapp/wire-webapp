@@ -26,7 +26,7 @@ import {InvitationActionCreator} from './creator/';
 
 export class InvitationAction {
   invite = (invitation: {email: string; locale: string; inviter_name: string}): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
       const inviteList = InviteSelector.getInvites(state);
@@ -57,7 +57,7 @@ export class InvitationAction {
     };
   };
   resetInviteErrors = (): ThunkAction => {
-    return function(dispatch, getState, {apiClient}) {
+    return (dispatch, getState, {apiClient}) => {
       return Promise.resolve().then(() => {
         dispatch(InvitationActionCreator.resetError());
       });
