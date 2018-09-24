@@ -40,7 +40,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
     this.selectedSuggestionIndex.subscribe(this.updateScrollPosition);
     this.selectedSuggestion = ko.pureComputed(() => this.suggestions()[this.selectedSuggestionIndex()]);
 
-    this.suggestions.subscribe(suggestions => {
+    this.suggestionSubscription = this.suggestions.subscribe(suggestions => {
       const shouldBeVisible = suggestions.length > 0;
       if (shouldBeVisible && !this.isVisible()) {
         this.initList();
@@ -138,6 +138,10 @@ z.components.MentionSuggestions = class MentionSuggestions {
     input.addEventListener('keydown', this.onInput, true);
     this.targetInput = input;
     return input;
+  }
+
+  dispose() {
+    this.suggestionSubscription.dispose();
   }
 };
 
