@@ -135,7 +135,10 @@ z.conversation.ConversationCellState = (() => {
           numberOfSelfMentions += 1;
         }
 
-        if (numberOfSelfMentions >= 2) {
+        const hasMultipleSelfMentions = numberOfSelfMentions >= 2;
+        const isAdditionalMessage = numberOfSelfMentions && !isSelfMentioned && messageEntity.is_content();
+        const showMentionSummary = hasMultipleSelfMentions || isAdditionalMessage;
+        if (showMentionSummary) {
           return true;
         }
 
