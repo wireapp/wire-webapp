@@ -75,7 +75,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
+      return this.conversationEntity() ? this.conversationEntity().input().text.length > 0 : false;
     });
 
     this.input = ko.pureComputed({
@@ -85,7 +85,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         if (this.conversationEntity()) {
-          return this.conversationEntity().input() || '';
+          return this.conversationEntity().input().text || '';
         }
 
         return '';
@@ -96,7 +96,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         if (this.conversationEntity()) {
-          this.conversationEntity().input(value);
+          const mentions = this.currentMentions;
+
+          this.conversationEntity().input({
+            mentions,
+            text: value,
+          });
         }
       },
     });
@@ -134,6 +139,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editedMention = ko.observable(undefined);
     this.currentMentions = [];
+    this.conversationEntity.subscribe(() => {
+      if (this.conversationEntity()) {
+        this.currentMentions = this.conversationEntity().input().mentions;
+      }
+    });
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -168,7 +178,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.showGiphyButton = ko.pureComputed(() => {
       if (this.conversationEntity() && this.hasTextInput()) {
-        return this.conversationEntity().input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
+        return this.conversationEntity().input().text.length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
       }
     });
 
@@ -351,8 +361,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
+    this.currentMentions.length = 0;
     this.input('');
-    this.currentMentions = [];
     $(event.target).focus();
   }
 
@@ -512,7 +522,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendGiphy() {
     if (this.conversationEntity()) {
-      this.conversationEntity().input('');
+      this.conversationEntity().input({mentions: [], text: ''});
     }
   }
 
