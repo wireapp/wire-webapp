@@ -68,6 +68,7 @@ import {AnyAction} from 'redux';
 import ROOT_ACTIONS from '../module/action/';
 
 declare global {
+  // https://github.com/Microsoft/TypeScript/issues/26728
   interface Navigator {
     // Only available in a secure context.
     readonly clipboard?: {
