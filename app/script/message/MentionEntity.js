@@ -22,7 +22,19 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-z.message.MentionEntity = class Mention {
+z.message.MentionEntity = class MentionEntity {
+  static get ERROR() {
+    return {
+      INVALID_LENGTH: 'Invalid mention: Invalid length',
+      INVALID_START_INDEX: 'Invalid mention: Invalid startIndex',
+      INVALID_USER_ID: 'Invalid mention: User ID is not a valid UUID',
+      MISSING_LENGTH: 'Invalid mention: Missing length',
+      MISSING_START_INDEX: 'Invalid mention: Missing startIndex',
+      MISSING_USER_ID: 'Invalid mention: Missing user ID',
+      OUT_OF_BOUNDS: 'Invalid mention: Length out of string boundary',
+    };
+  }
+
   constructor(startIndex, length, userId) {
     this.startIndex = startIndex;
     this.length = length;
@@ -43,16 +55,39 @@ z.message.MentionEntity = class Mention {
   }
 
   validate(messageText = '') {
-    if (!typeof this.startIndex === 'number' || !typeof this.length === 'number' || !typeof this.userId === 'string') {
-      throw new Error('Invalid mention: Missing property');
+    const startIndexIsNumber = typeof this.startIndex === 'number';
+    if (!startIndexIsNumber) {
+      throw new Error(MentionEntity.ERROR.MISSING_START_INDEX);
+    }
+
+    const lengthIsNumber = typeof this.length === 'number';
+    if (!lengthIsNumber) {
+      throw new Error(MentionEntity.ERROR.MISSING_LENGTH);
+    }
+
+    const userIdIsString = typeof this.userId === 'string';
+    if (!userIdIsString) {
+      throw new Error(MentionEntity.ERROR.MISSING_USER_ID);
     }
 
     const isValidStartIndex = this.startIndex >= 0;
+    if (!isValidStartIndex) {
+      throw new Error(MentionEntity.ERROR.INVALID_START_INDEX);
+    }
+
     const isValidLength = this.length >= 1;
+    if (!isValidLength) {
+      throw new Error(MentionEntity.ERROR.INVALID_LENGTH);
+    }
+
     const isValidEnd = messageText.length && this.endIndex <= messageText.length;
+    if (!isValidEnd) {
+      throw new Error(MentionEntity.ERROR.OUT_OF_BOUNDS);
+    }
+
     const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
-    if (!isValidStartIndex || !isValidLength || !isValidEnd || !isValidUserId) {
-      throw new Error('Invalid mention: Failed consistency check');
+    if (!isValidUserId) {
+      throw new Error(MentionEntity.ERROR.INVALID_USER_ID);
     }
 
     return true;
