@@ -124,29 +124,25 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match: conversationEntity => {
-      if (!conversationEntity.unreadEventsCount()) {
-        return false;
-      }
+      let numberOfSelfMentions = 0;
+      for (const messageEntity of conversationEntity.unreadEvents()) {
+        const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+        if (isSelfMentioned) {
+          numberOfSelfMentions += 1;
+        }
 
-      /**
-       * Move to single loop.
-       * - Filter for all alert types
-       * - check for length >= 2
-       * - otherwise check for some alert of type ping or missed call
-       */
+        if (numberOfSelfMentions >= 2) {
+          return true;
+        }
 
-      const numberOfSelfMentions = conversationEntity
-        .unreadEvents()
-        .filter(messageEntity => messageEntity.is_content() && messageEntity.isSelfMentioned()).length;
-
-      if (numberOfSelfMentions >= 2) {
-        return true;
-      }
-
-      return conversationEntity.unreadEvents().some(messageEntity => {
         const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-        return isMissedCall || messageEntity.is_ping();
-      });
+        const isAlert = isMissedCall || messageEntity.is_ping();
+        if (isAlert) {
+          return true;
+        }
+      }
+
+      return false;
     },
   };
 
