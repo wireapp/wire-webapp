@@ -43,7 +43,7 @@ describe('ConversationRepository', () => {
   };
 
   const _generate_conversation = (
-    conversation_type = z.conversation.ConversationType.REGULAR,
+    conversation_type = z.conversation.ConversationType.GROUP,
     connection_status = z.user.ConnectionStatus.ACCEPTED
   ) => {
     const conversation = new z.entity.Conversation(z.util.createRandomUuid());
@@ -109,7 +109,7 @@ describe('ConversationRepository', () => {
     let message_et = null;
 
     beforeEach(done => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       TestFactory.conversation_repository
         .save_conversation(conversation_et)
         .then(() => {
@@ -161,7 +161,7 @@ describe('ConversationRepository', () => {
 
   describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       spyOn(TestFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
@@ -310,23 +310,23 @@ describe('ConversationRepository', () => {
 
   describe('getGroupsByName', () => {
     beforeEach(done => {
-      const group_a = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_a = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_a.name('Web Dudes');
 
-      const group_b = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_b = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_b.name('René, Benny, Gregor, Lipis');
 
-      const group_c = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_c = _generate_conversation(z.conversation.ConversationType.GROUP);
       self_user_et = new z.entity.User();
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
-      const group_cleared = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
 
-      const group_removed = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
@@ -372,16 +372,16 @@ describe('ConversationRepository', () => {
 
   describe('get_number_of_pending_uploads', () => {
     it('should return number of pending uploads if there are pending uploads', () => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
@@ -483,7 +483,7 @@ describe('ConversationRepository', () => {
 
   describe('"_handleConversationEvent"', () => {
     it('detects events send by a user not in the conversation', () => {
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
       const event = {
         conversation: conversationEntity.id,
         from: z.util.createRandomUuid(),
@@ -783,7 +783,7 @@ describe('ConversationRepository', () => {
       let message_et = undefined;
 
       beforeEach(done => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
         TestFactory.conversation_repository
           .save_conversation(conversation_et)
           .then(() => {
@@ -911,7 +911,7 @@ describe('ConversationRepository', () => {
       let messageId = null;
 
       beforeEach(done => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
 
         TestFactory.conversation_repository
           .save_conversation(conversation_et)
@@ -1116,18 +1116,18 @@ describe('ConversationRepository', () => {
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);
 
-      const dudes = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const dudes = _generate_conversation(z.conversation.ConversationType.GROUP);
       dudes.name('Web Dudes');
       dudes.participating_user_ets.push(bob);
       dudes.participating_user_ets.push(john);
 
-      const gals = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const gals = _generate_conversation(z.conversation.ConversationType.GROUP);
       gals.name('Web Gals');
       gals.participating_user_ets.push(anne);
       gals.participating_user_ets.push(jane);
       gals.participating_user_ets.push(lara);
 
-      const mixed_group = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const mixed_group = _generate_conversation(z.conversation.ConversationType.GROUP);
       mixed_group.name('Web Dudes & Gals');
       mixed_group.participating_user_ets.push(anne);
       mixed_group.participating_user_ets.push(bob);
