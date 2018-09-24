@@ -293,7 +293,9 @@ z.util.renderMessage = (message, mentionEntities = []) => {
   const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
-    const elementAttributes = mentionData.isSelfMentioned ? '' : ` data-user-id="${mentionData.userId}"`;
+    const elementAttributes = mentionData.isSelfMentioned
+      ? ' data-uie-name="label-self-mention"'
+      : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
 
     const content = `<span class="mention-at-sign">@</span>${mentionData.text.replace(/^@/, '')}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
