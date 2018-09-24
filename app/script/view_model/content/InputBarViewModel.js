@@ -394,7 +394,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  handleMentions() {
+  handleMentionFlow() {
     const textarea = document.querySelector('#conversation-input-bar-text');
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
@@ -454,7 +454,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         lengthDifference
       );
     }
-    this.handleMentions();
+    this.handleMentionFlow();
   }
 
   detectMentionEdgeDeletion(textarea, lengthDifference) {
@@ -490,7 +490,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   onInputKeyUp(data, keyboardEvent) {
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
     if (keyboardEvent.key !== z.util.KeyboardUtil.KEY.ESC) {
-      this.handleMentions();
+      this.handleMentionFlow();
     }
   }
 
