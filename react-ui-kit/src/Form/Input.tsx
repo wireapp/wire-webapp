@@ -42,7 +42,7 @@ const invalidDot = `
 `;
 const base64Dot = Encoder.toBase64(invalidDot).asString;
 
-const Input = styled.input<InputProps & React.HTMLAttributes<HTMLInputElement>>`
+const Input = styled.input<InputProps & React.InputHTMLAttributes<HTMLInputElement>>`
   background: ${COLOR.WHITE};
   border-radius: 4px;
   border: none;
