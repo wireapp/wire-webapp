@@ -327,9 +327,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
             const code = this.extractCode(text);
             this.setState({code});
           } else if (shouldEmitError) {
-            const error = new Error();
-            error.label = BackendError.SSO_ERRORS.SSO_NO_SSO_CODE;
-            throw error;
+            throw new BackendError({code: 400, label: BackendError.SSO_ERRORS.SSO_NO_SSO_CODE});
           }
         })
         .catch(error => this.setState({ssoError: error}));
