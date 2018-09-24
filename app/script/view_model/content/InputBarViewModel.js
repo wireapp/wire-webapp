@@ -402,28 +402,28 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  handleMentions() {
+  handleMentionFlow() {
     const textarea = document.querySelector('#conversation-input-bar-text');
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
-    const text = value.substr(0, selectionEnd);
-    if (this.editedMention()) {
-      // we check that the user is currently typing something that looks like a mention
-      const editedMentionText = text.match(/@(\w*)$/);
-      if (!editedMentionText) {
-        this.endMentionFlow();
-      } else {
-        const searchTerm = editedMentionText[1];
-        const currentEditedMention = this.editedMention();
-        this.editedMention(Object.assign({}, currentEditedMention, {term: searchTerm}));
-      }
+    const textInSelection = value.substring(selectionStart, selectionEnd);
+    const wordBeforeSelection = value.substring(0, selectionStart).replace(/.*\s/, '');
+    const isSpaceSelected = /\s/.test(textInSelection);
+    const isOverMention =
+      this.findMentionAtPosition(selectionStart, this.currentMentions) ||
+      this.findMentionAtPosition(selectionEnd, this.currentMentions);
+    const isOverValidMentionString = /^@\w*$/.test(wordBeforeSelection);
+
+    if (!isSpaceSelected && !isOverMention && isOverValidMentionString) {
+      const wordAfterSelection = value.substring(selectionEnd).replace(/\s.*/, '');
+      const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
+      const start = selectionStart - wordBeforeSelection.length;
+      this.editedMention({start, term});
     } else {
-      const startFlowRegexp = /(^| )@$/;
-      if (startFlowRegexp.test(text)) {
-        this.editedMention({start: selectionStart - 1, term: ''});
-      }
-      this.updateSelectionState();
+      this.editedMention(undefined);
     }
+
+    this.updateSelectionState();
   }
 
   updateSelectionState() {
@@ -463,7 +463,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       );
       this.currentMentions(allMentions);
     }
-    this.handleMentions();
   }
 
   detectMentionEdgeDeletion(textarea, lengthDifference) {
@@ -498,7 +497,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   onInputKeyUp(data, keyboardEvent) {
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
-    this.updateSelectionState();
+    if (keyboardEvent.key !== z.util.KeyboardUtil.KEY.ESC) {
+      this.handleMentionFlow();
+    }
   }
 
   removedFromView() {

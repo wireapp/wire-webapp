@@ -30,19 +30,27 @@ z.conversation.ConversationCellState = (() => {
     PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
   };
 
-  const _accumulateActivity = conversationEntity => {
+  const _accumulateSummary = (conversationEntity, prioritizeSelfMention) => {
     const activities = {
       [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.PING]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
     };
+    let mentionText = undefined;
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
-      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-      if (messageEntity.is_content() && messageEntity.isSelfMentioned()) {
+      const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+      if (isSelfMentioned) {
         activities[ACTIVITY_TYPE.MENTION] += 1;
-      } else if (isMissedCall) {
+        mentionText = conversationEntity.is_group()
+          ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
+          : messageEntity.get_first_asset().text;
+        return;
+      }
+
+      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+      if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
@@ -51,10 +59,17 @@ z.conversation.ConversationCellState = (() => {
       }
     });
 
-    return _generateActivityString(activities);
+    if (prioritizeSelfMention && activities[ACTIVITY_TYPE.MENTION] === 1) {
+      const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+      if (numberOfAlerts === 1) {
+        return mentionText;
+      }
+    }
+
+    return _generateSummaryDescription(activities);
   };
 
-  const _generateActivityString = activities => {
+  const _generateSummaryDescription = activities => {
     return Object.entries(activities)
       .map(([activity, activityCount]) => {
         if (activityCount) {
@@ -102,7 +117,7 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateAlert = {
-    description: conversationEntity => _accumulateActivity(conversationEntity),
+    description: conversationEntity => _accumulateSummary(conversationEntity, true),
     icon: conversationEntity => {
       const hasSelfMention = conversationEntity
         .unreadEvents()
@@ -124,8 +139,11 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match: conversationEntity => {
-      const hasUnreadEvents = conversationEntity.unreadEventsCount() > 0;
-      return hasUnreadEvents && conversationEntity.unreadEvents().some(_isAlert);
+      return conversationEntity.unreadEvents().some(messageEntity => {
+        const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+        const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+        return isSelfMentioned || isMissedCall || messageEntity.is_ping();
+      });
     },
   };
 
@@ -224,7 +242,7 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateMuted = {
-    description: conversationEntity => _accumulateActivity(conversationEntity),
+    description: conversationEntity => _accumulateSummary(conversationEntity, false),
     icon: () => z.conversation.ConversationStatusIcon.MUTED,
     match: conversationEntity => conversationEntity.is_muted(),
   };
@@ -308,12 +326,6 @@ z.conversation.ConversationCellState = (() => {
 
       return conversationEntity.is_request() || isEmpty1to1Conversation;
     },
-  };
-
-  const _isAlert = messageEntity => {
-    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
-    const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-    return isSelfMentioned || isMissedCall || messageEntity.is_ping();
   };
 
   return {

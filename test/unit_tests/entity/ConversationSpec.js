@@ -58,7 +58,7 @@ describe('Conversation', () => {
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(conversation_et.is_group()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
@@ -86,21 +86,21 @@ describe('Conversation', () => {
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(conversation_et.is_group()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(conversation_et.is_group()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(conversation_et.is_group()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
@@ -447,7 +447,7 @@ describe('Conversation', () => {
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       const expected_display_name = `${conversation_et
         .participating_user_ets()[0]
         .first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
@@ -455,13 +455,13 @@ describe('Conversation', () => {
     });
 
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(conversation_et.display_name()).toBe(z.string.conversationsEmptyConversation);
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
       const user = new z.entity.User(z.util.createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.type(z.conversation.ConversationType.GROUP);
       conversation_et.participating_user_ids.push(other_user.id);
       conversation_et.participating_user_ids.push(user.id);
 
@@ -567,7 +567,46 @@ describe('Conversation', () => {
     });
   });
 
-  describe('isWithService', () =>
+  describe('hasGuest', () => {
+    it('detects conversations with guest', () => {
+      conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
+      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      selfUserEntity.is_me = true;
+      selfUserEntity.inTeam(true);
+      conversation_et.self = selfUserEntity;
+
+      // Is false for conversations not containing a guest
+      const userEntity = new z.entity.User(z.util.createRandomUuid());
+      conversation_et.participating_user_ets.push(userEntity);
+
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.hasGuest()).toBe(false);
+
+      conversation_et.type(z.conversation.ConversationType.GROUP);
+      expect(conversation_et.hasGuest()).toBe(false);
+
+      // Is true for group conversations containing a guest
+      const secondUserEntity = new z.entity.User(z.util.createRandomUuid());
+      secondUserEntity.isGuest(true);
+      conversation_et.participating_user_ets.push(secondUserEntity);
+
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.hasGuest()).toBe(false);
+
+      conversation_et.type(z.conversation.ConversationType.GROUP);
+      expect(conversation_et.hasGuest()).toBe(true);
+
+      // Is false for conversations containing a guest if the self user is a personal account
+      conversation_et.self.inTeam(false);
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.hasGuest()).toBe(false);
+
+      conversation_et.type(z.conversation.ConversationType.GROUP);
+      expect(conversation_et.hasGuest()).toBe(false);
+    });
+  });
+
+  describe('hasService', () => {
     it('detects conversations with services', () => {
       const userEntity = new z.entity.User(z.util.createRandomUuid());
 
@@ -575,21 +614,22 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.isWithService()).toBe(false);
+      expect(conversation_et.hasService()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.isWithService()).toBe(false);
+      expect(conversation_et.hasService()).toBe(false);
 
       const secondUserEntity = new z.entity.User(z.util.createRandomUuid());
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.isWithService()).toBe(true);
+      expect(conversation_et.hasService()).toBe(true);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.isWithService()).toBe(true);
-    }));
+      expect(conversation_et.hasService()).toBe(true);
+    });
+  });
 
   describe('messages_visible', () => {
     it('should return no messages if conversation ID is empty', () => {
