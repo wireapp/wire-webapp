@@ -42,11 +42,8 @@ import {
   COLOR,
   IsMobile,
 } from '@wireapp/react-ui-kit';
-import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ClientAction from '../module/action/ClientAction';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import * as ConversationAction from '../module/action/ConversationAction';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import * as URLUtil from '../util/urlUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';

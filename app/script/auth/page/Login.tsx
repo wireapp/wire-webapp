@@ -61,7 +61,6 @@ import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter, RouteComponentProps} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {RootState, Api} from '../module/reducer';
