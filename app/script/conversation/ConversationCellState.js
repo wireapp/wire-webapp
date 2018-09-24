@@ -30,18 +30,22 @@ z.conversation.ConversationCellState = (() => {
     PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
   };
 
-  const _accumulateSummary = conversationEntity => {
+  const _accumulateSummary = (conversationEntity, prioritizeSelfMention) => {
     const activities = {
       [ACTIVITY_TYPE.MENTION]: 0,
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.PING]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
     };
+    let mentionText = undefined;
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
       const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
       if (isSelfMentioned) {
         activities[ACTIVITY_TYPE.MENTION] += 1;
+        mentionText = conversationEntity.is_group()
+          ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
+          : messageEntity.get_first_asset().text;
         return;
       }
 
@@ -54,6 +58,14 @@ z.conversation.ConversationCellState = (() => {
         activities[ACTIVITY_TYPE.MESSAGE] += 1;
       }
     });
+
+    const hasOneSelfMention = activities[ACTIVITY_TYPE.MENTION] === 1;
+    if (prioritizeSelfMention && hasOneSelfMention) {
+      const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+      if (numberOfAlerts === 1) {
+        return mentionText;
+      }
+    }
 
     return _generateSummaryDescription(activities);
   };
@@ -106,7 +118,7 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateAlert = {
-    description: conversationEntity => _accumulateSummary(conversationEntity),
+    description: conversationEntity => _accumulateSummary(conversationEntity, true),
     icon: conversationEntity => {
       const hasSelfMention = conversationEntity
         .unreadEvents()
@@ -128,21 +140,11 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match: conversationEntity => {
-      for (const messageEntity of conversationEntity.unreadEvents()) {
+      return conversationEntity.unreadEvents().some(messageEntity => {
         const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
-        const hasMultipleMessages = isSelfMentioned && conversationEntity.unreadEvents().length >= 2;
-        if (hasMultipleMessages) {
-          return true;
-        }
-
         const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-        const isAlert = isMissedCall || messageEntity.is_ping();
-        if (isAlert) {
-          return true;
-        }
-      }
-
-      return false;
+        return isSelfMentioned || isMissedCall || messageEntity.is_ping();
+      });
     },
   };
 
@@ -241,7 +243,7 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateMuted = {
-    description: conversationEntity => _accumulateSummary(conversationEntity),
+    description: conversationEntity => _accumulateSummary(conversationEntity, false),
     icon: () => z.conversation.ConversationStatusIcon.MUTED,
     match: conversationEntity => conversationEntity.is_muted(),
   };
@@ -303,15 +305,7 @@ z.conversation.ConversationCellState = (() => {
         }
       }
     },
-    icon: conversationEntity => {
-      const hasSelfMention = conversationEntity.unreadEvents().some(messageEntity => {
-        return messageEntity.is_content() && messageEntity.isSelfMentioned();
-      });
-
-      return hasSelfMention
-        ? z.conversation.ConversationStatusIcon.UNREAD_MENTION
-        : z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
-    },
+    icon: () => z.conversation.ConversationStatusIcon.UNREAD_MESSAGES,
     match: conversationEntity => conversationEntity.unreadEventsCount() > 0,
   };
 
