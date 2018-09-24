@@ -404,7 +404,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const isOverMention =
       this.findMentionAtPosition(selectionStart, this.currentMentions) ||
       this.findMentionAtPosition(selectionEnd, this.currentMentions);
-    const isOverValidMentionString = /^@\w*$/.test(wordBeforeSelection);
+    const isOverValidMentionString = /^@\S*$/.test(wordBeforeSelection);
 
     if (!isSpaceSelected && !isOverMention && isOverValidMentionString) {
       const wordAfterSelection = value.substring(selectionEnd).replace(/\s.*/, '');
