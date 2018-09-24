@@ -56,15 +56,15 @@ z.components.MentionSuggestions = class MentionSuggestions {
     });
 
     this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
-    this.shouldUpdateScrollbar.subscribe(() =>
+    this.shouldUpdateScrollbar.subscribe(() => {
       z.util.afterRender(() => {
         const item = document.querySelector('.mention-suggestion-list__item');
         const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
         if (item && wrapper) {
           wrapper.style.width = `${item.offsetWidth}px`;
         }
-      })
-    );
+      });
+    });
   }
 
   onInput(keyboardEvent) {
