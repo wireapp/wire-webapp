@@ -19,11 +19,16 @@
 
 import {Link, Small, Logo, Header, Footer, Content, CloseIcon} from '@wireapp/react-ui-kit';
 import {footerStrings, cookiePolicyStrings} from '../../strings';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import * as React from 'react';
 
-export const WirelessContainer = ({
+export interface Props {
+  showCookiePolicyBanner?: boolean;
+  onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
   showCookiePolicyBanner,
   onCookiePolicyBannerClose,
   children,

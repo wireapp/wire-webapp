@@ -77,7 +77,7 @@ class CreatePersonalAccount extends React.PureComponent<
       return this.props.enterGenericInviteCreationFlow();
     }
 
-    this.props.enterPersonalCreationFlow();
+    return this.props.enterPersonalCreationFlow();
   }
 
   createAccount = () => {

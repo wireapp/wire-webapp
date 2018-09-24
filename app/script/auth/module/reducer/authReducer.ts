@@ -34,6 +34,7 @@ export type AuthState = {
     phone: string;
     phone_code: string;
     team: any;
+    termsAccepted: boolean;
   };
   readonly currentFlow: string;
   readonly error: Error;
@@ -56,6 +57,7 @@ export const initialState: AuthState = {
     phone: null,
     phone_code: null,
     team: null,
+    termsAccepted: false,
   },
   currentFlow: null,
   error: null,

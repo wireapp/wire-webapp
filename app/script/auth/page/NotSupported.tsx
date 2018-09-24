@@ -17,7 +17,6 @@
  *
  */
 
-import {getLanguage} from '../module/selector/LanguageSelector';
 import * as React from 'react';
 import {Paragraph, Text, Logo, ContainerXS} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';

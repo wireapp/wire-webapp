@@ -22,13 +22,22 @@ import {unsupportedJoinStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {isMobileOs} from '../Runtime';
 import * as React from 'react';
+import {RootState} from '../module/reducer';
 
-export const WirelessUnsupportedBrowser = ({children, isSupportedBrowser, intl: {formatMessage: _}}) =>
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  isSupportedBrowser: boolean;
+}
+
+export const WirelessUnsupportedBrowser: React.SFC<Props & InjectedIntlProps> = ({
+  children,
+  isSupportedBrowser,
+  intl: {formatMessage: _},
+}) =>
   isSupportedBrowser ? (
-    children
+    <React.Fragment>{children}</React.Fragment>
   ) : (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto 0'}}>
@@ -49,7 +58,7 @@ export const WirelessUnsupportedBrowser = ({children, isSupportedBrowser, intl: 
   );
 
 export default injectIntl(
-  connect(state => ({
+  connect((state: RootState) => ({
     isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
   }))(WirelessUnsupportedBrowser)
 );

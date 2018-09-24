@@ -22,10 +22,16 @@ import {unsupportedStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import * as React from 'react';
+import {RootState} from '../module/reducer';
 
-const showUnsupportedMessage = (headline, subhead) => (
+interface UnsupportedProps {
+  headline: any;
+  subhead: any;
+}
+
+const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) => (
   <ContainerXS verticalCenter centerText>
     <Logo height={20} />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
@@ -37,7 +43,16 @@ const showUnsupportedMessage = (headline, subhead) => (
   </ContainerXS>
 );
 
-export const UnsupportedBrowser = ({
+export interface Props {}
+
+interface ConnectedProps {
+  hasCookieSupport: boolean;
+  hasIndexedDbSupport: boolean;
+  isCheckingSupport: boolean;
+  isSupportedBrowser: boolean;
+}
+
+export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
@@ -68,18 +83,25 @@ export const UnsupportedBrowser = ({
   }
 
   if (!hasCookieSupport) {
-    return showUnsupportedMessage(unsupportedStrings.headlineCookies, unsupportedStrings.subheadCookies);
+    return (
+      <UnsupportedMessage headline={unsupportedStrings.headlineCookies} subhead={unsupportedStrings.subheadCookies} />
+    );
   }
 
   if (!hasIndexedDbSupport) {
-    return showUnsupportedMessage(unsupportedStrings.headlineIndexedDb, unsupportedStrings.subheadIndexedDb);
+    return (
+      <UnsupportedMessage
+        headline={unsupportedStrings.headlineIndexedDb}
+        subhead={unsupportedStrings.subheadIndexedDb}
+      />
+    );
   }
 
-  return children;
+  return <React.Fragment>{children}</React.Fragment>;
 };
 
 export default injectIntl(
-  connect(state => ({
+  connect((state: RootState) => ({
     hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
     hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
     isCheckingSupport: RuntimeSelector.isChecking(state),

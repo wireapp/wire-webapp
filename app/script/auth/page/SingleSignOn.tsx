@@ -246,7 +246,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     event.preventDefault();
     this.props.resetAuthError();
     if (this.props.isFetching) {
-      return;
+      return undefined;
     }
     this.inputs.code.value = this.inputs.code.value.trim();
     const validationErrors = [];
@@ -268,6 +268,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
         if (isDesktopApp()) {
           return this.props.validateSSOCode(this.stripPrefix(this.state.code));
         }
+        return undefined;
       })
       .then(() => this.handleSSOWindow(this.stripPrefix(this.state.code)))
       .then(() => {

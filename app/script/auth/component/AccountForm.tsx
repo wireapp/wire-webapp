@@ -40,7 +40,21 @@ interface Props extends React.HTMLAttributes<AccountForm> {
 }
 
 interface ConnectedProps {
-  account: {};
+  account: {
+    accent_id: number;
+    assets: any;
+    email: string;
+    email_code: string;
+    invitation_code: string;
+    label: string;
+    locale: string;
+    name: string;
+    password: string;
+    phone: string;
+    phone_code: string;
+    team: any;
+    termsAccepted: boolean;
+  };
   authError: Error;
   isFetching: boolean;
   isPersonalFlow: boolean;
@@ -129,6 +143,7 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
         if (!isPersonalInvitation) {
           return this.props.doSendActivationCode(this.state.email);
         }
+        return undefined;
       })
       .then(() => this.props.onSubmit())
       .catch(error => {

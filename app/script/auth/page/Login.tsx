@@ -48,10 +48,7 @@ import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ConversationAction from '../module/action/ConversationAction';
-import * as ClientAction from '../module/action/ClientAction';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings, logoutReasonStrings} from '../../strings';
@@ -67,7 +64,7 @@ import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import ROOT_ACTIONS from '../module/action/';
-import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 
 interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
 
@@ -170,7 +167,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
     if (immediateLogin) {
       return this.immediateLogin();
     }
-    this.readAndUpdateParamsFromUrl(this.props);
+    return this.readAndUpdateParamsFromUrl(this.props);
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
@@ -198,7 +195,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
   handleSubmit = event => {
     event.preventDefault();
     if (this.props.isFetching) {
-      return;
+      return undefined;
     }
     this.inputs.email.value = this.inputs.email.value.trim();
     const validationErrors = [];

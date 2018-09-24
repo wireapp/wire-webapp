@@ -18,12 +18,17 @@
  */
 
 import * as React from 'react';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link, H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '@wireapp/react-ui-kit';
 
-const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
+export interface Props {
+  onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
   <Modal>
     <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
       <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">

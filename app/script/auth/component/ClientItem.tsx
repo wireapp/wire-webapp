@@ -35,9 +35,29 @@ import {
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import ValidationError from '../module/action/ValidationError';
 import {clientItemStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
-class ClientItem extends React.Component {
+export interface Props {
+  selected: boolean;
+  onClick: Function;
+  isFetching: boolean;
+  client: RegisteredClient;
+  clientError: Error;
+  onClientRemoval: (password: string) => void;
+}
+
+interface State {
+  animationStep: number;
+  isAnimating: boolean;
+  password: string;
+  validPassword: boolean;
+  validationError: Error;
+}
+
+class ClientItem extends React.Component<Props & InjectedIntlProps, State> {
+  private passwordInput: HTMLInputElement;
+
   static CONFIG = {
     animationSteps: 8,
   };
@@ -120,7 +140,7 @@ class ClientItem extends React.Component {
   handleSubmit = event => {
     event.preventDefault();
     if (this.props.isFetching) {
-      return;
+      return undefined;
     }
     let validationError = null;
     if (!this.passwordInput.checkValidity()) {
@@ -194,8 +214,8 @@ class ClientItem extends React.Component {
                     innerRef={node => (this.passwordInput = node)}
                     value={password}
                     autoComplete="section-login password"
-                    maxLength="1024"
-                    minLength="8"
+                    maxLength={1024}
+                    minLength={8}
                     pattern=".{8,1024}"
                     required
                     style={{background: 'transparent'}}

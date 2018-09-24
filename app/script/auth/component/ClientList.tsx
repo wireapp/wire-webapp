@@ -18,31 +18,50 @@
  */
 
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import * as React from 'react';
-import * as ClientAction from '../module/action/ClientAction';
-import {resetError} from '../module/action/creator/ClientActionCreator';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import ClientItem from './ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
 import {ROUTE} from '../route';
 import BackendError from '../module/action/BackendError';
-import {withRouter} from 'react-router';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
+import {withRouter, RouteComponentProps} from 'react-router';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {pathWithParams} from '../util/urlUtil';
 import EXTERNAL_ROUTE from '../externalRoute';
+import {RootState, Api} from '../module/reducer';
+import ROOT_ACTIONS from '../module/action/';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
-class ClientList extends React.Component {
+export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
+
+interface ConnectedProps {
+  clientError: Error;
+  isFetching: boolean;
+  permanentClients: RegisteredClient[];
+}
+
+interface DispatchProps {
+  resetAuthError: () => Promise<void>;
+  doRemoveClient: (clientId: string, password: string) => Promise<void>;
+  getLocalStorage: (key: string) => Promise<string | boolean | number>;
+  doInitializeClient: (clientType: ClientType, password?: string) => Promise<void>;
+}
+
+interface State {
+  currentlySelectedClient: number;
+  showLoading: boolean;
+  loadingTimeoutId: number;
+}
+
+class ClientList extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   state = {
     currentlySelectedClient: null,
     showLoading: false,
+    loadingTimeoutId: undefined,
   };
-
-  constructor(props) {
-    super(props);
-    this.loadingTimeout = 0;
-  }
 
   componentWillUnmount() {
     this.resetLoadingSpinner();
@@ -52,12 +71,11 @@ class ClientList extends React.Component {
     const isSelectedClient = this.state.currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
     this.setState({...this.state, currentlySelectedClient: clientId});
-    this.props.resetError();
+    this.props.resetAuthError();
   };
 
   removeClient = (clientId, password) => {
-    this.setState({showLoading: true});
-    this.loadingTimeout = window.setTimeout(this.resetLoadingSpinner.bind(this), 1000);
+    this.setState({showLoading: true, loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner.bind(this), 1000)});
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
       .then(() => {
@@ -73,8 +91,10 @@ class ClientList extends React.Component {
   };
 
   resetLoadingSpinner() {
-    window.clearTimeout(this.loadingTimeout);
-    this.setState({showLoading: false});
+    if (this.state.loadingTimeoutId) {
+      window.clearTimeout(this.state.loadingTimeoutId);
+    }
+    this.setState({showLoading: false, loadingTimeoutId: undefined});
   }
 
   isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
@@ -99,7 +119,7 @@ class ClientList extends React.Component {
             selected={this.isSelectedClient(client.id)}
             client={client}
             clientError={this.isSelectedClient(client.id) && this.props.clientError}
-            onClick={event => this.setSelectedClient(client.id)}
+            onClick={() => this.setSelectedClient(client.id)}
             onClientRemoval={password => this.removeClient(client.id, password)}
           />
         ))}
@@ -111,12 +131,19 @@ class ClientList extends React.Component {
 export default withRouter(
   injectIntl(
     connect(
-      state => ({
+      (state: RootState) => ({
         clientError: ClientSelector.getError(state),
         isFetching: ClientSelector.isFetching(state),
         permanentClients: ClientSelector.getPermanentClients(state),
       }),
-      {...ClientAction, ...LocalStorageAction, resetError}
+      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+        doRemoveClient: (clientId: string, password: string) =>
+          dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
+        getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
+        doInitializeClient: (clientType: ClientType, password?: string) =>
+          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
+      })
     )(ClientList)
   )
 );

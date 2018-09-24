@@ -24,6 +24,7 @@ import * as React from 'react';
 import {ROUTE} from '../route';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
+import {RootState} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   hasAccountData?: boolean;
@@ -68,7 +69,7 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
 };
 
-export default connect(state => ({
+export default connect((state: RootState) => ({
   account: AuthSelector.getAccount(state),
   currentFlow: AuthSelector.getCurrentFlow(state),
   isStateAuthenticated: AuthSelector.isAuthenticated(state),

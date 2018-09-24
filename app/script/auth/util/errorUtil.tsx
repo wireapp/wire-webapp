@@ -29,6 +29,7 @@ export function parseError(error) {
     }
     return <FormattedHTMLMessage {...errorHandlerStrings.unexpected} values={error} />;
   }
+  return null;
 }
 
 export function parseValidationErrors(errors) {

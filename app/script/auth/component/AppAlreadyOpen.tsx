@@ -19,14 +19,28 @@
 
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {injectIntl} from 'react-intl';
+import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {appAlreadyOpenStrings} from '../../strings';
-import * as CookieAction from '../module/action/CookieAction';
 import {H3, Button, Container, Columns, Column, Modal, Text} from '@wireapp/react-ui-kit';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {COOKIE_NAME_APP_OPENED} from '../module/selector/CookieSelector';
+import {RootState, Api} from '../module/reducer';
+import ROOT_ACTIONS from '../module/action/';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
-class AppAlreadyOpen extends React.Component {
+export interface Props {
+  fullscreen?: boolean;
+}
+interface ConnectedProps {
+  isAppAlreadyOpen: boolean;
+}
+
+interface DispatchProps {
+  removeCookie: (name: string) => Promise<void>;
+}
+
+class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
   onContinue = () => {
     this.props.removeCookie(COOKIE_NAME_APP_OPENED);
   };
@@ -41,7 +55,7 @@ class AppAlreadyOpen extends React.Component {
       isAppAlreadyOpen && (
         <Modal fullscreen={fullscreen}>
           <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
-            <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="status-modal-title">
+            <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
               {_(appAlreadyOpenStrings.headline)}
             </H3>
             <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
@@ -61,9 +75,11 @@ class AppAlreadyOpen extends React.Component {
 
 export default injectIntl(
   connect(
-    state => ({
+    (state: RootState) => ({
       isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
     }),
-    {...CookieAction}
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
+    })
   )(AppAlreadyOpen)
 );
