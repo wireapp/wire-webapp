@@ -67,6 +67,16 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import ROOT_ACTIONS from '../module/action/';
 
+declare global {
+  interface Navigator {
+    // Only available in a secure context.
+    readonly clipboard?: {
+      writeText(text: string): Promise<void>;
+      readText(): Promise<string>;
+    };
+  }
+}
+
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
@@ -325,7 +335,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     }
   };
 
-  readFromClipboard = () => navigator.clipboard.readText();
+  readFromClipboard = () => window.navigator.clipboard.readText();
 
   containsSSOCode = text => text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
