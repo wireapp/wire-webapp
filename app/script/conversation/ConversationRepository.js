@@ -3397,8 +3397,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        const isSelfUserPing = messageEntity.user().is_me && messageEntity.is_ping();
-        const deleteForSelf = isSelfUserPing || conversationEntity.removed_from_conversation();
+        const isPingFromSelf = messageEntity.user().is_me && messageEntity.is_ping();
+        const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
           return this.deleteMessage(conversationEntity, messageEntity);
         }
