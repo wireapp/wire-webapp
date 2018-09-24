@@ -59,8 +59,7 @@ z.conversation.ConversationCellState = (() => {
       }
     });
 
-    const hasOneSelfMention = activities[ACTIVITY_TYPE.MENTION] === 1;
-    if (prioritizeSelfMention && hasOneSelfMention) {
+    if (prioritizeSelfMention && activities[ACTIVITY_TYPE.MENTION] === 1) {
       const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
       if (numberOfAlerts === 1) {
         return mentionText;
