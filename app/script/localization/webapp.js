@@ -458,6 +458,7 @@ z.string.conversationsSecondaryLinePersonAdded = '{{user}} was added';
 z.string.conversationsSecondaryLinePersonAddedSelf = '{{user}} joined';
 z.string.conversationsSecondaryLinePersonAddedYou = '{{user}} added you';
 z.string.conversationsSecondaryLineRenamed = '{{user}} renamed conversation';
+z.string.conversationsSecondaryLineTimedMention = 'Mentioned you';
 z.string.conversationsSecondaryLineTimedMessage = 'Timed message';
 z.string.conversationsSecondaryLineYouLeft = 'You left';
 z.string.conversationsSecondaryLineYouWereRemoved = 'You were removed';
