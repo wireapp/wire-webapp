@@ -44,7 +44,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   constructor(conversationMapper, eventService, eventListeners) {
     super();
 
-    const defaultEventListeners = {onMessageTimeout: () => {}};
+    const defaultEventListeners = {onMessageTimeout: z.util.noop};
     this.eventListeners = Object.assign({}, defaultEventListeners, eventListeners);
     this.eventService = eventService;
 
