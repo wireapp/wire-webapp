@@ -34,7 +34,7 @@ import {ThunkDispatch} from 'redux-thunk';
 import ROOT_ACTIONS from '../module/action/';
 
 interface Props extends React.HTMLAttributes<AccountForm> {
-  beforeSubmit: () => Promise<void>;
+  beforeSubmit?: () => Promise<void>;
   onSubmit: () => any;
   submitText?: string;
 }
@@ -73,7 +73,7 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
     password?: HTMLInputElement;
   } = {};
 
-  state: State = {
+  state = {
     accent_id: AccentColor.random().id,
     email: this.props.account.email || '',
     name: this.props.account.name || '',

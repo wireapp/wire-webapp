@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum RUNTIME_ACTION {
   RUNTIME_CHECK_INDEXEDDB_START = 'RUNTIME_CHECK_INDEXEDDB_START',
@@ -28,33 +28,51 @@ export enum RUNTIME_ACTION {
 }
 
 export type RuntimeActions =
-  | typeof RuntimeActionCreator.startCheckIndexedDb & AppAction
-  | typeof RuntimeActionCreator.finishCheckIndexedDb & AppAction
-  | typeof RuntimeActionCreator.startCheckCookie & AppAction
-  | typeof RuntimeActionCreator.finishCheckCookie & AppAction
-  | typeof RuntimeActionCreator.confirmSupportedBrowser & AppAction
-  ;
+  | CheckIndexedDBStartAction
+  | CheckIndexedDBSuccessAction
+  | CheckCookieStartAction
+  | CheckCookieSuccessAction
+  | ConfirmSupportedBrowserAction;
+
+export interface CheckIndexedDBStartAction extends AppAction {
+  readonly type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_START;
+}
+export interface CheckIndexedDBSuccessAction extends AppAction {
+  readonly payload: boolean;
+  readonly type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_FINISH;
+}
+export interface CheckCookieStartAction extends AppAction {
+  readonly type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_START;
+}
+export interface CheckCookieSuccessAction extends AppAction {
+  readonly payload: boolean;
+  readonly type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_FINISH;
+}
+
+export interface ConfirmSupportedBrowserAction extends AppAction {
+  readonly type: RUNTIME_ACTION.RUNTIME_CONFIRM_SUPPORTED_BROWSER;
+}
 
 export class RuntimeActionCreator {
-  static startCheckIndexedDb = () => ({
+  static startCheckIndexedDb = (): CheckIndexedDBStartAction => ({
     type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_START,
   });
 
-  static finishCheckIndexedDb = (result: boolean) => ({
+  static finishCheckIndexedDb = (result: boolean): CheckIndexedDBSuccessAction => ({
     payload: result,
     type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_FINISH,
   });
 
-  static startCheckCookie = () => ({
+  static startCheckCookie = (): CheckCookieStartAction => ({
     type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_START,
   });
 
-  static finishCheckCookie = (result: boolean) => ({
+  static finishCheckCookie = (result: boolean): CheckCookieSuccessAction => ({
     payload: result,
     type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_FINISH,
   });
 
-  static confirmSupportedBrowser = () => ({
+  static confirmSupportedBrowser = (): ConfirmSupportedBrowserAction => ({
     type: RUNTIME_ACTION.RUNTIME_CONFIRM_SUPPORTED_BROWSER,
   });
 }

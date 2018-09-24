@@ -18,7 +18,7 @@
  */
 
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum SELF_ACTION {
   CONSENT_GET_START = 'CONSENT_GET_START',
@@ -39,78 +39,128 @@ export enum SELF_ACTION {
 }
 
 export type SelfActions =
-  | typeof SelfActionCreator.startSetHandle & AppAction
-  | typeof SelfActionCreator.successfulSetHandle & AppAction
-  | typeof SelfActionCreator.failedSetHandle & AppAction
-  | typeof SelfActionCreator.startFetchSelf & AppAction
-  | typeof SelfActionCreator.successfulFetchSelf & AppAction
-  | typeof SelfActionCreator.failedFetchSelf & AppAction
-  | typeof SelfActionCreator.startGetConsents & AppAction
-  | typeof SelfActionCreator.successfulGetConsents & AppAction
-  | typeof SelfActionCreator.failedGetConsents & AppAction
-  | typeof SelfActionCreator.startSetConsent & AppAction
-  | typeof SelfActionCreator.successfulSetConsent & AppAction
-  | typeof SelfActionCreator.failedSetConsent & AppAction
-  ;
+  | FetchSelfStartAction
+  | FetchSelfSuccessAction
+  | FetchSelfFailedAction
+  | SetHandleStartAction
+  | SetHandleSuccessAction
+  | SetHandleFailedAction
+  | GetConsentsStartAction
+  | GetConsentsSuccessAction
+  | GetConsentsFailedAction
+  | SetConsentStartAction
+  | SetConsentSuccessAction
+  | SetConsentFailedAction;
+
+export interface SetHandleStartAction extends AppAction {
+  readonly params: any;
+  readonly type: SELF_ACTION.HANDLE_SET_START;
+}
+export interface SetHandleSuccessAction extends AppAction {
+  readonly payload: Self;
+  readonly type: SELF_ACTION.HANDLE_SET_SUCCESS;
+}
+export interface SetHandleFailedAction extends AppAction {
+  readonly type: SELF_ACTION.HANDLE_SET_FAILED;
+  readonly error: any;
+}
+export interface FetchSelfStartAction extends AppAction {
+  readonly params: any;
+  readonly type: SELF_ACTION.SELF_FETCH_START;
+}
+export interface FetchSelfSuccessAction extends AppAction {
+  readonly payload: Self;
+  readonly type: SELF_ACTION.SELF_FETCH_SUCCESS;
+}
+export interface FetchSelfFailedAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_FETCH_FAILED;
+  readonly error: any;
+}
+
+export interface GetConsentsStartAction extends AppAction {
+  readonly params: any;
+  readonly type: SELF_ACTION.CONSENT_GET_START;
+}
+export interface GetConsentsSuccessAction extends AppAction {
+  readonly payload: any[];
+  readonly type: SELF_ACTION.CONSENT_GET_SUCCESS;
+}
+export interface GetConsentsFailedAction extends AppAction {
+  readonly type: SELF_ACTION.CONSENT_GET_FAILED;
+  readonly error: any;
+}
+
+export interface SetConsentStartAction extends AppAction {
+  readonly params: any;
+  readonly type: SELF_ACTION.CONSENT_SET_START;
+}
+export interface SetConsentSuccessAction extends AppAction {
+  readonly payload: any;
+  readonly type: SELF_ACTION.CONSENT_SET_SUCCESS;
+}
+export interface SetConsentFailedAction extends AppAction {
+  readonly type: SELF_ACTION.CONSENT_SET_FAILED;
+  readonly error: any;
+}
 
 export class SelfActionCreator {
-  static startSetHandle = (params?: any) => ({
+  static startSetHandle = (params?: any): SetHandleStartAction => ({
     params,
     type: SELF_ACTION.HANDLE_SET_START,
   });
 
-  static successfulSetHandle = (selfUser: Self) => ({
+  static successfulSetHandle = (selfUser: Self): SetHandleSuccessAction => ({
     payload: selfUser,
     type: SELF_ACTION.HANDLE_SET_SUCCESS,
   });
 
-  static failedSetHandle = (error?: any) => ({
-    payload: error,
+  static failedSetHandle = (error?: any): SetHandleFailedAction => ({
+    error,
     type: SELF_ACTION.HANDLE_SET_FAILED,
   });
 
-  static startFetchSelf = (params?: any) => ({
+  static startFetchSelf = (params?: any): FetchSelfStartAction => ({
     params,
     type: SELF_ACTION.SELF_FETCH_START,
   });
 
-  static successfulFetchSelf = (selfUser: Self) => ({
+  static successfulFetchSelf = (selfUser: Self): FetchSelfSuccessAction => ({
     payload: selfUser,
     type: SELF_ACTION.SELF_FETCH_SUCCESS,
   });
 
-  static failedFetchSelf = (error?: any) => ({
-    payload: error,
+  static failedFetchSelf = (error?: any): FetchSelfFailedAction => ({
+    error,
     type: SELF_ACTION.SELF_FETCH_FAILED,
   });
 
-  static startGetConsents = (params?: any) => ({
+  static startGetConsents = (params?: any): GetConsentsStartAction => ({
     params,
     type: SELF_ACTION.CONSENT_GET_START,
   });
 
-  static successfulGetConsents = consents => ({
+  static successfulGetConsents = (consents: any[]): GetConsentsSuccessAction => ({
     payload: consents,
     type: SELF_ACTION.CONSENT_GET_SUCCESS,
   });
 
-  static failedGetConsents = (error?: any) => ({
-    payload: error,
+  static failedGetConsents = (error?: any): GetConsentsFailedAction => ({
+    error,
     type: SELF_ACTION.CONSENT_GET_FAILED,
   });
 
-  static startSetConsent = (params?: any) => ({
+  static startSetConsent = (params?: any): SetConsentStartAction => ({
     params,
     type: SELF_ACTION.CONSENT_SET_START,
   });
 
-  static successfulSetConsent = consent => ({
+  static successfulSetConsent = (consent: any): SetConsentSuccessAction => ({
     payload: consent,
     type: SELF_ACTION.CONSENT_SET_SUCCESS,
   });
 
-  static failedSetConsent = (error?: any) => ({
-    payload: error,
+  static failedSetConsent = (error?: any): SetConsentFailedAction => ({
+    error,
     type: SELF_ACTION.CONSENT_SET_FAILED,
   });
 }
