@@ -454,7 +454,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         lengthDifference
       );
     }
-    this.handleMentionFlow();
   }
 
   detectMentionEdgeDeletion(textarea, lengthDifference) {
