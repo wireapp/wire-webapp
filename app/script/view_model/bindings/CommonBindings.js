@@ -553,7 +553,7 @@ ko.bindingHandlers.clickOrDrag = {
       if (isDragging && !isMoved) {
         const diffX = Math.abs(startX - screenX);
         const diffY = Math.abs(startY - screenY);
-        if (diffX > 0 || diffY > 0) {
+        if (diffX > 1 || diffY > 1) {
           isMoved = true;
         }
       }

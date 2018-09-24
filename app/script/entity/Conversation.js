@@ -65,12 +65,12 @@ z.entity.Conversation = class Conversation {
     this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.is_group = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
     this.is_one2one = ko.pureComputed(() => {
@@ -81,7 +81,8 @@ z.entity.Conversation = class Conversation {
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
-      return this.is_group() && this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      return hasGuestUser && this.is_group() && this.self.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
@@ -643,14 +644,6 @@ z.entity.Conversation = class Conversation {
   getUsersWithUnverifiedClients() {
     const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
-  }
-
-  /**
-   * Check whether the conversation is held with a service.
-   * @returns {boolean} True, if conversation with a service
-   */
-  isWithService() {
-    return this.participating_user_ets().some(userEntity => userEntity.isService);
   }
 
   supportsVideoCall(isCreatingUser = false) {

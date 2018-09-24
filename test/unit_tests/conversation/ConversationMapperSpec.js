@@ -55,7 +55,7 @@ describe('Conversation Mapper', () => {
       expect(conversation_et.name()).toBe(conversation.name);
       expect(conversation_et.getNumberOfParticipants()).toBe(conversation.members.others.length + 1);
       expect(conversation_et.team_id).toEqual(conversation.team);
-      expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.type()).toBe(z.conversation.ConversationType.GROUP);
     });
 
     it('maps multiple conversations', () => {
