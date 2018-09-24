@@ -20,20 +20,60 @@
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
 import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit';
-import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as UserAction from '../module/action/UserAction';
 import ValidationError from '../module/action/ValidationError';
 import * as React from 'react';
 import EXTERNAL_ROUTE from '../externalRoute';
 import BackendError from '../module/action/BackendError';
 import * as AccentColor from '../util/AccentColor';
+import {RootState, Api} from '../module/reducer';
+import {AnyAction} from 'redux';
+import {ThunkDispatch} from 'redux-thunk';
+import ROOT_ACTIONS from '../module/action/';
 
-class AccountForm extends React.PureComponent {
-  inputs = {};
-  state = {
+interface Props extends React.HTMLAttributes<AccountForm> {
+  beforeSubmit: () => Promise<void>;
+  onSubmit: () => any;
+  submitText?: string;
+}
+
+interface ConnectedProps {
+  account: {};
+  authError: Error;
+  isFetching: boolean;
+  isPersonalFlow: boolean;
+  isPersonalInvitationFlow: boolean;
+}
+
+interface DispatchProps {
+  doSendActivationCode: (email: string) => Promise<void>;
+  pushAccountRegistrationData: (registrationData: any) => Promise<void>;
+}
+
+interface State {
+  accent_id: number;
+  email: string;
+  name: string;
+  password: string;
+  termsAccepted: boolean;
+  validInputs: {
+    email: boolean;
+    name: boolean;
+    password: boolean;
+  };
+  validationErrors: any[];
+}
+
+class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+  private inputs: {
+    name?: HTMLInputElement;
+    email?: HTMLInputElement;
+    password?: HTMLInputElement;
+  } = {};
+
+  state: State = {
     accent_id: AccentColor.random().id,
     email: this.props.account.email || '',
     name: this.props.account.name || '',
@@ -230,13 +270,17 @@ class AccountForm extends React.PureComponent {
 
 export default injectIntl(
   connect(
-    state => ({
+    (state: RootState) => ({
       account: AuthSelector.getAccount(state),
       authError: AuthSelector.getError(state),
       isFetching: AuthSelector.isFetching(state),
       isPersonalFlow: AuthSelector.isPersonalFlow(state),
       isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
     }),
-    {...AuthAction, ...UserAction}
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
+      pushAccountRegistrationData: registrationData =>
+        dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
+    })
   )(AccountForm)
 );
