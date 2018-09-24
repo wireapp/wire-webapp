@@ -140,7 +140,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editedMention = ko.observable(undefined);
     this.currentMentions = ko.observableArray();
     this.conversationEntity.subscribe(() => {
-      this.currentMentions(this.conversationEntity().input().mentions);
+      if (this.conversationEntity()) {
+        this.currentMentions(this.conversationEntity().input().mentions);
+      }
     });
 
     this.inputPlaceholder = ko.pureComputed(() => {
