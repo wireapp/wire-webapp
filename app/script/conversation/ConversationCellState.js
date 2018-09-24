@@ -128,17 +128,10 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match: conversationEntity => {
-      let numberOfSelfMentions = 0;
       for (const messageEntity of conversationEntity.unreadEvents()) {
         const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
-        if (isSelfMentioned) {
-          numberOfSelfMentions += 1;
-        }
-
-        const hasMultipleSelfMentions = numberOfSelfMentions >= 2;
-        const isAdditionalMessage = numberOfSelfMentions && !isSelfMentioned && messageEntity.is_content();
-        const showMentionSummary = hasMultipleSelfMentions || isAdditionalMessage;
-        if (showMentionSummary) {
+        const hasMultipleMessages = isSelfMentioned && conversationEntity.unreadEvents().length >= 2;
+        if (hasMultipleMessages) {
           return true;
         }
 
