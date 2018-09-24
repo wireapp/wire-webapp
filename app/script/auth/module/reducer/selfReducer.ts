@@ -50,7 +50,7 @@ export function selfReducer(state: SelfState = initialState, action: AppActions)
     case SELF_ACTION.SELF_FETCH_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
       };
     }

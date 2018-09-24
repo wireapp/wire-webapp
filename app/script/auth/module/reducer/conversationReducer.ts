@@ -45,7 +45,7 @@ export function conversationReducer(state: ConversationState = initialState, act
     case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
       };
     }

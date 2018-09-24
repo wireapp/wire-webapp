@@ -43,7 +43,7 @@ export interface AddInviteSuccessAction {
 
 export interface AddInviteFailedAction {
   type: INVITATION_ACTION.INVITE_ADD_FAILED;
-  payload: Error;
+  error: Error;
 }
 
 export interface ResetInviteErrorAction {
@@ -62,7 +62,7 @@ export class InvitationActionCreator {
   });
 
   static failedAddInvite = (error: Error): AddInviteFailedAction => ({
-    payload: error,
+    error,
     type: INVITATION_ACTION.INVITE_ADD_FAILED,
   });
 

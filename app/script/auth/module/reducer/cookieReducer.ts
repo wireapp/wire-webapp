@@ -63,7 +63,7 @@ export function cookieReducer(state: CookieState = initialState, action: AppActi
     case COOKIE_ACTION.COOKIE_POLLING_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
       };
     }
     case COOKIE_ACTION.COOKIE_GET_START: {
@@ -88,7 +88,7 @@ export function cookieReducer(state: CookieState = initialState, action: AppActi
     case COOKIE_ACTION.COOKIE_GET_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
       };
     }

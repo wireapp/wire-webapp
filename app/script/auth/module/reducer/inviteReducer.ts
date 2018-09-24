@@ -49,7 +49,7 @@ export function invitationReducer(state: InvitationState = initialState, action:
     case INVITATION_ACTION.INVITE_ADD_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
       };
     }

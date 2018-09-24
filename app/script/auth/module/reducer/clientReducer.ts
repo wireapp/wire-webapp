@@ -60,7 +60,7 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
     case CLIENT_ACTION.CLIENTS_FETCH_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
       };
     }
@@ -81,7 +81,7 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
     case CLIENT_ACTION.CLIENT_REMOVE_FAILED: {
       return {
         ...state,
-        error: action.payload,
+        error: action.error,
         fetching: false,
       };
     }

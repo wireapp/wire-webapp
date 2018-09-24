@@ -289,7 +289,7 @@ export class AuthActionCreator {
   });
 
   static failedValidateLocalClient = (error: any) => ({
-    payload: error,
+    error,
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
   });
 
@@ -354,7 +354,7 @@ export class AuthActionCreator {
   });
 
   static failedGetInvitationFromCode = (error: any) => ({
-    payload: error,
+    error,
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED,
   });
 }
