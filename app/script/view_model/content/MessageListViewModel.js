@@ -615,10 +615,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (!hasMentions) {
       return;
     }
-    const mentionElement = event.target.classList.contains('message-mention')
-      ? event.target
-      : event.target.closest('.message-mention');
-    if (hasMentions && mentionElement) {
+    const mentionElement = event.target.closest('.message-mention');
+    if (mentionElement) {
       const userId = mentionElement.dataset.userId;
       const userEntity = this.conversation()
         .participating_user_ets()
