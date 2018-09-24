@@ -299,7 +299,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       };
       const mergedConversation = Object.assign({}, localConversation || {id}, updates);
 
-      const isGroup = type === z.conversation.ConversationType.REGULAR;
+      const isGroup = type === z.conversation.ConversationType.GROUP;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
         mergedConversation.others = members.others
