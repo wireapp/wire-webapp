@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="4.0.11"></a>
+## [4.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.10...@wireapp/react-ui-kit@4.0.11) (2018-09-24)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Button and Input types ([#1150](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1150)) ([e3055b1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e3055b1))
+
+
+
+
+
 <a name="4.0.10"></a>
 ## [4.0.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.9...@wireapp/react-ui-kit@4.0.10) (2018-09-19)
 
