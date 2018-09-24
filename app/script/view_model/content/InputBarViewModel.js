@@ -91,11 +91,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           inputObject = this.editInput();
         } else if (this.conversationEntity() && this.conversationEntity().input()) {
           inputObject = this.conversationEntity().input();
-        }
 
-        this.currentMentions = inputObject.mentions.map(
-          mention => new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId)
-        );
+          this.currentMentions = inputObject.mentions.map(
+            mention => new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId)
+          );
+          this.updateSelectionState();
+        }
 
         return inputObject;
       },
