@@ -286,10 +286,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
-      this.currentMentions = this.editMessageEntity()
-        .get_first_asset()
-        .mentions();
-      this.input(this.editMessageEntity().get_first_asset().text);
+      this.currentMentions = messageEntity.get_first_asset().mentions();
+      this.input(messageEntity.get_first_asset().text);
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
