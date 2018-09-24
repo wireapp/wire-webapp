@@ -175,11 +175,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.pastedFile(null);
       this.cancelMessageEditing();
       if (this.conversationEntity()) {
-        const mentions = this.conversationEntity().input().mentions;
-        this.currentMentions = mentions;
-        if (this.currentMentions.length) {
-          this.input(`${this.input()} `);
-        }
+        this.currentMentions = this.conversationEntity().input().mentions;
       }
     });
 
