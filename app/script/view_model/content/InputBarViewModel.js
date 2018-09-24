@@ -359,8 +359,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.input('');
     this.currentMentions.removeAll();
+    this.input('');
     $(event.target).focus();
   }
 
