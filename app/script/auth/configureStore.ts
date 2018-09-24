@@ -25,13 +25,13 @@ import thunk, {ThunkDispatch} from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import * as Environment from './Environment';
 
-export const configureStore = (thunkArguments = {}) => {
+const configureStore = (thunkArguments = {}) => {
   const store = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
 
   if (process.env.NODE_ENV !== 'production') {
     if (module.hot) {
-      module.hot.accept('./module/reducer/index.js', () => {
-        store.replaceReducer(combineReducers(require('./module/reducer/index.js').default));
+      module.hot.accept('./module/reducer/index.ts', () => {
+        store.replaceReducer(combineReducers(require('./module/reducer/index.ts').default));
       });
     }
   }
@@ -73,8 +73,8 @@ const createMiddleware = thunkArguments => {
       })
     );
   }
-  const composeEnhancers = process.env.NODE_ENV !== 'production' ? composeWithDevTools : compose;
+  const composeEnhancers = process.env.NODE_ENV !== 'production' ? composeWithDevTools : <any>compose;
   return composeEnhancers(applyMiddleware(...middlewares));
 };
 
-export default configureStore;
+export {configureStore};

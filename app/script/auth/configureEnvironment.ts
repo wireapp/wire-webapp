@@ -54,4 +54,4 @@ window.$ = jQuery;
 // Expose wire object in global namespace to satisfy wrapper check
 const configureEnvironment = () => (window.wire = {});
 
-export default configureEnvironment;
+export {configureEnvironment};

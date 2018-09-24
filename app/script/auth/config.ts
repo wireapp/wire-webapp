@@ -19,6 +19,12 @@
 
 import UUID from 'uuid/v4';
 
+declare global {
+  interface Window {
+    VERSION: string;
+  }
+}
+
 export const APP_NAME = 'Webapp';
 export const VERSION = window.VERSION || '0.0.0';
 export const APP_INSTANCE_ID = UUID();

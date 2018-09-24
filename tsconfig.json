@@ -4,12 +4,13 @@
     "downlevelIteration": true,
     "jsx": "react",
     "lib": ["dom", "es2017"],
+    "moduleResolution": "node",
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "outDir": "app/script/auth",
     "rootDir": "app/script/auth",
     "sourceMap": true,
-    "target": "ES5"
+    "target": "ES6"
   },
   "exclude": ["node_modules"]
 }

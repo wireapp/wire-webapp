@@ -22,10 +22,10 @@
 import 'core-js/modules/web.immediate';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
-import configureStore from './configureStore';
-import configureClient from './configureClient';
-import configureCore from './configureCore';
-import configureEnvironment from './configureEnvironment';
+import {configureStore} from './configureStore';
+import {configureClient} from './configureClient';
+import {configureCore} from './configureCore';
+import {configureEnvironment} from './configureEnvironment';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Root from './page/Root';

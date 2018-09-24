@@ -82,7 +82,7 @@ module.exports = {
   },
   plugins: [new webpack.IgnorePlugin(/^.\/locale$/, /moment$/)],
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     modules: [path.resolve(srcScript), 'node_modules'],
   },
 };

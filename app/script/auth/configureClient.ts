@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {IndexedDBEngine} from '@wireapp/store-engine';
 import {BACKEND} from './Environment';
 
-export const configureClient = () => {
+const configureClient = () => {
   return new APIClient({
     schemaCallback: db => {
       const databaseSchemata = window.z.storage.StorageSchemata.SCHEMATA;
@@ -40,4 +40,4 @@ export const configureClient = () => {
   });
 };
 
-export default configureClient;
+export {configureClient};
