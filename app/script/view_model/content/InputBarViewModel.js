@@ -457,13 +457,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       textarea.selectionStart = edgeMention.startIndex;
       textarea.selectionEnd = edgeMention.endIndex;
     } else {
-      const allMentions = this.updateMentionRanges(
+      this.currentMentions = this.updateMentionRanges(
         this.currentMentions,
         this.selectionStart(),
         this.selectionEnd(),
         lengthDifference
       );
-      this.currentMentions = allMentions;
     }
   }
 
