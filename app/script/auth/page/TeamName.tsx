@@ -62,7 +62,7 @@ interface ConnectedProps {
 interface DispatchProps {
   enterTeamCreationFlow: () => Promise<void>;
   pushAccountRegistrationData: (teamData: {team: {name: string}}) => Promise<void>;
-  resetError: () => Promise<void>;
+  resetInviteErrors: () => Promise<void>;
 }
 
 interface State {
@@ -102,7 +102,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
 
   resetErrors = () => {
     this.setState({error: null, isValidTeamName: true});
-    this.props.resetError();
+    this.props.resetInviteErrors();
   };
 
   render() {
@@ -192,7 +192,7 @@ export default withRouter(
         enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.cookieAction.enterTeamCreationFlow(name)),
         pushAccountRegistrationData: (teamData: {team: {name: string}}) =>
           dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
-        resetError: () => dispatch(ROOT_ACTIONS.cookieAction.resetError(name)), // InvitationActionCreator
+        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       })
     )(TeamName)
   )

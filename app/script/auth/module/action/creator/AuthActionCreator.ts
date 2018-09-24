@@ -19,6 +19,7 @@
 
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {AppAction} from '.';
+import {Invitation} from '@wireapp/api-client/dist/commonjs/invitation';
 
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
@@ -89,24 +90,24 @@ export type AuthActions =
   | RefreshStartAction
   | RefreshSuccessAction
   | RefreshFailedAction
-  | typeof AuthActionCreator.startValidateLocalClient & AppAction
-  | typeof AuthActionCreator.successfulValidateLocalClient & AppAction
-  | typeof AuthActionCreator.failedValidateLocalClient & AppAction
+  | ValidateClientStartAction
+  | ValidateClientSuccessAction
+  | ValidateClientFailedAction
   | LogoutStartAction
   | LogoutSuccessAction
   | LogoutFailedAction
   | LogoutSilentSuccessAction
   | LogoutSilentFailedAction
-  | typeof AuthActionCreator.resetError & AppAction
-  | typeof AuthActionCreator.resetAccountData & AppAction
-  | typeof AuthActionCreator.pushAccountRegistrationData & AppAction
-  | typeof AuthActionCreator.enterTeamCreationFlow & AppAction
-  | typeof AuthActionCreator.enterPersonalCreationFlow & AppAction
-  | typeof AuthActionCreator.enterGenericInviteCreationFlow & AppAction
-  | typeof AuthActionCreator.enterPersonalInvitationCreationFlow & AppAction
-  | typeof AuthActionCreator.startGetInvitationFromCode & AppAction
-  | typeof AuthActionCreator.successfulGetInvitationFromCode & AppAction
-  | typeof AuthActionCreator.failedGetInvitationFromCode & AppAction;
+  | ResetAuthErrorsAction
+  | ResetRegistrationDataAction
+  | PushRegistrationDataAction
+  | EnterTeamCreationFlowAction
+  | EnterPersonalCreationFlowAction
+  | EnterGenericInvitationCreationFlowAction
+  | EnterPersonalInvitationCreationFlowAction
+  | GetInvitationFromCodeStartAction
+  | GetInvitationFromCodeSuccessAction
+  | GetInvitationFromCodeFailedAction;
 
 export interface LoginStartAction extends AppAction {
   readonly type: AUTH_ACTION.LOGIN_START;
@@ -178,6 +179,17 @@ export interface RefreshFailedAction extends AppAction {
   readonly error: any;
 }
 
+export interface ValidateClientStartAction extends AppAction {
+  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START;
+}
+export interface ValidateClientSuccessAction extends AppAction {
+  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS;
+}
+export interface ValidateClientFailedAction extends AppAction {
+  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED;
+  readonly error: any;
+}
+
 export interface LogoutStartAction extends AppAction {
   readonly type: AUTH_ACTION.LOGOUT_START;
 }
@@ -194,6 +206,47 @@ export interface LogoutSilentSuccessAction extends AppAction {
 }
 export interface LogoutSilentFailedAction extends AppAction {
   readonly type: AUTH_ACTION.SILENT_LOGOUT_FAILED;
+  readonly error: any;
+}
+
+export interface ResetAuthErrorsAction extends AppAction {
+  readonly type: AUTH_ACTION.AUTH_RESET_ERROR;
+}
+
+export interface ResetRegistrationDataAction extends AppAction {
+  readonly type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA;
+}
+
+export interface PushRegistrationDataAction extends AppAction {
+  readonly payload: RegisterData;
+  readonly type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA;
+}
+
+export interface EnterTeamCreationFlowAction extends AppAction {
+  readonly type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW;
+}
+
+export interface EnterPersonalCreationFlowAction extends AppAction {
+  readonly type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW;
+}
+
+export interface EnterGenericInvitationCreationFlowAction extends AppAction {
+  readonly type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW;
+}
+
+export interface EnterPersonalInvitationCreationFlowAction extends AppAction {
+  readonly type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW;
+}
+
+export interface GetInvitationFromCodeStartAction extends AppAction {
+  readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_START;
+}
+export interface GetInvitationFromCodeSuccessAction extends AppAction {
+  readonly payload: Invitation;
+  readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS;
+}
+export interface GetInvitationFromCodeFailedAction extends AppAction {
+  readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED;
   readonly error: any;
 }
 
@@ -280,15 +333,13 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REFRESH_FAILED,
   });
 
-  static startValidateLocalClient = () => ({
+  static startValidateLocalClient = (): ValidateClientStartAction => ({
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START,
   });
-
-  static successfulValidateLocalClient = () => ({
+  static successfulValidateLocalClient = (): ValidateClientSuccessAction => ({
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
   });
-
-  static failedValidateLocalClient = (error: any) => ({
+  static failedValidateLocalClient = (error: any): ValidateClientFailedAction => ({
     error,
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
   });
@@ -315,45 +366,45 @@ export class AuthActionCreator {
     type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
   });
 
-  static resetError = () => ({
+  static resetError = (): ResetAuthErrorsAction => ({
     type: AUTH_ACTION.AUTH_RESET_ERROR,
   });
 
-  static resetAccountData = () => ({
+  static resetAccountData = (): ResetRegistrationDataAction => ({
     type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
   });
 
-  static pushAccountRegistrationData = accountData => ({
+  static pushAccountRegistrationData = (accountData: RegisterData): PushRegistrationDataAction => ({
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
   });
 
-  static enterTeamCreationFlow = () => ({
+  static enterTeamCreationFlow = (): EnterTeamCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
   });
 
-  static enterPersonalCreationFlow = () => ({
+  static enterPersonalCreationFlow = (): EnterPersonalCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
   });
 
-  static enterGenericInviteCreationFlow = () => ({
+  static enterGenericInviteCreationFlow = (): EnterGenericInvitationCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
   });
 
-  static enterPersonalInvitationCreationFlow = () => ({
+  static enterPersonalInvitationCreationFlow = (): EnterPersonalInvitationCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW,
   });
 
-  static startGetInvitationFromCode = () => ({
+  static startGetInvitationFromCode = (): GetInvitationFromCodeStartAction => ({
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_START,
   });
 
-  static successfulGetInvitationFromCode = invitation => ({
+  static successfulGetInvitationFromCode = (invitation: Invitation): GetInvitationFromCodeSuccessAction => ({
     payload: invitation,
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS,
   });
 
-  static failedGetInvitationFromCode = (error: any) => ({
+  static failedGetInvitationFromCode = (error: any): GetInvitationFromCodeFailedAction => ({
     error,
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED,
   });

@@ -56,6 +56,13 @@ export class InvitationAction {
         });
     };
   };
+  resetInviteErrors = (): ThunkAction => {
+    return function(dispatch, getState, {apiClient}) {
+      return Promise.resolve().then(() => {
+        dispatch(InvitationActionCreator.resetError());
+      });
+    };
+  };
 }
 
 export const invitationAction = new InvitationAction();

@@ -62,8 +62,7 @@ export class AuthAction {
         actions: {clientAction, cookieAction, selfAction},
       } = global;
 
-      const obfuscatedLoginData = {...loginData, password: '********'};
-      dispatch(AuthActionCreator.startLogin(obfuscatedLoginData));
+      dispatch(AuthActionCreator.startLogin());
 
       return Promise.resolve()
         .then(() => onBeforeLogin(dispatch, getState, global))
@@ -174,7 +173,7 @@ export class AuthAction {
       registration.team.name = registration.team.name.trim();
 
       let createdAccount;
-      dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
+      dispatch(AuthActionCreator.startRegisterTeam());
       return Promise.resolve()
         .then(() => dispatch(this.doSilentLogout()))
         .then(() => apiClient.register(registration, clientType))
@@ -210,15 +209,7 @@ export class AuthAction {
       registration.email = registration.email.trim();
 
       let createdAccount;
-      dispatch(
-        AuthActionCreator.startRegisterPersonal({
-          accent_id: registration.accent_id,
-          email: registration.email,
-          locale: registration.locale,
-          name: registration.name,
-          password: '******',
-        })
-      );
+      dispatch(AuthActionCreator.startRegisterPersonal());
       return Promise.resolve()
         .then(() => dispatch(authAction.doSilentLogout()))
         .then(() => apiClient.register(registration, clientType))
@@ -253,15 +244,7 @@ export class AuthAction {
       registrationData.name = registrationData.name.trim();
 
       let createdAccount;
-      const obfuscatedRegistrationData = {
-        accent_id: registrationData.accent_id,
-        // TODO: Apply method call once core v6 is in
-        // eslint-disable-next-line dot-notation
-        expires_in: registrationData['expires_in'],
-        locale: registrationData.locale,
-        name: registrationData.name,
-      };
-      dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
+      dispatch(AuthActionCreator.startRegisterWireless());
 
       return Promise.resolve()
         .then(() => dispatch(authAction.doSilentLogout()))

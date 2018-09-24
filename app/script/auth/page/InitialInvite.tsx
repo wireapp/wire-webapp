@@ -60,7 +60,7 @@ interface ConnectedProps {
 
 interface DispatchProps {
   fetchSelf: () => Promise<void>;
-  resetError: () => Promise<void>;
+  resetInviteErrors: () => Promise<void>;
   invite: (inviteData: {email: string}) => Promise<void>;
 }
 
@@ -115,7 +115,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
   resetErrors = () => {
     this.setState({error: null});
-    this.props.resetError();
+    this.props.resetInviteErrors();
   };
 
   render() {
@@ -193,7 +193,7 @@ export default injectIntl(
     }),
     (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
       fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-      resetError: () => dispatch(ROOT_ACTIONS.invitationAction.resetError()), //Invite reset error
+      resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       invite: (invitation: {email: string; locale: string; inviter_name: string}) =>
         dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
     })

@@ -32,7 +32,7 @@ export class CookieAction {
     return function(dispatch, getState, {actions: {cookieAction}}) {
       return Promise.resolve()
         .then(() => dispatch(cookieAction.getCookie(name, asJSON)))
-        .then(() => setInterval(() => dispatch(cookieAction.getCookie(name, asJSON)), interval))
+        .then(() => window.setInterval(() => dispatch(cookieAction.getCookie(name, asJSON)), interval))
         .then(timerId => {
           dispatch(CookieActionCreator.startCookiePolling({name, timerId}));
         })

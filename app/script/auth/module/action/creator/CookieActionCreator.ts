@@ -134,7 +134,7 @@ export class CookieActionCreator {
     params: {cookie, name},
     type: COOKIE_ACTION.COOKIE_SET_START,
   });
-  static successfulSetCookie = ({cookie, name}: {cookie: string; name: string}): CookieSetSuccessAction => ({
+  static successfulSetCookie = ({cookie, name}: {cookie?: string; name: string}): CookieSetSuccessAction => ({
     payload: {cookie, name},
     type: COOKIE_ACTION.COOKIE_SET_SUCCESS,
   });
