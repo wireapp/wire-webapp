@@ -33,7 +33,7 @@ z.message.MentionEntity = class Mention {
 
     this.isSelfMentioned = ko.pureComputed(() => {
       const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-      return isTypeUserId && (this.userEntity() && this.userEntity().is_me);
+      return isTypeUserId && this.userEntity() && this.userEntity().is_me;
     });
   }
 
