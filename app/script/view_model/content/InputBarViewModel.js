@@ -134,11 +134,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editedMention = ko.observable(undefined);
     this.currentMentions = [];
-    this.conversationEntity.subscribe(() => {
-      if (this.conversationEntity()) {
-        this.currentMentions = this.conversationEntity().input().mentions;
-      }
-    });
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -179,6 +174,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.conversationHasFocus(true);
       this.pastedFile(null);
       this.cancelMessageEditing();
+      if (this.conversationEntity()) {
+        const mentions = this.conversationEntity().input().mentions;
+        this.currentMentions = mentions;
+        if (this.currentMentions.length) {
+          this.input(`${this.input()} `);
+        }
+      }
     });
 
     this.isEditing.subscribe(isEditing => {
