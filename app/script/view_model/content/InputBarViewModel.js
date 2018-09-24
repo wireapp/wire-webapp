@@ -100,6 +100,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         return inputObject;
       },
       write: value => {
+        if (!value) {
+          this.currentMentions = [];
+        }
+
         const outputObject = {mentions: this.currentMentions, text: value};
 
         if (this.isEditing()) {
@@ -362,7 +366,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.currentMentions = [];
     this.input('');
     $(event.target).focus();
   }
@@ -522,7 +525,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendGiphy() {
     if (this.conversationEntity()) {
-      this.conversationEntity.currentMentions = [];
       this.conversationEntity().input('');
     }
   }
