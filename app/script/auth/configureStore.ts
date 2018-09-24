@@ -20,8 +20,8 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import reducers from './module/reducer';
-import {checkCookieSupport, checkIndexedDbSupport, checkSupportedBrowser} from './module/action/RuntimeAction';
-import thunk from 'redux-thunk';
+import {runtimeAction} from './module/action/RuntimeAction';
+import thunk, {ThunkDispatch} from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import * as Environment from './Environment';
 
@@ -36,9 +36,10 @@ export const configureStore = (thunkArguments = {}) => {
     }
   }
 
-  store.dispatch(checkIndexedDbSupport());
-  store.dispatch(checkCookieSupport());
-  store.dispatch(checkSupportedBrowser());
+  const dispatch: ThunkDispatch<any, any, any> = store.dispatch;
+  dispatch(runtimeAction.checkIndexedDbSupport());
+  dispatch(runtimeAction.checkCookieSupport());
+  dispatch(runtimeAction.checkSupportedBrowser());
 
   return store;
 };
