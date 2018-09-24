@@ -142,8 +142,8 @@ class AccountForm extends React.PureComponent {
                 }
               }}
               autoFocus
-              maxLength="64"
-              minLength="2"
+              maxLength={64}
+              minLength={2}
               pattern=".{2,64}"
               required
               data-uie-name="enter-name"
@@ -168,7 +168,7 @@ class AccountForm extends React.PureComponent {
                   this.inputs.password.focus();
                 }
               }}
-              maxLength="128"
+              maxLength={128}
               type="email"
               required
               data-uie-name="enter-email"
@@ -187,8 +187,8 @@ class AccountForm extends React.PureComponent {
               autoComplete="section-create-team new-password"
               type="password"
               placeholder={_(accountFormStrings.passwordPlaceholder)}
-              maxLength="1024"
-              minLength="8"
+              maxLength={1024}
+              minLength={8}
               pattern=".{8,1024}"
               required
               data-uie-name="enter-password"
