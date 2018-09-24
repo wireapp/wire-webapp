@@ -17,7 +17,8 @@
  *
  */
 
-import {AppAction} from "./index";
+import {AppAction} from './index';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
 export enum CLIENT_ACTION {
   CLIENTS_FETCH_START = 'CLIENTS_FETCH_START',
@@ -36,64 +37,105 @@ export enum CLIENT_ACTION {
 }
 
 export type ClientActions =
-  | typeof ClientActionCreator.startGetAllClients & AppAction
-  | typeof ClientActionCreator.successfulGetAllClients & AppAction
-  | typeof ClientActionCreator.failedGetAllClients & AppAction
-  | typeof ClientActionCreator.startRemoveClient & AppAction
-  | typeof ClientActionCreator.successfulRemoveClient & AppAction
-  | typeof ClientActionCreator.failedRemoveClient & AppAction
-  | typeof ClientActionCreator.startInitializeClient & AppAction
-  | typeof ClientActionCreator.successfulInitializeClient & AppAction
-  | typeof ClientActionCreator.failedInitializeClient & AppAction
-  | typeof ClientActionCreator.resetError & AppAction
-  ;
+  | GetAllClientsStartAction
+  | GetAllClientsSuccessAction
+  | GetAllClientsFailedAction
+  | RemoveClientStartAction
+  | RemoveClientSuccessAction
+  | RemoveClientFailedAction
+  | InitializeClientStartAction
+  | InitializeClientSuccessAction
+  | InitializeClientFailedAction
+  | ResetClientErrorsAction;
+
+export interface GetAllClientsStartAction extends AppAction {
+  readonly type: CLIENT_ACTION.CLIENTS_FETCH_START;
+}
+export interface GetAllClientsSuccessAction extends AppAction {
+  readonly payload: RegisteredClient[];
+  readonly type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS;
+}
+export interface GetAllClientsFailedAction extends AppAction {
+  readonly type: CLIENT_ACTION.CLIENTS_FETCH_FAILED;
+  readonly error: any;
+}
+
+export interface RemoveClientStartAction extends AppAction {
+  readonly params: any;
+  readonly type: CLIENT_ACTION.CLIENT_REMOVE_START;
+}
+export interface RemoveClientSuccessAction extends AppAction {
+  readonly payload: string;
+  readonly type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS;
+}
+export interface RemoveClientFailedAction extends AppAction {
+  readonly type: CLIENT_ACTION.CLIENT_REMOVE_FAILED;
+  readonly error: any;
+}
+
+export interface InitializeClientStartAction extends AppAction {
+  readonly params: any;
+  readonly type: CLIENT_ACTION.CLIENT_INIT_START;
+}
+export interface InitializeClientSuccessAction extends AppAction {
+  readonly payload: {
+    isNewClient: boolean;
+    localClient: RegisteredClient;
+  };
+  readonly type: CLIENT_ACTION.CLIENT_INIT_SUCCESS;
+}
+export interface InitializeClientFailedAction extends AppAction {
+  readonly type: CLIENT_ACTION.CLIENT_INIT_FAILED;
+  readonly error: any;
+}
+
+export interface ResetClientErrorsAction extends AppAction {
+  readonly type: CLIENT_ACTION.CLIENT_RESET_ERROR;
+}
 
 export class ClientActionCreator {
-  static startGetAllClients = () => ({
+  static startGetAllClients = (): GetAllClientsStartAction => ({
     type: CLIENT_ACTION.CLIENTS_FETCH_START,
   });
-
-  static successfulGetAllClients = clients => ({
+  static successfulGetAllClients = (clients: RegisteredClient[]): GetAllClientsSuccessAction => ({
     payload: clients,
     type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS,
   });
-
-  static failedGetAllClients = (error?: any) => ({
-    payload: error,
+  static failedGetAllClients = (error: any): GetAllClientsFailedAction => ({
+    error,
     type: CLIENT_ACTION.CLIENTS_FETCH_FAILED,
   });
 
-  static startRemoveClient = (params?: any) => ({
+  static startRemoveClient = (params?: any): RemoveClientStartAction => ({
     params,
     type: CLIENT_ACTION.CLIENT_REMOVE_START,
   });
-
-  static successfulRemoveClient = deletedClientId => ({
+  static successfulRemoveClient = (deletedClientId: string): RemoveClientSuccessAction => ({
     payload: deletedClientId,
     type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS,
   });
-
-  static failedRemoveClient = (error?: any) => ({
-    payload: error,
+  static failedRemoveClient = (error: any): RemoveClientFailedAction => ({
+    error,
     type: CLIENT_ACTION.CLIENT_REMOVE_FAILED,
   });
 
-  static startInitializeClient = (params?: any) => ({
+  static startInitializeClient = (params?: any): InitializeClientStartAction => ({
     params,
     type: CLIENT_ACTION.CLIENT_INIT_START,
   });
-
-  static successfulInitializeClient = creationStatus => ({
+  static successfulInitializeClient = (creationStatus: {
+    isNewClient: boolean;
+    localClient: RegisteredClient;
+  }): InitializeClientSuccessAction => ({
     payload: creationStatus,
     type: CLIENT_ACTION.CLIENT_INIT_SUCCESS,
   });
-
-  static failedInitializeClient = (error?: any) => ({
-    payload: error,
+  static failedInitializeClient = (error: any): InitializeClientFailedAction => ({
+    error,
     type: CLIENT_ACTION.CLIENT_INIT_FAILED,
   });
 
-  static resetError = () => ({
+  static resetError = (): ResetClientErrorsAction => ({
     type: CLIENT_ACTION.CLIENT_RESET_ERROR,
   });
 }

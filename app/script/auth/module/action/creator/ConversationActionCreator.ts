@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from ".";
+import {AppAction} from '.';
 
 export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',
@@ -30,41 +30,61 @@ export enum CONVERSATION_ACTION {
 }
 
 export type ConversationActions =
-  | typeof ConversationActionCreator.startConversationCodeCheck & AppAction
-  | typeof ConversationActionCreator.successfulConversationCodeCheck & AppAction
-  | typeof ConversationActionCreator.failedConversationCodeCheck & AppAction
-  | typeof ConversationActionCreator.startJoinConversationByCode & AppAction
-  | typeof ConversationActionCreator.successfulJoinConversationByCode & AppAction
-  | typeof ConversationActionCreator.failedJoinConversationByCode & AppAction
-  ;
+  | ConversationCodeCheckStartAction
+  | ConversationCodeCheckSuccessAction
+  | ConversationCodeCheckFailedAction
+  | ConversationCodeJoinStartAction
+  | ConversationCodeJoinSuccessAction
+  | ConversationCodeJoinFailedAction;
+
+export interface ConversationCodeCheckStartAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START;
+}
+export interface ConversationCodeCheckSuccessAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS;
+}
+export interface ConversationCodeCheckFailedAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED;
+  readonly error: any;
+}
+
+export interface ConversationCodeJoinStartAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START;
+}
+export interface ConversationCodeJoinSuccessAction extends AppAction {
+  readonly payload: any;
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS;
+}
+export interface ConversationCodeJoinFailedAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED;
+  readonly error: any;
+}
 
 export class ConversationActionCreator {
-  static startConversationCodeCheck = (params?: any) => ({
-    params,
+  static startConversationCodeCheck = (): ConversationCodeCheckStartAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START,
   });
 
-  static successfulConversationCodeCheck = () => ({
+  static successfulConversationCodeCheck = (): ConversationCodeCheckSuccessAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
   });
 
-  static failedConversationCodeCheck = (error?: any) => ({
-    payload: error,
+  static failedConversationCodeCheck = (error?: any): ConversationCodeCheckFailedAction => ({
+    error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
   });
 
-  static startJoinConversationByCode = (params?: any) => ({
-    params,
+  static startJoinConversationByCode = (): ConversationCodeJoinStartAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START,
   });
 
-  static successfulJoinConversationByCode = data => ({
+  static successfulJoinConversationByCode = (data: any): ConversationCodeJoinSuccessAction => ({
     payload: data,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
   });
 
-  static failedJoinConversationByCode = (error?: any) => ({
-    payload: error,
+  static failedJoinConversationByCode = (error?: any): ConversationCodeJoinFailedAction => ({
+    error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,
   });
 }
