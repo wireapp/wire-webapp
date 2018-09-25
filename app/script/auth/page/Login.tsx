@@ -59,7 +59,7 @@ import {Redirect, withRouter, RouteComponentProps} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import Page from './Page';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
@@ -82,7 +82,7 @@ interface DispatchProps {
   doInit: (options: {isImmediateLogin: boolean}) => Promise<void>;
   doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) => Promise<void>;
   doLogin: (login: LoginData) => Promise<void>;
-  doGetAllClients: () => Promise<any[]>;
+  doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
 interface State {

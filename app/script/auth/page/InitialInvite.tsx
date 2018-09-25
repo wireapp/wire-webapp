@@ -49,6 +49,7 @@ import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+import {Self} from '@wireapp/api-client/dist/commonjs/self';
 
 interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
 
@@ -60,7 +61,7 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  fetchSelf: () => Promise<void>;
+  fetchSelf: () => Promise<Self>;
   resetInviteErrors: () => Promise<void>;
   invite: (inviteData: {email: string}) => Promise<void>;
 }

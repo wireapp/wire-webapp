@@ -19,11 +19,11 @@
 
 import {APP_NAME} from '../../config';
 import {ThunkAction} from '../reducer';
-import {ConsentType} from '@wireapp/api-client/dist/commonjs/self';
+import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
 import {SelfActionCreator} from './creator/';
 
 export class SelfAction {
-  fetchSelf = (): ThunkAction<Promise<any>> => {
+  fetchSelf = (): ThunkAction<Promise<Self>> => {
     return (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startFetchSelf());
       return apiClient.self.api
@@ -35,7 +35,10 @@ export class SelfAction {
             return selfUser;
           });
         })
-        .then(selfUser => dispatch(SelfActionCreator.successfulFetchSelf(selfUser)))
+        .then(selfUser => {
+          dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
+          return selfUser;
+        })
         .catch(error => {
           dispatch(SelfActionCreator.failedFetchSelf(error));
           throw error;
@@ -48,7 +51,7 @@ export class SelfAction {
       dispatch(SelfActionCreator.startSetHandle());
       return apiClient.self.api
         .putHandle({handle: handle.trim().toLowerCase()})
-        .then(() => dispatch(selfAction.fetchSelf()).then(action => action.payload))
+        .then(() => dispatch(selfAction.fetchSelf()))
         .then(result => {
           dispatch(SelfActionCreator.successfulSetHandle(result));
         })

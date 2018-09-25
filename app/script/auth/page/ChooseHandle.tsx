@@ -60,7 +60,7 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  doGetConsents: () => Promise<any>;
+  doGetConsents: () => Promise<void>;
   checkHandles: (handles: string[]) => Promise<string>;
   setHandle: (handle: string) => Promise<void>;
   doSetConsent: (consentType: ConsentType, value: number) => Promise<void>;

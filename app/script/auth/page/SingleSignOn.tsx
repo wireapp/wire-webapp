@@ -59,7 +59,7 @@ import {loginStrings, ssoLoginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {withRouter, RouteComponentProps} from 'react-router';
 import {UUID_REGEX} from '../util/stringUtil';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {BACKEND} from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Api, RootState} from '../module/reducer';
@@ -80,7 +80,7 @@ interface DispatchProps {
   resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
   doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
-  doGetAllClients: () => Promise<any[]>;
+  doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
 interface State {}

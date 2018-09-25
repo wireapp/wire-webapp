@@ -36,7 +36,7 @@ import {RegistrationDataState} from '../module/reducer/authReducer';
 
 interface Props extends React.HTMLAttributes<AccountForm> {
   beforeSubmit?: () => Promise<void>;
-  onSubmit: () => any;
+  onSubmit: (event: React.FormEvent<AccountForm>) => void;
   submitText?: string;
 }
 
@@ -147,7 +147,7 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
         }
         return undefined;
       })
-      .then(() => this.props.onSubmit())
+      .then(() => this.props.onSubmit(event))
       .catch(error => {
         if (error.label) {
           switch (error.label) {
