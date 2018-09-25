@@ -19,25 +19,22 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
+// grunt test_init && grunt test_run:view_model/InputBarViewModel
 
-z.cryptography.GENERIC_MESSAGE_TYPE = {
-  ASSET: 'asset',
-  AVAILABILITY: 'availability',
-  CALLING: 'calling',
-  CLEARED: 'cleared',
-  CLIENT_ACTION: 'clientAction',
-  CONFIRMATION: 'confirmation',
-  DELETED: 'deleted',
-  EDITED: 'edited',
-  EPHEMERAL: 'ephemeral',
-  EXTERNAL: 'external',
-  HIDDEN: 'hidden',
-  IMAGE: 'image',
-  KNOCK: 'knock',
-  LAST_READ: 'lastRead',
-  LOCATION: 'location',
-  REACTION: 'reaction',
-  TEXT: 'text',
-};
+describe('z.viewModel.content.InputBarViewModel', () => {
+  /*
+  const testFactory = new TestFactory();
+  let viewModel;
+
+  beforeAll(done => {
+    testFactory.exposeConversationActors().then(conversationRepository => {
+      viewModel = new z.viewModel.content.InputBarViewModel(
+        null,
+        {},
+        {conversation: conversationRepository, user: TestFactory.user_repository}
+      );
+      done();
+    });
+  });
+  */
+});

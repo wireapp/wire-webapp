@@ -301,12 +301,7 @@ z.string.sk.conversationsPopoverNotify = 'Zapnúť zvuk';
 z.string.sk.conversationsPopoverSilence = 'Stlmiť';
 z.string.sk.conversationsPopoverUnarchive = 'Zrušiť archiváciu';
 
-z.string.sk.conversationsSecondaryLineMissedCall = '{{number}} zmeškaný hovor';
-z.string.sk.conversationsSecondaryLineMissedCalls = '{{number}} neprijaté hovory';
-z.string.sk.conversationsSecondaryLineNewMessage = '{{number}} nová správa';
-z.string.sk.conversationsSecondaryLineNewMessages = '{{number}} nových správ';
-z.string.sk.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.sk.conversationsSecondaryLinePings = '{{number}} pingy';
+z.string.sk.conversationsSecondaryLineEphemeralMessage = 'Poslal Vám správu';
 z.string.sk.conversationsSecondaryLinePeopleLeft = '{{number}} ľudí zostáva';
 z.string.sk.conversationsSecondaryLinePersonLeft = '{{user}} zostáva';
 z.string.sk.conversationsSecondaryLinePersonRemoved = '{{user}} bol odstránený';
@@ -314,7 +309,6 @@ z.string.sk.conversationsSecondaryLinePeopleAdded = '{{user}} ľudia boli pridan
 z.string.sk.conversationsSecondaryLinePersonAdded = '{{user}} bol pridaný';
 z.string.sk.conversationsSecondaryLinePersonAddedYou = '{{user}} Vás pridal';
 z.string.sk.conversationsSecondaryLineRenamed = '{{user}} premenoval konverzáciu';
-z.string.sk.conversationsSecondaryLineTimedMessage = 'Časovaná správa';
 z.string.sk.conversationsSecondaryLineYouLeft = 'Odišli ste';
 z.string.sk.conversationsSecondaryLineYouWereRemoved = 'Boli ste odstránený';
 

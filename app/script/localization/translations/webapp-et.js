@@ -98,6 +98,7 @@ z.string.et.callAccept = 'Nõustu';
 z.string.et.callJoin = 'Liitu';
 z.string.et.callChooseSharedScreen = 'Vali ekraan, mida jagada';
 z.string.et.callParticipants = '{{number}} kõnes';
+z.string.et.callNoCameraAccess = 'Kaamera ligipääs puudub';
 
 z.string.et.videoCallOverlayFitVideoLabel = 'Topeltklõpsa, et mahutada video ekraanialasse';
 z.string.et.videoCallOverlayConversations = 'Vestlused';
@@ -275,6 +276,9 @@ z.string.et.modalUserUnblockAction = 'Eemalda blokeering';
 z.string.et.modalUserUnblockHeadline = 'Eemaldad blokeeringu?';
 z.string.et.modalUserUnblockMessage = '{{user}} saab sinuga uuesti ühendust võtta ja sind grupivestlustesse lisada.';
 
+z.string.et.modalNoCameraTitle = 'Kaamera ligipääs puudub';
+z.string.et.modalNoCameraMessage = 'Wire ei saa kaamerale ligi.[br][faqLink]Loe seda tugiartiklit[/faqLink] et parandada see probleem.';
+
 z.string.et.connectionRequestConnect = 'Ühendu';
 z.string.et.connectionRequestIgnore = 'Ignoreeri';
 
@@ -412,13 +416,8 @@ z.string.et.conversationsPopoverNotify = 'Eemalda vestluse vaigistus';
 z.string.et.conversationsPopoverSilence = 'Vaigista vestlus';
 z.string.et.conversationsPopoverUnarchive = 'Taasta vestlus arhiivist';
 
+z.string.et.conversationsSecondaryLineEphemeralMessage = 'Saatis sulle sõnumi';
 z.string.et.conversationsSecondaryLineIncomingCall = '{{user}} helistab';
-z.string.et.conversationsSecondaryLineMissedCall = '{{number}} vastamata kõne';
-z.string.et.conversationsSecondaryLineMissedCalls = '{{number}} vastamata kõnet';
-z.string.et.conversationsSecondaryLineNewMessage = '{{number}} uus sõnum';
-z.string.et.conversationsSecondaryLineNewMessages = '{{number}} uut sõnumit';
-z.string.et.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.et.conversationsSecondaryLinePings = '{{number}} pingi';
 z.string.et.conversationsSecondaryLinePeopleLeft = '{{number}} inimest lahkusid';
 z.string.et.conversationsSecondaryLinePersonLeft = '{{user}} lahkus';
 z.string.et.conversationsSecondaryLinePersonRemoved = '{{user}} eemaldati';
@@ -428,7 +427,6 @@ z.string.et.conversationsSecondaryLinePersonAdded = '{{user}} lisati';
 z.string.et.conversationsSecondaryLinePersonAddedSelf = '{{user}} liitus';
 z.string.et.conversationsSecondaryLinePersonAddedYou = '{{user}} lisas sind';
 z.string.et.conversationsSecondaryLineRenamed = '{{user}} nimetas vestluse ümber';
-z.string.et.conversationsSecondaryLineTimedMessage = 'Kustuv sõnum';
 z.string.et.conversationsSecondaryLineYouLeft = 'Sina lahkusid';
 z.string.et.conversationsSecondaryLineYouWereRemoved = 'Sind eemaldati vestlusest';
 
@@ -573,6 +571,7 @@ z.string.et.preferencesAVMicrophone = 'Mikrofon';
 z.string.et.preferencesAVPermissionDetail = 'Luba oma brauseri Eelistustest';
 z.string.et.preferencesAVSpeakers = 'Kõlarid';
 z.string.et.preferencesAVTemporaryDisclaimer = 'Külalised ei saa alustada videokonverentse. Vali kasutatav kaamera, kui liitud mõnega.';
+z.string.et.preferencesAVNoCamera = 'Wire ei saa kaamerale ligi.[br][faqLink]Loe seda tugiartiklit[/faqLink] et parandada see probleem.';
 z.string.et.preferencesAVTryAgain = 'Proovi uuesti';
 
 z.string.et.preferencesDevicesActivatedIn = 'kohas {{location}}';

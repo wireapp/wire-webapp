@@ -98,6 +98,7 @@ z.string.uk.callAccept = 'Прийняти';
 z.string.uk.callJoin = 'Приєднатись';
 z.string.uk.callChooseSharedScreen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
 z.string.uk.callParticipants = '{{number}} учасників';
+z.string.uk.callNoCameraAccess = 'Відсутній доступ до камери';
 
 z.string.uk.videoCallOverlayFitVideoLabel = 'Подвійний клік, щоб припасувати розмір відео до контейнера';
 z.string.uk.videoCallOverlayConversations = 'Розмови';
@@ -275,6 +276,9 @@ z.string.uk.modalUserUnblockAction = 'Розблокувати';
 z.string.uk.modalUserUnblockHeadline = 'Розблокувати?';
 z.string.uk.modalUserUnblockMessage = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
 
+z.string.uk.modalNoCameraTitle = 'Відсутній доступ до камери';
+z.string.uk.modalNoCameraMessage = 'Відсутній доступ до камери.[br][faqLink]Прочитати статтю[/faqLink] про те, як це можна виправити.';
+
 z.string.uk.connectionRequestConnect = 'Додати до контактів';
 z.string.uk.connectionRequestIgnore = 'Ігнорувати';
 
@@ -412,13 +416,8 @@ z.string.uk.conversationsPopoverNotify = 'Увімк. звук';
 z.string.uk.conversationsPopoverSilence = 'Вимк. звук';
 z.string.uk.conversationsPopoverUnarchive = 'Розархівувати';
 
+z.string.uk.conversationsSecondaryLineEphemeralMessage = 'Надіслав вам повідомлення';
 z.string.uk.conversationsSecondaryLineIncomingCall = '{{user}} дзвонить';
-z.string.uk.conversationsSecondaryLineMissedCall = '{{number}} пропущений дзвінок';
-z.string.uk.conversationsSecondaryLineMissedCalls = '{{number}} пропущених дзвінків';
-z.string.uk.conversationsSecondaryLineNewMessage = '{{number}} нове повідомлення';
-z.string.uk.conversationsSecondaryLineNewMessages = '{{number}} нових повідомлень';
-z.string.uk.conversationsSecondaryLinePing = '{{number}} пінг';
-z.string.uk.conversationsSecondaryLinePings = '{{number}} пінгів';
 z.string.uk.conversationsSecondaryLinePeopleLeft = '{{number}} учасників вийшло';
 z.string.uk.conversationsSecondaryLinePersonLeft = '{{user}} вийшов(-ла)';
 z.string.uk.conversationsSecondaryLinePersonRemoved = '{{user}} був(-ла) видалений(-а)';
@@ -428,7 +427,6 @@ z.string.uk.conversationsSecondaryLinePersonAdded = '{{user}} був(-ла) до
 z.string.uk.conversationsSecondaryLinePersonAddedSelf = '{{user}} приєднався(-лася)';
 z.string.uk.conversationsSecondaryLinePersonAddedYou = '{{user}} додав(-ла) вас';
 z.string.uk.conversationsSecondaryLineRenamed = '{{user}} перейменував(-ла) розмову';
-z.string.uk.conversationsSecondaryLineTimedMessage = 'Тимчасове повідомлення';
 z.string.uk.conversationsSecondaryLineYouLeft = 'Ви вийшли';
 z.string.uk.conversationsSecondaryLineYouWereRemoved = 'Вас видалили';
 
@@ -573,6 +571,7 @@ z.string.uk.preferencesAVMicrophone = 'Мікрофон';
 z.string.uk.preferencesAVPermissionDetail = 'Увімкніть в налаштуваннях свого браузера';
 z.string.uk.preferencesAVSpeakers = 'Гучномовець';
 z.string.uk.preferencesAVTemporaryDisclaimer = 'Гості не можуть розпочинати відеоконференції. Оберіть, яку з камер ви хотіли б використовувати при підключенні до відеоконференції.';
+z.string.uk.preferencesAVNoCamera = 'Відсутній доступ до камери.[br][faqLink]Прочитати статтю[/faqLink] про те, як це можна виправити.';
 z.string.uk.preferencesAVTryAgain = 'Спробувати ще раз';
 
 z.string.uk.preferencesDevicesActivatedIn = 'в {{location}}';

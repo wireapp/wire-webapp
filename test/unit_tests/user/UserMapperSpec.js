@@ -129,8 +129,8 @@ describe('User Mapper', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const func = () => mapper.updateUserFromObject(user_et, data);
-      expect(func).toThrow();
+      const functionCall = () => mapper.updateUserFromObject(user_et, data);
+      expect(functionCall).toThrow();
     });
 
     it('can update user with v3 assets', () => {

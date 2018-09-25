@@ -302,12 +302,7 @@ z.string.fi.conversationsPopoverNotify = 'Poista mykistys';
 z.string.fi.conversationsPopoverSilence = 'Mykistä';
 z.string.fi.conversationsPopoverUnarchive = 'Palauta arkistosta';
 
-z.string.fi.conversationsSecondaryLineMissedCall = '{{number}} vastaamaton puhelu';
-z.string.fi.conversationsSecondaryLineMissedCalls = '{{number}} vastaamatonta puhelua';
-z.string.fi.conversationsSecondaryLineNewMessage = '{{number}} uusi viesti';
-z.string.fi.conversationsSecondaryLineNewMessages = '{{number}} uutta viestiä';
-z.string.fi.conversationsSecondaryLinePing = '{{number}} pingi';
-z.string.fi.conversationsSecondaryLinePings = '{{number}} pingiä';
+z.string.fi.conversationsSecondaryLineEphemeralMessage = 'Lähetti sinulle viestin';
 z.string.fi.conversationsSecondaryLinePeopleLeft = '{{number}} henkilöä poistui';
 z.string.fi.conversationsSecondaryLinePersonLeft = '{{user}} poistui';
 z.string.fi.conversationsSecondaryLinePersonRemoved = '{{user}} poistettiin';
@@ -315,7 +310,6 @@ z.string.fi.conversationsSecondaryLinePeopleAdded = '{{user}} henkilöä lisätt
 z.string.fi.conversationsSecondaryLinePersonAdded = '{{user}} lisättiin';
 z.string.fi.conversationsSecondaryLinePersonAddedYou = '{{user}} lisäsi sinut';
 z.string.fi.conversationsSecondaryLineRenamed = '{{user}} vaihtoi keskustelun nimeä';
-z.string.fi.conversationsSecondaryLineTimedMessage = 'Ajoitettu viesti';
 z.string.fi.conversationsSecondaryLineYouLeft = 'Poistuit';
 z.string.fi.conversationsSecondaryLineYouWereRemoved = 'Sinut poistettiin';
 

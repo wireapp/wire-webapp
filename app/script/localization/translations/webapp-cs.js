@@ -301,12 +301,7 @@ z.string.cs.conversationsPopoverNotify = 'Zapnout zvuk';
 z.string.cs.conversationsPopoverSilence = 'Ztlumit';
 z.string.cs.conversationsPopoverUnarchive = 'Obnovit';
 
-z.string.cs.conversationsSecondaryLineMissedCall = '{{number}} zmeškaný hovor';
-z.string.cs.conversationsSecondaryLineMissedCalls = '{{number}} zmeškaných hovorů';
-z.string.cs.conversationsSecondaryLineNewMessage = '{{number}} nová zpráva';
-z.string.cs.conversationsSecondaryLineNewMessages = '{{number}} nové zprávy';
-z.string.cs.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.cs.conversationsSecondaryLinePings = '{{number}} x ping';
+z.string.cs.conversationsSecondaryLineEphemeralMessage = 'Vám poslal zprávu';
 z.string.cs.conversationsSecondaryLinePeopleLeft = '{{number}} lidí opustilo konverzaci';
 z.string.cs.conversationsSecondaryLinePersonLeft = '{{user}} opustil(a) konverzaci';
 z.string.cs.conversationsSecondaryLinePersonRemoved = '{{user}} byl odebrán';
@@ -314,7 +309,6 @@ z.string.cs.conversationsSecondaryLinePeopleAdded = '{{user}} lidé byli přidá
 z.string.cs.conversationsSecondaryLinePersonAdded = '{{user}} byl přídán';
 z.string.cs.conversationsSecondaryLinePersonAddedYou = '{{user}} vás přidal';
 z.string.cs.conversationsSecondaryLineRenamed = '{{user}} přejmenoval konverzaci';
-z.string.cs.conversationsSecondaryLineTimedMessage = 'Časované zprávy';
 z.string.cs.conversationsSecondaryLineYouLeft = 'Opustil(a) jste konverzaci';
 z.string.cs.conversationsSecondaryLineYouWereRemoved = 'Byl(a) jste odebrán(a)';
 
