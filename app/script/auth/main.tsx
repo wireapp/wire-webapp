@@ -30,6 +30,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Root from './page/Root';
 import CookieStore from 'js-cookie';
+import actionRoot from './module/action';
 
 configureEnvironment();
 const apiClient = configureClient();
@@ -42,6 +43,7 @@ try {
 } catch (error) {}
 
 const store = configureStore({
+  actions: actionRoot,
   apiClient,
   cookieStore,
   core,
