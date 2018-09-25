@@ -24,7 +24,14 @@
 describe('MentionEntity', () => {
   const userId = '7bec1483-5b11-429d-9759-ec71369654b5';
 
-  describe('checkValidity', () => {
+  beforeAll(done => {
+    z.util.protobuf
+      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .then(done)
+      .catch(done.fail);
+  });
+
+  describe('validate', () => {
     const textMessage = 'Hello, World! @test_user Please read!';
 
     it('should throw with missing properties or wrong types', () => {
@@ -69,7 +76,15 @@ describe('MentionEntity', () => {
 
     it('should return true on validation', () => {
       const mentionEntity = new z.message.MentionEntity(14, 10, userId);
-      expect(mentionEntity.validate(textMessage)).toBeTruthy();
+      expect(mentionEntity.validate(textMessage)).toBe(true);
+    });
+
+    fit('supports line breaks in texts with mentions', () => {
+      const encodedMention = 'CAEQCBokNDRiZDc3NmUtODcxOS00MzIwLWIxYTAtMzU0Y2NkOGU5ODNh';
+      const protoMention = z.proto.Mention.decode64(encodedMention);
+      const mentionEntity = new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
+      const messageText = '\n@Firefox';
+      expect(mentionEntity.validate(messageText)).toBe(true);
     });
   });
 
