@@ -8,7 +8,7 @@
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "outDir": "app/script/auth",
-    "rootDir": "app/script/auth",
+    "rootDir": "app/script",
     "sourceMap": true,
     "target": "ES6"
   },
