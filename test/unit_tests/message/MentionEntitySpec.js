@@ -79,7 +79,7 @@ describe('MentionEntity', () => {
       expect(mentionEntity.validate(textMessage)).toBe(true);
     });
 
-    fit('supports line breaks in texts with mentions', () => {
+    it('supports line breaks in texts with mentions', () => {
       const encodedMention = 'CAEQCBokNDRiZDc3NmUtODcxOS00MzIwLWIxYTAtMzU0Y2NkOGU5ODNh';
       const protoMention = z.proto.Mention.decode64(encodedMention);
       const mentionEntity = new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
