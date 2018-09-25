@@ -38,14 +38,14 @@ import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
-  account: any;
+  account: RegisterData;
   authError: Error;
   currentFlow: string;
 }
 
 interface DispatchProps {
-  doRegisterTeam: (registrationData: any) => Promise<void>;
-  doRegisterPersonal: (registrationData: any) => Promise<void>;
+  doRegisterTeam: (registrationData: RegisterData) => Promise<void>;
+  doRegisterPersonal: (registrationData: RegisterData) => Promise<void>;
   doSendActivationCode: (code: string) => Promise<void>;
 }
 

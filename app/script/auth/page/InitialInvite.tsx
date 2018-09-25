@@ -48,12 +48,13 @@ import EXTERNAL_ROUTE from '../externalRoute';
 import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
+import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
 
 interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
 
 interface ConnectedProps {
   error: Error;
-  invites: any[];
+  invites: TeamInvitation[];
   isFetching: boolean;
   language: string;
 }

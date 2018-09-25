@@ -18,11 +18,12 @@
  */
 
 import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
+import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
 
 export interface InvitationState {
   error: Error;
   fetching: boolean;
-  invites: any[];
+  invites: TeamInvitation[];
 }
 
 const initialState: InvitationState = {

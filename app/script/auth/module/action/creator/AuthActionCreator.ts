@@ -254,7 +254,7 @@ export class AuthActionCreator {
   static successfulLogin = (): LoginSuccessAction => ({
     type: AUTH_ACTION.LOGIN_SUCCESS,
   });
-  static failedLogin = (error?: any): LoginFailedAction => ({
+  static failedLogin = (error: Error): LoginFailedAction => ({
     error,
     type: AUTH_ACTION.LOGIN_FAILED,
   });
@@ -266,7 +266,7 @@ export class AuthActionCreator {
     payload: authData,
     type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
   });
-  static failedRegisterTeam = (error?: any): RegisterTeamFailedAction => ({
+  static failedRegisterTeam = (error: Error): RegisterTeamFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_TEAM_FAILED,
   });

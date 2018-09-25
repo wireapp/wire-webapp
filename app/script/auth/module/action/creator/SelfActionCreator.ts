@@ -17,7 +17,7 @@
  *
  */
 
-import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import {Self, Consent} from '@wireapp/api-client/dist/commonjs/self';
 import {AppAction} from '.';
 
 export enum SELF_ACTION {
@@ -80,7 +80,7 @@ export interface GetConsentsStartAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_GET_START;
 }
 export interface GetConsentsSuccessAction extends AppAction {
-  readonly payload: any[];
+  readonly payload: Consent[];
   readonly type: SELF_ACTION.CONSENT_GET_SUCCESS;
 }
 export interface GetConsentsFailedAction extends AppAction {
@@ -92,7 +92,7 @@ export interface SetConsentStartAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_SET_START;
 }
 export interface SetConsentSuccessAction extends AppAction {
-  readonly payload: any;
+  readonly payload: Consent;
   readonly type: SELF_ACTION.CONSENT_SET_SUCCESS;
 }
 export interface SetConsentFailedAction extends AppAction {
@@ -128,7 +128,7 @@ export class SelfActionCreator {
   static startGetConsents = (): GetConsentsStartAction => ({
     type: SELF_ACTION.CONSENT_GET_START,
   });
-  static successfulGetConsents = (consents: any[]): GetConsentsSuccessAction => ({
+  static successfulGetConsents = (consents: Consent[]): GetConsentsSuccessAction => ({
     payload: consents,
     type: SELF_ACTION.CONSENT_GET_SUCCESS,
   });
@@ -140,7 +140,7 @@ export class SelfActionCreator {
   static startSetConsent = (): SetConsentStartAction => ({
     type: SELF_ACTION.CONSENT_SET_START,
   });
-  static successfulSetConsent = (consent: any): SetConsentSuccessAction => ({
+  static successfulSetConsent = (consent: Consent): SetConsentSuccessAction => ({
     payload: consent,
     type: SELF_ACTION.CONSENT_SET_SUCCESS,
   });

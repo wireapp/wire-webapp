@@ -66,7 +66,7 @@ interface State {
     name: boolean;
     password: boolean;
   };
-  validationErrors: any[];
+  validationErrors: Error[];
 }
 
 class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {

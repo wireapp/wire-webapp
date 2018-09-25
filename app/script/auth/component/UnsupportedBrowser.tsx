@@ -22,15 +22,15 @@ import {unsupportedStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage, InjectedIntlProps, FormattedMessage} from 'react-intl';
 import * as React from 'react';
 import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 
 interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
-  headline: any;
-  subhead: any;
+  headline: FormattedMessage.MessageDescriptor;
+  subhead: FormattedMessage.MessageDescriptor;
 }
 
 const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) => (

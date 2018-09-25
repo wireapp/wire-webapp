@@ -18,6 +18,7 @@
  */
 
 import {AppAction} from '.';
+import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
 
 export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',
@@ -52,7 +53,7 @@ export interface ConversationCodeJoinStartAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START;
 }
 export interface ConversationCodeJoinSuccessAction extends AppAction {
-  readonly payload: any;
+  readonly payload: ConversationEvent;
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS;
 }
 export interface ConversationCodeJoinFailedAction extends AppAction {
@@ -75,7 +76,7 @@ export class ConversationActionCreator {
   static startJoinConversationByCode = (): ConversationCodeJoinStartAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START,
   });
-  static successfulJoinConversationByCode = (data: any): ConversationCodeJoinSuccessAction => ({
+  static successfulJoinConversationByCode = (data: ConversationEvent): ConversationCodeJoinSuccessAction => ({
     payload: data,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
   });

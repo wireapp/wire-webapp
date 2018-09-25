@@ -80,8 +80,8 @@ interface DispatchProps {
   resetAuthError: () => Promise<void>;
   doInitializeClient: (clientType: ClientType, password?: string) => Promise<void>;
   doInit: (options: {isImmediateLogin: boolean}) => Promise<void>;
-  doLoginAndJoin: (login: any, conversationKey: string, conversationCode: string) => Promise<void>;
-  doLogin: (login: any) => Promise<void>;
+  doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) => Promise<void>;
+  doLogin: (login: LoginData) => Promise<void>;
   doGetAllClients: () => Promise<any[]>;
 }
 
@@ -98,7 +98,7 @@ interface State {
     email: boolean;
     password: boolean;
   };
-  validationErrors: any[];
+  validationErrors: Error[];
 }
 
 class Login extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {

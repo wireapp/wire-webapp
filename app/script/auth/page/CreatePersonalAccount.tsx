@@ -41,7 +41,7 @@ interface URLParams {
 interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
 
 interface ConnectedProps {
-  account: any;
+  account: RegisterData;
   currentFlow: string;
   isPersonalFlow: boolean;
   isPersonalInvitationFlow: boolean;
@@ -52,7 +52,7 @@ interface DispatchProps {
   enterPersonalInvitationCreationFlow: () => Promise<void>;
   enterPersonalCreationFlow: () => Promise<void>;
   enterGenericInviteCreationFlow: () => Promise<void>;
-  doRegisterPersonal: (registrationData: any) => Promise<void>;
+  doRegisterPersonal: (registrationData: RegisterData) => Promise<void>;
 }
 
 interface State {}

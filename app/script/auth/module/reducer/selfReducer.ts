@@ -18,13 +18,14 @@
  */
 
 import {AppActions, SELF_ACTION} from '../action/creator/';
+import {Consent, Self} from '@wireapp/api-client/dist/commonjs/self';
 
 export interface SelfState {
-  consents: any;
+  consents: {[key: number]: number};
   error: Error;
   fetched: boolean;
   fetching: boolean;
-  self: any;
+  self: Self;
 }
 
 export const initialState: SelfState = {
@@ -32,7 +33,7 @@ export const initialState: SelfState = {
   error: null,
   fetched: false,
   fetching: false,
-  self: {name: null, team: null},
+  self: {assets: [], id: null, locale: null, name: null, team: null},
 };
 
 export function selfReducer(state: SelfState = initialState, action: AppActions): SelfState {

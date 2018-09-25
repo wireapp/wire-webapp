@@ -27,6 +27,7 @@ import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
+import {RegistrationDataState} from '../module/reducer/authReducer';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   hasAccountData?: boolean;
@@ -35,7 +36,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 interface ConnectedProps {
-  account: any;
+  account: RegistrationDataState;
   currentFlow: string;
   isStateAuthenticated: boolean;
 }

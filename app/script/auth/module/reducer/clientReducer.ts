@@ -18,9 +18,10 @@
  */
 
 import {AppActions, CLIENT_ACTION, AUTH_ACTION, NOTIFICATION_ACTION} from '../action/creator/';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
 export interface ClientState {
-  clients: any[];
+  clients: RegisteredClient[];
   error: Error;
   fetching: boolean;
   hasHistory: boolean;
@@ -73,7 +74,7 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
     case CLIENT_ACTION.CLIENT_REMOVE_SUCCESS: {
       return {
         ...state,
-        clients: [state.clients.filter(client => client.id === action.payload)],
+        clients: [...state.clients.filter(client => client.id === action.payload)],
         error: null,
         fetching: false,
       };
