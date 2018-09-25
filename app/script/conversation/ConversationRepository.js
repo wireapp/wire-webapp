@@ -1416,9 +1416,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   toggle_silence_conversation(conversation_et) {
     if (!conversation_et) {
-      return Promise.reject(
-        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND)
-      );
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+      return Promise.reject(error);
     }
 
     const payload = {
@@ -1978,14 +1977,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send edited message in specified conversation.
    *
    * @param {string} textMessage - Edited plain text message
-   * @param {Message} originalMessageEntity - Original message entity
-   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {z.entity.Message} originalMessageEntity - Original message entity
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(textMessage, originalMessageEntity, conversationEntity, mentionEntities) {
-    if (originalMessageEntity.get_first_asset().text === textMessage) {
-      return Promise.reject(new Error('Edited message equals original message'));
+    const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
+    const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
+    const wasEdited = hasDifferentText || hasDifferentMentions;
+
+    if (!wasEdited) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES);
+      return Promise.reject(error);
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());

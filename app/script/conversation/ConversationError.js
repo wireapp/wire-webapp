@@ -49,6 +49,9 @@ z.conversation.ConversationError = class ConversationError extends Error {
       case ConversationError.TYPE.NO_CONVERSATION_ID:
         this.message = 'Conversation ID is not defined';
         break;
+      case ConversationError.TYPE.NO_MESSAGE_CHANGES:
+        this.message = 'Edited message equals original message';
+        break;
       case ConversationError.TYPE.REQUEST_FAILED:
         this.message = 'Conversation related backend request failed';
         break;
@@ -77,6 +80,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
       MISSING_PARAMETER: 'ConversationError.TYPE.MISSING_PARAMETER',
       NO_CHANGES: 'ConversationError.TYPE.NO_CHANGES',
       NO_CONVERSATION_ID: 'ConversationError.TYPE.NO_CONVERSATION_ID',
+      NO_MESSAGE_CHANGES: 'ConversationError.TYPE.NO_MESSAGE_CHANGES',
       REQUEST_FAILURE: 'ConversationError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'ConversationError.TYPE.UNKNOWN',
       WRONG_CHANGE: 'ConversationError.TYPE.WRONG_CHANGE',
