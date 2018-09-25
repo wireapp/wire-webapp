@@ -869,9 +869,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
-          const connectionConfig = this.peerConnection.getConfiguration
-            ? this.peerConnection.getConfiguration()
-            : this.peerConnectionConfiguration;
+          const connectionConfig =
+            (this.peerConnection.getConfiguration && this.peerConnection.getConfiguration()) ||
+            this.peerConnectionConfiguration;
           const isValidGathering = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
             connectionConfig,
             iceCandidates
