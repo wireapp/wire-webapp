@@ -310,10 +310,11 @@ z.conversation.ConversationCellState = (() => {
               stringId = conversationEntity.is_group()
                 ? z.string.conversationsSecondaryLineEphemeralMentionGroup
                 : z.string.conversationsSecondaryLineEphemeralMention;
+            } else {
+              stringId = conversationEntity.is_group()
+                ? z.string.conversationsSecondaryLineEphemeralMessageGroup
+                : z.string.conversationsSecondaryLineEphemeralMessage;
             }
-            stringId = conversationEntity.is_group()
-              ? z.string.conversationsSecondaryLineEphemeralMessageGroup
-              : z.string.conversationsSecondaryLineEphemeralMessage;
             return z.l10n.text(stringId);
           }
 
