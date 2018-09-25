@@ -154,11 +154,7 @@ z.util.getFileExtension = filename => {
  * @returns {string} Trimmed string
  */
 z.util.trimEnd = text => {
-  if (_.isString(text)) {
-    return text.replace(/\s*$/, '');
-  }
-
-  return '';
+  return _.isString(text) ? text.replace(/\s*$/, '') : '';
 };
 
 /**
