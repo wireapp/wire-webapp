@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.15.23"></a>
+## [1.15.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.22...@wireapp/api-client@1.15.23) (2018-09-25)
+
+
+### Bug Fixes
+
+* **api-client:** Return TeamInvitation when posting a new Invitation ([#1155](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1155)) ([2e661ca](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2e661ca))
+
+
+
+
+
 <a name="1.15.22"></a>
 ## [1.15.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.15.21...@wireapp/api-client@1.15.22) (2018-09-24)
 
