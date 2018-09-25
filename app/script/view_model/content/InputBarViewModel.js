@@ -419,21 +419,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   handleMentionFlow() {
     const textarea = document.querySelector('#conversation-input-bar-text');
-    const value = textarea.value;
-    const {selectionStart, selectionEnd} = textarea;
+    const {selectionStart, selectionEnd, value} = textarea;
+
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
-    const isOverMention =
-      this.findMentionAtPosition(selectionStart - 1, this.currentMentions()) ||
-      this.findMentionAtPosition(selectionEnd, this.currentMentions());
+
+    const isSelectionStartMention = this.findMentionAtPosition(selectionStart - 1, this.currentMentions());
+    const isSelectionEndMention = this.findMentionAtPosition(selectionEnd, this.currentMentions());
+    const isOverMention = isSelectionStartMention || isSelectionEndMention;
     const isOverValidMentionString = /^@\S*$/.test(wordBeforeSelection);
 
     if (!isSpaceSelected && !isOverMention && isOverValidMentionString) {
       const wordAfterSelection = value.substring(selectionEnd).replace(/\s[^]*/, '');
+
       const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
-      const start = selectionStart - wordBeforeSelection.length;
-      this.editedMention({start, term});
+      const startIndex = selectionStart - wordBeforeSelection.length;
+      this.editedMention({startIndex, term});
     } else {
       this.editedMention(undefined);
     }
@@ -445,10 +447,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const textarea = document.querySelector('#conversation-input-bar-text');
     const {selectionStart, selectionEnd} = textarea;
     const defaultRange = {endIndex: 0, startIndex: Infinity};
+
     const firstMention = this.findMentionAtPosition(selectionStart, this.currentMentions()) || defaultRange;
     const lastMention = this.findMentionAtPosition(selectionEnd, this.currentMentions()) || defaultRange;
+
     const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
     const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
+
     const newStart = Math.min(mentionStart, selectionStart);
     const newEnd = Math.max(mentionEnd, selectionEnd);
     if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
@@ -463,6 +468,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const textarea = event.target;
     const value = textarea.value;
     const previousValue = this.input();
+
     const lengthDifference = value.length - previousValue.length;
     const edgeMention = this.detectMentionEdgeDeletion(textarea, lengthDifference);
     if (edgeMention) {
