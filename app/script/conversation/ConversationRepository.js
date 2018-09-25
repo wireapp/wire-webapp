@@ -1997,8 +1997,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send edited message in specified conversation.
    *
    * @param {string} textMessage - Edited plain text message
-   * @param {Message} originalMessageEntity - Original message entity
-   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {z.entity.Message} originalMessageEntity - Original message entity
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
