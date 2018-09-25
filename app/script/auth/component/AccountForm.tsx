@@ -32,6 +32,7 @@ import {RootState, Api} from '../module/reducer';
 import {AnyAction} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
 import ROOT_ACTIONS from '../module/action/';
+import {RegistrationDataState} from '../module/reducer/authReducer';
 
 interface Props extends React.HTMLAttributes<AccountForm> {
   beforeSubmit?: () => Promise<void>;
@@ -40,21 +41,7 @@ interface Props extends React.HTMLAttributes<AccountForm> {
 }
 
 interface ConnectedProps {
-  account: {
-    accent_id: number;
-    assets: any;
-    email: string;
-    email_code: string;
-    invitation_code: string;
-    label: string;
-    locale: string;
-    name: string;
-    password: string;
-    phone: string;
-    phone_code: string;
-    team: any;
-    termsAccepted: boolean;
-  };
+  account: RegistrationDataState;
   authError: Error;
   isFetching: boolean;
   isPersonalFlow: boolean;
@@ -63,15 +50,17 @@ interface ConnectedProps {
 
 interface DispatchProps {
   doSendActivationCode: (email: string) => Promise<void>;
-  pushAccountRegistrationData: (registrationData: any) => Promise<void>;
+  pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => Promise<void>;
 }
 
 interface State {
-  accent_id: number;
-  email: string;
-  name: string;
-  password: string;
-  termsAccepted: boolean;
+  registrationData: {
+    accent_id: number;
+    email: string;
+    name: string;
+    password: string;
+    termsAccepted: boolean;
+  };
   validInputs: {
     email: boolean;
     name: boolean;
@@ -88,11 +77,13 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
   } = {};
 
   state = {
-    accent_id: AccentColor.random().id,
-    email: this.props.account.email || '',
-    name: this.props.account.name || '',
-    password: this.props.account.password || '',
-    termsAccepted: this.props.account.termsAccepted || false,
+    registrationData: {
+      accent_id: AccentColor.random().id,
+      email: this.props.account.email || '',
+      name: this.props.account.name || '',
+      password: this.props.account.password || '',
+      termsAccepted: this.props.account.termsAccepted || false,
+    },
     validInputs: {
       email: true,
       name: true,
@@ -103,11 +94,21 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
 
   componentWillReceiveProps({account}) {
     if (account) {
-      if (account.email !== this.state.email) {
-        this.setState({email: account.email});
+      if (account.email !== this.state.registrationData.email) {
+        this.setState({
+          registrationData: {
+            ...this.state.registrationData,
+            email: account.email,
+          },
+        });
       }
       if (account.name !== this.props.account.name) {
-        this.setState({name: account.name});
+        this.setState({
+          registrationData: {
+            ...this.state.registrationData,
+            name: account.name,
+          },
+        });
       }
     }
   }
@@ -130,7 +131,8 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
     });
 
     this.setState({validInputs, validationErrors: errors});
-    const isPersonalInvitation = this.props.isPersonalInvitationFlow && this.state.email === this.props.account.email;
+    const isPersonalInvitation =
+      this.props.isPersonalInvitationFlow && this.state.registrationData.email === this.props.account.email;
     return Promise.resolve()
       .then(() => {
         if (errors.length > 0) {
@@ -138,10 +140,10 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
         }
       })
       .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
-      .then(() => this.props.pushAccountRegistrationData({...this.state}))
+      .then(() => this.props.pushAccountRegistrationData({...this.state.registrationData}))
       .then(() => {
         if (!isPersonalInvitation) {
-          return this.props.doSendActivationCode(this.state.email);
+          return this.props.doSendActivationCode(this.state.registrationData.email);
         }
         return undefined;
       })
@@ -173,7 +175,10 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
       submitText,
       intl: {formatMessage: _},
     } = this.props;
-    const {name, email, password, termsAccepted, validInputs} = this.state;
+    const {
+      registrationData: {name, email, password, termsAccepted},
+      validInputs,
+    } = this.state;
     return (
       <Form onSubmit={this.handleSubmit} style={{display: 'flex', flexDirection: 'column'}}>
         <div>
@@ -182,7 +187,10 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
               name="name"
               onChange={event =>
                 this.setState({
-                  name: event.target.value,
+                  registrationData: {
+                    ...this.state.registrationData,
+                    name: event.target.value,
+                  },
                   validInputs: {...validInputs, name: true},
                 })
               }
@@ -207,7 +215,10 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
               name="email"
               onChange={event =>
                 this.setState({
-                  email: event.target.value,
+                  registrationData: {
+                    ...this.state.registrationData,
+                    email: event.target.value,
+                  },
                   validInputs: {...validInputs, email: true},
                 })
               }
@@ -232,7 +243,10 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
               name="password"
               onChange={event =>
                 this.setState({
-                  password: event.target.value,
+                  registrationData: {
+                    ...this.state.registrationData,
+                    password: event.target.value,
+                  },
                   validInputs: {...validInputs, password: true},
                 })
               }
@@ -253,7 +267,14 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
           <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
         </div>
         <Checkbox
-          onChange={event => this.setState({termsAccepted: event.target.checked})}
+          onChange={event =>
+            this.setState({
+              registrationData: {
+                ...this.state.registrationData,
+                termsAccepted: event.target.checked,
+              },
+            })
+          }
           name="accept"
           required
           checked={termsAccepted}
@@ -294,7 +315,7 @@ export default injectIntl(
     }),
     (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
       doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-      pushAccountRegistrationData: registrationData =>
+      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
         dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
     })
   )(AccountForm)

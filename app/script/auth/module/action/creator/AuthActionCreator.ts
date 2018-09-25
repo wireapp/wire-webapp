@@ -20,6 +20,7 @@
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {AppAction} from '.';
 import {Invitation} from '@wireapp/api-client/dist/commonjs/invitation';
+import {RegistrationDataState} from '../../reducer/authReducer';
 
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
@@ -217,7 +218,7 @@ export interface ResetRegistrationDataAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA;
 }
 export interface PushRegistrationDataAction extends AppAction {
-  readonly payload: RegisterData;
+  readonly payload: Partial<RegistrationDataState>;
   readonly type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA;
 }
 
@@ -354,7 +355,7 @@ export class AuthActionCreator {
   static resetAccountData = (): ResetRegistrationDataAction => ({
     type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
   });
-  static pushAccountRegistrationData = (accountData: RegisterData): PushRegistrationDataAction => ({
+  static pushAccountRegistrationData = (accountData: Partial<RegistrationDataState>): PushRegistrationDataAction => ({
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
   });

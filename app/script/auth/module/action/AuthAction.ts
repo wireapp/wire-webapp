@@ -28,6 +28,7 @@ import {AnyAction} from 'redux';
 import {Api, RootState, ThunkAction} from '../reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AuthActionCreator} from './creator/';
+import {RegistrationDataState} from '../reducer/authReducer';
 
 type LoginLifecycleFunction = (
   dispatch: ThunkDispatch<RootState, Api, AnyAction>,
@@ -151,7 +152,9 @@ export class AuthAction {
     return Promise.all(saveTasks);
   };
 
-  pushAccountRegistrationData = (registration): ThunkAction => {
+  pushAccountRegistrationData = (
+    registration: Partial<RegistrationDataState>
+  ): ThunkAction => {
     return dispatch => {
       return Promise.resolve().then(() => {
         dispatch(AuthActionCreator.pushAccountRegistrationData(registration));

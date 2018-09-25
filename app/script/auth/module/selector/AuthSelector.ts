@@ -18,6 +18,8 @@
  */
 
 import {RootState} from '../reducer';
+import {RegistrationDataState} from '../reducer/authReducer';
+import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 
 export const REGISTER_FLOW = {
   GENERIC_INVITATION: 'REGISTER_FLOW_GENERIC_INVITATION',
@@ -26,12 +28,36 @@ export const REGISTER_FLOW = {
   TEAM: 'REGISTER_FLOW_TEAM',
 };
 
+const unsetRegistrationData: RegistrationDataState = {
+  accent_id: 0,
+  assets: [],
+  email: undefined,
+  email_code: undefined,
+  invitation_code: undefined,
+  label: undefined,
+  locale: undefined,
+  name: undefined,
+  password: undefined,
+  phone: undefined,
+  phone_code: undefined,
+  team: undefined,
+  termsAccepted: false,
+};
+
+const unsetTeam: TeamData = {
+  id: undefined,
+  name: undefined,
+  icon: undefined,
+  creator: undefined,
+  binding: undefined,
+};
+
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;
 export const isFetching = (state: RootState) => state.authState.fetching;
 export const getError = (state: RootState) => state.authState.error;
 export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
-export const getAccount = (state: RootState) => state.authState.account || {team: {}};
-export const getAccountTeam = (state: RootState) => getAccount(state).team || {};
+export const getAccount = (state: RootState): RegistrationDataState => state.authState.account || unsetRegistrationData;
+export const getAccountTeam = (state: RootState) => getAccount(state).team || unsetTeam;
 export const getAccountTeamName = (state: RootState) => getAccountTeam(state).name;
 
 export const isGenericInvitationFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;

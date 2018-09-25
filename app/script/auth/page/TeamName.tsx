@@ -51,6 +51,7 @@ import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import ROOT_ACTIONS from '../module/action/';
+import {RegistrationDataState} from '../module/reducer/authReducer';
 
 interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
 
@@ -61,7 +62,7 @@ interface ConnectedProps {
 
 interface DispatchProps {
   enterTeamCreationFlow: () => Promise<void>;
-  pushAccountRegistrationData: (teamData: {team: {name: string}}) => Promise<void>;
+  pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) => Promise<void>;
   resetInviteErrors: () => Promise<void>;
 }
 
@@ -94,7 +95,17 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
     } else {
       Promise.resolve(this.teamNameInput.value)
         .then(teamName => teamName.trim())
-        .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
+        .then(teamName =>
+          this.props.pushAccountRegistrationData({
+            team: {
+              id: undefined,
+              name: teamName,
+              icon: undefined,
+              creator: undefined,
+              binding: undefined,
+            },
+          })
+        )
         .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
     this.teamNameInput.focus();
@@ -190,7 +201,7 @@ export default withRouter(
       }),
       (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
         enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
-        pushAccountRegistrationData: (teamData: {team: {name: string}}) =>
+        pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
           dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       })

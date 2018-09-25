@@ -19,23 +19,27 @@
 
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 import {AppActions, USER_ACTION, AUTH_ACTION} from '../action/creator/';
+import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
+import {UserAsset} from '@wireapp/api-client/dist/commonjs/user';
+
+export interface RegistrationDataState {
+  accent_id: number;
+  assets: UserAsset[];
+  email: string;
+  email_code: string;
+  invitation_code: string;
+  label: string;
+  locale: string;
+  name: string;
+  password: string;
+  phone: string;
+  phone_code: string;
+  team: TeamData;
+  termsAccepted: boolean;
+}
 
 export type AuthState = {
-  readonly account: {
-    accent_id: number;
-    assets: any;
-    email: string;
-    email_code: string;
-    invitation_code: string;
-    label: string;
-    locale: string;
-    name: string;
-    password: string;
-    phone: string;
-    phone_code: string;
-    team: any;
-    termsAccepted: boolean;
-  };
+  readonly account: RegistrationDataState;
   readonly currentFlow: string;
   readonly error: Error;
   readonly fetched: boolean;
