@@ -1975,25 +1975,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Checks if two arrays with mentions contain different values.
-   *
-   * @param {Array<z.message.MentionEntity>} [existingMentions] - Existing mentions
-   * @param {Array<z.message.MentionEntity>} [updatedMentions] - Updated mentions
-   * @returns {boolean} Are the mentions different from each other
-   */
-  haveMentionsChanged(existingMentions, updatedMentions) {
-    const flattenToUserId = mentions => mentions.map(mention => mention.userId).sort();
-
-    existingMentions = flattenToUserId(existingMentions);
-    updatedMentions = flattenToUserId(updatedMentions);
-
-    const hasDifferentAmount = existingMentions.length !== updatedMentions.length;
-    const hasDifferentUserIDs = existingMentions.some((userId, index) => userId !== updatedMentions[index]);
-
-    return hasDifferentAmount || hasDifferentUserIDs;
-  }
-
-  /**
    * Send edited message in specified conversation.
    *
    * @param {string} textMessage - Edited plain text message
@@ -2003,12 +1984,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(textMessage, originalMessageEntity, conversationEntity, mentionEntities) {
-    const hasTextChanged = textMessage !== originalMessageEntity.get_first_asset().text;
-    const haveMentionsChanged = this.haveMentionsChanged(
-      originalMessageEntity.get_first_asset().mentions(),
-      mentionEntities
-    );
-    const wasEdited = hasTextChanged || haveMentionsChanged;
+    const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
+    const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
+    const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
       const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES);
