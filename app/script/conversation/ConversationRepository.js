@@ -3397,8 +3397,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        if (conversationEntity.removed_from_conversation()) {
-          return this.delete_message(conversationEntity, messageEntity);
+        const isPingFromSelf = messageEntity.user().is_me && messageEntity.is_ping();
+        const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
+        if (deleteForSelf) {
+          return this.deleteMessage(conversationEntity, messageEntity);
         }
 
         const userIds = conversationEntity.is_group() ? [this.selfUser().id, messageEntity.from] : undefined;
@@ -3737,7 +3739,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
-        with_service: conversationEntity.isWithService(),
+        with_service: conversationEntity.hasService(),
       };
 
       const isTeamConversation = !!conversationEntity.team_id;
