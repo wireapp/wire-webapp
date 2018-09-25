@@ -3564,9 +3564,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           const textAsset = messageEntity.get_first_asset();
           if (textAsset.mentions && textAsset.mentions().length) {
-            textAsset.mentions().forEach(mentionEntity => {
-              mentionEntity.setReaderId(this.selfUser().id);
-            });
+            textAsset.mentions().forEach(mentionEntity => mentionEntity.setSelfId(this.selfUser().id));
           }
         }
       }
