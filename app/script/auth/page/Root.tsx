@@ -71,7 +71,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
     };
   };
 
-  loadLanguage = language => {
+  loadLanguage = (language: string) => {
     return SUPPORTED_LOCALE.includes(language) ? require(`../../../i18n/webapp-${language}.json`) : {};
   };
 

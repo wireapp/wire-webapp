@@ -26,6 +26,8 @@ import {mount} from 'enzyme';
 import thunk from 'redux-thunk';
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {Store} from 'redux';
+import {RootState} from '../module/reducer';
 
 const engine = new MemoryEngine();
 engine.init('test-execution');
@@ -50,14 +52,18 @@ export const mockStore = (
   return configureStore(middlewares)(state);
 };
 
-export const withStore = (children, store) => <Provider store={store}>{children}</Provider>;
+export const withStore = (children: React.ReactNode, store: Store<RootState>) => (
+  <Provider store={store}>{children}</Provider>
+);
 
-export const withIntl = component => (
+export const withIntl = (component: React.ReactNode) => (
   <IntlProvider locale="en">
     <HashRouter hashType="noslash">{component}</HashRouter>
   </IntlProvider>
 );
 
-export const mountWithIntl = (component, store = () => {}) => mount(withStore(withIntl(component), store));
+export const mountWithIntl = (component: React.ReactNode, store: Store<RootState>) =>
+  mount(withStore(withIntl(component), store));
 
-export const mountWithStore = (component, store = () => {}) => mount(withStore(component, store));
+export const mountWithStore = (component: React.ReactNode, store: Store<RootState>) =>
+  mount(withStore(component, store));

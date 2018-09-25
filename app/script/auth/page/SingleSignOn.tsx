@@ -147,7 +147,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
         this.setState({isOverlayOpen: false});
       };
 
-      onReceiveChildWindowMessage = event => {
+      onReceiveChildWindowMessage = (event: MessageEvent) => {
         const isExpectedOrigin = event.origin === BACKEND.rest;
         if (!isExpectedOrigin) {
           onChildWindowClose();
@@ -231,14 +231,14 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     });
   };
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     this.props.resetAuthError();
     if (this.props.isFetching) {
       return undefined;
     }
     this.inputs.code.value = this.inputs.code.value.trim();
-    const validationErrors = [];
+    const validationErrors: Error[] = [];
     const validInputs = this.state.validInputs;
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
@@ -305,7 +305,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   focusChildWindow = () => this.ssoWindow && this.ssoWindow.focus();
 
-  extractSSOLink = (event, shouldEmitError = true) => {
+  extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
     if (event) {
       event.preventDefault();
     }
@@ -326,17 +326,18 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   readFromClipboard = () => window.navigator.clipboard.readText();
 
-  containsSSOCode = text => text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
+  containsSSOCode = (text: string) =>
+    text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
-  isSSOCode = text => text && new RegExp(`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
+  isSSOCode = (text: string) => text && new RegExp(`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
 
-  extractCode = text => {
+  extractCode = (text: string) => {
     return this.containsSSOCode(text)
       ? text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
       : '';
   };
 
-  stripPrefix = code =>
+  stripPrefix = (code: string) =>
     code &&
     code
       .trim()

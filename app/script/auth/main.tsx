@@ -49,7 +49,7 @@ const store = configureStore({
   localStorage,
 });
 
-const Wrapper = Component => (
+const Wrapper = (Component: React.ComponentClass) => (
   <AppContainer>
     <Provider store={store}>
       <Component />
@@ -57,7 +57,7 @@ const Wrapper = Component => (
   </AppContainer>
 );
 
-const render = Component => {
+const render = (Component: React.ComponentClass) => {
   ReactDOM.render(Wrapper(Component), document.getElementById('main'));
 };
 

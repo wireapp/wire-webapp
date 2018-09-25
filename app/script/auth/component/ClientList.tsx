@@ -74,7 +74,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
     this.props.resetAuthError();
   };
 
-  removeClient = (clientId, password) => {
+  removeClient = (clientId: string, password: string) => {
     this.setState({showLoading: true, loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner.bind(this), 1000)});
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
@@ -97,7 +97,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
     this.setState({showLoading: false, loadingTimeoutId: undefined});
   }
 
-  isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
+  isSelectedClient = (clientId: string) => clientId === this.state.currentlySelectedClient;
 
   render() {
     const {isFetching, permanentClients} = this.props;
@@ -120,7 +120,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
             client={client}
             clientError={this.isSelectedClient(client.id) && this.props.clientError}
             onClick={() => this.setSelectedClient(client.id)}
-            onClientRemoval={password => this.removeClient(client.id, password)}
+            onClientRemoval={(password: string) => this.removeClient(client.id, password)}
           />
         ))}
       </ContainerXS>

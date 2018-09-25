@@ -63,7 +63,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
   intl: {formatMessage: _},
   ...connected
 }) => {
-  const createAccount = email_code => {
+  const createAccount = (email_code: string) => {
     switch (currentFlow) {
       case REGISTER_FLOW.TEAM: {
         connected
@@ -83,7 +83,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
     }
   };
 
-  const resendCode = event => {
+  const resendCode = (event: React.MouseEvent) => {
     event.preventDefault();
     return connected
       .doSendActivationCode(account.email)
