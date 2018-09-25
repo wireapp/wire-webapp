@@ -1487,8 +1487,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const skipChange = sameTimestamp && !forceChange;
 
     if (!stateChange && skipChange) {
-      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
-      return Promise.reject(error);
+      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES));
     }
 
     const payload = {
@@ -2594,8 +2593,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         if (!messageEntity.user().is_me && !messageEntity.ephemeral_expires()) {
-          const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
-          throw error;
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
         const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
@@ -2704,8 +2702,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
-      const error = new Error('Conversation Repository Event Handling: Event missing');
-      return Promise.reject(error);
+      return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
     const {conversation, data: eventData, type} = eventJson;
