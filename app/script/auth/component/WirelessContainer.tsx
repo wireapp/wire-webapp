@@ -61,7 +61,7 @@ export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
             bold={false}
             data-uie-name="go-privacy"
           >
-            <FormattedHTMLMessage style={{textAlign: 'center'}} {...cookiePolicyStrings.bannerText} />
+            <FormattedHTMLMessage {...cookiePolicyStrings.bannerText} />
           </Link>
         </div>
         <div
