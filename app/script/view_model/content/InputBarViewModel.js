@@ -65,7 +65,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editMessageEntity = ko.observable();
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
-    this.editInput = ko.observable('');
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -79,30 +78,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => this.input().length);
 
-    this.input = ko.pureComputed({
-      read: () => {
-        if (this.isEditing()) {
-          return this.editInput();
-        }
-
-        const textInput = this.conversationEntity() && this.conversationEntity().input().text;
-        return textInput || '';
-      },
-      write: value => {
-        if (this.isEditing()) {
-          return this.editInput(value);
-        }
-
-        if (this.conversationEntity()) {
-          const mentions = this.currentMentions();
-
-          this.conversationEntity().input({
-            mentions,
-            text: value,
-          });
-        }
-      },
-    });
+    this.input = ko.observable('');
 
     this.input.subscribeChanged((newValue, oldValue) => {
       const difference = newValue.length - oldValue.length;
@@ -190,15 +166,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
 
-    this.conversationEntity.subscribe(() => {
-      this.conversationHasFocus(true);
-      this.pastedFile(null);
-      this.cancelMessageEditing();
-      if (this.conversationEntity()) {
-        this.currentMentions(this.conversationEntity().input().mentions);
-      }
-    });
-
     this.isEditing.subscribe(isEditing => {
       if (isEditing) {
         return window.addEventListener('click', this.onWindowClick);
@@ -227,6 +194,22 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
+    this.editedMessage = ko
+      .pureComputed(() => {
+        const text = this.input();
+        const mentions = this.currentMentions();
+        return {mentions, text};
+      })
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
+
+    this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
+    this.editedMessage.subscribe(message => {
+      if (!this.conversationEntity()) {
+        return;
+      }
+      this._saveEditState(this.conversationEntity(), message.text, message.mentions);
+    });
+
     this._init_subscriptions();
   }
 
@@ -238,6 +221,45 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => {
       window.requestAnimationFrame(() => this.conversationHasFocus(true));
     });
+  }
+
+  loadInitialStateForConversation(conversationEntity) {
+    this.conversationHasFocus(true);
+    this.pastedFile(null);
+    this.cancelMessageEditing();
+    if (!conversationEntity) {
+      return;
+    }
+    const previousSessionData = this._loadEditState(conversationEntity);
+    this.input(previousSessionData.text);
+    this.currentMentions(previousSessionData.mentions);
+  }
+
+  _saveEditState(conversationEntity, text, mentions) {
+    if (!this.isEditing()) {
+      // we only save state for newly written messages
+      const storageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+      z.util.StorageUtil.setValue(storageKey, {mentions, text: z.util.StringUtil.trimEnd(text)});
+    }
+  }
+
+  _loadEditState(conversationEntity) {
+    const storageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+    const storageValue = z.util.StorageUtil.getValue(storageKey);
+
+    if (typeof storageValue === 'undefined') {
+      return {mentions: [], text: ''};
+    }
+
+    if (typeof storageValue === 'string') {
+      return {mentions: [], text: storageValue};
+    }
+
+    storageValue.mentions = storageValue.mentions.map(mention => {
+      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+    });
+
+    return storageValue;
   }
 
   _createMentionEntity(userEntity) {
@@ -284,7 +306,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editMessageEntity(undefined);
     this.currentMentions.removeAll();
-    this.editInput('');
+    this.input('');
   }
 
   clickToCancelPastedFile() {
@@ -292,7 +314,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   clickToShowGiphy() {
-    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW);
+    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.input());
   }
 
   clickToPing() {
