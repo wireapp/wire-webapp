@@ -171,7 +171,7 @@ describe('z.util.renderMessage', () => {
       },
       {
         expected:
-          'salut <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>`I am a **pain** in the __a**__`</span>',
+          'salut <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>&#x60;I am a **pain** in the __a**__&#x60;</span>',
         mentions: [{length: 33, startIndex: 6, userId: 'pain-id'}],
         testCase: "doesn't parse markdown in user names",
         text: 'salut @`I am a **pain** in the __a**__`',
