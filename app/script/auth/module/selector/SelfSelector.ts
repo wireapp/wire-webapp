@@ -18,8 +18,20 @@
 */
 
 import {RootState} from '../reducer';
+import {Self} from '@wireapp/api-client/dist/commonjs/self';
 
-export const getSelf = (state: RootState) => state.selfState.self || {};
+const unsetSelf: Self = {
+  id: undefined,
+  locale: undefined,
+  name: undefined,
+  handle: undefined,
+  expires_at: undefined,
+  assets: [],
+  accent_id: undefined,
+  team: undefined,
+};
+
+export const getSelf = (state: RootState) => state.selfState.self || unsetSelf;
 export const getSelfName = (state: RootState) => getSelf(state).name;
 export const getSelfHandle = (state: RootState) => getSelf(state).handle;
 export const hasSelfHandle = (state: RootState) => !!getSelf(state).handle;

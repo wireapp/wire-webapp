@@ -21,7 +21,7 @@ import * as Environment from '../../Environment';
 import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime';
 import {hasURLParameter} from '../../util/urlUtil';
 import {QUERY_KEY} from '../../route';
-import {Cookies} from 'js-cookie';
+import {CookiesStatic} from 'js-cookie';
 import {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
 
@@ -54,10 +54,10 @@ export class RuntimeAction {
   };
 
   checkCookieSupport = (): ThunkAction<void> => {
-    return (dispatch, getState, {actions: {runtimeAction}}) => {
+    return (dispatch, getState, {actions: {runtimeAction}, cookieStore}) => {
       dispatch(RuntimeActionCreator.startCheckCookie());
       runtimeAction
-        .hasCookieSupport()
+        .hasCookieSupport(cookieStore)
         .then(() => {
           dispatch(RuntimeActionCreator.finishCheckCookie(true));
         })
@@ -67,7 +67,7 @@ export class RuntimeAction {
     };
   };
 
-  hasCookieSupport = (): Promise<void> => {
+  hasCookieSupport = (cookieStore: CookiesStatic): Promise<void> => {
     const cookieName = 'cookie_supported';
 
     return new Promise((resolve, reject) => {
@@ -77,9 +77,9 @@ export class RuntimeAction {
         case false:
           return reject(new Error());
         default:
-          Cookies.set(cookieName, 'yes');
-          if (Cookies.get(cookieName)) {
-            Cookies.remove(cookieName);
+          cookieStore.set(cookieName, 'yes');
+          if (cookieStore.get(cookieName)) {
+            cookieStore.remove(cookieName);
             return resolve();
           }
           return reject(new Error());
