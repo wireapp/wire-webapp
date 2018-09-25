@@ -53,12 +53,10 @@ export class NotificationActionCreator {
   static startCheckHistory = (): HistoryCheckStartAction => ({
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_START,
   });
-
   static successfulCheckHistory = (hasHistory: boolean): HistoryCheckSuccessAction => ({
     payload: hasHistory,
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS,
   });
-
   static failedCheckHistory = (error: Error): HistoryCheckFailedAction => ({
     error,
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_FAILED,

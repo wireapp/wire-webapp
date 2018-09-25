@@ -36,12 +36,10 @@ export type InvitationActions =
 export interface AddInviteStartAction {
   type: INVITATION_ACTION.INVITE_ADD_START;
 }
-
 export interface AddInviteSuccessAction {
   type: INVITATION_ACTION.INVITE_ADD_SUCCESS;
   payload: {invite: TeamInvitation};
 }
-
 export interface AddInviteFailedAction {
   type: INVITATION_ACTION.INVITE_ADD_FAILED;
   error: Error;
@@ -55,12 +53,10 @@ export class InvitationActionCreator {
   static startAddInvite = (): AddInviteStartAction => ({
     type: INVITATION_ACTION.INVITE_ADD_START,
   });
-
   static successfulAddInvite = (invite: any): AddInviteSuccessAction => ({
     payload: {invite},
     type: INVITATION_ACTION.INVITE_ADD_SUCCESS,
   });
-
   static failedAddInvite = (error: Error): AddInviteFailedAction => ({
     error,
     type: INVITATION_ACTION.INVITE_ADD_FAILED,

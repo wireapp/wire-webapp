@@ -45,11 +45,9 @@ export class UserActionCreator {
   static startSendActivationCode = (): SendActivationCodeStartAction => ({
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START,
   });
-
   static successfulSendActivationCode = (): SendActivationCodeSuccessAction => ({
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS,
   });
-
   static failedSendActivationCode = (error: Error): SendActivationCodeFailedAction => ({
     error,
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED,

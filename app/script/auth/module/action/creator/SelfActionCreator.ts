@@ -63,6 +63,7 @@ export interface SetHandleFailedAction extends AppAction {
   readonly type: SELF_ACTION.HANDLE_SET_FAILED;
   readonly error: Error;
 }
+
 export interface FetchSelfStartAction extends AppAction {
   readonly type: SELF_ACTION.SELF_FETCH_START;
 }
@@ -103,12 +104,10 @@ export class SelfActionCreator {
   static startSetHandle = (): SetHandleStartAction => ({
     type: SELF_ACTION.HANDLE_SET_START,
   });
-
   static successfulSetHandle = (selfUser: Self): SetHandleSuccessAction => ({
     payload: selfUser,
     type: SELF_ACTION.HANDLE_SET_SUCCESS,
   });
-
   static failedSetHandle = (error: Error): SetHandleFailedAction => ({
     error,
     type: SELF_ACTION.HANDLE_SET_FAILED,
@@ -117,12 +116,10 @@ export class SelfActionCreator {
   static startFetchSelf = (): FetchSelfStartAction => ({
     type: SELF_ACTION.SELF_FETCH_START,
   });
-
   static successfulFetchSelf = (selfUser: Self): FetchSelfSuccessAction => ({
     payload: selfUser,
     type: SELF_ACTION.SELF_FETCH_SUCCESS,
   });
-
   static failedFetchSelf = (error: Error): FetchSelfFailedAction => ({
     error,
     type: SELF_ACTION.SELF_FETCH_FAILED,
@@ -131,12 +128,10 @@ export class SelfActionCreator {
   static startGetConsents = (): GetConsentsStartAction => ({
     type: SELF_ACTION.CONSENT_GET_START,
   });
-
   static successfulGetConsents = (consents: any[]): GetConsentsSuccessAction => ({
     payload: consents,
     type: SELF_ACTION.CONSENT_GET_SUCCESS,
   });
-
   static failedGetConsents = (error: Error): GetConsentsFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_GET_FAILED,
@@ -145,12 +140,10 @@ export class SelfActionCreator {
   static startSetConsent = (): SetConsentStartAction => ({
     type: SELF_ACTION.CONSENT_SET_START,
   });
-
   static successfulSetConsent = (consent: any): SetConsentSuccessAction => ({
     payload: consent,
     type: SELF_ACTION.CONSENT_SET_SUCCESS,
   });
-
   static failedSetConsent = (error: Error): SetConsentFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_SET_FAILED,

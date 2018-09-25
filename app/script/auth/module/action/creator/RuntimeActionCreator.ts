@@ -41,6 +41,7 @@ export interface CheckIndexedDBSuccessAction extends AppAction {
   readonly payload: boolean;
   readonly type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_FINISH;
 }
+
 export interface CheckCookieStartAction extends AppAction {
   readonly type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_START;
 }
@@ -57,7 +58,6 @@ export class RuntimeActionCreator {
   static startCheckIndexedDb = (): CheckIndexedDBStartAction => ({
     type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_START,
   });
-
   static finishCheckIndexedDb = (result: boolean): CheckIndexedDBSuccessAction => ({
     payload: result,
     type: RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_FINISH,
@@ -66,7 +66,6 @@ export class RuntimeActionCreator {
   static startCheckCookie = (): CheckCookieStartAction => ({
     type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_START,
   });
-
   static finishCheckCookie = (result: boolean): CheckCookieSuccessAction => ({
     payload: result,
     type: RUNTIME_ACTION.RUNTIME_CHECK_COOKIE_FINISH,

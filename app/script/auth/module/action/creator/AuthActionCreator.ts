@@ -216,7 +216,6 @@ export interface ResetAuthErrorsAction extends AppAction {
 export interface ResetRegistrationDataAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA;
 }
-
 export interface PushRegistrationDataAction extends AppAction {
   readonly payload: RegisterData;
   readonly type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA;
@@ -225,15 +224,12 @@ export interface PushRegistrationDataAction extends AppAction {
 export interface EnterTeamCreationFlowAction extends AppAction {
   readonly type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW;
 }
-
 export interface EnterPersonalCreationFlowAction extends AppAction {
   readonly type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW;
 }
-
 export interface EnterGenericInvitationCreationFlowAction extends AppAction {
   readonly type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW;
 }
-
 export interface EnterPersonalInvitationCreationFlowAction extends AppAction {
   readonly type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW;
 }
@@ -254,11 +250,9 @@ export class AuthActionCreator {
   static startLogin = (): LoginStartAction => ({
     type: AUTH_ACTION.LOGIN_START,
   });
-
   static successfulLogin = (): LoginSuccessAction => ({
     type: AUTH_ACTION.LOGIN_SUCCESS,
   });
-
   static failedLogin = (error?: any): LoginFailedAction => ({
     error,
     type: AUTH_ACTION.LOGIN_FAILED,
@@ -267,12 +261,10 @@ export class AuthActionCreator {
   static startRegisterTeam = (): RegisterTeamStartAction => ({
     type: AUTH_ACTION.REGISTER_TEAM_START,
   });
-
   static successfulRegisterTeam = (authData: RegisterData): RegisterTeamSuccessAction => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
   });
-
   static failedRegisterTeam = (error?: any): RegisterTeamFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_TEAM_FAILED,
@@ -281,12 +273,10 @@ export class AuthActionCreator {
   static startRegisterPersonal = (): RegisterPersonalStartAction => ({
     type: AUTH_ACTION.REGISTER_PERSONAL_START,
   });
-
   static successfulRegisterPersonal = (authData: RegisterData): RegisterPersonalSuccessAction => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
   });
-
   static failedRegisterPersonal = (error: Error): RegisterPersonalFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
@@ -295,12 +285,10 @@ export class AuthActionCreator {
   static startRegisterWireless = (): RegisterWirelessStartAction => ({
     type: AUTH_ACTION.REGISTER_WIRELESS_START,
   });
-
   static successfulRegisterWireless = (authData: RegisterData): RegisterWirelessSuccessAction => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
   });
-
   static failedRegisterWireless = (error: Error): RegisterWirelessFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
@@ -309,12 +297,10 @@ export class AuthActionCreator {
   static startRegisterJoin = (): RegisterJoinStartAction => ({
     type: AUTH_ACTION.REGISTER_JOIN_START,
   });
-
   static successfulRegisterJoin = (authData: RegisterData): RegisterJoinSuccessAction => ({
     payload: authData,
     type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
   });
-
   static failedRegisterJoin = (error: Error): RegisterJoinFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_JOIN_FAILED,
@@ -323,11 +309,9 @@ export class AuthActionCreator {
   static startRefresh = (): RefreshStartAction => ({
     type: AUTH_ACTION.REFRESH_START,
   });
-
   static successfulRefresh = (): RefreshSuccessAction => ({
     type: AUTH_ACTION.REFRESH_SUCCESS,
   });
-
   static failedRefresh = (error: Error): RefreshFailedAction => ({
     error,
     type: AUTH_ACTION.REFRESH_FAILED,
@@ -347,11 +331,9 @@ export class AuthActionCreator {
   static startLogout = (): LogoutStartAction => ({
     type: AUTH_ACTION.LOGOUT_START,
   });
-
   static successfulLogout = (): LogoutSuccessAction => ({
     type: AUTH_ACTION.LOGOUT_SUCCESS,
   });
-
   static failedLogout = (error: Error): LogoutFailedAction => ({
     error,
     type: AUTH_ACTION.LOGOUT_FAILED,
@@ -360,7 +342,6 @@ export class AuthActionCreator {
   static successfulSilentLogout = (): LogoutSilentSuccessAction => ({
     type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
   });
-
   static failedSilentLogout = (error: Error): LogoutSilentFailedAction => ({
     error,
     type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
@@ -373,7 +354,6 @@ export class AuthActionCreator {
   static resetAccountData = (): ResetRegistrationDataAction => ({
     type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
   });
-
   static pushAccountRegistrationData = (accountData: RegisterData): PushRegistrationDataAction => ({
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
@@ -382,15 +362,12 @@ export class AuthActionCreator {
   static enterTeamCreationFlow = (): EnterTeamCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
   });
-
   static enterPersonalCreationFlow = (): EnterPersonalCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
   });
-
   static enterGenericInviteCreationFlow = (): EnterGenericInvitationCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
   });
-
   static enterPersonalInvitationCreationFlow = (): EnterPersonalInvitationCreationFlowAction => ({
     type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW,
   });
@@ -398,12 +375,10 @@ export class AuthActionCreator {
   static startGetInvitationFromCode = (): GetInvitationFromCodeStartAction => ({
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_START,
   });
-
   static successfulGetInvitationFromCode = (invitation: Invitation): GetInvitationFromCodeSuccessAction => ({
     payload: invitation,
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS,
   });
-
   static failedGetInvitationFromCode = (error: Error): GetInvitationFromCodeFailedAction => ({
     error,
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED,
