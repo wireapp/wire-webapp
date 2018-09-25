@@ -317,7 +317,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onWindowClick(event) {
-    if (!$(event.target).closest('.conversation-input-bar').length) {
+    if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
       this.cancelMessageEditing();
     }
   }
