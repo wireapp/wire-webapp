@@ -290,7 +290,7 @@ z.util.alias = {
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.renderMessage = (message, mentionEntities = []) => {
-  const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
