@@ -2002,8 +2002,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendMessageEdit(textMessage, originalMessageEntity, conversationEntity, mentionEntities) {
     const hasTextChanged = textMessage !== originalMessageEntity.get_first_asset().text;
-    const wasEdited =
-      hasTextChanged || this.haveMentionsChanged(originalMessageEntity.get_first_asset().mentions(), mentionEntities);
+    const haveMentionsChanged = this.haveMentionsChanged(
+      originalMessageEntity.get_first_asset().mentions(),
+      mentionEntities
+    );
+    const wasEdited = hasTextChanged || haveMentionsChanged;
+
     if (!wasEdited) {
       const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES);
       return Promise.reject(error);
