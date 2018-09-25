@@ -85,7 +85,7 @@ class TeamInvitationAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
-  public postInvitation(teamId: string, invitation: NewTeamInvitation): AxiosPromise {
+  public postInvitation(teamId: string, invitation: NewTeamInvitation): AxiosPromise<TeamInvitation> {
     const config: AxiosRequestConfig = {
       data: invitation,
       method: 'post',
