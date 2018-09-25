@@ -131,7 +131,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           [this.input()]
         );
 
-      return pieces.map((piece, index) => `<span${index % 2 ? mentionAttributes : ''}>${piece}</span>`).join('');
+      return pieces
+        .map((piece, index) => {
+          return `<span${index % 2 ? mentionAttributes : ''}>${z.util.SanitizationUtil.escapeString(piece)}</span>`;
+        })
+        .join('');
     });
 
     this.editedMention = ko.observable(undefined);
