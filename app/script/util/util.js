@@ -324,6 +324,15 @@ z.util.renderMessage = (message, mentionEntities = []) => {
 
   mentionlessText = marked(mentionlessText, {
     highlight: function(code) {
+      const containsMentions = mentionEntities.some(mention => {
+        const hash = createMentionHash(mention);
+        return code.includes(hash);
+      });
+      if (containsMentions) {
+        // disable code highlighting if there is a mention in there
+        // hightlighting will be wrong anyway because this is not valid code
+        return code;
+      }
       return hljs.highlightAuto(code).value;
     },
     sanitize: true,
