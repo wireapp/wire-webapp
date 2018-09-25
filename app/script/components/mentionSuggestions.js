@@ -56,17 +56,23 @@ z.components.MentionSuggestions = class MentionSuggestions {
     });
 
     this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
+    this.shouldUpdateScrollbar.subscribe(() => this.setWrapperSize(), null, 'beforeChange');
     this.shouldUpdateScrollbar.subscribe(() => {
       z.util.afterRender(() => {
-        const items = document.querySelectorAll('.mention-suggestion-list__item');
-        const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
-        if (items.length && wrapper) {
-          const itemWidths = Array.from(items).map(item => item.offsetWidth);
-          const maxWidth = Math.max.apply(null, itemWidths);
-          wrapper.style.width = `${maxWidth}px`;
+        const items = Array.from(document.querySelectorAll('.mention-suggestion-list__item'));
+        if (items.length) {
+          const maxWidth = items.reduce((currentMax, item) => Math.max(currentMax, item.offsetWidth), 0);
+          this.setWrapperSize(`${maxWidth}px`);
         }
       });
     });
+  }
+
+  setWrapperSize(size = '') {
+    const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
+    if (wrapper) {
+      wrapper.style.width = size;
+    }
   }
 
   onInput(keyboardEvent) {
