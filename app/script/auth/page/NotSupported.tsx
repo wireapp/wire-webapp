@@ -18,7 +18,7 @@
  */
 
 import * as React from 'react';
-import {Paragraph, Text, Logo, ContainerXS} from '@wireapp/react-ui-kit';
+import {Text, Logo, ContainerXS} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
@@ -40,7 +40,6 @@ const NotSupported: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
     <Page>
       <ContainerXS centerText verticalCenter>
         <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-        <Paragraph center>{_(indexStrings.claim)}</Paragraph>
         <Text>{_(indexStrings.loginInfo)}</Text>
       </ContainerXS>
     </Page>
