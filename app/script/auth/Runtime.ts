@@ -100,7 +100,7 @@ const isMobileOs = () => isAndroid() || isIOS();
 const isAndroid = () => OS.MOBILE.ANDROID.includes(getOsFamily());
 const isIOS = () => OS.MOBILE.IOS.includes(getOsFamily());
 
-const isSupportingClipboard = () => !!navigator['clipboard'];
+const isSupportingClipboard = () => !!navigator.clipboard;
 
 export {
   getBrowserName,
