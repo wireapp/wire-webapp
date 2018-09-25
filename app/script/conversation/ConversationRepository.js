@@ -1983,12 +1983,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   haveMentionsChanged(existingMentions, updatedMentions) {
     const flattenToUserId = mentions => mentions.map(mention => mention.userId).sort();
+
     existingMentions = flattenToUserId(existingMentions);
     updatedMentions = flattenToUserId(updatedMentions);
-    return (
-      existingMentions.length !== updatedMentions.length ||
-      existingMentions.some((userId, index) => userId !== updatedMentions[index])
-    );
+
+    const hasDifferentAmount = existingMentions.length !== updatedMentions.length;
+    const hasDifferentUserIDs = existingMentions.some((userId, index) => userId !== updatedMentions[index]);
+
+    return hasDifferentAmount || hasDifferentUserIDs;
   }
 
   /**
