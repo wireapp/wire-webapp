@@ -1975,6 +1975,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Checks if two arrays with mentions contain different values.
+   *
+   * @param {Array<z.message.MentionEntity>} [existingMentions] - Mentions as part of the message
+   * @param {Array<z.message.MentionEntity>} [updatedMentions] - Mentions as part of the message
+   * @returns {boolean} Are the mentions different from each other
+   */
+  haveMentionsChanged(existingMentions, updatedMentions) {
+    const flattenToUserId = mentions => mentions.map(mention => mention.userId).sort();
+    existingMentions = flattenToUserId(existingMentions);
+    updatedMentions = flattenToUserId(updatedMentions);
+    return (
+      existingMentions.length !== updatedMentions.length ||
+      existingMentions.some((userId, index) => userId !== updatedMentions[index])
+    );
+  }
+
+  /**
    * Send edited message in specified conversation.
    *
    * @param {string} textMessage - Edited plain text message
@@ -1984,8 +2001,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(textMessage, originalMessageEntity, conversationEntity, mentionEntities) {
-    if (originalMessageEntity.get_first_asset().text === textMessage) {
-      return Promise.reject(new Error('Edited message equals original message'));
+    const hasTextChanged = textMessage !== originalMessageEntity.get_first_asset().text;
+    const wasEdited =
+      hasTextChanged || this.haveMentionsChanged(originalMessageEntity.get_first_asset().mentions(), mentionEntities);
+    if (!wasEdited) {
+      return Promise.reject(
+        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES)
+      );
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());

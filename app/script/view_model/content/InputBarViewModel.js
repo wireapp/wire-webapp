@@ -533,15 +533,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    const hasTextChanged = messageText !== messageEntity.get_first_asset().text;
-    if (hasTextChanged) {
-      this.conversationRepository.sendMessageEdit(
-        messageText,
-        messageEntity,
-        this.conversationEntity(),
-        mentionEntities
-      );
-    }
+    this.conversationRepository
+      .sendMessageEdit(messageText, messageEntity, this.conversationEntity(), mentionEntities)
+      .catch(error => {
+        if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+          throw error;
+        }
+      });
   }
 
   sendPastedFile() {
