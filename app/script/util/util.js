@@ -153,7 +153,7 @@ z.util.getFileExtension = filename => {
  * @param {string} text - text to trim
  * @returns {string} Trimmed string
  */
-z.util.trimEnd = text => (_.isString(text) ? text.replace(/\s*$/, '') : '');
+z.util.trimEnd = text => text.replace(/\s*$/, '');
 
 /**
  * Remove extension of a filename.
