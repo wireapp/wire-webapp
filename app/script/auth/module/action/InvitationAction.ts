@@ -57,7 +57,7 @@ export class InvitationAction {
     };
   };
   resetInviteErrors = (): ThunkAction => {
-    return (dispatch, getState, {apiClient}) => {
+    return dispatch => {
       return Promise.resolve().then(() => {
         dispatch(InvitationActionCreator.resetError());
       });

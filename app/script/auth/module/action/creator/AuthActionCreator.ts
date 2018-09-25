@@ -117,7 +117,7 @@ export interface LoginSuccessAction extends AppAction {
 }
 export interface LoginFailedAction extends AppAction {
   readonly type: AUTH_ACTION.LOGIN_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface RegisterTeamStartAction extends AppAction {
@@ -129,7 +129,7 @@ export interface RegisterTeamSuccessAction extends AppAction {
 }
 export interface RegisterTeamFailedAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_TEAM_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface RegisterPersonalStartAction extends AppAction {
@@ -141,7 +141,7 @@ export interface RegisterPersonalSuccessAction extends AppAction {
 }
 export interface RegisterPersonalFailedAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_PERSONAL_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface RegisterWirelessStartAction extends AppAction {
@@ -153,7 +153,7 @@ export interface RegisterWirelessSuccessAction extends AppAction {
 }
 export interface RegisterWirelessFailedAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_WIRELESS_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface RegisterJoinStartAction extends AppAction {
@@ -165,7 +165,7 @@ export interface RegisterJoinSuccessAction extends AppAction {
 }
 export interface RegisterJoinFailedAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_JOIN_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface RefreshStartAction extends AppAction {
@@ -176,7 +176,7 @@ export interface RefreshSuccessAction extends AppAction {
 }
 export interface RefreshFailedAction extends AppAction {
   readonly type: AUTH_ACTION.REFRESH_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface ValidateClientStartAction extends AppAction {
@@ -187,7 +187,7 @@ export interface ValidateClientSuccessAction extends AppAction {
 }
 export interface ValidateClientFailedAction extends AppAction {
   readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface LogoutStartAction extends AppAction {
@@ -198,7 +198,7 @@ export interface LogoutSuccessAction extends AppAction {
 }
 export interface LogoutFailedAction extends AppAction {
   readonly type: AUTH_ACTION.LOGOUT_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface LogoutSilentSuccessAction extends AppAction {
@@ -206,7 +206,7 @@ export interface LogoutSilentSuccessAction extends AppAction {
 }
 export interface LogoutSilentFailedAction extends AppAction {
   readonly type: AUTH_ACTION.SILENT_LOGOUT_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface ResetAuthErrorsAction extends AppAction {
@@ -247,7 +247,7 @@ export interface GetInvitationFromCodeSuccessAction extends AppAction {
 }
 export interface GetInvitationFromCodeFailedAction extends AppAction {
   readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class AuthActionCreator {
@@ -287,7 +287,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
   });
 
-  static failedRegisterPersonal = (error: any): RegisterPersonalFailedAction => ({
+  static failedRegisterPersonal = (error: Error): RegisterPersonalFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
   });
@@ -301,7 +301,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
   });
 
-  static failedRegisterWireless = (error: any): RegisterWirelessFailedAction => ({
+  static failedRegisterWireless = (error: Error): RegisterWirelessFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
   });
@@ -315,7 +315,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
   });
 
-  static failedRegisterJoin = (error: any): RegisterJoinFailedAction => ({
+  static failedRegisterJoin = (error: Error): RegisterJoinFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_JOIN_FAILED,
   });
@@ -328,7 +328,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REFRESH_SUCCESS,
   });
 
-  static failedRefresh = (error: any): RefreshFailedAction => ({
+  static failedRefresh = (error: Error): RefreshFailedAction => ({
     error,
     type: AUTH_ACTION.REFRESH_FAILED,
   });
@@ -339,7 +339,7 @@ export class AuthActionCreator {
   static successfulValidateLocalClient = (): ValidateClientSuccessAction => ({
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
   });
-  static failedValidateLocalClient = (error: any): ValidateClientFailedAction => ({
+  static failedValidateLocalClient = (error: Error): ValidateClientFailedAction => ({
     error,
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
   });
@@ -352,7 +352,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.LOGOUT_SUCCESS,
   });
 
-  static failedLogout = (error: any): LogoutFailedAction => ({
+  static failedLogout = (error: Error): LogoutFailedAction => ({
     error,
     type: AUTH_ACTION.LOGOUT_FAILED,
   });
@@ -361,7 +361,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
   });
 
-  static failedSilentLogout = (error: any): LogoutSilentFailedAction => ({
+  static failedSilentLogout = (error: Error): LogoutSilentFailedAction => ({
     error,
     type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
   });
@@ -404,7 +404,7 @@ export class AuthActionCreator {
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS,
   });
 
-  static failedGetInvitationFromCode = (error: any): GetInvitationFromCodeFailedAction => ({
+  static failedGetInvitationFromCode = (error: Error): GetInvitationFromCodeFailedAction => ({
     error,
     type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED,
   });

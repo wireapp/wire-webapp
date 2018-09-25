@@ -53,7 +53,7 @@ export interface SetSuccessAction extends AppAction {
 }
 export interface SetFailedAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface GetStartAction extends AppAction {
@@ -65,7 +65,7 @@ export interface GetSuccessAction extends AppAction {
 }
 export interface GetFailedAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface DeleteStartAction extends AppAction {
@@ -77,7 +77,7 @@ export interface DeleteSuccessAction extends AppAction {
 }
 export interface DeleteFailedAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class LocalStorageActionCreator {
@@ -90,7 +90,7 @@ export class LocalStorageActionCreator {
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
   });
 
-  static failedLocalStorageSet = (error?: any): SetFailedAction => ({
+  static failedLocalStorageSet = (error: Error): SetFailedAction => ({
     error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED,
   });
@@ -104,7 +104,7 @@ export class LocalStorageActionCreator {
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
   });
 
-  static failedLocalStorageGet = (error?: any): GetFailedAction => ({
+  static failedLocalStorageGet = (error: Error): GetFailedAction => ({
     error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED,
   });
@@ -118,7 +118,7 @@ export class LocalStorageActionCreator {
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS,
   });
 
-  static failedLocalStorageDelete = (error?: any): DeleteFailedAction => ({
+  static failedLocalStorageDelete = (error: Error): DeleteFailedAction => ({
     error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED,
   });

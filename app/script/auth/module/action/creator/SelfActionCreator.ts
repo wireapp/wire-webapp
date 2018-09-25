@@ -53,7 +53,6 @@ export type SelfActions =
   | SetConsentFailedAction;
 
 export interface SetHandleStartAction extends AppAction {
-  readonly params: any;
   readonly type: SELF_ACTION.HANDLE_SET_START;
 }
 export interface SetHandleSuccessAction extends AppAction {
@@ -62,10 +61,9 @@ export interface SetHandleSuccessAction extends AppAction {
 }
 export interface SetHandleFailedAction extends AppAction {
   readonly type: SELF_ACTION.HANDLE_SET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 export interface FetchSelfStartAction extends AppAction {
-  readonly params: any;
   readonly type: SELF_ACTION.SELF_FETCH_START;
 }
 export interface FetchSelfSuccessAction extends AppAction {
@@ -74,11 +72,10 @@ export interface FetchSelfSuccessAction extends AppAction {
 }
 export interface FetchSelfFailedAction extends AppAction {
   readonly type: SELF_ACTION.SELF_FETCH_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface GetConsentsStartAction extends AppAction {
-  readonly params: any;
   readonly type: SELF_ACTION.CONSENT_GET_START;
 }
 export interface GetConsentsSuccessAction extends AppAction {
@@ -87,11 +84,10 @@ export interface GetConsentsSuccessAction extends AppAction {
 }
 export interface GetConsentsFailedAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_GET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface SetConsentStartAction extends AppAction {
-  readonly params: any;
   readonly type: SELF_ACTION.CONSENT_SET_START;
 }
 export interface SetConsentSuccessAction extends AppAction {
@@ -100,12 +96,11 @@ export interface SetConsentSuccessAction extends AppAction {
 }
 export interface SetConsentFailedAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_SET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class SelfActionCreator {
-  static startSetHandle = (params?: any): SetHandleStartAction => ({
-    params,
+  static startSetHandle = (): SetHandleStartAction => ({
     type: SELF_ACTION.HANDLE_SET_START,
   });
 
@@ -114,13 +109,12 @@ export class SelfActionCreator {
     type: SELF_ACTION.HANDLE_SET_SUCCESS,
   });
 
-  static failedSetHandle = (error?: any): SetHandleFailedAction => ({
+  static failedSetHandle = (error: Error): SetHandleFailedAction => ({
     error,
     type: SELF_ACTION.HANDLE_SET_FAILED,
   });
 
-  static startFetchSelf = (params?: any): FetchSelfStartAction => ({
-    params,
+  static startFetchSelf = (): FetchSelfStartAction => ({
     type: SELF_ACTION.SELF_FETCH_START,
   });
 
@@ -129,13 +123,12 @@ export class SelfActionCreator {
     type: SELF_ACTION.SELF_FETCH_SUCCESS,
   });
 
-  static failedFetchSelf = (error?: any): FetchSelfFailedAction => ({
+  static failedFetchSelf = (error: Error): FetchSelfFailedAction => ({
     error,
     type: SELF_ACTION.SELF_FETCH_FAILED,
   });
 
-  static startGetConsents = (params?: any): GetConsentsStartAction => ({
-    params,
+  static startGetConsents = (): GetConsentsStartAction => ({
     type: SELF_ACTION.CONSENT_GET_START,
   });
 
@@ -144,13 +137,12 @@ export class SelfActionCreator {
     type: SELF_ACTION.CONSENT_GET_SUCCESS,
   });
 
-  static failedGetConsents = (error?: any): GetConsentsFailedAction => ({
+  static failedGetConsents = (error: Error): GetConsentsFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_GET_FAILED,
   });
 
-  static startSetConsent = (params?: any): SetConsentStartAction => ({
-    params,
+  static startSetConsent = (): SetConsentStartAction => ({
     type: SELF_ACTION.CONSENT_SET_START,
   });
 
@@ -159,7 +151,7 @@ export class SelfActionCreator {
     type: SELF_ACTION.CONSENT_SET_SUCCESS,
   });
 
-  static failedSetConsent = (error?: any): SetConsentFailedAction => ({
+  static failedSetConsent = (error: Error): SetConsentFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_SET_FAILED,
   });

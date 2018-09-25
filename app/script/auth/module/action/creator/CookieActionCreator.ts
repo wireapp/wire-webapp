@@ -61,7 +61,7 @@ export interface CookiePollingStopAction extends AppAction {
 }
 export interface CookiePollingFailedAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_POLLING_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface CookieGetStartAction extends AppAction {
@@ -74,7 +74,7 @@ export interface CookieGetSuccessAction extends AppAction {
 }
 export interface CookieGetFailedAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_GET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface CookieSetStartAction extends AppAction {
@@ -87,7 +87,7 @@ export interface CookieSetSuccessAction extends AppAction {
 }
 export interface CookieSetFailedAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_SET_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface CookieRemoveStartAction extends AppAction {
@@ -100,7 +100,7 @@ export interface CookieRemoveSuccessAction extends AppAction {
 }
 export interface CookieRemoveFailedAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_REMOVE_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class CookieActionCreator {

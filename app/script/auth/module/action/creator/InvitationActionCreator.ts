@@ -17,6 +17,8 @@
  *
  */
 
+import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+
 export enum INVITATION_ACTION {
   INVITE_ADD_START = 'INVITE_ADD_START',
   INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS',
@@ -33,12 +35,11 @@ export type InvitationActions =
 
 export interface AddInviteStartAction {
   type: INVITATION_ACTION.INVITE_ADD_START;
-  params: any;
 }
 
 export interface AddInviteSuccessAction {
   type: INVITATION_ACTION.INVITE_ADD_SUCCESS;
-  payload: {invite: any};
+  payload: {invite: TeamInvitation};
 }
 
 export interface AddInviteFailedAction {
@@ -51,8 +52,7 @@ export interface ResetInviteErrorAction {
 }
 
 export class InvitationActionCreator {
-  static startAddInvite = (params?: any): AddInviteStartAction => ({
-    params,
+  static startAddInvite = (): AddInviteStartAction => ({
     type: INVITATION_ACTION.INVITE_ADD_START,
   });
 

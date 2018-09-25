@@ -45,7 +45,7 @@ export interface ConversationCodeCheckSuccessAction extends AppAction {
 }
 export interface ConversationCodeCheckFailedAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface ConversationCodeJoinStartAction extends AppAction {
@@ -57,7 +57,7 @@ export interface ConversationCodeJoinSuccessAction extends AppAction {
 }
 export interface ConversationCodeJoinFailedAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class ConversationActionCreator {
@@ -69,7 +69,7 @@ export class ConversationActionCreator {
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
   });
 
-  static failedConversationCodeCheck = (error?: any): ConversationCodeCheckFailedAction => ({
+  static failedConversationCodeCheck = (error: Error): ConversationCodeCheckFailedAction => ({
     error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
   });
@@ -83,7 +83,7 @@ export class ConversationActionCreator {
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
   });
 
-  static failedJoinConversationByCode = (error?: any): ConversationCodeJoinFailedAction => ({
+  static failedJoinConversationByCode = (error: Error): ConversationCodeJoinFailedAction => ({
     error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,
   });

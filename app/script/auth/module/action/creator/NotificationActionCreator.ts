@@ -42,7 +42,7 @@ export interface HistoryCheckSuccessAction extends AppAction {
 }
 export interface HistoryCheckFailedAction extends AppAction {
   readonly type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export interface HistoryCheckResetAction extends AppAction {
@@ -59,7 +59,7 @@ export class NotificationActionCreator {
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS,
   });
 
-  static failedCheckHistory = (error?: any): HistoryCheckFailedAction => ({
+  static failedCheckHistory = (error: Error): HistoryCheckFailedAction => ({
     error,
     type: NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_FAILED,
   });

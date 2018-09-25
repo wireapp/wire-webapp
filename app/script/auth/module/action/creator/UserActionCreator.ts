@@ -38,7 +38,7 @@ export interface SendActivationCodeSuccessAction extends AppAction {
 }
 export interface SendActivationCodeFailedAction extends AppAction {
   readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class UserActionCreator {
@@ -50,7 +50,7 @@ export class UserActionCreator {
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS,
   });
 
-  static failedSendActivationCode = (error: any): SendActivationCodeFailedAction => ({
+  static failedSendActivationCode = (error: Error): SendActivationCodeFailedAction => ({
     error,
     type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED,
   });

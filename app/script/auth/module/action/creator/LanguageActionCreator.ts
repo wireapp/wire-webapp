@@ -36,7 +36,7 @@ export interface LanguageSwitchSuccessAction extends AppAction {
 }
 export interface LanguageSwitchFailedAction extends AppAction {
   readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_FAILED;
-  readonly error: any;
+  readonly error: Error;
 }
 
 export class LanguageActionCreator {
