@@ -330,12 +330,7 @@ z.string.fr.conversationsPopoverNotify = 'Activer le micro';
 z.string.fr.conversationsPopoverSilence = 'Mettre en sourdine';
 z.string.fr.conversationsPopoverUnarchive = 'Restaurer';
 
-z.string.fr.conversationsSecondaryLineMissedCall = '{{number}} appel manqué';
-z.string.fr.conversationsSecondaryLineMissedCalls = '{{number}} appels manqués';
-z.string.fr.conversationsSecondaryLineNewMessage = '{{number}} nouveau message';
-z.string.fr.conversationsSecondaryLineNewMessages = '{{number}} nouveaux messages';
-z.string.fr.conversationsSecondaryLinePing = '{{number}} signe';
-z.string.fr.conversationsSecondaryLinePings = '{{number}} signes';
+z.string.fr.conversationsSecondaryLineEphemeralMessage = 'vous a envoyé un message';
 z.string.fr.conversationsSecondaryLinePeopleLeft = '{{number}} personnes sont parties';
 z.string.fr.conversationsSecondaryLinePersonLeft = '{{user}} est parti';
 z.string.fr.conversationsSecondaryLinePersonRemoved = '{{user}} a été exclu';
@@ -343,7 +338,6 @@ z.string.fr.conversationsSecondaryLinePeopleAdded = '{{user}} personnes ont ét�
 z.string.fr.conversationsSecondaryLinePersonAdded = '{{user}} a été ajouté';
 z.string.fr.conversationsSecondaryLinePersonAddedYou = '{{user}} vous a ajouté';
 z.string.fr.conversationsSecondaryLineRenamed = '{{user}} a renommé la conversation';
-z.string.fr.conversationsSecondaryLineTimedMessage = 'Message éphémère';
 z.string.fr.conversationsSecondaryLineYouLeft = 'Vous êtes parti';
 z.string.fr.conversationsSecondaryLineYouWereRemoved = 'Vous avez été exclu';
 
