@@ -349,7 +349,7 @@ z.util.renderMessage = (message, mentionEntities = []) => {
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
     const mentionMarkup = renderMention(mentionTexts[mentionHash]);
 
-    return text.replace(new RegExp(mentionHash, 'g'), mentionMarkup);
+    return text.replace(mentionHash, mentionMarkup);
   }, mentionlessText);
 
   return parsedText;
