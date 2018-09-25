@@ -18,7 +18,7 @@
  */
 
 import {applyMiddleware, combineReducers, compose, createStore, AnyAction} from 'redux';
-import {composeWithDevTools} from 'redux-devtools-extension';
+import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import reducers, {Api, RootState} from './module/reducer';
 import {runtimeAction} from './module/action/RuntimeAction';
 import thunk, {ThunkDispatch} from 'redux-thunk';
@@ -73,8 +73,9 @@ const createMiddleware = thunkArguments => {
       })
     );
   }
-  const composeEnhancers = process.env.NODE_ENV !== 'production' ? composeWithDevTools : <any>compose;
-  return composeEnhancers(applyMiddleware(...middlewares));
+  // Note: Redux DevTools will only be applied when NODE_ENV is NOT production
+  // https://github.com/zalmoxisus/redux-devtools-extension/blob/master/npm-package/developmentOnly.js
+  return composeWithDevTools(applyMiddleware(...middlewares));
 };
 
 export {configureStore};
