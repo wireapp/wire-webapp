@@ -308,12 +308,12 @@ z.conversation.ConversationCellState = (() => {
             const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
             if (isSelfMentioned) {
               stringId = conversationEntity.is_group()
-                ? z.string.conversationsSecondaryLineEpemeralMentionGroup
-                : z.string.conversationsSecondaryLineEpemeralMention;
+                ? z.string.conversationsSecondaryLineEphemeralMentionGroup
+                : z.string.conversationsSecondaryLineEphemeralMention;
             }
             stringId = conversationEntity.is_group()
-              ? z.string.conversationsSecondaryLineEpemeralMessageGroup
-              : z.string.conversationsSecondaryLineEpemeralMessage;
+              ? z.string.conversationsSecondaryLineEphemeralMessageGroup
+              : z.string.conversationsSecondaryLineEphemeralMessage;
             return z.l10n.text(stringId);
           }
 
