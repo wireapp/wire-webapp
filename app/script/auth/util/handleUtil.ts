@@ -19,7 +19,7 @@
  */
 
 import {randomArrayElement, randomInt} from './randomUtil';
-import getSlug from 'speakingurl';
+import * as getSlug from 'speakingurl';
 
 const MAX_HANDLE_LENGTH = 21;
 const DEFAULT_NUMBER_VARIATIONS = 5;
@@ -28,34 +28,37 @@ const RANDOM_WORDS_1 = ['acid', 'agate', 'agile', 'amber', 'aqua', 'arid', 'avid
 // prettier-ignore
 const RANDOM_WORDS_2 = ['alligator', 'alpaca', 'ant', 'antelope', 'asp', 'badger', 'bat', 'bear', 'bee', 'beetle', 'bird', 'bison', 'bobcat', 'buffalo', 'buzzard', 'camel', 'caribou', 'carp', 'cat', 'catfish', 'cheetah', 'clam', 'cobra', 'cod', 'condor', 'cow', 'coyote', 'crane', 'crayfish', 'cricket', 'crow', 'deer', 'dog', 'dolphin', 'donkey', 'dove', 'duck', 'eagle', 'eel', 'elk', 'falcon', 'ferret', 'finch', 'fly', 'fox', 'frog', 'gazelle', 'giraffe', 'gnu', 'goat', 'goose', 'gopher', 'grouse', 'gull', 'halibut', 'hamster', 'hare', 'hawk', 'heron', 'herring', 'horse', 'husky', 'impala', 'jackal', 'jaguar', 'kangaroo', 'koala', 'lemur', 'lion', 'lizard', 'llama', 'lobster', 'mackerel', 'mole', 'moose', 'moth', 'mouse', 'mule', 'mussel', 'newt', 'octopus', 'orca', 'ostrich', 'otter', 'owl', 'ox', 'oyster', 'panda', 'panther', 'parrot', 'pelican', 'penguin', 'pigeon', 'pike', 'pony', 'quail', 'rabbit', 'racoon', 'ram', 'raven', 'salmon', 'sardine', 'seal', 'shark', 'sheep', 'sloth', 'snail', 'snake', 'squid', 'sturgeon', 'swan', 'tiger', 'tilapia', 'toad', 'trout', 'tuna', 'turkey', 'turtle', 'walrus', 'wapiti', 'wasp', 'weasel', 'whale', 'wolf', 'wombat', 'yak', 'zebra'];
 
-function getRandomWordCombination() {
+function getRandomWordCombination(): string {
   return `${randomArrayElement(RANDOM_WORDS_1)}${randomArrayElement(RANDOM_WORDS_2)}`;
 }
 
-export function generateHandleVariations(handle, numberOfVariations = DEFAULT_NUMBER_VARIATIONS) {
+export function generateHandleVariations(
+  handle: string,
+  numberOfVariations: number = DEFAULT_NUMBER_VARIATIONS
+): string[] {
   return Array.from(Array(numberOfVariations), (_, index) => {
     const digitCount = index + 1;
     return appendRandomDigits(handle.slice(0, MAX_HANDLE_LENGTH - digitCount), digitCount);
   });
 }
 
-export function appendRandomDigits(handle, additionalNumbers) {
+export function appendRandomDigits(handle: string, additionalNumbers: number): string {
   const MAX_RANDOM_INT = 9;
   const randomDigits = Array.from(Array(additionalNumbers), () => randomInt(MAX_RANDOM_INT));
   return `${handle}${randomDigits.join('')}`;
 }
 
-export function normalizeName(name) {
+export function normalizeName(name: string): string {
   return getSlug(name)
     .toLowerCase()
     .replace(/[^a-z0-9_]/g, '')
     .substring(0, MAX_HANDLE_LENGTH);
 }
 
-export function createSuggestions(name) {
+export function createSuggestions(name: string): string[] {
   const normalizedName = normalizeName(name);
   const randomName = getRandomWordCombination();
-  let suggestions = [];
+  let suggestions: string[] = [];
 
   if (normalizedName) {
     suggestions.push(normalizedName);

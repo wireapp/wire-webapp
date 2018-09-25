@@ -17,11 +17,11 @@
  *
  */
 
-export function randomArrayElement(array) {
+export function randomArrayElement<T>(array: T[]): T {
   return array[randomInt(array.length - 1)];
 }
 
 // returns number: 0 <= number <= max
-export function randomInt(max) {
+export function randomInt(max: number): number {
   return Math.floor(Math.random() * (max + 1));
 }

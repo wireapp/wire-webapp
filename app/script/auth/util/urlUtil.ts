@@ -23,7 +23,7 @@ export function pathWithParams(
   path: string,
   additionalParams?: string,
   whitelistParams: string[] = FORWARDED_QUERY_KEYS
-) {
+): string {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
@@ -40,18 +40,18 @@ export function pathWithParams(
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
 }
 
-export function getURLParameter(parameterName: string) {
+export function getURLParameter(parameterName: string): string {
   return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
 }
 
-export function hasURLParameter(parameterName) {
+export function hasURLParameter(parameterName: string): boolean {
   return window.location.search
     .split(/\?|&/)
     .map(parameter => parameter.split('=')[0])
     .includes(parameterName);
 }
 
-export function openTab(url) {
+export function openTab(url: string): Window {
   const newWindow = window.open(url);
   if (newWindow) {
     newWindow.opener = null;

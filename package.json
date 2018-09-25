@@ -74,6 +74,7 @@
     "@types/react-redux": "6.0.9",
     "@types/react-router": "4.0.31",
     "@types/react-router-dom": "4.3.1",
+    "@types/speakingurl": "13.0.2",
     "@types/webpack-env": "1.13.6",
     "autoprefixer": "9.1.5",
     "awesome-typescript-loader": "5.2.1",

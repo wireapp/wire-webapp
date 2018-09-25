@@ -1014,6 +1014,10 @@
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/spark-md5/-/spark-md5-3.0.0.tgz#15b80a036f59167a8ec6045f6f1efcd9c8b02a7c"
 
+"@types/speakingurl@13.0.2":
+  version "13.0.2"
+  resolved "https://registry.yarnpkg.com/@types/speakingurl/-/speakingurl-13.0.2.tgz#865dc309b4d61ea333ade3171e916e341aa26137"
+
 "@types/tough-cookie@2.3.3":
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
