@@ -143,7 +143,7 @@ class CreatePersonalAccount extends React.PureComponent<
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         account: AuthSelector.getAccount(state),
         currentFlow: AuthSelector.getCurrentFlow(state),
         isPersonalFlow: AuthSelector.isPersonalFlow(state),

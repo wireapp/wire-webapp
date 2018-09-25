@@ -367,7 +367,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
         isFetching: ConversationSelector.isFetching(state),

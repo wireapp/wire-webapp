@@ -157,7 +157,7 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default injectIntl(
   withRouter(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
         isFetching: SelfSelector.isFetching(state),
         isTeamFlow: AuthSelector.isTeamFlow(state),

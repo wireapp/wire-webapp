@@ -25,13 +25,19 @@ import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {isMobileOs} from '../Runtime';
 import * as React from 'react';
-import {RootState} from '../module/reducer';
+import {RootState, Api} from '../module/reducer';
+import {AnyAction} from 'redux';
+import {ThunkDispatch} from 'redux-thunk';
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+
+interface ConnectedProps {
   isSupportedBrowser: boolean;
 }
 
-export const WirelessUnsupportedBrowser: React.SFC<Props & InjectedIntlProps> = ({
+interface DispatchProps {}
+
+export const WirelessUnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
   children,
   isSupportedBrowser,
   intl: {formatMessage: _},
@@ -58,7 +64,10 @@ export const WirelessUnsupportedBrowser: React.SFC<Props & InjectedIntlProps> = 
   );
 
 export default injectIntl(
-  connect((state: RootState) => ({
-    isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-  }))(WirelessUnsupportedBrowser)
+  connect(
+    (state: RootState): ConnectedProps => ({
+      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+    }),
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+  )(WirelessUnsupportedBrowser)
 );

@@ -285,7 +285,7 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
 
 export default injectIntl(
   connect(
-    (state: RootState) => ({
+    (state: RootState): ConnectedProps => ({
       account: AuthSelector.getAccount(state),
       authError: AuthSelector.getError(state),
       isFetching: AuthSelector.isFetching(state),

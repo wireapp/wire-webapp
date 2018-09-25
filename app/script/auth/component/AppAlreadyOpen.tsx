@@ -75,7 +75,7 @@ class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchPr
 
 export default injectIntl(
   connect(
-    (state: RootState) => ({
+    (state: RootState): ConnectedProps => ({
       isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
     }),
     (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({

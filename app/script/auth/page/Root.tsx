@@ -106,7 +106,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
 }
 
 export default connect(
-  (state: RootState) => ({language: LanguageSelector.getLanguage(state)}),
+  (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
   (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
     startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
       dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),

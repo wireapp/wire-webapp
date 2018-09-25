@@ -185,7 +185,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
 export default injectIntl(
   connect(
-    (state: RootState) => ({
+    (state: RootState): ConnectedProps => ({
       error: InviteSelector.getError(state),
       invites: InviteSelector.getInvites(state),
       isFetching: InviteSelector.isFetching(state),

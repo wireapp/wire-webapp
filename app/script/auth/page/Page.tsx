@@ -24,7 +24,9 @@ import * as React from 'react';
 import {ROUTE} from '../route';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import {RootState} from '../module/reducer';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   hasAccountData?: boolean;
@@ -69,8 +71,11 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
 };
 
-export default connect((state: RootState) => ({
-  account: AuthSelector.getAccount(state),
-  currentFlow: AuthSelector.getCurrentFlow(state),
-  isStateAuthenticated: AuthSelector.isAuthenticated(state),
-}))(Page);
+export default connect(
+  (state: RootState): ConnectedProps => ({
+    account: AuthSelector.getAccount(state),
+    currentFlow: AuthSelector.getCurrentFlow(state),
+    isStateAuthenticated: AuthSelector.isAuthenticated(state),
+  }),
+  (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+)(Page);

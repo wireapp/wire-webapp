@@ -184,7 +184,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         error: AuthSelector.getError(state),
         teamName: AuthSelector.getAccountTeamName(state),
       }),

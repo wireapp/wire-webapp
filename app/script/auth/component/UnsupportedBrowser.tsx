@@ -24,7 +24,9 @@ import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import * as React from 'react';
-import {RootState} from '../module/reducer';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
 
 interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
   headline: any;
@@ -51,6 +53,8 @@ interface ConnectedProps {
   isCheckingSupport: boolean;
   isSupportedBrowser: boolean;
 }
+
+interface DispatchProps {}
 
 export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
   children,
@@ -101,10 +105,13 @@ export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntl
 };
 
 export default injectIntl(
-  connect((state: RootState) => ({
-    hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
-    hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
-    isCheckingSupport: RuntimeSelector.isChecking(state),
-    isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-  }))(UnsupportedBrowser)
+  connect(
+    (state: RootState): ConnectedProps => ({
+      hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+      hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+      isCheckingSupport: RuntimeSelector.isChecking(state),
+      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+    }),
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+  )(UnsupportedBrowser)
 );

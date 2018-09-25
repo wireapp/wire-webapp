@@ -506,7 +506,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),

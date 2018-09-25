@@ -125,7 +125,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
         currentFlow: AuthSelector.getCurrentFlow(state),

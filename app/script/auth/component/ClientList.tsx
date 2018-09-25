@@ -131,7 +131,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState) => ({
+      (state: RootState): ConnectedProps => ({
         clientError: ClientSelector.getError(state),
         isFetching: ClientSelector.isFetching(state),
         permanentClients: ClientSelector.getPermanentClients(state),

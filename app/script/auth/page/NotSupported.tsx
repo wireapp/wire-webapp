@@ -29,9 +29,7 @@ import {AnyAction} from 'redux';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
-interface ConnectedProps {
-  language: string;
-}
+interface ConnectedProps {}
 
 interface DispatchProps {}
 
@@ -51,7 +49,7 @@ const NotSupported: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
 
 export default injectIntl(
   connect(
-    (state: RootState) => ({}),
+    (state: RootState): ConnectedProps => ({}),
     (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
   )(NotSupported)
 );

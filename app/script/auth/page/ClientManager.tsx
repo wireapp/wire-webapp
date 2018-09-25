@@ -28,13 +28,18 @@ import {connect} from 'react-redux';
 import {clientManagerStrings} from '../../strings';
 import {ROUTE} from '../route';
 import {RouteComponentProps} from 'react-router';
+import {RootState, Api} from '../module/reducer';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import ROOT_ACTIONS from '../module/action/';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
 interface Props extends React.HTMLAttributes<ClientManager>, RouteComponentProps {}
 
 interface ConnectedProps {}
 
 interface DispatchProps {
-  doGetAllClients: () => Promise<void>;
+  doGetAllClients: () => Promise<RegisteredClient[]>;
   doLogout: () => Promise<void>;
 }
 
@@ -82,7 +87,10 @@ class ClientManager extends React.Component<Props & ConnectedProps & DispatchPro
 
 export default injectIntl(
   connect(
-    null,
-    {...AuthAction, ...ClientAction}
+    (state: RootState): ConnectedProps => ({}),
+    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+      doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
+    })
   )(ClientManager)
 );

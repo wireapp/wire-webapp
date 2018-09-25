@@ -120,7 +120,7 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
 
 export default injectIntl(
   connect(
-    (state: RootState) => ({language: LanguageSelector.getLanguage(state)}),
+    (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
     (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
   )(Index)
 );
