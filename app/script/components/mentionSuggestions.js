@@ -61,7 +61,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
         const items = document.querySelectorAll('.mention-suggestion-list__item');
         const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
         if (items.length && wrapper) {
-          const itemWidths = items.map(item => item.offsetWidth);
+          const itemWidths = Array.from(items).map(item => item.offsetWidth);
           const maxWidth = Math.max.apply(null, itemWidths);
           wrapper.style.width = `${maxWidth}px`;
         }
