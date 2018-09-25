@@ -209,18 +209,6 @@ describe('z.util.StringUtil', () => {
     });
   });
 
-  describe('z.util.trimLineBreaks', () => {
-    it('removes line breaks at the beginning and/or end', () => {
-      expect(z.util.StringUtil.trimLineBreaks('\n\n\n\n\nB\nC\nD')).toBe('B\nC\nD');
-      expect(z.util.StringUtil.trimLineBreaks('B\nC\nD\n\n\n\n\n')).toBe('B\nC\nD');
-      expect(z.util.StringUtil.trimLineBreaks('\n\n\n\nB\nC\n\n\n\n\n')).toBe('B\nC');
-    });
-
-    it('does not remove line breaks in between', () => {
-      expect(z.util.StringUtil.trimLineBreaks('A\nB\nC\nD')).toBe('A\nB\nC\nD');
-    });
-  });
-
   describe('truncate', () => {
     it('returns the full string if it is shorter than the target length', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 90);
