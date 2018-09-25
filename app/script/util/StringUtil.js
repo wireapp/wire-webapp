@@ -156,8 +156,7 @@ z.util.StringUtil = {
   startsWith: (string = '', query) => string.toLowerCase().startsWith(query.toLowerCase()),
 
   trimEnd: (string = '') => string.replace(/\s*$/, ''),
-
-  trimLineBreaks: (string = '') => string.replace(/^\s+|\s+$/g, ''),
+  trimStart: (string = '') => string.replace(/^\s*/, ''),
 
   truncate: (string, outputLength, wordBoundary = true) => {
     if (string.length > outputLength) {

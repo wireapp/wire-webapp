@@ -355,7 +355,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.sendPastedFile();
     }
 
-    const messageText = z.util.StringUtil.trimLineBreaks(this.input());
+    const beforeLength = this.input().length;
+    const messageTrimmedStart = z.util.StringUtil.trimStart(this.input());
+    const afterLength = messageTrimmedStart.length;
+
+    const updatedMentions = this.updateMentionRanges(this.currentMentions(), 0, 0, afterLength - beforeLength);
+    this.currentMentions(updatedMentions);
+
+    const messageText = z.util.StringUtil.trimEnd(messageTrimmedStart);
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
