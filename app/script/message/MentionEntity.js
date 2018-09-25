@@ -43,10 +43,20 @@ z.message.MentionEntity = class MentionEntity {
     this.userId = userId;
     this.userEntity = ko.observable();
 
-    this.isSelfMentioned = ko.pureComputed(() => {
-      const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-      return isTypeUserId && this.userEntity() && this.userEntity().is_me;
-    });
+    // id of the self user (needed to know if the mention is a selfMention)
+    this.selfId = undefined;
+  }
+
+  setSelfId(userId) {
+    this.selfId = userId;
+  }
+
+  isSelfMentioned() {
+    if (this.selfId === undefined) {
+      throw new Error('Cannot determine if mention is a self mention if selfId is not set');
+    }
+    const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    return isTypeUserId && this.userId === this.selfId;
   }
 
   // Index of first char outside of mention

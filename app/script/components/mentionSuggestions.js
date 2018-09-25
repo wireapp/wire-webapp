@@ -56,15 +56,23 @@ z.components.MentionSuggestions = class MentionSuggestions {
     });
 
     this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
+    this.shouldUpdateScrollbar.subscribe(() => this.setWrapperSize(), null, 'beforeChange');
     this.shouldUpdateScrollbar.subscribe(() => {
       z.util.afterRender(() => {
-        const item = document.querySelector('.mention-suggestion-list__item');
-        const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
-        if (item && wrapper) {
-          wrapper.style.width = `${item.offsetWidth}px`;
+        const items = Array.from(document.querySelectorAll('.mention-suggestion-list__item'));
+        if (items.length) {
+          const maxWidth = items.reduce((currentMax, item) => Math.max(currentMax, item.offsetWidth), 0);
+          this.setWrapperSize(`${maxWidth}px`);
         }
       });
     });
+  }
+
+  setWrapperSize(size = '') {
+    const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
+    if (wrapper) {
+      wrapper.style.width = size;
+    }
   }
 
   onInput(keyboardEvent) {
@@ -164,7 +172,12 @@ ko.components.register('mention-suggestions', {
         <div class="mention-suggestion-list__item" data-bind="click: $parent.onSuggestionClick, css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()}, attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === $parent.selectedSuggestion()}" data-uie-name="item-mention-suggestion">
           <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
           <div class="mention-suggestion-list__item__name" data-bind="text: suggestion.name()" data-uie-name="status-name"></div>
-          <div class="mention-suggestion-list__item__username"data-bind="text: suggestion.username()" data-uie-name="status-username"></div>
+          <!-- ko if: suggestion.isTemporaryGuest() -->
+            <div class="mention-suggestion-list__item__remaining"  data-bind="text: suggestion.expirationRemainingText()" data-uie-name="status-remaining"></div>
+          <!-- /ko -->
+          <!-- ko ifnot: suggestion.isTemporaryGuest() -->
+            <div class="mention-suggestion-list__item__username" data-bind="text: suggestion.username()" data-uie-name="status-username"></div>
+          <!-- /ko -->
           <!-- ko if: suggestion.isGuest() -->
             <guest-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest"></guest-icon>
           <!-- /ko -->
