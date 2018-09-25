@@ -297,7 +297,8 @@ z.util.renderMessage = (message, mentionEntities = []) => {
       ? ' data-uie-name="label-self-mention"'
       : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
 
-    const content = `<span class="mention-at-sign">@</span>${mentionData.text.replace(/^@/, '')}`;
+    const mentionText = mentionData.text.replace(/^@/, '');
+    const content = `<span class="mention-at-sign">@</span>${z.util.SanitizationUtil.escapeString(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
   const mentionTexts = {};
