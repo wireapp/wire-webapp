@@ -42,7 +42,7 @@
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
     "@wireapp/core": "3.16.7",
     "@wireapp/react-ui-kit": "4.0.12",
-    "babel-plugin-react-intl": "3.0.0",
+    "babel-plugin-react-intl": "3.0.1",
     "dexie-batch": "0.4.1",
     "intl": "1.2.5",
     "jquery": "3.3.1",
