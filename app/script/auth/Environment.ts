@@ -21,26 +21,28 @@ import {getURLParameter} from './util/urlUtil';
 import {QUERY_KEY} from './route';
 import {APIClient} from '@wireapp/api-client';
 
-export const LOCAL = 'LOCAL';
-export const STAGING = 'STAGING';
-export const PRODUCTION = 'PRODUCTION';
+export enum ENVIRONMENT {
+  LOCAL = 'LOCAL',
+  STAGING = 'STAGING',
+  PRODUCTION = 'PRODUCTION',
+}
 
 export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 export function getEnvironmentFromQuery() {
   switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
     case 'staging': {
-      return STAGING;
+      return ENVIRONMENT.STAGING;
     }
     case 'prod': {
-      return PRODUCTION;
+      return ENVIRONMENT.PRODUCTION;
     }
     default: {
       const isProductionHost = window.location.hostname.endsWith('wire.com');
       if (isProductionHost) {
-        return PRODUCTION;
+        return ENVIRONMENT.PRODUCTION;
       }
-      return isLocalhost() ? LOCAL : STAGING;
+      return isLocalhost() ? ENVIRONMENT.LOCAL : ENVIRONMENT.STAGING;
     }
   }
 }
@@ -55,7 +57,7 @@ export function isInternalEnvironment() {
 
 export function checkEnvironment() {
   const environment = getEnvironment();
-  if (![LOCAL, STAGING, PRODUCTION].includes(environment)) {
+  if (![ENVIRONMENT.LOCAL, ENVIRONMENT.STAGING, ENVIRONMENT.PRODUCTION].includes(environment)) {
     throw new Error(`Invalid environment ${environment}`);
   }
 }
@@ -64,21 +66,21 @@ export function getEnvironment() {
   return APP_ENVIRONMENT;
 }
 
-export function isEnvironment(environment) {
+export function isEnvironment(environment: ENVIRONMENT) {
   return APP_ENVIRONMENT === environment;
 }
 
-export function onEnvironment(environmentConditions) {
+export function onEnvironment<T>(environmentConditions: {onLocal?: T; onStaging: T; onProduction: T}): T {
   switch (getEnvironment()) {
-    case LOCAL: {
+    case ENVIRONMENT.LOCAL: {
       return environmentConditions.onLocal === undefined
         ? environmentConditions.onStaging
         : environmentConditions.onLocal;
     }
-    case STAGING: {
+    case ENVIRONMENT.STAGING: {
       return environmentConditions.onStaging;
     }
-    case PRODUCTION: {
+    case ENVIRONMENT.PRODUCTION: {
       return environmentConditions.onProduction;
     }
     default: {

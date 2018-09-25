@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'uuid/v4';
+import * as UUID from 'uuid/v4';
 
 declare global {
   interface Window {

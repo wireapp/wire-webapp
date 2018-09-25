@@ -268,7 +268,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
   };
 
   isValidPhoneNumber = phoneNumber => {
-    const isProductionBackend = Environment.isEnvironment(Environment.PRODUCTION);
+    const isProductionBackend = Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION);
     const e164regex = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
 
     return e164regex.test(phoneNumber);

@@ -17,7 +17,7 @@
  *
  */
 
-import {applyMiddleware, combineReducers, compose, createStore, AnyAction} from 'redux';
+import {applyMiddleware, combineReducers, createStore, AnyAction, Store} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import reducers, {Api, RootState} from './module/reducer';
 import {runtimeAction} from './module/action/RuntimeAction';
@@ -26,7 +26,7 @@ import {createLogger} from 'redux-logger';
 import * as Environment from './Environment';
 
 const configureStore = (thunkArguments = {}) => {
-  const store = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
+  const store: Store<RootState> = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
 
   if (process.env.NODE_ENV !== 'production') {
     if (module.hot) {
@@ -55,7 +55,7 @@ const createMiddleware = thunkArguments => {
   if (localStorage) {
     localStorage.removeItem('debug');
   }
-  if (!Environment.isEnvironment(Environment.PRODUCTION)) {
+  if (!Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION)) {
     if (localStorage) {
       localStorage.setItem('debug', '@wireapp/*');
     }

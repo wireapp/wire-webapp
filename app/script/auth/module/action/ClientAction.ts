@@ -101,7 +101,7 @@ export class ClientAction {
       } else {
         deviceModel = 'Wire Linux';
       }
-      if (!Environment.isEnvironment(Environment.PRODUCTION)) {
+      if (!Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION)) {
         deviceModel = `${deviceModel} (Internal)`;
       }
     } else if (clientType === ClientType.TEMPORARY) {
