@@ -86,6 +86,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
     //##############################################################################
 
     this.peerConnection = undefined;
+    /*
+      Because Chrome seems to not have the `getConfiguration` method on the peerConnection object when connection is not established,
+      we also need to keep track of the configuration we feed the peerConnection.
+      It might need reconsideration when Chrome 70 is out https://www.chromestatus.com/feature/5271355306016768
+    */
     this.peerConnectionConfiguration = undefined;
     this.iceCandidatesGatheringAttempts = 1;
     this.pcInitialized = ko.observable(false);
@@ -864,7 +869,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
-          const connectionConfig = this.peerConnectionConfiguration;
+          const connectionConfig = this.peerConnection.getConfiguration
+            ? this.peerConnection.getConfiguration()
+            : this.peerConnectionConfiguration;
           const isValidGathering = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
             connectionConfig,
             iceCandidates
