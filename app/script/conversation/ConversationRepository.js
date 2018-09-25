@@ -1977,8 +1977,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Checks if two arrays with mentions contain different values.
    *
-   * @param {Array<z.message.MentionEntity>} [existingMentions] - Mentions as part of the message
-   * @param {Array<z.message.MentionEntity>} [updatedMentions] - Mentions as part of the message
+   * @param {Array<z.message.MentionEntity>} [existingMentions] - Existing mentions
+   * @param {Array<z.message.MentionEntity>} [updatedMentions] - Updated mentions
    * @returns {boolean} Are the mentions different from each other
    */
   haveMentionsChanged(existingMentions, updatedMentions) {
