@@ -619,12 +619,15 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     const mentionElement = event.target.closest('.message-mention');
     if (mentionElement) {
       const userId = mentionElement.dataset.userId;
-      const userEntity = this.conversation()
-        .participating_user_ets()
-        .find(user => user.id === userId);
-      if (userEntity) {
-        this.showUserDetails(userEntity);
-      }
+
+      this.userRepository
+        .get_user_by_id(userId)
+        .then(userEntity => this.showUserDetails(userEntity))
+        .catch(error => {
+          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+            throw error;
+          }
+        });
     }
   }
 
