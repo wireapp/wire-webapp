@@ -2911,13 +2911,13 @@ css-what@2.1:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/css-what/-/css-what-2.1.0.tgz#9467d032c38cfaefb9f2d79501253062f87fa1bd"
 
-cssnano-preset-default@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/cssnano-preset-default/-/cssnano-preset-default-4.0.0.tgz#c334287b4f7d49fb2d170a92f9214655788e3b6b"
+cssnano-preset-default@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/cssnano-preset-default/-/cssnano-preset-default-4.0.1.tgz#063c874bc82afe49d4a8790688348dce3f59e672"
   dependencies:
     css-declaration-sorter "^3.0.0"
     cssnano-util-raw-cache "^4.0.0"
-    postcss "^6.0.0"
+    postcss "^7.0.0"
     postcss-calc "^6.0.0"
     postcss-colormin "^4.0.0"
     postcss-convert-values "^4.0.0"
@@ -2964,14 +2964,14 @@ cssnano-util-same-parent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/cssnano-util-same-parent/-/cssnano-util-same-parent-4.0.0.tgz#d2a3de1039aa98bc4ec25001fa050330c2a16dac"
 
-cssnano@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.1.0.tgz#682c37b84b9b7df616450a5a8dc9269b9bd10734"
+cssnano@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.1.1.tgz#46e97285ca709b8f7e1ceafb352699d0ac15102a"
   dependencies:
     cosmiconfig "^5.0.0"
-    cssnano-preset-default "^4.0.0"
+    cssnano-preset-default "^4.0.1"
     is-resolvable "^1.0.0"
-    postcss "^6.0.0"
+    postcss "^7.0.0"
 
 csso@^3.5.0:
   version "3.5.1"
