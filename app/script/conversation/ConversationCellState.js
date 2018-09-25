@@ -278,34 +278,48 @@ z.conversation.ConversationCellState = (() => {
   const _getStateUnreadMessage = {
     description: conversationEntity => {
       for (const messageEntity of conversationEntity.unreadEvents()) {
-        let stateText;
+        let stringId;
 
-        if (messageEntity.is_ephemeral()) {
-          stateText = z.l10n.text(z.string.conversationsSecondaryLineTimedMessage);
-        } else if (messageEntity.is_ping()) {
-          stateText = z.l10n.text(z.string.notificationPing);
+        if (messageEntity.is_ping()) {
+          stringId = z.string.notificationPing;
         } else if (messageEntity.has_asset_text()) {
-          stateText = messageEntity.get_first_asset().text;
+          stringId = true;
         } else if (messageEntity.has_asset()) {
           const assetEntity = messageEntity.get_first_asset();
           const isUploaded = assetEntity.status() === z.assets.AssetTransferState.UPLOADED;
 
           if (isUploaded) {
             if (assetEntity.is_audio()) {
-              stateText = z.l10n.text(z.string.notificationSharedAudio);
+              stringId = z.string.notificationSharedAudio;
             } else if (assetEntity.is_video()) {
-              stateText = z.l10n.text(z.string.notificationSharedVideo);
+              stringId = z.string.notificationSharedVideo;
             } else {
-              stateText = z.l10n.text(z.string.notificationSharedFile);
+              stringId = z.string.notificationSharedFile;
             }
           }
         } else if (messageEntity.has_asset_location()) {
-          stateText = z.l10n.text(z.string.notificationSharedLocation);
+          stringId = z.string.notificationSharedLocation;
         } else if (messageEntity.has_asset_image()) {
-          stateText = z.l10n.text(z.string.notificationAssetAdd);
+          stringId = z.string.notificationAssetAdd;
         }
 
-        if (stateText) {
+        if (!!stringId) {
+          if (messageEntity.is_ephemeral()) {
+            const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+            if (isSelfMentioned) {
+              stringId = conversationEntity.is_group()
+                ? z.string.conversationsSecondaryLineEphemeralMentionGroup
+                : z.string.conversationsSecondaryLineEphemeralMention;
+            } else {
+              stringId = conversationEntity.is_group()
+                ? z.string.conversationsSecondaryLineEphemeralMessageGroup
+                : z.string.conversationsSecondaryLineEphemeralMessage;
+            }
+            return z.l10n.text(stringId);
+          }
+
+          const hasStringId = stringId && stringId !== true;
+          const stateText = hasStringId ? z.l10n.text(stringId) : messageEntity.get_first_asset().text;
           return conversationEntity.is_group() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
         }
       }
