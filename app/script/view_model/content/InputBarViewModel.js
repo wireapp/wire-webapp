@@ -73,6 +73,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.pingDisabled = ko.observable(false);
 
+    this.editedMention = ko.observable(undefined);
+    this.currentMentions = ko.observableArray();
+
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => this.input().length);
 
@@ -102,15 +105,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.mentionSuggestions = ko.pureComputed(() => {
-      const editedMention = this.editedMention();
-      if (!editedMention || !this.conversationEntity()) {
+      if (!this.editedMention() || !this.conversationEntity()) {
         return [];
       }
 
       const candidates = this.conversationEntity()
         .participating_user_ets()
         .filter(userEntity => !userEntity.isService);
-      return this.searchRepository.searchUserInSet(editedMention.term, candidates);
+      return this.searchRepository.searchUserInSet(this.editedMention().term, candidates);
     });
 
     this.richTextInput = ko.pureComputed(() => {
@@ -137,9 +139,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         })
         .join('');
     });
-
-    this.editedMention = ko.observable(undefined);
-    this.currentMentions = ko.observableArray();
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -227,13 +226,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   addMention(userEntity, inputElement) {
-    const editedMention = this.editedMention();
-    const mentionEntity = new z.message.MentionEntity(editedMention.start, userEntity.name().length + 1, userEntity.id);
+    const mentionLength = userEntity.name().length + 1;
+    const mentionEntity = new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
 
     // keep track of what is before and after the mention being edited
     const beforeMentionPartial = this.input().slice(0, mentionEntity.startIndex);
     const afterMentionPartial = this.input()
-      .slice(mentionEntity.startIndex + editedMention.term.length + 1)
+      .slice(mentionEntity.startIndex + this.editedMention().term.length + 1)
       .replace(/^ /, '');
 
     const lengthBefore = this.input().length;
