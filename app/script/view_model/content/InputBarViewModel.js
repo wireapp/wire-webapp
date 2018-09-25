@@ -114,6 +114,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput = ko.pureComputed(() => {
+      this.updateSelectionState();
+
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
       const pieces = this.currentMentions
         .slice()
