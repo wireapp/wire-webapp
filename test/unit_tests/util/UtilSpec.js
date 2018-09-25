@@ -193,6 +193,13 @@ describe('z.util.renderMessage', () => {
         testCase: 'displays self mentions differently',
         text: '**salut** @you and @toi',
       },
+      {
+        expected:
+          'salut<br /><pre><code><span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>you</span><br /></code></pre>',
+        mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
+        testCase: 'displays mention inside code block',
+        text: 'salut\n```\n@you\n```',
+      },
     ];
 
     tests.forEach(({expected, mentions, testCase, text}) => {
