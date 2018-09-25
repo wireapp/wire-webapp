@@ -109,7 +109,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const candidates = this.conversationEntity()
         .participating_user_ets()
-        .filter(userEntity => !userEntity.isService && !userEntity.isTemporaryGuest());
+        .filter(userEntity => !userEntity.isService);
       return this.searchRepository.searchUserInSet(editedMention.term, candidates);
     });
 
