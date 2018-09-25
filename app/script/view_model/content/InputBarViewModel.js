@@ -400,7 +400,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const value = textarea.value;
     const {selectionStart, selectionEnd} = textarea;
     const textInSelection = value.substring(selectionStart, selectionEnd);
-    const wordBeforeSelection = value.substring(0, selectionStart).replace(/.*\s/, '');
+    const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
     const isOverMention =
       this.findMentionAtPosition(selectionStart - 1, this.currentMentions()) ||
@@ -408,7 +408,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const isOverValidMentionString = /^@\S*$/.test(wordBeforeSelection);
 
     if (!isSpaceSelected && !isOverMention && isOverValidMentionString) {
-      const wordAfterSelection = value.substring(selectionEnd).replace(/\s.*/, '');
+      const wordAfterSelection = value.substring(selectionEnd).replace(/\s[^]*/, '');
       const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
       const start = selectionStart - wordBeforeSelection.length;
       this.editedMention({start, term});
