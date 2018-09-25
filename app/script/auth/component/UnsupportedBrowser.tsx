@@ -26,7 +26,7 @@ import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import * as React from 'react';
 import {RootState} from '../module/reducer';
 
-interface UnsupportedProps {
+interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
   headline: any;
   subhead: any;
 }
@@ -43,7 +43,7 @@ const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) =>
   </ContainerXS>
 );
 
-export interface Props {}
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
 interface ConnectedProps {
   hasCookieSupport: boolean;

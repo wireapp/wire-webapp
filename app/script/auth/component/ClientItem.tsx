@@ -38,9 +38,9 @@ import {clientItemStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
-export interface Props {
+export interface Props extends React.HTMLAttributes<ClientItem> {
   selected: boolean;
-  onClick: Function;
+  onClick: (event: React.MouseEvent<ClientItem>) => void;
   isFetching: boolean;
   client: RegisteredClient;
   clientError: Error;

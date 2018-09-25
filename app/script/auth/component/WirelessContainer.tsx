@@ -23,7 +23,7 @@ import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import * as React from 'react';
 
-export interface Props {
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }

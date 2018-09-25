@@ -29,7 +29,7 @@ import ROOT_ACTIONS from '../module/action/';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 
-export interface Props {
+export interface Props extends React.HTMLAttributes<AppAlreadyOpen> {
   fullscreen?: boolean;
 }
 interface ConnectedProps {

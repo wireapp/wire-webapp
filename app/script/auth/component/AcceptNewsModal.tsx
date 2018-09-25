@@ -23,7 +23,7 @@ import {acceptNewsModalStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link, H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '@wireapp/react-ui-kit';
 
-export interface Props {
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
