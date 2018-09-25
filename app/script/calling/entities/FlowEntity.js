@@ -86,6 +86,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     //##############################################################################
 
     this.peerConnection = undefined;
+    this.peerConnectionConfiguration = undefined;
     this.iceCandidatesGatheringAttempts = 1;
     this.pcInitialized = ko.observable(false);
 
@@ -501,6 +502,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _createPeerConnection() {
     return this._createPeerConnectionConfiguration().then(pcConfiguration => {
       this.peerConnection = new window.RTCPeerConnection(pcConfiguration);
+      this.peerConnectionConfiguration = pcConfiguration;
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
@@ -862,7 +864,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
-          const connectionConfig = this.peerConnection.getConfiguration();
+          const connectionConfig = this.peerConnectionConfiguration;
           const isValidGathering = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
             connectionConfig,
             iceCandidates
