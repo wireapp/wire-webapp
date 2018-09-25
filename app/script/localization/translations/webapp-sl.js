@@ -293,12 +293,7 @@ z.string.sl.conversationsPopoverNotify = 'Povrni glasnost';
 z.string.sl.conversationsPopoverSilence = 'Utišaj';
 z.string.sl.conversationsPopoverUnarchive = 'Dearhiviraj';
 
-z.string.sl.conversationsSecondaryLineMissedCall = '{{number}} zgrešeni klic';
-z.string.sl.conversationsSecondaryLineMissedCalls = '{{number}} zgrešenih klicev';
-z.string.sl.conversationsSecondaryLineNewMessage = '{{number}} novo sporočilo';
-z.string.sl.conversationsSecondaryLineNewMessages = '{{number}} novih sporočil';
-z.string.sl.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.sl.conversationsSecondaryLinePings = '{{number}} pingov';
+z.string.sl.conversationsSecondaryLineEphemeralMessage = 'Vam je poslal(-a) sporočilo';
 z.string.sl.conversationsSecondaryLinePeopleLeft = '{{number}} oseb je zapustilo pogovor';
 z.string.sl.conversationsSecondaryLinePersonLeft = '{{user}} je zapustil(-a)';
 z.string.sl.conversationsSecondaryLinePersonRemoved = '{{user}} je bil(-a) odstranjen(-a)';
@@ -306,7 +301,6 @@ z.string.sl.conversationsSecondaryLinePeopleAdded = '{{user}} oseb je bilo dodan
 z.string.sl.conversationsSecondaryLinePersonAdded = '{{user}} je bil(-a) dodan(-a)';
 z.string.sl.conversationsSecondaryLinePersonAddedYou = '{{user}} te je dodal(-a)';
 z.string.sl.conversationsSecondaryLineRenamed = '{{user}} preimenoval(-a) pogovor';
-z.string.sl.conversationsSecondaryLineTimedMessage = 'Časovno sporočilo';
 z.string.sl.conversationsSecondaryLineYouLeft = 'Si zapustil(-a)';
 z.string.sl.conversationsSecondaryLineYouWereRemoved = 'Bil(-a) si odstranjen(-a)';
 

@@ -226,6 +226,7 @@ z.string.ru.modalConversationRevokeLinkAction = 'Отозвать ссылку';
 z.string.ru.modalConversationRevokeLinkHeadline = 'Отозвать эту ссылку?';
 z.string.ru.modalConversationRevokeLinkMessage = 'Новые гости не смогут присоединиться по этой ссылке. На доступ текущих гостей это не повлияет.';
 
+z.string.ru.modalConversationGuestOptionsAllowGuestMessage = 'Не удалось разрешить гостей и сервисы. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsDisableGuestMessage = 'Не удалось удалить гостей и сервисы. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsGetCodeMessage = 'Не удалось получить доступ по ссылке.';
 z.string.ru.modalConversationGuestOptionsRequestCodeMessage = 'Не удалось запросить ссылку на доступ. Попробуйте снова.';
@@ -382,6 +383,8 @@ z.string.ru.guestRoomToggleInfo = 'Открыть этот разговор дл
 z.string.ru.guestRoomToggleInfoExtended = 'Открыть этот разговор для пользователей не из вашей команды. Вы всегда сможете изменить это позже.';
 
 z.string.ru.guestRoomConversationBadge = 'Присутствуют гости';
+z.string.ru.guestRoomConversationBadgeService = 'Сервисы активны';
+z.string.ru.guestRoomConversationBadgeGuestAndService = 'Присутствуют гости и сервисы';
 
 z.string.ru.guestRoomConversationHead = 'Участники не из вашей команды смогут присоединиться к этому разговору.';
 z.string.ru.guestRoomConversationButton = 'Пригласить участников';
@@ -412,13 +415,9 @@ z.string.ru.conversationsPopoverNotify = 'Вкл. звук';
 z.string.ru.conversationsPopoverSilence = 'Выкл. звук';
 z.string.ru.conversationsPopoverUnarchive = 'Разархивировать';
 
+z.string.ru.conversationsSecondaryLineEphemeralMention = 'Вас упомянули';
+z.string.ru.conversationsSecondaryLineEphemeralMessage = 'Отправил(а) вам сообщение';
 z.string.ru.conversationsSecondaryLineIncomingCall = '{{user}} вызывает';
-z.string.ru.conversationsSecondaryLineMissedCall = '{{number}} пропущенный звонок';
-z.string.ru.conversationsSecondaryLineMissedCalls = '{{number}} пропущенных звонка';
-z.string.ru.conversationsSecondaryLineNewMessage = '{{number}} новое сообщение';
-z.string.ru.conversationsSecondaryLineNewMessages = '{{number}} новых сообщения';
-z.string.ru.conversationsSecondaryLinePing = '{{number}} пинг';
-z.string.ru.conversationsSecondaryLinePings = '{{number}} пинга';
 z.string.ru.conversationsSecondaryLinePeopleLeft = '{{number}} участник покинул';
 z.string.ru.conversationsSecondaryLinePersonLeft = '{{user}} покинул(а)';
 z.string.ru.conversationsSecondaryLinePersonRemoved = '{{user}} был удален(а)';
@@ -428,7 +427,6 @@ z.string.ru.conversationsSecondaryLinePersonAdded = '{{user}} был(а) доб�
 z.string.ru.conversationsSecondaryLinePersonAddedSelf = '{{user}} присоединился';
 z.string.ru.conversationsSecondaryLinePersonAddedYou = '{{user}} добавил вас';
 z.string.ru.conversationsSecondaryLineRenamed = '{{user}} переименовал разговор';
-z.string.ru.conversationsSecondaryLineTimedMessage = 'Временное сообщение';
 z.string.ru.conversationsSecondaryLineYouLeft = 'Вы покинули';
 z.string.ru.conversationsSecondaryLineYouWereRemoved = 'Вы были удалены';
 
@@ -739,7 +737,9 @@ z.string.ru.notificationMemberJoinMany = '{{user}} добавил(а) {{number}}
 z.string.ru.notificationMemberJoinSelf = '{{user}} присоединился к разговору';
 z.string.ru.notificationMemberJoinOne = '{{user1}} добавил(а) в разговор {{user2}}';
 z.string.ru.notificationMemberLeaveRemovedYou = '{{user}} удалил(а) вас из разговора';
+z.string.ru.notificationMention = 'Новое упоминание:';
 z.string.ru.notificationObfuscated = 'Отправил(а) вам сообщение';
+z.string.ru.notificationObfuscatedMention = 'Вас упомянули';
 z.string.ru.notificationObfuscatedTitle = 'Кто-то';
 z.string.ru.notificationPing = 'Отправил(а) пинг';
 z.string.ru.notificationReaction = '{{reaction}} ваше сообщение';

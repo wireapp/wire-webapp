@@ -315,12 +315,7 @@ z.string.nl.conversationsPopoverNotify = 'Dempen opheffen';
 z.string.nl.conversationsPopoverSilence = 'Dempen';
 z.string.nl.conversationsPopoverUnarchive = 'Terugzetten';
 
-z.string.nl.conversationsSecondaryLineMissedCall = '{{number}} gemist gesprek';
-z.string.nl.conversationsSecondaryLineMissedCalls = '{{number}} gemiste gespreken';
-z.string.nl.conversationsSecondaryLineNewMessage = '{{number}} nieuw bericht';
-z.string.nl.conversationsSecondaryLineNewMessages = '{{number}} nieuwe berichten';
-z.string.nl.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.nl.conversationsSecondaryLinePings = '{{number}} pings';
+z.string.nl.conversationsSecondaryLineEphemeralMessage = 'Stuurde je een bericht';
 z.string.nl.conversationsSecondaryLinePeopleLeft = '{{number}} personen verlieten dit gesprek';
 z.string.nl.conversationsSecondaryLinePersonLeft = '{{user}} verliet dit gesprek';
 z.string.nl.conversationsSecondaryLinePersonRemoved = '{{user}} is verwijderd';
@@ -328,7 +323,6 @@ z.string.nl.conversationsSecondaryLinePeopleAdded = '{{user}} personen zijn toeg
 z.string.nl.conversationsSecondaryLinePersonAdded = '{{user}} is toegevoegd';
 z.string.nl.conversationsSecondaryLinePersonAddedYou = '{{user}} heeft jou toegevoegd';
 z.string.nl.conversationsSecondaryLineRenamed = '{{user}} hernoemde de conversatie';
-z.string.nl.conversationsSecondaryLineTimedMessage = 'Tijdelijk bericht';
 z.string.nl.conversationsSecondaryLineYouLeft = 'Je hebt het gesprek verlaten';
 z.string.nl.conversationsSecondaryLineYouWereRemoved = 'Je bent verwijderd';
 
