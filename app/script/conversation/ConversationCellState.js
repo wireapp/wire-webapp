@@ -45,12 +45,16 @@ z.conversation.ConversationCellState = (() => {
         activities[ACTIVITY_TYPE.MENTION] += 1;
 
         if (!mentionText) {
-          const messageText = messageEntity.is_ephemeral()
-            ? z.l10n.text(z.string.conversationsSecondaryLineTimedMention)
-            : messageEntity.get_first_asset().text;
-          mentionText = conversationEntity.is_group()
-            ? `${messageEntity.unsafeSenderName()}: ${messageText}`
-            : messageText;
+          if (messageEntity.is_ephemeral()) {
+            const stringId = conversationEntity.is_group()
+              ? z.string.conversationsSecondaryLineEphemeralMentionGroup
+              : z.string.conversationsSecondaryLineEphemeralMention;
+            mentionText = z.l10n.text(stringId);
+          } else {
+            mentionText = conversationEntity.is_group()
+              ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
+              : messageEntity.get_first_asset().text;
+          }
         }
         return;
       }
@@ -85,29 +89,29 @@ z.conversation.ConversationCellState = (() => {
           switch (activity) {
             case ACTIVITY_TYPE.CALL: {
               stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineMissedCall
-                : z.string.conversationsSecondaryLineMissedCalls;
+                ? z.string.conversationsSecondaryLineSummaryMissedCall
+                : z.string.conversationsSecondaryLineSummaryMissedCalls;
               break;
             }
 
             case ACTIVITY_TYPE.MENTION: {
               stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineNewMention
-                : z.string.conversationsSecondaryLineNewMentions;
+                ? z.string.conversationsSecondaryLineSummaryMention
+                : z.string.conversationsSecondaryLineSummaryMentions;
               break;
             }
 
             case ACTIVITY_TYPE.MESSAGE: {
               stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineNewMessage
-                : z.string.conversationsSecondaryLineNewMessages;
+                ? z.string.conversationsSecondaryLineSummaryMessage
+                : z.string.conversationsSecondaryLineSummaryMessages;
               break;
             }
 
             case ACTIVITY_TYPE.PING: {
               stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLinePing
-                : z.string.conversationsSecondaryLinePings;
+                ? z.string.conversationsSecondaryLineSummaryPing
+                : z.string.conversationsSecondaryLineSummaryPings;
               break;
             }
 
@@ -305,16 +309,9 @@ z.conversation.ConversationCellState = (() => {
 
         if (!!stringId) {
           if (messageEntity.is_ephemeral()) {
-            const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
-            if (isSelfMentioned) {
-              stringId = conversationEntity.is_group()
-                ? z.string.conversationsSecondaryLineEphemeralMentionGroup
-                : z.string.conversationsSecondaryLineEphemeralMention;
-            } else {
-              stringId = conversationEntity.is_group()
-                ? z.string.conversationsSecondaryLineEphemeralMessageGroup
-                : z.string.conversationsSecondaryLineEphemeralMessage;
-            }
+            stringId = conversationEntity.is_group()
+              ? z.string.conversationsSecondaryLineEphemeralMessageGroup
+              : z.string.conversationsSecondaryLineEphemeralMessage;
             return z.l10n.text(stringId);
           }
 
