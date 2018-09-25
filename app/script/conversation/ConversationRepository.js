@@ -1416,9 +1416,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   toggle_silence_conversation(conversation_et) {
     if (!conversation_et) {
-      return Promise.reject(
-        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND)
-      );
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+      return Promise.reject(error);
     }
 
     const payload = {
@@ -1488,7 +1487,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const skipChange = sameTimestamp && !forceChange;
 
     if (!stateChange && skipChange) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES));
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+      return Promise.reject(error);
     }
 
     const payload = {
@@ -2005,9 +2005,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const wasEdited =
       hasTextChanged || this.haveMentionsChanged(originalMessageEntity.get_first_asset().mentions(), mentionEntities);
     if (!wasEdited) {
-      return Promise.reject(
-        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES)
-      );
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES);
+      return Promise.reject(error);
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
@@ -2611,7 +2610,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         if (!messageEntity.user().is_me && !messageEntity.ephemeral_expires()) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+          const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+          throw error;
         }
 
         const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
@@ -2720,7 +2720,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
-      return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
+      const error = new Error('Conversation Repository Event Handling: Event missing');
+      return Promise.reject(error);
     }
 
     const {conversation, data: eventData, type} = eventJson;
