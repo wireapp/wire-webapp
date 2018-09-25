@@ -23,9 +23,13 @@ window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
 z.cryptography.CryptographyMapper = class CryptographyMapper {
-  /**
-   * Construct a new CryptographyMapper.
-   */
+  static get CONFIG() {
+    return {
+      MAX_MENTIONS_PER_MESSAGE: 500,
+    };
+  }
+
+  // Construct a new CryptographyMapper.
   constructor() {
     this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
   }
@@ -413,15 +417,18 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapText(text) {
-    if (text.mentions && text.mentions.length > 500) {
-      text.mentions.length = 500;
+    const {link_preview: linkPreviews, mentions} = text;
+
+    if (mentions && mentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+      this.logger.warn(`Message contains '${mentions.length}' mentions exceeding limit`, text);
+      mentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
     return {
       data: {
         content: `${text.content}`,
-        mentions: text.mentions.map(mention => mention.encode64()),
-        previews: text.link_preview.map(preview => preview.encode64()),
+        mentions: mentions.map(protoMention => protoMention.encode64()),
+        previews: linkPreviews.map(protoLinkPreview => protoLinkPreview.encode64()),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
