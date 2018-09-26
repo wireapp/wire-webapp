@@ -551,7 +551,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   sendMessage(messageText) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions();
-      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
+      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
 
@@ -564,7 +564,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.conversationRepository
-      .sendMessageEdit(messageText, messageEntity, this.conversationEntity(), mentionEntities)
+      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
           throw error;
