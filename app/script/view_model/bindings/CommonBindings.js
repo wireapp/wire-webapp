@@ -145,11 +145,9 @@ ko.bindingHandlers.resize = (function() {
       last_height = current_height;
       const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
 
-      if (current_height === max_height) {
-        return (element.style.overflowY = 'scroll');
-      }
-
-      element.style.overflowY = 'hidden';
+      const isMaximumHeight = current_height === max_height;
+      element.style.overflowY = isMaximumHeight ? 'scroll' : 'hidden';
+      $(element).scroll();
     }
   }, 100);
 
