@@ -612,12 +612,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   handleClickOnMessage(messageEntity, event) {
     const hasMentions = messageEntity.mentions().length;
-    const mentionElement = event.target.closest('.message-mention');
-    if (hasMentions && mentionElement) {
-      const userId = mentionElement.dataset.userId;
-
+    const mentionElement = hasMentions && event.target.closest('.message-mention');
+    if (mentionElement) {
       this.userRepository
-        .get_user_by_id(userId)
+        .get_user_by_id(mentionElement.dataset.userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
