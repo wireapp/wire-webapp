@@ -384,13 +384,8 @@ z.string.hu.conversationsPopoverNotify = 'Némítás feloldása';
 z.string.hu.conversationsPopoverSilence = 'Némítás';
 z.string.hu.conversationsPopoverUnarchive = 'Archiválás visszavonása';
 
+z.string.hu.conversationsSecondaryLineEphemeralMessage = 'Üzenetet küldött';
 z.string.hu.conversationsSecondaryLineIncomingCall = '{{user}} hív';
-z.string.hu.conversationsSecondaryLineMissedCall = '{{number}} nem fogadott hívás';
-z.string.hu.conversationsSecondaryLineMissedCalls = '{{number}} nem fogadott hívás';
-z.string.hu.conversationsSecondaryLineNewMessage = '{{number}} új üzenet';
-z.string.hu.conversationsSecondaryLineNewMessages = '{{number}} új üzenet';
-z.string.hu.conversationsSecondaryLinePing = '{{number}} kopogás';
-z.string.hu.conversationsSecondaryLinePings = '{{number}} kopogás';
 z.string.hu.conversationsSecondaryLinePeopleLeft = '{{number}} partner kilépett a beszélgetésből';
 z.string.hu.conversationsSecondaryLinePersonLeft = '{{user}} kilépett';
 z.string.hu.conversationsSecondaryLinePersonRemoved = '{{user}} eltávolítva';
@@ -400,7 +395,6 @@ z.string.hu.conversationsSecondaryLinePersonAdded = '{{user}} hozzáadva';
 z.string.hu.conversationsSecondaryLinePersonAddedSelf = '{{user}} csatlakozott';
 z.string.hu.conversationsSecondaryLinePersonAddedYou = '{{user}} hozzáadott téged';
 z.string.hu.conversationsSecondaryLineRenamed = '{{user}} átnevezte a beszélgetést';
-z.string.hu.conversationsSecondaryLineTimedMessage = 'Időzített üzenet';
 z.string.hu.conversationsSecondaryLineYouLeft = 'Kiléptél';
 z.string.hu.conversationsSecondaryLineYouWereRemoved = 'El lettél távolítva';
 

@@ -59,7 +59,7 @@ describe('ConversationRepository', () => {
 
   beforeAll(done => {
     z.util.protobuf
-      .loadProtos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
       .then(done)
       .catch(done.fail);
   });
@@ -1042,7 +1042,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('send_text_with_link_preview', () => {
+  describe('sendTextWithLinkPreview', () => {
     it('sends ephemeral message (within the range [1 second, 1 year])', () => {
       const conversationRepository = TestFactory.conversation_repository;
       const conversation = _generate_conversation();
@@ -1074,7 +1074,7 @@ describe('ConversationRepository', () => {
         conversation.localMessageTimer(expiration);
         conversation.self = {id: 'felix'};
         const message = 'hello there';
-        return conversationRepository.send_text_with_link_preview(message, conversation);
+        return conversationRepository.sendTextWithLinkPreview(message, conversation);
       });
       return Promise.all(sentPromises).then(sentMessages => {
         expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(

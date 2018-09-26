@@ -382,7 +382,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
       .show();
     this.emojiDiv.find('.emoji:nth(0)').addClass('selected');
 
-    const position = this._getCursorPixelPosition(input);
+    const position = z.util.popup.getCursorPixelPosition(input);
     const top = position.top - this.emojiDiv.height() - EmojiInputViewModel.CONFIG.LIST.OFFSET_TOP;
     const left = position.left - EmojiInputViewModel.CONFIG.LIST.OFFSET_LEFT;
 
@@ -429,42 +429,6 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
   removeEmojiPopup() {
     this._closeEmojiPopup();
     this.emojiStartPosition = -1;
-  }
-
-  _getCursorPixelPosition(input) {
-    const css = getComputedStyle(input);
-    const boundingRectangleInput = input.getBoundingClientRect();
-    const mask = document.createElement('div');
-    const span = document.createElement('span');
-    const text = document.createTextNode(input.value);
-
-    mask.appendChild(text);
-    mask.style.font = css.font;
-    mask.style.position = 'fixed';
-    mask.style.left = `${input.clientLeft + boundingRectangleInput.left}px`;
-    mask.style.top = `${input.clientTop + boundingRectangleInput.top}px`;
-    mask.style.color = 'red';
-    mask.style.overflow = 'scroll';
-    mask.style.visibility = 'hidden';
-    mask.style.whiteSpace = 'pre-wrap';
-    mask.style.padding = css.padding;
-    mask.style.width = css.width;
-    mask.style.height = css.height;
-    span.innerText = 'I';
-
-    const position = input.selectionStart;
-    if (position === input.value.length) {
-      mask.appendChild(span);
-    } else {
-      mask.insertBefore(span, mask.childNodes[0].splitText(position));
-    }
-    document.body.appendChild(mask);
-    span.scrollIntoView();
-
-    const boundingRectangleSpan = span.getBoundingClientRect();
-
-    mask.remove();
-    return boundingRectangleSpan;
   }
 
   _getUsageCount(emojiName) {

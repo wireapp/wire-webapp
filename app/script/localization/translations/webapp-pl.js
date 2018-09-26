@@ -332,12 +332,7 @@ z.string.pl.conversationsPopoverNotify = 'Włącz dźwięk';
 z.string.pl.conversationsPopoverSilence = 'Wycisz';
 z.string.pl.conversationsPopoverUnarchive = 'Przywróć z archiwum';
 
-z.string.pl.conversationsSecondaryLineMissedCall = '{{number}} nieodebrane połączenie';
-z.string.pl.conversationsSecondaryLineMissedCalls = 'nieodebranych połączeń: {{number}}';
-z.string.pl.conversationsSecondaryLineNewMessage = '{{number}} nowa wiadomość';
-z.string.pl.conversationsSecondaryLineNewMessages = 'nowych wiadomości: {{number}}';
-z.string.pl.conversationsSecondaryLinePing = '{{number}} zaczepienie';
-z.string.pl.conversationsSecondaryLinePings = 'zaczepień: {{number}}';
+z.string.pl.conversationsSecondaryLineEphemeralMessage = 'Wysłał(a) ci wiadomość';
 z.string.pl.conversationsSecondaryLinePeopleLeft = '{{number}} osoby/ób opuściły/o rozmowę';
 z.string.pl.conversationsSecondaryLinePersonLeft = '{{user}} wyszedł';
 z.string.pl.conversationsSecondaryLinePersonRemoved = '{{user}} został usunięty';
@@ -345,7 +340,6 @@ z.string.pl.conversationsSecondaryLinePeopleAdded = 'dodanych osób: {{user}}';
 z.string.pl.conversationsSecondaryLinePersonAdded = '{{user}} został dodany';
 z.string.pl.conversationsSecondaryLinePersonAddedYou = '{{user}} dodał Cię';
 z.string.pl.conversationsSecondaryLineRenamed = '{{user}} zmieniono nazwę konwersacji';
-z.string.pl.conversationsSecondaryLineTimedMessage = 'Wiadomość tymczasowa';
 z.string.pl.conversationsSecondaryLineYouLeft = 'Opuściłeś/aś';
 z.string.pl.conversationsSecondaryLineYouWereRemoved = 'Zostałeś usunięty/Zostałaś usunięta';
 

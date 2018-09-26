@@ -296,12 +296,7 @@ z.string.it.conversationsPopoverNotify = 'Riattiva audio';
 z.string.it.conversationsPopoverSilence = 'Silenzia';
 z.string.it.conversationsPopoverUnarchive = 'Disarchivia';
 
-z.string.it.conversationsSecondaryLineMissedCall = '{{number}} chiamata persa';
-z.string.it.conversationsSecondaryLineMissedCalls = '{{number}} chiamate perse';
-z.string.it.conversationsSecondaryLineNewMessage = '{{number}} nuovo messaggio';
-z.string.it.conversationsSecondaryLineNewMessages = '{{number}} nuovi messaggi';
-z.string.it.conversationsSecondaryLinePing = '{{number}} trillo';
-z.string.it.conversationsSecondaryLinePings = '{{number}} trilli';
+z.string.it.conversationsSecondaryLineEphemeralMessage = 'Ti ha inviato un messaggio';
 z.string.it.conversationsSecondaryLinePeopleLeft = '{{number}} utenti hanno abbandonato';
 z.string.it.conversationsSecondaryLinePersonLeft = '{{user}} ha abbandonato';
 z.string.it.conversationsSecondaryLinePersonRemoved = '{{user}} è stato rimosso';
@@ -309,7 +304,6 @@ z.string.it.conversationsSecondaryLinePeopleAdded = '{{user}} persone sono state
 z.string.it.conversationsSecondaryLinePersonAdded = '{{user}} è stato aggiunto';
 z.string.it.conversationsSecondaryLinePersonAddedYou = '{{user}} ti ha aggiunto';
 z.string.it.conversationsSecondaryLineRenamed = '{{user}} ha cambiato nome di conversazione';
-z.string.it.conversationsSecondaryLineTimedMessage = 'Messaggio a tempo';
 z.string.it.conversationsSecondaryLineYouLeft = 'Hai abbandonato';
 z.string.it.conversationsSecondaryLineYouWereRemoved = 'Sei stato rimosso';
 
