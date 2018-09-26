@@ -183,7 +183,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return false;
     });
 
-    this.showGiphyButton = ko.pureComputed(() => this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH);
+    this.showGiphyButton = ko.pureComputed(() => {
+      return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
+    });
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
