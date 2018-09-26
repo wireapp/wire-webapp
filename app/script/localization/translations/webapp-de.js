@@ -436,7 +436,7 @@ z.string.de.conversationsSecondaryLineSummaryMentions = '{{number}} Erwähnungen
 z.string.de.conversationsSecondaryLineSummaryMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineSummaryMissedCalls = '{{number}} verpasste Anrufe';
 z.string.de.conversationsSecondaryLineSummaryPing = '{{number}} Ping';
-z.string.de.conversationsSecondaryLineSummaryPings = '{{number}} Ping';
+z.string.de.conversationsSecondaryLineSummaryPings = '{{number}} Pings';
 z.string.de.conversationsSecondaryLineYouLeft = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversationsSecondaryLineYouWereRemoved = 'Du wurdest entfent';
 
