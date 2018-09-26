@@ -610,18 +610,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     z.ui.Context.from(event, entries, 'message-options-menu');
   }
 
-  handleClickOnMessage(message, event) {
-    const hasMentions = message.mentions().length > 0;
-    if (!hasMentions) {
-      // need to return `true` because knockout will prevent default if we return anything else (including undefined)
-      return true;
-    }
-    const mentionElement = event.target.closest('.message-mention');
+  handleClickOnMessage(messageEntity, event) {
+    const hasMentions = messageEntity.mentions().length;
+    const mentionElement = hasMentions && event.target.closest('.message-mention');
     if (mentionElement) {
-      const userId = mentionElement.dataset.userId;
-
       this.userRepository
-        .get_user_by_id(userId)
+        .get_user_by_id(mentionElement.dataset.userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
@@ -629,6 +623,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           }
         });
     }
+
+    // need to return `true` because knockout will prevent default if we return anything else (including undefined)
+    return true;
   }
 
   bindShowMore(elements, message) {
