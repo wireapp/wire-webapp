@@ -19,13 +19,22 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+// grunt test_init && grunt test_run:view_model/InputBarViewModel
 
-// Enum of different conversation types.
-z.conversation.ConversationType = {
-  CONNECT: 3,
-  GROUP: 0,
-  ONE2ONE: 2,
-  SELF: 1,
-};
+describe('z.viewModel.content.InputBarViewModel', () => {
+  /*
+  const testFactory = new TestFactory();
+  let viewModel;
+
+  beforeAll(done => {
+    testFactory.exposeConversationActors().then(conversationRepository => {
+      viewModel = new z.viewModel.content.InputBarViewModel(
+        null,
+        {},
+        {conversation: conversationRepository, user: TestFactory.user_repository}
+      );
+      done();
+    });
+  });
+  */
+});

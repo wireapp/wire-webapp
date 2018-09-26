@@ -41,8 +41,10 @@ z.entity.Conversation = class Conversation {
     this.type = ko.observable();
 
     const inputStorageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`;
-    this.input = ko.observable(z.util.StorageUtil.getValue(inputStorageKey) || '');
-    this.input.subscribe(text => z.util.StorageUtil.setValue(inputStorageKey, text.trim()));
+    this.input = ko.observable(this._getStorageInputData(inputStorageKey));
+    this.input.subscribe(({mentions, text}) => {
+      return z.util.StorageUtil.setValue(inputStorageKey, {mentions, text: z.util.StringUtil.trimEnd(text)});
+    });
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -65,12 +67,12 @@ z.entity.Conversation = class Conversation {
     this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.is_group = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
     this.is_one2one = ko.pureComputed(() => {
@@ -81,7 +83,8 @@ z.entity.Conversation = class Conversation {
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
-      return this.is_group() && this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      return hasGuestUser && this.is_group() && this.self.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
@@ -159,27 +162,27 @@ z.entity.Conversation = class Conversation {
     this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
-    this.unread_events = ko.pureComputed(() => {
-      const unread_event = [];
+    this.unreadEvents = ko.pureComputed(() => {
+      const unreadEvents = [];
       const messages = this.messages();
 
       for (let index = messages.length - 1; index >= 0; index--) {
-        const message_et = messages[index];
-        if (message_et.visible()) {
-          if (message_et.timestamp() <= this.last_read_timestamp() || message_et.user().is_me) {
+        const messageEntity = messages[index];
+        if (messageEntity.visible()) {
+          if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
             break;
           }
-          unread_event.push(message_et);
+          unreadEvents.push(messageEntity);
         }
       }
 
-      return unread_event;
+      return unreadEvents;
     });
 
-    this.unread_event_count = ko.pureComputed(() => this.unread_events().length);
+    this.unreadEventsCount = ko.pureComputed(() => this.unreadEvents().length);
 
-    this.unread_message_count = ko.pureComputed(() => {
-      return this.unread_events().filter(message_et => {
+    this.unreadMessagesCount = ko.pureComputed(() => {
+      return this.unreadEvents().filter(message_et => {
         const is_missed_call = message_et.is_call() && message_et.was_missed();
         return is_missed_call || message_et.is_ping() || message_et.is_content();
       }).length;
@@ -276,7 +279,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   release() {
-    if (!this.unread_event_count()) {
+    if (!this.unreadEventsCount()) {
       this.remove_messages();
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
@@ -385,6 +388,13 @@ z.entity.Conversation = class Conversation {
     }
 
     z.util.koArrayPushAll(this.messages_unordered, message_ets);
+  }
+
+  getFirstUnreadSelfMention() {
+    return this.unreadEvents()
+      .slice()
+      .reverse()
+      .find(messageEntity => messageEntity.visible() && messageEntity.is_content() && messageEntity.isSelfMentioned());
   }
 
   get_last_known_timestamp(time_offset) {
@@ -499,6 +509,24 @@ z.entity.Conversation = class Conversation {
         return sameId && sameSender;
       });
     }
+  }
+
+  _getStorageInputData(inputStorageKey) {
+    const storageValue = z.util.StorageUtil.getValue(inputStorageKey);
+
+    if (typeof storageValue === 'undefined') {
+      return {mentions: [], text: ''};
+    }
+
+    if (typeof storageValue === 'string') {
+      return {mentions: [], text: storageValue};
+    }
+
+    storageValue.mentions = storageValue.mentions.map(mention => {
+      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+    });
+
+    return storageValue;
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
@@ -643,14 +671,6 @@ z.entity.Conversation = class Conversation {
   getUsersWithUnverifiedClients() {
     const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
-  }
-
-  /**
-   * Check whether the conversation is held with a service.
-   * @returns {boolean} True, if conversation with a service
-   */
-  isWithService() {
-    return this.participating_user_ets().some(userEntity => userEntity.isService);
   }
 
   supportsVideoCall(isCreatingUser = false) {

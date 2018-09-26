@@ -122,8 +122,8 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     if (openGraphImage.data) {
       return this._uploadPreviewImage(openGraphImage.data)
         .then(asset => {
-          linkPreview.article.set('image', asset); // deprecated
-          linkPreview.image.set('image', asset);
+          linkPreview.article.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE, asset); // deprecated
+          linkPreview.image.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE, asset);
           return linkPreview;
         })
         .catch(() => linkPreview);

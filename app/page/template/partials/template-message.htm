@@ -55,7 +55,7 @@
 <script type="text/html" id="delete">
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.showUserDetails, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
@@ -71,7 +71,7 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.showUserDetails, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -117,7 +117,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(), event: {click: $parents[1].handleClickOnMessage}, css: {'text-graphite': $parent.is_editing, 'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></link-preview-asset>
@@ -177,7 +177,7 @@
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, click: $parents[1].showUserDetails, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>

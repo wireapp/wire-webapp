@@ -20,12 +20,18 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+window.z.cryptography = z.cryptography || {};
 
-// Enum of different conversation types.
-z.conversation.ConversationType = {
-  CONNECT: 3,
-  GROUP: 0,
-  ONE2ONE: 2,
-  SELF: 1,
+z.cryptography.PROTO_MESSAGE_TYPE = {
+  ASSET_NOT_UPLOADED: 'not_uploaded',
+  ASSET_ORIGINAL: 'original',
+  ASSET_PREVIEW: 'preview',
+  ASSET_UPLOADED: 'uploaded',
+  EPHEMERAL_EXPIRATION: 'expire_after_millis',
+  LINK_PREVIEW_IMAGE: 'image',
+  LINK_PREVIEW_TITLE: 'title',
+  LINK_PREVIEWS: 'link_preview',
+  MENTION_TYPE_USER_ID: 'user_id',
+  MENTIONS: 'mentions',
+  TWEET: 'tweet',
 };

@@ -370,13 +370,8 @@ z.string.es.conversationsPopoverNotify = 'Sonido';
 z.string.es.conversationsPopoverSilence = 'Silenciar';
 z.string.es.conversationsPopoverUnarchive = 'Desarchivar';
 
+z.string.es.conversationsSecondaryLineEphemeralMessage = 'Te envió un mensaje';
 z.string.es.conversationsSecondaryLineIncomingCall = '{{user}} está llamando';
-z.string.es.conversationsSecondaryLineMissedCall = '{{number}} llamada perdida';
-z.string.es.conversationsSecondaryLineMissedCalls = '{{number}} llamadas perdidas';
-z.string.es.conversationsSecondaryLineNewMessage = '{{number}} mensaje nuevo';
-z.string.es.conversationsSecondaryLineNewMessages = '{{number}} mensajes nuevos';
-z.string.es.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.es.conversationsSecondaryLinePings = '{{number}} pings';
 z.string.es.conversationsSecondaryLinePeopleLeft = '{{number}} personas se fueron';
 z.string.es.conversationsSecondaryLinePersonLeft = '{{user}} se fue';
 z.string.es.conversationsSecondaryLinePersonRemoved = '{{user}} fue eliminado';
@@ -384,7 +379,6 @@ z.string.es.conversationsSecondaryLinePeopleAdded = '{{user}} personas se han a�
 z.string.es.conversationsSecondaryLinePersonAdded = '{{user}} se ha añadido';
 z.string.es.conversationsSecondaryLinePersonAddedYou = '{{user}} te ha añadido';
 z.string.es.conversationsSecondaryLineRenamed = '{{user}} renombró la conversación';
-z.string.es.conversationsSecondaryLineTimedMessage = 'Mensaje temporizado';
 z.string.es.conversationsSecondaryLineYouLeft = 'Te fuiste';
 z.string.es.conversationsSecondaryLineYouWereRemoved = 'Te han eliminado';
 

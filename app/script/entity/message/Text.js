@@ -33,6 +33,9 @@ z.entity.Text = class Text extends z.entity.Asset {
     // Can be used to theme media embeds
     this.theme_color = undefined;
 
+    // Array of z.message.MentionEntity instances
+    this.mentions = ko.observableArray();
+
     // Array of z.entity.LinkPreview instances
     this.previews = ko.observableArray();
 
@@ -47,7 +50,11 @@ z.entity.Text = class Text extends z.entity.Asset {
 
   // Process text before rendering it
   render() {
-    const message = z.util.renderMessage(this.text);
+    const message = z.util.renderMessage(this.text, this.mentions());
     return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, this.theme_color) : message;
+  }
+
+  isSelfMentioned() {
+    return this.mentions().some(mentionEntity => mentionEntity.isSelfMentioned());
   }
 };

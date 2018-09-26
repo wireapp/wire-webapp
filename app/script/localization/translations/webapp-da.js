@@ -368,12 +368,7 @@ z.string.da.conversationsPopoverNotify = 'Lyd til samtale';
 z.string.da.conversationsPopoverSilence = 'Stum samtale';
 z.string.da.conversationsPopoverUnarchive = 'Genopret samtale';
 
-z.string.da.conversationsSecondaryLineMissedCall = '{{number}} ubesvaret opkald';
-z.string.da.conversationsSecondaryLineMissedCalls = '{{number}} ubesvarede opkald';
-z.string.da.conversationsSecondaryLineNewMessage = '{{number}} ny besked';
-z.string.da.conversationsSecondaryLineNewMessages = '{{number}} nye beskeder';
-z.string.da.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.da.conversationsSecondaryLinePings = '{{number}} pings';
+z.string.da.conversationsSecondaryLineEphemeralMessage = 'Sendte dig en besked';
 z.string.da.conversationsSecondaryLinePeopleLeft = '{{number}} personer forlod';
 z.string.da.conversationsSecondaryLinePersonLeft = '{{user}} forlod';
 z.string.da.conversationsSecondaryLinePersonRemoved = '{{user}} blev fjernet';
@@ -383,7 +378,6 @@ z.string.da.conversationsSecondaryLinePersonAdded = '{{user}} blev tilføjet';
 z.string.da.conversationsSecondaryLinePersonAddedSelf = '{{user}} tilsluttede';
 z.string.da.conversationsSecondaryLinePersonAddedYou = '{{user}} har tilføjet dig';
 z.string.da.conversationsSecondaryLineRenamed = '{{user}} omdøbte samtalen';
-z.string.da.conversationsSecondaryLineTimedMessage = 'Tidsbestemt besked';
 z.string.da.conversationsSecondaryLineYouLeft = 'Du forlod';
 z.string.da.conversationsSecondaryLineYouWereRemoved = 'Du blev fjernet';
 

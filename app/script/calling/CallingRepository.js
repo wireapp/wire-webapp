@@ -597,7 +597,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       if (!eventFromStream) {
         const eventInfoEntity = new z.conversation.EventInfoEntity(undefined, conversationId, {recipients: [userId]});
-        eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE);
+        eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING);
         const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
 
@@ -726,8 +726,8 @@ z.calling.CallingRepository = class CallingRepository {
           this._logMessage(true, callMessageEntity);
 
           const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-          const calling = new z.proto.Calling(callMessageEntity.toContentString());
-          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, calling);
+          const protoCalling = new z.proto.Calling(callMessageEntity.toContentString());
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, protoCalling);
 
           const options = {precondition, recipients};
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);

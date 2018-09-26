@@ -588,8 +588,8 @@ z.user.UserRepository = class UserRepository {
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
+    const protoAvailability = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
+    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, protoAvailability);
 
     amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
   }

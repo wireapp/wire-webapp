@@ -289,23 +289,71 @@ z.util.alias = {
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.renderMessage = message => {
-  message = marked(message, {
+z.util.renderMessage = (message, mentionEntities = []) => {
+  const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const renderMention = mentionData => {
+    const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
+    const elementAttributes = mentionData.isSelfMentioned
+      ? ' data-uie-name="label-self-mention"'
+      : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
+
+    const mentionText = mentionData.text.replace(/^@/, '');
+    const content = `<span class="mention-at-sign">@</span>${z.util.SanitizationUtil.escapeString(mentionText)}`;
+    return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
+  };
+  const mentionTexts = {};
+
+  let mentionlessText = mentionEntities
+    .slice()
+    // sort mentions to start with the lastest mention first (in order not to have to recompute the index everytime we modify the original text)
+    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
+    .reduce((strippedText, mention) => {
+      const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
+      const mentionKey = createMentionHash(mention);
+      mentionTexts[mentionKey] = {
+        isSelfMentioned: mention.isSelfMentioned(),
+        text: mentionText,
+        userId: mention.userId,
+      };
+      return z.util.StringUtil.replaceInRange(
+        strippedText,
+        mentionKey,
+        mention.startIndex,
+        mention.startIndex + mention.length
+      );
+    }, message);
+
+  mentionlessText = marked(mentionlessText, {
     highlight: function(code) {
+      const containsMentions = mentionEntities.some(mention => {
+        const hash = createMentionHash(mention);
+        return code.includes(hash);
+      });
+      if (containsMentions) {
+        // disable code highlighting if there is a mention in there
+        // hightlighting will be wrong anyway because this is not valid code
+        return code;
+      }
       return hljs.highlightAuto(code).value;
     },
     sanitize: true,
   });
 
   // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  message = message.replace(/\n/g, '<br />');
+  mentionlessText = mentionlessText.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message
-  if (z.util.StringUtil.getLastChars(message, '<br />'.length) === '<br />') {
-    message = z.util.StringUtil.cutLastChars(message, '<br />'.length);
+  if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
+    mentionlessText = z.util.StringUtil.cutLastChars(mentionlessText, '<br />'.length);
   }
 
-  return message;
+  const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
+    const mentionMarkup = renderMention(mentionTexts[mentionHash]);
+
+    return text.replace(mentionHash, mentionMarkup);
+  }, mentionlessText);
+
+  return parsedText;
 };
 
 z.util.koArrayPushAll = (koArray, valuesToPush) => {

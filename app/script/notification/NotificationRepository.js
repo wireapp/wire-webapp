@@ -207,9 +207,13 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _createBodyContent(messageEntity) {
     if (messageEntity.has_asset_text()) {
-      for (const asset_et of messageEntity.assets()) {
-        if (asset_et.is_text()) {
-          return z.util.StringUtil.truncate(asset_et.text, NotificationRepository.CONFIG.BODY_LENGTH);
+      for (const assetEntity of messageEntity.assets()) {
+        if (assetEntity.is_text()) {
+          const notificationText = assetEntity.isSelfMentioned()
+            ? `${z.l10n.text(z.string.notificationMention)} ${assetEntity.text}`
+            : assetEntity.text;
+
+          return z.util.StringUtil.truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     }
@@ -223,16 +227,16 @@ z.notification.NotificationRepository = class NotificationRepository {
     }
 
     if (messageEntity.has_asset()) {
-      const [asset_et] = messageEntity.assets();
-      if (asset_et.is_audio()) {
+      const assetEntity = messageEntity.get_first_asset();
+      if (assetEntity.is_audio()) {
         return z.l10n.text(z.string.notificationSharedAudio);
       }
 
-      if (asset_et.is_video()) {
+      if (assetEntity.is_video()) {
         return z.l10n.text(z.string.notificationSharedVideo);
       }
 
-      if (asset_et.is_file()) {
+      if (assetEntity.is_file()) {
         return z.l10n.text(z.string.notificationSharedFile);
       }
     }
@@ -321,11 +325,15 @@ z.notification.NotificationRepository = class NotificationRepository {
 
   /**
    * Creates the notification body for obfuscated messages.
+   *
    * @private
+   * @param {z.entity.Message} messageEntity - Message to obfuscate body for
    * @returns {string} Notification message body
    */
-  _createBodyObfuscated() {
-    return z.l10n.text(z.string.notificationObfuscated);
+  _createBodyObfuscated(messageEntity) {
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    const stringId = isSelfMentioned ? z.string.notificationObfuscatedMention : z.string.notificationObfuscated;
+    return z.l10n.text(stringId);
   }
 
   /**
@@ -407,7 +415,7 @@ z.notification.NotificationRepository = class NotificationRepository {
           const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
           return {
             options: {
-              body: shouldObfuscateMessage ? this._createBodyObfuscated() : optionsBody,
+              body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : optionsBody,
               data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
               icon: iconUrl,
               silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
@@ -556,25 +564,18 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createTrigger(messageEntity, connectionEntity, conversationEntity) {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
-    if (messageEntity.is_member()) {
-      switch (messageEntity.memberMessageType) {
-        case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_CONNECTED: {
-          return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
-        }
-
-        case z.message.SystemMessageType.CONNECTION_REQUEST: {
-          return () => {
-            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
-          };
-        }
-
-        default: {
-          const message = `No notification trigger for message '${messageEntity.id} in '${conversationId}'.`;
-          this.logger.log(this.logger.levels.OFF, message);
-        }
-      }
+    const containsSelfMention = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    if (containsSelfMention) {
+      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity, true);
     }
+
+    const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
+    if (isConnectionRequest) {
+      return () => {
+        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      };
+    }
+
     return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
   }
 
@@ -701,12 +702,12 @@ z.notification.NotificationRepository = class NotificationRepository {
   /**
    * Should sender in a notification be obfuscated.
    * @private
-   * @param {z.entity.Message} message_et - Message entity
+   * @param {z.entity.Message} messageEntity - Message entity
    * @returns {boolean} Obfuscate sender in notification
    */
-  _shouldObfuscateNotificationSender(message_et) {
+  _shouldObfuscateNotificationSender(messageEntity) {
     const isSetToObfuscate = this.notificationsPreference() === z.notification.NotificationPreference.OBFUSCATE;
-    return isSetToObfuscate || message_et.is_ephemeral();
+    return isSetToObfuscate || messageEntity.is_ephemeral();
   }
 
   /**
