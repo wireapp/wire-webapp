@@ -74,11 +74,11 @@ describe('MentionEntity', () => {
       expect(mentionEntity.validate(textMessage)).toBeTruthy();
 
       const beginningTextMessage = '@Gregor Can you please take a look?';
-      const beginningMentionEntity = new z.message.mentionEntity(0, 7, userId);
+      const beginningMentionEntity = new z.message.MentionEntity(0, 7, userId);
       expect(beginningMentionEntity.validate(beginningTextMessage)).toBeTruthy();
 
       const endTextMessage = 'Can you please take a look? @Gregor';
-      const endMentionEntity = new z.message.mentionEntity(28, 7, userId);
+      const endMentionEntity = new z.message.MentionEntity(28, 7, userId);
       expect(endMentionEntity.validate(endTextMessage)).toBeTruthy();
     });
 
