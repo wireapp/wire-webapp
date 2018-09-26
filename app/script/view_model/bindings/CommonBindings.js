@@ -127,9 +127,9 @@ ko.virtualElements.allowedBindings.stopBinding = true;
  * Resize textarea according to the containing text.
  */
 ko.bindingHandlers.resize = (function() {
-  let last_height = null;
-  let resize_observable = null;
-  let resize_callback = null;
+  let lastHeight = null;
+  let resizeObservable = null;
+  let resizeCallback = null;
 
   const resize_textarea = _.throttle(element => {
     element.style.height = 0;
@@ -138,11 +138,11 @@ ko.bindingHandlers.resize = (function() {
     const current_height = element.clientHeight;
 
     // height has changed
-    if (last_height !== current_height) {
-      if (typeof resize_callback === 'function') {
-        resize_callback(current_height, last_height);
+    if (lastHeight !== current_height) {
+      if (typeof resizeCallback === 'function') {
+        resizeCallback(current_height, lastHeight);
       }
-      last_height = current_height;
+      lastHeight = current_height;
       const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
 
       const isMaximumHeight = current_height === max_height;
@@ -153,11 +153,11 @@ ko.bindingHandlers.resize = (function() {
 
   return {
     init(element, valueAccessor, allBindings, data, context) {
-      last_height = element.scrollHeight;
-      resize_observable = ko.unwrap(valueAccessor());
-      resize_callback = allBindings.get('resize_callback');
+      lastHeight = element.scrollHeight;
+      resizeObservable = ko.unwrap(valueAccessor());
+      resizeCallback = allBindings.get('resizeCallback');
 
-      if (!resize_observable) {
+      if (!resizeObservable) {
         return ko.applyBindingsToNode(
           element,
           {
@@ -176,9 +176,9 @@ ko.bindingHandlers.resize = (function() {
     },
 
     update(element, valueAccessor, allBindings) {
-      resize_observable = ko.unwrap(valueAccessor());
+      resizeObservable = ko.unwrap(valueAccessor());
       resize_textarea(element);
-      resize_callback = allBindings.get('resize_callback');
+      resizeCallback = allBindings.get('resizeCallback');
     },
   };
 })();
