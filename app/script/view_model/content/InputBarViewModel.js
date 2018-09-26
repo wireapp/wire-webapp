@@ -92,6 +92,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.updateSelectionState();
     });
 
+    this.draftMessage = ko
+      .pureComputed(() => {
+        const text = this.input();
+        const mentions = this.currentMentions();
+        return {mentions, text};
+      })
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
+
     this.mentionSuggestions = ko.pureComputed(() => {
       if (!this.editedMention() || !this.conversationEntity()) {
         return [];
@@ -105,7 +113,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-      const pieces = this.currentMentions
+      const {text, mentions} = this.draftMessage();
+      const pieces = mentions
         .slice()
         .reverse()
         .reduce(
@@ -116,7 +125,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [this.input()]
+          [text]
         );
 
       return pieces
@@ -194,20 +203,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
-    this.editedMessage = ko
-      .pureComputed(() => {
-        const text = this.input();
-        const mentions = this.currentMentions();
-        return {mentions, text};
-      })
-      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
-
     this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
-    this.editedMessage.subscribe(message => {
+    this.draftMessage.subscribe(message => {
       if (!this.conversationEntity()) {
         return;
       }
-      this._saveEditState(this.conversationEntity(), message.text, message.mentions);
+      this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
     });
 
     this._init_subscriptions();
@@ -230,12 +231,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!conversationEntity) {
       return;
     }
-    const previousSessionData = this._loadEditState(conversationEntity);
+    const previousSessionData = this._loadDraftState(conversationEntity);
     this.input(previousSessionData.text);
     this.currentMentions(previousSessionData.mentions);
   }
 
-  _saveEditState(conversationEntity, text, mentions) {
+  _saveDraftState(conversationEntity, text, mentions) {
     if (!this.isEditing()) {
       // we only save state for newly written messages
       const storageKey = this._generateStorageKey(conversationEntity);
@@ -247,7 +248,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
   }
 
-  _loadEditState(conversationEntity) {
+  _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
     const storageValue = z.util.StorageUtil.getValue(storageKey);
 
@@ -336,13 +337,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
 
-      // clean mentions before setting text in order to prevent mentions offset recomputing
-      this.currentMentions.removeAll();
       this.input(messageEntity.get_first_asset().text);
+      this.currentMentions(
+        messageEntity
+          .get_first_asset()
+          .mentions()
+          .slice()
+      );
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
-      this.currentMentions(messageEntity.get_first_asset().mentions());
     }
   }
 
@@ -692,6 +696,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     window.setTimeout(() => {
       const newSelectionStart = (input_element.selectionEnd = input_element.value.length * 2);
       input_element.selectionStart = newSelectionStart;
+      this.updateSelectionState();
     }, 0);
   }
 
