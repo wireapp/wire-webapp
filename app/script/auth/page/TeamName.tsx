@@ -47,9 +47,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as React from 'react';
 import Page from './Page';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 
@@ -199,7 +197,7 @@ export default withRouter(
         error: AuthSelector.getError(state),
         teamName: AuthSelector.getAccountTeamName(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
         pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
           dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),

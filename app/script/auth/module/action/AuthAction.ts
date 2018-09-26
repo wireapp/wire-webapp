@@ -23,16 +23,14 @@ import {LocalStorageKey, LocalStorageAction} from './LocalStorageAction';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
-import {LoginData, RegisterData, Context} from '@wireapp/api-client/dist/commonjs/auth';
-import {AnyAction} from 'redux';
-import {Api, RootState, ThunkAction} from '../reducer';
-import {ThunkDispatch} from 'redux-thunk';
+import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {ThunkDispatch, RootState, ThunkAction, Api} from '../reducer';
 import {AuthActionCreator} from './creator/';
 import {RegistrationDataState} from '../reducer/authReducer';
 import {Account} from '@wireapp/core';
 
 type LoginLifecycleFunction = (
-  dispatch: ThunkDispatch<RootState, Api, AnyAction>,
+  dispatch: ThunkDispatch,
   getState: () => RootState,
   global: Api
 ) => void;
@@ -139,7 +137,7 @@ export class AuthAction {
   persistAuthData = (
     clientType: ClientType,
     core: Account,
-    dispatch: ThunkDispatch<RootState, Api, AnyAction>,
+    dispatch: ThunkDispatch,
     localStorageAction: LocalStorageAction
   ): Promise<void[]> => {
     const persist = clientType === ClientType.PERMANENT;

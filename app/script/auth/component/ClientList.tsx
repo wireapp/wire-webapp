@@ -30,10 +30,8 @@ import {withRouter, RouteComponentProps} from 'react-router';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {pathWithParams} from '../util/urlUtil';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {RootState, Api} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -136,7 +134,7 @@ export default withRouter(
         isFetching: ClientSelector.isFetching(state),
         permanentClients: ClientSelector.getPermanentClients(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         doRemoveClient: (clientId: string, password: string) =>
           dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),

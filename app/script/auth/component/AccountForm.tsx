@@ -28,9 +28,7 @@ import * as React from 'react';
 import EXTERNAL_ROUTE from '../externalRoute';
 import BackendError from '../module/action/BackendError';
 import * as AccentColor from '../util/AccentColor';
-import {RootState, Api} from '../module/reducer';
-import {AnyAction} from 'redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 
@@ -313,7 +311,7 @@ export default injectIntl(
       isPersonalFlow: AuthSelector.isPersonalFlow(state),
       isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
     }),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+    (dispatch: ThunkDispatch): DispatchProps => ({
       doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
       pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
         dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),

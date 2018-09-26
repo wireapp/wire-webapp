@@ -25,9 +25,7 @@ import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {isMobileOs} from '../Runtime';
 import * as React from 'react';
-import {RootState, Api} from '../module/reducer';
-import {AnyAction} from 'redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {RootState, ThunkDispatch} from '../module/reducer';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -68,6 +66,6 @@ export default injectIntl(
     (state: RootState): ConnectedProps => ({
       isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
     }),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+    (dispatch: ThunkDispatch): DispatchProps => ({})
   )(WirelessUnsupportedBrowser)
 );

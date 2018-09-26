@@ -30,9 +30,7 @@ import * as URLUtil from '../util/urlUtil';
 import {withRouter, RouteComponentProps} from 'react-router';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -103,7 +101,7 @@ export default withRouter(
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         resetHistoryCheck: () => dispatch(ROOT_ACTIONS.notificationAction.resetHistoryCheck()),
       })
     )(HistoryInfo)

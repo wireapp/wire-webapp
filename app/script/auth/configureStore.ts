@@ -19,9 +19,9 @@
 
 import {applyMiddleware, combineReducers, createStore, AnyAction, Store} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
-import reducers, {Api, RootState} from './module/reducer';
+import reducers, {ThunkDispatch, RootState} from './module/reducer';
 import {runtimeAction} from './module/action/RuntimeAction';
-import thunk, {ThunkDispatch} from 'redux-thunk';
+import thunk from 'redux-thunk';
 const {createLogger} = require('redux-logger');
 import * as Environment from './Environment';
 
@@ -36,7 +36,7 @@ const configureStore = (thunkArguments: object = {}) => {
     }
   }
 
-  const dispatch: ThunkDispatch<RootState, Api, AnyAction> = store.dispatch;
+  const dispatch: ThunkDispatch = store.dispatch;
   dispatch(runtimeAction.checkIndexedDbSupport());
   dispatch(runtimeAction.checkCookieSupport());
   dispatch(runtimeAction.checkSupportedBrowser());

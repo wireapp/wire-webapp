@@ -23,9 +23,7 @@ import {conversationJoinStrings} from '../../strings';
 import {H2, Text, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
 
@@ -69,6 +67,6 @@ class ConversationJoinInvalid extends React.PureComponent<
 export default injectIntl(
   connect(
     (state: RootState): ConnectedProps => ({}),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+    (dispatch: ThunkDispatch): DispatchProps => ({})
   )(ConversationJoinInvalid)
 );

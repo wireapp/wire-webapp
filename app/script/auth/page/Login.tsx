@@ -60,9 +60,7 @@ import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import Page from './Page';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 
@@ -456,25 +454,25 @@ class Login extends React.Component<CombinedProps, State> {
 export default withRouter(
   injectIntl(
     connect(
-    (state: RootState): ConnectedProps => ({
-      hasHistory: ClientSelector.hasHistory(state),
-      hasSelfHandle: SelfSelector.hasSelfHandle(state),
-      isFetching: AuthSelector.isFetching(state),
-      loginError: AuthSelector.getError(state),
-    }),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
-      doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
-        dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
-      resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-      doInitializeClient: (clientType: ClientType, password?: string) =>
-        dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-      doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
-        dispatch(ROOT_ACTIONS.authAction.doInit(options)),
-      doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
-        dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
-      doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
-      doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-    })
+      (state: RootState): ConnectedProps => ({
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
+        isFetching: AuthSelector.isFetching(state),
+        loginError: AuthSelector.getError(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
+          dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+        doInitializeClient: (clientType: ClientType, password?: string) =>
+          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
+        doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
+          dispatch(ROOT_ACTIONS.authAction.doInit(options)),
+        doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
+          dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
+        doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
+        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+      })
     )(Login)
   )
 );

@@ -28,9 +28,7 @@ import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import Page from './Page';
-import {ThunkDispatch} from 'redux-thunk';
-import {RootState, Api} from '../module/reducer';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 
@@ -149,7 +147,7 @@ export default withRouter(
         isPersonalFlow: AuthSelector.isPersonalFlow(state),
         isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         getInvitationFromCode: (invitationCode: string) =>
           dispatch(ROOT_ACTIONS.authAction.getInvitationFromCode(invitationCode)),
         enterPersonalInvitationCreationFlow: () =>

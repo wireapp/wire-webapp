@@ -41,9 +41,7 @@ const SUPPORTED_LOCALE = require('../supportedLocales');
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {APP_INSTANCE_ID} from '../config';
 import SingleSignOn from './SingleSignOn';
-import {ThunkDispatch} from 'redux-thunk';
-import {Api, RootState} from '../module/reducer';
-import {AnyAction} from 'redux';
+import {ThunkDispatch, RootState} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 
 addLocaleData([...de]);
@@ -107,7 +105,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
 
 export default connect(
   (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
-  (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+  (dispatch: ThunkDispatch): DispatchProps => ({
     startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
       dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
     safelyRemoveCookie: (name: string, value: string) =>

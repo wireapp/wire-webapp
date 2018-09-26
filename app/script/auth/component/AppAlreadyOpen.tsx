@@ -24,10 +24,8 @@ import {appAlreadyOpenStrings} from '../../strings';
 import {H3, Button, Container, Columns, Column, Modal, Text} from '@wireapp/react-ui-kit';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {COOKIE_NAME_APP_OPENED} from '../module/selector/CookieSelector';
-import {RootState, Api} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
 
 export interface Props extends React.HTMLAttributes<AppAlreadyOpen> {
   fullscreen?: boolean;
@@ -78,7 +76,7 @@ export default injectIntl(
     (state: RootState): ConnectedProps => ({
       isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
     }),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+    (dispatch: ThunkDispatch): DispatchProps => ({
       removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
     })
   )(AppAlreadyOpen)

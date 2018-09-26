@@ -29,9 +29,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import Page from './Page';
 import * as React from 'react';
 import {ROUTE} from '../route';
-import {ThunkDispatch} from 'redux-thunk';
-import {RootState, Api} from '../module/reducer';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 
@@ -130,7 +128,7 @@ export default withRouter(
         authError: AuthSelector.getError(state),
         currentFlow: AuthSelector.getCurrentFlow(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         doRegisterTeam: (registrationData: RegisterData) =>
           dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
         doRegisterPersonal: (registrationData: RegisterData) =>

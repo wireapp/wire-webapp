@@ -24,9 +24,7 @@ import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage, InjectedIntlProps, FormattedMessage} from 'react-intl';
 import * as React from 'react';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
   headline: FormattedMessage.MessageDescriptor;
@@ -112,6 +110,6 @@ export default injectIntl(
       isCheckingSupport: RuntimeSelector.isChecking(state),
       isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
     }),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+    (dispatch: ThunkDispatch): DispatchProps => ({})
   )(UnsupportedBrowser)
 );

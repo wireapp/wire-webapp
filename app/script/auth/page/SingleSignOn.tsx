@@ -62,9 +62,7 @@ import {UUID_REGEX} from '../util/stringUtil';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {BACKEND} from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {Api, RootState} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {ThunkDispatch, RootState} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
@@ -511,7 +509,7 @@ export default withRouter(
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
         doFinalizeSSOLogin: (options: {clientType: ClientType}) =>

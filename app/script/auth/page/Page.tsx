@@ -24,9 +24,7 @@ import * as React from 'react';
 import {ROUTE} from '../route';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 
@@ -79,5 +77,5 @@ export default connect(
     currentFlow: AuthSelector.getCurrentFlow(state),
     isStateAuthenticated: AuthSelector.isAuthenticated(state),
   }),
-  (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({})
+  (dispatch: ThunkDispatch): DispatchProps => ({})
 )(Page);

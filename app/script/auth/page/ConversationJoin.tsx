@@ -55,9 +55,7 @@ import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser'
 import WirelessContainer from '../component/WirelessContainer';
 import * as AccentColor from '../util/AccentColor';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {RootState, Api} from '../module/reducer';
-import {AnyAction} from 'redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
@@ -376,7 +374,7 @@ export default withRouter(
         isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         doCheckConversationCode: (conversationCode: string, conversationKey: string) =>
           dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationCode, conversationKey)),
         doJoinConversationByCode: (conversationKey: string, conversationCode: string) =>

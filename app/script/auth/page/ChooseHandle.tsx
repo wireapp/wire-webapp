@@ -45,10 +45,8 @@ import {ROUTE} from '../route';
 import {withRouter, RouteComponentProps} from 'react-router';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
-import {RootState, Api} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {AnyAction} from 'redux';
-import {ThunkDispatch} from 'redux-thunk';
 
 interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps<{}> {}
 
@@ -163,7 +161,7 @@ export default injectIntl(
         isTeamFlow: AuthSelector.isTeamFlow(state),
         name: SelfSelector.getSelfName(state),
       }),
-      (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+      (dispatch: ThunkDispatch): DispatchProps => ({
         checkHandles: (handles: string[]) => dispatch(ROOT_ACTIONS.userAction.checkHandles(handles)),
         doGetConsents: () => dispatch(ROOT_ACTIONS.selfAction.doGetConsents()),
         doSetConsent: (consentType: ConsentType, value: number) =>
