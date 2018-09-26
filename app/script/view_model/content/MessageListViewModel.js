@@ -610,14 +610,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     z.ui.Context.from(event, entries, 'message-options-menu');
   }
 
-  handleClickOnMessage(message, event) {
-    const hasMentions = message.mentions().length > 0;
-    if (!hasMentions) {
-      // need to return `true` because knockout will prevent default if we return anything else (including undefined)
-      return true;
-    }
+  handleClickOnMessage(messageEntity, event) {
+    const hasMentions = messageEntity.mentions().length;
     const mentionElement = event.target.closest('.message-mention');
-    if (mentionElement) {
+    if (hasMentions && mentionElement) {
       const userId = mentionElement.dataset.userId;
 
       this.userRepository
@@ -629,6 +625,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           }
         });
     }
+
+    // need to return `true` because knockout will prevent default if we return anything else (including undefined)
+    return true;
   }
 
   bindShowMore(elements, message) {
