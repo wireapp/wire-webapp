@@ -337,6 +337,22 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
 };
 
 /**
+ * Subscribe to changes and receive the new and the old value
+ * https://github.com/knockout/knockout/issues/914#issuecomment-66697321
+ * @param {function} handler - Handler
+ * @returns {ko.subscription} knockout subscription
+ */
+
+ko.subscribable.fn.subscribeChanged = function(handler) {
+  let savedValue = this.peek();
+  return this.subscribe(latestValue => {
+    const oldValue = savedValue;
+    savedValue = latestValue;
+    handler(latestValue, oldValue);
+  });
+};
+
+/**
  * Render antiscroll scrollbar.
  */
 ko.bindingHandlers.antiscroll = {
