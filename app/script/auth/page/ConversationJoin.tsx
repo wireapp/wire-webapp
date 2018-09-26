@@ -94,7 +94,9 @@ interface State {
   showCookiePolicyBanner: boolean;
 }
 
-class ConversationJoin extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+
+class ConversationJoin extends React.Component<CombinedProps, State> {
   nameInput: HTMLInputElement;
   state: State = {
     accentColor: AccentColor.random(),
@@ -109,7 +111,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
     showCookiePolicyBanner: true,
   };
 
-  readAndUpdateParamsFromUrl = nextProps => {
+  readAndUpdateParamsFromUrl = (nextProps: CombinedProps) => {
     if (this.isPwaSupportedBrowser()) {
       this.setState({forceNewTemporaryGuestAccount: true});
     }
@@ -150,7 +152,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
       .then(() => this.readAndUpdateParamsFromUrl(this.props));
   };
 
-  componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
+  componentWillReceiveProps = (nextProps: CombinedProps) => this.readAndUpdateParamsFromUrl(nextProps);
 
   onOpenWireClick = () => {
     this.props
@@ -173,7 +175,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
     window.location.replace(redirectLocation);
   };
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     this.nameInput.value = this.nameInput.value.trim();
     if (!this.nameInput.checkValidity()) {
@@ -202,7 +204,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
     this.nameInput.focus();
   };
 
-  isConversationFullError = error =>
+  isConversationFullError = (error: BackendError) =>
     error && error.label && error.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
 
   resetErrors = () => this.setState({error: null, isValidName: true});
@@ -343,7 +345,7 @@ class ConversationJoin extends React.Component<Props & ConnectedProps & Dispatch
     if (!isValidLink) {
       return <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />;
     }
-    if (this.isConversationFullError(error)) {
+    if (this.isConversationFullError(error as BackendError)) {
       return this.renderFullConversation();
     }
     const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;

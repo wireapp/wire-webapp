@@ -25,7 +25,7 @@ import thunk, {ThunkDispatch} from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import * as Environment from './Environment';
 
-const configureStore = (thunkArguments = {}) => {
+const configureStore = (thunkArguments: object = {}) => {
   const store: Store<RootState> = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
 
   if (process.env.NODE_ENV !== 'production') {
@@ -44,7 +44,7 @@ const configureStore = (thunkArguments = {}) => {
   return store;
 };
 
-const createMiddleware = thunkArguments => {
+const createMiddleware = (thunkArguments: object) => {
   const middlewares = [thunk.withExtraArgument(thunkArguments)];
 
   let localStorage;

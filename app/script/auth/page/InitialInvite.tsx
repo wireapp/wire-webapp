@@ -84,7 +84,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
   onInviteDone = () => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
 
-  renderEmail = email => (
+  renderEmail = (email: string) => (
     <div
       style={{
         alignItems: 'center',
@@ -102,7 +102,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
     </div>
   );
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     this.emailInput.value = this.emailInput.value.trim();
     if (!this.emailInput.checkValidity()) {

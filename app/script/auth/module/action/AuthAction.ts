@@ -19,16 +19,17 @@
 
 import BackendError from './BackendError';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
-import {LocalStorageKey} from './LocalStorageAction';
+import {LocalStorageKey, LocalStorageAction} from './LocalStorageAction';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
-import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData, RegisterData, Context} from '@wireapp/api-client/dist/commonjs/auth';
 import {AnyAction} from 'redux';
 import {Api, RootState, ThunkAction} from '../reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AuthActionCreator} from './creator/';
 import {RegistrationDataState} from '../reducer/authReducer';
+import {Account} from '@wireapp/core';
 
 type LoginLifecycleFunction = (
   dispatch: ThunkDispatch<RootState, Api, AnyAction>,
@@ -115,9 +116,9 @@ export class AuthAction {
     };
   };
 
-  validateSSOCode = (code): ThunkAction => {
+  validateSSOCode = (code: string): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
-      const mapError = error => {
+      const mapError = (error: any) => {
         const statusCode = error && error.response && error.response.status;
         if (statusCode === 404) {
           return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
@@ -135,9 +136,16 @@ export class AuthAction {
     };
   };
 
-  persistAuthData = (clientType, core, dispatch, localStorageAction): Promise<void[]> => {
+  persistAuthData = (
+    clientType: ClientType,
+    core: Account,
+    dispatch: ThunkDispatch<RootState, Api, AnyAction>,
+    localStorageAction: LocalStorageAction
+  ): Promise<void[]> => {
     const persist = clientType === ClientType.PERMANENT;
-    const accessToken = core.apiClient.accessTokenStore.accessToken;
+    // TODO: Fixed once core v6 is inside
+    // eslint-disable-next-line dot-notation
+    const accessToken = core['apiClient'].accessTokenStore.accessToken;
     const expiresMillis = accessToken.expires_in * 1000;
     const expireTimestamp = Date.now() + expiresMillis;
     const saveTasks = [
@@ -152,9 +160,7 @@ export class AuthAction {
     return Promise.all(saveTasks);
   };
 
-  pushAccountRegistrationData = (
-    registration: Partial<RegistrationDataState>
-  ): ThunkAction => {
+  pushAccountRegistrationData = (registration: Partial<RegistrationDataState>): ThunkAction => {
     return dispatch => {
       return Promise.resolve().then(() => {
         dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
@@ -179,23 +185,21 @@ export class AuthAction {
       registration.team['currency'] = currentCurrency();
       registration.team.name = registration.team.name.trim();
 
-      let createdAccount;
       dispatch(AuthActionCreator.startRegisterTeam());
       return Promise.resolve()
         .then(() => dispatch(this.doSilentLogout()))
         .then(() => apiClient.register(registration, clientType))
-        .then(newAccount => (createdAccount = newAccount))
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
-          dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
+          dispatch(AuthActionCreator.successfulRegisterTeam(registration));
         })
         .catch(error => {
           if (error.label === BackendError.LABEL.NEW_CLIENT) {
-            dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
+            dispatch(AuthActionCreator.successfulRegisterTeam(registration));
           } else {
             dispatch(AuthActionCreator.failedRegisterTeam(error));
           }
@@ -215,23 +219,21 @@ export class AuthAction {
       registration.name = registration.name.trim();
       registration.email = registration.email.trim();
 
-      let createdAccount;
       dispatch(AuthActionCreator.startRegisterPersonal());
       return Promise.resolve()
         .then(() => dispatch(authAction.doSilentLogout()))
         .then(() => apiClient.register(registration, clientType))
-        .then(newAccount => (createdAccount = newAccount))
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
-          dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
+          dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
         })
         .catch(error => {
           if (error.label === BackendError.LABEL.NEW_CLIENT) {
-            dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
+            dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
           } else {
             dispatch(AuthActionCreator.failedRegisterPersonal(error));
           }
@@ -250,24 +252,22 @@ export class AuthAction {
       registrationData.locale = currentLanguage();
       registrationData.name = registrationData.name.trim();
 
-      let createdAccount;
       dispatch(AuthActionCreator.startRegisterWireless());
 
       return Promise.resolve()
         .then(() => dispatch(authAction.doSilentLogout()))
         .then(() => apiClient.register(registrationData, clientType))
-        .then(newAccount => (createdAccount = newAccount))
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
-          dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
+          dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
         })
         .catch(error => {
           if (error.label === BackendError.LABEL.NEW_CLIENT) {
-            dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
+            dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
           } else {
             dispatch(AuthActionCreator.failedRegisterWireless(error));
           }
@@ -282,7 +282,7 @@ export class AuthAction {
       getState,
       {apiClient, core, actions: {authAction, clientAction, selfAction, localStorageAction}}
     ) => {
-      let clientType;
+      let clientType: ClientType;
       dispatch(AuthActionCreator.startRefresh());
       return Promise.resolve()
         .then(() => {

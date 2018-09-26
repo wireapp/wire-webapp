@@ -34,7 +34,7 @@ export const LocalStorageKey = {
 };
 
 export class LocalStorageAction {
-  setLocalStorage = (key, value): ThunkAction => {
+  setLocalStorage = (key: string, value: any): ThunkAction => {
     return (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageSet());
       return Promise.resolve()
@@ -52,7 +52,7 @@ export class LocalStorageAction {
   getLocalStorage = (key: string): ThunkAction<Promise<string | boolean | number>> => {
     return (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageGet());
-      let data;
+      let data: string | boolean | number;
       return Promise.resolve()
         .then(() => (data = JSON.parse(localStorage.getItem(key)).data))
         .then(() => {
@@ -66,7 +66,7 @@ export class LocalStorageAction {
     };
   };
 
-  deleteLocalStorage = (key): ThunkAction => {
+  deleteLocalStorage = (key: string): ThunkAction => {
     return (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageDelete());
       return Promise.resolve()

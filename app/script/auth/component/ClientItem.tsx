@@ -41,7 +41,6 @@ import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 export interface Props extends React.HTMLAttributes<ClientItem> {
   selected: boolean;
   onClick: (event: React.MouseEvent<ClientItem>) => void;
-  isFetching: boolean;
   client: RegisteredClient;
   clientError: Error;
   onClientRemoval: (password: string) => void;
@@ -55,22 +54,27 @@ interface State {
   validationError: Error;
 }
 
-class ClientItem extends React.Component<Props & InjectedIntlProps, State> {
+type CombinedProps = Props & InjectedIntlProps;
+
+class ClientItem extends React.Component<CombinedProps, State> {
   private passwordInput: HTMLInputElement;
+  state: State;
 
   static CONFIG = {
     animationSteps: 8,
   };
 
-  static initialState = {
+  static initialState: State = {
     password: '',
     validPassword: true,
     validationError: null,
+    animationStep: 0,
+    isAnimating: false,
   };
 
   formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
 
-  constructor(props) {
+  constructor(props: CombinedProps) {
     super(props);
     this.state = {
       ...ClientItem.initialState,
@@ -79,7 +83,7 @@ class ClientItem extends React.Component<Props & InjectedIntlProps, State> {
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: CombinedProps) {
     if (!this.props.selected && newProps.selected) {
       this.setState({isAnimating: true});
       this.executeAnimateIn();
@@ -109,7 +113,7 @@ class ClientItem extends React.Component<Props & InjectedIntlProps, State> {
     }
   }
 
-  formatDate = dateString =>
+  formatDate = (dateString: string) =>
     dateString
       ? new Date(dateString).toLocaleString('en-US', {
           day: 'numeric',
@@ -122,7 +126,7 @@ class ClientItem extends React.Component<Props & InjectedIntlProps, State> {
         })
       : '?';
 
-  formatName = (model, clazz) =>
+  formatName = (model: string, clazz: string) =>
     model || (
       <Text bold textTransform={'capitalize'}>
         {clazz}
@@ -132,16 +136,13 @@ class ClientItem extends React.Component<Props & InjectedIntlProps, State> {
 
   resetState = () => this.setState(ClientItem.initialState);
 
-  wrappedOnClick = event => {
+  wrappedOnClick = (event: React.MouseEvent<ClientItem>) => {
     this.resetState();
     this.props.onClick(event);
   };
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (this.props.isFetching) {
-      return undefined;
-    }
     let validationError = null;
     if (!this.passwordInput.checkValidity()) {
       validationError = ValidationError.handleValidationState(this.passwordInput.name, this.passwordInput.validity);

@@ -40,5 +40,5 @@ export const getSelfTeamId = (state: RootState) => getSelf(state).team;
 export const getSelfError = (state: RootState) => state.selfState.error;
 export const isFetching = (state: RootState) => state.selfState.fetching;
 export const getConsents = (state: RootState) => state.selfState.consents || {};
-const getConsent = (state: RootState, consentType) => getConsents(state)[consentType];
-export const hasUnsetConsent = (state: RootState, consentType) => getConsent(state, consentType) === undefined;
+const getConsent = (state: RootState, consentType: number) => getConsents(state)[consentType];
+export const hasUnsetConsent = (state: RootState, consentType: number) => getConsent(state, consentType) === undefined;

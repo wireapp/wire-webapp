@@ -21,8 +21,9 @@ import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 import {FormattedHTMLMessage} from 'react-intl';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 import * as React from 'react';
+import BackendError from '../module/action/BackendError';
 
-export function parseError(error) {
+export function parseError(error: any) {
   if (error) {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
       return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
@@ -32,7 +33,7 @@ export function parseError(error) {
   return null;
 }
 
-export function parseValidationErrors(errors) {
+export function parseValidationErrors(errors: any | any[]) {
   const errorMessages = [].concat(errors || []);
   return errorMessages.map(error => (
     <ErrorMessage data-uie-name="error-message" key={error.label}>

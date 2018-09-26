@@ -34,9 +34,9 @@ import {ThunkDispatch} from 'redux-thunk';
 import ROOT_ACTIONS from '../module/action/';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 
-interface Props extends React.HTMLAttributes<AccountForm> {
+interface Props extends React.FormHTMLAttributes<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;
-  onSubmit: (event: React.FormEvent<AccountForm>) => void;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   submitText?: string;
 }
 
@@ -62,21 +62,21 @@ interface State {
     termsAccepted: boolean;
   };
   validInputs: {
-    email: boolean;
-    name: boolean;
-    password: boolean;
+    [field: string]: boolean;
   };
   validationErrors: Error[];
 }
 
-class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+
+class AccountForm extends React.PureComponent<CombinedProps, State> {
   private inputs: {
     name?: HTMLInputElement;
     email?: HTMLInputElement;
     password?: HTMLInputElement;
   } = {};
 
-  state = {
+  state: State = {
     registrationData: {
       accent_id: AccentColor.random().id,
       email: this.props.account.email || '',
@@ -92,7 +92,7 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
     validationErrors: [],
   };
 
-  componentWillReceiveProps({account}) {
+  componentWillReceiveProps({account}: CombinedProps) {
     if (account) {
       if (account.email !== this.state.registrationData.email) {
         this.setState({
@@ -117,10 +117,10 @@ class AccountForm extends React.PureComponent<Props & ConnectedProps & DispatchP
     return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${this.props.isPersonalFlow ? 'personal' : 'teams'}/`;
   };
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validInputs = this.state.validInputs;
-    const errors = [];
+    const validInputs: {[field: string]: boolean} = this.state.validInputs;
+    const errors: Error[] = [];
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       currentInput.value = currentInput.value.trim();

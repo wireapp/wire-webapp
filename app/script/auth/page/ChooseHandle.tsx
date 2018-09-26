@@ -88,7 +88,7 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   updateConsent = (consentType: ConsentType, value: number) => this.props.doSetConsent(consentType, value);
 
-  onSetHandle = event => {
+  onSetHandle = (event: React.FormEvent) => {
     event.preventDefault();
     this.props
       .setHandle(this.state.handle)

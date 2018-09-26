@@ -83,15 +83,24 @@ interface DispatchProps {
   doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
-interface State {}
+interface State {
+  code: string;
+  isOverlayOpen: boolean;
+  persist: boolean;
+  ssoError: Error;
+  validInputs: {
+    [field: string]: boolean;
+  };
+  validationErrors: Error[];
+}
 
 class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   private static SSO_CODE_PREFIX = 'wire-';
   private static SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
-  private ssoWindow = undefined;
+  private ssoWindow: Window = undefined;
   private inputs: {code?: HTMLInputElement} = {};
-  state = {
+  state: State = {
     code: '',
     isOverlayOpen: false,
     persist: true,
@@ -112,7 +121,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     this.props.resetAuthError();
   };
 
-  calculateChildPosition = (childHeight, childWidth) => {
+  calculateChildPosition = (childHeight: number, childWidth: number) => {
     const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
     const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
 
@@ -130,15 +139,15 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     return {left, top};
   };
 
-  handleSSOWindow = code => {
+  handleSSOWindow = (code: string) => {
     const POPUP_HEIGHT = 520;
     const POPUP_WIDTH = 480;
     const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
 
     return new Promise((resolve, reject) => {
-      let timerId = undefined;
-      let onReceiveChildWindowMessage = undefined;
-      let onParentWindowClose = undefined;
+      let timerId: number = undefined;
+      let onReceiveChildWindowMessage: (event: MessageEvent) => void = undefined;
+      let onParentWindowClose: (event: Event) => void = undefined;
 
       const onChildWindowClose = () => {
         clearInterval(timerId);
@@ -239,7 +248,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     }
     this.inputs.code.value = this.inputs.code.value.trim();
     const validationErrors: Error[] = [];
-    const validInputs = this.state.validInputs;
+    const validInputs: {[field: string]: boolean} = this.state.validInputs;
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.checkValidity()) {

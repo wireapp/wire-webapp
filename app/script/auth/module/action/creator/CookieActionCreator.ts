@@ -69,7 +69,7 @@ export interface CookieGetStartAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_GET_START;
 }
 export interface CookieGetSuccessAction extends AppAction {
-  payload: {cookie: string | object; name: string};
+  payload: {cookie: object; name: string};
   readonly type: COOKIE_ACTION.COOKIE_GET_SUCCESS;
 }
 export interface CookieGetFailedAction extends AppAction {
@@ -121,7 +121,7 @@ export class CookieActionCreator {
     params: name,
     type: COOKIE_ACTION.COOKIE_GET_START,
   });
-  static successfulGetCookie = ({cookie, name}: {cookie: string | object; name: string}): CookieGetSuccessAction => ({
+  static successfulGetCookie = ({cookie, name}: {cookie: object; name: string}): CookieGetSuccessAction => ({
     payload: {cookie, name},
     type: COOKIE_ACTION.COOKIE_GET_SUCCESS,
   });

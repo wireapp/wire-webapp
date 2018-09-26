@@ -48,7 +48,7 @@ export interface SetStartAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START;
 }
 export interface SetSuccessAction extends AppAction {
-  readonly payload: {key: string; value: string};
+  readonly payload: {key: string; value: string | boolean | number};
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS;
 }
 export interface SetFailedAction extends AppAction {
@@ -60,7 +60,7 @@ export interface GetStartAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START;
 }
 export interface GetSuccessAction extends AppAction {
-  readonly payload: {key: string; value: string};
+  readonly payload: {key: string; value: string | boolean | number};
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS;
 }
 export interface GetFailedAction extends AppAction {
@@ -84,7 +84,7 @@ export class LocalStorageActionCreator {
   static startLocalStorageSet = (): SetStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START,
   });
-  static successfulLocalStorageSet = (key, value): SetSuccessAction => ({
+  static successfulLocalStorageSet = (key: string, value: string | boolean | number): SetSuccessAction => ({
     payload: {key, value},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
   });
@@ -96,7 +96,7 @@ export class LocalStorageActionCreator {
   static startLocalStorageGet = (): GetStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START,
   });
-  static successfulLocalStorageGet = (key: string, value: string): GetSuccessAction => ({
+  static successfulLocalStorageGet = (key: string, value: string | boolean | number): GetSuccessAction => ({
     payload: {key, value},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
   });

@@ -21,7 +21,7 @@ import {AppActions, COOKIE_ACTION} from '../action/creator/';
 
 export interface CookieState {
   cookieTimer: {[key: string]: number};
-  cookies: {[key: string]: string | object};
+  cookies: {[key: string]: object};
   error: Error;
   fetched: boolean;
   fetching: boolean;

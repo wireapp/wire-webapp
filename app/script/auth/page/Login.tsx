@@ -95,19 +95,20 @@ interface State {
   password: string;
   persist: boolean;
   validInputs: {
-    email: boolean;
-    password: boolean;
+    [field: string]: boolean;
   };
   validationErrors: Error[];
 }
 
-class Login extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+
+class Login extends React.Component<CombinedProps, State> {
   private inputs: {
     email?: HTMLInputElement;
     password?: HTMLInputElement;
   } = {};
 
-  state = {
+  state: State = {
     conversationCode: null,
     conversationKey: null,
     email: '',
@@ -123,7 +124,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
     validationErrors: [],
   };
 
-  readAndUpdateParamsFromUrl = nextProps => {
+  readAndUpdateParamsFromUrl = (nextProps: CombinedProps) => {
     const logoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
     const logoutReasonChanged = logoutReason !== this.state.logoutReason;
 
@@ -170,7 +171,7 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
     return this.readAndUpdateParamsFromUrl(this.props);
   };
 
-  componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
+  componentWillReceiveProps = (nextProps: CombinedProps) => this.readAndUpdateParamsFromUrl(nextProps);
 
   componentWillUnmount = () => {
     this.props.resetAuthError();
@@ -192,14 +193,14 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
 
   forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (this.props.isFetching) {
       return undefined;
     }
     this.inputs.email.value = this.inputs.email.value.trim();
-    const validationErrors = [];
-    const validInputs = this.state.validInputs;
+    const validationErrors: Error[] = [];
+    const validInputs: {[field: string]: boolean} = this.state.validInputs;
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.checkValidity()) {
@@ -262,19 +263,19 @@ class Login extends React.Component<Props & ConnectedProps & DispatchProps & Inj
       });
   };
 
-  isValidEmail = email => {
+  isValidEmail = (email: string) => {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return emailRegex.test(email);
   };
 
-  isValidPhoneNumber = phoneNumber => {
+  isValidPhoneNumber = (phoneNumber: string) => {
     const isProductionBackend = Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION);
     const e164regex = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
 
     return e164regex.test(phoneNumber);
   };
 
-  isValidUsername = username => {
+  isValidUsername = (username: string) => {
     if (username.startsWith('@')) {
       username = username.substring(1);
     }

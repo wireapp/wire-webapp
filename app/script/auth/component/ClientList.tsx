@@ -51,13 +51,13 @@ interface DispatchProps {
 }
 
 interface State {
-  currentlySelectedClient: number;
+  currentlySelectedClient: string;
   showLoading: boolean;
-  loadingTimeoutId: number;
+  loadingTimeoutId: number | undefined;
 }
 
 class ClientList extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  state = {
+  state: State = {
     currentlySelectedClient: null,
     showLoading: false,
     loadingTimeoutId: undefined,
@@ -67,7 +67,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
     this.resetLoadingSpinner();
   }
 
-  setSelectedClient = clientId => {
+  setSelectedClient = (clientId: string) => {
     const isSelectedClient = this.state.currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
     this.setState({...this.state, currentlySelectedClient: clientId});

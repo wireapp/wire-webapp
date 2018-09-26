@@ -28,6 +28,7 @@ import {RootState, Api} from '../module/reducer';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {RegistrationDataState} from '../module/reducer/authReducer';
+import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   hasAccountData?: boolean;
@@ -43,9 +44,9 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-const hasInvalidAccountData = account => !account.name || !account.email || !account.password;
+const hasInvalidAccountData = (account: RegistrationDataState) => !account.name || !account.email || !account.password;
 
-const hasInvalidTeamData = ({team}) => !team || !team.name;
+const hasInvalidTeamData = ({team}: {team: TeamData}) => !team || !team.name;
 
 const redirects = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,

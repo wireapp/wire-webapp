@@ -43,7 +43,7 @@ export class ClientAction {
     };
   };
 
-  doRemoveClient = (clientId, password): ThunkAction => {
+  doRemoveClient = (clientId: string, password: string): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startRemoveClient());
       return Promise.resolve()

@@ -84,7 +84,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
     this.props.enterTeamCreationFlow();
   }
 
-  handleSubmit = event => {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     this.teamNameInput.value = this.teamNameInput.value.trim();
     if (!this.teamNameInput.checkValidity()) {

@@ -99,7 +99,7 @@ export class RuntimeAction {
     }
 
     if (isFirefox()) {
-      let dbOpenRequest;
+      let dbOpenRequest: IDBOpenDBRequest;
 
       try {
         dbOpenRequest = window.indexedDB.open('test');

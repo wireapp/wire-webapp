@@ -52,7 +52,7 @@ export default class ValidationError extends Error {
     const field = ValidationError.getFieldByName(fieldName);
     const validationStateKeys = ValidationError.getAllPropertyNames(validationState);
     for (const key of validationStateKeys) {
-      if (Object.values(ValidationError.ERROR).includes(key) && validationState[key]) {
+      if (Object.values(ValidationError.ERROR).includes(key) && validationState[key as keyof ValidityState]) {
         return new ValidationError(field[ValidationError.getErrorKeyByValue(key)]);
       }
     }
