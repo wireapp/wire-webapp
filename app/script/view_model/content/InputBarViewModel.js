@@ -307,11 +307,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
-      this.currentMentions(messageEntity.get_first_asset().mentions());
+
+      // clean mentions before setting text in order to prevent mentions offset recomputing
+      this.currentMentions.removeAll();
       this.input(messageEntity.get_first_asset().text);
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
+      this.currentMentions(messageEntity.get_first_asset().mentions());
     }
   }
 
