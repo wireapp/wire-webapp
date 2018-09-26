@@ -1925,7 +1925,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(linkPreview => {
         if (linkPreview) {
           const protoText = this._createTextProto(messageId, textMessage, mentionEntities, [linkPreview]);
-          genericMessage[genericMessage.content].set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
         }
