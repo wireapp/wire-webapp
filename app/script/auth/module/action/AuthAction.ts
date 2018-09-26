@@ -182,6 +182,7 @@ export class AuthAction {
       registration.team.binding = true;
       // TODO: Fixed once core v6 is inside
       // eslint-disable-next-line dot-notation
+      // @ts-ignore
       registration.team['currency'] = currentCurrency();
       registration.team.name = registration.team.name.trim();
 

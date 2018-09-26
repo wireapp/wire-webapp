@@ -17,7 +17,7 @@
  *
  */
 
-import platform from 'platform';
+import * as platform from 'platform';
 
 const BROWSER = {
   CHROME: 'chrome',

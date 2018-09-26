@@ -17,10 +17,10 @@
  *
  */
 
-import jQuery from 'jquery';
+const jQuery = require('jquery');
 import * as amplify from '@bower_components/amplify';
 import * as bazinga64 from 'bazinga64';
-import platform from 'platform';
+import * as platform from 'platform';
 import '../event/WebApp';
 import '../config';
 import '../service/BackendEnvironment';

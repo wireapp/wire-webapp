@@ -5,7 +5,7 @@
     "jsx": "react",
     "lib": ["dom", "es2017"],
     "moduleResolution": "node",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitReturns": true,
     "outDir": "app/script/auth",
     "rootDir": "app/script",

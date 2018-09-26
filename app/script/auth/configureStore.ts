@@ -22,7 +22,7 @@ import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import reducers, {Api, RootState} from './module/reducer';
 import {runtimeAction} from './module/action/RuntimeAction';
 import thunk, {ThunkDispatch} from 'redux-thunk';
-import {createLogger} from 'redux-logger';
+const {createLogger} = require('redux-logger');
 import * as Environment from './Environment';
 
 const configureStore = (thunkArguments: object = {}) => {
