@@ -432,7 +432,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    * @param {string} value - Text input
    * @returns {undefined|{startIndex: number, term: string}} Matched mention info
    */
-  getMentionCandidate(selectionStart, selectionEnd, value) {
+  static getMentionCandidate(selectionStart, selectionEnd, value) {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -455,7 +455,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   handleMentionFlow() {
     const textarea = document.querySelector('#conversation-input-bar-text');
     const {selectionStart, selectionEnd, value} = textarea;
-    const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
+    const mentionCandidate = InputBarViewModel.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
