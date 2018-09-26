@@ -75,6 +75,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editedMention = ko.observable(undefined);
     this.currentMentions = ko.observableArray();
+    this.currentMentions.subscribe(mentions => this.conversationEntity().input({mentions, text: this.input()}));
 
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => this.input().length);
@@ -94,12 +95,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         if (this.conversationEntity()) {
-          const mentions = this.currentMentions();
-
-          this.conversationEntity().input({
-            mentions,
-            text: value,
-          });
+          this.conversationEntity().input({mentions: this.currentMentions(), text: value});
         }
       },
     });
