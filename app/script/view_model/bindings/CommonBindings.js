@@ -186,6 +186,22 @@ ko.bindingHandlers.resize = (function() {
 })();
 
 /**
+ * Syncs scrolling to another element.
+ */
+
+ko.bindingHandlers.scrollSync = {
+  init(element, valueAccessor) {
+    const selector = valueAccessor();
+    const anchorElement = document.querySelector(selector);
+    if (anchorElement) {
+      anchorElement.addEventListener('scroll', () => {
+        element.scrollTop = anchorElement.scrollTop;
+      });
+    }
+  },
+};
+
+/**
  * Register on enter key pressed.
  */
 ko.bindingHandlers.enter = {
