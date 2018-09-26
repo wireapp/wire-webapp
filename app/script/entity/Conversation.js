@@ -394,7 +394,9 @@ z.entity.Conversation = class Conversation {
     return this.unreadEvents()
       .slice()
       .reverse()
-      .find(messageEntity => messageEntity.visible() && messageEntity.is_content() && messageEntity.isSelfMentioned());
+      .find(messageEntity => {
+        return messageEntity.visible() && messageEntity.is_content() && messageEntity.isSelfMentioned(this.self.id);
+      });
   }
 
   get_last_known_timestamp(time_offset) {
