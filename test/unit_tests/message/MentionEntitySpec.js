@@ -24,12 +24,7 @@
 describe('MentionEntity', () => {
   const userId = '7bec1483-5b11-429d-9759-ec71369654b5';
 
-  beforeAll(done => {
-    z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
   describe('validate', () => {
     const textMessage = 'Hello, World! @test_user Please read!';
@@ -76,7 +71,15 @@ describe('MentionEntity', () => {
 
     it('should return true on validation', () => {
       const mentionEntity = new z.message.MentionEntity(14, 10, userId);
-      expect(mentionEntity.validate(textMessage)).toBe(true);
+      expect(mentionEntity.validate(textMessage)).toBeThruthy();
+
+      const beginningTextMessage = '@Gregor Can you please take a look?';
+      const beginningMentionEntity = new z.message.mentionEntity(0, 7, userId);
+      expect(beginningMentionEntity.validate(beginningTextMessage)).toBeThruthy();
+
+      const endTextMessage = 'Can you please take a look? @Gregor';
+      const endMentionEntity = new z.message.mentionEntity(28, 7, userId);
+      expect(endMentionEntity.validate(endTextMessage)).toBeThruthy();
     });
 
     it('supports line breaks in texts with mentions', () => {
