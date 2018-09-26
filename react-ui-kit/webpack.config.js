@@ -39,27 +39,8 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        test: /\.jsx?$/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-        ],
-      },
-      {
-        exclude: /node_modules/,
-        test: /\.ts(x?)$/,
-        use: [
-          {
-            loader: 'awesome-typescript-loader',
-            options: {
-              babelCore: '@babel/core',
-              sourceMap: true,
-              useBabel: true,
-              useCache: true,
-            },
-          },
-        ],
+        loader: 'babel-loader',
+        test: /\.(js|ts)x?$/,
       },
     ],
   },
