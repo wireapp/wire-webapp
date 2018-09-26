@@ -71,15 +71,15 @@ describe('MentionEntity', () => {
 
     it('should return true on validation', () => {
       const mentionEntity = new z.message.MentionEntity(14, 10, userId);
-      expect(mentionEntity.validate(textMessage)).toBeThruthy();
+      expect(mentionEntity.validate(textMessage)).toBeTruthy();
 
       const beginningTextMessage = '@Gregor Can you please take a look?';
       const beginningMentionEntity = new z.message.mentionEntity(0, 7, userId);
-      expect(beginningMentionEntity.validate(beginningTextMessage)).toBeThruthy();
+      expect(beginningMentionEntity.validate(beginningTextMessage)).toBeTruthy();
 
       const endTextMessage = 'Can you please take a look? @Gregor';
       const endMentionEntity = new z.message.mentionEntity(28, 7, userId);
-      expect(endMentionEntity.validate(endTextMessage)).toBeThruthy();
+      expect(endMentionEntity.validate(endTextMessage)).toBeTruthy();
     });
 
     it('supports line breaks in texts with mentions', () => {
