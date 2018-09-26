@@ -103,6 +103,21 @@ describe('z.search.SearchRepository', () => {
         expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
       });
     });
+
+    it('handles sorting matching results', () => {
+      const first = generateUser('xxx', '_surname');
+      const second = generateUser('xxx', 'surname _lastname');
+      const third = generateUser('_xxx', 'surname lastname');
+      const fourth = generateUser('xxx', 'sur_name lastname');
+      const fifth = generateUser('xxx', 'surname last_name');
+      const sixth = generateUser('x_xx', 'surname lastname');
+
+      const unsortedUsers = [sixth, fifth, third, second, first, fourth];
+      const expectedUsers = [first, second, third, fourth, fifth, sixth];
+
+      const suggestions = TestFactory.search_repository.searchUserInSet('_', unsortedUsers);
+      expect(suggestions.map(serializeUser)).toEqual(expectedUsers.map(serializeUser));
+    });
   });
 });
 
