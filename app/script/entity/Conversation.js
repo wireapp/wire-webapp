@@ -395,7 +395,7 @@ z.entity.Conversation = class Conversation {
       .slice()
       .reverse()
       .find(messageEntity => {
-        return messageEntity.visible() && messageEntity.is_content() && messageEntity.isSelfMentioned(this.self.id);
+        return messageEntity.visible() && messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id);
       });
   }
 

@@ -108,9 +108,9 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     }
   }
 
-  isSelfMentioned(selfId) {
+  isUserMentioned(userId) {
     return this.has_asset_text()
-      ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isSelfMentioned(selfId))
+      ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isUserMentioned(userId))
       : false;
   }
 

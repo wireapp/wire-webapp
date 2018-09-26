@@ -212,7 +212,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (messageEntity.has_asset_text()) {
       for (const assetEntity of messageEntity.assets()) {
         if (assetEntity.is_text()) {
-          const notificationText = assetEntity.isSelfMentioned(this.userRepository.self().id)
+          const notificationText = assetEntity.isUserMentioned(this.userRepository.self().id)
             ? `${z.l10n.text(z.string.notificationMention)} ${assetEntity.text}`
             : assetEntity.text;
 
@@ -334,7 +334,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyObfuscated(messageEntity) {
-    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned(this.userRepository.self().id);
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(this.userRepository.self().id);
     const stringId = isSelfMentioned ? z.string.notificationObfuscatedMention : z.string.notificationObfuscated;
     return z.l10n.text(stringId);
   }
@@ -568,7 +568,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.is_content() && messageEntity.isSelfMentioned(this.userRepository.self().id);
+      messageEntity.is_content() && messageEntity.isUserMentioned(this.userRepository.self().id);
     if (containsSelfMention) {
       return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity, true);
     }
