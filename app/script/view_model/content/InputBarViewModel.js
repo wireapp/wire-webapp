@@ -423,10 +423,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  handleMentionFlow() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
-    const {selectionStart, selectionEnd, value} = textarea;
-
+  /**
+   * Returns a term which is a mention match together with its starting position.
+   * If nothing could be matched, it returns `undefined`.
+   *
+   * @param {number} selectionStart - Current caret position or start of selection  (if text is marked)
+   * @param {number} selectionEnd - Current caret position or end of selection (if text is marked)
+   * @param {string} value - Text input
+   * @returns {undefined|{startIndex: number, term: string}} Matched mention info
+   */
+  getMentionCandidate(selectionStart, selectionEnd, value) {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -442,11 +448,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
       const startIndex = selectionStart - wordBeforeSelection.length;
-      this.editedMention({startIndex, term});
-    } else {
-      this.editedMention(undefined);
+      return {startIndex, term};
     }
+  }
 
+  handleMentionFlow() {
+    const textarea = document.querySelector('#conversation-input-bar-text');
+    const {selectionStart, selectionEnd, value} = textarea;
+    const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
+    this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
 
