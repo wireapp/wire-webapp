@@ -145,7 +145,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          return `<span${index % 2 ? mentionAttributes : ''}>${z.util.SanitizationUtil.escapeString(piece)}</span>`;
+          const textPiece = z.util.SanitizationUtil.escapeString(piece)
+            .replace(/[\r\n]$/, '<br>&nbsp;')
+            .replace(/[\r\n]/g, '<br>');
+          return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('');
     });
