@@ -125,7 +125,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
       const conversationEntity = this.conversationRepository.active_conversation();
       this.sendingGiphyMessage = true;
 
-      this.conversationRepository.send_gif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
+      this.conversationRepository.sendGif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
         this.sendingGiphyMessage = false;
         amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
       });

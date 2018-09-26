@@ -1073,8 +1073,8 @@ describe('ConversationRepository', () => {
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
         conversation.self = {id: 'felix'};
-        const message = 'hello there';
-        return conversationRepository.sendTextWithLinkPreview(message, conversation);
+        const messageText = 'hello there';
+        return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });
       return Promise.all(sentPromises).then(sentMessages => {
         expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
