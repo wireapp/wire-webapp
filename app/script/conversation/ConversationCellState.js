@@ -40,7 +40,7 @@ z.conversation.ConversationCellState = (() => {
     let mentionText = undefined;
 
     conversationEntity.unreadEvents().forEach(messageEntity => {
-      const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+      const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(conversationEntity.self.id);
       if (isSelfMentioned) {
         activities[ACTIVITY_TYPE.MENTION] += 1;
 
@@ -131,7 +131,7 @@ z.conversation.ConversationCellState = (() => {
     icon: conversationEntity => {
       const hasSelfMention = conversationEntity
         .unreadEvents()
-        .some(messageEntity => messageEntity.is_content() && messageEntity.isSelfMentioned());
+        .some(messageEntity => messageEntity.is_content() && messageEntity.isUserMentioned(conversationEntity.self.id));
       if (hasSelfMention) {
         return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
       }
@@ -150,7 +150,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match: conversationEntity => {
       return conversationEntity.unreadEvents().some(messageEntity => {
-        const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+        const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(conversationEntity.self.id);
         const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
         return isSelfMentioned || isMissedCall || messageEntity.is_ping();
       });

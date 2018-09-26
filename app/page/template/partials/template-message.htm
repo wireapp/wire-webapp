@@ -117,7 +117,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), event: {click: $parents[1].handleClickOnMessage}, css: {'text-graphite': $parent.is_editing, 'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render($parents[1].selfUser().id), event: {click: $parents[1].handleClickOnMessage}, css: {'text-graphite': $parent.is_editing, 'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></link-preview-asset>

@@ -186,10 +186,7 @@ describe('z.util.renderMessage', () => {
       {
         expected:
           '<strong>salut</strong> <span class="message-mention self-mention" data-uie-name="label-self-mention"><span class="mention-at-sign">@</span>you</span> and <span class="message-mention" data-uie-name="label-other-mention" data-user-id="toi-id"><span class="mention-at-sign">@</span>toi</span>',
-        mentions: [
-          {isSelfMentioned: true, length: 4, startIndex: 10, userId: 'you-id'},
-          {length: 4, startIndex: 19, userId: 'toi-id'},
-        ],
+        mentions: [{length: 4, startIndex: 10, userId: 'self-id'}, {length: 4, startIndex: 19, userId: 'toi-id'}],
         testCase: 'displays self mentions differently',
         text: '**salut** @you and @toi',
       },
@@ -205,12 +202,11 @@ describe('z.util.renderMessage', () => {
     tests.forEach(({expected, mentions, testCase, text}) => {
       const mentionEntities = mentions.map(mention => {
         const mentionEntity = new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
-        mentionEntity.isSelfMentioned = () => mention.isSelfMentioned;
         return mentionEntity;
       });
 
       it(testCase, () => {
-        const result = z.util.renderMessage(text, mentionEntities);
+        const result = z.util.renderMessage(text, 'self-id', mentionEntities);
         expect(result).toEqual(expected);
       });
     });
