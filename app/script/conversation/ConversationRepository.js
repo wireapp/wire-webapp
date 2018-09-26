@@ -3563,6 +3563,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
         }
       }
+
       return messageEntity;
     });
   }
