@@ -54,11 +54,14 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @param {z.calling.CallingRepository} callingRepository - Repository for all call interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {z.user.UserRepository} userRepository - Repository for users
    */
-  constructor(callingRepository, conversationRepository, permissionRepository) {
+  constructor(callingRepository, conversationRepository, permissionRepository, userRepository) {
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
+    this.userRepository = userRepository;
+
     this.logger = new z.util.Logger('z.notification.NotificationRepository', z.config.LOGGER.OPTIONS);
 
     this.notifications = [];
@@ -73,6 +76,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     });
 
     this.permissionState = this.permissionRepository.permissionState[z.permission.PermissionType.NOTIFICATIONS];
+    this.selfUser = this.userRepository.self;
   }
 
   subscribeToEvents() {
@@ -209,7 +213,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (messageEntity.has_asset_text()) {
       for (const assetEntity of messageEntity.assets()) {
         if (assetEntity.is_text()) {
-          const notificationText = assetEntity.isSelfMentioned()
+          const notificationText = assetEntity.isUserMentioned(this.selfUser().id)
             ? `${z.l10n.text(z.string.notificationMention)} ${assetEntity.text}`
             : assetEntity.text;
 
@@ -331,7 +335,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyObfuscated(messageEntity) {
-    const isSelfMentioned = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
     const stringId = isSelfMentioned ? z.string.notificationObfuscatedMention : z.string.notificationObfuscated;
     return z.l10n.text(stringId);
   }
@@ -564,7 +568,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createTrigger(messageEntity, connectionEntity, conversationEntity) {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
-    const containsSelfMention = messageEntity.is_content() && messageEntity.isSelfMentioned();
+    const containsSelfMention = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
       return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity, true);
     }

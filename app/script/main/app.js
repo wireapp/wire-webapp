@@ -172,7 +172,8 @@ z.main.App = class App {
     repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
       repositories.conversation,
-      repositories.permission
+      repositories.permission,
+      repositories.user
     );
     repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 

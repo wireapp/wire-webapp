@@ -289,7 +289,7 @@ z.util.alias = {
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.renderMessage = (message, mentionEntities = []) => {
+z.util.renderMessage = (message, selfId, mentionEntities = []) => {
   const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
@@ -311,7 +311,7 @@ z.util.renderMessage = (message, mentionEntities = []) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
-        isSelfMentioned: mention.isSelfMentioned(),
+        isSelfMentioned: mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,
       };

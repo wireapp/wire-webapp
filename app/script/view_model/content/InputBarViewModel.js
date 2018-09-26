@@ -145,7 +145,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          return `<span${index % 2 ? mentionAttributes : ''}>${z.util.SanitizationUtil.escapeString(piece)}</span>`;
+          const textPiece = z.util.SanitizationUtil.escapeString(piece)
+            .replace(/[\r\n]$/, '<br>&nbsp;')
+            .replace(/[\r\n]/g, '<br>');
+          return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('');
     });
@@ -180,7 +183,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return false;
     });
 
-    this.showGiphyButton = ko.pureComputed(() => this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH);
+    this.showGiphyButton = ko.pureComputed(() => {
+      return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
+    });
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
