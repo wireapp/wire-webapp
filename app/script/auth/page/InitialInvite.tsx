@@ -45,9 +45,7 @@ import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 import {RouteComponentProps} from 'react-router';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {RootState, Api} from '../module/reducer';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
 
@@ -193,7 +191,7 @@ export default injectIntl(
       isFetching: InviteSelector.isFetching(state),
       language: LanguageSelector.getLanguage(state),
     }),
-    (dispatch: ThunkDispatch<RootState, Api, AnyAction>): DispatchProps => ({
+    (dispatch: ThunkDispatch): DispatchProps => ({
       fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
       resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       invite: (invitation: {email: string; locale: string; inviter_name: string}) =>

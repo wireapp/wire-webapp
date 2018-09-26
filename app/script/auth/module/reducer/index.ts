@@ -25,7 +25,7 @@ import {InvitationState, invitationReducer} from './inviteReducer';
 import {LanguageState, languageReducer} from './languageReducer';
 import {RuntimeState, runtimeReducer} from './runtimeReducer';
 import {SelfState, selfReducer} from './selfReducer';
-import {ThunkAction as ReduxThunkAction} from 'redux-thunk';
+import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
@@ -52,6 +52,7 @@ export interface RootState {
 }
 
 export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
+export type ThunkDispatch = ReduxThunkDispatch<RootState, Api, AnyAction>;
 
 const reducers = {
   authState: authReducer,
