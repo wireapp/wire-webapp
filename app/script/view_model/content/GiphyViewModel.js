@@ -136,7 +136,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
 
   showGiphy() {
     this.sendingGiphyMessage = false;
-    this.query(this.conversationRepository.active_conversation().input());
+    this.query(this.conversationRepository.active_conversation().input().text);
     this.state(GiphyViewModel.STATE.DEFAULT);
     this._getRandomGif();
 
