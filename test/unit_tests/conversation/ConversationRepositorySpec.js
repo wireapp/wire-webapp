@@ -57,12 +57,7 @@ describe('ConversationRepository', () => {
     return conversation;
   };
 
-  beforeAll(done => {
-    z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
   beforeEach(done => {
     server = sinon.fakeServer.create();

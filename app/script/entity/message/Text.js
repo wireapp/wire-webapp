@@ -49,12 +49,12 @@ z.entity.Text = class Text extends z.entity.Asset {
   }
 
   // Process text before rendering it
-  render() {
-    const message = z.util.renderMessage(this.text, this.mentions());
+  render(selfId) {
+    const message = z.util.renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, this.theme_color) : message;
   }
 
-  isSelfMentioned() {
-    return this.mentions().some(mentionEntity => mentionEntity.isSelfMentioned());
+  isUserMentioned(userId) {
+    return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
   }
 };

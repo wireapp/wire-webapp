@@ -449,7 +449,8 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
       TestFactory.notification_repository = new z.notification.NotificationRepository(
         TestFactory.calling_repository,
         TestFactory.conversation_repository,
-        TestFactory.permission_repository
+        TestFactory.permission_repository,
+        TestFactory.user_repository
       );
 
       return TestFactory.notification_repository;

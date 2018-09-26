@@ -26,8 +26,8 @@ describe('Event Mapper', () => {
   let conversation_et = null;
   let event_mapper = null;
 
-  beforeAll(done => {
-    z.util.protobuf
+  beforeAll(() => {
+    return z.util.protobuf
       .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
       .then(() => test_factory.exposeUserActors())
       .then(() => {
@@ -36,9 +36,7 @@ describe('Event Mapper', () => {
             asset: TestFactory.asset_service,
           },
         };
-        done();
-      })
-      .catch(done.fail);
+      });
   });
 
   beforeEach(() => {
