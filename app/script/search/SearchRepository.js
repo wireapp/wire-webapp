@@ -84,7 +84,7 @@ z.search.SearchRepository = class SearchRepository {
         .slice()
         .reverse()
         .reduce((weight, property, index) => {
-          const propertyWeight = index + 1;
+          const propertyWeight = 10 * index + 1;
           const propertyMatchWeight = this._matches(term, property, userEntity);
           return weight + propertyMatchWeight * propertyWeight;
         }, 0);

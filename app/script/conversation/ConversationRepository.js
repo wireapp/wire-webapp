@@ -3562,11 +3562,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
               assetEntity.theme_color = messageEntity.user().accent_color();
             }
           });
-
-          const textAsset = messageEntity.get_first_asset();
-          if (textAsset.mentions && textAsset.mentions().length) {
-            textAsset.mentions().forEach(mentionEntity => mentionEntity.setSelfId(this.selfUser().id));
-          }
         }
       }
 
