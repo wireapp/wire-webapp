@@ -52,9 +52,6 @@ z.message.MentionEntity = class MentionEntity {
   }
 
   isSelfMentioned() {
-    if (this.selfId === undefined) {
-      throw new Error('Cannot determine if mention is a self mention if selfId is not set');
-    }
     const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     return isTypeUserId && this.userId === this.selfId;
   }
