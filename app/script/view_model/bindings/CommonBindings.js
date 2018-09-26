@@ -186,6 +186,22 @@ ko.bindingHandlers.resize = (function() {
 })();
 
 /**
+ * Syncs scrolling to another element.
+ */
+
+ko.bindingHandlers.scrollSync = {
+  init(element, valueAccessor) {
+    const selector = valueAccessor();
+    const anchorElement = document.querySelector(selector);
+    if (anchorElement) {
+      anchorElement.addEventListener('scroll', () => {
+        element.scrollTop = anchorElement.scrollTop;
+      });
+    }
+  },
+};
+
+/**
  * Register on enter key pressed.
  */
 ko.bindingHandlers.enter = {
@@ -318,6 +334,22 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
     owner,
     event_name
   );
+};
+
+/**
+ * Subscribe to changes and receive the new and the old value
+ * https://github.com/knockout/knockout/issues/914#issuecomment-66697321
+ * @param {function} handler - Handler
+ * @returns {ko.subscription} knockout subscription
+ */
+
+ko.subscribable.fn.subscribeChanged = function(handler) {
+  let savedValue = this.peek();
+  return this.subscribe(latestValue => {
+    const oldValue = savedValue;
+    savedValue = latestValue;
+    handler(latestValue, oldValue);
+  });
 };
 
 /**
