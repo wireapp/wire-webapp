@@ -38,12 +38,7 @@ describe('z.cryptography.CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
-    beforeAll(done => {
-      z.util.protobuf
-        .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
-        .then(done)
-        .catch(done.fail);
-    });
+    beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
     it('resolves with a mapped original asset message', done => {
       const original = {

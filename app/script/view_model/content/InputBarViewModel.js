@@ -104,6 +104,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     });
 
+    this.input.subscribeChanged((newValue, oldValue) => {
+      const difference = newValue.length - oldValue.length;
+      const updatedMentions = this.updateMentionRanges(
+        this.currentMentions(),
+        this.selectionStart(),
+        this.selectionEnd(),
+        difference
+      );
+      this.currentMentions(updatedMentions);
+      this.updateSelectionState();
+    });
+
     this.mentionSuggestions = ko.pureComputed(() => {
       if (!this.editedMention() || !this.conversationEntity()) {
         return [];
@@ -116,8 +128,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput = ko.pureComputed(() => {
-      this.updateSelectionState();
-
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
       const pieces = this.currentMentions
         .slice()
@@ -135,10 +145,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          return `<span${index % 2 ? mentionAttributes : ''}>${z.util.SanitizationUtil.escapeString(piece)}</span>`;
+          const textPiece = z.util.SanitizationUtil.escapeString(piece)
+            .replace(/[\r\n]$/, '<br>&nbsp;')
+            .replace(/[\r\n]/g, '<br>');
+          return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('');
     });
+
+    this.richTextInput.subscribe(() => $('.shadow-input').trigger('input'));
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
@@ -170,7 +185,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return false;
     });
 
-    this.showGiphyButton = ko.pureComputed(() => this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH);
+    this.showGiphyButton = ko.pureComputed(() => {
+      return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
+    });
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
@@ -235,30 +252,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .slice(mentionEntity.startIndex + this.editedMention().term.length + 1)
       .replace(/^ /, '');
 
-    const lengthBefore = this.input().length;
-
     // insert the mention in between
     this.input(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
 
-    const lengthAfter = this.input().length;
-
-    const difference = lengthAfter - lengthBefore;
-
-    const updatedMentions = this.updateMentionRanges(
-      this.currentMentions(),
-      mentionEntity.startIndex,
-      mentionEntity.startIndex,
-      difference
-    );
-
-    updatedMentions.push(mentionEntity);
-    updatedMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
-    this.currentMentions(updatedMentions);
+    this.currentMentions.push(mentionEntity);
+    this.currentMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
 
     const caretPosition = mentionEntity.endIndex + 1;
     inputElement.selectionStart = caretPosition;
     inputElement.selectionEnd = caretPosition;
-
     this.endMentionFlow();
   }
 
@@ -305,11 +307,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
-      this.currentMentions(messageEntity.get_first_asset().mentions());
+
+      // clean mentions before setting text in order to prevent mentions offset recomputing
+      this.currentMentions.removeAll();
       this.input(messageEntity.get_first_asset().text);
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
+      this.currentMentions(messageEntity.get_first_asset().mentions());
     }
   }
 
@@ -452,6 +457,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   updateSelectionState() {
     const textarea = document.querySelector('#conversation-input-bar-text');
+    if (!textarea) {
+      return;
+    }
     const {selectionStart, selectionEnd} = textarea;
     const defaultRange = {endIndex: 0, startIndex: Infinity};
 
@@ -482,14 +490,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       textarea.value = this.input();
       textarea.selectionStart = edgeMention.startIndex;
       textarea.selectionEnd = edgeMention.endIndex;
-    } else {
-      const updatedMentions = this.updateMentionRanges(
-        this.currentMentions(),
-        this.selectionStart(),
-        this.selectionEnd(),
-        lengthDifference
-      );
-      this.currentMentions(updatedMentions);
     }
   }
 
@@ -556,7 +556,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   sendMessage(messageText) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions();
-      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
+      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
 
@@ -569,7 +569,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.conversationRepository
-      .sendMessageEdit(messageText, messageEntity, this.conversationEntity(), mentionEntities)
+      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
           throw error;
