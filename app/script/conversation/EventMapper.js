@@ -669,7 +669,16 @@ z.conversation.EventMapper = class EventMapper {
         const protoMention = z.proto.Mention.decode64(encodedMention);
         return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
       })
-      .filter(mentionEntity => mentionEntity && mentionEntity.validate(messageText));
+      .filter(mentionEntity => {
+        if (mentionEntity) {
+          try {
+            return mentionEntity.validate(messageText);
+          } catch (error) {
+            this.logger.warn(`Removing invalid mention from message: ${error.message}`, mentionEntity);
+            return false;
+          }
+        }
+      });
   }
 
   /**
