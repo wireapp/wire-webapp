@@ -178,11 +178,12 @@ describe('Event Mapper', () => {
     });
 
     it('filters mentions that are out of range', () => {
-      // const mandy = '@Mandy';
-      // const randy = '@Randy';
-      // const text = `Hi ${mandy} and ${randy}.`;
+      const mandy = '@Mandy';
+      const randy = '@Randy';
+      const text = `Hi ${mandy} and ${randy}.`;
 
-      // const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
+      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
+      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, z.util.createRandomUuid());
 
       const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
 
@@ -194,10 +195,7 @@ describe('Event Mapper', () => {
         time: '2018-09-27T15:23:14.177Z',
         data: {
           content: 'Hi @Node and @Kenny.',
-          mentions: [
-            'CAMQBRokMWFhZWJhZTUtMDBkNi00NmNlLTk2OTMtMTc5ODgwOWI0M2I3',
-            'CA0QBhokM2RiZTBkYmYtYzlmMy00NWRlLTgzOTItMDY4MDE4MDMzZDU2',
-          ],
+          mentions: [validMention.toProto().encode64(), outOfRangeMention.toProto().encode64()],
           previews: [],
         },
         type: 'conversation.message-add',
@@ -208,7 +206,7 @@ describe('Event Mapper', () => {
 
       event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
         const mentions = messageEntity.get_first_asset().mentions();
-        expect(mentions.length).toBe(2);
+        expect(mentions.length).toBe(1);
       });
     });
   });
