@@ -348,7 +348,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  editMessage(messageEntity, inputElement) {
+  editMessage(messageEntity) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
@@ -360,6 +360,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
+      const inputElement = this.getTextArea();
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -443,7 +444,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
+            this.editMessage(this.conversationEntity().get_last_editable_message());
             this.updateMentions(data, keyboardEvent);
           }
           break;
