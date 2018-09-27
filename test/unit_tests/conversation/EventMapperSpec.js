@@ -187,22 +187,20 @@ describe('Event Mapper', () => {
 
       const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
 
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
+        category: 16,
         conversation: conversationEntity.id,
-        from: '44bd776e-8719-4320-b1a0-354ccd8e983a',
-        id: '0d8547dd-d6b7-442d-a41f-120998421819',
-        time: '2018-09-27T15:23:14.177Z',
         data: {
           content: 'Hi @Node and @Kenny.',
           mentions: [validMention.toProto().encode64(), outOfRangeMention.toProto().encode64()],
           previews: [],
         },
-        type: 'conversation.message-add',
-        category: 16,
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
         primary_key: 5,
+        time: '2018-09-27T15:23:14.177Z',
+        type: 'conversation.message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
         const mentions = messageEntity.get_first_asset().mentions();
