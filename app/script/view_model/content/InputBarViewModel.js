@@ -113,7 +113,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-      const {text, mentions} = this.draftMessage();
+      const {mentions, text} = this.draftMessage();
       const pieces = mentions
         .slice()
         .reverse()
@@ -130,12 +130,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          const textPiece = z.util.SanitizationUtil.escapeString(piece)
-            .replace(/[\r\n]$/, '<br>&nbsp;')
-            .replace(/[\r\n]/g, '<br>');
+          const textPiece = z.util.SanitizationUtil.escapeString(piece).replace(/[\r\n]/g, '<br>');
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
-        .join('');
+        .join('')
+        .replace(/<br><\/span>$/, '<br>&nbsp;</span>');
+    });
+
+    this.richTextInput.subscribe(() => {
+      const textarea = this.getTextArea();
+      const shadowInput = document.querySelector('.shadow-input');
+      if (textarea && shadowInput) {
+        z.util.afterRender(() => {
+          if (shadowInput.scrollTop !== textarea.scrollTop) {
+            shadowInput.scrollTop = textarea.scrollTop;
+          }
+        });
+      }
     });
 
     this.inputPlaceholder = ko.pureComputed(() => {
@@ -265,9 +276,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return storageValue;
   }
 
+  _resetDraftState() {
+    this.currentMentions.removeAll();
+    this.input('');
+  }
+
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  getTextArea() {
+    return document.querySelector('#conversation-input-bar-text');
   }
 
   addMention(userEntity, inputElement) {
@@ -308,8 +328,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.editMessageEntity(undefined);
-    this.currentMentions.removeAll();
-    this.input('');
+    this._resetDraftState();
   }
 
   clickToCancelPastedFile() {
@@ -329,7 +348,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  editMessage(messageEntity, inputElement) {
+  editMessage(messageEntity) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
@@ -341,6 +360,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
+      const inputElement = this.getTextArea();
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -413,8 +433,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.currentMentions.removeAll();
-    this.input('');
+    this._resetDraftState();
     $(event.target).focus();
   }
 
@@ -425,7 +444,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
+            this.editMessage(this.conversationEntity().get_last_editable_message());
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -489,15 +508,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   handleMentionFlow() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
-    const {selectionStart, selectionEnd, value} = textarea;
+    const {selectionStart, selectionEnd, value} = this.getTextArea();
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
 
   updateSelectionState() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
+    const textarea = this.getTextArea();
     if (!textarea) {
       return;
     }
@@ -589,9 +607,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   sendGiphy() {
-    if (this.conversationEntity()) {
-      this.conversationEntity().input({mentions: [], text: ''});
-    }
+    this._resetDraftState();
   }
 
   sendMessage(messageText) {
