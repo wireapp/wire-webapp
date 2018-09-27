@@ -138,6 +138,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .join('');
     });
 
+    this.richTextInput.subscribe(() => {
+      const textarea = document.querySelector('#conversation-input-bar-text');
+      const shadowInput = document.querySelector('.shadow-input');
+      if (textarea && shadowInput) {
+        z.util.afterRender(() => {
+          if (shadowInput.scrollTop !== textarea.scrollTop) {
+            shadowInput.scrollTop = textarea.scrollTop;
+          }
+        });
+      }
+    });
+
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
