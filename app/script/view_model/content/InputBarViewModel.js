@@ -242,9 +242,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
   }
 
-  addMention(userEntity, inputElement) {
+  _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
-    const mentionEntity = new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  addMention(userEntity, inputElement) {
+    const mentionEntity = this._createMentionEntity(userEntity);
 
     // keep track of what is before and after the mention being edited
     const beforeMentionPartial = this.input().slice(0, mentionEntity.startIndex);
@@ -437,7 +441,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    * @param {string} value - Text input
    * @returns {undefined|{startIndex: number, term: string}} Matched mention info
    */
-  static getMentionCandidate(selectionStart, selectionEnd, value) {
+  getMentionCandidate(selectionStart, selectionEnd, value) {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -460,7 +464,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   handleMentionFlow() {
     const textarea = document.querySelector('#conversation-input-bar-text');
     const {selectionStart, selectionEnd, value} = textarea;
-    const mentionCandidate = InputBarViewModel.getMentionCandidate(selectionStart, selectionEnd, value);
+    const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }

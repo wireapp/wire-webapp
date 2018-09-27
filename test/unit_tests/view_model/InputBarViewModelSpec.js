@@ -22,19 +22,41 @@
 // grunt test_init && grunt test_run:view_model/InputBarViewModel
 
 describe('z.viewModel.content.InputBarViewModel', () => {
-  /*
   const testFactory = new TestFactory();
   let viewModel;
 
-  beforeAll(done => {
-    testFactory.exposeConversationActors().then(conversationRepository => {
-      viewModel = new z.viewModel.content.InputBarViewModel(
-        null,
-        {},
-        {conversation: conversationRepository, user: TestFactory.user_repository}
-      );
-      done();
+  beforeAll(() => {
+    return testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors());
+  });
+
+  beforeEach(() => {
+    viewModel = new z.viewModel.content.InputBarViewModel(
+      undefined,
+      {},
+      {
+        conversation: TestFactory.conversation_repository,
+        search: TestFactory.search_repository,
+        user: TestFactory.user_repository,
+      }
+    );
+  });
+
+  describe('_createMentionEntity', () => {
+    it('matches multibyte characters in mentioned user names', () => {
+      const selectionStart = 5;
+      const selectionEnd = 5;
+      const inputValue = 'Hi @n';
+      const userName = 'nqa1👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧';
+
+      const mentionCandidate = viewModel.getMentionCandidate(selectionStart, selectionEnd, inputValue);
+      viewModel.editedMention(mentionCandidate);
+
+      const userEntity = new z.entity.User(z.util.createRandomUuid());
+      userEntity.name(userName);
+
+      const mentionEntity = viewModel._createMentionEntity(userEntity);
+      expect(mentionEntity.startIndex).toBe(3);
+      expect(mentionEntity.length).toBe(38);
     });
   });
-  */
 });
