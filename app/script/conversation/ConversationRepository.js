@@ -2127,7 +2127,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
       this.logger.debug(logMessage, mentionEntities);
 
-      const mentions = mentionEntities
+      const protoMentions = mentionEntities
         .filter(mentionEntity => {
           if (mentionEntity) {
             try {
@@ -2140,7 +2140,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         })
         .map(mentionEntity => mentionEntity.toProto());
-      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, mentions);
+      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, protoMentions);
     }
 
     if (linkPreviews && linkPreviews.length) {
