@@ -51,7 +51,7 @@ z.conversation.EventMapper = class EventMapper {
             const {conversation, from, type} = event;
             const errorMessage =
               'Failure while mapping event.' +
-              `Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
+              ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
             this.logger.error(errorMessage, {error, event});
 
             const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
@@ -81,7 +81,7 @@ z.conversation.EventMapper = class EventMapper {
         const {conversation, from, type} = event;
         const errorMessage =
           'Failure while mapping event.' +
-          `Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
+          ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
         this.logger.error(errorMessage, {error, event});
 
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
