@@ -191,7 +191,7 @@ describe('Event Mapper', () => {
         category: 16,
         conversation: conversationEntity.id,
         data: {
-          content: 'Hi @Node and @Kenny.',
+          content: text,
           mentions: [validMention.toProto().encode64(), outOfRangeMention.toProto().encode64()],
           previews: [],
         },
