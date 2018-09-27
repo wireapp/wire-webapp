@@ -323,6 +323,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   cancelMessageEditing() {
     this.emojiInput.removeEmojiPopup();
 
+    if (!this.isEditing()) {
+      return;
+    }
+
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
     }
