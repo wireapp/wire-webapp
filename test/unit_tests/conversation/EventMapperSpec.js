@@ -176,6 +176,41 @@ describe('Event Mapper', () => {
         })
         .catch(done.fail);
     });
+
+    it('filters mentions that are out of range', () => {
+      // const mandy = '@Mandy';
+      // const randy = '@Randy';
+      // const text = `Hi ${mandy} and ${randy}.`;
+
+      // const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
+
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      const event = {
+        conversation: conversationEntity.id,
+        from: '44bd776e-8719-4320-b1a0-354ccd8e983a',
+        id: '0d8547dd-d6b7-442d-a41f-120998421819',
+        time: '2018-09-27T15:23:14.177Z',
+        data: {
+          content: 'Hi @Node and @Kenny.',
+          mentions: [
+            'CAMQBRokMWFhZWJhZTUtMDBkNi00NmNlLTk2OTMtMTc5ODgwOWI0M2I3',
+            'CA0QBhokM2RiZTBkYmYtYzlmMy00NWRlLTgzOTItMDY4MDE4MDMzZDU2',
+          ],
+          previews: [],
+        },
+        type: 'conversation.message-add',
+        category: 16,
+        primary_key: 5,
+      };
+      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+
+      event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
+        const mentions = messageEntity.get_first_asset().mentions();
+        expect(mentions.length).toBe(2);
+      });
+    });
   });
 
   describe('_mapAssetImage', () => {
