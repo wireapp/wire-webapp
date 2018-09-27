@@ -451,7 +451,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         case z.util.KeyboardUtil.KEY.ESC: {
-          if (this.editedMention()) {
+          if (this.mentionSuggestions().length) {
             this.endMentionFlow();
           } else if (this.pastedFile()) {
             this.pastedFile(null);
