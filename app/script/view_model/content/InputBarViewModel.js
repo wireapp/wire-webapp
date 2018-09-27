@@ -589,9 +589,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   sendGiphy() {
-    if (this.conversationEntity()) {
-      this.conversationEntity().input({mentions: [], text: ''});
-    }
+    this.input('');
+    this.currentMentions.removeAll();
   }
 
   sendMessage(messageText) {
