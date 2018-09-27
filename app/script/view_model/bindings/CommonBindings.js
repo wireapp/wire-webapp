@@ -133,8 +133,8 @@ ko.bindingHandlers.resize = (function() {
   let syncElement = null;
 
   const resizeTextarea = _.throttle(element => {
-    const newStyleHeight = `${element.scrollHeight}px`;
     element.style.height = 0;
+    const newStyleHeight = `${element.scrollHeight}px`;
     element.style.height = newStyleHeight;
 
     const currentHeight = element.clientHeight;
@@ -149,7 +149,6 @@ ko.bindingHandlers.resize = (function() {
     element.style.overflowY = newStyleOverflowY;
 
     if (syncElement) {
-      syncElement.style.height = 0;
       syncElement.style.height = newStyleHeight;
       syncElement.style.overflowY = newStyleOverflowY;
     }
