@@ -265,6 +265,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return storageValue;
   }
 
+  _resetDraftState() {
+    this.currentMentions.removeAll();
+    this.input('');
+  }
+
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
@@ -308,8 +313,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.editMessageEntity(undefined);
-    this.currentMentions.removeAll();
-    this.input('');
+    this._resetDraftState();
   }
 
   clickToCancelPastedFile() {
@@ -413,8 +417,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.currentMentions.removeAll();
-    this.input('');
+    this._resetDraftState();
     $(event.target).focus();
   }
 
@@ -589,8 +592,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   sendGiphy() {
-    this.input('');
-    this.currentMentions.removeAll();
+    this._resetDraftState();
   }
 
   sendMessage(messageText) {
