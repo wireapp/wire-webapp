@@ -106,6 +106,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.input.subscribeChanged((newValue, oldValue) => {
       const difference = newValue.length - oldValue.length;
+      this.updateSelectionState();
       const updatedMentions = this.updateMentionRanges(
         this.currentMentions(),
         this.selectionStart(),
@@ -113,7 +114,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         difference
       );
       this.currentMentions(updatedMentions);
-      this.updateSelectionState();
     });
 
     this.mentionSuggestions = ko.pureComputed(() => {
