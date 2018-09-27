@@ -2109,7 +2109,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.sendText(conversationEntity, textMessage, mentionEntities)
       .then(genericMessage => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
         }
       })
       .catch(error => {
