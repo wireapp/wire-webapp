@@ -48,7 +48,10 @@ z.conversation.EventMapper = class EventMapper {
           try {
             return this._mapJsonEvent(event, conversationEntity, createDummyImage);
           } catch (error) {
-            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+            const {conversation, from, type} = event;
+            const errorMessage =
+              'Failure while mapping event.' +
+              ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
             this.logger.error(errorMessage, {error, event});
 
             const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
@@ -75,8 +78,10 @@ z.conversation.EventMapper = class EventMapper {
         if (isMessageNotFound) {
           throw error;
         }
-
-        const errorMessage = `Failure while mapping event. Affected '${event.type}' event: ${error.message}`;
+        const {conversation, from, type} = event;
+        const errorMessage =
+          'Failure while mapping event.' +
+          ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
         this.logger.error(errorMessage, {error, event});
 
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
@@ -664,7 +669,16 @@ z.conversation.EventMapper = class EventMapper {
         const protoMention = z.proto.Mention.decode64(encodedMention);
         return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
       })
-      .filter(mentionEntity => mentionEntity && mentionEntity.validate(messageText));
+      .filter(mentionEntity => {
+        if (mentionEntity) {
+          try {
+            return mentionEntity.validate(messageText);
+          } catch (error) {
+            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
+            return false;
+          }
+        }
+      });
   }
 
   /**
