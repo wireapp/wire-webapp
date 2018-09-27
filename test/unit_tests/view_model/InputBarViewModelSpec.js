@@ -25,9 +25,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
   const testFactory = new TestFactory();
   let viewModel;
 
-  beforeAll(() => {
-    return testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors());
-  });
+  beforeAll(() => testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors()));
 
   beforeEach(() => {
     viewModel = new z.viewModel.content.InputBarViewModel(

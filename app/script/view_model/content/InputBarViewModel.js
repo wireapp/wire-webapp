@@ -457,6 +457,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const startIndex = selectionStart - wordBeforeSelection.length;
       return {startIndex, term};
     }
+
+    return undefined;
   }
 
   handleMentionFlow() {
