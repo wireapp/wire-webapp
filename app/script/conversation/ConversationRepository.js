@@ -2127,8 +2127,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
       this.logger.debug(logMessage, mentionEntities);
 
-      const mentions = mentionEntities.map(mentionEntity => mentionEntity.toProto());
-      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, mentions);
+      const protoMentions = mentionEntities
+        .filter(mentionEntity => {
+          if (mentionEntity) {
+            try {
+              return mentionEntity.validate(textMessage);
+            } catch (error) {
+              const log = `Removed invalid mention when sending message '${messageId}': ${error.message}`;
+              this.logger.warn(log, mentionEntity);
+              return false;
+            }
+          }
+        })
+        .map(mentionEntity => mentionEntity.toProto());
+      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, protoMentions);
     }
 
     if (linkPreviews && linkPreviews.length) {

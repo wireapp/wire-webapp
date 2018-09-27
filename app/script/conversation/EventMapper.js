@@ -674,7 +674,7 @@ z.conversation.EventMapper = class EventMapper {
           try {
             return mentionEntity.validate(messageText);
           } catch (error) {
-            this.logger.warn(`Removing invalid mention from message: ${error.message}`, mentionEntity);
+            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
             return false;
           }
         }
