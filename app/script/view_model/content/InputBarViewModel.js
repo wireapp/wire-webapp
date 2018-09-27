@@ -505,8 +505,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   handleMentionFlow() {
-    const textarea = this.getTextArea();
-    const {selectionStart, selectionEnd, value} = textarea;
+    const {selectionStart, selectionEnd, value} = this.getTextArea();
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
