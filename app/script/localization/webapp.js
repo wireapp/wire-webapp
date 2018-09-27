@@ -266,10 +266,10 @@ z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB
 z.string.modalPictureTooSmallHeadline = 'Picture too small';
 z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
 
-z.string.modalImproveWireAction = 'Accept';
-z.string.modalImproveWireSecondary = 'Not now';
+z.string.modalImproveWireAction = 'I Agree';
+z.string.modalImproveWireSecondary = 'No';
 z.string.modalImproveWireHeadline = 'Help us make Wire better';
-z.string.modalImproveWireMessage = 'Sending anonymous usage and crash reports helps us to improve our products and services. We do not use this information for anything else.';
+z.string.modalImproveWireMessage = 'I agree that Wire may create and use anonymous usage and error reports to improve the Wire App. I can revoke this consent at any time.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable at the moment.';
