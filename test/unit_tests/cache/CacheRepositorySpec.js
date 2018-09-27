@@ -29,7 +29,8 @@ describe('z.cache.CacheRepository', () => {
     beforeEach(() => {
       cache_repository.clearCache();
 
-      amplify.store(z.storage.StorageKey.CONVERSATION.INPUT, 'text');
+      const conversationInputKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${z.util.createRandomUuid()}`;
+      amplify.store(conversationInputKey, {mentions: [], text: 'test'});
       amplify.store(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
       amplify.store(TEMP_KEY, true);
     });
