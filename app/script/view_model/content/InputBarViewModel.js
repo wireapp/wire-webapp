@@ -205,10 +205,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
     this.draftMessage.subscribe(message => {
-      if (!this.conversationEntity()) {
-        return;
+      if (this.conversationEntity()) {
+        this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
       }
-      this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
     });
 
     this._init_subscriptions();
@@ -228,12 +227,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus(true);
     this.pastedFile(null);
     this.cancelMessageEditing();
-    if (!conversationEntity) {
-      return;
+    if (conversationEntity) {
+      const previousSessionData = this._loadDraftState(conversationEntity);
+      this.input(previousSessionData.text);
+      this.currentMentions(previousSessionData.mentions);
     }
-    const previousSessionData = this._loadDraftState(conversationEntity);
-    this.input(previousSessionData.text);
-    this.currentMentions(previousSessionData.mentions);
   }
 
   _saveDraftState(conversationEntity, text, mentions) {
@@ -338,12 +336,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.editMessageEntity(messageEntity);
 
       this.input(messageEntity.get_first_asset().text);
-      this.currentMentions(
-        messageEntity
-          .get_first_asset()
-          .mentions()
-          .slice()
-      );
+      const newMentions = messageEntity
+        .get_first_asset()
+        .mentions()
+        .slice();
+      this.currentMentions(newMentions);
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
