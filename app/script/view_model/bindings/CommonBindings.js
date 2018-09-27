@@ -137,22 +137,28 @@ ko.bindingHandlers.resize = (function() {
     const newStyleHeight = `${element.scrollHeight}px`;
     element.style.height = newStyleHeight;
 
-    const currentHeight = element.clientHeight;
-    if (typeof callback === 'function') {
-      callback(currentHeight, lastHeight);
-    }
-    lastHeight = currentHeight;
-    const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
-
-    const isMaximumHeight = currentHeight >= max_height;
-    const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
-    element.style.overflowY = newStyleOverflowY;
-
     if (syncElement) {
       syncElement.style.height = newStyleHeight;
-      syncElement.style.overflowY = newStyleOverflowY;
     }
-    $(element).scroll();
+
+    const currentHeight = element.clientHeight;
+
+    if (lastHeight !== currentHeight) {
+      if (typeof callback === 'function') {
+        callback(currentHeight, lastHeight);
+      }
+      lastHeight = currentHeight;
+      const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
+
+      const isMaximumHeight = currentHeight >= max_height;
+      const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
+      element.style.overflowY = newStyleOverflowY;
+
+      if (syncElement) {
+        syncElement.style.overflowY = newStyleOverflowY;
+      }
+      $(element).scroll();
+    }
   }, 100);
 
   return {
