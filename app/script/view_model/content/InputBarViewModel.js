@@ -321,8 +321,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageEditing() {
-    this.emojiInput.removeEmojiPopup();
-
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
     }
@@ -455,7 +453,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             this.endMentionFlow();
           } else if (this.pastedFile()) {
             this.pastedFile(null);
-          } else {
+          } else if (this.isEditing()) {
             this.cancelMessageEditing();
           }
           break;
