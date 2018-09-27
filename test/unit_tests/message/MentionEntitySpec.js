@@ -67,6 +67,10 @@ describe('MentionEntity', () => {
       mentionEntity.length = 10;
       mentionEntity.userId = '1337';
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_USER_ID);
+
+      mentionEntity.userId = userId;
+      const functionToThrow = () => mentionEntity.validate('Hello, World! Please read!');
+      expect(functionToThrow).toThrowError(z.message.MentionEntity.ERROR.INVALID_START_CHAR);
     });
 
     it('should return true on validation', () => {
