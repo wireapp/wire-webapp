@@ -10,7 +10,7 @@
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
     "bower": "1.8.4",
-    "chai": "4.1.2",
+    "chai": "4.2.0",
     "jasmine": "3.2.0",
     "rimraf": "2.6.2",
     "typescript": "3.0.3",
