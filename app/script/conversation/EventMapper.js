@@ -48,7 +48,10 @@ z.conversation.EventMapper = class EventMapper {
           try {
             return this._mapJsonEvent(event, conversationEntity, createDummyImage);
           } catch (error) {
-            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+            const {conversation, from, type} = event;
+            const errorMessage =
+              'Failure while mapping event.' +
+              ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
             this.logger.error(errorMessage, {error, event});
 
             const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
@@ -75,8 +78,10 @@ z.conversation.EventMapper = class EventMapper {
         if (isMessageNotFound) {
           throw error;
         }
-
-        const errorMessage = `Failure while mapping event. Affected '${event.type}' event: ${error.message}`;
+        const {conversation, from, type} = event;
+        const errorMessage =
+          'Failure while mapping event.' +
+          ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
         this.logger.error(errorMessage, {error, event});
 
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
