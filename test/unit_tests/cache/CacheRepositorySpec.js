@@ -29,16 +29,13 @@ describe('z.cache.CacheRepository', () => {
     beforeEach(() => {
       cache_repository.clearCache();
 
-      const conversation = new z.entity.Conversation();
-      conversation.input({mentions: [], text: 'Hello World!'});
-
       amplify.store(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
       amplify.store(TEMP_KEY, true);
     });
 
     it('deletes cached keys', () => {
       const deleted_keys = cache_repository.clearCache(false);
-      expect(deleted_keys.length).toBe(2);
+      expect(deleted_keys.length).toBe(1);
     });
 
     it('preserves cached conversation inputs while deleting other keys', () => {
