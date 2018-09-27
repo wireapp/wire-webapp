@@ -2133,7 +2133,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             try {
               return mentionEntity.validate(textMessage);
             } catch (error) {
-              const log = `Removing invalid mention when sending message '${messageId}': ${error.message}`;
+              const log = `Removed invalid mention when sending message '${messageId}': ${error.message}`;
               this.logger.warn(log, mentionEntity);
               return false;
             }
