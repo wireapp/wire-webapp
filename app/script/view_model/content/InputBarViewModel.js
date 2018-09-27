@@ -113,9 +113,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-      const {text, mentions} = this.draftMessage();
-      const pieces = mentions
-        .slice()
+
+      const text = this.draftMessage().text.replace(/[\r\n]$/, '<br>&nbsp;');
+      const pieces = this.draftMessage()
+        .mentions.slice()
         .reverse()
         .reduce(
           (currentPieces, mentionEntity) => {
@@ -130,9 +131,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          const textPiece = z.util.SanitizationUtil.escapeString(piece)
-            .replace(/[\r\n]$/, '<br>&nbsp;')
-            .replace(/[\r\n]/g, '<br>');
+          const textPiece = z.util.SanitizationUtil.escapeString(piece).replace(/[\r\n]/g, '<br>');
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('');
