@@ -127,46 +127,52 @@ ko.virtualElements.allowedBindings.stopBinding = true;
  * Resize textarea according to the containing text.
  */
 ko.bindingHandlers.resize = (function() {
-  let last_height = null;
-  let resize_observable = null;
-  let resize_callback = null;
+  let lastHeight = null;
+  let triggerValue = null;
+  let callback = null;
+  let syncElement = null;
 
-  const resize_textarea = _.throttle(element => {
+  const resizeTextarea = _.throttle(element => {
     element.style.height = 0;
-    element.style.height = `${element.scrollHeight}px`;
+    const newStyleHeight = `${element.scrollHeight}px`;
+    element.style.height = newStyleHeight;
 
-    const current_height = element.clientHeight;
-
-    // height has changed
-    if (last_height !== current_height) {
-      if (typeof resize_callback === 'function') {
-        resize_callback(current_height, last_height);
-      }
-      last_height = current_height;
-      const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
-
-      const isMaximumHeight = current_height === max_height;
-      element.style.overflowY = isMaximumHeight ? 'scroll' : 'hidden';
-      $(element).scroll();
+    const currentHeight = element.clientHeight;
+    if (typeof callback === 'function') {
+      callback(currentHeight, lastHeight);
     }
+    lastHeight = currentHeight;
+    const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
+
+    const isMaximumHeight = currentHeight >= max_height;
+    const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
+    element.style.overflowY = newStyleOverflowY;
+
+    if (syncElement) {
+      syncElement.style.height = newStyleHeight;
+      syncElement.style.overflowY = newStyleOverflowY;
+    }
+    $(element).scroll();
   }, 100);
 
   return {
     init(element, valueAccessor, allBindings, data, context) {
-      last_height = element.scrollHeight;
-      resize_observable = ko.unwrap(valueAccessor());
-      resize_callback = allBindings.get('resize_callback');
+      lastHeight = element.scrollHeight;
+      const params = ko.unwrap(valueAccessor()) || {};
+      triggerValue = params.triggerValue;
+      syncElement = document.querySelector(params.syncElement);
+      callback = params.callback;
 
-      if (!resize_observable) {
+      if (triggerValue === undefined) {
         return ko.applyBindingsToNode(
           element,
           {
             event: {
               focus() {
-                resize_textarea(element);
+                resizeTextarea(element);
               },
               input() {
-                resize_textarea(element);
+                resizeTextarea(element);
               },
             },
           },
@@ -175,10 +181,12 @@ ko.bindingHandlers.resize = (function() {
       }
     },
 
-    update(element, valueAccessor, allBindings) {
-      resize_observable = ko.unwrap(valueAccessor());
-      resize_textarea(element);
-      resize_callback = allBindings.get('resize_callback');
+    update(element, valueAccessor) {
+      const params = ko.unwrap(valueAccessor()) || {};
+      triggerValue = params.triggerValue;
+      syncElement = document.querySelector(params.syncElement);
+      callback = params.callback;
+      resizeTextarea(element);
     },
   };
 })();

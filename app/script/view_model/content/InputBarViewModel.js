@@ -65,7 +65,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editMessageEntity = ko.observable();
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
-    this.editInput = ko.observable('');
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -79,30 +78,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => this.input().length);
 
-    this.input = ko.pureComputed({
-      read: () => {
-        if (this.isEditing()) {
-          return this.editInput();
-        }
-
-        const textInput = this.conversationEntity() && this.conversationEntity().input().text;
-        return textInput || '';
-      },
-      write: value => {
-        if (this.isEditing()) {
-          return this.editInput(value);
-        }
-
-        if (this.conversationEntity()) {
-          const mentions = this.currentMentions();
-
-          this.conversationEntity().input({
-            mentions,
-            text: value,
-          });
-        }
-      },
-    });
+    this.input = ko.observable('');
 
     this.input.subscribeChanged((newValue, oldValue) => {
       const difference = newValue.length - oldValue.length;
@@ -115,6 +91,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.currentMentions(updatedMentions);
       this.updateSelectionState();
     });
+
+    this.draftMessage = ko
+      .pureComputed(() => {
+        const text = this.input();
+        const mentions = this.currentMentions();
+        return {mentions, text};
+      })
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
 
     this.mentionSuggestions = ko.pureComputed(() => {
       if (!this.editedMention() || !this.conversationEntity()) {
@@ -129,8 +113,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-      const pieces = this.currentMentions
-        .slice()
+
+      const text = this.draftMessage().text.replace(/[\r\n]$/, '<br>&nbsp;');
+      const pieces = this.draftMessage()
+        .mentions.slice()
         .reverse()
         .reduce(
           (currentPieces, mentionEntity) => {
@@ -140,17 +126,27 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [this.input()]
+          [text]
         );
 
       return pieces
         .map((piece, index) => {
-          const textPiece = z.util.SanitizationUtil.escapeString(piece)
-            .replace(/[\r\n]$/, '<br>&nbsp;')
-            .replace(/[\r\n]/g, '<br>');
+          const textPiece = z.util.SanitizationUtil.escapeString(piece).replace(/[\r\n]/g, '<br>');
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('');
+    });
+
+    this.richTextInput.subscribe(() => {
+      const textarea = this.getTextArea();
+      const shadowInput = document.querySelector('.shadow-input');
+      if (textarea && shadowInput) {
+        z.util.afterRender(() => {
+          if (shadowInput.scrollTop !== textarea.scrollTop) {
+            shadowInput.scrollTop = textarea.scrollTop;
+          }
+        });
+      }
     });
 
     this.inputPlaceholder = ko.pureComputed(() => {
@@ -190,15 +186,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
 
-    this.conversationEntity.subscribe(() => {
-      this.conversationHasFocus(true);
-      this.pastedFile(null);
-      this.cancelMessageEditing();
-      if (this.conversationEntity()) {
-        this.currentMentions(this.conversationEntity().input().mentions);
-      }
-    });
-
     this.isEditing.subscribe(isEditing => {
       if (isEditing) {
         return window.addEventListener('click', this.onWindowClick);
@@ -227,6 +214,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
+    this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
+    this.draftMessage.subscribe(message => {
+      if (this.conversationEntity()) {
+        this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
+      }
+    });
+
     this._init_subscriptions();
   }
 
@@ -240,9 +234,64 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
   }
 
-  addMention(userEntity, inputElement) {
+  loadInitialStateForConversation(conversationEntity) {
+    this.conversationHasFocus(true);
+    this.pastedFile(null);
+    this.cancelMessageEditing();
+    if (conversationEntity) {
+      const previousSessionData = this._loadDraftState(conversationEntity);
+      this.input(previousSessionData.text);
+      this.currentMentions(previousSessionData.mentions);
+    }
+  }
+
+  _saveDraftState(conversationEntity, text, mentions) {
+    if (!this.isEditing()) {
+      // we only save state for newly written messages
+      const storageKey = this._generateStorageKey(conversationEntity);
+      z.util.StorageUtil.setValue(storageKey, {mentions, text});
+    }
+  }
+
+  _generateStorageKey(conversationEntity) {
+    return `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+  }
+
+  _loadDraftState(conversationEntity) {
+    const storageKey = this._generateStorageKey(conversationEntity);
+    const storageValue = z.util.StorageUtil.getValue(storageKey);
+
+    if (typeof storageValue === 'undefined') {
+      return {mentions: [], text: ''};
+    }
+
+    if (typeof storageValue === 'string') {
+      return {mentions: [], text: storageValue};
+    }
+
+    storageValue.mentions = storageValue.mentions.map(mention => {
+      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+    });
+
+    return storageValue;
+  }
+
+  _resetDraftState() {
+    this.currentMentions.removeAll();
+    this.input('');
+  }
+
+  _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
-    const mentionEntity = new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  getTextArea() {
+    return document.querySelector('#conversation-input-bar-text');
+  }
+
+  addMention(userEntity, inputElement) {
+    const mentionEntity = this._createMentionEntity(userEntity);
 
     // keep track of what is before and after the mention being edited
     const beforeMentionPartial = this.input().slice(0, mentionEntity.startIndex);
@@ -279,8 +328,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.editMessageEntity(undefined);
-    this.currentMentions.removeAll();
-    this.editInput('');
+    this._resetDraftState();
   }
 
   clickToCancelPastedFile() {
@@ -288,7 +336,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   clickToShowGiphy() {
-    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW);
+    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.input());
   }
 
   clickToPing() {
@@ -300,13 +348,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  editMessage(messageEntity, inputElement) {
+  editMessage(messageEntity) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
-      this.currentMentions(messageEntity.get_first_asset().mentions());
+
       this.input(messageEntity.get_first_asset().text);
+      const newMentions = messageEntity
+        .get_first_asset()
+        .mentions()
+        .slice();
+      this.currentMentions(newMentions);
+      const inputElement = this.getTextArea();
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -379,8 +433,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.currentMentions.removeAll();
-    this.input('');
+    this._resetDraftState();
     $(event.target).focus();
   }
 
@@ -391,7 +444,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
+            this.editMessage(this.conversationEntity().get_last_editable_message());
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -423,10 +476,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  handleMentionFlow() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
-    const {selectionStart, selectionEnd, value} = textarea;
-
+  /**
+   * Returns a term which is a mention match together with its starting position.
+   * If nothing could be matched, it returns `undefined`.
+   *
+   * @param {number} selectionStart - Current caret position or start of selection  (if text is marked)
+   * @param {number} selectionEnd - Current caret position or end of selection (if text is marked)
+   * @param {string} value - Text input
+   * @returns {undefined|{startIndex: number, term: string}} Matched mention info
+   */
+  getMentionCandidate(selectionStart, selectionEnd, value) {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -442,16 +501,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
       const startIndex = selectionStart - wordBeforeSelection.length;
-      this.editedMention({startIndex, term});
-    } else {
-      this.editedMention(undefined);
+      return {startIndex, term};
     }
 
+    return undefined;
+  }
+
+  handleMentionFlow() {
+    const {selectionStart, selectionEnd, value} = this.getTextArea();
+    const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
+    this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
 
   updateSelectionState() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
+    const textarea = this.getTextArea();
     if (!textarea) {
       return;
     }
@@ -543,15 +607,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   sendGiphy() {
-    if (this.conversationEntity()) {
-      this.conversationEntity().input({mentions: [], text: ''});
-    }
+    this._resetDraftState();
   }
 
   sendMessage(messageText) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions();
-      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
+      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
 
@@ -564,7 +626,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.conversationRepository
-      .sendMessageEdit(messageText, messageEntity, this.conversationEntity(), mentionEntities)
+      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
           throw error;
@@ -647,6 +709,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     window.setTimeout(() => {
       const newSelectionStart = (input_element.selectionEnd = input_element.value.length * 2);
       input_element.selectionStart = newSelectionStart;
+      this.updateSelectionState();
     }, 0);
   }
 

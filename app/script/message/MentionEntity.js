@@ -26,6 +26,7 @@ z.message.MentionEntity = class MentionEntity {
   static get ERROR() {
     return {
       INVALID_LENGTH: 'Invalid mention: Invalid length',
+      INVALID_START_CHAR: 'Invalid mention: Mention does not start with @',
       INVALID_START_INDEX: 'Invalid mention: Invalid startIndex',
       INVALID_USER_ID: 'Invalid mention: User ID is not a valid UUID',
       MISSING_LENGTH: 'Invalid mention: Missing length',
@@ -87,6 +88,11 @@ z.message.MentionEntity = class MentionEntity {
     const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
     if (!isValidUserId) {
       throw new Error(MentionEntity.ERROR.INVALID_USER_ID);
+    }
+
+    const isValidMention = messageText.substr(this.startIndex, 1) === '@';
+    if (!isValidMention) {
+      throw new Error(MentionEntity.ERROR.INVALID_START_CHAR);
     }
 
     return true;
