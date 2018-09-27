@@ -128,6 +128,7 @@ ko.virtualElements.allowedBindings.stopBinding = true;
  */
 ko.bindingHandlers.resize = (function() {
   let lastHeight = null;
+  let triggerValue = null;
   let callback = null;
   let syncElement = null;
 
@@ -152,20 +153,38 @@ ko.bindingHandlers.resize = (function() {
       syncElement.style.height = newStyleHeight;
       syncElement.style.overflowY = newStyleOverflowY;
     }
-
     $(element).scroll();
   }, 100);
 
   return {
     init(element, valueAccessor, allBindings, data, context) {
       lastHeight = element.scrollHeight;
-      const params = ko.unwrap(valueAccessor());
+      const params = ko.unwrap(valueAccessor()) || {};
+      triggerValue = params.triggerValue;
       syncElement = document.querySelector(params.syncElement);
       callback = params.callback;
+
+      if (triggerValue === undefined) {
+        return ko.applyBindingsToNode(
+          element,
+          {
+            event: {
+              focus() {
+                resizeTextarea(element);
+              },
+              input() {
+                resizeTextarea(element);
+              },
+            },
+          },
+          context
+        );
+      }
     },
 
     update(element, valueAccessor) {
-      const params = ko.unwrap(valueAccessor());
+      const params = ko.unwrap(valueAccessor()) || {};
+      triggerValue = params.triggerValue;
       syncElement = document.querySelector(params.syncElement);
       callback = params.callback;
       resizeTextarea(element);
