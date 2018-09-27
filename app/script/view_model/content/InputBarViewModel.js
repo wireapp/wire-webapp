@@ -240,7 +240,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this.isEditing()) {
       // we only save state for newly written messages
       const storageKey = this._generateStorageKey(conversationEntity);
-      z.util.StorageUtil.setValue(storageKey, {mentions, text: z.util.StringUtil.trimEnd(text)});
+      z.util.StorageUtil.setValue(storageKey, {mentions, text});
     }
   }
 
