@@ -148,9 +148,9 @@ ko.bindingHandlers.resize = (function() {
         callback(currentHeight, lastHeight);
       }
       lastHeight = currentHeight;
-      const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
+      const maxHeight = window.parseInt(getComputedStyle(element).maxHeight, 10);
 
-      const isMaximumHeight = currentHeight >= max_height;
+      const isMaximumHeight = currentHeight >= maxHeight;
       const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
       element.style.overflowY = newStyleOverflowY;
 
