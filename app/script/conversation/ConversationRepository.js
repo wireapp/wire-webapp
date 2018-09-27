@@ -1371,19 +1371,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send a specific GIF to a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to send message in
+   * @param {Conversation} conversationEntity - Conversation to send message in
    * @param {string} url - URL of giphy image
    * @param {string} tag - tag tag used for gif search
    * @returns {Promise} Resolves when the gif was posted
    */
-  send_gif(conversation_et, url, tag) {
+  sendGif(conversationEntity, url, tag) {
     if (!tag) {
       tag = z.l10n.text(z.string.extensionsGiphyRandom);
     }
 
     return z.util.loadUrlBlob(url).then(blob => {
-      this.sendText(z.l10n.text(z.string.extensionsGiphyMessage, tag), conversation_et);
-      return this.upload_images(conversation_et, [blob]);
+      const textMessage = z.l10n.text(z.string.extensionsGiphyMessage, tag);
+      this.sendText(conversationEntity, textMessage);
+      return this.upload_images(conversationEntity, [blob]);
     });
   }
 
@@ -1910,12 +1911,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send link preview in specified conversation.
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {string} textMessage - Plain text message that possibly contains link
+   * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
    * @returns {Promise} Resolves after sending the message
    */
-  sendLinkPreview(conversationEntity, genericMessage, textMessage, mentionEntities) {
+  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities) {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.message_id;
 
@@ -1924,7 +1925,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(linkPreview => {
         if (linkPreview) {
           const protoText = this._createTextProto(messageId, textMessage, mentionEntities, [linkPreview]);
-          genericMessage[genericMessage.content].set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
         }
@@ -1976,13 +1977,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send edited message in specified conversation.
    *
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
-  sendMessageEdit(textMessage, originalMessageEntity, conversationEntity, mentionEntities) {
+  sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
     const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -2000,7 +2001,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._send_and_inject_generic_message(conversationEntity, genericMessage, false)
       .then(() => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, genericMessage, textMessage, mentionEntities);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
         }
       })
       .catch(error => {
@@ -2079,12 +2080,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send text message in specified conversation.
    *
-   * @param {string} textMessage - Plain text message
    * @param {Conversation} conversationEntity - Conversation that should receive the message
+   * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
-  sendText(textMessage, conversationEntity, mentionEntities) {
+  sendText(conversationEntity, textMessage, mentionEntities) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
     const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
@@ -2099,16 +2100,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send text message with link preview in specified conversation.
    *
-   * @param {string} textMessage - Plain text message
    * @param {Conversation} conversationEntity - Conversation that should receive the message
+   * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
    * @returns {Promise} Resolves after sending the message
    */
-  sendTextWithLinkPreview(textMessage, conversationEntity, mentionEntities) {
-    return this.sendText(textMessage, conversationEntity, mentionEntities)
+  sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities) {
+    return this.sendText(conversationEntity, textMessage, mentionEntities)
       .then(genericMessage => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(textMessage, conversationEntity, genericMessage);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage);
         }
       })
       .catch(error => {

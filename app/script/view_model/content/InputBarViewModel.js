@@ -153,6 +153,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .join('');
     });
 
+    this.richTextInput.subscribe(() => $('.shadow-input').trigger('input'));
+
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
@@ -305,11 +307,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
-      this.currentMentions(messageEntity.get_first_asset().mentions());
+
+      // clean mentions before setting text in order to prevent mentions offset recomputing
+      this.currentMentions.removeAll();
       this.input(messageEntity.get_first_asset().text);
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
+      this.currentMentions(messageEntity.get_first_asset().mentions());
     }
   }
 
@@ -561,7 +566,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   sendMessage(messageText) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions();
-      this.conversationRepository.sendTextWithLinkPreview(messageText, this.conversationEntity(), mentionEntities);
+      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
 
@@ -574,7 +579,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     this.conversationRepository
-      .sendMessageEdit(messageText, messageEntity, this.conversationEntity(), mentionEntities)
+      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
           throw error;
