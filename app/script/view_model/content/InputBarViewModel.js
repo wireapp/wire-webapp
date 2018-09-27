@@ -134,7 +134,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('')
-        .replace(/<br>$/, '<br>&nbsp;');
+        .replace(/<br><\/span>$/, '<br>&nbsp;</span>');
     });
 
     this.richTextInput.subscribe(() => {
