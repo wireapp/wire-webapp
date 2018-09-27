@@ -153,8 +153,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .join('');
     });
 
-    this.richTextInput.subscribe(() => $('.shadow-input').trigger('input'));
-
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
