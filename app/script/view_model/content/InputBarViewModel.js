@@ -139,7 +139,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput.subscribe(() => {
-      const textarea = document.querySelector('#conversation-input-bar-text');
+      const textarea = this.getTextArea();
       const shadowInput = document.querySelector('.shadow-input');
       if (textarea && shadowInput) {
         z.util.afterRender(() => {
@@ -280,6 +280,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  getTextArea() {
+    return document.querySelector('#conversation-input-bar-text');
   }
 
   addMention(userEntity, inputElement) {
@@ -501,7 +505,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   handleMentionFlow() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
+    const textarea = this.getTextArea();
     const {selectionStart, selectionEnd, value} = textarea;
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
@@ -509,7 +513,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   updateSelectionState() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
+    const textarea = this.getTextArea();
     if (!textarea) {
       return;
     }
