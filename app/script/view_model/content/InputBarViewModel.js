@@ -360,7 +360,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
-      const inputElement = document.querySelector('#conversation-input-bar-text');
+      const inputElement = this.getTextArea();
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
