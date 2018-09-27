@@ -128,18 +128,13 @@ ko.virtualElements.allowedBindings.stopBinding = true;
  */
 ko.bindingHandlers.resize = (function() {
   let lastHeight = null;
-  let triggerObservable = null;
   let callback = null;
   let syncElement = null;
 
   const resizeTextarea = _.throttle(element => {
+    const newStyleHeight = `${element.scrollHeight}px`;
     element.style.height = 0;
-    element.style.height = `${element.scrollHeight}px`;
-
-    if (syncElement) {
-      syncElement.style.height = 0;
-      syncElement.style.height = `${element.scrollHeight}px`;
-    }
+    element.style.height = newStyleHeight;
 
     const currentHeight = element.clientHeight;
     if (typeof callback === 'function') {
@@ -149,10 +144,15 @@ ko.bindingHandlers.resize = (function() {
     const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
 
     const isMaximumHeight = currentHeight >= max_height;
-    element.style.overflowY = isMaximumHeight ? 'scroll' : 'hidden';
+    const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
+    element.style.overflowY = newStyleOverflowY;
+
     if (syncElement) {
-      syncElement.style.overflowY = isMaximumHeight ? 'scroll' : 'hidden';
+      syncElement.style.height = 0;
+      syncElement.style.height = newStyleHeight;
+      syncElement.style.overflowY = newStyleOverflowY;
     }
+
     $(element).scroll();
   }, 100);
 
@@ -160,31 +160,12 @@ ko.bindingHandlers.resize = (function() {
     init(element, valueAccessor, allBindings, data, context) {
       lastHeight = element.scrollHeight;
       const params = ko.unwrap(valueAccessor());
-      triggerObservable = params.triggerObservable;
       syncElement = document.querySelector(params.syncElement);
       callback = params.callback;
-
-      if (!triggerObservable) {
-        return ko.applyBindingsToNode(
-          element,
-          {
-            event: {
-              focus() {
-                resizeTextarea(element);
-              },
-              input() {
-                resizeTextarea(element);
-              },
-            },
-          },
-          context
-        );
-      }
     },
 
     update(element, valueAccessor) {
       const params = ko.unwrap(valueAccessor());
-      triggerObservable = params.triggerObservable;
       syncElement = document.querySelector(params.syncElement);
       callback = params.callback;
       resizeTextarea(element);

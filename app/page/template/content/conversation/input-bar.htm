@@ -20,7 +20,7 @@
                              enter: onInputEnter,
                              hasFocus: hasFocus,
                              textInput: input,
-                             resize: {triggerObservable: input(), callback: scrollMessageList, syncElement: '.shadow-input'},
+                             resize: {triggerValue: input(), callback: scrollMessageList, syncElement: '.shadow-input'},
                              click: onInputClick,
                              attr: {'placeholder': inputPlaceholder},
                              css: {'conversation-input-bar-text--accent': hasLocalEphemeralTimer()},
