@@ -40,12 +40,6 @@ z.entity.Conversation = class Conversation {
     this.team_id = undefined;
     this.type = ko.observable();
 
-    const inputStorageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`;
-    this.input = ko.observable(this._getStorageInputData(inputStorageKey));
-    this.input.subscribe(({mentions, text}) => {
-      return z.util.StorageUtil.setValue(inputStorageKey, {mentions, text: z.util.StringUtil.trimEnd(text)});
-    });
-
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
@@ -511,24 +505,6 @@ z.entity.Conversation = class Conversation {
         return sameId && sameSender;
       });
     }
-  }
-
-  _getStorageInputData(inputStorageKey) {
-    const storageValue = z.util.StorageUtil.getValue(inputStorageKey);
-
-    if (typeof storageValue === 'undefined') {
-      return {mentions: [], text: ''};
-    }
-
-    if (typeof storageValue === 'string') {
-      return {mentions: [], text: storageValue};
-    }
-
-    storageValue.mentions = storageValue.mentions.map(mention => {
-      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
-    });
-
-    return storageValue;
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
