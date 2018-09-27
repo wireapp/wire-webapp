@@ -240,9 +240,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
   }
 
-  addMention(userEntity, inputElement) {
+  _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
-    const mentionEntity = new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  addMention(userEntity, inputElement) {
+    const mentionEntity = this._createMentionEntity(userEntity);
 
     // keep track of what is before and after the mention being edited
     const beforeMentionPartial = this.input().slice(0, mentionEntity.startIndex);
@@ -426,10 +430,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  handleMentionFlow() {
-    const textarea = document.querySelector('#conversation-input-bar-text');
-    const {selectionStart, selectionEnd, value} = textarea;
-
+  /**
+   * Returns a term which is a mention match together with its starting position.
+   * If nothing could be matched, it returns `undefined`.
+   *
+   * @param {number} selectionStart - Current caret position or start of selection  (if text is marked)
+   * @param {number} selectionEnd - Current caret position or end of selection (if text is marked)
+   * @param {string} value - Text input
+   * @returns {undefined|{startIndex: number, term: string}} Matched mention info
+   */
+  getMentionCandidate(selectionStart, selectionEnd, value) {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -445,11 +455,17 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
       const startIndex = selectionStart - wordBeforeSelection.length;
-      this.editedMention({startIndex, term});
-    } else {
-      this.editedMention(undefined);
+      return {startIndex, term};
     }
 
+    return undefined;
+  }
+
+  handleMentionFlow() {
+    const textarea = document.querySelector('#conversation-input-bar-text');
+    const {selectionStart, selectionEnd, value} = textarea;
+    const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
+    this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
 
