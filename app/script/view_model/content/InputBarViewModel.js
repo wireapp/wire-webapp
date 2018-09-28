@@ -46,7 +46,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
+    this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
+
+    this.shadowInput = null;
+    this.textarea = null;
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
@@ -113,10 +117,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-
-      const text = this.draftMessage().text.replace(/[\r\n]$/, '<br>&nbsp;');
-      const pieces = this.draftMessage()
-        .mentions.slice()
+      const pieces = this.currentMentions()
+        .slice()
         .reverse()
         .reduce(
           (currentPieces, mentionEntity) => {
@@ -126,7 +128,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [text]
+          [this.input()]
         );
 
       return pieces
@@ -134,16 +136,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           const textPiece = z.util.SanitizationUtil.escapeString(piece).replace(/[\r\n]/g, '<br>');
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
-        .join('');
+        .join('')
+        .replace(/<br><\/span>$/, '<br>&nbsp;</span>');
     });
 
     this.richTextInput.subscribe(() => {
-      const textarea = this.getTextArea();
-      const shadowInput = document.querySelector('.shadow-input');
-      if (textarea && shadowInput) {
+      if (this.textarea && this.shadowInput) {
         z.util.afterRender(() => {
-          if (shadowInput.scrollTop !== textarea.scrollTop) {
-            shadowInput.scrollTop = textarea.scrollTop;
+          if (this.shadowInput.scrollTop !== this.textarea.scrollTop) {
+            this.shadowInput.scrollTop = this.textarea.scrollTop;
           }
         });
       }
@@ -234,6 +235,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
   }
 
+  setElements(nodes) {
+    this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text');
+    this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input'));
+  }
+
   loadInitialStateForConversation(conversationEntity) {
     this.conversationHasFocus(true);
     this.pastedFile(null);
@@ -286,10 +292,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
   }
 
-  getTextArea() {
-    return document.querySelector('#conversation-input-bar-text');
-  }
-
   addMention(userEntity, inputElement) {
     const mentionEntity = this._createMentionEntity(userEntity);
 
@@ -321,8 +323,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageEditing() {
-    this.emojiInput.removeEmojiPopup();
-
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
     }
@@ -360,9 +360,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
-      const inputElement = this.getTextArea();
-      if (inputElement) {
-        this._moveCursorToEnd(inputElement);
+      if (this.textarea) {
+        this._moveCursorToEnd(this.textarea);
       }
     }
   }
@@ -451,9 +450,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         case z.util.KeyboardUtil.KEY.ESC: {
-          if (this.pastedFile()) {
+          if (this.mentionSuggestions().length) {
+            this.endMentionFlow();
+          } else if (this.pastedFile()) {
             this.pastedFile(null);
-          } else {
+          } else if (this.isEditing()) {
             this.cancelMessageEditing();
           }
           break;
@@ -508,18 +509,17 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   handleMentionFlow() {
-    const {selectionStart, selectionEnd, value} = this.getTextArea();
+    const {selectionStart, selectionEnd, value} = this.textarea;
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
 
   updateSelectionState() {
-    const textarea = this.getTextArea();
-    if (!textarea) {
+    if (!this.textarea) {
       return;
     }
-    const {selectionStart, selectionEnd} = textarea;
+    const {selectionStart, selectionEnd} = this.textarea;
     const defaultRange = {endIndex: 0, startIndex: Infinity};
 
     const firstMention = this.findMentionAtPosition(selectionStart, this.currentMentions()) || defaultRange;
@@ -530,9 +530,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const newStart = Math.min(mentionStart, selectionStart);
     const newEnd = Math.max(mentionEnd, selectionEnd);
-    if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
-      textarea.selectionStart = newStart;
-      textarea.selectionEnd = newEnd;
+    if (newStart !== selectionStart || newEnd !== selectionEnd) {
+      this.textarea.selectionStart = newStart;
+      this.textarea.selectionEnd = newEnd;
     }
     this.selectionStart(newStart);
     this.selectionEnd(newEnd);
@@ -612,7 +612,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText) {
     if (messageText.length) {
-      const mentionEntities = this.currentMentions();
+      const mentionEntities = this.currentMentions.slice();
       this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
