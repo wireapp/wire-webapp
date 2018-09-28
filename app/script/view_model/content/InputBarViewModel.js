@@ -113,7 +113,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-      const pieces = this.mentions()
+      const pieces = this.currentMentions()
         .slice()
         .reverse()
         .reduce(
