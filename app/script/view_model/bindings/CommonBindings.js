@@ -169,6 +169,7 @@ ko.bindingHandlers.resize = (function() {
       triggerValue = params.triggerValue;
       syncElement = document.querySelector(params.syncElement);
       callback = params.callback;
+      throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
 
       if (triggerValue === undefined) {
         return ko.applyBindingsToNode(
@@ -185,11 +186,9 @@ ko.bindingHandlers.resize = (function() {
     },
 
     update(element, valueAccessor) {
-      const params = ko.unwrap(valueAccessor()) || {};
-      triggerValue = params.triggerValue;
-      syncElement = document.querySelector(params.syncElement);
-      throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
-      callback = params.callback;
+      // we need to consume the `valueAccessor` here in order
+      // for knockout to trigger this function (even if we actually don't need the value)
+      ko.unwrap(valueAccessor());
       throttledResizeTextarea(element);
     },
   };
