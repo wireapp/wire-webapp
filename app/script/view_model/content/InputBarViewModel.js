@@ -46,11 +46,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
-    this.updateSelectionState = this.updateSelectionState.bind(this);
     this.setElements = this.setElements.bind(this);
+    this.updateSelectionState = this.updateSelectionState.bind(this);
 
-    this.textarea = null;
     this.shadowInput = null;
+    this.textarea = null;
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
