@@ -40,14 +40,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
+    this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
+    this.endMentionFlow = this.endMentionFlow.bind(this);
     this.onDropFiles = this.onDropFiles.bind(this);
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
+    this.updateSelectionState = this.updateSelectionState.bind(this);
+
+    this.selectionStart = ko.observable(0);
+    this.selectionEnd = ko.observable(0);
 
     this.emojiInput = contentViewModel.emojiInput;
 
     this.conversationRepository = repositories.conversation;
+    this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
 
@@ -57,7 +64,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 
     this.editMessageEntity = ko.observable();
-    this.editInput = ko.observable('');
+    this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -65,38 +72,85 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.pingDisabled = ko.observable(false);
 
+    this.editedMention = ko.observable(undefined);
+    this.currentMentions = ko.observableArray();
+
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
-    this.hasTextInput = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
+    this.hasTextInput = ko.pureComputed(() => this.input().length);
+
+    this.input = ko.observable('');
+
+    this.input.subscribeChanged((newValue, oldValue) => {
+      const difference = newValue.length - oldValue.length;
+      const updatedMentions = this.updateMentionRanges(
+        this.currentMentions(),
+        this.selectionStart(),
+        this.selectionEnd(),
+        difference
+      );
+      this.currentMentions(updatedMentions);
+      this.updateSelectionState();
     });
 
-    this.input = ko.pureComputed({
-      read: () => {
-        if (this.isEditing()) {
-          return this.editInput();
-        }
+    this.draftMessage = ko
+      .pureComputed(() => {
+        const text = this.input();
+        const mentions = this.currentMentions();
+        return {mentions, text};
+      })
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
 
-        if (this.conversationEntity()) {
-          return this.conversationEntity().input() || '';
-        }
+    this.mentionSuggestions = ko.pureComputed(() => {
+      if (!this.editedMention() || !this.conversationEntity()) {
+        return [];
+      }
 
-        return '';
-      },
-      write: value => {
-        if (this.isEditing()) {
-          return this.editInput(value);
-        }
+      const candidates = this.conversationEntity()
+        .participating_user_ets()
+        .filter(userEntity => !userEntity.isService);
+      return this.searchRepository.searchUserInSet(this.editedMention().term, candidates);
+    });
 
-        if (this.conversationEntity()) {
-          this.conversationEntity().input(value);
-        }
-      },
+    this.richTextInput = ko.pureComputed(() => {
+      const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
+      const pieces = this.currentMentions()
+        .slice()
+        .reverse()
+        .reduce(
+          (currentPieces, mentionEntity) => {
+            const currentPiece = currentPieces.shift();
+            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
+            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
+            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
+            return currentPieces;
+          },
+          [this.input()]
+        );
+
+      return pieces
+        .map((piece, index) => {
+          const textPiece = z.util.SanitizationUtil.escapeString(piece).replace(/[\r\n]/g, '<br>');
+          return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
+        })
+        .join('')
+        .replace(/<br><\/span>$/, '<br>&nbsp;</span>');
+    });
+
+    this.richTextInput.subscribe(() => {
+      const textarea = this.getTextArea();
+      const shadowInput = document.querySelector('.shadow-input');
+      if (textarea && shadowInput) {
+        z.util.afterRender(() => {
+          if (shadowInput.scrollTop !== textarea.scrollTop) {
+            shadowInput.scrollTop = textarea.scrollTop;
+          }
+        });
+      }
     });
 
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
-
         const availabilityStrings = {
           [z.user.AvailabilityType.AVAILABLE]: z.string.tooltipConversationInputPlaceholderAvailable,
           [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAway,
@@ -113,8 +167,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return z.l10n.text(stringId);
     });
 
-    this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
-
     this.showAvailabilityTooltip = ko.pureComputed(() => {
       if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
         const isOne2OneConversation = this.conversationEntity().is_one2one();
@@ -127,19 +179,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.showGiphyButton = ko.pureComputed(() => {
-      if (this.conversationEntity() && this.hasTextInput()) {
-        return this.conversationEntity().input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
-      }
+      return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
     });
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
     this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
-
-    this.conversationEntity.subscribe(() => {
-      this.conversationHasFocus(true);
-      this.pastedFile(null);
-      this.cancelMessageEditing();
-    });
 
     this.isEditing.subscribe(isEditing => {
       if (isEditing) {
@@ -169,6 +213,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
+    this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
+    this.draftMessage.subscribe(message => {
+      if (this.conversationEntity()) {
+        this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
+      }
+    });
+
     this._init_subscriptions();
   }
 
@@ -177,9 +228,91 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversationHasFocus(false));
-    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
-      window.requestAnimationFrame(() => this.conversationHasFocus(true))
-    );
+    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => {
+      window.requestAnimationFrame(() => this.conversationHasFocus(true));
+    });
+  }
+
+  loadInitialStateForConversation(conversationEntity) {
+    this.conversationHasFocus(true);
+    this.pastedFile(null);
+    this.cancelMessageEditing();
+    if (conversationEntity) {
+      const previousSessionData = this._loadDraftState(conversationEntity);
+      this.input(previousSessionData.text);
+      this.currentMentions(previousSessionData.mentions);
+    }
+  }
+
+  _saveDraftState(conversationEntity, text, mentions) {
+    if (!this.isEditing()) {
+      // we only save state for newly written messages
+      const storageKey = this._generateStorageKey(conversationEntity);
+      z.util.StorageUtil.setValue(storageKey, {mentions, text});
+    }
+  }
+
+  _generateStorageKey(conversationEntity) {
+    return `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+  }
+
+  _loadDraftState(conversationEntity) {
+    const storageKey = this._generateStorageKey(conversationEntity);
+    const storageValue = z.util.StorageUtil.getValue(storageKey);
+
+    if (typeof storageValue === 'undefined') {
+      return {mentions: [], text: ''};
+    }
+
+    if (typeof storageValue === 'string') {
+      return {mentions: [], text: storageValue};
+    }
+
+    storageValue.mentions = storageValue.mentions.map(mention => {
+      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+    });
+
+    return storageValue;
+  }
+
+  _resetDraftState() {
+    this.currentMentions.removeAll();
+    this.input('');
+  }
+
+  _createMentionEntity(userEntity) {
+    const mentionLength = userEntity.name().length + 1;
+    return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  getTextArea() {
+    return document.querySelector('#conversation-input-bar-text');
+  }
+
+  addMention(userEntity, inputElement) {
+    const mentionEntity = this._createMentionEntity(userEntity);
+
+    // keep track of what is before and after the mention being edited
+    const beforeMentionPartial = this.input().slice(0, mentionEntity.startIndex);
+    const afterMentionPartial = this.input()
+      .slice(mentionEntity.startIndex + this.editedMention().term.length + 1)
+      .replace(/^ /, '');
+
+    // insert the mention in between
+    this.input(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
+
+    this.currentMentions.push(mentionEntity);
+    this.currentMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+
+    const caretPosition = mentionEntity.endIndex + 1;
+    inputElement.selectionStart = caretPosition;
+    inputElement.selectionEnd = caretPosition;
+    this.endMentionFlow();
+  }
+
+  endMentionFlow() {
+    this.editedMention(undefined);
+    this.updateSelectionState();
   }
 
   addedToView() {
@@ -187,14 +320,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageEditing() {
-    this.emojiInput.removeEmojiPopup();
-
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
     }
 
     this.editMessageEntity(undefined);
-    this.editInput('');
+    this._resetDraftState();
   }
 
   clickToCancelPastedFile() {
@@ -202,24 +333,31 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   clickToShowGiphy() {
-    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW);
+    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.input());
   }
 
   clickToPing() {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.conversationRepository.send_knock(this.conversationEntity()).then(() => {
+      this.conversationRepository.sendKnock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
   }
 
-  editMessage(messageEntity, inputElement) {
+  editMessage(messageEntity) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
+      messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
-      this.editMessageEntity().isEditing(true);
-      this.input(this.editMessageEntity().get_first_asset().text);
+
+      this.input(messageEntity.get_first_asset().text);
+      const newMentions = messageEntity
+        .get_first_asset()
+        .mentions()
+        .slice();
+      this.currentMentions(newMentions);
+      const inputElement = this.getTextArea();
       if (inputElement) {
         this._moveCursorToEnd(inputElement);
       }
@@ -251,7 +389,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onWindowClick(event) {
-    if (!$(event.target).closest('.conversation-input-bar').length) {
+    if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
       this.cancelMessageEditing();
     }
   }
@@ -267,7 +405,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.sendPastedFile();
     }
 
-    const messageText = z.util.StringUtil.trimLineBreaks(this.input());
+    const beforeLength = this.input().length;
+    const messageTrimmedStart = z.util.StringUtil.trimStart(this.input());
+    const afterLength = messageTrimmedStart.length;
+
+    const updatedMentions = this.updateMentionRanges(this.currentMentions(), 0, 0, afterLength - beforeLength);
+    this.currentMentions(updatedMentions);
+
+    const messageText = z.util.StringUtil.trimEnd(messageTrimmedStart);
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
@@ -285,7 +430,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.sendMessage(messageText);
     }
 
-    this.input('');
+    this._resetDraftState();
     $(event.target).focus();
   }
 
@@ -296,15 +441,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
+            this.editMessage(this.conversationEntity().get_last_editable_message());
+            this.updateMentions(data, keyboardEvent);
           }
           break;
         }
 
         case z.util.KeyboardUtil.KEY.ESC: {
-          if (this.pastedFile()) {
+          if (this.mentionSuggestions().length) {
+            this.endMentionFlow();
+          } else if (this.pastedFile()) {
             this.pastedFile(null);
-          } else {
+          } else if (this.isEditing()) {
             this.cancelMessageEditing();
           }
           break;
@@ -327,8 +475,117 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
+  /**
+   * Returns a term which is a mention match together with its starting position.
+   * If nothing could be matched, it returns `undefined`.
+   *
+   * @param {number} selectionStart - Current caret position or start of selection  (if text is marked)
+   * @param {number} selectionEnd - Current caret position or end of selection (if text is marked)
+   * @param {string} value - Text input
+   * @returns {undefined|{startIndex: number, term: string}} Matched mention info
+   */
+  getMentionCandidate(selectionStart, selectionEnd, value) {
+    const textInSelection = value.substring(selectionStart, selectionEnd);
+    const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
+    const isSpaceSelected = /\s/.test(textInSelection);
+
+    const startOffset = wordBeforeSelection.length ? wordBeforeSelection.length - 1 : 1;
+    const isSelectionStartMention = this.findMentionAtPosition(selectionStart - startOffset, this.currentMentions());
+    const isSelectionEndMention = this.findMentionAtPosition(selectionEnd, this.currentMentions());
+    const isOverMention = isSelectionStartMention || isSelectionEndMention;
+    const isOverValidMentionString = /^@\S*$/.test(wordBeforeSelection);
+
+    if (!isSpaceSelected && !isOverMention && isOverValidMentionString) {
+      const wordAfterSelection = value.substring(selectionEnd).replace(/\s[^]*/, '');
+
+      const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
+      const startIndex = selectionStart - wordBeforeSelection.length;
+      return {startIndex, term};
+    }
+
+    return undefined;
+  }
+
+  handleMentionFlow() {
+    const {selectionStart, selectionEnd, value} = this.getTextArea();
+    const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
+    this.editedMention(mentionCandidate);
+    this.updateSelectionState();
+  }
+
+  updateSelectionState() {
+    const textarea = this.getTextArea();
+    if (!textarea) {
+      return;
+    }
+    const {selectionStart, selectionEnd} = textarea;
+    const defaultRange = {endIndex: 0, startIndex: Infinity};
+
+    const firstMention = this.findMentionAtPosition(selectionStart, this.currentMentions()) || defaultRange;
+    const lastMention = this.findMentionAtPosition(selectionEnd, this.currentMentions()) || defaultRange;
+
+    const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
+    const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
+
+    const newStart = Math.min(mentionStart, selectionStart);
+    const newEnd = Math.max(mentionEnd, selectionEnd);
+    if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newEnd;
+    }
+    this.selectionStart(newStart);
+    this.selectionEnd(newEnd);
+  }
+
+  updateMentions(data, event) {
+    const textarea = event.target;
+    const value = textarea.value;
+    const previousValue = this.input();
+
+    const lengthDifference = value.length - previousValue.length;
+    const edgeMention = this.detectMentionEdgeDeletion(textarea, lengthDifference);
+    if (edgeMention) {
+      textarea.value = this.input();
+      textarea.selectionStart = edgeMention.startIndex;
+      textarea.selectionEnd = edgeMention.endIndex;
+    }
+  }
+
+  detectMentionEdgeDeletion(textarea, lengthDifference) {
+    const hadSelection = this.selectionStart() !== this.selectionEnd();
+    if (hadSelection) {
+      return null;
+    }
+    if (lengthDifference >= 0) {
+      return null;
+    }
+    const currentSelectionStart = textarea.selectionStart;
+    const forwardDeleted = currentSelectionStart === this.selectionStart();
+    const checkPosition = forwardDeleted ? currentSelectionStart + 1 : currentSelectionStart;
+    return this.findMentionAtPosition(checkPosition, this.currentMentions());
+  }
+
+  updateMentionRanges(mentions, start, end, difference) {
+    const remainingMentions = mentions.filter(({startIndex, endIndex}) => endIndex <= start || startIndex >= end);
+
+    remainingMentions.forEach(mention => {
+      if (mention.startIndex >= end) {
+        mention.startIndex += difference;
+      }
+    });
+
+    return remainingMentions;
+  }
+
+  findMentionAtPosition(position, mentions) {
+    return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
+  }
+
   onInputKeyUp(data, keyboardEvent) {
     this.emojiInput.onInputKeyUp(data, keyboardEvent);
+    if (keyboardEvent.key !== z.util.KeyboardUtil.KEY.ESC) {
+      this.handleMentionFlow();
+    }
   }
 
   removedFromView() {
@@ -349,28 +606,31 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   sendGiphy() {
-    if (this.conversationEntity()) {
-      this.conversationEntity().input('');
-    }
+    this._resetDraftState();
   }
 
   sendMessage(messageText) {
     if (messageText.length) {
-      this.conversationRepository.send_text_with_link_preview(messageText, this.conversationEntity());
+      const mentionEntities = this.currentMentions.slice();
+      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
 
   sendMessageEdit(messageText, messageEntity) {
+    const mentionEntities = this.currentMentions.slice();
     this.cancelMessageEditing();
 
     if (!messageText.length) {
-      return this.conversationRepository.delete_message_everyone(this.conversationEntity(), messageEntity);
+      return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    const isTextChange = messageText !== messageEntity.get_first_asset().text;
-    if (isTextChange) {
-      this.conversationRepository.send_message_edit(messageText, messageEntity, this.conversationEntity());
-    }
+    this.conversationRepository
+      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
+      .catch(error => {
+        if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+          throw error;
+        }
+      });
   }
 
   sendPastedFile() {
@@ -448,6 +708,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     window.setTimeout(() => {
       const newSelectionStart = (input_element.selectionEnd = input_element.value.length * 2);
       input_element.selectionStart = newSelectionStart;
+      this.updateSelectionState();
     }, 0);
   }
 

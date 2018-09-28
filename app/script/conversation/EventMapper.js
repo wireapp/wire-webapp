@@ -48,7 +48,10 @@ z.conversation.EventMapper = class EventMapper {
           try {
             return this._mapJsonEvent(event, conversationEntity, createDummyImage);
           } catch (error) {
-            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+            const {conversation, from, type} = event;
+            const errorMessage =
+              'Failure while mapping event.' +
+              ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
             this.logger.error(errorMessage, {error, event});
 
             const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
@@ -75,8 +78,10 @@ z.conversation.EventMapper = class EventMapper {
         if (isMessageNotFound) {
           throw error;
         }
-
-        const errorMessage = `Failure while mapping event. Affected '${event.type}' event: ${error.message}`;
+        const {conversation, from, type} = event;
+        const errorMessage =
+          'Failure while mapping event.' +
+          ` Affected '${type}' event in '${conversation}' from '${from}': ${error.message}`;
         this.logger.error(errorMessage, {error, event});
 
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
@@ -98,61 +103,96 @@ z.conversation.EventMapper = class EventMapper {
     let messageEntity;
 
     switch (event.type) {
-      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+      case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
         messageEntity = this._mapEventMemberJoin(event, conversationEntity);
         break;
-      case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+      }
+
+      case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
         messageEntity = this._mapEventMemberLeave(event);
         break;
-      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      }
+
+      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE: {
         messageEntity = this._mapEventMessageTimerUpdate(event);
         break;
-      case z.event.Backend.CONVERSATION.RENAME:
+      }
+
+      case z.event.Backend.CONVERSATION.RENAME: {
         messageEntity = this._mapEventRename(event);
         break;
-      case z.event.Client.CONVERSATION.ASSET_ADD:
+      }
+
+      case z.event.Client.CONVERSATION.ASSET_ADD: {
         messageEntity = this._mapEventAssetAdd(event, createDummyImage);
         break;
-      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
+      }
+
+      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE: {
         messageEntity = this._mapEventDeleteEverywhere(event);
         break;
-      case z.event.Client.CONVERSATION.GROUP_CREATION:
+      }
+
+      case z.event.Client.CONVERSATION.GROUP_CREATION: {
         messageEntity = this._mapEventGroupCreation(event);
         break;
+      }
+
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT: {
         messageEntity = this._mapEventUnableToDecrypt(event);
         break;
-      case z.event.Client.CONVERSATION.KNOCK:
+      }
+
+      case z.event.Client.CONVERSATION.KNOCK: {
         messageEntity = this._mapEventPing();
         break;
-      case z.event.Client.CONVERSATION.LOCATION:
+      }
+
+      case z.event.Client.CONVERSATION.LOCATION: {
         messageEntity = this._mapEventLocation(event);
         break;
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+      }
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
         messageEntity = this._mapEventMessageAdd(event);
         break;
-      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
+      }
+
+      case z.event.Client.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
         break;
-      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+      }
+
+      case z.event.Client.CONVERSATION.ONE2ONE_CREATION: {
         messageEntity = this._mapEvent1to1Creation(event);
         break;
-      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+      }
+
+      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
         messageEntity = this._mapEventTeamMemberLeave(event);
         break;
-      case z.event.Client.CONVERSATION.VERIFICATION:
+      }
+
+      case z.event.Client.CONVERSATION.VERIFICATION: {
         messageEntity = this._mapEventVerification(event);
         break;
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
+      }
+
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE: {
         messageEntity = this._mapEventVoiceChannelActivate();
         break;
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      }
+
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
         break;
-      default:
+      }
+
+      default: {
         this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+      }
     }
 
     const {category, from, id, primary_key, time, type, version} = event;
@@ -192,7 +232,7 @@ z.conversation.EventMapper = class EventMapper {
   //##############################################################################
 
   /**
-   * Maps JSON data of conversation.one2one-creation message into message entity
+   * Maps JSON data of conversation.one2one-creation message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -213,7 +253,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.asset_add message into message entity
+   * Maps JSON data of conversation.asset_add message into message entity.
    *
    * @private
    * @param {Object} event - Message data
@@ -233,7 +273,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of delete everywhere event to message entity
+   * Maps JSON data of delete everywhere event to message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -246,7 +286,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   *Map JSON ata of group creation event to message entity
+   * Map JSON ata of group creation event to message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -262,7 +302,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.location message into message entity
+   * Maps JSON data of conversation.location message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -284,7 +324,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.member_join message into message entity
+   * Maps JSON data of conversation.member_join message into message entity.
    *
    * @private
    * @param {Object} event - Message data
@@ -321,7 +361,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.member_leave message into message entity
+   * Maps JSON data of conversation.member_leave message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -334,7 +374,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.message_add message into message entity
+   * Maps JSON data of conversation.message_add message into message entity.
    *
    * @private
    * @param {Object} event - Message data
@@ -352,7 +392,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of local missed message event to message entity
+   * Maps JSON data of local missed message event to message entity.
    * @private
    * @returns {MissedMessage} Missed message entity
    */
@@ -361,7 +401,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.knock message into message entity
+   * Maps JSON data of conversation.knock message into message entity.
    * @private
    * @returns {PingMessage} Ping message entity
    */
@@ -370,7 +410,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.rename message into message entity
+   * Maps JSON data of conversation.rename message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -383,7 +423,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.message-timer-update message into message entity
+   * Maps JSON data of conversation.message-timer-update message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -394,7 +434,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.team_leave message into message entity
+   * Maps JSON data of conversation.team_leave message into message entity.
    *
    * @private
    * @param {Object} event - Message data
@@ -408,7 +448,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of local decrypt errors to message entity
+   * Maps JSON data of local decrypt errors to message entity.
    *
    * @private
    * @param {Object} error_code - Error data received as JSON
@@ -427,7 +467,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.verification message into message entity
+   * Maps JSON data of conversation.verification message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -444,7 +484,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.voice-channel-activate message into message entity
+   * Maps JSON data of conversation.voice-channel-activate message into message entity.
    * @private
    * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
@@ -458,7 +498,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.voice-channel-deactivate message into message entity
+   * Maps JSON data of conversation.voice-channel-deactivate message into message entity.
    *
    * @private
    * @param {Object} eventData - Message data
@@ -483,7 +523,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of file asset into asset entity
+   * Maps JSON data of file asset into asset entity.
    *
    * @private
    * @param {Object} event - Asset data received as JSON
@@ -531,7 +571,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of medium image asset into asset entity
+   * Maps JSON data of medium image asset into asset entity.
    *
    * @private
    * @param {Object} event - Asset data received as JSON
@@ -568,7 +608,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Map link preview
+   * Map link preview from proto message.
    *
    * @private
    * @param {z.proto.LinkPreview} linkPreview - Link preview proto message
@@ -602,13 +642,13 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Map link previews
+   * Map link previews from proto messages.
    *
    * @private
-   * @param {Array} [linkPreviews=[]] - base64 encoded proto previews
+   * @param {Array} linkPreviews - Link previews as base64 encoded proto messages
    * @returns {Array<LinkPreview>} Array of mapped link previews
    */
-  _mapAssetLinkPreviews(linkPreviews = []) {
+  _mapAssetLinkPreviews(linkPreviews) {
     return linkPreviews
       .map(encodedLinkPreview => z.proto.LinkPreview.decode64(encodedLinkPreview))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
@@ -616,17 +656,49 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of text asset into asset entity
+   * Map mentions from proto messages.
+   *
+   * @private
+   * @param {Array} mentions - Mentions as base64 encoded proto messages
+   * @param {string} messageText - Text of message
+   * @returns {Array<z.message.MentionEntity>} Array of mapped mentions
+   */
+  _mapAssetMentions(mentions, messageText) {
+    return mentions
+      .map(encodedMention => {
+        const protoMention = z.proto.Mention.decode64(encodedMention);
+        return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
+      })
+      .filter(mentionEntity => {
+        if (mentionEntity) {
+          try {
+            return mentionEntity.validate(messageText);
+          } catch (error) {
+            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
+            return false;
+          }
+        }
+      });
+  }
+
+  /**
+   * Maps JSON data of text asset into asset entity.
    *
    * @private
    * @param {Object} eventData - Asset data received as JSON
    * @returns {Text} Text asset entity
    */
   _mapAssetText(eventData) {
-    const {id, content, message, previews} = eventData;
-    const assetEntity = new z.entity.Text(id, content || message);
+    const {id, content, mentions, message, previews} = eventData;
+    const messageText = content || message;
+    const assetEntity = new z.entity.Text(id, messageText);
 
-    assetEntity.previews(this._mapAssetLinkPreviews(previews));
+    if (mentions && mentions.length) {
+      assetEntity.mentions(this._mapAssetMentions(mentions, messageText));
+    }
+    if (previews && previews.length) {
+      assetEntity.previews(this._mapAssetLinkPreviews(previews));
+    }
 
     return assetEntity;
   }

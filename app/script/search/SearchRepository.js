@@ -27,6 +27,10 @@ z.search.SearchRepository = class SearchRepository {
     return {
       MAX_DIRECTORY_RESULTS: 30,
       MAX_SEARCH_RESULTS: 10,
+      SEARCHABLE_FIELDS: {
+        NAME: 'name',
+        USERNAME: 'username',
+      },
     };
   }
 
@@ -54,6 +58,80 @@ z.search.SearchRepository = class SearchRepository {
     this.searchService = searchService;
     this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
+  }
+
+  /**
+   * Search for a user in the given user list and given a search term.
+   * Doesn't sort the results and keep the initial order of the given user list.
+   *
+   * @param {string} term - the search term
+   * @param {Array<z.entity.User>} userEntities - entities to match the search term against
+   * @param {Array<z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
+   *    the order of the properties in the array indicates the priorities by which results will be sorted
+   * @returns {Array<z.entity.User>} the filtered list of users
+   */
+  searchUserInSet(term, userEntities, properties) {
+    if (term === '') {
+      return userEntities;
+    }
+    properties = properties || [
+      SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME,
+      SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME,
+    ];
+
+    const weightedResults = userEntities.reduce((results, userEntity) => {
+      const matchWeight = properties
+        .slice()
+        .reverse()
+        .reduce((weight, property, index) => {
+          const propertyWeight = 10 * index + 1;
+          const propertyMatchWeight = this._matches(term, property, userEntity);
+          return weight + propertyMatchWeight * propertyWeight;
+        }, 0);
+
+      return matchWeight === 0 ? results : results.concat({user: userEntity, weight: matchWeight});
+    }, []);
+
+    return weightedResults
+      .slice()
+      .sort((result1, result2) => {
+        if (result2.weight === result1.weight) {
+          return result2.user.name() > result1.user.name() ? -1 : 1;
+        }
+        return result2.weight - result1.weight;
+      })
+      .map(result => result.user);
+  }
+
+  _matches(term, property, userEntity) {
+    const excludedEmojis = Array.from(term).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
+    const value = ko.unwrap(userEntity[property]) || '';
+
+    const isStrictMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);
+    if (isStrictMatch) {
+      // if the pattern matches the raw text, give the maximum value to the match
+      return 100;
+    }
+    const isLoosyMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, false);
+    if (!isLoosyMatch) {
+      // if the pattern doesn't match loosely, then it's not a match at all
+      return 0;
+    }
+
+    const tokens = z.util.StringUtil.computeTransliteration(value).split(/\W+/g);
+    // computing the match value by testing all components of the property
+    return tokens.reverse().reduce((weight, token, index) => {
+      const indexWeight = index + 1;
+      let tokenWeight = 0;
+
+      if (z.util.StringUtil.compareTransliteration(token, term, excludedEmojis, true)) {
+        tokenWeight = indexWeight * 10;
+      } else if (z.util.StringUtil.compareTransliteration(token, term, excludedEmojis, false)) {
+        tokenWeight = indexWeight;
+      }
+
+      return weight + tokenWeight;
+    }, 0);
   }
 
   /**

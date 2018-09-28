@@ -32,6 +32,7 @@ z.cryptography.GENERIC_MESSAGE_TYPE = {
   DELETED: 'deleted',
   EDITED: 'edited',
   EPHEMERAL: 'ephemeral',
+  EXTERNAL: 'external',
   HIDDEN: 'hidden',
   IMAGE: 'image',
   KNOCK: 'knock',

@@ -303,12 +303,7 @@ z.string.tr.conversationsPopoverNotify = 'Susturmayı Aç';
 z.string.tr.conversationsPopoverSilence = 'Sustur';
 z.string.tr.conversationsPopoverUnarchive = 'Arşivden Çıkar';
 
-z.string.tr.conversationsSecondaryLineMissedCall = '{{number}} cevapsız çağrı';
-z.string.tr.conversationsSecondaryLineMissedCalls = '{{number}} cevapsız çağrı';
-z.string.tr.conversationsSecondaryLineNewMessage = '{{number}} yeni mesaj';
-z.string.tr.conversationsSecondaryLineNewMessages = '{{number}} yeni mesaj';
-z.string.tr.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.tr.conversationsSecondaryLinePings = '{{number}} ping';
+z.string.tr.conversationsSecondaryLineEphemeralMessage = 'Size bir mesaj gönderdi';
 z.string.tr.conversationsSecondaryLinePeopleLeft = '{{number}} kişi ayrıldı';
 z.string.tr.conversationsSecondaryLinePersonLeft = '{{user}} ayrıldı';
 z.string.tr.conversationsSecondaryLinePersonRemoved = '{{user}} çıkartıldı';
@@ -316,7 +311,6 @@ z.string.tr.conversationsSecondaryLinePeopleAdded = '{{user}} kişi eklendi';
 z.string.tr.conversationsSecondaryLinePersonAdded = '{{user}} eklendi';
 z.string.tr.conversationsSecondaryLinePersonAddedYou = '{{user}} seni ekledi';
 z.string.tr.conversationsSecondaryLineRenamed = '{{user}} konuşmayı yeniden adlandırdı';
-z.string.tr.conversationsSecondaryLineTimedMessage = 'Süreli Mesaj';
 z.string.tr.conversationsSecondaryLineYouLeft = 'Ayrıldın';
 z.string.tr.conversationsSecondaryLineYouWereRemoved = 'Çıkartıldınız';
 

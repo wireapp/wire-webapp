@@ -204,12 +204,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     const replacePromise = this.joinedCall()
       ? this._updateJoinedCall(mediaStreamInfo)
-      : Promise.resolve({replace: false, streamInfo: mediaStreamInfo});
+      : Promise.resolve({replacedTrack: false, streamInfo: mediaStreamInfo});
 
     replacePromise.then(this._handleReplacedMediaStream.bind(this));
   }
 
-  _handleReplacedMediaStream({streamInfo: mediaStreamInfo, replace}) {
+  _handleReplacedMediaStream({replacedTrack, streamInfo: mediaStreamInfo}) {
     const replaceMediaStreamLocally = newMediaStreamInfo => {
       const newMediaStream = newMediaStreamInfo.stream;
       const newMediaStreamType = newMediaStreamInfo.getType();
@@ -232,7 +232,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       }
     };
 
-    return replace ? replaceMediaStreamLocally(mediaStreamInfo) : replaceMediaTracksLocally(mediaStreamInfo);
+    return replacedTrack ? replaceMediaTracksLocally(mediaStreamInfo) : replaceMediaStreamLocally(mediaStreamInfo);
   }
 
   /**
@@ -241,7 +241,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the input source has been replaced
    */
   replaceInputSource(mediaType) {
-    const isPreferenceChange = !this.mediaStreamInUse();
+    const isPreferenceChange = this.currentCalls.size === 0;
 
     let constraintsPromise;
     switch (mediaType) {
@@ -268,7 +268,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return constraintsPromise
       .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
-        if (!this.mediaStreamInUse()) {
+        // FIXME: the mediaStreamInUse should be more intelligent and handle all scenarios where the stream is actually needed
+        if (!isPreferenceChange && !this.mediaStreamInUse()) {
+          // in case the stream is returned after the call has actually ended, we need to release the stream right away
           this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
           return this._releaseMediaStream(mediaStreamInfo.stream);
         }
@@ -698,7 +700,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     const replaceMediaTrackInFlows = (streamInfo, flows) => {
       const replacementPromises = flows.map(flowEntity => flowEntity.replaceMediaTrack(streamInfo));
-      return Promise.all(replacementPromises).then(() => streamInfo);
+      return Promise.all(replacementPromises).then(() => ({replacedTrack: true, streamInfo}));
     };
 
     const replaceMediaStreamInFlows = (streamInfo, flows) => {
@@ -706,17 +708,16 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         const upgradePromises = flows.map(flowEntity => {
           return flowEntity.replaceMediaStream(newMediaStreamInfo, this.localMediaStream());
         });
-        return Promise.all(upgradePromises).then(() => newMediaStreamInfo);
+        return Promise.all(upgradePromises).then(() => ({replacedTrack: false, streamInfo: newMediaStreamInfo}));
       });
     };
 
     return firstFlowEntity
       .supportsTrackReplacement(mediaStreamInfo.getType())
       .then(canReplaceTracks => {
-        const replacePromise = canReplaceTracks
+        return canReplaceTracks
           ? replaceMediaTrackInFlows(mediaStreamInfo, flowEntities)
           : replaceMediaStreamInFlows(mediaStreamInfo, flowEntities);
-        return replacePromise.then(streamInfo => ({replace: !canReplaceTracks, streamInfo}));
       })
       .catch(error => {
         const message = `Failed to update call with '${mediaStreamInfo.getType()}': ${error.name} - ${error.message}`;

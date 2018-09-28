@@ -25,9 +25,24 @@ window.z.util = z.util || {};
 z.util.StringUtil = {
   capitalizeFirstChar: (string = '') => `${string.charAt(0).toUpperCase()}${string.substring(1)}`,
 
-  compareTransliteration: (nameA, nameB, excludedChars = []) => {
+  /**
+   * Returns true if the string and the query match by applying transliteration first.
+   *
+   * @param {string} string - the string to compare the query against
+   * @param {string} query - the query to compare to the string
+   * @param {array<string>} excludedChars - extra characters to remove from both the query and the string
+   * @param {boolean} fromStart=false - should the query match the string from the beginning of the string
+   * @returns {boolean} does the string matches the query
+   */
+  compareTransliteration: (string, query, excludedChars = [], fromStart = false) => {
+    const nameSlug = z.util.StringUtil.computeTransliteration(string, excludedChars);
+    const querySlug = z.util.StringUtil.computeTransliteration(query, excludedChars);
+    return fromStart ? nameSlug.startsWith(querySlug) : z.util.StringUtil.includes(nameSlug, querySlug);
+  },
+
+  computeTransliteration: (string, excludedChars = []) => {
     const options = {custom: excludedChars};
-    return z.util.StringUtil.includes(window.getSlug(nameA, options), window.getSlug(nameB, options));
+    return window.getSlug(string, options);
   },
 
   cutLastChars: (string, length) => string.substring(0, string.length - length),
@@ -79,6 +94,12 @@ z.util.StringUtil = {
   },
 
   removeLineBreaks: (string = '') => string.replace(/(\r\n|\n|\r)/gm, ''),
+
+  replaceInRange(text, replacement, startIndex, endIndex) {
+    const beforePartial = text.slice(0, startIndex);
+    const afterPartial = text.slice(endIndex);
+    return `${beforePartial}${replacement}${afterPartial}`;
+  },
 
   sortByPriority: (stringA = '', stringB = '', query) => {
     stringA = stringA.toLowerCase();
@@ -134,7 +155,8 @@ z.util.StringUtil = {
 
   startsWith: (string = '', query) => string.toLowerCase().startsWith(query.toLowerCase()),
 
-  trimLineBreaks: (string = '') => string.replace(/^\s+|\s+$/g, ''),
+  trimEnd: (string = '') => string.replace(/\s*$/, ''),
+  trimStart: (string = '') => string.replace(/^\s*/, ''),
 
   truncate: (string, outputLength, wordBoundary = true) => {
     if (string.length > outputLength) {

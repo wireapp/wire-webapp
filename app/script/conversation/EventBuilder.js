@@ -136,14 +136,17 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
-  buildMemberJoin(conversationEntity, userIds, timeOffset) {
+  buildMemberJoin(conversationEntity, sender, joiningUserIds, timestamp) {
+    timestamp = timestamp ? timestamp : conversationEntity.get_last_known_timestamp() + 1;
+    const isoDate = new Date(timestamp).toISOString();
+
     return {
       conversation: conversationEntity.id,
       data: {
-        user_ids: userIds,
+        user_ids: joiningUserIds,
       },
-      from: userIds[0],
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      from: sender,
+      time: isoDate,
       type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
     };
   },

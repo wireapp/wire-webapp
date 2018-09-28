@@ -170,6 +170,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.currentDeviceId.screenInput.subscribe(mediaDeviceId => {
+      if (mediaDeviceId) {
+        this._updateCurrentIndexFromId(z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
+      }
+
       const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.SCREEN;
       const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
@@ -178,6 +182,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
+      if (mediaDeviceId) {
+        this._updateCurrentIndexFromId(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+      }
+
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
 
       const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.VIDEO;
@@ -326,7 +334,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     const {device} = this._getCurrentDevice(availableDevices, currentDeviceIdObservable());
     const nextIndex = z.util.ArrayUtil.iterateIndex(availableDevices, currentDeviceIndex);
 
-    const {deviceId, label} = availableDevices[nextIndex || 0];
+    const nextDevice = availableDevices[nextIndex || 0];
+    const deviceId = nextDevice.deviceId || nextDevice.id;
+    const label = nextDevice.label || nextDevice.name;
+
     currentDeviceIdObservable(deviceId);
 
     const deviceName = device ? device.label || device.deviceId : undefined;

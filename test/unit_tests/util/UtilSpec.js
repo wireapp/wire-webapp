@@ -152,6 +152,65 @@ describe('z.util.renderMessage', () => {
     expect(z.util.renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
   /* eslint-enable no-useless-escape */
+
+  describe('Mentions', () => {
+    const tests = [
+      {
+        expected:
+          'bonjour <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id"><span class="mention-at-sign">@</span>felix</span>',
+        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}],
+        testCase: 'replaces single mention in simple text',
+        text: 'bonjour @felix',
+      },
+      {
+        expected:
+          'bonjour <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id"><span class="mention-at-sign">@</span>felix</span>, tu vas bien <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id"><span class="mention-at-sign">@</span>felix</span>?',
+        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}, {length: 6, startIndex: 28, userId: 'user-id'}],
+        testCase: 'replaces two mentions to same user in simple text',
+        text: 'bonjour @felix, tu vas bien @felix?',
+      },
+      {
+        expected:
+          'salut <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>&#x60;I am a **pain** in the __a**__&#x60;</span>',
+        mentions: [{length: 33, startIndex: 6, userId: 'pain-id'}],
+        testCase: "doesn't parse markdown in user names",
+        text: 'salut @`I am a **pain** in the __a**__`',
+      },
+      {
+        expected:
+          '<strong>salut</strong> <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>you</span>',
+        mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
+        testCase: 'parses markdown outside of mentions',
+        text: '**salut** @you',
+      },
+      {
+        expected:
+          '<strong>salut</strong> <span class="message-mention self-mention" data-uie-name="label-self-mention"><span class="mention-at-sign">@</span>you</span> and <span class="message-mention" data-uie-name="label-other-mention" data-user-id="toi-id"><span class="mention-at-sign">@</span>toi</span>',
+        mentions: [{length: 4, startIndex: 10, userId: 'self-id'}, {length: 4, startIndex: 19, userId: 'toi-id'}],
+        testCase: 'displays self mentions differently',
+        text: '**salut** @you and @toi',
+      },
+      {
+        expected:
+          'salut<br /><pre><code><span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>you</span><br /></code></pre>',
+        mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
+        testCase: 'displays mention inside code block',
+        text: 'salut\n```\n@you\n```',
+      },
+    ];
+
+    tests.forEach(({expected, mentions, testCase, text}) => {
+      const mentionEntities = mentions.map(mention => {
+        const mentionEntity = new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+        return mentionEntity;
+      });
+
+      it(testCase, () => {
+        const result = z.util.renderMessage(text, 'self-id', mentionEntities);
+        expect(result).toEqual(expected);
+      });
+    });
+  });
 });
 
 describe('z.util.arrayToMd5Base64', () => {

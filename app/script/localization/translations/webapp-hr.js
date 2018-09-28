@@ -280,7 +280,7 @@ z.string.hr.conversationsPopoverNotify = 'Uključi zvuk';
 z.string.hr.conversationsPopoverSilence = 'Isključi zvuk';
 z.string.hr.conversationsPopoverUnarchive = 'Dearhiviraj';
 
-z.string.hr.conversationsSecondaryLineTimedMessage = 'Odgođeno slanje';
+z.string.hr.conversationsSecondaryLineEphemeralMessage = 'Poslao ti je poruku';
 
 z.string.hr.takeoverSub = 'Zatražite svoje jedinstveno ime na Wire.';
 z.string.hr.takeoverLink = 'Saznaj više';

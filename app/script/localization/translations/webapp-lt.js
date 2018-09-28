@@ -98,13 +98,16 @@ z.string.lt.callAccept = 'Priimti';
 z.string.lt.callJoin = 'Prisijungti';
 z.string.lt.callChooseSharedScreen = 'Pasirinkite ekraną, kurį bendrinti';
 z.string.lt.callParticipants = '{{number}} kalba';
+z.string.lt.callNoCameraAccess = 'Nėra galimybės naudotis kamera';
 
+z.string.lt.videoCallOverlayFitVideoLabel = 'Spustelėkite dukart ir vaizdas bus įtalpintas arba užpildytas';
 z.string.lt.videoCallOverlayConversations = 'Susirašinėjimai';
 z.string.lt.videoCallOverlayMute = 'Nutildyti';
 z.string.lt.videoCallOverlayVideo = 'Vaizdas';
 z.string.lt.videoCallOverlayShareScreen = 'Siųsti ekrano vaizdą';
 z.string.lt.videoCallOverlayHangUp = 'Užbaigti';
 z.string.lt.videoCallPaused = 'Vaizdas pristabdytas';
+z.string.lt.videoCallScreenShareNotSupported = 'Ši naršykle nepalaiko ekrano rodymo';
 
 z.string.lt.modalAcknowledgeAction = 'Gerai';
 z.string.lt.modalAcknowledgeHeadline = 'Kažkas nutiko';
@@ -273,6 +276,9 @@ z.string.lt.modalUserUnblockAction = 'Atblokuoti';
 z.string.lt.modalUserUnblockHeadline = 'Atblokuoti?';
 z.string.lt.modalUserUnblockMessage = '{{user}} galės ir vėl su jumis susisiekti ar pridėti jus į grupės pokalbius.';
 
+z.string.lt.modalNoCameraTitle = 'Nėra galimybės naudotis kamera';
+z.string.lt.modalNoCameraMessage = '„Wire“ neturi galimybės prisijungti prie kameros.[br][faqLink]Perskaitykite šį pagalbos straipsnį[/faqLink] ir sužinosite, kaip tai sutvarkyti.';
+
 z.string.lt.connectionRequestConnect = 'Užmegzti kontaktą';
 z.string.lt.connectionRequestIgnore = 'Nepaisyti';
 
@@ -358,6 +364,7 @@ z.string.lt.conversationLikesCaption = '{{number}} žmonėms';
 z.string.lt.conversationSendPastedFile = 'Paveikslas įdėtas {{date}}';
 z.string.lt.conversationSomeone = 'Kažkas';
 z.string.lt.conversationTweetAuthor = ' socialiniame tinkle Twitter';
+z.string.lt.conversationServicesWarning = 'Tarnybos turi galimybę prisijungti prie šio susirašinėjimo turinio';
 
 z.string.lt.groupCreationPreferencesAction = 'Kitas';
 z.string.lt.groupCreationPreferencesErrorNameShort = 'Bent 1 simbolis';
@@ -377,6 +384,8 @@ z.string.lt.guestRoomToggleInfo = 'Leiskite žmonėms nesantiems jūsų komandoj
 z.string.lt.guestRoomToggleInfoExtended = 'Leiskite žmonėms nesantiems jūsų komandoje prisijungti. Bet kada galėsite tai pakeisti.';
 
 z.string.lt.guestRoomConversationBadge = 'Yra svečių';
+z.string.lt.guestRoomConversationBadgeService = 'Tarnybos aktyvios';
+z.string.lt.guestRoomConversationBadgeGuestAndService = 'Yra svečių ir tarnybų';
 
 z.string.lt.guestRoomConversationHead = 'Žmonės nesantys jūsų komandoje gali prisijungti prie susirašinėjimo.';
 z.string.lt.guestRoomConversationButton = 'Kviesti žmonių';
@@ -407,13 +416,8 @@ z.string.lt.conversationsPopoverNotify = 'Įjungti susirašinėjimo pranešimus'
 z.string.lt.conversationsPopoverSilence = 'Išjungti susirašinėjimo pranešimus';
 z.string.lt.conversationsPopoverUnarchive = 'Išimti susirašinėjimą iš archyvo';
 
+z.string.lt.conversationsSecondaryLineEphemeralMessage = 'Išsiuntė jums žinutę';
 z.string.lt.conversationsSecondaryLineIncomingCall = '{{user}} jums skambina';
-z.string.lt.conversationsSecondaryLineMissedCall = '{{number}} praleistas skambutis';
-z.string.lt.conversationsSecondaryLineMissedCalls = '{{number}} praleistų skambučių';
-z.string.lt.conversationsSecondaryLineNewMessage = '{{number}} nauja žinutė';
-z.string.lt.conversationsSecondaryLineNewMessages = '{{number}} naujų žinučių';
-z.string.lt.conversationsSecondaryLinePing = '{{number}} ryšio tikrinimas';
-z.string.lt.conversationsSecondaryLinePings = '{{number}} ryšio tikrinimų';
 z.string.lt.conversationsSecondaryLinePeopleLeft = '{{number}} žmonių išėjo';
 z.string.lt.conversationsSecondaryLinePersonLeft = '{{user}} išėjo';
 z.string.lt.conversationsSecondaryLinePersonRemoved = '{{user}} buvo pašalinta(-s)';
@@ -423,7 +427,6 @@ z.string.lt.conversationsSecondaryLinePersonAdded = '{{user}} buvo pridėta(-s)'
 z.string.lt.conversationsSecondaryLinePersonAddedSelf = '{{user}} prisijungė';
 z.string.lt.conversationsSecondaryLinePersonAddedYou = '{{user}} pridėjo jus';
 z.string.lt.conversationsSecondaryLineRenamed = '{{user}} pervadino pokalbį';
-z.string.lt.conversationsSecondaryLineTimedMessage = 'Laikina žinutė';
 z.string.lt.conversationsSecondaryLineYouLeft = 'Jūs išėjote';
 z.string.lt.conversationsSecondaryLineYouWereRemoved = 'Jūs buvote pašalinti';
 
@@ -451,6 +454,10 @@ z.string.lt.extensionsGiphyRandom = 'Atsitiktinis';
 z.string.lt.addParticipantsConfirmLabel = 'Pridėti';
 z.string.lt.addParticipantsHeader = 'Pridėti žmonių';
 z.string.lt.addParticipantsHeaderWithCounter = 'Pridėti žmonių ({{number}})';
+z.string.lt.addParticipantsManageServices = 'Valdyti tarnybas';
+z.string.lt.addParticipantsManageServicesNoResults = 'Valdyti tarnybas';
+z.string.lt.addParticipantsNoServicesManager = 'Tarnybos yra pagalbininkai, kurie padeda pagerinti darbo eigą.';
+z.string.lt.addParticipantsNoServicesMember = 'Tarnybos yra pagalbininkai, kurie padeda pagerinti darbo eigą. Norėdami jomis naudotis, prašykite savo administratoriaus.';
 z.string.lt.addParticipantsSearchPlaceholder = 'Ieškokite pagal vardą';
 z.string.lt.addParticipantsServiceConfirmButton = 'Pridėti paslaugą';
 z.string.lt.addParticipantsTabsPeople = 'Žmonės';
@@ -564,6 +571,7 @@ z.string.lt.preferencesAVMicrophone = 'Mikrofonas';
 z.string.lt.preferencesAVPermissionDetail = 'Įjunkite savo naršyklės nuostatose';
 z.string.lt.preferencesAVSpeakers = 'Garsiakalbiai';
 z.string.lt.preferencesAVTemporaryDisclaimer = 'Svečiai negali pradėti vaizdo konferencijų. Pasirinkite norimą kamerą jei prisijungiate.';
+z.string.lt.preferencesAVNoCamera = '„Wire“ neturi galimybės prisijungti prie kameros.[br][faqLink]Perskaitykite šį pagalbos straipsnį[/faqLink] ir sužinosite, kaip tai sutvarkyti.';
 z.string.lt.preferencesAVTryAgain = 'Bandykite dar kartą';
 
 z.string.lt.preferencesDevicesActivatedIn = 'šalia {{location}}';
@@ -648,6 +656,10 @@ z.string.lt.searchPeople = 'Žmonės';
 z.string.lt.searchPlaceholder = 'Ieškokite pagal vardą ar naudotojo vardą';
 z.string.lt.searchServicePlaceholder = 'Ieškokite pagal vardą';
 z.string.lt.searchServices = 'Paslaugos';
+z.string.lt.searchManageServices = 'Valdyti tarnybas';
+z.string.lt.searchManageServicesNoResults = 'Valdyti tarnybas';
+z.string.lt.searchNoServicesManager = 'Tarnybos yra pagalbininkai, kurie padeda pagerinti darbo eigą.';
+z.string.lt.searchNoServicesMember = 'Tarnybos yra pagalbininkai, kurie padeda pagerinti darbo eigą. Norėdami jomis naudotis, prašykite savo administratoriaus.';
 z.string.lt.searchTeamGroups = 'Komandos pokalbiai';
 z.string.lt.searchTeamMembers = 'Komandos dalyviai';
 z.string.lt.searchTopPeople = 'Svarbiausi žmonės';

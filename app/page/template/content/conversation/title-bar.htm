@@ -9,7 +9,7 @@
     </div>
 
     <div id="show-participants"
-          data-bind=" clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip}"
+          data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip}"
           data-placement="bottom"
           data-uie-name="do-participants"
           class="conversation-title-bar-name">
@@ -31,18 +31,6 @@
               data-bind="clickOrDrag: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
               data-uie-name="do-call">
         </pickup-icon>
-      <!-- /ko -->
-      <!-- ko if: hasOngoingCall() -->
-        <!-- ko if: selfStreamState.screenSend() -->
-          <span class="conversation-title-bar-icon button-icon-large icon-screensharing"
-            data-uie-name="status-self-screensharing">
-          </span>
-        <!-- /ko -->
-        <!-- ko if: selfStreamState.videoSend() -->
-          <span class="conversation-title-bar-icon button-icon-large icon-video"
-                data-uie-name="status-self-video">
-          </span>
-        <!-- /ko -->
       <!-- /ko -->
       <info-icon class="conversation-title-bar-icon" data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}" data-uie-name="do-open-info"></info-icon>
     </div>

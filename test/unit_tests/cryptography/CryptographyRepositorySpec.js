@@ -24,12 +24,10 @@
 describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    z.util.protobuf
-      .loadProtos('ext/proto/generic-message-proto/messages.proto')
-      .then(() => test_factory.exposeCryptographyActors(false))
-      .then(done)
-      .catch(done.fail);
+  beforeAll(() => {
+    return z.util.protobuf
+      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .then(() => test_factory.exposeCryptographyActors(false));
   });
 
   describe('encryptGenericMessage', () => {

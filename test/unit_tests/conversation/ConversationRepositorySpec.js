@@ -43,7 +43,7 @@ describe('ConversationRepository', () => {
   };
 
   const _generate_conversation = (
-    conversation_type = z.conversation.ConversationType.REGULAR,
+    conversation_type = z.conversation.ConversationType.GROUP,
     connection_status = z.user.ConnectionStatus.ACCEPTED
   ) => {
     const conversation = new z.entity.Conversation(z.util.createRandomUuid());
@@ -57,12 +57,7 @@ describe('ConversationRepository', () => {
     return conversation;
   };
 
-  beforeAll(done => {
-    z.util.protobuf
-      .loadProtos('ext/proto/generic-message-proto/messages.proto')
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
   beforeEach(done => {
     server = sinon.fakeServer.create();
@@ -109,7 +104,7 @@ describe('ConversationRepository', () => {
     let message_et = null;
 
     beforeEach(done => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       TestFactory.conversation_repository
         .save_conversation(conversation_et)
         .then(() => {
@@ -159,9 +154,9 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('delete_message_everyone', () => {
+  describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       spyOn(TestFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
@@ -173,7 +168,7 @@ describe('ConversationRepository', () => {
       conversation_et.add_message(message_to_delete_et);
 
       TestFactory.conversation_repository
-        .delete_message_everyone(conversation_et, message_to_delete_et)
+        .deleteMessageForEveryone(conversation_et, message_to_delete_et)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
@@ -196,7 +191,7 @@ describe('ConversationRepository', () => {
       expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
 
       return TestFactory.conversation_repository
-        .delete_message_everyone(conversation_et, messageEntityToDelete)
+        .deleteMessageForEveryone(conversation_et, messageEntityToDelete)
         .then(() => {
           expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined();
         });
@@ -310,23 +305,23 @@ describe('ConversationRepository', () => {
 
   describe('getGroupsByName', () => {
     beforeEach(done => {
-      const group_a = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_a = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_a.name('Web Dudes');
 
-      const group_b = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_b = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_b.name('René, Benny, Gregor, Lipis');
 
-      const group_c = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_c = _generate_conversation(z.conversation.ConversationType.GROUP);
       self_user_et = new z.entity.User();
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
-      const group_cleared = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
 
-      const group_removed = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
@@ -372,16 +367,16 @@ describe('ConversationRepository', () => {
 
   describe('get_number_of_pending_uploads', () => {
     it('should return number of pending uploads if there are pending uploads', () => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
-      conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
@@ -483,7 +478,7 @@ describe('ConversationRepository', () => {
 
   describe('"_handleConversationEvent"', () => {
     it('detects events send by a user not in the conversation', () => {
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
       const event = {
         conversation: conversationEntity.id,
         from: z.util.createRandomUuid(),
@@ -501,9 +496,11 @@ describe('ConversationRepository', () => {
       );
 
       return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
-        expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(event.conversation, [
-          event.from,
-        ]);
+        expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
+          event.conversation,
+          [event.from],
+          new Date(event.time).getTime() - 1
+        );
       });
     });
 
@@ -781,7 +778,7 @@ describe('ConversationRepository', () => {
       let message_et = undefined;
 
       beforeEach(done => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
         TestFactory.conversation_repository
           .save_conversation(conversation_et)
           .then(() => {
@@ -909,7 +906,7 @@ describe('ConversationRepository', () => {
       let messageId = null;
 
       beforeEach(done => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
+        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
 
         TestFactory.conversation_repository
           .save_conversation(conversation_et)
@@ -1004,57 +1001,43 @@ describe('ConversationRepository', () => {
   });
 
   describe('_shouldSendAsExternal', () => {
-    it('should return true for big payload', done => {
-      const external_conversation_et = _generate_conversation();
-      external_conversation_et.participating_user_ids(_.range(128));
+    it('should return true for big payload', () => {
+      const largeConversationEntity = _generate_conversation();
+      largeConversationEntity.participating_user_ids(_.range(128));
 
-      TestFactory.conversation_repository
-        .save_conversation(external_conversation_et)
+      return TestFactory.conversation_repository
+        .save_conversation(largeConversationEntity)
         .then(() => {
-          const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-          generic_message.set(
-            z.cryptography.GENERIC_MESSAGE_TYPE.TEXT,
-            new z.proto.Text(
-              'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
-            )
+          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+          const text = new z.proto.Text(
+            'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
           );
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, text);
 
-          return TestFactory.conversation_repository._shouldSendAsExternal(
-            external_conversation_et.id,
-            generic_message
-          );
+          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
+          return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(should_send_as_external => {
-          expect(should_send_as_external).toBeTruthy();
-          done();
-        })
-        .catch(done.fail);
+        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeTruthy());
     });
 
-    it('should return false for small payload', done => {
-      const external_conversation_et = _generate_conversation();
-      external_conversation_et.participating_user_ids([0, 1]);
+    it('should return false for small payload', () => {
+      const smallConversationEntity = _generate_conversation();
+      smallConversationEntity.participating_user_ids([0, 1]);
 
-      TestFactory.conversation_repository
-        .save_conversation(external_conversation_et)
+      return TestFactory.conversation_repository
+        .save_conversation(smallConversationEntity)
         .then(() => {
-          const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
+          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
 
-          return TestFactory.conversation_repository._shouldSendAsExternal(
-            external_conversation_et.id,
-            generic_message
-          );
+          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
+          return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(should_send_as_external => {
-          expect(should_send_as_external).toBeFalsy();
-          done();
-        })
-        .catch(done.fail);
+        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeFalsy());
     });
   });
 
-  describe('send_text_with_link_preview', () => {
+  describe('sendTextWithLinkPreview', () => {
     it('sends ephemeral message (within the range [1 second, 1 year])', () => {
       const conversationRepository = TestFactory.conversation_repository;
       const conversation = _generate_conversation();
@@ -1085,8 +1068,8 @@ describe('ConversationRepository', () => {
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
         conversation.self = {id: 'felix'};
-        const message = 'hello there';
-        return conversationRepository.send_text_with_link_preview(message, conversation);
+        const messageText = 'hello there';
+        return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });
       return Promise.all(sentPromises).then(sentMessages => {
         expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
@@ -1128,18 +1111,18 @@ describe('ConversationRepository', () => {
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);
 
-      const dudes = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const dudes = _generate_conversation(z.conversation.ConversationType.GROUP);
       dudes.name('Web Dudes');
       dudes.participating_user_ets.push(bob);
       dudes.participating_user_ets.push(john);
 
-      const gals = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const gals = _generate_conversation(z.conversation.ConversationType.GROUP);
       gals.name('Web Gals');
       gals.participating_user_ets.push(anne);
       gals.participating_user_ets.push(jane);
       gals.participating_user_ets.push(lara);
 
-      const mixed_group = _generate_conversation(z.conversation.ConversationType.REGULAR);
+      const mixed_group = _generate_conversation(z.conversation.ConversationType.GROUP);
       mixed_group.name('Web Dudes & Gals');
       mixed_group.participating_user_ets.push(anne);
       mixed_group.participating_user_ets.push(bob);

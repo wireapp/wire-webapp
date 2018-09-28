@@ -108,6 +108,12 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     }
   }
 
+  isUserMentioned(userId) {
+    return this.has_asset_text()
+      ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isUserMentioned(userId))
+      : false;
+  }
+
   /**
    * Check whether the message was edited.
    * @returns {boolean} True, if message has been edited.

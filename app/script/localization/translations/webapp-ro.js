@@ -323,12 +323,7 @@ z.string.ro.conversationsPopoverNotify = 'Demutizează';
 z.string.ro.conversationsPopoverSilence = 'Mutizează';
 z.string.ro.conversationsPopoverUnarchive = 'Dezarhivează';
 
-z.string.ro.conversationsSecondaryLineMissedCall = '{{number}} apel pierdut';
-z.string.ro.conversationsSecondaryLineMissedCalls = '{{number}} apeluri pierdute';
-z.string.ro.conversationsSecondaryLineNewMessage = '{{number}} mesaj nou';
-z.string.ro.conversationsSecondaryLineNewMessages = '{{number}} mesaje noi';
-z.string.ro.conversationsSecondaryLinePing = '{{number}} ping';
-z.string.ro.conversationsSecondaryLinePings = '{{number}} pinguri';
+z.string.ro.conversationsSecondaryLineEphemeralMessage = 'Ți-a trimis un mesaj';
 z.string.ro.conversationsSecondaryLinePeopleLeft = '{{number}} persoane au plecat';
 z.string.ro.conversationsSecondaryLinePersonLeft = '{{user}} a ieșit';
 z.string.ro.conversationsSecondaryLinePersonRemoved = '{{user}} a fost scos din conversație';
@@ -336,7 +331,6 @@ z.string.ro.conversationsSecondaryLinePeopleAdded = '{{user}} persoane au fost a
 z.string.ro.conversationsSecondaryLinePersonAdded = '{{user}} a fost adăugat';
 z.string.ro.conversationsSecondaryLinePersonAddedYou = '{{user}} te-a adăugat';
 z.string.ro.conversationsSecondaryLineRenamed = '{{user}} a redenumit conversația';
-z.string.ro.conversationsSecondaryLineTimedMessage = 'Mesaj temporizat';
 z.string.ro.conversationsSecondaryLineYouLeft = 'Ai ieșit';
 z.string.ro.conversationsSecondaryLineYouWereRemoved = 'Ai fost scos din conversație';
 

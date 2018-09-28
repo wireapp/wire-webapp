@@ -125,7 +125,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
       const conversationEntity = this.conversationRepository.active_conversation();
       this.sendingGiphyMessage = true;
 
-      this.conversationRepository.send_gif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
+      this.conversationRepository.sendGif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
         this.sendingGiphyMessage = false;
         amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
       });
@@ -134,9 +134,9 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     }
   }
 
-  showGiphy() {
+  showGiphy(query) {
     this.sendingGiphyMessage = false;
-    this.query(this.conversationRepository.active_conversation().input());
+    this.query(query);
     this.state(GiphyViewModel.STATE.DEFAULT);
     this._getRandomGif();
 

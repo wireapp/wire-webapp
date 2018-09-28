@@ -172,7 +172,8 @@ z.main.App = class App {
     repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
       repositories.conversation,
-      repositories.permission
+      repositories.permission,
+      repositories.user
     );
     repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 
@@ -263,7 +264,7 @@ z.main.App = class App {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-        const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
+        const protoFile = `ext/proto/@wireapp/protocol-messaging/messages.proto?${z.util.Environment.version(false)}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {

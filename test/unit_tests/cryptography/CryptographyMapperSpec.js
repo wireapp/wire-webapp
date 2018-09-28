@@ -38,12 +38,7 @@ describe('z.cryptography.CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
-    beforeAll(done => {
-      z.util.protobuf
-        .loadProtos('ext/proto/generic-message-proto/messages.proto')
-        .then(done)
-        .catch(done.fail);
-    });
+    beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
     it('resolves with a mapped original asset message', done => {
       const original = {
@@ -268,10 +263,8 @@ describe('z.cryptography.CryptographyMapper', () => {
       const conversation_id = z.util.createRandomUuid();
       const message_id = z.util.createRandomUuid();
       const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN,
-        new z.proto.MessageHide(conversation_id, message_id)
-      );
+      const messageHide = new z.proto.MessageHide(conversation_id, message_id);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN, messageHide);
 
       mapper
         .mapGenericMessage(generic_message, event)
@@ -494,10 +487,8 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('resolves with a mapped reaction message', done => {
       const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.REACTION,
-        new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id)
-      );
+      const reaction = new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.REACTION, reaction);
 
       mapper
         .mapGenericMessage(generic_message, event)
@@ -601,10 +592,8 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('resolves with a mapped location message', done => {
       const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION,
-        new z.proto.Location(52.520645, 13.409779, 'Berlin', 1)
-      );
+      const location = new z.proto.Location(52.520645, 13.409779, 'Berlin', 1);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, location);
 
       mapper
         .mapGenericMessage(generic_message, event)
@@ -653,10 +642,8 @@ describe('z.cryptography.CryptographyMapper', () => {
       };
 
       const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
-        new z.proto.Calling(JSON.stringify(content_message))
-      );
+      const calling = new z.proto.Calling(JSON.stringify(content_message));
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, calling);
 
       mapper
         .mapGenericMessage(generic_message, event)

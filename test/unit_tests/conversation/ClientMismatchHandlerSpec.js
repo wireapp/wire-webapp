@@ -26,12 +26,7 @@ describe('ClientMismatchHandler', () => {
 
   let conversationEntity = undefined;
 
-  beforeAll(done => {
-    z.util.protobuf
-      .loadProtos('ext/proto/generic-message-proto/messages.proto')
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
   beforeEach(done => {
     testFactory
@@ -104,12 +99,17 @@ describe('ClientMismatchHandler', () => {
       spyOn(TestFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
 
+      const timestamp = new Date(clientMismatch.time).getTime();
+      const eventInfoEntity = new z.conversation.EventInfoEntity(undefined, conversationId);
+      eventInfoEntity.setTimestamp(timestamp);
       return TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, null, payload, conversationId)
+        .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(() => {
-          expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(conversationId, [
-            unknownUserId,
-          ]);
+          expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
+            conversationId,
+            [unknownUserId],
+            timestamp - 1
+          );
         });
     });
 
@@ -151,8 +151,9 @@ describe('ClientMismatchHandler', () => {
       TestFactory.cryptography_repository.createCryptobox.and.callThrough();
 
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db).then(() => {
+        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
         return TestFactory.conversation_repository.clientMismatchHandler
-          .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
+          .onClientMismatch(eventInfoEntity, clientMismatch, payload)
           .then(updatedPayload => {
             expect(Object.keys(updatedPayload.recipients).length).toBe(2);
             expect(Object.keys(updatedPayload.recipients[johnDoe.user_id]).length).toBe(1);
@@ -160,7 +161,7 @@ describe('ClientMismatchHandler', () => {
       });
     });
 
-    it('should remove the payload of deleted clients', done => {
+    it('should remove the payload of deleted clients', () => {
       clientMismatch = {
         deleted: {
           [janeRoe.user_id]: [`${janeRoe.client_id}`],
@@ -170,17 +171,16 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
+      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+      return TestFactory.conversation_repository.clientMismatchHandler
+        .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updatedPayload => {
           expect(TestFactory.user_repository.remove_client_from_user).toHaveBeenCalled();
           expect(Object.keys(updatedPayload.recipients).length).toBe(0);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
 
-    it('should remove the payload of redundant clients', done => {
+    it('should remove the payload of redundant clients', () => {
       clientMismatch = {
         deleted: {},
         missing: {},
@@ -190,14 +190,13 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
+      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+      return TestFactory.conversation_repository.clientMismatchHandler
+        .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updated_payload => {
           expect(TestFactory.user_repository.remove_client_from_user).not.toHaveBeenCalled();
           expect(Object.keys(updated_payload.recipients).length).toBe(0);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
   });
 });

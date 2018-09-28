@@ -318,12 +318,7 @@ z.string.el.conversationsPopoverNotify = 'Ενεργή ένταση';
 z.string.el.conversationsPopoverSilence = 'Σίγαση';
 z.string.el.conversationsPopoverUnarchive = 'Αναίρεση αρχειοθέτησης';
 
-z.string.el.conversationsSecondaryLineMissedCall = '{{number}} αναπάντητη κλήση';
-z.string.el.conversationsSecondaryLineMissedCalls = '{{number}} αναπάντητες κλήσεις';
-z.string.el.conversationsSecondaryLineNewMessage = '{{number}} νέο μήνυμα';
-z.string.el.conversationsSecondaryLineNewMessages = '{{number}} νέα μηνύματα';
-z.string.el.conversationsSecondaryLinePing = '{{number}} κουδούνισμα';
-z.string.el.conversationsSecondaryLinePings = '{{number}} κουδουνίσματα';
+z.string.el.conversationsSecondaryLineEphemeralMessage = 'Σας έστειλε ένα μήνυμα';
 z.string.el.conversationsSecondaryLinePeopleLeft = '{{number}} άτομα αποχώρησαν';
 z.string.el.conversationsSecondaryLinePersonLeft = '{{user}} αποχώρησε';
 z.string.el.conversationsSecondaryLinePersonRemoved = '{{user}} αφαιρέθηκε';
@@ -331,7 +326,6 @@ z.string.el.conversationsSecondaryLinePeopleAdded = '{{user}} άτομο προ�
 z.string.el.conversationsSecondaryLinePersonAdded = '{{user}} προστέθηκε';
 z.string.el.conversationsSecondaryLinePersonAddedYou = '{{user}} σας πρόσθεσε';
 z.string.el.conversationsSecondaryLineRenamed = '{{user}} μετονόμασε την συνομιλία';
-z.string.el.conversationsSecondaryLineTimedMessage = 'Προσωρινό μήνυμα';
 z.string.el.conversationsSecondaryLineYouLeft = 'Αποχωρήσατε';
 z.string.el.conversationsSecondaryLineYouWereRemoved = 'Σας αφαίρεσαν';
 

@@ -33,16 +33,17 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
+    this.bindShowMore = this.bindShowMore.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
     this.get_timestamp_class = this.get_timestamp_class.bind(this);
+    this.handleClickOnMessage = this.handleClickOnMessage.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
     this.on_context_menu_click = this.on_context_menu_click.bind(this);
-    this.onMessageUserClick = this.onMessageUserClick.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
-    this.bindShowMore = this.bindShowMore.bind(this);
+    this.showUserDetails = this.showUserDetails.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
@@ -185,7 +186,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.marked_message(messageEntity);
 
     // Keep last read timestamp to render unread when entering conversation
-    if (this.conversation().unread_event_count()) {
+    if (this.conversation().unreadEventsCount()) {
       this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
     }
 
@@ -397,7 +398,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @param {z.entity.User} userEntity - User entity of the selected user
    * @returns {undefined} No return value
    */
-  onMessageUserClick(userEntity) {
+  showUserDetails(userEntity) {
     userEntity = ko.unwrap(userEntity);
     const conversationEntity = this.conversation_repository.active_conversation();
     const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
@@ -607,6 +608,24 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     z.ui.Context.from(event, entries, 'message-options-menu');
+  }
+
+  handleClickOnMessage(messageEntity, event) {
+    const hasMentions = messageEntity.mentions().length;
+    const mentionElement = hasMentions && event.target.closest('.message-mention');
+    if (mentionElement) {
+      this.userRepository
+        .get_user_by_id(mentionElement.dataset.userId)
+        .then(userEntity => this.showUserDetails(userEntity))
+        .catch(error => {
+          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+            throw error;
+          }
+        });
+    }
+
+    // need to return `true` because knockout will prevent default if we return anything else (including undefined)
+    return true;
   }
 
   bindShowMore(elements, message) {
