@@ -175,12 +175,8 @@ ko.bindingHandlers.resize = (function() {
           element,
           {
             event: {
-              focus() {
-                throttledResizeTextarea(element);
-              },
-              input() {
-                throttledResizeTextarea(element);
-              },
+              focus: () => throttledResizeTextarea(element),
+              input: () => throttledResizeTextarea(element),
             },
           },
           context
