@@ -47,6 +47,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
+    this._setElements = this._setElements.bind(this);
+
+    this.textarea = null;
+    this.shadowInput = null;
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
@@ -137,12 +141,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.richTextInput.subscribe(() => {
-      const textarea = this.getTextArea();
-      const shadowInput = document.querySelector('.shadow-input');
-      if (textarea && shadowInput) {
+      if (this.textarea && this.shadowInput) {
         z.util.afterRender(() => {
-          if (shadowInput.scrollTop !== textarea.scrollTop) {
-            shadowInput.scrollTop = textarea.scrollTop;
+          if (this.shadowInput.scrollTop !== this.textarea.scrollTop) {
+            this.shadowInput.scrollTop = this.textarea.scrollTop;
           }
         });
       }
@@ -233,6 +235,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
   }
 
+  _setElements(nodes) {
+    this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text');
+    this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input'));
+  }
+
   loadInitialStateForConversation(conversationEntity) {
     this.conversationHasFocus(true);
     this.pastedFile(null);
@@ -283,10 +290,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
-  }
-
-  getTextArea() {
-    return document.querySelector('#conversation-input-bar-text');
   }
 
   addMention(userEntity, inputElement) {
@@ -357,9 +360,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
-      const inputElement = this.getTextArea();
-      if (inputElement) {
-        this._moveCursorToEnd(inputElement);
+      if (this.textarea) {
+        this._moveCursorToEnd(this.textarea);
       }
     }
   }
@@ -507,18 +509,17 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   handleMentionFlow() {
-    const {selectionStart, selectionEnd, value} = this.getTextArea();
+    const {selectionStart, selectionEnd, value} = this.textarea;
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
   }
 
   updateSelectionState() {
-    const textarea = this.getTextArea();
-    if (!textarea) {
+    if (!this.textarea) {
       return;
     }
-    const {selectionStart, selectionEnd} = textarea;
+    const {selectionStart, selectionEnd} = this.textarea;
     const defaultRange = {endIndex: 0, startIndex: Infinity};
 
     const firstMention = this.findMentionAtPosition(selectionStart, this.currentMentions()) || defaultRange;
@@ -529,9 +530,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const newStart = Math.min(mentionStart, selectionStart);
     const newEnd = Math.max(mentionEnd, selectionEnd);
-    if (newStart !== textarea.selectionStart || newEnd !== textarea.selectionEnd) {
-      textarea.selectionStart = newStart;
-      textarea.selectionEnd = newEnd;
+    if (newStart !== selectionStart || newEnd !== selectionEnd) {
+      this.textarea.selectionStart = newStart;
+      this.textarea.selectionEnd = newEnd;
     }
     this.selectionStart(newStart);
     this.selectionEnd(newEnd);
