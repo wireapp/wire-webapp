@@ -12,7 +12,7 @@
     </div>
 
     <!-- ko if: !conversationEntity().removed_from_conversation() -->
-      <div class="controls-center">
+      <div class="controls-center" data-bind="template: {afterRender: setElements}">
         <textarea id="conversation-input-bar-text"
                   class="conversation-input-bar-text border-theme"
                   data-bind="event: {'keydown': onInputKeyDown, 'keyup': onInputKeyUp, 'select click': handleMentionFlow, 'input': updateMentions},
@@ -20,7 +20,7 @@
                              enter: onInputEnter,
                              hasFocus: hasFocus,
                              textInput: input,
-                             resize: {triggerValue: input(), callback: scrollMessageList, syncElement: '.shadow-input'},
+                             resize: {triggerValue: input(), callback: scrollMessageList, syncElement: '.shadow-input', delayedResize: true},
                              click: onInputClick,
                              attr: {'placeholder': inputPlaceholder},
                              css: {'conversation-input-bar-text--accent': hasLocalEphemeralTimer()},
