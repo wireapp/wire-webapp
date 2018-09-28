@@ -21,7 +21,7 @@
     "@babel/core": "7.1.0",
     "@babel/preset-react": "7.0.0",
     "@wireapp/react-ui-kit": "4.0.13",
-    "babel-loader": "8.0.2",
+    "babel-loader": "8.0.4",
     "browser-sync": "2.24.7",
     "concurrently": "4.0.1",
     "cross-env": "5.2.0",
