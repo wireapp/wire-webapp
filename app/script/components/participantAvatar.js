@@ -179,15 +179,16 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       _loadAvatarPicture();
     };
 
-    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
-
-    this.pictureSubscription = this.participant().mediumPictureResource.subscribe(() => {
+    const _loadAvatarPictureIfVisible = () => {
       if (this.avatarEnteredViewport) {
         _loadAvatarPicture();
       }
-    });
+    };
 
-    this.participantSubscription = this.participant.subscribe(() => _loadAvatarPicture());
+    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
+
+    this.pictureSubscription = this.participant().mediumPictureResource.subscribe(_loadAvatarPictureIfVisible);
+    this.participantSubscription = this.participant.subscribe(_loadAvatarPictureIfVisible);
   }
 
   dispose() {

@@ -131,8 +131,9 @@ ko.bindingHandlers.resize = (function() {
   let triggerValue = null;
   let callback = null;
   let syncElement = null;
+  let throttledResizeTextarea = undefined;
 
-  const resizeTextarea = _.throttle(element => {
+  const resizeTextarea = element => {
     element.style.height = 0;
     const newStyleHeight = `${element.scrollHeight}px`;
     element.style.height = newStyleHeight;
@@ -159,7 +160,7 @@ ko.bindingHandlers.resize = (function() {
       }
       $(element).scroll();
     }
-  }, 100);
+  };
 
   return {
     init(element, valueAccessor, allBindings, data, context) {
@@ -168,18 +169,15 @@ ko.bindingHandlers.resize = (function() {
       triggerValue = params.triggerValue;
       syncElement = document.querySelector(params.syncElement);
       callback = params.callback;
+      throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
 
       if (triggerValue === undefined) {
         return ko.applyBindingsToNode(
           element,
           {
             event: {
-              focus() {
-                resizeTextarea(element);
-              },
-              input() {
-                resizeTextarea(element);
-              },
+              focus: () => throttledResizeTextarea(element),
+              input: () => throttledResizeTextarea(element),
             },
           },
           context
@@ -188,11 +186,10 @@ ko.bindingHandlers.resize = (function() {
     },
 
     update(element, valueAccessor) {
-      const params = ko.unwrap(valueAccessor()) || {};
-      triggerValue = params.triggerValue;
-      syncElement = document.querySelector(params.syncElement);
-      callback = params.callback;
-      resizeTextarea(element);
+      // we need to consume the `valueAccessor` here in order
+      // for knockout to trigger this function (even if we actually don't need the value)
+      ko.unwrap(valueAccessor());
+      throttledResizeTextarea(element);
     },
   };
 })();
