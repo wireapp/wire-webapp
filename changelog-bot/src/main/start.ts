@@ -17,40 +17,53 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
+
 import {ChangelogBot} from './ChangelogBot';
-import {ChangelogData} from './ChangelogData';
+import {ChangelogData, LoginDataBackend, Parameters} from './interfaces';
 
-export async function start(parameters: {[index: string]: string}): Promise<void> {
-  const {conversationIds, email, password} = parameters;
-  const {TRAVIS_COMMIT_RANGE, TRAVIS_REPO_SLUG} = process.env;
+export async function start(parameters: Parameters): Promise<void> {
+  const {backend, conversationIds, email, password, travisCommitRange, travisRepoSlug} = parameters;
+  let message = parameters.message;
+  const isCustomMessage = !!message;
 
-  const loginData: LoginData = {
+  const loginData: LoginDataBackend = {
+    backend,
     clientType: ClientType.TEMPORARY,
     email,
     password,
   };
 
-  if (!TRAVIS_REPO_SLUG) {
-    throw Error('You need to specify a repository slug. Otherwise this script will not work.');
+  if (!loginData.email) {
+    throw new Error('You need to specify an email address. Otherwise this bot will not work.');
   }
 
-  if (!TRAVIS_COMMIT_RANGE) {
-    throw Error('You need to specify a commit range. Otherwise this script will not work.');
+  if (!loginData.password) {
+    throw new Error('You need to specify a password. Otherwise this bot will not work.');
   }
 
-  const changelog = await ChangelogBot.generateChangelog(TRAVIS_REPO_SLUG, TRAVIS_COMMIT_RANGE);
+  if (!travisRepoSlug) {
+    throw new Error('You need to specify a repository slug. Otherwise this bot will not work.');
+  }
+
+  if (!travisCommitRange) {
+    throw new Error('You need to specify a commit range. Otherwise this bot will not work.');
+  }
+
+  if (!message) {
+    message = await ChangelogBot.generateChangelog(travisRepoSlug, travisCommitRange);
+  }
 
   const messageData: ChangelogData = {
-    content: changelog,
-    repoSlug: TRAVIS_REPO_SLUG,
+    content: message,
+    isCustomMessage,
+    repoSlug: travisRepoSlug,
   };
 
   if (conversationIds) {
-    messageData.conversationIds = conversationIds.replace(' ', '').split(',');
+    messageData.conversationIds = conversationIds.replace(/\s/g, '').split(',');
   }
 
   const bot = new ChangelogBot(loginData, messageData);
-  await bot.sendMessage(parameters.message);
+  await bot.sendMessage();
 }

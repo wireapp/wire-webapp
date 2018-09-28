@@ -17,37 +17,40 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
-import {Account} from '@wireapp/core';
-import {MemoryEngine} from '@wireapp/store-engine';
 import {exec} from 'child_process';
 import * as Changelog from 'generate-changelog';
+import * as logdown from 'logdown';
 import {promisify} from 'util';
-import {ChangelogData} from './ChangelogData';
 
-const logdown = require('logdown');
+import {APIClient} from '@wireapp/api-client';
+import {Account} from '@wireapp/core';
+import {MemoryEngine} from '@wireapp/store-engine';
+import {ChangelogData, LoginDataBackend} from './interfaces';
 
 const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
   logger: console,
   markdown: false,
 });
 
+logger.state.isEnabled = true;
+
 class ChangelogBot {
-  constructor(private readonly loginData: LoginData, private readonly messageData: ChangelogData) {}
+  constructor(private readonly loginData: LoginDataBackend, private readonly messageData: ChangelogData) {}
 
   get message(): string {
-    const {content, repoSlug} = this.messageData;
-    return `\n**Changelog for "${repoSlug}":**\n\n${content}\n`;
+    const {content, isCustomMessage, repoSlug} = this.messageData;
+    return isCustomMessage ? content : `\n**Changelog for "${repoSlug}":**\n\n${content}\n`;
   }
 
-  async sendMessage(customMessage?: string): Promise<void> {
+  async sendMessage(): Promise<void> {
     let {conversationIds} = this.messageData;
 
     const engine = new MemoryEngine();
-    await engine.init('');
+    await engine.init('changelog-bot');
 
-    const client = new APIClient({store: engine, urls: APIClient.BACKEND.PRODUCTION});
+    const backendUrls = this.loginData.backend === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION;
+
+    const client = new APIClient({store: engine, urls: backendUrls});
 
     const account = new Account(client);
     await account.login(this.loginData);
@@ -58,18 +61,17 @@ class ChangelogBot {
       conversationIds = groupConversations.map(conversation => conversation.id);
     }
 
-    await Promise.all(
-      conversationIds.map(async id => {
-        if (!account.service) {
-          throw new Error(`Account service is not set. Not logged in?`);
-        }
-        if (id) {
-          logger.log(`Sending message to conversation ${id} ...`);
-          const textPayload = await account.service.conversation.createText(customMessage || this.message).build();
-          await account.service.conversation.send(id, textPayload);
-        }
-      })
-    );
+    if (!account.service) {
+      throw new Error(`Account service is not set. Not logged in?`);
+    }
+
+    for (const conversationId of conversationIds) {
+      if (conversationId) {
+        logger.log(`Sending message to conversation "${conversationId}" ...`);
+        const textPayload = await account.service.conversation.createText(this.message).build();
+        await account.service.conversation.send(conversationId, textPayload);
+      }
+    }
   }
 
   static async generateChangelog(repoSlug: string, previousGitTag: string, maximumChars?: number): Promise<string> {

@@ -6,7 +6,6 @@
     "@types/generate-changelog": "1.7.0",
     "@types/node": "10.11.2",
     "@wireapp/core": "6.3.13",
-    "chalk": "2.4.1",
     "commander": "2.18.0",
     "generate-changelog": "1.7.1"
   },

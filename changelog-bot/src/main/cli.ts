@@ -19,13 +19,12 @@
  *
  */
 
-// @ts-check
+import * as program from 'commander';
+import * as logdown from 'logdown';
 
-import chalk from 'chalk';
+import {Parameters} from './interfaces';
 import {start as startChangelogBot} from './start';
 
-const program = require('commander');
-const logdown = require('logdown');
 const {description, version}: {description: string; version: string} = require('../package.json');
 
 const logger = logdown('@wireapp/changelog-bot/cli', {
@@ -42,33 +41,28 @@ program
   .option('-e, --email <email>', 'Your email address')
   .option('-m, --message <message>', 'Custom message')
   .option('-p, --password <password>', 'Your password')
+  .option('-b, --backend <type>', 'Backend type ("production" or "staging")')
+  .option('-s, --slug <slug>', 'A repo slug')
+  .option('-r, --range <range>', 'The commit range')
   .parse(process.argv);
 
-const TRAVIS_ENV_VARS = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_REPO_SLUG'];
-
-const parameters = {
+const parameters: Parameters = {
+  backend: program.backend,
   conversationIds: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
   email: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
   message: program.message,
   password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
+  travisCommitRange: program.range || process.env.TRAVIS_COMMIT_RANGE,
+  travisRepoSlug: program.slug || process.env.TRAVIS_REPO_SLUG,
 };
 
-logger.log(chalk`{bold wire-changelog-bot v${version}}`);
-
-TRAVIS_ENV_VARS.forEach(envVar => {
-  if (!process.env[envVar]) {
-    logger.error(
-      chalk`{bold Error:} Travis environment variable "${envVar}" is not set.\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables`
-    );
-    process.exit(1);
-  }
-});
+logger.log(`wire-changelog-bot v${version}`);
 
 startChangelogBot(parameters)
   .then(() => process.exit(0))
   .catch(error => {
     // Info:
     // Don't log error payloads here (on a global level) as they can leak sensitive information. Stack traces are ok!
-    logger.error('Error at:', error.stack);
+    logger.error(error.stack);
     process.exit(1);
   });
