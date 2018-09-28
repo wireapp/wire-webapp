@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../http';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
@@ -50,7 +50,7 @@ class AssetAPI {
       config.params.asset_token = token;
     }
 
-    return this.client.sendRequest(config, true).then((response: AxiosResponse) => response.data);
+    return this.client.sendRequest<ArrayBuffer>(config, true).then(response => response.data);
   }
 
   postAsset(asset: Uint8Array, options?: {public: boolean; retention: AssetRetentionPolicy}): Promise<AssetUploadData> {
@@ -79,7 +79,7 @@ class AssetAPI {
     const footer = `\r\n--${BOUNDARY}--\r\n`;
 
     return this.client
-      .sendRequest({
+      .sendRequest<AssetUploadData>({
         data: concatToBuffer(body, asset, footer),
         headers: {
           'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
@@ -87,7 +87,7 @@ class AssetAPI {
         method: 'post',
         url: AssetAPI.ASSET_URL,
       })
-      .then((response: AxiosResponse) => response.data);
+      .then(response => response.data);
   }
 }
 

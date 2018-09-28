@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../http';
 import {Notification, NotificationList} from './index';
 
@@ -46,7 +46,7 @@ class NotificationAPI {
       url: `${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Notification>(config).then(response => response.data);
   }
 
   /**
@@ -70,7 +70,7 @@ class NotificationAPI {
       url: NotificationAPI.URL.NOTIFICATION,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<NotificationList>(config).then(response => response.data);
   }
 
   /**
@@ -91,7 +91,7 @@ class NotificationAPI {
       url: `${NotificationAPI.URL.NOTIFICATION}/${notificationId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Notification>(config).then(response => response.data);
   }
 }
 

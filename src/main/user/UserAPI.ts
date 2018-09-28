@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {ClientPreKey, PreKeyBundle} from '../auth';
 import {PublicClient} from '../client/';
@@ -98,7 +98,7 @@ class UserAPI {
       url: UserAPI.URL.ACTIVATE,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ActivationResponse>(config).then(response => response.data);
   }
 
   /**
@@ -111,7 +111,7 @@ class UserAPI {
       url: `${UserAPI.URL.CALLS}/config`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<RTCConfiguration>(config).then(response => response.data);
   }
 
   /**
@@ -126,7 +126,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}/${clientId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<PublicClient>(config).then(response => response.data);
   }
 
   /**
@@ -141,7 +141,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ClientPreKey>(config).then(response => response.data);
   }
 
   /**
@@ -155,7 +155,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<PublicClient[]>(config).then(response => response.data);
   }
 
   /**
@@ -169,7 +169,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<HandleInfo>(config).then(response => response.data);
   }
 
   /**
@@ -182,7 +182,7 @@ class UserAPI {
       url: UserAPI.URL.PROPERTIES,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<string[]>(config).then(response => response.data);
   }
 
   /**
@@ -190,13 +190,13 @@ class UserAPI {
    * @param propertyKey The property key to get
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getProperty
    */
-  public getProperty(propertyKey: string): Promise<Object> {
+  public getProperty<T extends string>(propertyKey: string): Promise<{[key in T]: any}> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<{[key in T]: any}>(config).then(response => response.data);
   }
 
   /**
@@ -218,7 +218,7 @@ class UserAPI {
       config.params.size = limit;
     }
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<SearchResult>(config).then(response => response.data);
   }
 
   /**
@@ -232,7 +232,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${userId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<User>(config).then(response => response.data);
   }
 
   /**
@@ -245,7 +245,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<PreKeyBundle>(config).then(response => response.data);
   }
 
   /**
@@ -267,7 +267,7 @@ class UserAPI {
       config.params.ids = parameters.ids.join(',');
     }
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<User[]>(config).then(response => response.data);
   }
 
   /**
@@ -306,7 +306,7 @@ class UserAPI {
       url: UserAPI.URL.ACTIVATE,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ActivationResponse>(config).then(response => response.data);
   }
 
   /**
@@ -351,7 +351,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<string[]>(config).then(response => response.data);
   }
 
   /**
@@ -367,7 +367,7 @@ class UserAPI {
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.PRE_KEYS}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<UserPreKeyBundleMap>(config).then(response => response.data);
   }
 
   /**

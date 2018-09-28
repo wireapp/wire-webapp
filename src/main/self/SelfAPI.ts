@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {HttpClient} from '../http';
 import {ChangePassword, Delete, SearchableStatus, Self} from '../self';
@@ -91,7 +91,7 @@ class SelfAPI {
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.NAME}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<{name: string}>(config).then(response => response.data);
   }
 
   /**
@@ -104,7 +104,7 @@ class SelfAPI {
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.CONSENT}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<{results: Consent[]}>(config).then(response => response.data);
   }
 
   /**
@@ -131,7 +131,7 @@ class SelfAPI {
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.SEARCHABLE}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<SearchableStatus>(config).then(response => response.data);
   }
 
   /**
@@ -144,7 +144,7 @@ class SelfAPI {
       url: SelfAPI.URL.SELF,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Self>(config).then(response => response.data);
   }
 
   /**
@@ -159,7 +159,7 @@ class SelfAPI {
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.EMAIL}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**

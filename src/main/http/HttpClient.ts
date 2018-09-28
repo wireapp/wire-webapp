@@ -19,7 +19,7 @@
 
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
@@ -84,7 +84,11 @@ class HttpClient extends EventEmitter {
     return `${this.baseURL}${url}`;
   }
 
-  public _sendRequest(config: AxiosRequestConfig, tokenAsParam = false, firstTry = true): AxiosPromise {
+  public async _sendRequest<T>(
+    config: AxiosRequestConfig,
+    tokenAsParam = false,
+    firstTry = true
+  ): Promise<AxiosResponse<T>> {
     config.baseURL = this.baseURL;
 
     if (this.accessTokenStore.accessToken) {
@@ -103,45 +107,44 @@ class HttpClient extends EventEmitter {
       }
     }
 
-    return axios
-      .request({
+    try {
+      const response = await axios.request<T>({
         ...config,
         maxContentLength: 104857600, // 100 Megabytes
-      })
-      .then((response: AxiosResponse) => {
-        this.updateConnectionState(ConnectionState.CONNECTED);
-        return response;
-      })
-      .catch(error => {
-        const {response, request} = error;
-
-        // Map Axios errors
-        const isNetworkError = !response && request && !Object.keys(request).length;
-        if (isNetworkError) {
-          const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
-          const networkError = new NetworkError(message);
-          this.updateConnectionState(ConnectionState.DISCONNECTED);
-          return Promise.reject(networkError);
-        }
-
-        if (response) {
-          const {data: errorData, status: errorStatus} = response;
-          const isBackendError = errorData && errorData.code && errorData.label && errorData.message;
-
-          if (isBackendError) {
-            const isForbidden = errorStatus === StatusCode.FORBIDDEN;
-            const isInvalidCredentials = errorData.label === BackendErrorLabel.INVALID_CREDENTIALS;
-            const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
-            if (isForbidden && isInvalidCredentials && hasAccessToken && firstTry) {
-              return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam, true));
-            }
-
-            error = BackendErrorMapper.map(errorData);
-          }
-        }
-
-        return Promise.reject(error);
       });
+
+      this.updateConnectionState(ConnectionState.CONNECTED);
+      return response;
+    } catch (error) {
+      const {response, request} = error;
+
+      // Map Axios errors
+      const isNetworkError = !response && request && !Object.keys(request).length;
+      if (isNetworkError) {
+        const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
+        const networkError = new NetworkError(message);
+        this.updateConnectionState(ConnectionState.DISCONNECTED);
+        return Promise.reject(networkError);
+      }
+
+      if (response) {
+        const {data: errorData, status: errorStatus} = response;
+        const isBackendError = errorData && errorData.code && errorData.label && errorData.message;
+
+        if (isBackendError) {
+          const isForbidden = errorStatus === StatusCode.FORBIDDEN;
+          const isInvalidCredentials = errorData.label === BackendErrorLabel.INVALID_CREDENTIALS;
+          const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
+          if (isForbidden && isInvalidCredentials && hasAccessToken && firstTry) {
+            return this.refreshAccessToken().then(() => this._sendRequest<T>(config, tokenAsParam, true));
+          }
+
+          error = BackendErrorMapper.map(errorData);
+        }
+      }
+
+      return Promise.reject(error);
+    }
   }
 
   public async refreshAccessToken(): Promise<AccessTokenData> {
@@ -172,27 +175,24 @@ class HttpClient extends EventEmitter {
       )}`;
     }
 
-    return sendRequestWithCookie(this, config, this.engine).then((response: AxiosResponse) => response.data);
+    return sendRequestWithCookie<AccessTokenData>(this, config, this.engine).then(response => response.data);
   }
 
-  public sendRequest(config: AxiosRequestConfig, tokenAsParam: boolean = false): AxiosPromise {
-    return this.requestQueue.add(() => this._sendRequest(config, tokenAsParam));
+  public sendRequest<T>(config: AxiosRequestConfig, tokenAsParam: boolean = false): Promise<AxiosResponse<T>> {
+    return this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam));
   }
 
-  public sendJSON(config: AxiosRequestConfig): AxiosPromise {
+  public sendJSON<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_JSON,
     };
-    return this.sendRequest(config);
+    return this.sendRequest<T>(config);
   }
 
-  public sendProtocolBuffer(config: AxiosRequestConfig): AxiosPromise {
-    config.headers = {
-      ...config.headers,
-      'Content-Type': ContentType.APPLICATION_PROTOBUF,
-    };
-    return this.sendRequest(config);
+  public sendProtocolBuffer<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    config.headers['Content-Type'] = ContentType.APPLICATION_PROTOBUF;
+    return this.sendRequest<T>(config);
   }
 }
 
