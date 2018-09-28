@@ -79,15 +79,17 @@ z.components.MentionSuggestions = class MentionSuggestions {
     const actions = {
       [z.util.KeyboardUtil.KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
       [z.util.KeyboardUtil.KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
-      [z.util.KeyboardUtil.KEY.ENTER]: this.validateSelection.bind(this),
-      [z.util.KeyboardUtil.KEY.TAB]: this.validateSelection.bind(this),
+      [z.util.KeyboardUtil.KEY.ENTER]: this.validateSelection.bind(this, keyboardEvent),
+      [z.util.KeyboardUtil.KEY.TAB]: this.validateSelection.bind(this, keyboardEvent),
     };
 
     const action = actions[keyboardEvent.key];
     if (action) {
-      action();
-      keyboardEvent.preventDefault();
-      keyboardEvent.stopPropagation();
+      const wasHandled = action();
+      if (wasHandled) {
+        keyboardEvent.preventDefault();
+        keyboardEvent.stopPropagation();
+      }
     }
   }
 
@@ -95,6 +97,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
     const currentIndex = this.selectedSuggestionIndex();
     const newIndex = z.util.NumberUtil.clamp(currentIndex + delta, 0, this.suggestions().length - 1);
     this.selectedSuggestionIndex(newIndex);
+    return true;
   }
 
   onSuggestionClick(data, event) {
@@ -103,8 +106,14 @@ z.components.MentionSuggestions = class MentionSuggestions {
     this.onSelectionValidated(data, this.targetInput);
   }
 
-  validateSelection() {
+  validateSelection(keyboardEvent) {
+    const skipValidation = z.util.KeyboardUtil.isEnterKey(keyboardEvent) && keyboardEvent.shiftKey;
+    if (skipValidation) {
+      return false;
+    }
+
     this.onSelectionValidated(this.selectedSuggestion(), this.targetInput);
+    return true;
   }
 
   updateScrollPosition(selectedNumber) {
