@@ -21,7 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import * as logdown from 'logdown';
 
 import {AssetAPI} from './asset/';
-import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData} from './auth';
+import {AuthAPI, Context, LoginData, RegisterData} from './auth';
 import {AccessTokenStore} from './auth/';
 import {ClientAPI, ClientType} from './client/';
 import {Config} from './Config';
@@ -159,7 +159,7 @@ class APIClient {
     }
 
     const cookieResponse = await this.auth.api.postLogin(loginData);
-    const accessToken = cookieResponse.data as AccessTokenData;
+    const accessToken = cookieResponse.data;
 
     this.logger.info(
       `Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`,

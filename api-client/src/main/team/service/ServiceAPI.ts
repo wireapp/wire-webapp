@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {HttpClient} from '../../http';
 import {Provider, Service, ServiceWhitelistData, Services} from './';
@@ -46,7 +46,7 @@ class ServiceAPI {
       url: `/${ServiceAPI.URL.SERVICES}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Services>(config).then(response => response.data);
   }
 
   public getTeamServices(teamId: string, limit: number = 100): Promise<Services> {
@@ -60,7 +60,7 @@ class ServiceAPI {
       url: `${ServiceAPI.URL.TEAMS}/${teamId}/${ServiceAPI.URL.SERVICES}/${ServiceAPI.URL.WHITELISTED}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Services>(config).then(response => response.data);
   }
 
   public getProvider(providerId: string): Promise<Provider> {
@@ -69,7 +69,7 @@ class ServiceAPI {
       url: `${ServiceAPI.URL.PROVIDERS}/${providerId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Provider>(config).then(response => response.data);
   }
 
   public getProviderServices(providerId: string): Promise<Services> {
@@ -78,7 +78,7 @@ class ServiceAPI {
       url: `${ServiceAPI.URL.PROVIDERS}/${providerId}/${ServiceAPI.URL.SERVICES}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Services>(config).then(response => response.data);
   }
 
   public getService(providerId: string, serviceId: string): Promise<Service> {
@@ -87,7 +87,7 @@ class ServiceAPI {
       url: `${ServiceAPI.URL.PROVIDERS}/${providerId}/${ServiceAPI.URL.SERVICES}/${serviceId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Service>(config).then(response => response.data);
   }
 
   public postServiceWhitelist(teamId: string, whitelistData: ServiceWhitelistData): Promise<Services> {
@@ -97,7 +97,7 @@ class ServiceAPI {
       url: `${ServiceAPI.URL.TEAMS}/${teamId}/${ServiceAPI.URL.SERVICES}/${ServiceAPI.URL.WHITELIST}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Services>(config).then(response => response.data);
   }
 }
 

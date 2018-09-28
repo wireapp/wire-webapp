@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 import {
   ClientMismatch,
   Conversation,
@@ -80,7 +80,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${userId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationMemberLeaveEvent>(config).then(response => response.data);
   }
 
   /**
@@ -120,7 +120,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Conversation>(config).then(response => response.data);
   }
 
   /**
@@ -139,7 +139,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/ids`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationIds>(config).then(response => response.data);
   }
 
   /**
@@ -214,7 +214,7 @@ class ConversationAPI {
       config.params.ids = filteredConversationIds.join(',');
     }
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Conversations>(config).then(response => response.data);
   }
 
   /**
@@ -228,7 +228,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/self`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Member>(config).then(response => response.data);
   }
 
   /**
@@ -259,7 +259,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationEvent>(config).then(response => response.data);
   }
 
   /**
@@ -293,7 +293,7 @@ class ConversationAPI {
       url: ConversationAPI.URL.CONVERSATIONS,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Conversation>(config).then(response => response.data);
   }
 
   /**
@@ -323,7 +323,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationEvent>(config).then(response => response.data);
   }
 
   /**
@@ -338,7 +338,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationEvent>(config).then(response => response.data);
   }
 
   /**
@@ -380,10 +380,10 @@ class ConversationAPI {
     };
 
     if (typeof messageData.recipients === 'object') {
-      return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+      return this.client.sendJSON<ClientMismatch>(config).then(response => response.data);
     }
 
-    return this.client.sendProtocolBuffer(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendProtocolBuffer<ClientMismatch>(config).then(response => response.data);
   }
 
   /**
@@ -397,7 +397,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/self`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Conversation>(config).then(response => response.data);
   }
 
   /**
@@ -429,7 +429,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationEvent>(config).then(response => response.data);
   }
 
   /**
@@ -448,7 +448,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/message-timer`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationEvent>(config).then(response => response.data);
   }
 
   /**
@@ -466,7 +466,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<ConversationMemberJoinEvent>(config).then(response => response.data);
   }
 
   /**

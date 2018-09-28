@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {Image} from '../giphy/';
 import {HttpClient} from '../http/';
@@ -45,7 +45,7 @@ class GiphyAPI {
       url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${GiphyAPI.URL.RANDOM}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Image>(config).then(response => response.data);
   }
 }
 

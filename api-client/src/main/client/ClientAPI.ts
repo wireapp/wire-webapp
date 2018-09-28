@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {PreKeyBundle} from '../auth';
 import {NewClient, RegisteredClient} from '../client/index';
@@ -39,7 +39,7 @@ class ClientAPI {
       url: ClientAPI.URL.CLIENTS,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<RegisteredClient>(config).then(response => response.data);
   }
 
   public async deleteClient(clientId: string, password?: string): Promise<void> {
@@ -61,7 +61,7 @@ class ClientAPI {
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<RegisteredClient>(config).then(response => response.data);
   }
 
   public getClients(): Promise<RegisteredClient[]> {
@@ -71,7 +71,7 @@ class ClientAPI {
       url: ClientAPI.URL.CLIENTS,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<RegisteredClient[]>(config).then(response => response.data);
   }
 
   public getClientPreKeys(clientId: string): Promise<PreKeyBundle> {
@@ -81,7 +81,7 @@ class ClientAPI {
       url: `${ClientAPI.URL.CLIENTS}/${clientId}/prekeys`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<PreKeyBundle>(config).then(response => response.data);
   }
 }
 

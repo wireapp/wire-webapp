@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {HttpClient} from '../http';
 import {Invitation, InvitationList, InvitationRequest} from '../invitation';
@@ -57,7 +57,7 @@ class InvitationAPI {
       url: `${InvitationAPI.URL.INVITATIONS}/${invitationId}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Invitation>(config).then(response => response.data);
   }
 
   /**
@@ -74,7 +74,7 @@ class InvitationAPI {
       url: `${InvitationAPI.URL.INVITATIONS}/${InvitationAPI.URL.INFO}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Invitation>(config).then(response => response.data);
   }
 
   /**
@@ -96,7 +96,7 @@ class InvitationAPI {
       config.data.start = emailAddress;
     }
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<InvitationList>(config).then(response => response.data);
   }
 
   /**
@@ -111,7 +111,7 @@ class InvitationAPI {
       url: InvitationAPI.URL.INVITATIONS,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    return this.client.sendJSON<Invitation>(config).then(response => response.data);
   }
 }
 
