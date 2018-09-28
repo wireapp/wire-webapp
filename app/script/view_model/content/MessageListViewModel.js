@@ -617,7 +617,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (userId) {
       this.userRepository
-        .get_user_by_id(mentionElement.dataset.userId)
+        .get_user_by_id(userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
