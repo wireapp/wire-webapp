@@ -113,8 +113,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput = ko.pureComputed(() => {
       const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-      const {mentions, text} = this.draftMessage();
-      const pieces = mentions
+      const pieces = this.currentMentions()
         .slice()
         .reverse()
         .reduce(
@@ -125,7 +124,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [text]
+          [this.input()]
         );
 
       return pieces
@@ -321,8 +320,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageEditing() {
-    this.emojiInput.removeEmojiPopup();
-
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
     }
@@ -451,9 +448,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         case z.util.KeyboardUtil.KEY.ESC: {
-          if (this.pastedFile()) {
+          if (this.mentionSuggestions().length) {
+            this.endMentionFlow();
+          } else if (this.pastedFile()) {
             this.pastedFile(null);
-          } else {
+          } else if (this.isEditing()) {
             this.cancelMessageEditing();
           }
           break;
@@ -612,7 +611,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText) {
     if (messageText.length) {
-      const mentionEntities = this.currentMentions();
+      const mentionEntities = this.currentMentions.slice();
       this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
     }
   }
