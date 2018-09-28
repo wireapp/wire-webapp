@@ -131,6 +131,7 @@ ko.bindingHandlers.resize = (function() {
   let triggerValue = null;
   let callback = null;
   let syncElement = null;
+  let throttledResizeTextarea = undefined;
 
   const resizeTextarea = element => {
     element.style.height = 0;
@@ -160,7 +161,6 @@ ko.bindingHandlers.resize = (function() {
       $(element).scroll();
     }
   };
-  const throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: false});
 
   return {
     init(element, valueAccessor, allBindings, data, context) {
@@ -188,6 +188,7 @@ ko.bindingHandlers.resize = (function() {
       const params = ko.unwrap(valueAccessor()) || {};
       triggerValue = params.triggerValue;
       syncElement = document.querySelector(params.syncElement);
+      throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
       callback = params.callback;
       throttledResizeTextarea(element);
     },
