@@ -47,7 +47,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onPasteFiles = this.onPasteFiles.bind(this);
     this.onWindowClick = this.onWindowClick.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this._setElements = this._setElements.bind(this);
+    this.setElements = this.setElements.bind(this);
 
     this.textarea = null;
     this.shadowInput = null;
@@ -235,7 +235,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
   }
 
-  _setElements(nodes) {
+  setElements(nodes) {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text');
     this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input'));
   }
