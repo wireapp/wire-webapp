@@ -8654,9 +8654,9 @@ react-intl-po@2.2.2:
     po2json "^0.4.5"
     ramda "^0.25.0"
 
-react-intl@2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.6.0.tgz#b822fa91f1b55209b36c63d849f66e8c1bd08ea0"
+react-intl@2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.7.0.tgz#be1244769ce51f71476afb9556485a46090db5fa"
   dependencies:
     hoist-non-react-statics "^2.5.5"
     intl-format-cache "^2.0.5"
