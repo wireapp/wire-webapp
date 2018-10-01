@@ -21,6 +21,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import {COLOR} from '../Identity';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
+import {QUERY} from '../mediaQueries';
 
 interface OverlayProps {}
 
@@ -52,7 +53,7 @@ const OverlayContent = styled.div<React.HTMLAttributes<HTMLDivElement>>`
     color: ${COLOR.WHITE};
   }
 
-  @media (max-width: 767px) {
+  @media (${QUERY.tabletDown}) {
     width: 100%;
   }
 `;

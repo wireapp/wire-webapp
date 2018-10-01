@@ -74,6 +74,14 @@ export const ANIMATION = {
       transform: translateY(0);
     }
   `,
+  topDownMovementLight: keyframes`
+    0% {
+      transform: translateY(-20%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  `,
 };
 
 export const defaultTransition = 'transition: all 0.24s;';
