@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="4.2.0"></a>
+# [4.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.1.0...@wireapp/react-ui-kit@4.2.0) (2018-10-01)
+
+
+### Features
+
+* **react-ui-kit:** Header Submenu ([#1163](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1163)) ([d9e7c57](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d9e7c57))
+
+
+
+
+
 <a name="4.1.0"></a>
 # [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.14...@wireapp/react-ui-kit@4.1.0) (2018-10-01)
 
