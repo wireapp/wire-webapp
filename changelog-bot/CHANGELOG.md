@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.27"></a>
+## [1.0.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@1.0.26...@wireapp/changelog-bot@1.0.27) (2018-10-01)
+
+
+### Bug Fixes
+
+* **changelog-bot:** Log error message ([#1183](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/1183)) ([b1cff79](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/b1cff79))
+
+
+
+
+
 <a name="1.0.26"></a>
 ## [1.0.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@1.0.25...@wireapp/changelog-bot@1.0.26) (2018-10-01)
 
