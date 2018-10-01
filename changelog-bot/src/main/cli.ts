@@ -63,6 +63,6 @@ startChangelogBot(parameters)
   .catch(error => {
     // Info:
     // Don't log error payloads here (on a global level) as they can leak sensitive information. Stack traces are ok!
-    logger.error(error.stack);
+    logger.error(error.message, error.stack);
     process.exit(1);
   });
