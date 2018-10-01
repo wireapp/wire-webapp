@@ -111,6 +111,8 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
       return accumulator.length > currentItem.length ? accumulator : currentItem;
     }).length;
 
+    this.isVisible = false;
+
     this.emojiList = [];
     this.emojiDict = {};
 
@@ -187,7 +189,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     }
 
     // Handling emoji popup
-    if (this.emojiDiv.is(':visible')) {
+    if (this.isVisible) {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ESC: {
           this.removeEmojiPopup();
@@ -376,6 +378,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     }
 
     window.addEventListener('click', this.removeEmojiPopup);
+    this.isVisible = true;
     this.emojiDiv
       .html(emojiMatched)
       .appendTo('body')
@@ -422,6 +425,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
   }
 
   _closeEmojiPopup() {
+    this.isVisible = false;
     window.removeEventListener('click', this.removeEmojiPopup);
     this.emojiDiv.remove();
   }
