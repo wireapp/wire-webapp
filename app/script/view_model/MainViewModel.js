@@ -131,7 +131,6 @@ z.viewModel.MainViewModel = class MainViewModel {
     const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
     const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
-
     return new Promise(resolve => {
       const transitionEndHandler = event => {
         if (event.target === panel) {
