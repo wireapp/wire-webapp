@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.22"></a>
+## [0.2.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.21...@wireapp/priority-queue@0.2.22) (2018-10-01)
+
+**Note:** Version bump only for package @wireapp/priority-queue
+
+
+
+
+
 <a name="0.2.21"></a>
 ## [0.2.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.20...@wireapp/priority-queue@0.2.21) (2018-09-28)
 
