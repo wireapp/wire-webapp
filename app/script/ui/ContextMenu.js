@@ -43,7 +43,7 @@ z.ui.Context = (() => {
       return _rotateItem(keyboardEvent.key);
     }
 
-    if (z.util.KeyboardUtil.isEnterKey(z.util.KeyboardUtil.KEY.ENTER)) {
+    if (z.util.KeyboardUtil.isEnterKey(keyboardEvent)) {
       _triggerItem();
     }
   };

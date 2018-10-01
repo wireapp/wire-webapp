@@ -126,76 +126,63 @@ ko.virtualElements.allowedBindings.stopBinding = true;
 /**
  * Resize textarea according to the containing text.
  */
-ko.bindingHandlers.resize = (function() {
-  let lastHeight = null;
-  let triggerValue = null;
-  let callback = null;
-  let syncElement = null;
+ko.bindingHandlers.resize = {
+  init(element, valueAccessor, allBindings, data, context) {
+    const params = ko.unwrap(valueAccessor()) || {};
 
-  const resizeTextarea = _.throttle(element => {
-    element.style.height = 0;
-    const newStyleHeight = `${element.scrollHeight}px`;
-    element.style.height = newStyleHeight;
+    const callback = params.callback;
+    const syncElement = document.querySelector(params.syncElement);
+    const triggerValue = params.triggerValue;
 
-    if (syncElement) {
-      syncElement.style.height = newStyleHeight;
-    }
+    let lastHeight = element.scrollHeight;
 
-    const currentHeight = element.clientHeight;
-
-    if (lastHeight !== currentHeight) {
-      if (typeof callback === 'function') {
-        callback(currentHeight, lastHeight);
-      }
-      lastHeight = currentHeight;
-      const maxHeight = window.parseInt(getComputedStyle(element).maxHeight, 10);
-
-      const isMaximumHeight = currentHeight >= maxHeight;
-      const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
-      element.style.overflowY = newStyleOverflowY;
+    const resizeTextarea = (textareaElement => {
+      textareaElement.style.height = 0;
+      const newStyleHeight = `${textareaElement.scrollHeight}px`;
+      textareaElement.style.height = newStyleHeight;
 
       if (syncElement) {
-        syncElement.style.overflowY = newStyleOverflowY;
+        syncElement.style.height = newStyleHeight;
       }
-      $(element).scroll();
-    }
-  }, 100);
 
-  return {
-    init(element, valueAccessor, allBindings, data, context) {
-      lastHeight = element.scrollHeight;
-      const params = ko.unwrap(valueAccessor()) || {};
-      triggerValue = params.triggerValue;
-      syncElement = document.querySelector(params.syncElement);
-      callback = params.callback;
+      const currentHeight = textareaElement.clientHeight;
 
-      if (triggerValue === undefined) {
-        return ko.applyBindingsToNode(
-          element,
-          {
-            event: {
-              focus() {
-                resizeTextarea(element);
-              },
-              input() {
-                resizeTextarea(element);
-              },
-            },
+      if (lastHeight !== currentHeight) {
+        if (typeof callback === 'function') {
+          callback(currentHeight, lastHeight);
+        }
+        lastHeight = currentHeight;
+        const maxHeight = window.parseInt(getComputedStyle(textareaElement).maxHeight, 10);
+
+        const isMaximumHeight = currentHeight >= maxHeight;
+        const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
+        textareaElement.style.overflowY = newStyleOverflowY;
+
+        if (syncElement) {
+          syncElement.style.overflowY = newStyleOverflowY;
+        }
+        $(textareaElement).scroll();
+      }
+    }).bind(null, element);
+    const throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
+
+    throttledResizeTextarea();
+    if (triggerValue === undefined) {
+      return ko.applyBindingsToNode(
+        element,
+        {
+          event: {
+            focus: throttledResizeTextarea,
+            input: throttledResizeTextarea,
           },
-          context
-        );
-      }
-    },
-
-    update(element, valueAccessor) {
-      const params = ko.unwrap(valueAccessor()) || {};
-      triggerValue = params.triggerValue;
-      syncElement = document.querySelector(params.syncElement);
-      callback = params.callback;
-      resizeTextarea(element);
-    },
-  };
-})();
+        },
+        context
+      );
+    }
+    const valueSubscription = params.triggerValue.subscribe(throttledResizeTextarea);
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => valueSubscription.dispose());
+  },
+};
 
 /**
  * Syncs scrolling to another element.
