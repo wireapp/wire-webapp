@@ -1049,15 +1049,15 @@ class ConversationService {
   }
 
   public async getConversations(conversationId: string): Promise<Conversation>;
-  public async getConversations(conversationId?: string[]): Promise<Conversation[]>;
-  public async getConversations(conversationId?: string | string[]): Promise<Conversation[] | Conversation> {
-    if (!conversationId || !conversationId.length) {
+  public async getConversations(conversationIds?: string[]): Promise<Conversation[]>;
+  public async getConversations(conversationIds?: string | string[]): Promise<Conversation[] | Conversation> {
+    if (!conversationIds || !conversationIds.length) {
       return this.apiClient.conversation.api.getAllConversations();
     }
-    if (typeof conversationId === 'string') {
-      return this.apiClient.conversation.api.getConversation(conversationId);
+    if (typeof conversationIds === 'string') {
+      return this.apiClient.conversation.api.getConversation(conversationIds);
     }
-    return this.apiClient.conversation.api.getConversationsByIds(conversationId);
+    return this.apiClient.conversation.api.getConversationsByIds(conversationIds);
   }
 
   public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
