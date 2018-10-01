@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.4.0"></a>
+# [6.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.3.15...@wireapp/core@6.4.0) (2018-10-01)
+
+
+### Features
+
+* **core,api-client:** Implement giphy service ([#1172](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1172)) ([a1b4c2e](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/a1b4c2e))
+
+
+
+
+
 <a name="6.3.15"></a>
 ## [6.3.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.3.14...@wireapp/core@6.3.15) (2018-10-01)
 
