@@ -17,7 +17,19 @@
  *
  */
 
-export * from './GiphyAPI';
-export * from './GiphyOptions';
-export * from './GiphyResult';
-export * from './GiphyImage';
+import {GiphyImage} from './GiphyImage';
+
+interface GiphyResult {
+  data: GiphyImage;
+  meta: {
+    status: number;
+    msg: string;
+    response_id: string;
+  };
+}
+
+type GiphySearchResult = GiphyResult & {
+  data: GiphyImage[];
+};
+
+export {GiphyResult, GiphySearchResult};

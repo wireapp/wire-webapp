@@ -17,7 +17,10 @@
  *
  */
 
-export * from './GiphyAPI';
-export * from './GiphyOptions';
-export * from './GiphyResult';
-export * from './GiphyImage';
+interface GiphyOptions {
+  limit?: number;
+  offset?: number;
+  sort?: 'relevant' | 'recent';
+}
+
+export {GiphyOptions};
