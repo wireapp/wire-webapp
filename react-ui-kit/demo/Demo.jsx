@@ -25,6 +25,7 @@ import {
   AttachmentIcon,
   AudioVideoIcon,
   Bold,
+  BottomUpMovement,
   Box,
   Button,
   ButtonLink,
@@ -72,6 +73,7 @@ import {
   Large,
   Lead,
   LeaveIcon,
+  LeftRightMovement,
   Line,
   Link,
   LinkedInIcon,
@@ -87,6 +89,7 @@ import {
   MoreIcon,
   MuteIcon,
   Muted,
+  Opacity,
   OptionsIcon,
   Overlay,
   PILL_TYPE,
@@ -96,6 +99,7 @@ import {
   PingIcon,
   PlaneIcon,
   ProfileIcon,
+  RightLeftMovement,
   RoundIconButton,
   Select,
   ServicesIcon,
@@ -109,10 +113,13 @@ import {
   TimedIcon,
   Title,
   Tooltip,
+  TopDownMovement,
   TrashIcon,
   TwitterIcon,
   Uppercase,
   WireIcon,
+  XAxisMovement,
+  YAxisMovement,
 } from '@wireapp/react-ui-kit';
 import Color from 'color';
 import Helmet from 'react-helmet';
@@ -164,12 +171,27 @@ ${props.value}${
 
 class Demo extends React.PureComponent {
   state = {
+    animationToggleTimerId: undefined,
     currentPage: 0,
     isFullscreenModalOpen: false,
     isMenuModalOpen: false,
     isModalOpen: false,
     isOverlayOpen: false,
+    showAnimation: false,
   };
+
+  componentDidMount() {
+    const animationInterval = 1000;
+    this.setState({
+      animationToggleTimerId: window.setInterval(() => {
+        this.setState(({showAnimation}) => ({showAnimation: !showAnimation}));
+      }, animationInterval),
+    });
+  }
+
+  componentWillUnmount() {
+    window.clearInterval(this.state.animationToggleTimerId);
+  }
 
   goPage = index => this.setState(state => ({currentPage: index}));
 
@@ -777,6 +799,56 @@ class Demo extends React.PureComponent {
             <Label>Label</Label>
             <LabelLink block>LabelLink</LabelLink>
             <Line />
+            <H1>Animations</H1>
+            <Columns>
+              <Column>
+                <Opacity in={this.state.showAnimation} startValue={'0'} endValue={'1'}>
+                  <div>Opacity</div>
+                </Opacity>
+              </Column>
+              <Column>
+                <TopDownMovement in={this.state.showAnimation}>
+                  <div>TopDown</div>
+                </TopDownMovement>
+              </Column>
+              <Column>
+                <BottomUpMovement in={this.state.showAnimation}>
+                  <div>BottomUpMovement</div>
+                </BottomUpMovement>
+              </Column>
+              <Column>
+                <YAxisMovement in={this.state.showAnimation} startValue={'50%'} endValue={'-50%'}>
+                  <div>YAxisMovement</div>
+                </YAxisMovement>
+              </Column>
+            </Columns>
+            <br />
+            <br />
+            <Columns>
+              <Column>
+                <LeftRightMovement in={this.state.showAnimation}>
+                  <div>LeftRightMovement</div>
+                </LeftRightMovement>
+              </Column>
+              <Column>
+                <XAxisMovement in={this.state.showAnimation} startValue={'10vh'} endValue={'-10vh'}>
+                  <div>XAxisMovement</div>
+                </XAxisMovement>
+              </Column>
+              <Column>
+                <RightLeftMovement in={this.state.showAnimation}>
+                  <div>RightLeftMovement</div>
+                </RightLeftMovement>
+              </Column>
+            </Columns>
+            <br />
+            <TopDownMovement in={this.state.showAnimation}>
+              <Opacity in={this.state.showAnimation} isInnerAnimation>
+                <XAxisMovement in={this.state.showAnimation} startValue={'40vh'} endValue={'10vh'} isInnerAnimation>
+                  <div>Combined Animation</div>
+                </XAxisMovement>
+              </Opacity>
+            </TopDownMovement>
             <H1>Colors</H1>
             {this.renderColorSection()}
           </Container>

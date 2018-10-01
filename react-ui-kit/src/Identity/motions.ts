@@ -25,11 +25,11 @@ import {keyframes} from 'styled-components';
  * Duration exception - When a motion longer than 0.7 seconds is needed use a multiplier of 700.
  */
 export const DURATION = {
-  DEFAULT: '0.55s',
-  EXTRA_LONG: '2.4s',
-  PROACTIVE_FAST: '0.15s',
-  PROACTIVE_SLOW: '0.35s',
-  SYSTEM: '0.7s',
+  DEFAULT: 550,
+  EXTRA_LONG: 2400,
+  PROACTIVE_FAST: 150,
+  PROACTIVE_SLOW: 350,
+  SYSTEM: 700,
 };
 
 /**
