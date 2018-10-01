@@ -30,7 +30,7 @@
     "typescript": "3.1.1",
     "uglifyjs-webpack-plugin": "1.3.0",
     "webpack": "4.20.2",
-    "webpack-cli": "3.1.1"
+    "webpack-cli": "3.1.2"
   },
   "description": "Wire for Web's communication core.",
   "files": [
