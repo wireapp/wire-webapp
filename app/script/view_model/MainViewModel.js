@@ -140,7 +140,7 @@ z.viewModel.MainViewModel = class MainViewModel {
           this._clearStyles(input, ['width', 'transition']);
 
           const overlay = document.querySelector('.center-column__overlay');
-          if (app.classList.contains('app--panel-open')) {
+          if (isPanelOpen) {
             app.classList.remove('app--panel-open');
             this.isPanelOpen(false);
             overlay.removeEventListener('click', this.closePanelOnClick);
