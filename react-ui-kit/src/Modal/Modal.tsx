@@ -21,6 +21,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import {CloseIcon} from '../Icon';
 import {COLOR} from '../Identity';
+import {QUERY} from '../mediaQueries';
 import {OverlayBackground, OverlayWrapper} from './Overlay';
 
 interface ModalBodyProps {
@@ -39,7 +40,7 @@ const ModalBody = styled.div<ModalBodyProps & React.HTMLAttributes<HTMLDivElemen
       border-radius: 0;
       justify-content: center;
       box-shadow: none;
-      @media (max-width: 767px) {
+      @media (${QUERY.tabletDown}) {
         width: initial;
       }
       `
@@ -48,7 +49,7 @@ const ModalBody = styled.div<ModalBodyProps & React.HTMLAttributes<HTMLDivElemen
       border-radius: 8px;
       box-shadow: 0 16px 64px 0 rgba(0, 0, 0, 0.16);
       justify-content: space-between;
-      @media (max-width: 767px) {
+      @media (${QUERY.tabletDown}) {
         width: 100%;
       }
       `};
