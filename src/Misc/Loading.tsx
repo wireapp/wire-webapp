@@ -66,7 +66,7 @@ const fillAnimation = keyframes`
 `;
 
 const rotationOffset = -0.75;
-const rotationDelay = `${parseFloat(DURATION.EXTRA_LONG) * rotationOffset}s`;
+const rotationDelay = DURATION.EXTRA_LONG * rotationOffset;
 
 interface LoadingProps {
   progress?: number;
@@ -80,8 +80,8 @@ const Loading = styled<LoadingProps & React.HTMLAttributes<SVGElement>>(LoadingC
       circle:nth-of-type(2) {
         transform-origin: 50% 50%;
         stroke-dasharray: ${pathLength};
-        animation: ${fillAnimation} ${DURATION.EXTRA_LONG} ease-in-out infinite,
-          ${ANIMATION.rotate} ${DURATION.EXTRA_LONG} linear ${rotationDelay} infinite;
+        animation: ${fillAnimation} ${DURATION.EXTRA_LONG}ms ease-in-out infinite,
+          ${ANIMATION.rotate} ${DURATION.EXTRA_LONG}ms linear ${rotationDelay}ms infinite;
       }
     `};
 `;

@@ -5,9 +5,11 @@
     "color": "3.0.0",
     "react": "16.5.2",
     "react-dom": "16.5.2",
+    "react-transition-group": "2.5.0",
     "recompose": "0.30.0",
     "styled-components": "3.4.9",
-    "styled-normalize": "8.0.1"
+    "styled-normalize": "8.0.1",
+    "styled-transition-group": "1.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.1.2",
@@ -15,6 +17,7 @@
     "@babel/preset-env": "7.1.0",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
+    "@types/recompose": "0.26.5",
     "@types/styled-components": "3.0.1",
     "babel-loader": "8.0.4",
     "react-helmet": "5.2.0",

@@ -65,7 +65,7 @@ const OverlayBackground = styled.div<React.HTMLAttributes<HTMLDivElement>>`
   width: 100vw;
   background: rgba(0, 0, 0, 0.88);
   z-index: 9998;
-  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW} ${EASE.QUART};
+  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART};
 `;
 
 const Overlay = ({children = null, ...props}: OverlayProps & React.HTMLAttributes<HTMLDivElement>) => (

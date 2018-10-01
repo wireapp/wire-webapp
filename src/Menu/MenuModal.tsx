@@ -42,7 +42,7 @@ const MenuModalBody = styled.div<React.HTMLAttributes<HTMLDivElement>>`
   margin-left: auto;
   margin-right: auto;
   width: 767px;
-  animation: ${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT} ${EASE.EXPONENTIAL};
+  animation: ${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT}ms ${EASE.EXPONENTIAL};
   @media (max-width: 767px) {
     width: 100%;
   }
