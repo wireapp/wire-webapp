@@ -166,7 +166,7 @@ ko.bindingHandlers.resize = {
     }).bind(null, element);
     const throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
 
-    throttledResizeTextarea();
+    resizeTextarea();
     if (triggerValue === undefined) {
       return ko.applyBindingsToNode(
         element,
