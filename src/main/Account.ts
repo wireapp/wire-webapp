@@ -58,6 +58,7 @@ import {
   PayloadBundleType,
 } from './conversation/root';
 import {CryptographyService} from './cryptography/root';
+import {GiphyService} from './giphy/root';
 import {NotificationService} from './notification/root';
 import {SelfService} from './self/root';
 
@@ -76,9 +77,10 @@ class Account extends EventEmitter {
   public service?: {
     asset: AssetService;
     client: ClientService;
-    conversation: ConversationService;
     connection: ConnectionService;
+    conversation: ConversationService;
     cryptography: CryptographyService;
+    giphy: GiphyService;
     notification: NotificationService;
     self: SelfService;
   };
@@ -95,6 +97,7 @@ class Account extends EventEmitter {
     const clientService = new ClientService(this.apiClient, this.apiClient.config.store, cryptographyService);
     const connectionService = new ConnectionService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
+    const giphyService = new GiphyService(this.apiClient);
     const conversationService = new ConversationService(this.apiClient, cryptographyService, assetService);
     const notificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
     const selfService = new SelfService(this.apiClient);
@@ -105,6 +108,7 @@ class Account extends EventEmitter {
       connection: connectionService,
       conversation: conversationService,
       cryptography: cryptographyService,
+      giphy: giphyService,
       notification: notificationService,
       self: selfService,
     };
