@@ -223,7 +223,7 @@ class HeaderSubMenu extends React.PureComponent<
 
   render() {
     const {caption, children} = this.props;
-    const isDesktop = window.matchMedia(`(${QUERY.desktop})`).matches;
+    const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
     return (
       <MenuLink
         onMouseLeave={isDesktop ? this.closeMenu : undefined}
@@ -259,8 +259,10 @@ class HeaderMenu extends React.PureComponent<HeaderMenuProps & React.HTMLAttribu
   };
 
   toggleMenu = () => {
-    window.scrollTo(0, 0);
-    this.setState(({isOpen}) => ({isOpen: !isOpen}));
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      this.setState(({isOpen}) => ({isOpen: !isOpen}));
+    }
   };
 
   closeMenu = () => {
