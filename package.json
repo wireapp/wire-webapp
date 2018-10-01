@@ -139,6 +139,11 @@
   "engines": {
     "yarn": ">= 1.0.0"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
     "*.{js,jsx}": [
       "eslint --fix",
@@ -166,7 +171,6 @@
     "fix:assets": "yarn prettier --write && yarn stylelint",
     "fix:scripts": "yarn test:scripts --fix",
     "postinstall": "grunt init",
-    "precommit": "lint-staged",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "concurrently \"yarn start:dev\" \"grunt\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
