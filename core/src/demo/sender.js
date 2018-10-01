@@ -8,11 +8,15 @@ process.on('unhandledRejection', error =>
   console.error(`Uncaught rejection "${error.constructor.name}": ${error.message}`, error)
 );
 
+const program = require('commander');
 const logdown = require('logdown');
 const fs = require('fs');
 const path = require('path');
 const TimeUnits = require('./TimeUnits');
 const {promisify} = require('util');
+
+program.option('-c, --conversationId <conversationId>').parse(process.argv);
+
 require('dotenv').config({path: path.join(__dirname, 'sender.env')});
 
 const logger = logdown('@wireapp/core/demo/sender.js', {
@@ -24,11 +28,10 @@ logger.state.isEnabled = true;
 const {Account} = require('@wireapp/core');
 const {APIClient} = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
-const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {FileEngine} = require('@wireapp/store-engine');
 
 (async () => {
-  const CONVERSATION_ID = process.env.WIRE_CONVERSATION_ID;
+  const CONVERSATION_ID = program.conversationId || process.env.WIRE_CONVERSATION_ID;
   const MESSAGE_TIMER = 5000;
 
   const login = {
@@ -90,7 +93,7 @@ const {FileEngine} = require('@wireapp/store-engine');
     const payload = account.service.conversation.createText('Hello, Wolrd!').build();
     const {id: originalMessageId} = await account.service.conversation.send(CONVERSATION_ID, payload);
     setInterval(async () => {
-      const editedPayload = account.service.conversation.createEditedText('Hello, World!', originalMessageId);
+      const editedPayload = account.service.conversation.createEditedText('Hello, World!', originalMessageId).build();
       await account.service.conversation.send(CONVERSATION_ID, editedPayload);
     }, 2000);
   }
@@ -125,7 +128,43 @@ const {FileEngine} = require('@wireapp/store-engine');
     await account.service.conversation.clearConversation(CONVERSATION_ID);
   }
 
-  const methods = [sendAndDeleteMessage, sendAndEdit, sendEphemeralText, sendFile, sendImage, sendPing, sendText];
+  async function sendMentions() {
+    const conversation = await account.service.conversation.getConversations(CONVERSATION_ID);
+    const userIds = conversation.members.others.map(participant => participant.id);
+    const users = await account.service.user.getUsers(userIds);
+
+    let text = 'Hello';
+
+    const mentions = users.map(user => {
+      text += ' ';
+      const mentionText = `@${user.name}`;
+      const mention = {
+        length: mentionText.length,
+        start: text.length,
+        userId: user.id,
+      };
+      text += mentionText;
+      return mention;
+    });
+
+    const payload = account.service.conversation
+      .createText(text)
+      .withMentions(mentions)
+      .build();
+
+    await account.service.conversation.send(CONVERSATION_ID, payload);
+  }
+
+  const methods = [
+    sendAndDeleteMessage,
+    sendAndEdit,
+    sendEphemeralText,
+    sendFile,
+    sendImage,
+    sendPing,
+    sendText,
+    sendMentions,
+  ];
 
   const timeoutInMillis = 2000;
   setInterval(() => {
