@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="4.2.2"></a>
+## [4.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.2.1...@wireapp/react-ui-kit@4.2.2) (2018-10-01)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Remove no-wrap in the menu link ([#1185](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1185)) ([d57895b](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d57895b))
+
+
+
+
+
 <a name="4.2.1"></a>
 ## [4.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.2.0...@wireapp/react-ui-kit@4.2.1) (2018-10-01)
 
