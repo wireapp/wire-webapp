@@ -107,8 +107,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
   }
 
   validateSelection(keyboardEvent) {
-    const skipValidation = z.util.KeyboardUtil.isEnterKey(keyboardEvent) && keyboardEvent.shiftKey;
-    if (skipValidation) {
+    const isShiftEnter = z.util.KeyboardUtil.isEnterKey(keyboardEvent) && keyboardEvent.shiftKey;
+    if (isShiftEnter) {
       return false;
     }
 
