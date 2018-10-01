@@ -332,9 +332,10 @@ class Demo extends React.PureComponent {
           </MenuLink>
           <MenuLink href="#">test1</MenuLink>
           <MenuLink href="#">test2</MenuLink>
-          <HeaderSubMenu caption={'SubSubSubSub'}>
-            <MenuLink>sub1</MenuLink>
-            <MenuLink>sub2</MenuLink>
+          <HeaderSubMenu caption={'Drowdown'}>
+            <MenuLink>{'Messaging'}</MenuLink>
+            <MenuLink>{'Voice & video'}</MenuLink>
+            <MenuLink>{'File sharing & productivity'}</MenuLink>
           </HeaderSubMenu>
           <MenuLink href="#">test3</MenuLink>
           <MenuLink href="#">test4</MenuLink>

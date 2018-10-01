@@ -160,7 +160,6 @@ const StyledHeaderSubMenu = styled.span<React.HTMLAttributes<HTMLSpanElement>>`
   flex-direction: column;
   justify-content: center;
   @media (${QUERY.desktop}) {
-    min-width: 200px;
     align-items: left;
     background-color: white;
     box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.16);
@@ -171,9 +170,11 @@ const StyledHeaderSubMenu = styled.span<React.HTMLAttributes<HTMLSpanElement>>`
     a {
       margin: 0px;
       padding-left: 10px !important;
+      padding-right: 10px !important;
       height: 30px;
       display: flex;
       align-items: center;
+      white-space: nowrap;
     }
     a:hover {
       background-color: ${COLOR.GRAY_LIGHTEN_72};
