@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="4.1.0"></a>
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.14...@wireapp/react-ui-kit@4.1.0) (2018-10-01)
+
+
+### Features
+
+* **react-ui-kit:** Animation components ([#1182](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1182)) ([a221fa1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/a221fa1))
+
+
+
+
+
 <a name="4.0.14"></a>
 ## [4.0.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.0.13...@wireapp/react-ui-kit@4.0.14) (2018-09-28)
 
