@@ -131,17 +131,16 @@ z.viewModel.MainViewModel = class MainViewModel {
     const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
     const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
-
     return new Promise(resolve => {
       const transitionEndHandler = event => {
         if (event.target === panel) {
-          panel.removeEventListener('transitionend', transitionEndHandler)
+          panel.removeEventListener('transitionend', transitionEndHandler);
           this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
           this._clearStyles(titleBar, ['width', 'transition']);
           this._clearStyles(input, ['width', 'transition']);
 
           const overlay = document.querySelector('.center-column__overlay');
-          if (app.classList.contains('app--panel-open')) {
+          if (isPanelOpen) {
             app.classList.remove('app--panel-open');
             this.isPanelOpen(false);
             overlay.removeEventListener('click', this.closePanelOnClick);
@@ -160,41 +159,41 @@ z.viewModel.MainViewModel = class MainViewModel {
           });
           resolve();
         }
-      }
+      };
 
       panel.addEventListener('transitionend', transitionEndHandler);
 
       if (isPanelOpen) {
         this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
         if (!isNarrowScreen) {
-          this._applyStyle(titleBar, { width: `${centerWidthOpen}px` });
-          this._applyStyle(input, { width: `${centerWidthOpen}px` });
+          this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+          this._applyStyle(input, {width: `${centerWidthOpen}px`});
         }
       } else {
         this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
         if (!isNarrowScreen) {
-          this._applyStyle(titleBar, { width: `${centerWidthClose}px` });
-          this._applyStyle(input, { width: `${centerWidthClose}px` });
+          this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+          this._applyStyle(input, {width: `${centerWidthClose}px`});
         }
       }
 
       z.util.afterRender(() => {
         const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
-        this._applyStyle(panel, { transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)' });
-        this._applyStyle(titleBar, { transition: widthTransition });
-        this._applyStyle(input, { transition: widthTransition });
+        this._applyStyle(panel, {transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)'});
+        this._applyStyle(titleBar, {transition: widthTransition});
+        this._applyStyle(input, {transition: widthTransition});
 
         if (isPanelOpen) {
           this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
           if (!isNarrowScreen) {
-            this._applyStyle(titleBar, { width: `${centerWidthClose}px` });
-            this._applyStyle(input, { width: `${centerWidthClose}px` });
+            this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+            this._applyStyle(input, {width: `${centerWidthClose}px`});
           }
         } else {
           this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
           if (!isNarrowScreen) {
-            this._applyStyle(titleBar, { width: `${centerWidthOpen}px` });
-            this._applyStyle(input, { width: `${centerWidthOpen}px` });
+            this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+            this._applyStyle(input, {width: `${centerWidthOpen}px`});
           }
         }
       });
