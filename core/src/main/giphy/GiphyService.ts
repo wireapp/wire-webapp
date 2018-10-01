@@ -17,7 +17,19 @@
  *
  */
 
-export * from './GiphyAPI';
-export * from './GiphyOptions';
-export * from './GiphyResult';
-export * from './GiphyImage';
+import {APIClient} from '@wireapp/api-client';
+import {GiphyOptions, GiphyResult} from '@wireapp/api-client/dist/commonjs/giphy/';
+
+class GiphyService {
+  constructor(private readonly apiClient: APIClient) {}
+
+  public getRandomGif(tag?: string): Promise<GiphyResult> {
+    return this.apiClient.giphy.api.getGiphyRandom(tag);
+  }
+
+  public searchGif(query: string, options?: GiphyOptions): Promise<GiphyResult> {
+    return this.apiClient.giphy.api.getGiphySearch(query, options);
+  }
+}
+
+export {GiphyService};
