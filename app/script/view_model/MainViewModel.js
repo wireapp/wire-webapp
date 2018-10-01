@@ -131,71 +131,70 @@ z.viewModel.MainViewModel = class MainViewModel {
     const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
     const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
+
     return new Promise(resolve => {
-      panel.addEventListener(
-        'transitionend',
-        event => {
-          if (event.target === panel) {
-            this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
-            this._clearStyles(titleBar, ['width', 'transition']);
-            this._clearStyles(input, ['width', 'transition']);
+      const transitionEndHandler = event => {
+        if (event.target === panel) {
+          panel.removeEventListener('transitionend', transitionEndHandler)
+          this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
+          this._clearStyles(titleBar, ['width', 'transition']);
+          this._clearStyles(input, ['width', 'transition']);
 
-            const overlay = document.querySelector('.center-column__overlay');
-            if (isPanelOpen) {
-              app.classList.remove('app--panel-open');
-              this.isPanelOpen(false);
-              overlay.removeEventListener('click', this.closePanelOnClick);
-            } else {
-              app.classList.add('app--panel-open');
-              this.isPanelOpen(true);
-              overlay.addEventListener('click', this.closePanelOnClick);
-            }
-            window.dispatchEvent(new Event('resize'));
-
-            z.util.afterRender(() => {
-              const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
-              if (scrollToBottom) {
-                $('.messages-wrap').scrollToBottom();
-              }
-            });
-            resolve();
+          const overlay = document.querySelector('.center-column__overlay');
+          if (app.classList.contains('app--panel-open')) {
+            app.classList.remove('app--panel-open');
+            this.isPanelOpen(false);
+            overlay.removeEventListener('click', this.closePanelOnClick);
+          } else {
+            app.classList.add('app--panel-open');
+            this.isPanelOpen(true);
+            overlay.addEventListener('click', this.closePanelOnClick);
           }
-        },
+          window.dispatchEvent(new Event('resize'));
 
-        {once: true}
-      );
+          z.util.afterRender(() => {
+            const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
+            if (scrollToBottom) {
+              $('.messages-wrap').scrollToBottom();
+            }
+          });
+          resolve();
+        }
+      }
+
+      panel.addEventListener('transitionend', transitionEndHandler);
 
       if (isPanelOpen) {
         this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
         if (!isNarrowScreen) {
-          this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
-          this._applyStyle(input, {width: `${centerWidthOpen}px`});
+          this._applyStyle(titleBar, { width: `${centerWidthOpen}px` });
+          this._applyStyle(input, { width: `${centerWidthOpen}px` });
         }
       } else {
         this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
         if (!isNarrowScreen) {
-          this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
-          this._applyStyle(input, {width: `${centerWidthClose}px`});
+          this._applyStyle(titleBar, { width: `${centerWidthClose}px` });
+          this._applyStyle(input, { width: `${centerWidthClose}px` });
         }
       }
 
       z.util.afterRender(() => {
         const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
-        this._applyStyle(panel, {transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)'});
-        this._applyStyle(titleBar, {transition: widthTransition});
-        this._applyStyle(input, {transition: widthTransition});
+        this._applyStyle(panel, { transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)' });
+        this._applyStyle(titleBar, { transition: widthTransition });
+        this._applyStyle(input, { transition: widthTransition });
 
         if (isPanelOpen) {
           this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
           if (!isNarrowScreen) {
-            this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
-            this._applyStyle(input, {width: `${centerWidthClose}px`});
+            this._applyStyle(titleBar, { width: `${centerWidthClose}px` });
+            this._applyStyle(input, { width: `${centerWidthClose}px` });
           }
         } else {
           this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
           if (!isNarrowScreen) {
-            this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
-            this._applyStyle(input, {width: `${centerWidthOpen}px`});
+            this._applyStyle(titleBar, { width: `${centerWidthOpen}px` });
+            this._applyStyle(input, { width: `${centerWidthOpen}px` });
           }
         }
       });
