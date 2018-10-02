@@ -1336,10 +1336,10 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@4.2.2":
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.2.2.tgz#3bf04584cac9963c6a09d4d3c6aaf31febc28558"
-  integrity sha512-E5txrzbnBOmXaVM2l4zrW6Uap2ETcIJavhLrazqztM+uSd/abBrMqylZMX9sGnEKs++2ihG6tSJiH1ap4GV2KA==
+"@wireapp/react-ui-kit@4.2.3":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.2.3.tgz#7bfd539578ad36099d3c10b55edbe9d74f3fc51f"
+  integrity sha512-XAo9EvSfrjtNW7dDfE6cPZAnkDmKQK7L0XmAfwtrrzV77SbcOZfU9f+JTOgCt7VcDyh7h84++JE8POZuExOMGQ==
   dependencies:
     "@types/color" "3.0.0"
     bazinga64 "5.3.13"
