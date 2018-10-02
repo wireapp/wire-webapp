@@ -123,13 +123,13 @@
           <hr class="preferences-separator">
 
           <!-- ko if: isTeamManager() -->
-            <div class="preferences-link text-theme" data-bind="click: clickOnManage, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
+            <div class="preferences-link text-theme" data-bind="click: clickOpenManageTeam, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
           <!-- /ko -->
 
           <!-- ko ifnot: isMacOsWrapper -->
-            <div class="preferences-link text-theme" data-bind="click: clickOnCreate, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
+            <div class="preferences-link text-theme" data-bind="click: clickOpenCreateTeam, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
           <!-- /ko -->
-          
+
           <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
 
           <!-- ko ifnot: isTeam() -->
