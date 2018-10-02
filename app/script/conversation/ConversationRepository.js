@@ -2434,7 +2434,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             let messageStringId;
             let titleStringId;
 
-            const hasMultipleUsers = userEntities.length >= 2;
+            const hasMultipleUsers = userEntities.length > 1;
             if (hasMultipleUsers) {
               titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
             } else {
