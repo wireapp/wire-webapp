@@ -21,7 +21,9 @@ import * as React from 'react';
 import IconHOC from './IconHOC';
 
 const size = 16;
-const message = <path d="M9.8 13h.2a6 6 0 0 0 6-6V6a6 6 0 0 0-6-6H6a6 6 0 0 0-6 6v1a6 6 0 0 0 6 6h.2L8 16l1.8-3z" />;
+const message = (
+  <path d="M3 0h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2.1A1 1 0 0 1 0 15V3a3 3 0 0 1 3-3z" />
+);
 const MessageIcon = IconHOC(message, size, size);
 
 export {MessageIcon};
