@@ -230,8 +230,16 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
-  clickToOpenTeamAdmin() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
+  clickToOpenManageTeam() {
+    this._openTeamAdmin(z.config.URL_PATH.MANAGE_TEAM);
+  }
+
+  clickToOpenManageServices() {
+    this._openTeamAdmin(z.config.URL_PATH.MANAGE_SERVICES);
+  }
+
+  _openTeamAdmin(pagePath) {
+    const path = `${pagePath}?utm_source=client_landing&utm_term=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }

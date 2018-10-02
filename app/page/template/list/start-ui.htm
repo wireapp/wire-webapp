@@ -37,7 +37,7 @@
           <!-- ko ifnot: showSearchResults() -->
             <!-- ko if: showInviteMember() -->
               <ul class="start-ui-invite-people left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="do-invite-member">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenManageTeam" data-uie-name="do-invite-member">
                   <div class="left-column-icon icon-envelope"></div>
                   <div class="center-column" data-bind="l10n_text: z.string.searchMemberInvite"></div>
                 </li>
@@ -108,7 +108,7 @@
           <!-- ko if: services().length -->
             <!-- ko if: isTeamManager() -->
               <ul class="start-ui-manage-services left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenTeamAdmin" data-uie-name="go-manage-services">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickToOpenManageServices" data-uie-name="go-manage-services">
                   <service-icon class="left-column-icon"></service-icon>
                   <div class="center-column" data-bind="l10n_text: z.string.searchManageServices"></div>
                 </li>
@@ -121,7 +121,7 @@
               <service-icon class="search__no-services__icon"></service-icon>
               <!-- ko if: isTeamManager() -->
                 <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
-                <div class="search__no-services__manage-button" data-bind="l10n_text: z.string.searchManageServicesNoResults, click: clickToOpenTeamAdmin" data-uie-name="go-enable-services"></div>
+                <div class="search__no-services__manage-button" data-bind="l10n_text: z.string.searchManageServicesNoResults, click: clickToOpenManageServices" data-uie-name="go-enable-services"></div>
               <!-- /ko -->
               <!-- ko ifnot: isTeamManager() -->
                 <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesMember" data-uie-name="label-no-services-enabled"></div>
