@@ -26,7 +26,7 @@ export default class FileEngine implements CRUDEngine {
     }
   }
 
-  public async init(storeName = '', options: {fileExtension: string}): Promise<any> {
+  public async init(storeName = '', options?: {fileExtension: string}): Promise<any> {
     await this.isSupported();
 
     FileEngine.enforcePathRestrictions(this.baseDirectory, storeName);
