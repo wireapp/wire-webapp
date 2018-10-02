@@ -30,7 +30,7 @@ z.util.StringUtil = {
    *
    * @param {string} string - the string to compare the query against
    * @param {string} query - the query to compare to the string
-   * @param {array<string>} excludedChars - extra characters to remove from both the query and the string
+   * @param {Object} excludedChars - extra characters to ignore when creating a slug ({[string]: string})
    * @param {boolean} fromStart=false - should the query match the string from the beginning of the string
    * @returns {boolean} does the string matches the query
    */
