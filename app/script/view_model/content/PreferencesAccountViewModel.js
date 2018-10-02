@@ -219,7 +219,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
   }
 
-  clickToOpenCreateTeam() {
+  clickOpenCreateTeam() {
     const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
@@ -252,7 +252,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.clientRepository.logoutClient();
   }
 
-  clickToOpenManageTeam() {
+  clickOpenManageTeam() {
     const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);

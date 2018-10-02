@@ -230,15 +230,15 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
-  clickToOpenManageTeam() {
-    this._openTeamAdmin(z.config.URL_PATH.MANAGE_TEAM);
+  clickOpenManageTeam() {
+    this._openTeamSettings(z.config.URL_PATH.MANAGE_TEAM);
   }
 
-  clickToOpenManageServices() {
-    this._openTeamAdmin(z.config.URL_PATH.MANAGE_SERVICES);
+  clickOpenManageServices() {
+    this._openTeamSettings(z.config.URL_PATH.MANAGE_SERVICES);
   }
 
-  _openTeamAdmin(pagePath) {
+  _openTeamSettings(pagePath) {
     const path = `${pagePath}?utm_source=client_landing&utm_term=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
