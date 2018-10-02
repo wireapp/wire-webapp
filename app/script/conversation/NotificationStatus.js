@@ -22,14 +22,17 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-/* eslint-disable sort-keys */
-
 z.conversation.NotificationSetting = {
+  /* eslint-disable sort-keys */
+
   STATE: {
     EVERYTHING: 0b00,
     ONLY_MENTIONS: 0b01,
     NOTHING: 0b11,
   },
+
+  /* eslint-enable sort-keys */
+
   getText(status) {
     const statusTexts = {
       [z.conversation.NotificationSetting.STATE.EVERYTHING]: z.string.notificationSettingsEverything,
