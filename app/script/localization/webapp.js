@@ -515,6 +515,7 @@ z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guests and services';
 z.string.conversationDetailsActionTimedMessages = 'Timed messages';
+z.string.conversationDetailsActionNotifications = 'Notifications';
 z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
 z.string.conversationDetailsGuestsOn = 'On';
@@ -552,6 +553,13 @@ z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link…';
 z.string.guestOptionsTitle = 'Guests and services';
+
+// Panel: Notifications
+z.string.notificationSettingsTitle = 'Notifications';
+z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when you are mentioned.';
+z.string.notificationSettingsEverything = 'Everything';
+z.string.notificationSettingsOnlyMentions = 'Only mentions';
+z.string.notificationSettingsNothing = 'Nothing';
 
 // Panel: Timed messages
 z.string.timedMessagesTitle = 'Timed messages';

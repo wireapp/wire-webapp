@@ -145,6 +145,14 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         : false;
     });
 
+    this.showActionNotificationSettings = ko.pureComputed(() => {
+      return (
+        this.activeConversation() &&
+        !this.activeConversation().is_request() &&
+        !this.activeConversation().removed_from_conversation()
+      );
+    });
+
     this.showActionGuestOptions = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().inTeam();
     });
@@ -155,7 +163,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         : false;
     });
 
-    this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
+    this.showSectionOptions = ko.pureComputed(() => {
+      return this.showActionNotificationSettings() || this.showActionGuestOptions() || this.showActionTimedMessages();
+    });
 
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
@@ -173,6 +183,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.guestOptionsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
+    });
+
+    this.notificationStatusText = ko.pureComputed(() => {
+      return z.conversation.NotificationSetting.getText(z.conversation.NotificationSetting.STATE.EVERYTHING);
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
@@ -229,6 +243,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
   clickOnTimedMessages() {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
+  }
+
+  clickOnNotifications() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
   }
 
   clickOnShowUser(userEntity) {
