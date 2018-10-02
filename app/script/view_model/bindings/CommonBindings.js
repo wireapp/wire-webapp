@@ -185,7 +185,7 @@ ko.bindingHandlers.heightSync = {
 
     // initial resize
     resizeTarget();
-    const valueSubscription = triggerValue.subscribe(resizeTarget);
+    const valueSubscription = triggerValue.subscribe(() => window.requestAnimationFrame(resizeTarget));
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => valueSubscription.dispose());
   },
 };
