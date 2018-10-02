@@ -95,6 +95,20 @@
   }
 }
 
+.fill-svg(@color) {
+  svg > path {
+    fill: @color !important;
+  }
+}
+
+.svg-green {
+  .fill-svg(@w-green);
+}
+
+.svg-red {
+  .fill-svg(@w-red);
+}
+
 // fonts
 .font-size(@size) {
   font-size: @size !important;
