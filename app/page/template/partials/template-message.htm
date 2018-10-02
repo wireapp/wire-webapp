@@ -34,12 +34,12 @@
 
 <script type="text/html" id="call">
   <div class="message-header">
-    <div class="message-header-icon">
+    <div class="message-header-icon message-header-icon--svg">
       <!-- ko if: message.was_completed() -->
-        <div class="icon-call text-green"></div>
+        <div class="svg-green"><pickup-icon></pickup-icon></div>
       <!-- /ko -->
       <!-- ko if: message.was_missed() -->
-        <div class="icon-end-call text-red"></div>
+        <div class="svg-red"><hangup-icon></hangup-icon></div>
       <!-- /ko -->
     </div>
     <div class="message-header-label">
