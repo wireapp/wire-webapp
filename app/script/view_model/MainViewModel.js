@@ -132,8 +132,9 @@ z.viewModel.MainViewModel = class MainViewModel {
     const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
     return new Promise(resolve => {
-      panel.addEventListener('transitionend', event => {
+      const transitionEndHandler = event => {
         if (event.target === panel) {
+          panel.removeEventListener('transitionend', transitionEndHandler);
           this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
           this._clearStyles(titleBar, ['width', 'transition']);
           this._clearStyles(input, ['width', 'transition']);
@@ -149,6 +150,7 @@ z.viewModel.MainViewModel = class MainViewModel {
             overlay.addEventListener('click', this.closePanelOnClick);
           }
           window.dispatchEvent(new Event('resize'));
+
           z.util.afterRender(() => {
             const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
             if (scrollToBottom) {
@@ -157,7 +159,9 @@ z.viewModel.MainViewModel = class MainViewModel {
           });
           resolve();
         }
-      });
+      };
+
+      panel.addEventListener('transitionend', transitionEndHandler);
 
       if (isPanelOpen) {
         this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
