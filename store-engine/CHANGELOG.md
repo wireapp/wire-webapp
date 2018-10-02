@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.12.23"></a>
+## [0.12.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.12.22...@wireapp/store-engine@0.12.23) (2018-10-02)
+
+
+### Bug Fixes
+
+* **store-engine:** Make init() options optional ([#1191](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1191)) ([50c8814](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/50c8814))
+
+
+
+
+
 <a name="0.12.22"></a>
 ## [0.12.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.12.21...@wireapp/store-engine@0.12.22) (2018-10-01)
 
