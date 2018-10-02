@@ -104,6 +104,15 @@ describe('z.search.SearchRepository', () => {
       });
     });
 
+    it('does not replace numbers with emojis', () => {
+      const felix10 = generateUser('simple10', 'Felix10');
+
+      const unsortedUsers = [felix10];
+
+      const suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+      expect(suggestions.map(serializeUser)).toEqual([]);
+    });
+
     it('handles sorting matching results', () => {
       const first = generateUser('xxx', '_surname');
       const second = generateUser('xxx', 'surname _lastname');

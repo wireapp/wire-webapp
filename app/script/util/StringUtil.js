@@ -34,13 +34,13 @@ z.util.StringUtil = {
    * @param {boolean} fromStart=false - should the query match the string from the beginning of the string
    * @returns {boolean} does the string matches the query
    */
-  compareTransliteration: (string, query, excludedChars = [], fromStart = false) => {
+  compareTransliteration: (string, query, excludedChars = {}, fromStart = false) => {
     const nameSlug = z.util.StringUtil.computeTransliteration(string, excludedChars);
     const querySlug = z.util.StringUtil.computeTransliteration(query, excludedChars);
     return fromStart ? nameSlug.startsWith(querySlug) : z.util.StringUtil.includes(nameSlug, querySlug);
   },
 
-  computeTransliteration: (string, excludedChars = []) => {
+  computeTransliteration: (string, excludedChars = {}) => {
     const options = {custom: excludedChars};
     return window.getSlug(string, options);
   },
