@@ -130,10 +130,6 @@ ko.bindingHandlers.resize = {
   init(element, valueAccessor, allBindings, data, context) {
     const params = ko.unwrap(valueAccessor()) || {};
 
-    const callback = params.callback;
-    const syncElement = document.querySelector(params.syncElement);
-    const triggerValue = params.triggerValue;
-
     let lastHeight = element.scrollHeight;
 
     const resizeTextarea = (textareaElement => {
@@ -141,45 +137,55 @@ ko.bindingHandlers.resize = {
       const newStyleHeight = `${textareaElement.scrollHeight}px`;
       textareaElement.style.height = newStyleHeight;
 
-      if (syncElement) {
-        syncElement.style.height = newStyleHeight;
-      }
-
       const currentHeight = textareaElement.clientHeight;
 
       if (lastHeight !== currentHeight) {
-        if (typeof callback === 'function') {
-          callback(currentHeight, lastHeight);
-        }
         lastHeight = currentHeight;
         const maxHeight = window.parseInt(getComputedStyle(textareaElement).maxHeight, 10);
 
         const isMaximumHeight = currentHeight >= maxHeight;
         const newStyleOverflowY = isMaximumHeight ? 'scroll' : 'hidden';
         textareaElement.style.overflowY = newStyleOverflowY;
-
-        if (syncElement) {
-          syncElement.style.overflowY = newStyleOverflowY;
-        }
-        $(textareaElement).scroll();
       }
     }).bind(null, element);
     const throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
 
     resizeTextarea();
-    if (triggerValue === undefined) {
-      return ko.applyBindingsToNode(
-        element,
-        {
-          event: {
-            focus: throttledResizeTextarea,
-            input: throttledResizeTextarea,
-          },
+    return ko.applyBindingsToNode(
+      element,
+      {
+        event: {
+          focus: throttledResizeTextarea,
+          input: throttledResizeTextarea,
         },
-        context
-      );
-    }
-    const valueSubscription = params.triggerValue.subscribe(throttledResizeTextarea);
+      },
+      context
+    );
+  },
+};
+
+ko.bindingHandlers.heightSync = {
+  init(element, valueAccessor, allBindings, data, context) {
+    const params = ko.unwrap(valueAccessor()) || {};
+
+    const resizeCallback = params.callback;
+    const targetElement = document.querySelector(params.target);
+    const triggerValue = params.trigger;
+
+    const resizeTarget = () => {
+      const sourceHeight = element.scrollHeight;
+      const targetHeight = parseInt(targetElement.style.height, 10);
+      if (sourceHeight !== targetHeight) {
+        targetElement.style.height = `${element.scrollHeight}px`;
+        if (typeof resizeCallback === 'function') {
+          resizeCallback(sourceHeight, targetHeight);
+        }
+      }
+    };
+
+    // initial resize
+    resizeTarget();
+    const valueSubscription = triggerValue.subscribe(resizeTarget);
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => valueSubscription.dispose());
   },
 };
@@ -187,7 +193,6 @@ ko.bindingHandlers.resize = {
 /**
  * Syncs scrolling to another element.
  */
-
 ko.bindingHandlers.scrollSync = {
   init(element, valueAccessor) {
     const selector = valueAccessor();
