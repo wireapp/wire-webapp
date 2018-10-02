@@ -163,7 +163,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         : false;
     });
 
-    this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
+    this.showSectionOptions = ko.pureComputed(() => {
+      return this.showActionNotificationSettings() || this.showActionGuestOptions() || this.showActionTimedMessages();
+    });
 
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;

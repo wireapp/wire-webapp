@@ -74,7 +74,9 @@
                             <disclose-icon></disclose-icon>
                           </div>
                         </div>
-                        <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsOptions"></div>
+                        <!-- ko if: showSectionOptions() -->
+                          <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsOptions"></div>
+                        <!-- /ko -->
                         <!-- ko if: showActionNotificationSettings() -->
                           <div class="conversation-details__notifications">
                             <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
