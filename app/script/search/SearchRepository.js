@@ -112,11 +112,12 @@ z.search.SearchRepository = class SearchRepository {
 
     const isStrictMatch = value.toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
+      // if the pattern matches the raw text, give the maximum value to the match
       return 100;
     }
     const isStrictTransliteratedMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);
     if (isStrictTransliteratedMatch) {
-      // if the pattern matches the raw text, give the maximum value to the match
+      // give a little less points if the pattern strictly matches the transliterated string
       return 50;
     }
     const isLoosyMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, false);
