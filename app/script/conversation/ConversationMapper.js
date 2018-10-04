@@ -205,14 +205,14 @@ z.conversation.ConversationMapper = class ConversationMapper {
       const {otr_archived, otr_muted} = selfState;
 
       if (otr_archived !== undefined) {
-        const otr_archived_timestamp = new Date(selfState.otr_archived_ref).getTime();
-        conversationEntity.setTimestamp(otr_archived_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
+        const otrArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+        conversationEntity.setTimestamp(otrArchivedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
         conversationEntity.archived_state(otr_archived);
       }
 
       if (otr_muted !== undefined) {
-        const otr_muted_timestamp = new Date(selfState.otr_muted_ref).getTime();
-        conversationEntity.setTimestamp(otr_muted_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
+        const otrMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
+        conversationEntity.setTimestamp(otrMutedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
         conversationEntity.muted_state(otr_muted);
       }
 
@@ -244,8 +244,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversationEntity.type(type);
     conversationEntity.name(name ? name : '');
 
-    const self_state = members ? members.self : conversationData;
-    conversationEntity = this.updateSelfStatus(conversationEntity, self_state);
+    const selfState = members ? members.self : conversationData;
+    conversationEntity = this.updateSelfStatus(conversationEntity, selfState);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
       conversationEntity.last_event_timestamp(initialTimestamp);
@@ -257,9 +257,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
-    const team_id = conversationData.team_id || conversationData.team;
-    if (team_id) {
-      conversationEntity.team_id = team_id;
+    const teamId = conversationData.team_id || conversationData.team;
+    if (teamId) {
+      conversationEntity.team_id = teamId;
     }
 
     if (conversationData.is_guest) {
@@ -381,11 +381,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
       const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
       const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
-      if (isGuestRoomMode) {
-        return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
-      }
-
-      return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.LEGACY);
+      return isGuestRoomMode
+        ? conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
+        : conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.LEGACY);
     }
 
     if (conversationEntity.is_self()) {
