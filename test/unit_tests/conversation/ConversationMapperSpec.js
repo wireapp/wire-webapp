@@ -51,6 +51,12 @@ describe('Conversation Mapper', () => {
         z.conversation.ConversationError,
         z.conversation.ConversationError.MESSAGE.MISSING_PARAMETER
       );
+
+      const functionCallStringInArray = () => conversation_mapper.mapConversations(['Conversation']);
+      expect(functionCallStringInArray).toThrowError(
+        z.conversation.ConversationError,
+        z.conversation.ConversationError.MESSAGE.INVALID_PARAMETER
+      );
     });
 
     it('maps a single conversation', () => {
