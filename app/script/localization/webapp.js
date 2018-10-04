@@ -835,7 +835,6 @@ z.string.tooltipConversationsArchive = 'Archive ({{shortcut}})';
 z.string.tooltipConversationsArchived = 'Show archive ({{number}})';
 z.string.tooltipConversationsMore = 'More';
 z.string.tooltipConversationsNotifications = 'Open notification settings ({{shortcut}})';
-z.string.tooltipConversationsNotify = 'Unmute ({{shortcut}})';
 z.string.tooltipConversationsPreferences = 'Open preferences';
 z.string.tooltipConversationsStart = 'Start conversation ({{shortcut}})';
 
