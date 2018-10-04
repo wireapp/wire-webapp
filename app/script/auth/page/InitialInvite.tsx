@@ -16,38 +16,38 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import * as React from 'react';
-import {connect} from 'react-redux';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import {inviteStrings} from '../../strings';
+import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
 import {
-  H1,
-  Text,
-  Link,
+  ButtonLink,
   COLOR,
   CheckIcon,
   ContainerXS,
-  ICON_NAME,
-  InputSubmitCombo,
-  Input,
-  RoundIconButton,
-  Form,
-  Muted,
-  ButtonLink,
   ErrorMessage,
+  Form,
+  H1,
+  ICON_NAME,
+  Input,
+  InputSubmitCombo,
+  Link,
+  Muted,
+  RoundIconButton,
+  Text,
 } from '@wireapp/react-ui-kit';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {pathWithParams} from '../util/urlUtil';
-import * as LanguageSelector from '../module/selector/LanguageSelector';
-import * as InviteSelector from '../module/selector/InviteSelector';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps} from 'react-router';
+import {inviteStrings} from '../../strings';
+import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import ValidationError from '../module/action/ValidationError';
-import Page from './Page';
-import {RouteComponentProps} from 'react-router';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
-import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import * as InviteSelector from '../module/selector/InviteSelector';
+import * as LanguageSelector from '../module/selector/LanguageSelector';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {pathWithParams} from '../util/urlUtil';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
 
@@ -185,17 +185,21 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({
-      error: InviteSelector.getError(state),
-      invites: InviteSelector.getInvites(state),
-      isFetching: InviteSelector.isFetching(state),
-      language: LanguageSelector.getLanguage(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-      resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-      invite: (invitation: {email: string; locale: string; inviter_name: string}) =>
-        dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
-    })
+    (state: RootState): ConnectedProps => {
+      return {
+        error: InviteSelector.getError(state),
+        invites: InviteSelector.getInvites(state),
+        isFetching: InviteSelector.isFetching(state),
+        language: LanguageSelector.getLanguage(state),
+      };
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {
+        fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
+        invite: (invitation: {email: string; locale: string; inviter_name: string}) =>
+          dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
+        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
+      };
+    }
   )(InitialInvite)
 );

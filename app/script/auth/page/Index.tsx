@@ -17,29 +17,29 @@
  *
  */
 
-import * as LanguageSelector from '../module/selector/LanguageSelector';
-import * as React from 'react';
-import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
 import {
-  Link,
-  Text,
   Bold,
+  COLOR,
+  Column,
+  Columns,
+  ContainerXS,
+  Link,
+  Logo,
   ProfileIcon,
   RoundContainer,
   TeamIcon,
-  Logo,
-  COLOR,
-  Columns,
-  Column,
-  ContainerXS,
+  Text,
 } from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {indexStrings} from '../../strings';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import Page from './Page';
 import {RouteComponentProps} from 'react-router';
+import {indexStrings} from '../../strings';
 import {RootState, ThunkDispatch} from '../module/reducer';
+import * as LanguageSelector from '../module/selector/LanguageSelector';
+import {ROUTE} from '../route';
+import {isDesktopApp, isMacOS} from '../Runtime';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<Index>, RouteComponentProps {}
 
@@ -118,7 +118,11 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
-    (dispatch: ThunkDispatch): DispatchProps => ({})
+    (state: RootState): ConnectedProps => {
+      return {language: LanguageSelector.getLanguage(state)};
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {};
+    }
   )(Index)
 );
