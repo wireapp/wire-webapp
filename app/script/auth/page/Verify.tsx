@@ -17,21 +17,20 @@
  *
  */
 
-import {H1, Muted, Link, ContainerXS, CodeInput, ErrorMessage} from '@wireapp/react-ui-kit';
-import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
-import {Link as RRLink} from 'react-router-dom';
-import {parseError} from '../util/errorUtil';
-import {verifyStrings} from '../../strings';
-import {withRouter, RouteComponentProps} from 'react-router';
-import {REGISTER_FLOW} from '../module/selector/AuthSelector';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import Page from './Page';
-import * as React from 'react';
-import {ROUTE} from '../route';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import ROOT_ACTIONS from '../module/action/';
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {CodeInput, ContainerXS, ErrorMessage, H1, Link, Muted} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {verifyStrings} from '../../strings';
+import ROOT_ACTIONS from '../module/action/';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import {ROUTE} from '../route';
+import {parseError} from '../util/errorUtil';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
@@ -48,9 +47,9 @@ interface DispatchProps {
 }
 
 const changeEmailRedirect = {
-  [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
-  [REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
-  [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
+  [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
+  [AuthSelector.REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
+  [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
 const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
@@ -63,7 +62,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
 }) => {
   const createAccount = (email_code: string) => {
     switch (currentFlow) {
-      case REGISTER_FLOW.TEAM: {
+      case AuthSelector.REGISTER_FLOW.TEAM: {
         connected
           .doRegisterTeam({...account, email_code})
           .then(() => history.push(ROUTE.CHOOSE_HANDLE))
@@ -71,8 +70,8 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
         break;
       }
 
-      case REGISTER_FLOW.PERSONAL:
-      case REGISTER_FLOW.GENERIC_INVITATION: {
+      case AuthSelector.REGISTER_FLOW.PERSONAL:
+      case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
         connected
           .doRegisterPersonal({...account, email_code})
           .then(() => history.push(ROUTE.CHOOSE_HANDLE))
@@ -123,18 +122,22 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => ({
-        account: AuthSelector.getAccount(state),
-        authError: AuthSelector.getError(state),
-        currentFlow: AuthSelector.getCurrentFlow(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doRegisterTeam: (registrationData: RegisterData) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
-        doRegisterPersonal: (registrationData: RegisterData) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
-        doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          account: AuthSelector.getAccount(state),
+          authError: AuthSelector.getError(state),
+          currentFlow: AuthSelector.getCurrentFlow(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          doRegisterPersonal: (registrationData: RegisterData) =>
+            dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
+          doRegisterTeam: (registrationData: RegisterData) =>
+            dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
+          doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
+        };
+      }
     )(Verify)
   )
 );
