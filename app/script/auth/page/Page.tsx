@@ -17,16 +17,15 @@
  *
  */
 
-import {connect} from 'react-redux';
-import {REGISTER_FLOW} from '../module/selector/AuthSelector';
-import * as AuthSelector from '../module/selector/AuthSelector';
+import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 import * as React from 'react';
-import {ROUTE} from '../route';
+import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
-import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import {ROUTE} from '../route';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   hasAccountData?: boolean;
@@ -47,9 +46,9 @@ const hasInvalidAccountData = (account: RegistrationDataState) => !account.name 
 const hasInvalidTeamData = ({team}: {team: TeamData}) => !team || !team.name;
 
 const redirects = {
-  [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
-  [REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
-  [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
+  [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
+  [AuthSelector.REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
+  [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 
 const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
@@ -72,10 +71,14 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
 };
 
 export default connect(
-  (state: RootState): ConnectedProps => ({
-    account: AuthSelector.getAccount(state),
-    currentFlow: AuthSelector.getCurrentFlow(state),
-    isStateAuthenticated: AuthSelector.isAuthenticated(state),
-  }),
-  (dispatch: ThunkDispatch): DispatchProps => ({})
+  (state: RootState): ConnectedProps => {
+    return {
+      account: AuthSelector.getAccount(state),
+      currentFlow: AuthSelector.getCurrentFlow(state),
+      isStateAuthenticated: AuthSelector.isAuthenticated(state),
+    };
+  },
+  (dispatch: ThunkDispatch): DispatchProps => {
+    return {};
+  }
 )(Page);

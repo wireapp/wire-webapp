@@ -17,18 +17,18 @@
  *
  */
 
-import {H1, Muted, Link, ContainerXS} from '@wireapp/react-ui-kit';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import Page from './Page';
-import * as React from 'react';
-import ClientList from '../component/ClientList';
-import {connect} from 'react-redux';
-import {clientManagerStrings} from '../../strings';
-import {ROUTE} from '../route';
-import {RouteComponentProps} from 'react-router';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import ROOT_ACTIONS from '../module/action/';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps} from 'react-router';
+import {clientManagerStrings} from '../../strings';
+import ClientList from '../component/ClientList';
+import ROOT_ACTIONS from '../module/action/';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import {ROUTE} from '../route';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<ClientManager>, RouteComponentProps {}
 
@@ -83,10 +83,14 @@ class ClientManager extends React.Component<Props & ConnectedProps & DispatchPro
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({}),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-      doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
-    })
+    (state: RootState): ConnectedProps => {
+      return {};
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {
+        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+        doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
+      };
+    }
   )(ClientManager)
 );
