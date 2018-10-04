@@ -108,7 +108,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     if (!conversationsData.length) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
-    return conversationsData.map((data, index) => this._createConversation(data, timestamp + index));
+    return conversationsData.map((data, index) => this._createConversationEntity(data, timestamp + index));
   }
 
   /**
@@ -238,7 +238,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @param {number} [initialTimestamp] - Initial timestamp for conversation in milliseconds
    * @returns {Conversation} Mapped conversation entity
    */
-  _createConversation(conversationData, initialTimestamp) {
+  _createConversationEntity(conversationData, initialTimestamp) {
     if (conversationData === undefined || !Object.keys(conversationData).length) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
