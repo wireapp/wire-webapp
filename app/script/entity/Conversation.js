@@ -193,6 +193,12 @@ z.entity.Conversation = class Conversation {
       }).length;
     });
 
+    this.unreadSelfMentionsCount = ko.pureComputed(() => {
+      return this.unreadEvents().filter(messageEntity => {
+        return messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id);
+      }).length;
+    });
+
     /**
      * Display name strategy:
      *
