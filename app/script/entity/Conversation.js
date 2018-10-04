@@ -167,9 +167,15 @@ z.entity.Conversation = class Conversation {
     this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
+    this.unreadEventsCount = ko.pureComputed(0);
+    this.unreadMessagesCount = ko.pureComputed(0);
+    this.hasUnreadSelfMention = ko.observable(false);
+
     this.unreadEvents = ko.pureComputed(() => {
       const unreadEvents = [];
       const messages = this.messages();
+      let hasSelfMention = false;
+      let unreadMessages = 0;
 
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
@@ -177,26 +183,26 @@ z.entity.Conversation = class Conversation {
           if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
             break;
           }
+
+          const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+
+          if (isMissedCall || messageEntity.is_ping() || messageEntity.is_content()) {
+            unreadMessages++;
+          }
+
+          if (!hasSelfMention && messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id)) {
+            hasSelfMention = true;
+          }
+
           unreadEvents.push(messageEntity);
         }
       }
 
+      this.unreadEventsCount(unreadEvents.length);
+      this.unreadMessagesCount(unreadMessages);
+      this.hasUnreadSelfMention(hasSelfMention);
+
       return unreadEvents;
-    });
-
-    this.unreadEventsCount = ko.pureComputed(() => this.unreadEvents().length);
-
-    this.unreadMessagesCount = ko.pureComputed(() => {
-      return this.unreadEvents().filter(message_et => {
-        const is_missed_call = message_et.is_call() && message_et.was_missed();
-        return is_missed_call || message_et.is_ping() || message_et.is_content();
-      }).length;
-    });
-
-    this.unreadSelfMentionsCount = ko.pureComputed(() => {
-      return this.unreadEvents().filter(messageEntity => {
-        return messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id);
-      }).length;
     });
 
     /**

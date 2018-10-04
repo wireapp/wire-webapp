@@ -61,10 +61,9 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
             }
 
             const notifySelfMentions = conversationEntity.showNotificationsOnlyMentions();
-            const selfMentions = conversationEntity.unreadSelfMentionsCount();
 
             if (notifySelfMentions) {
-              return selfMentions > 0;
+              return conversationEntity.hasUnreadSelfMention();
             }
 
             return conversationEntity.unreadMessagesCount() > 0 || conversationEntity.hasJoinableCall();
