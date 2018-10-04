@@ -768,27 +768,27 @@ describe('Conversation', () => {
     });
   });
 
-  describe('set_timestamp', () => {
+  describe('setTimestamp', () => {
     it('turns strings into numbers', () => {
       const lrt = conversation_et.last_read_timestamp();
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
-      conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.setTimestamp(new_lrt_string, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     });
 
     it('checks that new timestamp is newer that previous one', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
-      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(currentTimestamp);
     });
 
     it('allows to set an older timestamp with the forceUpdate flag', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
-      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ, true);
+      conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ, true);
       expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
     });
   });
@@ -835,11 +835,11 @@ describe('Conversation', () => {
     });
   });
 
-  describe('_increment_time_only', () => {
+  describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
-      expect(conversation_et._increment_time_only(first_timestamp, second_timestamp)).toBe(second_timestamp);
-      expect(conversation_et._increment_time_only(second_timestamp, first_timestamp)).toBeFalsy();
-      expect(conversation_et._increment_time_only(first_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._incrementTimeOnly(first_timestamp, second_timestamp)).toBe(second_timestamp);
+      expect(conversation_et._incrementTimeOnly(second_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._incrementTimeOnly(first_timestamp, first_timestamp)).toBeFalsy();
     });
   });
 
