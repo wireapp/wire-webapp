@@ -17,14 +17,14 @@
  *
  */
 
-import {H1, H2, H3, Text, Container, ContainerXS, COLOR, Loading, Logo} from '@wireapp/react-ui-kit';
-import {unsupportedStrings} from '../../strings';
-import WirelessContainer from './WirelessContainer';
-import * as RuntimeSelector from '../module/selector/RuntimeSelector';
-import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps, FormattedMessage} from 'react-intl';
+import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import * as React from 'react';
+import {FormattedHTMLMessage, FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {unsupportedStrings} from '../../strings';
 import {RootState, ThunkDispatch} from '../module/reducer';
+import * as RuntimeSelector from '../module/selector/RuntimeSelector';
+import WirelessContainer from './WirelessContainer';
 
 interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
   headline: FormattedMessage.MessageDescriptor;
@@ -104,12 +104,16 @@ export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntl
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({
-      hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
-      hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
-      isCheckingSupport: RuntimeSelector.isChecking(state),
-      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({})
+    (state: RootState): ConnectedProps => {
+      return {
+        hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+        hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+        isCheckingSupport: RuntimeSelector.isChecking(state),
+        isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+      };
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {};
+    }
   )(UnsupportedBrowser)
 );

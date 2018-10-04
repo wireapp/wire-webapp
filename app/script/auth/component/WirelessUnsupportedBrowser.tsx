@@ -17,15 +17,15 @@
  *
  */
 
-import {H2, H3, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
-import {unsupportedJoinStrings} from '../../strings';
-import WirelessContainer from './WirelessContainer';
-import * as RuntimeSelector from '../module/selector/RuntimeSelector';
-import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
-import {isMobileOs} from '../Runtime';
+import {COLOR, ContainerXS, H2, H3} from '@wireapp/react-ui-kit';
 import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {unsupportedJoinStrings} from '../../strings';
 import {RootState, ThunkDispatch} from '../module/reducer';
+import * as RuntimeSelector from '../module/selector/RuntimeSelector';
+import {isMobileOs} from '../Runtime';
+import WirelessContainer from './WirelessContainer';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -63,9 +63,13 @@ export const WirelessUnsupportedBrowser: React.SFC<Props & ConnectedProps & Inje
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({
-      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({})
+    (state: RootState): ConnectedProps => {
+      return {
+        isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+      };
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {};
+    }
   )(WirelessUnsupportedBrowser)
 );
