@@ -64,7 +64,7 @@ const MenuItems = styled.div<HTMLMenuProps>`
     background-color: ${COLOR.WHITE};
     z-index: 1;
     transform: translateX(110%);
-    transition: transform 0.25s ease-in-out;
+    transition: transform 0.25s ease;
     ${props => props.open && `transform: translateX(0);`}
 `;
 
@@ -197,81 +197,62 @@ const MobileStyledHeaderSubMenu = styled.span<React.HTMLAttributes<HTMLSpanEleme
 
 interface HeaderSubMenuProps {
   caption: string;
+  isOpen: boolean;
 }
 
-interface HeaderSubMenuState {
-  isOpen?: boolean;
-}
-
-class HeaderSubMenu extends React.PureComponent<
-  HeaderSubMenuProps & React.HTMLAttributes<HTMLDivElement>,
-  HeaderSubMenuState
-> {
-  state: HeaderSubMenuState = {
-    isOpen: false,
-  };
-
-  toggleMenu = event => {
-    event.stopPropagation();
-    this.setState(({isOpen}) => ({
-      isOpen: !isOpen,
-    }));
-  };
-
-  openMenu = () => !this.state.isOpen && this.setState({isOpen: true});
-  closeMenu = () => this.state.isOpen && this.setState({isOpen: false});
-
-  render() {
-    const {caption, children} = this.props;
-    const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
-    return (
-      <MenuLink
-        onMouseLeave={isDesktop ? this.closeMenu : undefined}
-        onMouseOver={isDesktop ? this.openMenu : undefined}
-        style={{textAlign: 'center', display: 'inline-block', position: 'relative', cursor: 'pointer'}}
+const HeaderSubMenu: React.SFC<HeaderSubMenuProps & React.HTMLAttributes<HTMLSpanElement>> = ({
+  caption,
+  isOpen,
+  children,
+  ...props
+}) => {
+  const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
+  return (
+    <MenuLink
+      {...props}
+      style={{textAlign: 'center', display: 'inline-block', position: 'relative', cursor: 'pointer'}}
+    >
+      <span>{caption}</span>
+      <Opacity
+        in={isOpen && isDesktop}
+        timeout={DURATION.DEFAULT}
+        style={{display: 'inline-block', position: 'absolute', left: -18, zIndex: 1, paddingTop: 20, marginTop: 10}}
+        mountOnEnter={false}
+        unmountOnExit={false}
       >
-        <span onClick={this.toggleMenu}>{caption}</span>
-        <Opacity
-          in={this.state.isOpen && isDesktop}
-          timeout={DURATION.DEFAULT}
-          style={{display: 'inline-block', position: 'absolute', left: -18, zIndex: 1, paddingTop: 20, marginTop: 10}}
-          mountOnEnter={false}
-          unmountOnExit={false}
-        >
-          <YAxisMovement
-            in={this.state.isOpen && isDesktop}
-            startValue={'-30px'}
-            endValue={'0px'}
-            style={{display: 'inline-block'}}
-            timeout={DURATION.DEFAULT}
-            mountOnEnter={false}
-            unmountOnExit={true}
-          >
-            <DesktopStyledHeaderSubMenu onClick={this.closeMenu}>{children}</DesktopStyledHeaderSubMenu>
-          </YAxisMovement>
-        </Opacity>
-        <Opacity
-          in={this.state.isOpen && !isDesktop}
+        <YAxisMovement
+          in={isOpen && isDesktop}
+          startValue={'-30px'}
+          endValue={'0px'}
+          style={{display: 'inline-block'}}
           timeout={DURATION.DEFAULT}
           mountOnEnter={false}
-          unmountOnExit={false}
-          style={{position: 'relative', display: 'block'}}
+          unmountOnExit={true}
         >
-          <Slide
-            in={this.state.isOpen && !isDesktop}
-            startValue={'-58%'}
-            endValue={'0'}
-            timeout={DURATION.DEFAULT}
-            mountOnEnter={false}
-            unmountOnExit={true}
-          >
-            <MobileStyledHeaderSubMenu onClick={this.closeMenu}>{children}</MobileStyledHeaderSubMenu>
-          </Slide>
-        </Opacity>
-      </MenuLink>
-    );
-  }
-}
+          <DesktopStyledHeaderSubMenu>{children}</DesktopStyledHeaderSubMenu>
+        </YAxisMovement>
+      </Opacity>
+      <Opacity
+        in={isOpen && !isDesktop}
+        timeout={DURATION.DEFAULT}
+        mountOnEnter={false}
+        unmountOnExit={false}
+        style={{position: 'relative', display: 'block'}}
+      >
+        <Slide
+          in={isOpen && !isDesktop}
+          startValue={'-58%'}
+          endValue={'0'}
+          timeout={DURATION.DEFAULT}
+          mountOnEnter={false}
+          unmountOnExit={true}
+        >
+          <MobileStyledHeaderSubMenu>{children}</MobileStyledHeaderSubMenu>
+        </Slide>
+      </Opacity>
+    </MenuLink>
+  );
+};
 
 interface HeaderMenuProps {
   logoElement?: React.ReactNode;
