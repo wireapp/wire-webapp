@@ -138,9 +138,18 @@ z.notification.NotificationRepository = class NotificationRepository {
   notify(messageEntity, connectionEntity, conversationEntity) {
     return Promise.resolve().then(() => {
       const isEventToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
-      const isMuted = conversationEntity && conversationEntity.is_muted();
+      const ignoreAllNotifications = conversationEntity && conversationEntity.showNotificationsNothing();
 
-      const shouldNotify = isEventToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview() && !isMuted;
+      const showNotificationsOnlyMentions = conversationEntity && conversationEntity.showNotificationsOnlyMentions();
+      const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
+      const ignoreMention = !showNotificationsOnlyMentions || !isSelfMentioned;
+
+      const shouldNotify =
+        isEventToNotify &&
+        !messageEntity.isEdited() &&
+        !messageEntity.isLinkPreview() &&
+        !ignoreAllNotifications &&
+        !ignoreMention;
       if (shouldNotify) {
         this._notifySound(messageEntity);
         return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
