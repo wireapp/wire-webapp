@@ -104,7 +104,10 @@ z.search.SearchRepository = class SearchRepository {
   }
 
   _matches(term, property, userEntity) {
-    const excludedEmojis = Array.from(term).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
+    const excludedEmojis = Array.from(term).reduce((emojis, char) => {
+      const isEmoji = z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+      return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
+    }, {});
     const value = ko.unwrap(userEntity[property]) || '';
 
     const isStrictMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);

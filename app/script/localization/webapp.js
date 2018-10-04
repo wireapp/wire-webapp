@@ -493,8 +493,8 @@ z.string.extensionsGiphyRandom = 'Random';
 // Panel
 // Panel: Add participants
 z.string.addParticipantsConfirmLabel = 'Add';
-z.string.addParticipantsHeader = 'Add people';
-z.string.addParticipantsHeaderWithCounter = 'Add people ({{number}})';
+z.string.addParticipantsHeader = 'Add participants';
+z.string.addParticipantsHeaderWithCounter = 'Add participants ({{number}})';
 z.string.addParticipantsManageServices = 'Manage services';
 z.string.addParticipantsManageServicesNoResults = 'Manage services';
 z.string.addParticipantsNoServicesManager = 'Services are helpers that can improve your workflow.';
