@@ -48,7 +48,7 @@ describe('z.notification.NotificationRepository', () => {
 
         // Create entities
         user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
-        conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversations([
+        conversation_et = TestFactory.conversation_repository.conversationMapper.mapConversations([
           entities.conversation,
         ])[0];
         conversation_et.team_id = undefined;
