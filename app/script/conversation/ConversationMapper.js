@@ -87,7 +87,7 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-// Conversation Mapper to convert all server side JSON conversation objects into core entities
+// Conversation Mapper to convert all server side JSON conversation objects into core entities.
 z.conversation.ConversationMapper = class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
@@ -112,7 +112,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   }
 
   /**
-   * Updates all properties of a conversation specified
+   * Updates all properties of a conversation specified.
    *
    * @example data: {"name":"ThisIsMyNewConversationName"}
    * @todo make utility?
@@ -284,6 +284,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
   /**
    * Merge local database records with remote backend payload.
+   *
    * @param {Array} local - Database records
    * @param {Array} remote - Backend payload
    * @returns {Array} Merged conversation data
