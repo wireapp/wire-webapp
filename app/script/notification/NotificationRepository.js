@@ -137,12 +137,12 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
     return Promise.resolve().then(() => {
-      const shouldNotify = new z.notification.NotificationFilter(
+      const shouldNotify = z.util.NotificationUtil.shouldNotify(
         conversationEntity,
         messageEntity,
         NotificationRepository.EVENTS_TO_NOTIFY,
         this.selfUser
-      ).shouldNotify();
+      );
 
       if (shouldNotify) {
         this._notifySound(messageEntity);

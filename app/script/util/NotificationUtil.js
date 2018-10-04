@@ -20,47 +20,33 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.notification = z.notification || {};
+window.z.util = z.util || {};
 
-z.notification.NotificationFilter = class NotificationFilter {
+z.util.NotificationUtil = {
   /**
    * @param {z.entity.Conversation} conversationEntity - The conversation to filter from.
    * @param {z.entity.Message} messageEntity - The message to filter from.
    * @param {EVENTS_TO_NOTIFY} eventsToNotify - The events which should be counted in.
    * @param {z.entity.User} selfUser - The user to filter from.
+   * @returns {boolean} If the conversation should send a notification.
    */
-  constructor(conversationEntity, messageEntity, eventsToNotify, selfUser) {
-    this.conversationEntity = conversationEntity;
-    this.eventsToNotify = eventsToNotify;
-    this.messageEntity = messageEntity;
-    this.selfUser = selfUser;
-  }
+  shouldNotify: (conversationEntity, messageEntity, eventsToNotify, selfUser) => {
+    const isEventToNotify =
+      eventsToNotify.includes(messageEntity.super_type) && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
 
-  shouldNotify() {
-    switch (this.conversationEntity.notificationState()) {
+    const isSelfMentioned =
+      isEventToNotify && messageEntity.is_content() && messageEntity.isUserMentioned(selfUser().id);
+
+    switch (conversationEntity.notificationState()) {
       case z.conversation.NotificationSetting.STATE.EVERYTHING: {
-        return this._isEventToNotify();
+        return isEventToNotify;
       }
       case z.conversation.NotificationSetting.STATE.NOTHING: {
         return false;
       }
       case z.conversation.NotificationSetting.STATE.ONLY_MENTIONS: {
-        return this._isSelfMentioned();
+        return isSelfMentioned;
       }
     }
-  }
-
-  _isEventToNotify() {
-    return (
-      this.eventsToNotify.includes(this.messageEntity.super_type) &&
-      !this.messageEntity.isEdited() &&
-      !this.messageEntity.isLinkPreview()
-    );
-  }
-
-  _isSelfMentioned() {
-    return (
-      this._isEventToNotify && this.messageEntity.is_content() && this.messageEntity.isUserMentioned(this.selfUser().id)
-    );
-  }
+  },
 };

@@ -19,18 +19,17 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:notification/NotificationFilter
+// grunt test_init && grunt test_run:util/NotificationUtil
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 
-describe('z.notification.NotificationFilter', () => {
+describe('z.util.NotificationUtil', () => {
   const eventsToNotify = z.notification.NotificationRepository.EVENTS_TO_NOTIFY;
   const userId = 'c59dfb06-6bef-4ac5-b220-11f32040cf40';
 
   let conversationEntity;
   let messageEntity;
-  let notificationFilter;
   let selfUserObservable;
 
   function generateTextAsset(selfMentioned = false) {
@@ -57,55 +56,55 @@ describe('z.notification.NotificationFilter', () => {
     messageEntity.add_asset(generateTextAsset());
 
     conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.EVERYTHING');
-    notificationFilter = new z.notification.NotificationFilter(
+    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
       selfUserObservable
     );
 
-    expect(notificationFilter.shouldNotify()).toBe(true);
+    expect(shouldNotify).toBe(true);
   });
 
   it('returns the correct value for no notifications', () => {
     messageEntity.add_asset(generateTextAsset());
 
     conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.NOTHING');
-    notificationFilter = new z.notification.NotificationFilter(
+    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
       selfUserObservable
     );
 
-    expect(notificationFilter.shouldNotify()).toBe(false);
+    expect(shouldNotify).toBe(false);
   });
 
   it('returns the correct value for self mentioned messages', () => {
     messageEntity.add_asset(generateTextAsset(true));
 
     conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.ONLY_MENTIONS');
-    notificationFilter = new z.notification.NotificationFilter(
+    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
       selfUserObservable
     );
 
-    expect(notificationFilter.shouldNotify()).toBe(true);
+    expect(shouldNotify).toBe(true);
   });
 
   it('returns the correct value for non-self mentioned messages', () => {
     messageEntity.add_asset(generateTextAsset());
 
     conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.ONLY_MENTIONS');
-    notificationFilter = new z.notification.NotificationFilter(
+    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
       selfUserObservable
     );
 
-    expect(notificationFilter.shouldNotify()).toBe(false);
+    expect(shouldNotify).toBe(false);
   });
 });
