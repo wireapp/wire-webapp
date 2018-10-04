@@ -100,6 +100,7 @@ import {
   PingIcon,
   PlaneIcon,
   ProfileIcon,
+  QUERY,
   RightLeftMovement,
   RoundIconButton,
   Select,
@@ -179,6 +180,8 @@ class Demo extends React.PureComponent {
     isModalOpen: false,
     isOverlayOpen: false,
     showAnimation: false,
+    showFirstDropdown: false,
+    showSecondDropdown: false,
   };
 
   componentDidMount() {
@@ -256,6 +259,7 @@ class Demo extends React.PureComponent {
   }
 
   render() {
+    const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
     const ColumnsStyle = {
       marginBottom: '12px',
     };
@@ -332,10 +336,37 @@ class Demo extends React.PureComponent {
           </MenuLink>
           <MenuLink href="#">test1</MenuLink>
           <MenuLink href="#">test2</MenuLink>
-          <HeaderSubMenu caption={'Drowdown'}>
-            <MenuLink noWrap>{'Messaging'}</MenuLink>
-            <MenuLink noWrap>{'Voice & video'}</MenuLink>
-            <MenuLink noWrap>{'File sharing & productivity'}</MenuLink>
+          <HeaderSubMenu
+            caption={'Drowdown1'}
+            isOpen={this.state.showFirstDropdown}
+            onMouseLeave={isDesktop ? () => this.setState({showFirstDropdown: false}) : undefined}
+            onMouseOver={
+              isDesktop ? () => this.setState({showFirstDropdown: true, showSecondDropdown: false}) : undefined
+            }
+            onClick={event => {
+              event.stopPropagation();
+              this.setState({showFirstDropdown: !this.state.showFirstDropdown, showSecondDropdown: false});
+            }}
+          >
+            <MenuLink noWrap>{'Messaging1'}</MenuLink>
+            <MenuLink noWrap>{'Voice & video1'}</MenuLink>
+            <MenuLink noWrap>{'File sharing & productivity1'}</MenuLink>
+          </HeaderSubMenu>
+          <HeaderSubMenu
+            caption={'Drowdown2'}
+            isOpen={this.state.showSecondDropdown}
+            onMouseLeave={isDesktop ? () => this.setState({showSecondDropdown: false}) : undefined}
+            onMouseOver={
+              isDesktop ? () => this.setState({showFirstDropdown: false, showSecondDropdown: true}) : undefined
+            }
+            onClick={event => {
+              event.stopPropagation();
+              this.setState({showFirstDropdown: false, showSecondDropdown: !this.state.showSecondDropdown});
+            }}
+          >
+            <MenuLink noWrap>{'Messaging2'}</MenuLink>
+            <MenuLink noWrap>{'Voice & video2'}</MenuLink>
+            <MenuLink noWrap>{'File sharing & productivity2'}</MenuLink>
           </HeaderSubMenu>
           <MenuLink href="#">test3</MenuLink>
           <MenuLink href="#">test4</MenuLink>
