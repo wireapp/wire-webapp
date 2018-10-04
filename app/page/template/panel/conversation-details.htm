@@ -43,7 +43,7 @@
                 </div>
               </div>
             <!-- /ko -->
-  
+
             <!-- ko if: activeConversation() && activeConversation().is_group() -->
               <div class="conversation-details__participant_count">
                 <!-- ko if: userParticipants().length -->
@@ -81,7 +81,7 @@
                       <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                         <notification-icon class="panel__action-item__icon"></notification-icon>
                         <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionNotifications"></div>
-                        <div class="panel__action-item__status" data-bind="l10n_text: notificationStatusText" data-uie-name="status-timed-messages"></div>
+                        <div class="panel__action-item__status" data-bind="l10n_text: notificationStatusText" data-uie-name="status-notifications"></div>
                         <disclose-icon></disclose-icon>
                       </div>
                     </div>
@@ -123,7 +123,7 @@
                   </div>
                 <!-- /ko -->
               <!-- /ko -->
-  
+
               <!-- ko if: serviceParticipants().length -->
                 <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsServices"></div>
                 <service-list params="services: serviceParticipants, click: clickOnShowService, altStyle: true" data-uie-name="list-services"></service-list>
@@ -138,7 +138,7 @@
                 <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                   <notification-icon class="panel__action-item__icon"></notification-icon>
                   <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionNotifications"></div>
-                  <div class="panel__action-item__status" data-bind="l10n_text: notificationStatusText" data-uie-name="status-timed-messages"></div>
+                  <div class="panel__action-item__status" data-bind="l10n_text: notificationStatusText" data-uie-name="status-notifications"></div>
                   <disclose-icon></disclose-icon>
                 </div>
               </div>
