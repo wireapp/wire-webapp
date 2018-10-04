@@ -17,21 +17,21 @@
  *
  */
 
-import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import * as React from 'react';
-import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import ClientItem from './ClientItem';
-import * as ClientSelector from '../module/selector/ClientSelector';
-import {connect} from 'react-redux';
-import {ROUTE} from '../route';
-import BackendError from '../module/action/BackendError';
-import {withRouter, RouteComponentProps} from 'react-router';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import {pathWithParams} from '../util/urlUtil';
+import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
+import BackendError from '../module/action/BackendError';
+import * as LocalStorageAction from '../module/action/LocalStorageAction';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as ClientSelector from '../module/selector/ClientSelector';
+import {ROUTE} from '../route';
+import {pathWithParams} from '../util/urlUtil';
+import ClientItem from './ClientItem';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -50,15 +50,15 @@ interface DispatchProps {
 
 interface State {
   currentlySelectedClient: string;
-  showLoading: boolean;
   loadingTimeoutId: number | undefined;
+  showLoading: boolean;
 }
 
 class ClientList extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   state: State = {
     currentlySelectedClient: null,
-    showLoading: false,
     loadingTimeoutId: undefined,
+    showLoading: false,
   };
 
   componentWillUnmount() {
@@ -129,19 +129,23 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => ({
-        clientError: ClientSelector.getError(state),
-        isFetching: ClientSelector.isFetching(state),
-        permanentClients: ClientSelector.getPermanentClients(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-        doRemoveClient: (clientId: string, password: string) =>
-          dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
-        getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
-        doInitializeClient: (clientType: ClientType, password?: string) =>
-          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          clientError: ClientSelector.getError(state),
+          isFetching: ClientSelector.isFetching(state),
+          permanentClients: ClientSelector.getPermanentClients(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          doInitializeClient: (clientType: ClientType, password?: string) =>
+            dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
+          doRemoveClient: (clientId: string, password: string) =>
+            dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
+          getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
+          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+        };
+      }
     )(ClientList)
   )
 );
