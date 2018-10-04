@@ -167,8 +167,8 @@ z.entity.Conversation = class Conversation {
     this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
-    this.unreadEventsCount = ko.pureComputed(0);
-    this.unreadMessagesCount = ko.pureComputed(0);
+    this.unreadEventsCount = ko.observable(0);
+    this.unreadMessagesCount = ko.observable(0);
     this.hasUnreadSelfMention = ko.observable(false);
 
     this.unreadEvents = ko.pureComputed(() => {
