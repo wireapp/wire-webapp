@@ -21,70 +21,88 @@ import {defaultProps} from 'recompose';
 import transition from 'styled-transition-group';
 import {DURATION, EASE} from './motions';
 
-const Opacity = transition.div.attrs({
-  timeout: ({duration = DURATION.DEFAULT}) => duration,
-  unmountOnExit: ({isInnerAnimation}) => isInnerAnimation,
-})`
+const Opacity = transition.div`
   &:enter {
     opacity: ${({startValue = 0}) => startValue};
   }
   &:enter-active {
     opacity: ${({endValue = 1}) => endValue};
-    transition: all ${({duration = DURATION.DEFAULT}) => duration}ms ${EASE.QUART};
+    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
   }
   &:exit {
     opacity: ${({endValue = 1}) => endValue};
   }
   &:exit-active {
+    pointer-events: none;
     opacity: ${({startValue = 0}) => startValue};
-    transition: all ${({duration = DURATION.DEFAULT}) => duration}ms ${EASE.QUART};
+    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
   }
 `;
 
-const YAxisMovement = transition.div.attrs({
-  timeout: ({duration = DURATION.DEFAULT}) => duration,
-  unmountOnExit: ({isInnerAnimation}) => isInnerAnimation,
-})`
+const YAxisMovement = transition.div`
   &:enter {
     transform: translateY(${({startValue}) => startValue});
   }
   &:enter-active {
     transform: translateY(${({endValue}) => endValue});
-    transition: all ${({duration = DURATION.DEFAULT}) => duration}ms ${EASE.EXPONENTIAL};
+    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
   }
   &:exit {
     transform: translateY(${({endValue}) => endValue});
   }
   &:exit-active {
     transform: translateY(${({startValue}) => startValue});
-    transition: all ${({duration = DURATION.DEFAULT}) => duration}ms ${EASE.EXPONENTIAL};
+    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
   }
 `;
 
 const TopDownMovement = defaultProps({startValue: '-100%', endValue: '0%'})(YAxisMovement);
 const BottomUpMovement = defaultProps({startValue: '100%', endValue: '0%'})(YAxisMovement);
 
-const XAxisMovement = transition.div.attrs({
-  timeout: ({duration = DURATION.DEFAULT}) => duration,
-  unmountOnExit: ({isInnerAnimation}) => isInnerAnimation,
-})`
+const Slide = transition.div`
+&:enter {
+  margin-top: ${({startValue = '-100%'}) => startValue};
+}
+&:enter-active {
+  margin-top: ${({endValue = '0'}) => endValue};
+  transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
+}
+&:exit {
+  margin-top: ${({endValue = '0'}) => endValue};
+}
+&:exit-active {
+  margin-top: ${({startValue = '-100%'}) => startValue};
+  transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
+}
+`;
+
+const XAxisMovement = transition.div`
   &:enter {
     transform: translateX(${({startValue}) => startValue});
   }
   &:enter-active {
     transform: translateX(${({endValue}) => endValue});
-    transition: all ${({duration = DURATION.DEFAULT}) => duration}ms ${EASE.EXPONENTIAL};
+    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
   }
   &:exit {
     transform: translateX(${({endValue}) => endValue});
   }
   &:exit-active {
     transform: translateX(${({startValue}) => startValue});
-    transition: all ${({duration = DURATION.DEFAULT}) => duration}ms ${EASE.EXPONENTIAL};
+    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
   }
 `;
 
 const LeftRightMovement = defaultProps({startValue: '-100vh', endValue: '0vh'})(XAxisMovement);
 const RightLeftMovement = defaultProps({startValue: '100vh', endValue: '0vh'})(XAxisMovement);
 
-export {Opacity, TopDownMovement, BottomUpMovement, YAxisMovement, LeftRightMovement, RightLeftMovement, XAxisMovement};
+export {
+  Slide,
+  Opacity,
+  TopDownMovement,
+  BottomUpMovement,
+  YAxisMovement,
+  LeftRightMovement,
+  RightLeftMovement,
+  XAxisMovement,
+};
