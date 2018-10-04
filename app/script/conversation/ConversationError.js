@@ -37,6 +37,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
     return {
       CONVERSATION_NOT_FOUND: 'Conversation not found',
       DEGRADED_CONVERSATION_CANCELLATION: 'Sending to degraded conversation was canceled by user',
+      INVALID_PARAMETER: 'Invalid parameter passed',
       MESSAGE_NOT_FOUND: 'Message not found in conversation',
       MISSING_PARAMETER: 'Required parameter is not defined',
       NO_CHANGES: 'Missing changes to message',
@@ -55,6 +56,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
     return {
       CONVERSATION_NOT_FOUND: 'CONVERSATION_NOT_FOUND',
       DEGRADED_CONVERSATION_CANCELLATION: 'DEGRADED_CONVERSATION_CANCELLATION',
+      INVALID_PARAMETER: 'INVALID_PARAMETER',
       MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
       MISSING_PARAMETER: 'MISSING_PARAMETER',
       NO_CHANGES: 'NO_CHANGES',

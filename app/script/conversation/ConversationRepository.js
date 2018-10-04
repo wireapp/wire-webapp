@@ -1253,7 +1253,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _updateClearedTimestamp(conversationEntity) {
     const timestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
 
-    if (timestamp && conversationEntity.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
+    if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new z.proto.Cleared(conversationEntity.id, timestamp);
       const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, protoCleared);
@@ -1605,7 +1605,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const timestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
     const conversationId = conversationEntity.id;
 
-    if (timestamp && conversationEntity.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
+    if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const protoLeastRead = new z.proto.LastRead(conversationId, conversationEntity.last_read_timestamp());
       const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, protoLeastRead);

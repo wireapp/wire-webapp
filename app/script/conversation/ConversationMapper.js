@@ -160,12 +160,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
       } = self_state;
 
       if (archived_timestamp) {
-        conversation_et.set_timestamp(archived_timestamp, z.conversation.TIMESTAMP_TYPE.ARCHIVED);
+        conversation_et.setTimestamp(archived_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
         conversation_et.archived_state(self_state.archived_state);
       }
 
       if (cleared_timestamp !== undefined) {
-        conversation_et.set_timestamp(cleared_timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED, true);
+        conversation_et.setTimestamp(cleared_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED, true);
       }
 
       if (ephemeral_timer !== undefined) {
@@ -177,19 +177,19 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       if (last_event_timestamp) {
-        conversation_et.set_timestamp(last_event_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+        conversation_et.setTimestamp(last_event_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_EVENT);
       }
 
       if (last_read_timestamp) {
-        conversation_et.set_timestamp(last_read_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+        conversation_et.setTimestamp(last_read_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       }
 
       if (last_server_timestamp) {
-        conversation_et.set_timestamp(last_server_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        conversation_et.setTimestamp(last_server_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
 
       if (muted_timestamp) {
-        conversation_et.set_timestamp(muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
+        conversation_et.setTimestamp(muted_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
         conversation_et.muted_state(self_state.muted_state);
       }
 
@@ -206,13 +206,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       if (otr_archived !== undefined) {
         const otr_archived_timestamp = new Date(self_state.otr_archived_ref).getTime();
-        conversation_et.set_timestamp(otr_archived_timestamp, z.conversation.TIMESTAMP_TYPE.ARCHIVED);
+        conversation_et.setTimestamp(otr_archived_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
         conversation_et.archived_state(otr_archived);
       }
 
       if (otr_muted !== undefined) {
         const otr_muted_timestamp = new Date(self_state.otr_muted_ref).getTime();
-        conversation_et.set_timestamp(otr_muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
+        conversation_et.setTimestamp(otr_muted_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
         conversation_et.muted_state(otr_muted);
       }
 

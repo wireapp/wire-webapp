@@ -319,12 +319,12 @@ describe('ConversationRepository', () => {
       const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
-      group_cleared.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
+      group_cleared.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
 
       const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
-      group_removed.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
+      group_removed.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
       group_removed.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       Promise.all([
