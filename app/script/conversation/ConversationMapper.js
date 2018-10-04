@@ -234,7 +234,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    */
   _create_conversation_et(conversation_data, initial_timestamp) {
     if (conversation_data === undefined || !Object.keys(conversation_data).length) {
-      throw new Error('Cannot create conversation entity without data');
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
 
     const {creator, id, members, name, others, type} = conversation_data;
