@@ -38,9 +38,9 @@ import {clientItemStrings} from '../../strings';
 import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
-export interface Props extends React.HTMLAttributes<ClientItem> {
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   selected: boolean;
-  onClick: (event: React.MouseEvent<ClientItem>) => void;
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   client: RegisteredClient;
   clientError: Error;
   onClientRemoval: (password: string) => void;
@@ -136,7 +136,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
 
   resetState = () => this.setState(ClientItem.initialState);
 
-  wrappedOnClick = (event: React.MouseEvent<ClientItem>) => {
+  wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>) => {
     this.resetState();
     this.props.onClick(event);
   };
