@@ -20,7 +20,6 @@
                              enter: onInputEnter,
                              hasFocus: hasFocus,
                              textInput: input,
-                             resize: {triggerValue: input, callback: scrollMessageList, syncElement: '.shadow-input', delayedResize: true},
                              click: onInputClick,
                              attr: {'placeholder': inputPlaceholder},
                              css: {'conversation-input-bar-text--accent': hasLocalEphemeralTimer()},
@@ -28,7 +27,10 @@
                   data-uie-name="input-message"
                   dir="auto">
         </textarea>
-        <div class="shadow-input" data-bind="html: richTextInput, scrollSync: '#conversation-input-bar-text'" data-uie-name="input-message-rich-text"></div>
+        <div class="shadow-input" data-bind="html: richTextInput,
+                                             scrollSync: '#conversation-input-bar-text',
+                                             heightSync: {target: '#conversation-input-bar-text', trigger: richTextInput, callback: scrollMessageList}"
+             data-uie-name="input-message-rich-text"></div>
       </div>
       <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
 

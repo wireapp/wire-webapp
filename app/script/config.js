@@ -118,6 +118,7 @@ window.z.config = {
     CREATE_TEAM: '/create-team/',
     DECRYPT_ERROR_1: '/privacy/error-1/',
     DECRYPT_ERROR_2: '/privacy/error-2/',
+    MANAGE_SERVICES: '/services/',
     MANAGE_TEAM: '/login/',
     PASSWORD_RESET: '/forgot/',
     PRIVACY_HOW: '/privacy/how/',
