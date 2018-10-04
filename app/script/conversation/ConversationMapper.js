@@ -97,14 +97,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Array} [conversationsData=[undefined]] - Conversation data
+   * @param {Array} [conversationsData=[]] - Conversation data
    * @param {number} [timestamp=1] - Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  mapConversations(conversationsData = [undefined], timestamp = 1) {
-    return conversationsData.map((conversationData, index) => {
-      return this._create_conversation_et(conversationData, timestamp + index);
-    });
+  mapConversations(conversationsData = [], timestamp = 1) {
+    return conversationsData.map((data, index) => this._createConversation(data, timestamp + index));
   }
 
   /**
