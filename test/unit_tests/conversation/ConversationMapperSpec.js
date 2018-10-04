@@ -117,7 +117,8 @@ describe('Conversation Mapper', () => {
   describe('updateProperties', () => {
     it('can update the properties of a conversation', () => {
       const creator_id = z.util.createRandomUuid();
-      const [conversation_et] = conversation_mapper.mapConversations(payload.conversations.get.conversations[0]);
+      const conversationsData = [payload.conversations.get.conversations[0]];
+      const [conversation_et] = conversation_mapper.mapConversations(conversationsData);
       const data = {
         creator: creator_id,
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
@@ -152,7 +153,8 @@ describe('Conversation Mapper', () => {
     let conversation_et = undefined;
 
     beforeEach(() => {
-      [conversation_et] = conversation_mapper.mapConversations(payload.conversations.get.conversations[0]);
+      const conversationsData = [payload.conversations.get.conversations[0]];
+      [conversation_et] = conversation_mapper.mapConversations(conversationsData);
     });
 
     it('returns without updating if conversation entity does not exist', () => {
