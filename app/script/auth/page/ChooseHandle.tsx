@@ -17,36 +17,36 @@
  *
  */
 
-import {chooseHandleStrings} from '../../strings';
+import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
 import {
-  H1,
-  Text,
   ContainerXS,
-  ICON_NAME,
-  InputSubmitCombo,
-  Input,
-  RoundIconButton,
-  Form,
-  Muted,
   ErrorMessage,
+  Form,
+  H1,
+  ICON_NAME,
+  Input,
+  InputSubmitCombo,
+  Muted,
+  RoundIconButton,
+  Text,
 } from '@wireapp/react-ui-kit';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import {parseError} from '../util/errorUtil';
-import {pathWithParams} from '../util/urlUtil';
-import Page from './Page';
 import * as React from 'react';
-import {createSuggestions} from '../util/handleUtil';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {chooseHandleStrings} from '../../strings';
+import AcceptNewsModal from '../component/AcceptNewsModal';
+import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
-import {ROUTE} from '../route';
-import {withRouter, RouteComponentProps} from 'react-router';
-import AcceptNewsModal from '../component/AcceptNewsModal';
-import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import EXTERNAL_ROUTE from '../externalRoute';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as SelfSelector from '../module/selector/SelfSelector';
+import {ROUTE} from '../route';
+import {parseError} from '../util/errorUtil';
+import {createSuggestions} from '../util/handleUtil';
+import {pathWithParams} from '../util/urlUtil';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps<{}> {}
 
@@ -155,19 +155,23 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default injectIntl(
   withRouter(
     connect(
-      (state: RootState): ConnectedProps => ({
-        hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
-        isFetching: SelfSelector.isFetching(state),
-        isTeamFlow: AuthSelector.isTeamFlow(state),
-        name: SelfSelector.getSelfName(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        checkHandles: (handles: string[]) => dispatch(ROOT_ACTIONS.userAction.checkHandles(handles)),
-        doGetConsents: () => dispatch(ROOT_ACTIONS.selfAction.doGetConsents()),
-        doSetConsent: (consentType: ConsentType, value: number) =>
-          dispatch(ROOT_ACTIONS.selfAction.doSetConsent(consentType, value)),
-        setHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
+          isFetching: SelfSelector.isFetching(state),
+          isTeamFlow: AuthSelector.isTeamFlow(state),
+          name: SelfSelector.getSelfName(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          checkHandles: (handles: string[]) => dispatch(ROOT_ACTIONS.userAction.checkHandles(handles)),
+          doGetConsents: () => dispatch(ROOT_ACTIONS.selfAction.doGetConsents()),
+          doSetConsent: (consentType: ConsentType, value: number) =>
+            dispatch(ROOT_ACTIONS.selfAction.doSetConsent(consentType, value)),
+          setHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
+        };
+      }
     )(ChooseHandle)
   )
 );

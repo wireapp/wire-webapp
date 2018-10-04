@@ -16,13 +16,13 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
 import {conversationJoinStrings} from '../../strings';
-import {H2, Text, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
-import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
+import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
@@ -66,7 +66,11 @@ class ConversationJoinInvalid extends React.PureComponent<
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({}),
-    (dispatch: ThunkDispatch): DispatchProps => ({})
+    (state: RootState): ConnectedProps => {
+      return {};
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {};
+    }
   )(ConversationJoinInvalid)
 );

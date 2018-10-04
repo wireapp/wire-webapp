@@ -17,20 +17,20 @@
  *
  */
 
+import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
-import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import ValidationError from '../module/action/ValidationError';
-import * as React from 'react';
 import EXTERNAL_ROUTE from '../externalRoute';
-import BackendError from '../module/action/BackendError';
-import * as AccentColor from '../util/AccentColor';
-import {RootState, ThunkDispatch} from '../module/reducer';
 import ROOT_ACTIONS from '../module/action/';
+import BackendError from '../module/action/BackendError';
+import ValidationError from '../module/action/ValidationError';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as AccentColor from '../util/AccentColor';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 interface Props extends React.FormHTMLAttributes<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;
@@ -68,7 +68,7 @@ interface State {
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class AccountForm extends React.PureComponent<CombinedProps, State> {
-  private inputs: {
+  private readonly inputs: {
     name?: HTMLInputElement;
     email?: HTMLInputElement;
     password?: HTMLInputElement;
@@ -304,17 +304,21 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => ({
-      account: AuthSelector.getAccount(state),
-      authError: AuthSelector.getError(state),
-      isFetching: AuthSelector.isFetching(state),
-      isPersonalFlow: AuthSelector.isPersonalFlow(state),
-      isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
-        dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
-    })
+    (state: RootState): ConnectedProps => {
+      return {
+        account: AuthSelector.getAccount(state),
+        authError: AuthSelector.getError(state),
+        isFetching: AuthSelector.isFetching(state),
+        isPersonalFlow: AuthSelector.isPersonalFlow(state),
+        isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
+      };
+    },
+    (dispatch: ThunkDispatch): DispatchProps => {
+      return {
+        doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
+        pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
+          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
+      };
+    }
   )(AccountForm)
 );
