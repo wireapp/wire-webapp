@@ -800,7 +800,7 @@ describe('Conversation', () => {
       time = Date.now();
       conversation_et.archived_timestamp(time);
       conversation_et.archived_state(true);
-      conversation_et.muted_state(true);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
     });
 
     it('returns expected bool whether a conversation should be unarchived', () => {
@@ -813,7 +813,7 @@ describe('Conversation', () => {
       conversation_et.last_event_timestamp(time + 100);
       expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
-      conversation_et.muted_state(false);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
       conversation_et.last_event_timestamp(time - 100);
       expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
@@ -849,7 +849,7 @@ describe('Conversation', () => {
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.muted_state(false);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);

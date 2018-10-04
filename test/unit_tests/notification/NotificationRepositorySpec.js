@@ -246,7 +246,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the conversation is muted', done => {
-      conversation_et.muted_state(true);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
 
       TestFactory.notification_repository
         .notify(message_et, undefined, conversation_et)

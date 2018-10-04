@@ -1419,7 +1419,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const payload = {
-      otr_muted: !conversation_et.is_muted(),
+      otr_muted: conversation_et.showNotificationsEverything(),
       otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(this.timeOffset)).toISOString(),
     };
 
@@ -3252,7 +3252,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (conversationEntity.is_muted()) {
+    if (!conversationEntity.showNotificationsEverything()) {
       const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
       if (hasIncomingCall) {
         amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversationEntity.id, false);

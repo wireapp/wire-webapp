@@ -73,15 +73,17 @@ describe('Conversation Mapper', () => {
 
       expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
       expect(conversation_et.id).toBe(conversation.id);
-      expect(conversation_et.is_group()).toBeTruthy();
-      expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
-      expect(conversation_et.last_event_timestamp()).toBe(initial_timestamp);
-      expect(conversation_et.last_server_timestamp()).toBe(initial_timestamp);
-      expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
-      expect(conversation_et.name()).toBe(conversation.name);
       expect(conversation_et.getNumberOfParticipants()).toBe(conversation.members.others.length + 1);
+      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.name()).toBe(conversation.name);
+      expect(conversation_et.notificationState()).toBe(z.conversation.NotificationSetting.STATE.EVERYTHING);
       expect(conversation_et.team_id).toEqual(conversation.team);
       expect(conversation_et.type()).toBe(z.conversation.ConversationType.GROUP);
+
+      const expectedNotificationTimestamp = new Date(conversation.members.self.otr_muted_ref).getTime();
+      expect(conversation_et.notificationTimestamp()).toEqual(expectedNotificationTimestamp);
+      expect(conversation_et.last_event_timestamp()).toBe(initial_timestamp);
+      expect(conversation_et.last_server_timestamp()).toBe(initial_timestamp);
     });
 
     it('maps multiple conversations', () => {
@@ -244,6 +246,7 @@ describe('Conversation Mapper', () => {
     it('can update the self status if a conversation is muted', () => {
       const timestamp = Date.now();
       conversation_et.last_event_timestamp(timestamp);
+
       const self_status = {
         otr_muted: true,
         otr_muted_ref: new Date(timestamp).toISOString(),
@@ -251,7 +254,8 @@ describe('Conversation Mapper', () => {
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
 
       expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
-      expect(updated_conversation_et.muted_state()).toBe(true);
+      expect(updated_conversation_et.notificationTimestamp()).toBe(timestamp);
+      expect(updated_conversation_et.notificationState()).toBe(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
     });
 
     it('accepts string values which must be parsed later on', () => {
@@ -267,13 +271,13 @@ describe('Conversation Mapper', () => {
   describe('mergeConversation', () => {
     // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "service": null, "otr_muted_ref": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z"}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "team": "5316fe03-24ee-4b19-b789-6d026bd3ce5f", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
+    const  remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "service": null, "otr_muted_ref": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z"}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "team": "5316fe03-24ee-4b19-b789-6d026bd3ce5f", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
     it('incorporates remote data from backend into local data', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": false, "muted_timestamp": 0, "verification_state": 0};
+      const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "notification_state": z.conversation.NotificationSetting.STATE.EVERYTHING, "notification_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const [merged_conversation] = conversation_mapper.mergeConversation([local_data], [remote_data]);
@@ -292,8 +296,8 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation.id).toBe(local_data.id);
       expect(merged_conversation.last_event_timestamp).toBe(local_data.last_event_timestamp);
       expect(merged_conversation.last_read_timestamp).toBe(local_data.last_read_timestamp);
-      expect(merged_conversation.muted_state).toBe(local_data.muted_state);
-      expect(merged_conversation.muted_timestamp).toBe(local_data.muted_timestamp);
+      expect(merged_conversation.notification_state).toBe(local_data.notification_state);
+      expect(merged_conversation.notification_timestamp).toBe(local_data.notification_timestamp);
       expect(merged_conversation.verification_state).toBe(local_data.verification_state);
     });
 
@@ -325,13 +329,13 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation.last_server_timestamp).toBe(local_data.last_event_timestamp);
       expect(merged_conversation.verification_state).toBe(local_data.verification_state);
 
+      const expectedArchivedTimestamp = new Date(remote_data.members.self.otr_archived_ref).getTime();
+      expect(merged_conversation.archived_timestamp).toBe(expectedArchivedTimestamp);
       expect(merged_conversation.archived_state).toBe(remote_data.members.self.otr_archived);
-      expect(merged_conversation.archived_timestamp).toBe(
-        new Date(remote_data.members.self.otr_archived_ref).getTime()
-      );
 
-      expect(merged_conversation.muted_state).toBe(remote_data.members.self.otr_muted);
-      expect(merged_conversation.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
+      const expectedNotificationTimestamp = new Date(remote_data.members.self.otr_muted_ref).getTime();
+      expect(merged_conversation.notification_timestamp).toBe(expectedNotificationTimestamp);
+      expect(merged_conversation.notification_state).toBe(z.conversation.NotificationSetting.STATE.EVERYTHING);
 
       expect(merged_conversation_2.last_event_timestamp).toBe(2);
       expect(merged_conversation_2.last_server_timestamp).toBe(2);
@@ -365,7 +369,7 @@ describe('Conversation Mapper', () => {
     it('updates local archive and muted timestamps if time of remote data is newer', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const local_data = {"archived_state": false, "archived_timestamp": 1487066801118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": false, "muted_timestamp": 0, "verification_state": 0};
+      const local_data = {"archived_state": false, "archived_timestamp": 1487066801118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "notification_state": z.conversation.NotificationSetting.STATE.EVERYTHING, "notification_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const self_update = {
@@ -391,17 +395,17 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation.last_event_timestamp).toBe(local_data.last_event_timestamp);
       expect(merged_conversation.last_read_timestamp).toBe(local_data.last_read_timestamp);
 
-      expect(merged_conversation.muted_timestamp).not.toBe(local_data.muted_timestamp);
+      expect(merged_conversation.notification_timestamp).not.toBe(local_data.notification_timestamp);
       expect(merged_conversation.verification_state).toBe(local_data.verification_state);
 
       // remote one is newer
+      const expectedArchivedTimestamp = new Date(remote_data.members.self.otr_archived_ref).getTime();
+      expect(merged_conversation.archived_timestamp).toBe(expectedArchivedTimestamp);
       expect(merged_conversation.archived_state).toBe(remote_data.members.self.otr_archived);
-      expect(merged_conversation.archived_timestamp).toBe(
-        new Date(remote_data.members.self.otr_archived_ref).getTime()
-      );
 
-      expect(merged_conversation.muted_state).toBe(remote_data.members.self.otr_muted);
-      expect(merged_conversation.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
+      const expectedNotificationTimestamp = new Date(remote_data.members.self.otr_muted_ref).getTime();
+      expect(merged_conversation.notification_state).toBe(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      expect(merged_conversation.notification_timestamp).toBe(expectedNotificationTimestamp);
     });
 
     it('only maps other participants if they are still in the conversation', () => {
@@ -427,6 +431,56 @@ describe('Conversation Mapper', () => {
 
       expect(merged_conversation.last_event_timestamp).toBe(local_data.last_event_timestamp);
       expect(merged_conversation.last_server_timestamp).toBe(local_data.last_event_timestamp);
+    });
+  });
+
+  describe('getNotificationState', () => {
+    const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
+
+    it('returns states if the only a notification state is given', () => {
+      const expectNothingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.NOTHING);
+      expect(expectNothingState).toBe(NOTIFICATION_STATE.NOTHING);
+
+      const expectOnlyMentionsState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.ONLY_MENTIONS);
+      expect(expectOnlyMentionsState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+
+      const expectEverythingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.EVERYTHING);
+      expect(expectEverythingState).toBe(NOTIFICATION_STATE.EVERYTHING);
+    });
+
+    it('returns states if only a muted state is given', () => {
+      const expectTrueState = conversation_mapper.getNotificationState(undefined, true);
+      expect(expectTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+
+      const expectFalseState = conversation_mapper.getNotificationState(undefined, false);
+      expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+    });
+
+    it('returns states if congruent states are given', () => {
+      const expectNothingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.NOTHING, true);
+      expect(expectNothingState).toBe(NOTIFICATION_STATE.NOTHING);
+
+      const expectOnlyMentionsState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.ONLY_MENTIONS, true);
+      expect(expectOnlyMentionsState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+
+      const expectEverythingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.EVERYTHING, false);
+      expect(expectEverythingState).toBe(NOTIFICATION_STATE.EVERYTHING);
+    });
+
+    it('returns states if conflicting states are given', () => {
+      const expectNothingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.NOTHING, false);
+      expect(expectNothingState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectOnlyMentionsState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.ONLY_MENTIONS, false);
+      expect(expectOnlyMentionsState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectEverythingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.EVERYTHING, true);
+      expect(expectEverythingState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+    });
+
+    it('returns state if no state is given', () => {
+      const expectState = conversation_mapper.getNotificationState();
+      expect(expectState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
   });
 });
