@@ -17,20 +17,20 @@
  *
  */
 
+import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
+import {RouteComponentProps, withRouter} from 'react-router';
 import {historyInfoStrings} from '../../strings';
-import Page from './Page';
-import {H1, Link, ContainerXS, Button, Paragraph} from '@wireapp/react-ui-kit';
+import EXTERNAL_ROUTE from '../externalRoute';
+import ROOT_ACTIONS from '../module/action/';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
-import {withRouter, RouteComponentProps} from 'react-router';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -97,13 +97,17 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => ({
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        resetHistoryCheck: () => dispatch(ROOT_ACTIONS.notificationAction.resetHistoryCheck()),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          hasHistory: ClientSelector.hasHistory(state),
+          hasSelfHandle: SelfSelector.hasSelfHandle(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          resetHistoryCheck: () => dispatch(ROOT_ACTIONS.notificationAction.resetHistoryCheck()),
+        };
+      }
     )(HistoryInfo)
   )
 );
