@@ -27,11 +27,23 @@ describe('Conversation Mapper', () => {
   beforeEach(() => (conversation_mapper = new z.conversation.ConversationMapper()));
 
   describe('mapConversations', () => {
-    it('throws an error if conversation data is missing', () => {
+    it('throws an error for invalid parameters', () => {
       const functionCall = () => conversation_mapper.mapConversations();
       expect(functionCall).toThrowError(
         z.conversation.ConversationError,
         z.conversation.ConversationError.MESSAGE.MISSING_PARAMETER
+      );
+
+      const functionCall = () => conversation_mapper.mapConversations([]);
+      expect(functionCall).toThrowError(
+        z.conversation.ConversationError,
+        z.conversation.ConversationError.MESSAGE.INVALID_PARAMETER
+      );
+
+      const functionCall = () => conversation_mapper.mapConversations([undefined]);
+      expect(functionCall).toThrowError(
+        z.conversation.ConversationError,
+        z.conversation.ConversationError.MESSAGE.INVALID_PARAMETER
       );
     });
 
