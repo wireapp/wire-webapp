@@ -435,8 +435,7 @@ z.string.conversationsPopoverBlock = 'Block…';
 z.string.conversationsPopoverCancel = 'Cancel request…';
 z.string.conversationsPopoverClear = 'Delete content…';
 z.string.conversationsPopoverLeave = 'Leave group…';
-z.string.conversationsPopoverNotify = 'Unmute';
-z.string.conversationsPopoverSilence = 'Mute';
+z.string.conversationsPopoverNotificationSettings = 'Notifications…';
 z.string.conversationsPopoverUnarchive = 'Unarchive';
 
 // Conversations secondary line

@@ -160,7 +160,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    * @param {boolean} [openFirstSelfMention=false] - Open first self mention instead of passed message
    * @returns {undefined} No return value
    */
-  showConversation(conversation, messageEntity, openFirstSelfMention = false) {
+  showConversation(conversation, {messageEntity, openFirstSelfMention = false, openNotificationSettings = false} = {}) {
     if (!conversation) {
       return this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
@@ -180,6 +180,9 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
 
       if (conversationEntity && isActiveConversation && isConversationState) {
+        if (openNotificationSettings) {
+          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        }
         return;
       }
 
@@ -198,6 +201,9 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
         this.previousConversation = this.conversationRepository.active_conversation();
+        if (openNotificationSettings) {
+          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        }
       });
     });
   }

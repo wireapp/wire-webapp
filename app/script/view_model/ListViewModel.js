@@ -297,13 +297,10 @@ z.viewModel.ListViewModel = class ListViewModel {
       const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
       const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
 
-      const labelStringId = conversationEntity.is_muted()
-        ? z.string.conversationsPopoverNotify
-        : z.string.conversationsPopoverSilence;
       title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
       entries.push({
-        click: () => this.clickToToggleMute(conversationEntity),
-        label: z.l10n.text(labelStringId),
+        click: () => this.clickToOpenNotificationSettings(conversationEntity),
+        label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
         title: title,
       });
     }
@@ -393,6 +390,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   clickToToggleMute(conversationEntity = this.conversationRepository.active_conversation()) {
     this.actionsViewModel.toggleMuteConversation(conversationEntity);
+  }
+
+  clickToOpenNotificationSettings(conversationEntity = this.conversationRepository.active_conversation()) {
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   }
 
   clickToUnarchive(conversationEntity) {
