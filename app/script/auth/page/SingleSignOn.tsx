@@ -17,53 +17,53 @@
  *
  */
 
-import * as React from 'react';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
+  ArrowIcon,
   Button,
-  Container,
-  ContainerXS,
-  Columns,
-  Column,
+  COLOR,
   Checkbox,
   CheckboxLabel,
-  RoundIconButton,
-  InputSubmitCombo,
+  Column,
+  Columns,
+  Container,
+  ContainerXS,
   ErrorMessage,
-  ICON_NAME,
-  Overlay,
-  Text,
-  Logo,
   Form,
-  Input,
   H1,
-  Muted,
-  Link,
-  ArrowIcon,
-  COLOR,
+  ICON_NAME,
+  Input,
+  InputSubmitCombo,
   IsMobile,
+  Link,
+  Logo,
+  Muted,
+  Overlay,
+  RoundIconButton,
+  Text,
 } from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {loginStrings, ssoLoginStrings} from '../../strings';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {BACKEND} from '../Environment';
+import EXTERNAL_ROUTE from '../externalRoute';
+import ROOT_ACTIONS from '../module/action/';
+import BackendError from '../module/action/BackendError';
+import ValidationError from '../module/action/ValidationError';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import * as URLUtil from '../util/urlUtil';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import BackendError from '../module/action/BackendError';
-import Page from './Page';
-import ValidationError from '../module/action/ValidationError';
-import {Link as RRLink} from 'react-router-dom';
 import {ROUTE} from '../route';
-import {connect} from 'react-redux';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
-import {loginStrings, ssoLoginStrings} from '../../strings';
-import {parseValidationErrors, parseError} from '../util/errorUtil';
-import {withRouter, RouteComponentProps} from 'react-router';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {BACKEND} from '../Environment';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {ThunkDispatch, RootState} from '../module/reducer';
-import ROOT_ACTIONS from '../module/action/';
+import * as URLUtil from '../util/urlUtil';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
@@ -93,11 +93,11 @@ interface State {
 }
 
 class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  private static SSO_CODE_PREFIX = 'wire-';
-  private static SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
+  private static readonly SSO_CODE_PREFIX = 'wire-';
+  private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
   private ssoWindow: Window = undefined;
-  private inputs: {code?: HTMLInputElement} = {};
+  private readonly inputs: {code?: HTMLInputElement} = {};
   state: State = {
     code: '',
     isOverlayOpen: false,
@@ -503,19 +503,23 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => ({
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        isFetching: AuthSelector.isFetching(state),
-        loginError: AuthSelector.getError(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-        validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
-        doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
-          dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
-        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          hasHistory: ClientSelector.hasHistory(state),
+          hasSelfHandle: SelfSelector.hasSelfHandle(state),
+          isFetching: AuthSelector.isFetching(state),
+          loginError: AuthSelector.getError(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
+            dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
+          doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+          validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
+        };
+      }
     )(SingleSignOn)
   )
 );

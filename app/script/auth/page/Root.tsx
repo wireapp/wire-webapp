@@ -17,32 +17,33 @@
  *
  */
 
-import * as React from 'react';
-import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {StyledApp} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {IntlProvider, addLocaleData} from 'react-intl';
+import * as de from 'react-intl/locale-data/de';
+import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {APP_INSTANCE_ID} from '../config';
+import ROOT_ACTIONS from '../module/action/';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as CookieSelector from '../module/selector/CookieSelector';
+import * as LanguageSelector from '../module/selector/LanguageSelector';
+import {ROUTE} from '../route';
+import ChooseHandle from './ChooseHandle';
+import ClientManager from './ClientManager';
+import ConversationJoin from './ConversationJoin';
+import ConversationJoinInvalid from './ConversationJoinInvalid';
+import CreateAccount from './CreateAccount';
+import CreatePersonalAccount from './CreatePersonalAccount';
+import HistoryInfo from './HistoryInfo';
 import Index from './Index';
 import InitialInvite from './InitialInvite';
 import Login from './Login';
-import TeamName from './TeamName';
-import CreateAccount from './CreateAccount';
-import CreatePersonalAccount from './CreatePersonalAccount';
-import ConversationJoin from './ConversationJoin';
-import ChooseHandle from './ChooseHandle';
-import ClientManager from './ClientManager';
-import ConversationJoinInvalid from './ConversationJoinInvalid';
-import Verify from './Verify';
-import HistoryInfo from './HistoryInfo';
-import {IntlProvider, addLocaleData} from 'react-intl';
-import {connect} from 'react-redux';
-import * as de from 'react-intl/locale-data/de';
-import {ROUTE} from '../route';
-const SUPPORTED_LOCALE = require('../supportedLocales');
-import * as CookieSelector from '../module/selector/CookieSelector';
-import {APP_INSTANCE_ID} from '../config';
 import SingleSignOn from './SingleSignOn';
-import {ThunkDispatch, RootState} from '../module/reducer';
-import ROOT_ACTIONS from '../module/action/';
+import TeamName from './TeamName';
+import Verify from './Verify';
+
+const SUPPORTED_LOCALE = require('../supportedLocales');
 
 addLocaleData([...de]);
 
@@ -104,12 +105,16 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
 }
 
 export default connect(
-  (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
-  (dispatch: ThunkDispatch): DispatchProps => ({
-    startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
-      dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
-    safelyRemoveCookie: (name: string, value: string) =>
-      dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
-    stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
-  })
+  (state: RootState): ConnectedProps => {
+    return {language: LanguageSelector.getLanguage(state)};
+  },
+  (dispatch: ThunkDispatch): DispatchProps => {
+    return {
+      safelyRemoveCookie: (name: string, value: string) =>
+        dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
+      startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
+        dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
+      stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
+    };
+  }
 )(Root);
