@@ -28,8 +28,10 @@ describe('Conversation Mapper', () => {
 
   describe('map_conversations', () => {
     it('throws an error if conversation data is missing', () => {
-      expect(() => conversation_mapper.map_conversations()).toThrow(
-        new Error('Cannot create conversation entity without data')
+      const functionCall = () => conversation_mapper.map_conversations();
+      expect(functionCall).toThrowError(
+        z.conversation.ConversationError,
+        z.conversation.ConversationError.MESSAGE.MISSING_PARAMETER
       );
     });
 
