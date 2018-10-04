@@ -17,13 +17,13 @@
  *
  */
 
-import BackendError from './BackendError';
-import * as Runtime from '../../Runtime';
-import * as Environment from '../../Environment';
-import * as StringUtil from '../../util/stringUtil';
-import {ClientType, RegisteredClient, ClientClassification} from '@wireapp/api-client/dist/commonjs/client/index';
-import {ThunkAction} from '../reducer';
+import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ClientInfo} from '@wireapp/core/dist/client/root';
+import * as Environment from '../../Environment';
+import * as Runtime from '../../Runtime';
+import * as StringUtil from '../../util/stringUtil';
+import {ThunkAction} from '../reducer';
+import BackendError from './BackendError';
 import {ClientActionCreator} from './creator/';
 
 export class ClientAction {
@@ -71,13 +71,15 @@ export class ClientAction {
         .then(creationStatus => {
           const isNewSubsequentClient = password && creationStatus.isNewClient;
           if (isNewSubsequentClient) {
-            dispatch(notificationAction.checkHistory());
-            throw new BackendError({
-              code: 201,
-              label: BackendError.LABEL.NEW_CLIENT,
-              message: 'New client is created.',
+            return dispatch(notificationAction.checkHistory()).then(() => {
+              throw new BackendError({
+                code: 201,
+                label: BackendError.LABEL.NEW_CLIENT,
+                message: 'New client is created.',
+              });
             });
           }
+          return undefined;
         })
         .catch(error => {
           dispatch(ClientActionCreator.failedInitializeClient(error));

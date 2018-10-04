@@ -18,17 +18,17 @@
  */
 
 import {Action} from 'redux';
-import {UserActions} from './UserActionCreator';
 import {AuthActions} from './AuthActionCreator';
 import {ClientActions} from './ClientActionCreator';
 import {ConversationActions} from './ConversationActionCreator';
 import {CookieActions} from './CookieActionCreator';
+import {InvitationActions} from './InvitationActionCreator';
 import {LanguageActions} from './LanguageActionCreator';
 import {LocalStorageActions} from './LocalStorageActionCreator';
-import {SelfActions} from './SelfActionCreator';
-import {InvitationActions} from './InvitationActionCreator';
 import {NotificationActions} from './NotificationActionCreator';
 import {RuntimeActions} from './RuntimeActionCreator';
+import {SelfActions} from './SelfActionCreator';
+import {UserActions} from './UserActionCreator';
 
 export interface AppAction extends Action {
   type: string;

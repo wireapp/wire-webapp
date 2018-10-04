@@ -17,8 +17,8 @@
  *
  */
 
-import * as CookieSelector from '../selector/CookieSelector';
 import {ThunkAction} from '../reducer';
+import * as CookieSelector from '../selector/CookieSelector';
 import {CookieActionCreator} from './creator/';
 
 const COOKIE_POLL_INTERVAL = 1000;

@@ -17,9 +17,9 @@
  *
  */
 
+import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 import {RootState} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
-import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 
 export const REGISTER_FLOW = {
   GENERIC_INVITATION: 'REGISTER_FLOW_GENERIC_INVITATION',
@@ -45,11 +45,11 @@ const unsetRegistrationData: RegistrationDataState = {
 };
 
 const unsetTeam: TeamData = {
+  binding: undefined,
+  creator: undefined,
+  icon: undefined,
   id: undefined,
   name: undefined,
-  icon: undefined,
-  creator: undefined,
-  binding: undefined,
 };
 
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;

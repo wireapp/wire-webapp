@@ -17,8 +17,8 @@
  *
  */
 
-import {AppActions, SELF_ACTION} from '../action/creator/';
 import {Consent, Self} from '@wireapp/api-client/dist/commonjs/self';
+import {AppActions, SELF_ACTION} from '../action/creator/';
 
 export interface SelfState {
   consents: {[key: number]: number};

@@ -17,11 +17,11 @@
  *
  */
 
-import * as InviteSelector from '../selector/InviteSelector';
-import * as selfSelector from '../selector/SelfSelector';
-import * as languageSelector from '../selector/LanguageSelector';
-import BackendError from './BackendError';
 import {ThunkAction} from '../reducer';
+import * as InviteSelector from '../selector/InviteSelector';
+import * as languageSelector from '../selector/LanguageSelector';
+import * as selfSelector from '../selector/SelfSelector';
+import BackendError from './BackendError';
 import {InvitationActionCreator} from './creator/';
 
 export class InvitationAction {

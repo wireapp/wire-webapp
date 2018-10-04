@@ -17,17 +17,17 @@
 *
 */
 
-import {RootState} from '../reducer';
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import {RootState} from '../reducer';
 
 const unsetSelf: Self = {
+  accent_id: undefined,
+  assets: [],
+  expires_at: undefined,
+  handle: undefined,
   id: undefined,
   locale: undefined,
   name: undefined,
-  handle: undefined,
-  expires_at: undefined,
-  assets: [],
-  accent_id: undefined,
   team: undefined,
 };
 

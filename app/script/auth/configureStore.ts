@@ -17,11 +17,11 @@
  *
  */
 
-import {applyMiddleware, combineReducers, createStore, AnyAction, Store} from 'redux';
+import {AnyAction, Store, applyMiddleware, combineReducers, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
-import reducers, {ThunkDispatch, RootState} from './module/reducer';
-import {runtimeAction} from './module/action/RuntimeAction';
 import thunk from 'redux-thunk';
+import {runtimeAction} from './module/action/RuntimeAction';
+import reducers, {RootState, ThunkDispatch} from './module/reducer';
 const {createLogger} = require('redux-logger');
 import * as Environment from './Environment';
 

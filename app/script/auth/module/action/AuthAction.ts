@@ -17,23 +17,19 @@
  *
  */
 
-import BackendError from './BackendError';
-import {currentCurrency, currentLanguage} from '../../localeConfig';
-import {LocalStorageKey, LocalStorageAction} from './LocalStorageAction';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
-import {APP_INSTANCE_ID} from '../../config';
-import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
-import {ThunkDispatch, RootState, ThunkAction, Api} from '../reducer';
-import {AuthActionCreator} from './creator/';
-import {RegistrationDataState} from '../reducer/authReducer';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
+import {APP_INSTANCE_ID} from '../../config';
+import {currentCurrency, currentLanguage} from '../../localeConfig';
+import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
+import {RegistrationDataState} from '../reducer/authReducer';
+import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
+import BackendError from './BackendError';
+import {AuthActionCreator} from './creator/';
+import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
-type LoginLifecycleFunction = (
-  dispatch: ThunkDispatch,
-  getState: () => RootState,
-  global: Api
-) => void;
+type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => void;
 
 export class AuthAction {
   doLogin = (loginData: LoginData): ThunkAction => {
@@ -311,13 +307,16 @@ export class AuthAction {
           dispatch(AuthActionCreator.successfulRefresh());
         })
         .catch(error => {
-          if (options.shouldValidateLocalClient) {
-            dispatch(authAction.doLogout());
-          }
-          if (options.isImmediateLogin) {
-            dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.PERSIST));
-          }
-          dispatch(AuthActionCreator.failedRefresh(error));
+          const doLogout = options.shouldValidateLocalClient ? dispatch(authAction.doLogout()) : Promise.resolve();
+          const deleteClientType = options.isImmediateLogin
+            ? dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.PERSIST))
+            : Promise.resolve();
+
+          return Promise.all([doLogout, deleteClientType])
+            .catch(() => undefined)
+            .then(() => {
+              dispatch(AuthActionCreator.failedRefresh(error));
+            });
         });
     };
   };

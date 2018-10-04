@@ -17,9 +17,9 @@
  *
  */
 
+import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
 import {APP_NAME} from '../../config';
 import {ThunkAction} from '../reducer';
-import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
 import {SelfActionCreator} from './creator/';
 
 export class SelfAction {

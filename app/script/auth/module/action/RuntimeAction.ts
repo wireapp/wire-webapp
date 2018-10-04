@@ -17,11 +17,11 @@
  *
  */
 
-import * as Environment from '../../Environment';
-import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime';
-import {hasURLParameter} from '../../util/urlUtil';
-import {QUERY_KEY} from '../../route';
 import {CookiesStatic} from 'js-cookie';
+import * as Environment from '../../Environment';
+import {QUERY_KEY} from '../../route';
+import {isFirefox, isMobileOs, isSafari, isSupportedBrowser} from '../../Runtime';
+import {hasURLParameter} from '../../util/urlUtil';
 import {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
 
@@ -106,8 +106,9 @@ export class RuntimeAction {
         dbOpenRequest.onerror = event => {
           if (dbOpenRequest.error) {
             event.preventDefault();
-            Promise.reject(new Error('Error opening IndexedDB'));
+            return Promise.reject(new Error('Error opening IndexedDB'));
           }
+          return undefined;
         };
       } catch (error) {
         return Promise.reject(new Error('Error initializing IndexedDB'));

@@ -17,20 +17,20 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
+import {Account} from '@wireapp/core';
+import {CookiesStatic} from 'js-cookie';
+import {AnyAction} from 'redux';
+import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
+import {ActionRoot} from '../action';
 import {AuthState, authReducer} from './authReducer';
 import {ClientState, clientReducer} from './clientReducer';
-import {CookieState, cookieReducer} from './cookieReducer';
 import {ConversationState, conversationReducer} from './conversationReducer';
+import {CookieState, cookieReducer} from './cookieReducer';
 import {InvitationState, invitationReducer} from './inviteReducer';
 import {LanguageState, languageReducer} from './languageReducer';
 import {RuntimeState, runtimeReducer} from './runtimeReducer';
 import {SelfState, selfReducer} from './selfReducer';
-import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {APIClient} from '@wireapp/api-client';
-import {Account} from '@wireapp/core';
-import {CookiesStatic} from 'js-cookie';
-import {ActionRoot} from '../action';
 
 export type Api = {
   apiClient: APIClient;

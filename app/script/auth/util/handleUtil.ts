@@ -18,8 +18,8 @@
  *
  */
 
-import {randomArrayElement, randomInt} from './randomUtil';
 import * as getSlug from 'speakingurl';
+import {randomArrayElement, randomInt} from './randomUtil';
 
 const MAX_HANDLE_LENGTH = 21;
 const DEFAULT_NUMBER_VARIATIONS = 5;

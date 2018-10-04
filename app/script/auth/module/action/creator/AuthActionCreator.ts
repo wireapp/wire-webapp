@@ -18,8 +18,8 @@
  */
 
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
-import {AppAction} from '.';
 import {Invitation} from '@wireapp/api-client/dist/commonjs/invitation';
+import {AppAction} from '.';
 import {RegistrationDataState} from '../../reducer/authReducer';
 
 export enum AUTH_ACTION {

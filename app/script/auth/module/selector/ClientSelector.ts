@@ -17,8 +17,8 @@
  *
  */
 
-import {RootState} from '../reducer';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {RootState} from '../reducer';
 
 export const getClients = (state: RootState) => state.clientState.clients || [];
 export const getPermanentClients = (state: RootState) =>

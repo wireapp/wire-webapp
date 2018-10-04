@@ -17,8 +17,8 @@
  *
  */
 
-import {AppAction} from './index';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {AppAction} from './index';
 
 export enum CLIENT_ACTION {
   CLIENTS_FETCH_START = 'CLIENTS_FETCH_START',

@@ -17,8 +17,8 @@
  *
  */
 
-import {getURLParameter} from './util/urlUtil';
 import {QUERY_KEY} from './route';
+import {getURLParameter} from './util/urlUtil';
 
 export const SUPPORTED_LANGUAGE = require('./supportedLocales');
 

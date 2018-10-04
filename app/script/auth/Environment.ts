@@ -17,9 +17,9 @@
  *
  */
 
-import {getURLParameter} from './util/urlUtil';
-import {QUERY_KEY} from './route';
 import {APIClient} from '@wireapp/api-client';
+import {QUERY_KEY} from './route';
+import {getURLParameter} from './util/urlUtil';
 
 export enum ENVIRONMENT {
   LOCAL = 'LOCAL',
