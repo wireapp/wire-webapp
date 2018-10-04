@@ -36,10 +36,10 @@ z.viewModel.FaviconViewModel = class FaviconViewModel {
   }
 
   _updateFavicon(unreadCount) {
-    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    const link = document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
-    link.href = unreadCount != 0 ? '/images/favicon-badge.ico' : '/images/favicon.ico';
+    link.href = unreadCount != 0 ? '/image/favicon-badge.ico' : '/image/favicon.ico';
     document.getElementsByTagName('head')[0].appendChild(link);
   }
 
