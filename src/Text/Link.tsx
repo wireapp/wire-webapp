@@ -35,7 +35,8 @@ const Link: React.SFC<LinkProps & any> = ({color, component, ...props}) => {
     .toString();
   const StyledLink = styled(Text.withComponent(component))`
     text-decoration: none;
-    ${defaultTransition} cursor: pointer;
+    ${defaultTransition};
+    cursor: pointer;
     color: ${color};
 
     &:visited,
