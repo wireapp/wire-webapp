@@ -17,52 +17,52 @@
  *
  */
 
-import * as React from 'react';
+import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
-  Container,
-  ContainerXS,
-  Columns,
-  Column,
-  Form,
-  ICON_NAME,
-  InputSubmitCombo,
-  Input,
-  InputBlock,
-  RoundIconButton,
-  Checkbox,
-  CheckboxLabel,
-  H1,
-  Muted,
-  Small,
-  Link,
-  Loading,
   ArrowIcon,
   COLOR,
+  Checkbox,
+  CheckboxLabel,
+  Column,
+  Columns,
+  Container,
+  ContainerXS,
   ErrorMessage,
+  Form,
+  H1,
+  ICON_NAME,
+  Input,
+  InputBlock,
+  InputSubmitCombo,
   IsMobile,
+  Link,
+  Loading,
+  Muted,
+  RoundIconButton,
+  Small,
 } from '@wireapp/react-ui-kit';
-import * as Environment from '../Environment';
-import {ROUTE, QUERY_KEY} from '../route';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {Link as RRLink} from 'react-router-dom';
+import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
-import ValidationError from '../module/action/ValidationError';
+import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import {isDesktopApp} from '../Runtime';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import BackendError from '../module/action/BackendError';
-import {Redirect, withRouter, RouteComponentProps} from 'react-router';
-import * as URLUtil from '../util/urlUtil';
-import * as ClientSelector from '../module/selector/ClientSelector';
-import Page from './Page';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import * as Environment from '../Environment';
+import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import BackendError from '../module/action/BackendError';
+import ValidationError from '../module/action/ValidationError';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ClientSelector from '../module/selector/ClientSelector';
+import * as SelfSelector from '../module/selector/SelfSelector';
+import {QUERY_KEY, ROUTE} from '../route';
+import {isDesktopApp} from '../Runtime';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
+import * as URLUtil from '../util/urlUtil';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
 
@@ -101,7 +101,7 @@ interface State {
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class Login extends React.Component<CombinedProps, State> {
-  private inputs: {
+  private readonly inputs: {
     email?: HTMLInputElement;
     password?: HTMLInputElement;
   } = {};
@@ -454,25 +454,29 @@ class Login extends React.Component<CombinedProps, State> {
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => ({
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        isFetching: AuthSelector.isFetching(state),
-        loginError: AuthSelector.getError(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
-          dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
-        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-        doInitializeClient: (clientType: ClientType, password?: string) =>
-          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-        doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
-          dispatch(ROOT_ACTIONS.authAction.doInit(options)),
-        doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
-          dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
-        doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
-        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          hasHistory: ClientSelector.hasHistory(state),
+          hasSelfHandle: SelfSelector.hasSelfHandle(state),
+          isFetching: AuthSelector.isFetching(state),
+          loginError: AuthSelector.getError(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
+            dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
+          doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+          doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
+            dispatch(ROOT_ACTIONS.authAction.doInit(options)),
+          doInitializeClient: (clientType: ClientType, password?: string) =>
+            dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
+          doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
+          doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
+            dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
+          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+        };
+      }
     )(Login)
   )
 );
