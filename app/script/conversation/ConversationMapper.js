@@ -102,10 +102,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @returns {Array<Conversation>} Mapped conversation entities
    */
   mapConversations(conversationsData, timestamp = 1) {
-    if (!conversationsData) {
+    if (conversationsData === undefined) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
-    if (!conversationsData.map || !conversationsData.length) {
+    if (!_.isArray(conversationsData) || !conversationsData.length) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
     return conversationsData.map((data, index) => this._createConversationEntity(data, timestamp + index));
@@ -239,8 +239,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @returns {Conversation} Mapped conversation entity
    */
   _createConversationEntity(conversationData, initialTimestamp) {
-    if (conversationData === undefined || !Object.keys(conversationData).length) {
+    if (conversationData === undefined) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
+    }
+    if (!_.isObject(conversationData) || !Object.keys(conversationData).length) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
 
     const {creator, id, members, name, others, type} = conversationData;

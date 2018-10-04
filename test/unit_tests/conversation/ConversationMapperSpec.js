@@ -40,7 +40,7 @@ describe('Conversation Mapper', () => {
         z.conversation.ConversationError.MESSAGE.INVALID_PARAMETER
       );
 
-      const functionCallWrongType = () => conversation_mapper.mapConversations('');
+      const functionCallWrongType = () => conversation_mapper.mapConversations('Conversation');
       expect(functionCallWrongType).toThrowError(
         z.conversation.ConversationError,
         z.conversation.ConversationError.MESSAGE.INVALID_PARAMETER
