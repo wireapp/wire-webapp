@@ -30,7 +30,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
     this.stack = new Error().stack;
     this.type = type || ConversationError.TYPE.UNKNOWN;
 
-    this.message = ConversationError.MESSAGE[this.type] || ConversationError.MESSAGE[ConversationError.TYPE.UNKNOWN];
+    this.message = ConversationError.MESSAGE[this.type] || ConversationError.MESSAGE.UNKNOWN;
   }
 
   static get MESSAGE() {
