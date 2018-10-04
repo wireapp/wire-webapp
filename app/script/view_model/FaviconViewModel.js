@@ -22,7 +22,16 @@
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
+/**
+ * The FaviconViewModel is responsible for updating the favicon according to unread messages.
+ * To do so, it will listen for the UNREAD_COUNT that the app dispatches through the given dispatcher.
+ */
 z.viewModel.FaviconViewModel = class FaviconViewModel {
+  /**
+   * Construct a new FaviconViewModel.
+   *
+   * @param {Dispatcher} dispatcher - event dispatcher
+   */
   constructor(dispatcher) {
     this.dispatcher = dispatcher;
     this.unreadCount = ko.observable(0);
