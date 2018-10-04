@@ -8,7 +8,7 @@
     "no-duplicate-imports": true,
     "no-duplicate-switch-case": true,
     "no-duplicate-variable": [true, "check-parameters"],
-    "no-floating-promises": true,
+    "no-floating-promises": false,
     "no-invalid-template-strings": true,
     "no-object-literal-type-assertion": true,
     "no-return-await": true,
