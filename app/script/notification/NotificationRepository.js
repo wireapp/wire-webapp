@@ -570,12 +570,8 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     const containsSelfMention = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
-      return () => {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, {
-          messageEntity,
-          openFirstSelfMention: true,
-        });
-      };
+      const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
+      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, showOptions);
     }
 
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();

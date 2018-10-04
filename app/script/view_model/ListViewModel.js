@@ -288,20 +288,16 @@ z.viewModel.ListViewModel = class ListViewModel {
   //##############################################################################
 
   onContextMenu(conversationEntity, event) {
-    let title;
     const entries = [];
 
-    const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
-    if (canToggleMute) {
-      const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
-      const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
-      const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
+    const canSetNotifications = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
+    if (canSetNotifications) {
+      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
-      title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
       entries.push({
         click: () => this.clickToOpenNotificationSettings(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
-        title: title,
+        title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
       });
     }
 
