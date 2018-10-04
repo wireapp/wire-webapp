@@ -105,7 +105,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     if (!conversationsData) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
-    if (!conversationsData.length) {
+    if (!conversationsData.map || !conversationsData.length) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
     return conversationsData.map((data, index) => this._createConversationEntity(data, timestamp + index));
