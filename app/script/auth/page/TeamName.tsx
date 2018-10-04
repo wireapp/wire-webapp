@@ -18,38 +18,38 @@
  */
 
 import {
-  COLOR,
   ArrowIcon,
-  H1,
-  Muted,
-  Link,
+  COLOR,
+  Column,
+  Columns,
   Container,
   ContainerXS,
-  Columns,
-  Column,
-  Form,
-  ICON_NAME,
-  InputSubmitCombo,
-  Input,
-  RoundIconButton,
   ErrorMessage,
+  Form,
+  H1,
+  ICON_NAME,
+  Input,
+  InputSubmitCombo,
   IsMobile,
+  Link,
+  Muted,
+  RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import {ROUTE} from '../route';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {Link as RRLink} from 'react-router-dom';
-import {connect} from 'react-redux';
-import {teamNameStrings} from '../../strings';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import {withRouter, RouteComponentProps} from 'react-router';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import ValidationError from '../module/action/ValidationError';
 import * as React from 'react';
-import Page from './Page';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {teamNameStrings} from '../../strings';
+import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
+import ValidationError from '../module/action/ValidationError';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import {ROUTE} from '../route';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
 
@@ -96,11 +96,11 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
         .then(teamName =>
           this.props.pushAccountRegistrationData({
             team: {
+              binding: undefined,
+              creator: undefined,
+              icon: undefined,
               id: undefined,
               name: teamName,
-              icon: undefined,
-              creator: undefined,
-              binding: undefined,
             },
           })
         )
@@ -193,16 +193,20 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => ({
-        error: AuthSelector.getError(state),
-        teamName: AuthSelector.getAccountTeamName(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
-        pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
-          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
-        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-      })
+      (state: RootState): ConnectedProps => {
+        return {
+          error: AuthSelector.getError(state),
+          teamName: AuthSelector.getAccountTeamName(state),
+        };
+      },
+      (dispatch: ThunkDispatch): DispatchProps => {
+        return {
+          enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
+          pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
+            dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
+          resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
+        };
+      }
     )(TeamName)
   )
 );
