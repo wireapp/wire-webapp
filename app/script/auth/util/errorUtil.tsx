@@ -17,11 +17,10 @@
  *
  */
 
-import {errorHandlerStrings, validationErrorStrings} from '../../strings';
-import {FormattedHTMLMessage} from 'react-intl';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 import * as React from 'react';
-import BackendError from '../module/action/BackendError';
+import {FormattedHTMLMessage} from 'react-intl';
+import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 
 export function parseError(error: any) {
   if (error) {
