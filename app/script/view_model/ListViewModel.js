@@ -288,23 +288,16 @@ z.viewModel.ListViewModel = class ListViewModel {
   //##############################################################################
 
   onContextMenu(conversationEntity, event) {
-    let title;
     const entries = [];
 
-    const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
-    if (canToggleMute) {
-      const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
-      const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
-      const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
+    const canSetNotifications = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
+    if (canSetNotifications) {
+      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
-      const labelStringId = conversationEntity.is_muted()
-        ? z.string.conversationsPopoverNotify
-        : z.string.conversationsPopoverSilence;
-      title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
       entries.push({
-        click: () => this.clickToToggleMute(conversationEntity),
-        label: z.l10n.text(labelStringId),
-        title: title,
+        click: () => this.clickToOpenNotificationSettings(conversationEntity),
+        label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
+        title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
       });
     }
 
@@ -393,6 +386,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   clickToToggleMute(conversationEntity = this.conversationRepository.active_conversation()) {
     this.actionsViewModel.toggleMuteConversation(conversationEntity);
+  }
+
+  clickToOpenNotificationSettings(conversationEntity = this.conversationRepository.active_conversation()) {
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   }
 
   clickToUnarchive(conversationEntity) {
