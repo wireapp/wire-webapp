@@ -660,4 +660,80 @@ describe('z.notification.NotificationRepository', () => {
       verify_notification_ephemeral(done, conversation_et, message_et);
     });
   });
+
+  describe('notification behaviour', () => {
+    let conversationEntity;
+    let messageEntity;
+    const userId = z.util.createRandomUuid();
+
+    function generateTextAsset(selfMentioned = false) {
+      const mentionId = selfMentioned ? userId : z.util.createRandomUuid();
+
+      const textEntity = new z.entity.Text(z.util.createRandomUuid(), '@Gregor can you take a look?');
+      const mentionEntity = new z.message.MentionEntity(0, 7, mentionId);
+      textEntity.mentions([mentionEntity]);
+
+      return textEntity;
+    }
+
+    beforeEach(() => {
+      const selfUserEntity = new z.entity.User(userId);
+      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+      messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      messageEntity.user(selfUserEntity);
+    });
+
+    it('returns the correct value for all notifications', () => {
+      messageEntity.add_asset(generateTextAsset());
+
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+        conversationEntity,
+        messageEntity,
+        userId
+      );
+
+      expect(shouldNotify).toBe(true);
+    });
+
+    it('returns the correct value for no notifications', () => {
+      messageEntity.add_asset(generateTextAsset());
+
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
+      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+        conversationEntity,
+        messageEntity,
+        userId
+      );
+
+      expect(shouldNotify).toBe(false);
+    });
+
+    it('returns the correct value for self mentioned messages', () => {
+      messageEntity.add_asset(generateTextAsset(true));
+
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+        conversationEntity,
+        messageEntity,
+        userId
+      );
+
+      expect(shouldNotify).toBe(true);
+    });
+
+    it('returns the correct value for non-self mentioned messages', () => {
+      messageEntity.add_asset(generateTextAsset());
+
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+        conversationEntity,
+        messageEntity,
+        userId
+      );
+
+      expect(shouldNotify).toBe(false);
+    });
+  });
 });

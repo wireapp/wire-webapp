@@ -137,12 +137,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
     return Promise.resolve().then(() => {
-      const shouldNotify = z.util.NotificationUtil.shouldNotify(
-        conversationEntity,
-        messageEntity,
-        NotificationRepository.EVENTS_TO_NOTIFY,
-        this.selfUser().id
-      );
+      const shouldNotify = NotificationRepository._shouldNotify(conversationEntity, messageEntity, this.selfUser().id);
 
       if (shouldNotify) {
         this._notifySound(messageEntity);
@@ -815,5 +810,32 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     this.notifications.push(notification);
     this.logger.info(`Added notification for ${messageInfo} in '${conversationId}' to queue.`);
+  }
+
+  /**
+   * @param {z.entity.Conversation} conversationEntity - The conversation to filter from.
+   * @param {z.entity.Message} messageEntity - The message to filter from.
+   * @param {string} userId - The user id to check mentions for.
+   * @returns {boolean} If the conversation should send a notification.
+   */
+  static _shouldNotify(conversationEntity, messageEntity, userId) {
+    const isEventToNotify =
+      NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type) &&
+      !messageEntity.isEdited() &&
+      !messageEntity.isLinkPreview();
+
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
+
+    switch (conversationEntity.notificationState()) {
+      case z.conversation.NotificationSetting.STATE.EVERYTHING: {
+        return isEventToNotify;
+      }
+      case z.conversation.NotificationSetting.STATE.NOTHING: {
+        return false;
+      }
+      case z.conversation.NotificationSetting.STATE.ONLY_MENTIONS: {
+        return isEventToNotify && isSelfMentioned;
+      }
+    }
   }
 };
