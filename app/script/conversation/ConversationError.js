@@ -28,65 +28,46 @@ z.conversation.ConversationError = class ConversationError extends Error {
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.client.ConversationError.TYPE.UNKNOWN;
+    this.type = type || ConversationError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case ConversationError.TYPE.CONVERSATION_NOT_FOUND:
-        this.message = 'Conversation not found';
-        break;
-      case ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION:
-        this.message = 'Sending to degraded conversation was canceled by user';
-        break;
-      case ConversationError.TYPE.MESSAGE_NOT_FOUND:
-        this.message = 'Message not found';
-        break;
-      case ConversationError.TYPE.MISSING_PARAMETER:
-        this.message = 'Required parameter is not defined';
-        break;
-      case ConversationError.TYPE.NO_CHANGES:
-        this.message = 'Missing changes to message';
-        break;
-      case ConversationError.TYPE.NO_CONVERSATION_ID:
-        this.message = 'Conversation ID is not defined';
-        break;
-      case ConversationError.TYPE.NO_MESSAGE_CHANGES:
-        this.message = 'Edited message equals original message';
-        break;
-      case ConversationError.TYPE.REQUEST_FAILED:
-        this.message = 'Conversation related backend request failed';
-        break;
-      case ConversationError.TYPE.WRONG_CHANGE:
-        this.message = 'Attempted unsupported change on conversation';
-        break;
-      case ConversationError.TYPE.WRONG_CONVERSATION:
-        this.message = 'Message was sent in the wrong conversation';
-        break;
-      case ConversationError.TYPE.WRONG_TYPE:
-        this.message = 'Wrong message to for action';
-        break;
-      case ConversationError.TYPE.WRONG_USER:
-        this.message = 'Wrong user tried to change or delete a message';
-        break;
-      default:
-        this.message = 'Unknown ConversationError';
-    }
+    this.message = ConversationError.MESSAGE[this.type] || ConversationError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      CONVERSATION_NOT_FOUND: 'Conversation not found',
+      DEGRADED_CONVERSATION_CANCELLATION: 'Sending to degraded conversation was canceled by user',
+      INVALID_PARAMETER: 'Invalid parameter passed',
+      MESSAGE_NOT_FOUND: 'Message not found in conversation',
+      MISSING_PARAMETER: 'Required parameter is not defined',
+      NO_CHANGES: 'Missing changes to message',
+      NO_CONVERSATION_ID: 'Conversation ID is not defined',
+      NO_MESSAGE_CHANGES: 'Edited message equals original message',
+      REQUEST_FAILURE: 'Conversation related backend request failed',
+      UNKNOWN: 'Unknown ConversationError',
+      WRONG_CHANGE: 'Attempted unsupported change on conversation',
+      WRONG_CONVERSATION: 'Message was sent in the wrong conversation',
+      WRONG_TYPE: 'Wrong message to for action',
+      WRONG_USER: 'Wrong user tried to change or delete a message',
+    };
   }
 
   static get TYPE() {
     return {
-      CONVERSATION_NOT_FOUND: 'ConversationError.TYPE.CONVERSATION_NOT_FOUND',
-      DEGRADED_CONVERSATION_CANCELLATION: 'ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
-      MESSAGE_NOT_FOUND: 'ConversationError.TYPE.MESSAGE_NOT_FOUND',
-      MISSING_PARAMETER: 'ConversationError.TYPE.MISSING_PARAMETER',
-      NO_CHANGES: 'ConversationError.TYPE.NO_CHANGES',
-      NO_CONVERSATION_ID: 'ConversationError.TYPE.NO_CONVERSATION_ID',
-      NO_MESSAGE_CHANGES: 'ConversationError.TYPE.NO_MESSAGE_CHANGES',
-      REQUEST_FAILURE: 'ConversationError.TYPE.REQUEST_FAILURE',
-      UNKNOWN: 'ConversationError.TYPE.UNKNOWN',
-      WRONG_CHANGE: 'ConversationError.TYPE.WRONG_CHANGE',
-      WRONG_CONVERSATION: 'ConversationError.TYPE.WRONG_CONVERSATION',
-      WRONG_TYPE: 'ConversationError.TYPE.WRONG_TYPE',
-      WRONG_USER: 'ConversationError.TYPE.WRONG_USER',
+      CONVERSATION_NOT_FOUND: 'CONVERSATION_NOT_FOUND',
+      DEGRADED_CONVERSATION_CANCELLATION: 'DEGRADED_CONVERSATION_CANCELLATION',
+      INVALID_PARAMETER: 'INVALID_PARAMETER',
+      MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
+      MISSING_PARAMETER: 'MISSING_PARAMETER',
+      NO_CHANGES: 'NO_CHANGES',
+      NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',
+      NO_MESSAGE_CHANGES: 'NO_MESSAGE_CHANGES',
+      REQUEST_FAILURE: 'REQUEST_FAILURE',
+      UNKNOWN: 'UNKNOWN',
+      WRONG_CHANGE: 'WRONG_CHANGE',
+      WRONG_CONVERSATION: 'WRONG_CONVERSATION',
+      WRONG_TYPE: 'WRONG_TYPE',
+      WRONG_USER: 'WRONG_USER',
     };
   }
 };

@@ -93,7 +93,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const muted_conversation = new z.entity.Conversation(z.util.createRandomUuid());
-      muted_conversation.muted_state(true);
+      muted_conversation.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
       muted_conversation.name('Muted Conversation');
       muted_conversation.type(z.conversation.ConversationType.GROUP);
 

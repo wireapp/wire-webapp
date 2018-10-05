@@ -1383,7 +1383,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         callEntity.setRemoteVersion(callMessageEntity);
 
-        if (callEntity.conversationEntity.is_muted()) {
+        if (!callEntity.conversationEntity.showNotificationsEverything()) {
           silent = true;
         }
 

@@ -23,6 +23,17 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.Conversation = class Conversation {
+  static get TIMESTAMP_TYPE() {
+    return {
+      ARCHIVED: 'archived_timestamp',
+      CLEARED: 'cleared_timestamp',
+      LAST_EVENT: 'last_event_timestamp',
+      LAST_READ: 'last_read_timestamp',
+      LAST_SERVER: 'last_server_timestamp',
+      NOTIFICATION: 'notificationTimestamp',
+    };
+  }
+
   /**
    * Constructs a new conversation entity.
    * @class z.entity.Conversation
@@ -92,7 +103,7 @@ z.entity.Conversation = class Conversation {
 
     // E2EE conversation states
     this.archived_state = ko.observable(false).extend({notify: 'always'});
-    this.muted_state = ko.observable(false);
+    this.notificationState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
     this.verification_state = ko.observable(z.conversation.ConversationVerificationState.UNVERIFIED);
 
     this.archived_timestamp = ko.observable(0);
@@ -100,12 +111,11 @@ z.entity.Conversation = class Conversation {
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
-    this.muted_timestamp = ko.observable(0);
+    this.notificationTimestamp = ko.observable(0);
 
     // Conversation states for view
     this.is_archived = this.archived_state;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
-    this.is_muted = this.muted_state;
     this.is_verified = ko.pureComputed(() => {
       const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
       const isInitialized = this.self && hasMappedUsers;
@@ -115,6 +125,16 @@ z.entity.Conversation = class Conversation {
 
       const allUserEntities = [this.self].concat(this.participating_user_ets());
       return allUserEntities.every(userEntity => userEntity.is_verified());
+    });
+
+    this.showNotificationsEverything = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.EVERYTHING;
+    });
+    this.showNotificationsNothing = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
+    });
+    this.showNotificationsOnlyMentions = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -248,9 +268,9 @@ z.entity.Conversation = class Conversation {
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
-      this.muted_state,
-      this.muted_timestamp,
       this.name,
+      this.notificationState,
+      this.notificationTimestamp,
       this.participating_user_ids,
       this.status,
       this.type,
@@ -284,58 +304,37 @@ z.entity.Conversation = class Conversation {
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
    * @param {string|number} timestamp - Timestamp to be set
-   * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
+   * @param {Conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
    * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  set_timestamp(timestamp, type, forceUpdate = false) {
-    let entity_timestamp;
+  setTimestamp(timestamp, type, forceUpdate = false) {
     if (_.isString(timestamp)) {
       timestamp = window.parseInt(timestamp, 10);
     }
 
-    switch (type) {
-      case z.conversation.TIMESTAMP_TYPE.ARCHIVED:
-        entity_timestamp = this.archived_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.CLEARED:
-        entity_timestamp = this.cleared_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.LAST_EVENT:
-        entity_timestamp = this.last_event_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.LAST_READ:
-        entity_timestamp = this.last_read_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.LAST_SERVER:
-        entity_timestamp = this.last_server_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.MUTED:
-        entity_timestamp = this.muted_timestamp;
-        break;
-      default:
-        break;
+    const entityTimestamp = this[type];
+    if (!entityTimestamp) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
 
-    const updatedTimestamp = forceUpdate ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+    const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);
 
     if (updatedTimestamp !== false) {
-      entity_timestamp(updatedTimestamp);
+      entityTimestamp(updatedTimestamp);
     }
     return updatedTimestamp;
   }
 
   /**
    * Increment only on timestamp update
-   * @param {number} current_timestamp - Current timestamp
-   * @param {number} updated_timestamp - Timestamp from update
+   * @param {number} currentTimestamp - Current timestamp
+   * @param {number} updatedTimestamp - Timestamp from update
    * @returns {number|boolean} Updated timestamp or false if not increased
    */
-  _increment_time_only(current_timestamp, updated_timestamp) {
-    if (updated_timestamp > current_timestamp) {
-      return updated_timestamp;
-    }
-    return false;
+  _incrementTimeOnly(currentTimestamp, updatedTimestamp) {
+    const timestampIncreased = updatedTimestamp > currentTimestamp;
+    return timestampIncreased ? updatedTimestamp : false;
   }
 
   /**
@@ -473,7 +472,7 @@ z.entity.Conversation = class Conversation {
       const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
 
       const hasUpdate = hasNewerMessage || hasNewerCall;
-      return hasUpdate && !this.is_muted();
+      return hasUpdate && this.showNotificationsEverything();
     }
     return false;
   }
@@ -512,7 +511,7 @@ z.entity.Conversation = class Conversation {
       const timestamp = new Date(time).getTime();
 
       if (!_.isNaN(timestamp)) {
-        this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
     }
   }
@@ -530,11 +529,11 @@ z.entity.Conversation = class Conversation {
 
       if (timestamp <= this.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+          this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
           const from_self = message_et.user() && message_et.user().is_me;
           if (from_self) {
-            this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+            this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
         }
       }
@@ -687,9 +686,9 @@ z.entity.Conversation = class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
-      muted_state: this.muted_state(),
-      muted_timestamp: this.muted_timestamp(),
       name: this.name(),
+      notification_state: this.notificationState(),
+      notification_timestamp: this.notificationTimestamp(),
       others: this.participating_user_ids(),
       status: this.status(),
       team_id: this.team_id,

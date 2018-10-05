@@ -768,27 +768,27 @@ describe('Conversation', () => {
     });
   });
 
-  describe('set_timestamp', () => {
+  describe('setTimestamp', () => {
     it('turns strings into numbers', () => {
       const lrt = conversation_et.last_read_timestamp();
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
-      conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.setTimestamp(new_lrt_string, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     });
 
     it('checks that new timestamp is newer that previous one', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
-      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(currentTimestamp);
     });
 
     it('allows to set an older timestamp with the forceUpdate flag', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
-      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ, true);
+      conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ, true);
       expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
     });
   });
@@ -800,7 +800,7 @@ describe('Conversation', () => {
       time = Date.now();
       conversation_et.archived_timestamp(time);
       conversation_et.archived_state(true);
-      conversation_et.muted_state(true);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
     });
 
     it('returns expected bool whether a conversation should be unarchived', () => {
@@ -813,7 +813,7 @@ describe('Conversation', () => {
       conversation_et.last_event_timestamp(time + 100);
       expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
-      conversation_et.muted_state(false);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
       conversation_et.last_event_timestamp(time - 100);
       expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
@@ -835,11 +835,11 @@ describe('Conversation', () => {
     });
   });
 
-  describe('_increment_time_only', () => {
+  describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
-      expect(conversation_et._increment_time_only(first_timestamp, second_timestamp)).toBe(second_timestamp);
-      expect(conversation_et._increment_time_only(second_timestamp, first_timestamp)).toBeFalsy();
-      expect(conversation_et._increment_time_only(first_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._incrementTimeOnly(first_timestamp, second_timestamp)).toBe(second_timestamp);
+      expect(conversation_et._incrementTimeOnly(second_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._incrementTimeOnly(first_timestamp, first_timestamp)).toBeFalsy();
     });
   });
 
@@ -849,7 +849,7 @@ describe('Conversation', () => {
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.muted_state(false);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
@@ -870,7 +870,7 @@ describe('Conversation', () => {
       const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
 
       const conversation_mapper = new z.conversation.ConversationMapper();
-      const new_conversation = conversation_mapper._create_conversation_et(payload_conversation);
+      const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);
       new_conversation.connection(connection_et);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
