@@ -167,7 +167,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       if (archived_timestamp) {
         conversationEntity.setTimestamp(archived_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
-        conversationEntity.archived_state(selfState.archived_state);
+        conversationEntity.archivedState(selfState.archived_state);
       }
 
       if (cleared_timestamp !== undefined) {
@@ -214,7 +214,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       if (otr_archived !== undefined) {
         const archivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
         conversationEntity.setTimestamp(archivedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
-        conversationEntity.archived_state(otr_archived);
+        conversationEntity.archivedState(otr_archived);
       }
 
       if (otr_muted !== undefined) {

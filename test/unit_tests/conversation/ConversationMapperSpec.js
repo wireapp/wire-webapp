@@ -195,8 +195,8 @@ describe('Conversation Mapper', () => {
       };
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
 
-      expect(updated_conversation_et.archived_timestamp()).toBe(timestamp);
-      expect(updated_conversation_et.archived_state()).toBe(true);
+      expect(updated_conversation_et.archivedTimestamp()).toBe(timestamp);
+      expect(updated_conversation_et.archivedState()).toBe(true);
     });
 
     it('can update the self status using archived timestamp', () => {
@@ -207,8 +207,8 @@ describe('Conversation Mapper', () => {
       };
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
 
-      expect(updated_conversation_et.archived_timestamp()).toBe(timestamp);
-      expect(updated_conversation_et.archived_state()).toBe(true);
+      expect(updated_conversation_et.archivedTimestamp()).toBe(timestamp);
+      expect(updated_conversation_et.archivedState()).toBe(true);
     });
 
     it('can update the self when archive state is false', () => {
@@ -219,8 +219,8 @@ describe('Conversation Mapper', () => {
       };
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
 
-      expect(updated_conversation_et.archived_timestamp()).toBe(timestamp);
-      expect(updated_conversation_et.archived_state()).toBe(false);
+      expect(updated_conversation_et.archivedTimestamp()).toBe(timestamp);
+      expect(updated_conversation_et.archivedState()).toBe(false);
     });
 
     it('can update the self status if a conversation is cleared', () => {

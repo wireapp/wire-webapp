@@ -798,8 +798,8 @@ describe('Conversation', () => {
 
     beforeEach(() => {
       time = Date.now();
-      conversation_et.archived_timestamp(time);
-      conversation_et.archived_state(true);
+      conversation_et.archivedTimestamp(time);
+      conversation_et.archivedState(true);
       conversation_et.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
     });
 
@@ -823,7 +823,7 @@ describe('Conversation', () => {
       conversation_et.last_event_timestamp(time + 100);
       expect(conversation_et.shouldUnarchive()).toBeTruthy();
 
-      conversation_et.archived_state(false);
+      conversation_et.archivedState(false);
       conversation_et.last_event_timestamp(time - 100);
       expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
@@ -845,7 +845,7 @@ describe('Conversation', () => {
 
   describe('check subscribers', () =>
     it('to state updates', () => {
-      conversation_et.archived_state(false);
+      conversation_et.archivedState(false);
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
