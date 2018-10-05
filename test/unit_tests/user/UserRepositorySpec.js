@@ -192,59 +192,6 @@ describe('z.user.UserRepository', () => {
       });
     });
 
-    describe('search_for_connected_users', () => {
-      let user_et_a = null;
-      let user_et_b = null;
-
-      beforeEach(done => {
-        const connection_et = new z.entity.Connection();
-        connection_et.status(z.user.ConnectionStatus.ACCEPTED);
-
-        user_et_a = new z.entity.User(z.util.createRandomUuid());
-        user_et_a.name('René');
-        user_et_a.username('foo');
-        user_et_a.connection(connection_et);
-
-        user_et_b = new z.entity.User(z.util.createRandomUuid());
-        user_et_b.name('Gregor');
-        user_et_b.connection(connection_et);
-
-        TestFactory.user_repository
-          .save_users([user_et_a, user_et_b])
-          .then(done)
-          .catch(done.fail);
-      });
-
-      afterEach(() => {
-        TestFactory.user_repository.users.removeAll();
-      });
-
-      it('finds the correct user by searching for the full name', () => {
-        const result = TestFactory.user_repository.search_for_connected_users('Gregor');
-        expect(result.length).toBe(1);
-        expect(result[0].id).toBe(user_et_b.id);
-      });
-
-      it('finds the correct user by searching for the full name (transliteration)', () => {
-        const result = TestFactory.user_repository.search_for_connected_users('Rene');
-        expect(result.length).toBe(1);
-        expect(result[0].id).toBe(user_et_a.id);
-      });
-
-      it('finds the correct user by searching for the username', () => {
-        const result = TestFactory.user_repository.search_for_connected_users('foo');
-        expect(result.length).toBe(1);
-        expect(result[0].id).toBe(user_et_a.id);
-      });
-
-      it('finds the correct users', () => {
-        const result = TestFactory.user_repository.search_for_connected_users('e');
-        expect(result.length).toBe(2);
-        expect(result[0].id).toBe(user_et_b.id);
-        expect(result[1].id).toBe(user_et_a.id);
-      });
-    });
-
     describe('save_user', () => {
       afterEach(() => {
         TestFactory.user_repository.users.removeAll();

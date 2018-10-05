@@ -781,23 +781,6 @@ z.user.UserRepository = class UserRepository {
   }
 
   /**
-   * Search for user.
-   * @param {string} query - Find user by name or handle
-   * @param {boolean} is_handle - Query string is handle
-   * @returns {Array<z.entity.User>} Matching users
-   */
-  search_for_connected_users(query, is_handle) {
-    const excludedEmojis = Array.from(query).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
-    return this.connected_users()
-      .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
-      .sort((user_a, user_b) => {
-        return is_handle
-          ? z.util.StringUtil.sortByPriority(user_a.username(), user_b.username(), query)
-          : z.util.StringUtil.sortByPriority(user_a.name(), user_b.name(), query);
-      });
-  }
-
-  /**
    * Is the user the logged in user.
    * @param {z.entity.User|string} user_id - User entity or user ID
    * @returns {boolean} Is the user the logged in user

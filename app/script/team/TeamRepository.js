@@ -147,23 +147,6 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  /**
-   * Search for user.
-   * @param {string} query - Find user by name or handle
-   * @param {boolean} isHandle - Query string is handle
-   * @returns {Array<z.entity.User>} Matching users
-   */
-  searchForTeamUsers(query, isHandle) {
-    const excludedEmojis = Array.from(query).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
-    return this.teamUsers()
-      .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
-      .sort((userA, userB) => {
-        return isHandle
-          ? z.util.StringUtil.sortByPriority(userA.username(), userB.username(), query)
-          : z.util.StringUtil.sortByPriority(userA.name(), userB.name(), query);
-      });
-  }
-
   sendAccountInfo() {
     if (z.util.Environment.desktop) {
       const imageResource = this.isTeam() ? undefined : this.selfUser().previewPictureResource();

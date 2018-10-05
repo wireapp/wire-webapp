@@ -113,6 +113,22 @@ describe('z.search.SearchRepository', () => {
       expect(suggestions.map(serializeUser)).toEqual([]);
     });
 
+    it('prioritize exact matches with special characters', () => {
+      const smilyFelix = generateUser('smily', '😋Felix');
+      const atFelix = generateUser('at', '@Felix');
+      const simplyFelix = generateUser('simple', 'Felix');
+
+      const unsortedUsers = [atFelix, smilyFelix, simplyFelix];
+
+      let suggestions = TestFactory.search_repository.searchUserInSet('felix', unsortedUsers);
+      let expected = [simplyFelix, smilyFelix, atFelix];
+      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
+
+      suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+      expected = [smilyFelix];
+      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
+    });
+
     it('handles sorting matching results', () => {
       const first = generateUser('xxx', '_surname');
       const second = generateUser('xxx', 'surname _lastname');
