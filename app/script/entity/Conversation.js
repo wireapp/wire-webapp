@@ -150,7 +150,7 @@ z.entity.Conversation = class Conversation {
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
     this.isClearable = ko.pureComputed(() => !this.is_request() && !this.is_cleared());
-    this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.removed_from_conversation());
+    this.isLeavable = ko.pureComputed(() => this.is_group() && !this.removed_from_conversation());
     this.isMutable = ko.pureComputed(() => !this.is_request() && !this.removed_from_conversation());
 
     this.removed_from_conversation.subscribe(is_removed => {

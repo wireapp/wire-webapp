@@ -305,16 +305,15 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
-      if (this.isProAccount()) {
-        const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
+      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
+      if (this.isProAccount()) {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
           label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
           title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
         });
       } else {
-        const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
         const labelStringId = conversationEntity.showNotificationsNothing()
           ? z.string.conversationsPopoverNotify
           : z.string.conversationsPopoverSilence;
@@ -325,7 +324,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
           label: z.l10n.text(labelStringId),
-          title: z.l10n.text(titleStringId, silenceShortcut),
+          title: z.l10n.text(titleStringId, notificationsShortcut),
         });
       }
     }
