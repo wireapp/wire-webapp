@@ -171,7 +171,7 @@ z.entity.Conversation = class Conversation {
     this.unreadMessagesCount = ko.observable(0);
     this.hasUnreadSelfMention = ko.observable(false);
 
-    this.unreadEvents = ko.pureComputed(() => {
+    this.unreadEvents = ko.computed(() => {
       const unreadEvents = [];
       const messages = this.messages();
       let hasSelfMention = false;
