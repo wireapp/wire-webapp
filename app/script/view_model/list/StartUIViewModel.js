@@ -565,7 +565,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         : this.userRepository.connected_users();
 
       const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-      const localSearchFields = trimmedQuery.startsWith('@') ? [SEARCHABLE_FIELDS.USERNAME] : [SEARCHABLE_FIELDS.NAME];
+      const localSearchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
       const contactSearchResults = this.searchRepository.searchUserInSet(
         trimmedQuery.replace(/^@/, ''),

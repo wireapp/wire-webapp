@@ -80,7 +80,7 @@ z.components.UserList = class UserList {
           const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
-          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : [SEARCHABLE_FIELDS.NAME];
+          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
           return this.searchRepository.searchUserInSet(trimmedQuery.replace(/^@/, ''), this.userEntities(), properties);
         }
       }
