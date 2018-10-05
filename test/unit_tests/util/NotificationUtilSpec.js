@@ -52,8 +52,8 @@ describe('z.util.NotificationUtil', () => {
   it('returns the correct value for all notifications', () => {
     messageEntity.add_asset(generateTextAsset());
 
-    conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.EVERYTHING');
-    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
+    conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+    const shouldNotify = z.util.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
@@ -66,8 +66,8 @@ describe('z.util.NotificationUtil', () => {
   it('returns the correct value for no notifications', () => {
     messageEntity.add_asset(generateTextAsset());
 
-    conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.NOTHING');
-    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
+    conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
+    const shouldNotify = z.util.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
@@ -80,8 +80,8 @@ describe('z.util.NotificationUtil', () => {
   it('returns the correct value for self mentioned messages', () => {
     messageEntity.add_asset(generateTextAsset(true));
 
-    conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.ONLY_MENTIONS');
-    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
+    conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+    const shouldNotify = z.util.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
@@ -94,8 +94,8 @@ describe('z.util.NotificationUtil', () => {
   it('returns the correct value for non-self mentioned messages', () => {
     messageEntity.add_asset(generateTextAsset());
 
-    conversationEntity.notificationState('z.conversation.NotificationSetting.STATE.ONLY_MENTIONS');
-    const shouldNotify = z.notification.NotificationUtil.shouldNotify(
+    conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+    const shouldNotify = z.util.NotificationUtil.shouldNotify(
       conversationEntity,
       messageEntity,
       eventsToNotify,
