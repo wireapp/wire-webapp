@@ -226,7 +226,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   cleanup_conversations() {
     this.conversations().forEach(conversation_et => {
-      if (conversation_et.is_group() && conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
+      if (conversation_et.isGroup() && conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
         this.conversation_service.delete_conversation_from_db(conversation_et.id);
         this.delete_conversation(conversation_et.id);
       }
@@ -446,7 +446,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const checkCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
         if (checkCreationMessage) {
           const groupCreationMessageIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
-          const one2oneConnectionMessageInGroup = conversationEntity.is_group() && firstMessage.isConnection();
+          const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
           const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
           if (wrongMessageTypeForConversation) {
@@ -478,7 +478,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
 
-    const creationEvent = conversationEntity.is_group()
+    const creationEvent = conversationEntity.isGroup()
       ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
@@ -747,7 +747,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   getGroupsByName(query, isHandle) {
     return this.sorted_conversations()
       .filter(conversationEntity => {
-        if (!conversationEntity.is_group()) {
+        if (!conversationEntity.isGroup()) {
           return false;
         }
 
@@ -3443,7 +3443,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.deleteMessage(conversationEntity, messageEntity);
         }
 
-        const userIds = conversationEntity.is_group() ? [this.selfUser().id, messageEntity.from] : undefined;
+        const userIds = conversationEntity.isGroup() ? [this.selfUser().id, messageEntity.from] : undefined;
         this.deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
       });
     }

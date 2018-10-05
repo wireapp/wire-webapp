@@ -74,7 +74,7 @@ describe('Conversation Mapper', () => {
       expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
       expect(conversation_et.id).toBe(conversation.id);
       expect(conversation_et.getNumberOfParticipants()).toBe(conversation.members.others.length + 1);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.name()).toBe(conversation.name);
       expect(conversation_et.notificationState()).toBe(z.conversation.NotificationSetting.STATE.EVERYTHING);
       expect(conversation_et.team_id).toEqual(conversation.team);

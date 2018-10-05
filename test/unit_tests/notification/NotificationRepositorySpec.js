@@ -102,7 +102,7 @@ describe('z.notification.NotificationRepository', () => {
               notification_content.options.data.messageType = _message.type;
               notification_content.trigger = trigger;
 
-              if (_conversation.is_group()) {
+              if (_conversation.isGroup()) {
                 const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
                 const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
 

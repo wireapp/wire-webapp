@@ -91,7 +91,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isNameEditable = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().is_group() && this.activeConversation().isActiveParticipant()
+        ? this.activeConversation().isGroup() && this.activeConversation().isActiveParticipant()
         : false;
     });
 
@@ -116,7 +116,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.showActionAddParticipants = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_group();
+      return this.activeConversation() && this.activeConversation().isGroup();
     });
 
     this.showActionBlock = ko.pureComputed(() => {
@@ -151,7 +151,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showActionTimedMessages = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().is_group() && !this.activeConversation().isGuest()
+        ? this.activeConversation().isGroup() && !this.activeConversation().isGuest()
         : false;
     });
 

@@ -76,7 +76,7 @@ z.entity.Conversation = class Conversation {
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
-    this.is_group = ko.pureComputed(() => {
+    this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
@@ -89,7 +89,7 @@ z.entity.Conversation = class Conversation {
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.is_group() && this.self.inTeam();
+      return hasGuestUser && this.isGroup() && this.self.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
@@ -150,7 +150,7 @@ z.entity.Conversation = class Conversation {
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
     this.isClearable = ko.pureComputed(() => !this.is_request() && !this.is_cleared());
-    this.isLeavable = ko.pureComputed(() => this.is_group() && !this.removed_from_conversation());
+    this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.removed_from_conversation());
     this.isMutable = ko.pureComputed(() => !this.is_request() && !this.removed_from_conversation());
 
     this.removed_from_conversation.subscribe(is_removed => {
@@ -251,7 +251,7 @@ z.entity.Conversation = class Conversation {
         return userName ? userName : '…';
       }
 
-      if (this.is_group()) {
+      if (this.isGroup()) {
         if (this.name()) {
           return this.name();
         }

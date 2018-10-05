@@ -297,7 +297,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity) {
-    const isGroup = conversationEntity && conversationEntity.is_group();
+    const isGroup = conversationEntity && conversationEntity.isGroup();
 
     switch (messageEntity.memberMessageType) {
       case z.message.SystemMessageType.NORMAL:
@@ -536,7 +536,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     let title;
     if (conversationName) {
-      title = conversationEntity.is_group()
+      title = conversationEntity.isGroup()
         ? z.l10n.text(z.string.notificationTitleGroup, {conversation: conversationName, user: userEntity.first_name()})
         : conversationName;
     }
