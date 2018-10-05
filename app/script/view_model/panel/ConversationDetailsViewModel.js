@@ -133,28 +133,20 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation() && this.activeConversation().is_request();
     });
 
-    this.showActionClear = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
-        : false;
-    });
-
-    this.showActionLeave = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation()
-        : false;
-    });
-
-    this.showActionNotificationSettings = ko.pureComputed(() => {
-      return (
-        this.activeConversation() &&
-        !this.activeConversation().is_request() &&
-        !this.activeConversation().removed_from_conversation()
-      );
-    });
+    this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
 
     this.showActionGuestOptions = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().inTeam();
+    });
+
+    this.showActionLeave = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isLeavable());
+
+    this.showActionMute = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
+    });
+
+    this.showActionNotificationSettings = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
     });
 
     this.showActionTimedMessages = ko.pureComputed(() => {
@@ -164,7 +156,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.showSectionOptions = ko.pureComputed(() => {
-      return this.showActionNotificationSettings() || this.showActionGuestOptions() || this.showActionTimedMessages();
+      return this.showActionGuestOptions() || this.showActionNotificationSettings() || this.showActionTimedMessages();
     });
 
     this.participantsUserText = ko.pureComputed(() => {

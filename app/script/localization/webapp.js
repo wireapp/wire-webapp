@@ -436,6 +436,8 @@ z.string.conversationsPopoverCancel = 'Cancel request…';
 z.string.conversationsPopoverClear = 'Delete content…';
 z.string.conversationsPopoverLeave = 'Leave group…';
 z.string.conversationsPopoverNotificationSettings = 'Notifications…';
+z.string.conversationsPopoverNotify = 'Unmute';
+z.string.conversationsPopoverSilence = 'Mute';
 z.string.conversationsPopoverUnarchive = 'Unarchive';
 
 // Conversations secondary line
@@ -835,7 +837,9 @@ z.string.tooltipConversationsArchive = 'Archive ({{shortcut}})';
 z.string.tooltipConversationsArchived = 'Show archive ({{number}})';
 z.string.tooltipConversationsMore = 'More';
 z.string.tooltipConversationsNotifications = 'Open notification settings ({{shortcut}})';
+z.string.tooltipConversationsNotify = 'Unmute ({{shortcut}})';
 z.string.tooltipConversationsPreferences = 'Open preferences';
+z.string.tooltipConversationsSilence = 'Mute ({{shortcut}})';
 z.string.tooltipConversationsStart = 'Start conversation ({{shortcut}})';
 
 z.string.tooltipConversationDetailsAddPeople = 'Add participants to conversation ({{shortcut}})';
