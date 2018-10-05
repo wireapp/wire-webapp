@@ -17,9 +17,31 @@
  *
  */
 
-type BotConfig = {
-  conversations: string[];
-  owners: string[];
-};
+const {Bot} = require('@wireapp/bot-api');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 
-export {BotConfig};
+describe('Bot', () => {
+  let bot;
+
+  const credentials = {
+    email: 'email@example.com',
+    password: 'my-password',
+  };
+
+  beforeEach(() => {
+    bot = new Bot(credentials);
+  });
+
+  describe('"constructor"', () => {
+    it('merges the configuration correctly', () => {
+      const config = {
+        clientType: ClientType.PERMANENT,
+      };
+
+      const bot2 = new Bot(credentials, config);
+
+      expect(bot.config).not.toEqual(jasmine.objectContaining(config));
+      expect(bot2.config).toEqual(jasmine.objectContaining(config));
+    });
+  });
+});

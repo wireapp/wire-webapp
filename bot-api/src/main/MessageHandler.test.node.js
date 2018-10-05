@@ -25,7 +25,7 @@ const UUID_VERSION = 4;
 describe('MessageHandler', () => {
   let mainHandler;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     mainHandler = new MessageHandler();
   });
 
