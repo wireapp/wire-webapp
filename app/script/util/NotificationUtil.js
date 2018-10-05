@@ -34,7 +34,7 @@ z.util.NotificationUtil = {
     const isEventToNotify =
       eventsToNotify.includes(messageEntity.super_type) && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
 
-    const isSelfMentioned = isEventToNotify && messageEntity.is_content() && messageEntity.isUserMentioned(userId);
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
 
     switch (conversationEntity.notificationState()) {
       case z.conversation.NotificationSetting.STATE.EVERYTHING: {
@@ -44,7 +44,7 @@ z.util.NotificationUtil = {
         return false;
       }
       case z.conversation.NotificationSetting.STATE.ONLY_MENTIONS: {
-        return isSelfMentioned;
+        return isEventToNotify && isSelfMentioned;
       }
     }
   },
