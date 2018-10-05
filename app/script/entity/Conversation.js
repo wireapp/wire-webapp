@@ -180,6 +180,7 @@ z.entity.Conversation = class Conversation {
       const unreadEvents = [];
       const messages = this.messages();
       const unreadSelfMentions = [];
+      const unreadTextMessages = [];
       const unreadMessages = [];
       const unreadPings = [];
       const unreadCalls = [];
@@ -192,28 +193,29 @@ z.entity.Conversation = class Conversation {
           }
 
           const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+          const isPing = messageEntity.is_ping();
+          const isTextMessage = messageEntity.is_content();
+          const isSelfMention = isTextMessage && this.self && messageEntity.isUserMentioned(this.self.id);
 
-          if (isMissedCall || messageEntity.is_ping() || messageEntity.is_content()) {
+          if (isMissedCall || isPing || isTextMessage) {
             unreadMessages.push(messageEntity);
           }
 
-          if (isMissedCall) {
-            unreadCalls.push(messageEntity);
-          }
-
-          if (messageEntity.is_ping()) {
-            unreadPings.push(messageEntity);
-          }
-
-          if (messageEntity.is_content() && this.self && messageEntity.isUserMentioned(this.self.id)) {
+          if (isSelfMention) {
             unreadSelfMentions.push(messageEntity);
+          } else if (isMissedCall) {
+            unreadCalls.push(messageEntity);
+          } else if (isPing) {
+            unreadPings.push(messageEntity);
+          } else if (isTextMessage) {
+            unreadTextMessages.push(messageEntity);
           }
 
           unreadEvents.push(messageEntity);
         }
       }
 
-      return {unreadCalls, unreadEvents, unreadMessages, unreadPings, unreadSelfMentions};
+      return {unreadCalls, unreadEvents, unreadMessages, unreadPings, unreadSelfMentions, unreadTextMessages};
     });
 
     /**

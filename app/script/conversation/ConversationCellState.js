@@ -39,7 +39,7 @@ z.conversation.ConversationCellState = (() => {
     };
     let mentionText = undefined;
 
-    const {unreadMessages, unreadSelfMentions} = conversationEntity.unreadState();
+    const {unreadCalls, unreadPings, unreadSelfMentions, unreadTextMessages} = conversationEntity.unreadState();
 
     for (const messageEntity of unreadSelfMentions) {
       activities[ACTIVITY_TYPE.MENTION] += 1;
@@ -58,21 +58,9 @@ z.conversation.ConversationCellState = (() => {
       }
     }
 
-    for (const messageEntity of unreadMessages) {
-      const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(conversationEntity.self.id);
-      if (isSelfMentioned) {
-        return;
-      }
-
-      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
-      if (isMissedCall) {
-        activities[ACTIVITY_TYPE.CALL] += 1;
-      } else if (messageEntity.is_ping()) {
-        activities[ACTIVITY_TYPE.PING] += 1;
-      } else if (messageEntity.is_content()) {
-        activities[ACTIVITY_TYPE.MESSAGE] += 1;
-      }
-    }
+    activities[ACTIVITY_TYPE.CALL] += unreadCalls.length;
+    activities[ACTIVITY_TYPE.PING] += unreadPings.length;
+    activities[ACTIVITY_TYPE.MESSAGE] += unreadTextMessages.length;
 
     if (prioritizeSelfMention && activities[ACTIVITY_TYPE.MENTION] === 1) {
       const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
