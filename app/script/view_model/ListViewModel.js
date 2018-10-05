@@ -292,7 +292,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
-      if (this.teamRepository().isTeam()) {
+      if (this.teamRepository.isTeam()) {
         const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
         entries.push({
