@@ -291,8 +291,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   onContextMenu(conversationEntity, event) {
     const entries = [];
 
-    const isMutable = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
-    if (isMutable) {
+    if (conversationEntity.isMutable()) {
       if (this.teamRepository().isTeam()) {
         const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
@@ -340,8 +339,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    const canClear = !conversationEntity.is_request() && !conversationEntity.is_cleared();
-    if (canClear) {
+    if (conversationEntity.isClearable()) {
       entries.push({
         click: () => this.clickToClear(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverClear),
@@ -360,8 +358,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
     }
 
-    const canLeave = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
-    if (canLeave) {
+    if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverLeave),

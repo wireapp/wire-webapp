@@ -89,12 +89,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation() && this.activeConversation().isActiveParticipant();
     });
 
-    this.isMutable = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? !this.activeConversation().is_request() && !this.activeConversation().removed_from_conversation()
-        : false;
-    });
-
     this.isNameEditable = ko.pureComputed(() => {
       return this.activeConversation()
         ? this.activeConversation().is_group() && this.activeConversation().isActiveParticipant()
@@ -140,9 +134,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.showActionClear = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
-        : false;
+      return this.activeConversation() && this.activeConversation().isClearable();
     });
 
     this.showActionGuestOptions = ko.pureComputed(() => {
@@ -150,14 +142,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.showActionLeave = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation()
-        : false;
+      return this.activeConversation() && this.activeConversation().isLeavable();
     });
 
-    this.showActionMute = ko.pureComputed(() => !this.isTeam() && this.isMutable());
+    this.showActionMute = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
+    });
 
-    this.showActionNotificationSettings = ko.pureComputed(() => this.isTeam() && this.isMutable());
+    this.showActionNotificationSettings = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
+    });
 
     this.showActionTimedMessages = ko.pureComputed(() => {
       return this.activeConversation()
