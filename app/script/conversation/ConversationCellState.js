@@ -31,14 +31,6 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _accumulateSummary = (conversationEntity, prioritizeSelfMention) => {
-    const activities = {
-      [ACTIVITY_TYPE.MENTION]: 0,
-      [ACTIVITY_TYPE.CALL]: 0,
-      [ACTIVITY_TYPE.PING]: 0,
-      [ACTIVITY_TYPE.MESSAGE]: 0,
-    };
-    let mentionText = undefined;
-
     const {
       calls: unreadCalls,
       otherMessages: unreadOtherMessages,
@@ -46,31 +38,30 @@ z.conversation.ConversationCellState = (() => {
       selfMentions: unreadSelfMentions,
     } = conversationEntity.unreadState();
 
-    for (const messageEntity of unreadSelfMentions) {
-      activities[ACTIVITY_TYPE.MENTION] += 1;
+    // sorted in order of priority
+    const activities = {
+      [ACTIVITY_TYPE.MENTION]: unreadSelfMentions.length,
+      [ACTIVITY_TYPE.CALL]: unreadCalls.length,
+      [ACTIVITY_TYPE.PING]: unreadPings.length,
+      [ACTIVITY_TYPE.MESSAGE]: unreadOtherMessages.length,
+    };
 
-      if (!mentionText) {
+    if (prioritizeSelfMention && activities[ACTIVITY_TYPE.MENTION] === 1) {
+      const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+
+      if (numberOfAlerts === 1) {
+        const [messageEntity] = unreadSelfMentions;
+
         if (messageEntity.is_ephemeral()) {
           const stringId = conversationEntity.is_group()
             ? z.string.conversationsSecondaryLineEphemeralMentionGroup
             : z.string.conversationsSecondaryLineEphemeralMention;
-          mentionText = z.l10n.text(stringId);
-        } else {
-          mentionText = conversationEntity.is_group()
-            ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
-            : messageEntity.get_first_asset().text;
+          return z.l10n.text(stringId);
         }
-      }
-    }
 
-    activities[ACTIVITY_TYPE.CALL] += unreadCalls.length;
-    activities[ACTIVITY_TYPE.PING] += unreadPings.length;
-    activities[ACTIVITY_TYPE.MESSAGE] += unreadOtherMessages.length;
-
-    if (prioritizeSelfMention && activities[ACTIVITY_TYPE.MENTION] === 1) {
-      const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
-      if (numberOfAlerts === 1) {
-        return mentionText;
+        return conversationEntity.is_group()
+          ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
+          : messageEntity.get_first_asset().text;
       }
     }
 
