@@ -137,7 +137,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
     return Promise.resolve().then(() => {
-      const shouldNotify = NotificationRepository._shouldNotify(conversationEntity, messageEntity, this.selfUser().id);
+      const shouldNotify = NotificationRepository.shouldNotify(conversationEntity, messageEntity, this.selfUser().id);
 
       if (shouldNotify) {
         this._notifySound(messageEntity);
@@ -818,24 +818,19 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @param {string} userId - The user id to check mentions for.
    * @returns {boolean} If the conversation should send a notification.
    */
-  static _shouldNotify(conversationEntity, messageEntity, userId) {
-    const isEventToNotify =
-      NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type) &&
-      !messageEntity.isEdited() &&
-      !messageEntity.isLinkPreview();
+  static shouldNotify(conversationEntity, messageEntity, userId) {
+    if (conversationEntity.showNotificationsNothing()) {
+      return false;
+    }
+
+    const isEventTypeToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
+    const isEventToNotify = isEventTypeToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
+
+    if (conversationEntity.showNotificationsEverything()) {
+      return isEventToNotify;
+    }
 
     const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
-
-    switch (conversationEntity.notificationState()) {
-      case z.conversation.NotificationSetting.STATE.EVERYTHING: {
-        return isEventToNotify;
-      }
-      case z.conversation.NotificationSetting.STATE.NOTHING: {
-        return false;
-      }
-      case z.conversation.NotificationSetting.STATE.ONLY_MENTIONS: {
-        return isEventToNotify && isSelfMentioned;
-      }
-    }
+    return isEventToNotify && isSelfMentioned;
   }
 };

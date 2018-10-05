@@ -688,7 +688,7 @@ describe('z.notification.NotificationRepository', () => {
       messageEntity.add_asset(generateTextAsset());
 
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
-      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+      const shouldNotify = z.notification.NotificationRepository.shouldNotify(
         conversationEntity,
         messageEntity,
         userId
@@ -701,7 +701,7 @@ describe('z.notification.NotificationRepository', () => {
       messageEntity.add_asset(generateTextAsset());
 
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
-      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+      const shouldNotify = z.notification.NotificationRepository.shouldNotify(
         conversationEntity,
         messageEntity,
         userId
@@ -714,7 +714,7 @@ describe('z.notification.NotificationRepository', () => {
       messageEntity.add_asset(generateTextAsset(true));
 
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
-      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+      const shouldNotify = z.notification.NotificationRepository.shouldNotify(
         conversationEntity,
         messageEntity,
         userId
@@ -727,7 +727,7 @@ describe('z.notification.NotificationRepository', () => {
       messageEntity.add_asset(generateTextAsset());
 
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
-      const shouldNotify = z.notification.NotificationRepository._shouldNotify(
+      const shouldNotify = z.notification.NotificationRepository.shouldNotify(
         conversationEntity,
         messageEntity,
         userId
