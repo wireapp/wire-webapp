@@ -17,7 +17,7 @@
       <div class="add-participants__list panel__content">
         <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
           <!-- ko if: isStateAddPeople() -->
-            <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
+            <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts, searchRepository: searchRepository"></user-list>
           <!-- /ko -->
           <!-- ko if: isStateAddService() -->
             <!-- ko if: services().length -->
