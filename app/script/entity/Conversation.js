@@ -153,6 +153,12 @@ z.entity.Conversation = class Conversation {
     this.isLeavable = ko.pureComputed(() => this.is_group() && !this.removed_from_conversation());
     this.isMutable = ko.pureComputed(() => !this.is_request() && !this.removed_from_conversation());
 
+    this.removed_from_conversation.subscribe(is_removed => {
+      if (!is_removed) {
+        return this.archived_state(false);
+      }
+    });
+
     // Messages
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
