@@ -237,7 +237,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   toggleMuteConversation(conversationEntity) {
     if (conversationEntity) {
-      this.conversationRepository.toggle_silence_conversation(conversationEntity);
+      const notificationState = conversationEntity.showNotificationsEverything()
+        ? z.conversation.NotificationSetting.STATE.NOTHING
+        : z.conversation.NotificationSetting.STATE.EVERYTHING;
+      this.conversationRepository.setNotificationState(conversationEntity, notificationState);
     }
   }
 
