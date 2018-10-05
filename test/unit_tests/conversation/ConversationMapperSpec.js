@@ -437,7 +437,7 @@ describe('Conversation Mapper', () => {
   describe('getNotificationState', () => {
     const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
 
-    it('returns states if the only a notification state is given', () => {
+    it('returns states if only a notification state is given', () => {
       const expectNothingState = conversation_mapper.getNotificationState(NOTIFICATION_STATE.NOTHING);
       expect(expectNothingState).toBe(NOTIFICATION_STATE.NOTHING);
 
@@ -478,9 +478,12 @@ describe('Conversation Mapper', () => {
       expect(expectEverythingState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
     });
 
-    it('returns state if no state is given', () => {
-      const expectState = conversation_mapper.getNotificationState();
-      expect(expectState).toBe(NOTIFICATION_STATE.EVERYTHING);
+    it('returns state if invalid states are given', () => {
+      const expectUndefinedState = conversation_mapper.getNotificationState();
+      expect(expectUndefinedState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectInvalidState = conversation_mapper.getNotificationState(0b10);
+      expect(expectInvalidState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
   });
 });

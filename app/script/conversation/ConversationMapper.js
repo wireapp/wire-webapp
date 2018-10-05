@@ -296,7 +296,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @returns {z.conversation.NotificationSetting.STATE} validated notification setting
    */
   getNotificationState(notificationState, deprecatedMutedState) {
-    if (notificationState === undefined || notificationState === null) {
+    const validNotifcationState = Object.values(z.conversation.NotificationSetting.STATE);
+    if (!validNotifcationState.includes(notificationState)) {
       return deprecatedMutedState
         ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
         : z.conversation.NotificationSetting.STATE.EVERYTHING;
@@ -306,11 +307,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       return deprecatedMutedState ? notificationState | 0b1 : z.conversation.NotificationSetting.STATE.EVERYTHING;
     }
 
-    if (notificationState !== undefined) {
-      return notificationState;
-    }
-
-    return z.conversation.NotificationSetting.STATE.EVERYTHING;
+    return notificationState;
   }
 
   /**
