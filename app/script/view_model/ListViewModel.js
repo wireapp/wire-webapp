@@ -51,6 +51,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.elementId = 'left-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
+    this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
     this.actionsViewModel = this.mainViewModel.actions;
@@ -290,15 +291,31 @@ z.viewModel.ListViewModel = class ListViewModel {
   onContextMenu(conversationEntity, event) {
     const entries = [];
 
-    const canSetNotifications = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
-    if (canSetNotifications) {
-      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
+    const isMutable = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
+    if (isMutable) {
+      if (this.teamRepository().isTeam()) {
+        const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
-      entries.push({
-        click: () => this.clickToOpenNotificationSettings(conversationEntity),
-        label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
-        title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
-      });
+        entries.push({
+          click: () => this.clickToOpenNotificationSettings(conversationEntity),
+          label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
+          title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
+        });
+      } else {
+        const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
+        const labelStringId = conversationEntity.showNotificationsNothing()
+          ? z.string.conversationsPopoverNotify
+          : z.string.conversationsPopoverSilence;
+        const titleStringId = conversationEntity.showNotificationsNothing()
+          ? z.string.tooltipConversationsNotify
+          : z.string.tooltipConversationsSilence;
+
+        entries.push({
+          click: () => this.clickToToggleMute(conversationEntity),
+          label: z.l10n.text(labelStringId),
+          title: z.l10n.text(titleStringId, silenceShortcut),
+        });
+      }
     }
 
     if (conversationEntity.is_archived()) {

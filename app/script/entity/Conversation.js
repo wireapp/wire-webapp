@@ -131,10 +131,17 @@ z.entity.Conversation = class Conversation {
       return this.notificationState() === z.conversation.NotificationSetting.STATE.EVERYTHING;
     });
     this.showNotificationsNothing = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
+      if (this.self) {
+        return this.self.inTeam()
+          ? this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING
+          : this.notificationState() !== z.conversation.NotificationSetting.STATE.EVERYTHING;
+      }
     });
     this.showNotificationsOnlyMentions = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+      if (this.self) {
+        const isMentionsState = this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+        return this.self.inTeam() ? isMentionsState : false;
+      }
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
