@@ -199,12 +199,11 @@ z.event.WebApp = {
     CALL_REJECT: 'wire.webapp.shortcut.call_reject',
     DELETE: 'wire.webapp.shortcut.delete',
     NEXT: 'wire.webapp.shortcut.next',
-    NOTIFICATIONS: 'wire.webapp.shortcut.notifications', // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
     PEOPLE: 'wire.webapp.shortcut.people',
     PICTURE: 'wire.webapp.shortcut.picture',
     PING: 'wire.webapp.shortcut.ping',
     PREV: 'wire.webapp.shortcut.prev',
-    SILENCE: 'wire.webapp.shortcut.silence', // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+    SILENCE: 'wire.webapp.shortcut.silence',
     START: 'wire.webapp.shortcut.start',
   },
   SIGN_OUT: 'wire.webapp.logout',
