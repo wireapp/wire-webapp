@@ -822,6 +822,9 @@ z.event.EventRepository = class EventRepository {
 
     return Object.assign({}, newEvent, {
       category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+      ephemeral_expires: originalEvent.ephemeral_expires,
+      ephemeral_started: originalEvent.ephemeral_started,
+      ephemeral_time: originalEvent.ephemeral_time,
       server_time: newEvent.time,
       time: originalEvent.time,
       version: originalEvent.version,
