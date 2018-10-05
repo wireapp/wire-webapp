@@ -2,6 +2,9 @@
   <!-- ko if: isVisible() -->
     <div class="panel__header panel__header--reverse">
       <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+      <!-- ko if: showActionMute() -->
+        <mute-icon class="right-panel-mute icon-button" data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}" data-uie-name="do-mute"></mute-icon>
+      <!-- /ko -->
     </div>
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">

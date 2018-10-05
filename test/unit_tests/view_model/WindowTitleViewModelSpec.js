@@ -87,15 +87,20 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('does not change the title if muted conversations receive messages', () => {
+      const userEntity = new z.entity.User(z.util.createRandomUuid());
+      userEntity.inTeam(true);
+
       const selected_conversation = new z.entity.Conversation(z.util.createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.GROUP);
+      selected_conversation.self = userEntity;
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const muted_conversation = new z.entity.Conversation(z.util.createRandomUuid());
       muted_conversation.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
       muted_conversation.name('Muted Conversation');
       muted_conversation.type(z.conversation.ConversationType.GROUP);
+      muted_conversation.self = userEntity;
 
       // Add conversations to conversation repository
       expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(0);
@@ -117,7 +122,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       expect(muted_conversation.messages().length).toBe(1);
       expect(muted_conversation.messages_unordered().length).toBe(1);
-      expect(muted_conversation.unreadEvents().length).toBe(1);
+      expect(muted_conversation.unreadState().allEvents.length).toBe(1);
 
       // Check title when there are messages in the muted conversation
       title_view_model.initiateTitleUpdates();

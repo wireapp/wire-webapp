@@ -1033,7 +1033,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   markAsRead(conversationEntity) {
     if (conversationEntity) {
       const hasUnreadEvents = conversationEntity.last_read_timestamp() < conversationEntity.last_server_timestamp();
-      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadEventsCount();
+      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadState().allEvents.length;
       if (isNotMarkedAsRead && !this.block_event_handling()) {
         this._updateLastReadTimestamp(conversationEntity);
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
@@ -1408,41 +1408,47 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Toggle a conversation between silence and notify.
-   * @param {Conversation} conversation_et - Conversation to rename
-   * @returns {Promise} Resolves when the muted stated was toggled
+   * Set the notification state of a conversation.
+   *
+   * @param {z.entity.Conversation} conversationEntity - Conversation to change notification state off
+   * @param {z.conversation.NotificationSetting} notificationState - New notification state
+   * @returns {Promise} Resolves when the notification stated was change
    */
-  toggle_silence_conversation(conversation_et) {
-    if (!conversation_et) {
-      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+  setNotificationState(conversationEntity, notificationState) {
+    if (!conversationEntity || notificationState === undefined) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
       return Promise.reject(error);
     }
 
+    const validStates = Object.values(z.conversation.NotificationSetting.STATE);
+    if (!validStates.includes(notificationState)) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
+      return Promise.reject(error);
+    }
+
+    const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
     const payload = {
-      otr_muted: conversation_et.showNotificationsEverything(),
-      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(this.timeOffset)).toISOString(),
+      otr_muted: otrMuted,
+      otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(this.timeOffset)).toISOString(),
+      otr_muted_status: notificationState,
     };
 
     return this.conversation_service
-      .update_member_properties(conversation_et.id, payload)
+      .update_member_properties(conversationEntity.id, payload)
       .then(() => {
-        const response = {
-          data: payload,
-          from: this.selfUser().id,
-        };
+        const response = {data: payload, from: this.selfUser().id};
+        this._onMemberUpdate(conversationEntity, response);
 
-        this._onMemberUpdate(conversation_et, response);
-        this.logger.info(
-          `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${
-            payload.otr_muted_ref
-          }'`
-        );
+        const {otr_muted: muted, otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
+        const logMessage = `Changed notification state of conversation to '${muted} | ${mutedStatus}' on '${mutedRef}'`;
+        this.logger.info(logMessage);
         return response;
       })
       .catch(error => {
-        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.message}`);
-        this.logger.warn(reject_error.message, error);
-        throw reject_error;
+        const log = `Failed to change notification state of conversation '${conversationEntity.id}': ${error.message}`;
+        const rejectError = new Error(log);
+        this.logger.warn(rejectError.message, error);
+        throw rejectError;
       });
   }
 
