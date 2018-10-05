@@ -411,8 +411,7 @@ z.entity.Conversation = class Conversation {
   getFirstUnreadSelfMention() {
     return this.unreadState()
       .selfMentions.slice()
-      .reverse()
-      .shift();
+      .pop();
   }
 
   get_last_known_timestamp(time_offset) {
