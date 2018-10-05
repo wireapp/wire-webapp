@@ -54,6 +54,8 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         const unreadConversations = this.conversationRepository
           .conversations_unarchived()
           .filter(conversationEntity => {
+            const {unreadMessages, unreadSelfMentions} = conversationEntity.unreadState();
+
             const isIgnored = conversationEntity.is_request() || conversationEntity.showNotificationsNothing();
 
             if (isIgnored) {
@@ -61,8 +63,8 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
             }
 
             return conversationEntity.showNotificationsOnlyMentions()
-              ? conversationEntity.hasUnreadSelfMention()
-              : conversationEntity.unreadMessagesCount() > 0 || conversationEntity.hasJoinableCall();
+              ? unreadSelfMentions.length
+              : unreadMessages.length > 0 || conversationEntity.hasJoinableCall();
           }).length;
 
         const unreadCount = connectionRequests + unreadConversations;

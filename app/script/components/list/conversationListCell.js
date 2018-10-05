@@ -90,8 +90,8 @@ ko.components.register('conversation-list-cell', {
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
             <span class="conversation-list-cell-badge cell-badge-dark conversation-muted" data-uie-name="status-silence"><mute-icon class="svg-icon"></mute-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadMessagesCount() > 0 -->
-            <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadMessagesCount()" data-uie-name="status-unread"></span>
+          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadState().unreadMessages.length > 0 -->
+            <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadState().unreadMessages.length" data-uie-name="status-unread"></span>
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: showJoinButton -->

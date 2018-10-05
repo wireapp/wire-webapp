@@ -117,7 +117,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       expect(muted_conversation.messages().length).toBe(1);
       expect(muted_conversation.messages_unordered().length).toBe(1);
-      expect(muted_conversation.unreadEvents().length).toBe(1);
+      expect(muted_conversation.unreadState().unreadMessages.length).toBe(1);
 
       // Check title when there are messages in the muted conversation
       title_view_model.initiateTitleUpdates();

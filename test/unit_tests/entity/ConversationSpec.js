@@ -671,12 +671,12 @@ describe('Conversation', () => {
       conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadEventsCount()).toBe(1);
+      expect(conversation_et.unreadState().unreadEvents.length).toBe(1);
 
       conversation_et.release();
 
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadEventsCount()).toBe(1);
+      expect(conversation_et.unreadState().unreadEvents.length).toBe(1);
     });
 
     it('should release messages if conversation has no unread messages', () => {
@@ -686,14 +686,14 @@ describe('Conversation', () => {
       conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadEventsCount()).toBe(0);
+      expect(conversation_et.unreadState().unreadEvents.length).toBe(0);
 
       conversation_et.release();
 
       expect(conversation_et.hasAdditionalMessages()).toBeTruthy();
       expect(conversation_et.is_loaded()).toBeFalsy();
       expect(conversation_et.messages().length).toBe(0);
-      expect(conversation_et.unreadEventsCount()).toBe(0);
+      expect(conversation_et.unreadState().unreadEvents.length).toBe(0);
     });
   });
 

@@ -176,15 +176,13 @@ z.entity.Conversation = class Conversation {
     this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
-    this.unreadEventsCount = ko.observable(0);
-    this.unreadMessagesCount = ko.observable(0);
-    this.hasUnreadSelfMention = ko.observable(false);
-
-    this.unreadEvents = ko.computed(() => {
+    this.unreadState = ko.pureComputed(() => {
       const unreadEvents = [];
       const messages = this.messages();
-      let hasSelfMention = false;
-      let unreadMessages = 0;
+      const unreadSelfMentions = [];
+      const unreadMessages = [];
+      const unreadPings = [];
+      const unreadCalls = [];
 
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
@@ -196,22 +194,26 @@ z.entity.Conversation = class Conversation {
           const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
 
           if (isMissedCall || messageEntity.is_ping() || messageEntity.is_content()) {
-            unreadMessages++;
+            unreadMessages.push(messageEntity);
           }
 
-          if (!hasSelfMention && messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id)) {
-            hasSelfMention = true;
+          if (isMissedCall) {
+            unreadCalls.push(messageEntity);
+          }
+
+          if (messageEntity.is_ping()) {
+            unreadPings.push(messageEntity);
+          }
+
+          if (messageEntity.is_content() && this.self && messageEntity.isUserMentioned(this.self.id)) {
+            unreadSelfMentions.push(messageEntity);
           }
 
           unreadEvents.push(messageEntity);
         }
       }
 
-      this.unreadEventsCount(unreadEvents.length);
-      this.unreadMessagesCount(unreadMessages);
-      this.hasUnreadSelfMention(hasSelfMention);
-
-      return unreadEvents;
+      return {unreadCalls, unreadEvents, unreadMessages, unreadPings, unreadSelfMentions};
     });
 
     /**
@@ -305,7 +307,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   release() {
-    if (!this.unreadEventsCount()) {
+    if (!this.unreadState().unreadEvents.length) {
       this.remove_messages();
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
@@ -396,12 +398,9 @@ z.entity.Conversation = class Conversation {
   }
 
   getFirstUnreadSelfMention() {
-    return this.unreadEvents()
-      .slice()
-      .reverse()
-      .find(messageEntity => {
-        return messageEntity.visible() && messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id);
-      });
+    return this.unreadState()
+      .unreadSelfMentions.slice()
+      .reverse();
   }
 
   get_last_known_timestamp(time_offset) {
