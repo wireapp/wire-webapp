@@ -138,7 +138,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   notify(messageEntity, connectionEntity, conversationEntity) {
     return Promise.resolve().then(() => {
       const isEventToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
-      const isMuted = conversationEntity && conversationEntity.is_muted();
+      const isMuted = conversationEntity && !conversationEntity.showNotificationsEverything();
 
       const shouldNotify = isEventToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview() && !isMuted;
       if (shouldNotify) {

@@ -30,7 +30,7 @@ z.entity.Conversation = class Conversation {
       LAST_EVENT: 'last_event_timestamp',
       LAST_READ: 'last_read_timestamp',
       LAST_SERVER: 'last_server_timestamp',
-      MUTED: 'muted_timestamp',
+      NOTIFICATION: 'notificationTimestamp',
     };
   }
 
@@ -103,7 +103,7 @@ z.entity.Conversation = class Conversation {
 
     // E2EE conversation states
     this.archived_state = ko.observable(false).extend({notify: 'always'});
-    this.muted_state = ko.observable(false);
+    this.notificationState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
     this.verification_state = ko.observable(z.conversation.ConversationVerificationState.UNVERIFIED);
 
     this.archived_timestamp = ko.observable(0);
@@ -111,12 +111,11 @@ z.entity.Conversation = class Conversation {
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
-    this.muted_timestamp = ko.observable(0);
+    this.notificationTimestamp = ko.observable(0);
 
     // Conversation states for view
     this.is_archived = this.archived_state;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
-    this.is_muted = this.muted_state;
     this.is_verified = ko.pureComputed(() => {
       const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
       const isInitialized = this.self && hasMappedUsers;
@@ -126,6 +125,16 @@ z.entity.Conversation = class Conversation {
 
       const allUserEntities = [this.self].concat(this.participating_user_ets());
       return allUserEntities.every(userEntity => userEntity.is_verified());
+    });
+
+    this.showNotificationsEverything = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.EVERYTHING;
+    });
+    this.showNotificationsNothing = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
+    });
+    this.showNotificationsOnlyMentions = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -271,9 +280,9 @@ z.entity.Conversation = class Conversation {
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
-      this.muted_state,
-      this.muted_timestamp,
       this.name,
+      this.notificationState,
+      this.notificationTimestamp,
       this.participating_user_ids,
       this.status,
       this.type,
@@ -475,7 +484,7 @@ z.entity.Conversation = class Conversation {
       const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
 
       const hasUpdate = hasNewerMessage || hasNewerCall;
-      return hasUpdate && !this.is_muted();
+      return hasUpdate && this.showNotificationsEverything();
     }
     return false;
   }
@@ -689,9 +698,9 @@ z.entity.Conversation = class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
-      muted_state: this.muted_state(),
-      muted_timestamp: this.muted_timestamp(),
       name: this.name(),
+      notification_state: this.notificationState(),
+      notification_timestamp: this.notificationTimestamp(),
       others: this.participating_user_ids(),
       status: this.status(),
       team_id: this.team_id,

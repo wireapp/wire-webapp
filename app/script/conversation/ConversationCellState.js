@@ -238,9 +238,9 @@ z.conversation.ConversationCellState = (() => {
       const isMemberRemoval = lastMessageEntity.is_member() && lastMessageEntity.isMemberRemoval();
 
       if (isMemberRemoval) {
-        return conversationEntity.is_muted()
-          ? z.conversation.ConversationStatusIcon.MUTED
-          : z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
+        return conversationEntity.showNotificationsEverything()
+          ? z.conversation.ConversationStatusIcon.UNREAD_MESSAGES
+          : z.conversation.ConversationStatusIcon.MUTED;
       }
     },
     match: conversationEntity => {
@@ -254,7 +254,7 @@ z.conversation.ConversationCellState = (() => {
   const _getStateMuted = {
     description: conversationEntity => _accumulateSummary(conversationEntity, false),
     icon: () => z.conversation.ConversationStatusIcon.MUTED,
-    match: conversationEntity => conversationEntity.is_muted(),
+    match: conversationEntity => !conversationEntity.showNotificationsEverything(),
   };
 
   const _getStateRemoved = {
