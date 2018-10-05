@@ -10,6 +10,7 @@
 /_SpecRunner.html
 /.idea/**/*.xml
 /app/ext
+/app/min
 /app/i18n/**/*
 !/app/i18n/**/*.json
 /aws/s3
