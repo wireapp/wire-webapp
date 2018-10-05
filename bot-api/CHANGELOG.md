@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@1.0.32...@wireapp/bot-api@1.1.0) (2018-10-05)
+
+
+### Features
+
+* **bot-api:** Allow client type option, cleanup ([#1202](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1202)) ([d37044d](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/d37044d))
+
+
+
+
+
 ## [1.0.32](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@1.0.31...@wireapp/bot-api@1.0.32) (2018-10-04)
 
 **Note:** Version bump only for package @wireapp/bot-api
