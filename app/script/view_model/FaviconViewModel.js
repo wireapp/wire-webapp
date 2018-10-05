@@ -45,7 +45,7 @@ z.viewModel.FaviconViewModel = class FaviconViewModel {
   }
 
   _updateFavicon(unreadCount) {
-    const iconBadge = unreadCount != 0 ? '-badge' : '';
+    const iconBadge = unreadCount ? '-badge' : '';
     const link = document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
