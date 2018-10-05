@@ -271,7 +271,7 @@ z.conversation.ConversationCellState = (() => {
 
   const _getStateUnreadMessage = {
     description: conversationEntity => {
-      const unreadMessages = conversationEntity.unreadState().messages;
+      const unreadMessages = conversationEntity.unreadState().allMessages;
 
       for (const messageEntity of unreadMessages) {
         let stringId;

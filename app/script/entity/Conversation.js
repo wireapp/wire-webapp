@@ -177,17 +177,15 @@ z.entity.Conversation = class Conversation {
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
     this.unreadState = ko.pureComputed(() => {
-      const allMessages = this.messages();
-
       const allEvents = [];
       const calls = [];
-      const messages = [];
+      const allMessages = [];
       const otherMessages = [];
       const pings = [];
       const selfMentions = [];
 
-      for (let index = allMessages.length - 1; index >= 0; index--) {
-        const messageEntity = allMessages[index];
+      for (let index = this.messages().length - 1; index >= 0; index--) {
+        const messageEntity = this.messages()[index];
         if (messageEntity.visible()) {
           if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
             break;
@@ -199,7 +197,7 @@ z.entity.Conversation = class Conversation {
           const isSelfMention = isMessage && this.self && messageEntity.isUserMentioned(this.self.id);
 
           if (isMissedCall || isPing || isMessage) {
-            messages.push(messageEntity);
+            allMessages.push(messageEntity);
           }
 
           if (isSelfMention) {
@@ -216,7 +214,7 @@ z.entity.Conversation = class Conversation {
         }
       }
 
-      return {allEvents, calls, messages, otherMessages, pings, selfMentions};
+      return {allEvents, allMessages, calls, otherMessages, pings, selfMentions};
     });
 
     /**
@@ -403,7 +401,8 @@ z.entity.Conversation = class Conversation {
   getFirstUnreadSelfMention() {
     return this.unreadState()
       .selfMentions.slice()
-      .reverse();
+      .reverse()
+      .shift();
   }
 
   get_last_known_timestamp(time_offset) {

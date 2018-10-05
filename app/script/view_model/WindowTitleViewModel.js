@@ -54,7 +54,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         const unreadConversations = this.conversationRepository
           .conversations_unarchived()
           .filter(conversationEntity => {
-            const {messages: unreadMessages, selfMentions: unreadSelfMentions} = conversationEntity.unreadState();
+            const {allMessages: unreadMessages, selfMentions: unreadSelfMentions} = conversationEntity.unreadState();
 
             const isIgnored = conversationEntity.is_request() || conversationEntity.showNotificationsNothing();
 
