@@ -27,15 +27,14 @@ z.util.NotificationUtil = {
    * @param {z.entity.Conversation} conversationEntity - The conversation to filter from.
    * @param {z.entity.Message} messageEntity - The message to filter from.
    * @param {EVENTS_TO_NOTIFY} eventsToNotify - The events which should be counted in.
-   * @param {z.entity.User} selfUser - The user to filter from.
+   * @param {string} userId - The user id to check mentions for.
    * @returns {boolean} If the conversation should send a notification.
    */
-  shouldNotify: (conversationEntity, messageEntity, eventsToNotify, selfUser) => {
+  shouldNotify: (conversationEntity, messageEntity, eventsToNotify, userId) => {
     const isEventToNotify =
       eventsToNotify.includes(messageEntity.super_type) && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
 
-    const isSelfMentioned =
-      isEventToNotify && messageEntity.is_content() && messageEntity.isUserMentioned(selfUser().id);
+    const isSelfMentioned = isEventToNotify && messageEntity.is_content() && messageEntity.isUserMentioned(userId);
 
     switch (conversationEntity.notificationState()) {
       case z.conversation.NotificationSetting.STATE.EVERYTHING: {

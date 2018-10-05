@@ -30,7 +30,6 @@ describe('z.util.NotificationUtil', () => {
 
   let conversationEntity;
   let messageEntity;
-  let selfUserObservable;
 
   function generateTextAsset(selfMentioned = false) {
     const mentionId = selfMentioned ? userId : z.util.createRandomUuid();
@@ -44,8 +43,6 @@ describe('z.util.NotificationUtil', () => {
 
   beforeEach(() => {
     const selfUserEntity = new z.entity.User(userId);
-    selfUserObservable = () => selfUserEntity;
-
     conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
 
     messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
@@ -60,7 +57,7 @@ describe('z.util.NotificationUtil', () => {
       conversationEntity,
       messageEntity,
       eventsToNotify,
-      selfUserObservable
+      userId
     );
 
     expect(shouldNotify).toBe(true);
@@ -74,7 +71,7 @@ describe('z.util.NotificationUtil', () => {
       conversationEntity,
       messageEntity,
       eventsToNotify,
-      selfUserObservable
+      userId
     );
 
     expect(shouldNotify).toBe(false);
@@ -88,7 +85,7 @@ describe('z.util.NotificationUtil', () => {
       conversationEntity,
       messageEntity,
       eventsToNotify,
-      selfUserObservable
+      userId
     );
 
     expect(shouldNotify).toBe(true);
@@ -102,7 +99,7 @@ describe('z.util.NotificationUtil', () => {
       conversationEntity,
       messageEntity,
       eventsToNotify,
-      selfUserObservable
+      userId
     );
 
     expect(shouldNotify).toBe(false);

@@ -141,7 +141,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         conversationEntity,
         messageEntity,
         NotificationRepository.EVENTS_TO_NOTIFY,
-        this.selfUser
+        this.selfUser().id
       );
 
       if (shouldNotify) {
