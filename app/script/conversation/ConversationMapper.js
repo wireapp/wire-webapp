@@ -160,7 +160,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         last_event_timestamp,
         last_read_timestamp,
         last_server_timestamp,
-        muted_timestamp,
+        notification_timestamp,
         status,
         verification_state,
       } = selfState;
@@ -194,9 +194,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
         conversationEntity.setTimestamp(last_server_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
 
-      if (muted_timestamp) {
-        conversationEntity.setTimestamp(muted_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
-        conversationEntity.muted_state(selfState.muted_state);
+      if (notification_timestamp) {
+        conversationEntity.setTimestamp(notification_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.NOTIFICATION);
+        const notiticationState = this.getNotificationState(selfState.notification_state);
+        conversationEntity.notificationState(notiticationState);
       }
 
       if (status !== undefined) {
@@ -211,15 +212,17 @@ z.conversation.ConversationMapper = class ConversationMapper {
       const {otr_archived, otr_muted} = selfState;
 
       if (otr_archived !== undefined) {
-        const otrArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
-        conversationEntity.setTimestamp(otrArchivedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
+        const archivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+        conversationEntity.setTimestamp(archivedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
         conversationEntity.archived_state(otr_archived);
       }
 
       if (otr_muted !== undefined) {
-        const otrMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
-        conversationEntity.setTimestamp(otrMutedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
-        conversationEntity.muted_state(otr_muted);
+        const notificationTimestamp = new Date(selfState.otr_muted_ref).getTime();
+        conversationEntity.setTimestamp(notificationTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.NOTIFICATION);
+
+        const notificationState = this.getNotificationState(selfState.otr_muted_status, otr_muted);
+        conversationEntity.notificationState(notificationState);
       }
 
       if (disablePersistence) {
@@ -286,16 +289,55 @@ z.conversation.ConversationMapper = class ConversationMapper {
   }
 
   /**
+   * Get the valid notification state.
+   *
+   * @param {z.conversation.NotificationSetting.STATE} [notificationState] - Bit mask based notification setting
+   * @param {boolean} [deprecatedMutedState] - Outdated muted state
+   * @returns {z.conversation.NotificationSetting.STATE} validated notification setting
+   */
+  getNotificationState(notificationState, deprecatedMutedState) {
+    const validNotifcationState = Object.values(z.conversation.NotificationSetting.STATE);
+    if (!validNotifcationState.includes(notificationState)) {
+      return deprecatedMutedState
+        ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
+        : z.conversation.NotificationSetting.STATE.EVERYTHING;
+    }
+
+    if (deprecatedMutedState !== undefined) {
+      // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
+      return deprecatedMutedState ? notificationState | 0b1 : z.conversation.NotificationSetting.STATE.EVERYTHING;
+    }
+
+    return notificationState;
+  }
+
+  /**
    * Merge local database records with remote backend payload.
    *
-   * @param {Array} local - Database records
-   * @param {Array} remote - Backend payload
-   * @returns {Array} Merged conversation data
+   * @param {Array<Object>} localConversations - Database records
+   * @param {Array<Object>} remoteConversations - Backend payload
+   * @returns {Array<Object>} Merged conversation data
    */
-  mergeConversation(local, remote) {
-    return remote.map((remoteConversation, index) => {
-      const {access, access_role, id, creator, members, message_timer, name, team, type} = remoteConversation;
-      const localConversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
+  mergeConversation(localConversations, remoteConversations) {
+    localConversations = localConversations.filter(conversationData => conversationData);
+
+    return remoteConversations.map((remoteConversationData, index) => {
+      const conversationId = remoteConversationData.id;
+      const localConversationData = localConversations.find(({id}) => id === conversationId) || {id: conversationId};
+
+      // Update legacy muted state from database
+      const updateLegacyData = localConversationData && typeof localConversationData.muted_state === 'boolean';
+      if (updateLegacyData) {
+        const {muted_state, muted_timestamp} = localConversationData;
+        localConversationData.notification_timestamp = muted_timestamp;
+        localConversationData.notification_state = this.getNotificationState(undefined, muted_state);
+
+        delete localConversationData.muted_state;
+        delete localConversationData.muted_timestamp;
+      }
+
+      const {access, access_role, creator, members, message_timer, name, team, type} = remoteConversationData;
+      const {others: othersStates, self: selfState} = members;
 
       const updates = {
         accessModes: access,
@@ -303,18 +345,18 @@ z.conversation.ConversationMapper = class ConversationMapper {
         creator,
         message_timer,
         name,
-        status: members.self.status,
+        status: selfState.status,
         team_id: team,
         type,
       };
-      const mergedConversation = Object.assign({}, localConversation || {id}, updates);
+      const mergedConversation = Object.assign({}, localConversationData, updates);
 
       const isGroup = type === z.conversation.ConversationType.GROUP;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
-        mergedConversation.others = members.others
-          .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-          .map(other => other.id);
+        mergedConversation.others = othersStates
+          .filter(otherState => otherState.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+          .map(otherState => otherState.id);
       }
 
       // This should ensure a proper order
@@ -327,28 +369,33 @@ z.conversation.ConversationMapper = class ConversationMapper {
       if (!mergedConversation.last_server_timestamp || wrongServerTimestamp) {
         mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
       }
+
       const isRemoteTimestampNewer = (localTimestamp, remoteTimestamp) => {
         return localTimestamp !== undefined && remoteTimestamp > localTimestamp;
       };
 
       // Some archived timestamp were not properly stored in the database.
       // To fix this we check if the remote one is newer and update our local timestamp.
-      const {archived_state: localArchivedState, archived_timestamp: localArchivedTimestamp} = mergedConversation;
-      const remoteArchivedTimestamp = new Date(members.self.otr_archived_ref).getTime();
-      const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(localArchivedTimestamp, remoteArchivedTimestamp);
+      const {archived_state: archivedState, archived_timestamp: archivedTimestamp} = localConversationData;
+      const remoteArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+      const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(archivedTimestamp, remoteArchivedTimestamp);
 
-      if (isRemoteArchivedTimestampNewer || localArchivedState === undefined) {
-        mergedConversation.archived_state = members.self.otr_archived;
+      if (isRemoteArchivedTimestampNewer || archivedState === undefined) {
+        mergedConversation.archived_state = selfState.otr_archived;
         mergedConversation.archived_timestamp = remoteArchivedTimestamp;
       }
 
-      const {muted_state: localMutedState, muted_timestamp: localMutedTimestamp} = mergedConversation;
-      const remoteMutedTimestamp = new Date(members.self.otr_muted_ref).getTime();
-      const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(localMutedTimestamp, remoteMutedTimestamp);
+      const {
+        notification_state: notificationState,
+        notification_timestamp: notificationTimestamp,
+      } = localConversationData;
+      const remoteMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
+      const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(notificationTimestamp, remoteMutedTimestamp);
 
-      if (isRemoteMutedTimestampNewer || localMutedState === undefined) {
-        mergedConversation.muted_state = members.self.otr_muted;
-        mergedConversation.muted_timestamp = remoteMutedTimestamp;
+      if (isRemoteMutedTimestampNewer || notificationState === undefined) {
+        const notificationStatus = this.getNotificationState(selfState.otr_muted_status, selfState.otr_muted);
+        mergedConversation.notification_state = notificationStatus;
+        mergedConversation.notification_timestamp = remoteMutedTimestamp;
       }
 
       return mergedConversation;

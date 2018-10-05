@@ -186,7 +186,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.notificationStatusText = ko.pureComputed(() => {
-      return z.conversation.NotificationSetting.getText(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      return this.activeConversation()
+        ? z.conversation.NotificationSetting.getText(this.activeConversation().notificationState())
+        : '';
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
