@@ -56,7 +56,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.contentViewModel = this.mainViewModel.content;
+    this.panelViewModel = mainViewModel.panel;
+
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
@@ -120,7 +123,16 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.clickToToggleMute.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting.bind(this)); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+  }
+
+  changeNotificationSetting() {
+    if (this.isProAccount()) {
+      this.panelViewModel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+    } else {
+      this.clickToToggleMute();
+    }
   }
 
   goToNext() {
@@ -292,7 +304,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
-      if (this.teamRepository.isTeam()) {
+      if (this.isProAccount()) {
         const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
         entries.push({
