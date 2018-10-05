@@ -565,15 +565,11 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         : this.userRepository.connected_users();
 
       const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-      const localSearchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
-      const contactSearchResults = this.searchRepository.searchUserInSet(
-        normalizedQuery,
-        localSearchSources,
-        localSearchFields
-      );
+      const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
 
-      this.searchResults.contacts(contactSearchResults);
+      this.searchResults.contacts(contactResults);
       this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }
