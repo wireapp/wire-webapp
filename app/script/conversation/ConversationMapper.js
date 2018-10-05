@@ -304,6 +304,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     if (deprecatedMutedState !== undefined) {
+      // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
       return deprecatedMutedState ? notificationState | 0b1 : z.conversation.NotificationSetting.STATE.EVERYTHING;
     }
 
