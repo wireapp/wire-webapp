@@ -187,17 +187,20 @@ z.entity.Conversation = class Conversation {
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
     this.unreadState = ko.pureComputed(() => {
-      const allEvents = [];
-      const calls = [];
-      const allMessages = [];
-      const otherMessages = [];
-      const pings = [];
-      const selfMentions = [];
+      const unreadState = {
+        allEvents: [],
+        allMessages: [],
+        calls: [],
+        otherMessages: [],
+        pings: [],
+        selfMentions: [],
+      };
 
       for (let index = this.messages().length - 1; index >= 0; index--) {
         const messageEntity = this.messages()[index];
         if (messageEntity.visible()) {
-          if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
+          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
+          if (isReadMessage) {
             break;
           }
 
@@ -207,24 +210,24 @@ z.entity.Conversation = class Conversation {
           const isSelfMention = isMessage && this.self && messageEntity.isUserMentioned(this.self.id);
 
           if (isMissedCall || isPing || isMessage) {
-            allMessages.push(messageEntity);
+            unreadState.allMessages.push(messageEntity);
           }
 
           if (isSelfMention) {
-            selfMentions.push(messageEntity);
+            unreadState.selfMentions.push(messageEntity);
           } else if (isMissedCall) {
-            calls.push(messageEntity);
+            unreadState.calls.push(messageEntity);
           } else if (isPing) {
-            pings.push(messageEntity);
+            unreadState.pings.push(messageEntity);
           } else if (isMessage) {
-            otherMessages.push(messageEntity);
+            unreadState.otherMessages.push(messageEntity);
           }
 
-          allEvents.push(messageEntity);
+          unreadState.allEvents.push(messageEntity);
         }
       }
 
-      return {allEvents, allMessages, calls, otherMessages, pings, selfMentions};
+      return unreadState;
     });
 
     /**
