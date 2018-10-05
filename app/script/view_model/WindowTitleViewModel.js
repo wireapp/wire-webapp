@@ -60,9 +60,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
               return false;
             }
 
-            const notifySelfMentions = conversationEntity.showNotificationsOnlyMentions();
-
-            return notifySelfMentions
+            return conversationEntity.showNotificationsOnlyMentions()
               ? conversationEntity.hasUnreadSelfMention()
               : conversationEntity.unreadMessagesCount() > 0 || conversationEntity.hasJoinableCall();
           }).length;
