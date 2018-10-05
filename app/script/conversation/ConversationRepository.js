@@ -106,10 +106,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
-    this.conversations_with_new_events = {};
-    this.block_event_handling.subscribe(event_handling_state => {
-      if (!event_handling_state) {
-        this._check_changed_conversations();
+    this.conversationsWithNewEvents = new Map();
+    this.block_event_handling.subscribe(eventHandlingState => {
+      if (!eventHandlingState) {
+        this._checkChangedConversations();
       }
     });
 
@@ -1487,7 +1487,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const stateChange = conversationEntity.is_archived() !== newState;
 
     const archiveTimestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
-    const sameTimestamp = conversationEntity.archived_timestamp() === archiveTimestamp;
+    const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
 
     if (!stateChange && skipChange) {
@@ -1523,14 +1523,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
-  _check_changed_conversations() {
-    Object.values(this.conversations_with_new_events).forEach(conversationEntity => {
+  _checkChangedConversations() {
+    this.conversationsWithNewEvents.forEach(([, conversationEntity]) => {
       if (conversationEntity.shouldUnarchive()) {
         this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
       }
     });
 
-    this.conversations_with_new_events = {};
+    this.conversationsWithNewEvents.clear();
   }
 
   /**
@@ -2917,7 +2917,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       if (previouslyArchived) {
         // Add to check for un-archiving at the end of stream handling
         if (eventFromStream) {
-          return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
+          return this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
         }
 
         if (eventFromWebSocket && conversationEntity.shouldUnarchive()) {

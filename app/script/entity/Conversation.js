@@ -25,7 +25,7 @@ window.z.entity = z.entity || {};
 z.entity.Conversation = class Conversation {
   static get TIMESTAMP_TYPE() {
     return {
-      ARCHIVED: 'archived_timestamp',
+      ARCHIVED: 'archivedTimestamp',
       CLEARED: 'cleared_timestamp',
       LAST_EVENT: 'last_event_timestamp',
       LAST_READ: 'last_read_timestamp',
@@ -102,11 +102,11 @@ z.entity.Conversation = class Conversation {
     });
 
     // E2EE conversation states
-    this.archived_state = ko.observable(false).extend({notify: 'always'});
+    this.archivedState = ko.observable(false).extend({notify: 'always'});
     this.notificationState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
     this.verification_state = ko.observable(z.conversation.ConversationVerificationState.UNVERIFIED);
 
-    this.archived_timestamp = ko.observable(0);
+    this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
@@ -114,7 +114,7 @@ z.entity.Conversation = class Conversation {
     this.notificationTimestamp = ko.observable(0);
 
     // Conversation states for view
-    this.is_archived = this.archived_state;
+    this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
       const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
@@ -285,8 +285,8 @@ z.entity.Conversation = class Conversation {
 
   _initSubscriptions() {
     [
-      this.archived_state,
-      this.archived_timestamp,
+      this.archivedState,
+      this.archivedTimestamp,
       this.cleared_timestamp,
       this.messageTimer,
       this.isGuest,
@@ -487,8 +487,8 @@ z.entity.Conversation = class Conversation {
   }
 
   shouldUnarchive() {
-    if (this.archived_state()) {
-      const hasNewerMessage = this.last_event_timestamp() > this.archived_timestamp();
+    if (this.archivedState()) {
+      const hasNewerMessage = this.last_event_timestamp() > this.archivedTimestamp();
 
       const lastMessageEntity = this.getLastMessage();
       const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
@@ -697,8 +697,8 @@ z.entity.Conversation = class Conversation {
 
   serialize() {
     return {
-      archived_state: this.archived_state(),
-      archived_timestamp: this.archived_timestamp(),
+      archived_state: this.archivedState(),
+      archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
