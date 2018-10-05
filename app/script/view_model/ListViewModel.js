@@ -45,6 +45,7 @@ z.viewModel.ListViewModel = class ListViewModel {
    * @param {Object} repositories - Object containing all the repositories
    */
   constructor(mainViewModel, repositories) {
+    this.changeNotificationSetting = this.changeNotificationSetting.bind(this);
     this.switchList = this.switchList.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
 
@@ -123,8 +124,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting.bind(this)); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+    amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
+    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
   changeNotificationSetting() {
