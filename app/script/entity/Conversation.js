@@ -177,16 +177,17 @@ z.entity.Conversation = class Conversation {
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
     this.unreadState = ko.pureComputed(() => {
-      const unreadEvents = [];
-      const messages = this.messages();
-      const unreadSelfMentions = [];
-      const unreadTextMessages = [];
-      const unreadMessages = [];
-      const unreadPings = [];
-      const unreadCalls = [];
+      const allMessages = this.messages();
 
-      for (let index = messages.length - 1; index >= 0; index--) {
-        const messageEntity = messages[index];
+      const allEvents = [];
+      const calls = [];
+      const messages = [];
+      const otherMessages = [];
+      const pings = [];
+      const selfMentions = [];
+
+      for (let index = allMessages.length - 1; index >= 0; index--) {
+        const messageEntity = allMessages[index];
         if (messageEntity.visible()) {
           if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
             break;
@@ -194,28 +195,28 @@ z.entity.Conversation = class Conversation {
 
           const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
           const isPing = messageEntity.is_ping();
-          const isTextMessage = messageEntity.is_content();
-          const isSelfMention = isTextMessage && this.self && messageEntity.isUserMentioned(this.self.id);
+          const isMessage = messageEntity.is_content();
+          const isSelfMention = isMessage && this.self && messageEntity.isUserMentioned(this.self.id);
 
-          if (isMissedCall || isPing || isTextMessage) {
-            unreadMessages.push(messageEntity);
+          if (isMissedCall || isPing || isMessage) {
+            messages.push(messageEntity);
           }
 
           if (isSelfMention) {
-            unreadSelfMentions.push(messageEntity);
+            selfMentions.push(messageEntity);
           } else if (isMissedCall) {
-            unreadCalls.push(messageEntity);
+            calls.push(messageEntity);
           } else if (isPing) {
-            unreadPings.push(messageEntity);
-          } else if (isTextMessage) {
-            unreadTextMessages.push(messageEntity);
+            pings.push(messageEntity);
+          } else if (isMessage) {
+            otherMessages.push(messageEntity);
           }
 
-          unreadEvents.push(messageEntity);
+          allEvents.push(messageEntity);
         }
       }
 
-      return {unreadCalls, unreadEvents, unreadMessages, unreadPings, unreadSelfMentions, unreadTextMessages};
+      return {allEvents, calls, messages, otherMessages, pings, selfMentions};
     });
 
     /**
@@ -309,7 +310,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   release() {
-    if (!this.unreadState().unreadEvents.length) {
+    if (!this.unreadState().allEvents.length) {
       this.remove_messages();
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
@@ -401,7 +402,7 @@ z.entity.Conversation = class Conversation {
 
   getFirstUnreadSelfMention() {
     return this.unreadState()
-      .unreadSelfMentions.slice()
+      .selfMentions.slice()
       .reverse();
   }
 

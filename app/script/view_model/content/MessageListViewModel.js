@@ -186,7 +186,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.marked_message(messageEntity);
 
     // Keep last read timestamp to render unread when entering conversation
-    if (this.conversation().unreadState().unreadEvents.length) {
+    if (this.conversation().unreadState().allEvents.length) {
       this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
     }
 
