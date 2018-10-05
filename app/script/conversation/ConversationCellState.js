@@ -242,8 +242,17 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _getStateMuted = {
-    description: conversationEntity => _accumulateSummary(conversationEntity, false),
-    icon: () => z.conversation.ConversationStatusIcon.MUTED,
+    description: conversationEntity => {
+      return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsOnlyMentions());
+    },
+    icon: conversationEntity => {
+      const hasSelfMentions = conversationEntity.unreadState().selfMentions.length;
+      const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsOnlyMentions();
+
+      return showMentionsIcon
+        ? z.conversation.ConversationStatusIcon.UNREAD_MENTION
+        : z.conversation.ConversationStatusIcon.MUTED;
+    },
     match: conversationEntity => !conversationEntity.showNotificationsEverything(),
   };
 
