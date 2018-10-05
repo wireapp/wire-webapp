@@ -478,7 +478,7 @@ describe('Conversation Mapper', () => {
       expect(expectEverythingState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
     });
 
-    it('returns state if invalid states are given', () => {
+    it('returns states if invalid states are given', () => {
       const expectUndefinedState = conversation_mapper.getNotificationState();
       expect(expectUndefinedState).toBe(NOTIFICATION_STATE.EVERYTHING);
 
