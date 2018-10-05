@@ -125,12 +125,10 @@ z.extension.GiphyRepository = class GiphyRepository {
     }
 
     if (options.random) {
-      options.sorting = z.util.ArrayUtil.randomElement(['recent', 'relevant']);
-
       const total = this.gifQueryCache[options.query];
       if (total) {
         const resultExceedsTotal = options.results >= total;
-        offset = resultExceedsTotal ? 0 : Math.floor(Math.random() * total - options.number);
+        offset = resultExceedsTotal ? 0 : Math.floor(Math.random() * (total - options.number));
       }
     }
 
