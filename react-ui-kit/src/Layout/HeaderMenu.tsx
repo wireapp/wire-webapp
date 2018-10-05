@@ -44,18 +44,15 @@ const MenuContent = styled(Content)<HTMLMenuProps>`
   ${props =>
     props.open &&
     `
-  position: fixed;
-  width: 100%;
-  z-index: 10000;
-  left: 0;`};
+    position: fixed;
+    width: 100%;
+    z-index: 10000;
+    left: 0;
+  `};
 `;
 
 const MenuItems = styled.div<HTMLMenuProps>`
   @media (${QUERY.tabletDown}){
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -66,6 +63,15 @@ const MenuItems = styled.div<HTMLMenuProps>`
     transform: translateX(110%);
     transition: transform 0.25s ease;
     ${props => props.open && `transform: translateX(0);`}
+`;
+
+const ScrollableItems = styled.div<HTMLMenuProps>`
+  @media (${QUERY.tabletDown}){
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    height: 100%;
 `;
 
 const MenuOpenButton = styled.div<HTMLMenuProps>`
@@ -290,7 +296,7 @@ class HeaderMenu extends React.PureComponent<HeaderMenuProps & React.HTMLAttribu
         <MenuContent open={isOpen}>
           <MenuLogo onClick={this.closeMenu}>{logoElement}</MenuLogo>
           <MenuItems onClick={this.closeMenu} open={isOpen}>
-            {children}
+            <ScrollableItems>{children}</ScrollableItems>
           </MenuItems>
           <MenuOpenButton onClick={this.toggleMenu} open={isOpen} data-uie-name="do-toggle-header-menu">
             <div />
