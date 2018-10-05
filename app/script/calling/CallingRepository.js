@@ -664,7 +664,7 @@ z.calling.CallingRepository = class CallingRepository {
         if (groupMessageTypes.includes(type)) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
-      } else if (conversationEntity.is_group()) {
+      } else if (conversationEntity.isGroup()) {
         const one2oneMessageTypes = [z.calling.enum.CALL_MESSAGE_TYPE.SETUP];
 
         if (one2oneMessageTypes.includes(type)) {

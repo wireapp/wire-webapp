@@ -53,13 +53,13 @@ z.conversation.ConversationCellState = (() => {
         const [messageEntity] = unreadSelfMentions;
 
         if (messageEntity.is_ephemeral()) {
-          const stringId = conversationEntity.is_group()
+          const stringId = conversationEntity.isGroup()
             ? z.string.conversationsSecondaryLineEphemeralMentionGroup
             : z.string.conversationsSecondaryLineEphemeralMention;
           return z.l10n.text(stringId);
         }
 
-        return conversationEntity.is_group()
+        return conversationEntity.isGroup()
           ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
           : messageEntity.get_first_asset().text;
       }
@@ -237,7 +237,7 @@ z.conversation.ConversationCellState = (() => {
       const isExpectedType = lastMessageEntity ? lastMessageEntity.is_member() || lastMessageEntity.is_system() : false;
       const unreadEvents = conversationEntity.unreadState().allEvents;
 
-      return conversationEntity.is_group() && unreadEvents.length > 0 && isExpectedType;
+      return conversationEntity.isGroup() && unreadEvents.length > 0 && isExpectedType;
     },
   };
 
@@ -301,7 +301,7 @@ z.conversation.ConversationCellState = (() => {
 
         if (!!stringId) {
           if (messageEntity.is_ephemeral()) {
-            stringId = conversationEntity.is_group()
+            stringId = conversationEntity.isGroup()
               ? z.string.conversationsSecondaryLineEphemeralMessageGroup
               : z.string.conversationsSecondaryLineEphemeralMessage;
             return z.l10n.text(stringId);
@@ -309,7 +309,7 @@ z.conversation.ConversationCellState = (() => {
 
           const hasStringId = stringId && stringId !== true;
           const stateText = hasStringId ? z.l10n.text(stringId) : messageEntity.get_first_asset().text;
-          return conversationEntity.is_group() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
+          return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
         }
       }
     },

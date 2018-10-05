@@ -41,25 +41,25 @@ describe('Conversation', () => {
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeTruthy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
@@ -69,39 +69,39 @@ describe('Conversation', () => {
       conversation_et.team_id = z.util.createRandomUuid();
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeTruthy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();

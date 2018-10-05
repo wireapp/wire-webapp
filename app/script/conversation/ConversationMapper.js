@@ -447,7 +447,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       return conversationEntity.accessState(z.conversation.ACCESS_STATE.SELF);
     }
 
-    const personalAccessState = conversationEntity.is_group()
+    const personalAccessState = conversationEntity.isGroup()
       ? z.conversation.ACCESS_STATE.PERSONAL.GROUP
       : z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE;
     return conversationEntity.accessState(personalAccessState);

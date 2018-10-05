@@ -358,7 +358,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    if (!conversationEntity.is_group()) {
+    if (!conversationEntity.isGroup()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.is_connected() || userEntity.is_request());
 

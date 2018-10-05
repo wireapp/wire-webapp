@@ -47,7 +47,7 @@
               </div>
             <!-- /ko -->
 
-            <!-- ko if: activeConversation() && activeConversation().is_group() -->
+            <!-- ko if: activeConversation() && activeConversation().isGroup() -->
               <div class="conversation-details__participant_count">
                 <!-- ko if: userParticipants().length -->
                   <span class="conversation-details__participant_count__user">
@@ -114,7 +114,7 @@
             </div>
           <!-- /ko -->
           <div class="conversation-details__participants">
-            <!-- ko if: activeConversation() && activeConversation().is_group() -->
+            <!-- ko if: activeConversation() && activeConversation().isGroup() -->
               <!-- ko if: userParticipants().length -->
                 <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsPeople"></div>
                 <user-list params="user: userParticipants, click: clickOnShowUser, altStyle: true" data-uie-name="list-users"></user-list>

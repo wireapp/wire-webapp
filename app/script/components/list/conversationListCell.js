@@ -51,10 +51,10 @@ ko.components.register('conversation-list-cell', {
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
-        <!-- ko if: conversation.is_group() -->
+        <!-- ko if: conversation.isGroup() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko if: !conversation.is_group() && users().length -->
+        <!-- ko if: !conversation.isGroup() && users().length -->
           <div class="avatar-halo">
             <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
