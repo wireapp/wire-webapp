@@ -72,8 +72,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   clearConversation(conversationEntity) {
     if (conversationEntity) {
-      const canLeaveConversation = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
-      const modalType = canLeaveConversation
+      const modalType = conversationEntity.isLeavable()
         ? z.viewModel.ModalsViewModel.TYPE.OPTION
         : z.viewModel.ModalsViewModel.TYPE.CONFIRM;
 
