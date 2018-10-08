@@ -709,8 +709,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _moveCursorToEnd() {
     z.util.afterRender(() => {
       if (this.textarea) {
-        const newSelectionStart = (this.textarea.selectionEnd = this.textarea.value.length * 2);
-        this.textarea.selectionStart = newSelectionStart;
+        const endPosition = this.textarea.value.length;
+        this.textarea.setSelectionRange(endPosition, endPosition);
         this.updateSelectionState();
       }
     });
