@@ -17,48 +17,47 @@
  *
  */
 
-import {
-  H2,
-  Text,
-  Link,
-  Small,
-  Form,
-  Button,
-  ICON_NAME,
-  InputSubmitCombo,
-  Input,
-  RoundIconButton,
-  ErrorMessage,
-  ContainerXS,
-  COLOR,
-} from '@wireapp/react-ui-kit';
-import {conversationJoinStrings} from '../../strings';
-import {connect} from 'react-redux';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {isMobileOs, isSafari} from '../Runtime';
-import * as Environment from '../Environment';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
-import * as ConversationSelector from '../module/selector/ConversationSelector';
-import ValidationError from '../module/action/ValidationError';
-import * as StringUtil from '../util/stringUtil';
-import {Redirect, RouteComponentProps} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
-import {ROUTE, QUERY_KEY} from '../route';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
-import {withRouter} from 'react-router';
-import * as React from 'react';
-import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
-import BackendError from '../module/action/BackendError';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
-import WirelessContainer from '../component/WirelessContainer';
-import * as AccentColor from '../util/AccentColor';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import ROOT_ACTIONS from '../module/action/';
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {
+  Button,
+  COLOR,
+  ContainerXS,
+  ErrorMessage,
+  Form,
+  H2,
+  ICON_NAME,
+  Input,
+  InputSubmitCombo,
+  Link,
+  RoundIconButton,
+  Small,
+  Text,
+} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {conversationJoinStrings} from '../../strings';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import WirelessContainer from '../component/WirelessContainer';
+import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
+import * as Environment from '../Environment';
+import EXTERNAL_ROUTE from '../externalRoute';
+import ROOT_ACTIONS from '../module/action/';
+import BackendError from '../module/action/BackendError';
+import ValidationError from '../module/action/ValidationError';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationSelector from '../module/selector/ConversationSelector';
+import * as SelfSelector from '../module/selector/SelfSelector';
+import {QUERY_KEY, ROUTE} from '../route';
+import {isMobileOs, isSafari} from '../Runtime';
+import * as AccentColor from '../util/AccentColor';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
+import * as StringUtil from '../util/stringUtil';
+import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 
 interface Props extends React.HTMLAttributes<ConversationJoin>, RouteComponentProps {}
 
@@ -377,13 +376,13 @@ export default withRouter(
       (dispatch: ThunkDispatch): DispatchProps => ({
         doCheckConversationCode: (conversationCode: string, conversationKey: string) =>
           dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationCode, conversationKey)),
-        doJoinConversationByCode: (conversationKey: string, conversationCode: string) =>
-          dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(conversationKey, conversationCode)),
         doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
           dispatch(ROOT_ACTIONS.authAction.doInit(options)),
+        doJoinConversationByCode: (conversationKey: string, conversationCode: string) =>
+          dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(conversationKey, conversationCode)),
+        doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
         doRegisterWireless: (registrationData: RegisterData, options: {shouldInitializeClient: boolean}) =>
           dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(registrationData, options)),
-        doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
         setLastEventDate: (date: Date) => dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(date)),
       })
     )(ConversationJoin)

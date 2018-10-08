@@ -20,17 +20,17 @@
 // We need to force babel to load the setImmediate and clearImmediate polyfill because only setImmediate is set on electron side which means the polyfill won't be loaded later on.
 // https://github.com/electron/electron/issues/2984
 import 'core-js/modules/web.immediate';
+import * as cookieStore from 'js-cookie';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
-import {configureStore} from './configureStore';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import Root from './page/Root';
-import * as cookieStore from 'js-cookie';
+import {configureStore} from './configureStore';
 import actionRoot from './module/action';
+import Root from './page/Root';
 
 configureEnvironment();
 const apiClient = configureClient();

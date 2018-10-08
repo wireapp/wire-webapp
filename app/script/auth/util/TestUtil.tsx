@@ -17,16 +17,16 @@
  *
  */
 
-import configureStore from 'redux-mock-store';
-import * as React from 'react';
-import {HashRouter} from 'react-router-dom';
-import {IntlProvider} from 'react-intl';
-import {Provider} from 'react-redux';
-import {mount} from 'enzyme';
-import thunk from 'redux-thunk';
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {mount} from 'enzyme';
+import * as React from 'react';
+import {IntlProvider} from 'react-intl';
+import {Provider} from 'react-redux';
+import {HashRouter} from 'react-router-dom';
 import {Store} from 'redux';
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
 import {RootState} from '../module/reducer';
 
 const engine = new MemoryEngine();
