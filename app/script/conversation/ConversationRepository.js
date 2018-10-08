@@ -2787,7 +2787,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
-        const isLeaveEvent = eventJson.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+        const leavingEventTypes = [
+          z.event.Backend.CONVERSATION.MEMBER_LEAVE,
+          z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
+        ];
+        const isLeaveEvent = leavingEventTypes.includes(eventJson.type);
         if (isLeaveEvent) {
           const isFromLeavingUser = eventJson.data.user_ids.includes(sender);
           if (isFromLeavingUser) {
