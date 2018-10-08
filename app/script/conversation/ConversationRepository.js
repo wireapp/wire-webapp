@@ -340,11 +340,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   getConversations() {
-    const remoteConversationsSromise = this.conversation_service.getAllConversations().catch(error => {
+    const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
     });
 
-    return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsSromise])
+    return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsPromise])
       .then(([localConversations, remoteConversations = []]) => {
         const shouldMigrateData = localConversations.some(({muted_state}) => muted_state !== undefined);
         if (shouldMigrateData) {
