@@ -21,10 +21,17 @@ import * as UUID from 'uuid/v4';
 
 declare global {
   interface Window {
+    APP_NAME: string;
+    BACKEND_HTTP: string;
+    BACKEND_WS: string;
+    ENVIRONMENT: string;
     VERSION: string;
   }
 }
 
-export const APP_NAME = 'Webapp';
+export const APP_NAME = window.APP_NAME || 'Webapp';
+export const BACKEND_HTTP = window.BACKEND_HTTP || 'https://prod-nginz-https.wire.com';
+export const BACKEND_WS = window.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
+export const ENVIRONMENT = window.ENVIRONMENT || 'production';
 export const VERSION = window.VERSION || '0.0.0';
 export const APP_INSTANCE_ID = UUID();
