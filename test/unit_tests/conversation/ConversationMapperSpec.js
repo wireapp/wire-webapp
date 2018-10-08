@@ -455,17 +455,17 @@ describe('Conversation Mapper', () => {
       const expectFalseState = conversation_mapper.getNotificationState(undefined, false);
       expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
 
-      const expectTrueState = conversation_mapper.getNotificationState(undefined, true, false);
-      expect(expectTrueState).toBe(NOTIFICATION_STATE.NOTHING);
+      const expectPersonalTrueState = conversation_mapper.getNotificationState(undefined, true, false);
+      expect(expectPersonalTrueState).toBe(NOTIFICATION_STATE.NOTHING);
 
-      const expectFalseState = conversation_mapper.getNotificationState(undefined, false, false);
-      expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      const expectPersonalFalseState = conversation_mapper.getNotificationState(undefined, false, false);
+      expect(expectPersonalFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
 
-      const expectTrueState = conversation_mapper.getNotificationState(undefined, true, true);
-      expect(expectTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+      const expectProTrueState = conversation_mapper.getNotificationState(undefined, true, true);
+      expect(expectProTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
 
-      const expectFalseState = conversation_mapper.getNotificationState(undefined, false, true);
-      expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      const expectProFalseState = conversation_mapper.getNotificationState(undefined, false, true);
+      expect(expectProFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
 
     it('returns states if congruent states are given', () => {
