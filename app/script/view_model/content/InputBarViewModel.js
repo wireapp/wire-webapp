@@ -437,7 +437,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyDown(data, keyboardEvent) {
-    const inputHandledByEmoji = this.emojiInput.onInputKeyDown(data, keyboardEvent);
+    const inputHandledByEmoji = !this.editedMention() && this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
@@ -583,7 +583,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyUp(data, keyboardEvent) {
-    this.emojiInput.onInputKeyUp(data, keyboardEvent);
+    if (!this.editedMention()) {
+      this.emojiInput.onInputKeyUp(data, keyboardEvent);
+    }
     if (keyboardEvent.key !== z.util.KeyboardUtil.KEY.ESC) {
       this.handleMentionFlow();
     }
