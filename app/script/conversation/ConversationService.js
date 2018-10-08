@@ -401,7 +401,7 @@ z.conversation.ConversationService = class ConversationService {
 
     return this.storageService.db[this.EVENT_STORE_NAME]
       .where('time')
-      .between(min_date.toISOString(), new Date().toISOString())
+      .aboveOrEqual(min_date.toISOString())
       .toArray()
       .then(events => {
         const conversations = events.reduce((accumulated, event) => {
