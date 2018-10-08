@@ -78,26 +78,43 @@ const CSP: HelmetCSP = {
 };
 
 export interface ServerConfig {
-  CACHE_DURATION_SECONDS: number;
-  COMPRESS_LEVEL: number;
-  COMPRESS_MIN_SIZE: number;
-  CSP: typeof CSP;
-  DEVELOPMENT?: boolean;
-  ENVIRONMENT: string;
-  PORT_HTTP: number;
-  VERSION: string;
+  CLIENT: {
+    APP_NAME: string;
+    BACKEND_HTTP: string;
+    BACKEND_WS: string;
+    ENVIRONMENT: string;
+    VERSION: string;
+  };
+  SERVER: {
+    CACHE_DURATION_SECONDS: number;
+    COMPRESS_LEVEL: number;
+    COMPRESS_MIN_SIZE: number;
+    CSP: typeof CSP;
+    DEVELOPMENT?: boolean;
+    ENVIRONMENT: string;
+    PORT_HTTP: number;
+  };
 }
 
-const config: ServerConfig = {
-  CACHE_DURATION_SECONDS: 300,
-  COMPRESS_LEVEL: 6,
-  COMPRESS_MIN_SIZE: 500,
-  CSP,
-  ENVIRONMENT: process.env.NODE_ENV || 'prod',
-  PORT_HTTP: Number(process.env.PORT) || 21080,
-  VERSION: version,
-};
+const nodeEnvironment = process.env.NODE_ENV || 'production';
 
-config.DEVELOPMENT = config.ENVIRONMENT === 'dev';
+const config: ServerConfig = {
+  CLIENT: {
+    APP_NAME: process.env.APP_NAME,
+    BACKEND_HTTP: process.env.BACKEND_HTTP,
+    BACKEND_WS: process.env.BACKEND_WS,
+    ENVIRONMENT: nodeEnvironment,
+    VERSION: version,
+  },
+  SERVER: {
+    CACHE_DURATION_SECONDS: 300,
+    COMPRESS_LEVEL: 6,
+    COMPRESS_MIN_SIZE: 500,
+    CSP,
+    DEVELOPMENT: nodeEnvironment === 'development',
+    ENVIRONMENT: nodeEnvironment,
+    PORT_HTTP: Number(process.env.PORT) || 21080,
+  },
+};
 
 export default config;

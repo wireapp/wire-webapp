@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,18 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 import {Router} from 'express';
+import {ServerConfig} from '../../config';
 
-const healthRoute = () => Router().get('/_health/?', (req, res) => res.sendStatus(200));
+const ConfigRoute = (config: ServerConfig) =>
+  Router().get('/config.js', (req, res) => {
+    res.type('application/javascript').send(`
+      window.APP_NAME = '${config.CLIENT.APP_NAME}';
+      window.BACKEND_HTTP = '${config.CLIENT.BACKEND_HTTP}';
+      window.BACKEND_WS = '${config.CLIENT.BACKEND_WS}';
+      window.ENVIRONMENT = '${config.CLIENT.ENVIRONMENT}';
+      window.VERSION = '${config.CLIENT.VERSION}';
+    `);
+  });
 
-export default healthRoute;
+export default ConfigRoute;

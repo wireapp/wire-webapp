@@ -24,8 +24,9 @@ import * as http from 'http';
 import * as path from 'path';
 
 import {ServerConfig} from './config';
-import HealthCheckRoute from './routes/_health/HealthCheckRoute';
-import {internalErrorRoute, notFoundRoute} from './routes/error/ErrorRoutes';
+import HealthCheckRoute from './routes/_health/HealthRoute';
+import ConfigRoute from './routes/config/ConfigRoute';
+import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 
 const STATUS_CODE_MOVED = 301;
 
@@ -45,24 +46,28 @@ class Server {
     this.initSecurityHeaders();
     this.app.use(
       compression({
-        level: this.config.COMPRESS_LEVEL,
-        threshold: this.config.COMPRESS_MIN_SIZE,
+        level: this.config.SERVER.COMPRESS_LEVEL,
+        threshold: this.config.SERVER.COMPRESS_MIN_SIZE,
       })
     );
     this.initStaticRoutes();
     this.app.use(HealthCheckRoute());
-    this.app.use(notFoundRoute());
-    this.app.use(internalErrorRoute());
+    this.app.use(ConfigRoute(this.config));
+    this.app.use(NotFoundRoute());
+    this.app.use(InternalErrorRoute());
   }
 
   private initCaching() {
-    if (this.config.DEVELOPMENT) {
+    if (this.config.SERVER.DEVELOPMENT) {
       this.app.use(helmet.noCache());
     } else {
       this.app.use((req, res, next) => {
         const milliSeconds = 1000;
-        res.header('Cache-Control', `public, max-age=${this.config.CACHE_DURATION_SECONDS}`);
-        res.header('Expires', new Date(Date.now() + this.config.CACHE_DURATION_SECONDS * milliSeconds).toUTCString());
+        res.header('Cache-Control', `public, max-age=${this.config.SERVER.CACHE_DURATION_SECONDS}`);
+        res.header(
+          'Expires',
+          new Date(Date.now() + this.config.SERVER.CACHE_DURATION_SECONDS * milliSeconds).toUTCString()
+        );
         next();
       });
     }
@@ -71,7 +76,7 @@ class Server {
   private initForceSSL(): void {
     const SSLMiddleware: express.RequestHandler = (req, res, next) => {
       // Redirect to HTTPS
-      const isDevelopment = this.config.DEVELOPMENT || req.url.match(/_health\/?/);
+      const isDevelopment = this.config.SERVER.DEVELOPMENT || req.url.match(/_health\/?/);
       const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
 
       if (isInsecure && !isDevelopment) {
@@ -104,9 +109,9 @@ class Server {
     this.app.use(
       helmet.contentSecurityPolicy({
         browserSniff: true,
-        directives: this.config.CSP,
+        directives: this.config.SERVER.CSP,
         disableAndroid: false,
-        loose: !this.config.DEVELOPMENT,
+        loose: !this.config.SERVER.DEVELOPMENT,
         reportOnly: false,
         setAllHeaders: false,
       })
@@ -126,8 +131,8 @@ class Server {
     return new Promise((resolve, reject) => {
       if (this.server) {
         reject('Server is already running.');
-      } else if (this.config.PORT_HTTP) {
-        this.server = this.app.listen(this.config.PORT_HTTP, () => resolve(this.config.PORT_HTTP));
+      } else if (this.config.SERVER.PORT_HTTP) {
+        this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
       } else {
         reject('Server port not specified.');
       }

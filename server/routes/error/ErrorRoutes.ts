@@ -28,7 +28,7 @@ const logger = logdown('@wireapp/wire-web-ets/routes/error/errorRoutes', {
   markdown: false,
 });
 
-const internalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, next) => {
+const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, next) => {
   logger.error(`[${formatDate()}] ${err.stack}`);
   const error = {
     code: 500,
@@ -38,7 +38,7 @@ const internalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, ne
   return res.status(error.code).json(error);
 };
 
-const notFoundRoute = () =>
+const NotFoundRoute = () =>
   router.get('*', (req, res) => {
     const error = {
       code: 404,
@@ -47,4 +47,4 @@ const notFoundRoute = () =>
     return res.status(error.code).json(error);
   });
 
-export {internalErrorRoute, notFoundRoute};
+export {InternalErrorRoute, NotFoundRoute};
