@@ -323,9 +323,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @param {Array<Object>} localConversations - Database records
    * @param {Array<Object>} remoteConversations - Backend payload
+   * @param {boolean} isProAccount - Type of account for state mapping
    * @returns {Array<Object>} Merged conversation data
    */
-  mergeConversation(localConversations, remoteConversations) {
+  mergeConversation(localConversations, remoteConversations, isProAccount) {
     localConversations = localConversations.filter(conversationData => conversationData);
 
     return remoteConversations.map((remoteConversationData, index) => {
@@ -389,7 +390,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
       const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(notificationTimestamp, remoteMutedTimestamp);
 
       if (isRemoteMutedTimestampNewer || notificationState === undefined) {
-        const notificationStatus = this.getNotificationState(selfState.otr_muted_status, selfState.otr_muted);
+        const {otr_muted, otr_muted_status} = selfState;
+        const notificationStatus = this.getNotificationState(otr_muted_status, otr_muted, isProAccount);
         mergedConversation.notification_state = notificationStatus;
         mergedConversation.notification_timestamp = remoteMutedTimestamp;
       }

@@ -351,12 +351,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
           localConversations = this.conversationMapper.migrateConversationsData(localConversations, this.isTeam());
         }
 
-        if (remoteConversations.length) {
-          const conversationsData = this.conversationMapper.mergeConversation(localConversations, remoteConversations);
-          return this.conversation_service.save_conversations_in_db(conversationsData);
+        if (!remoteConversations.length) {
+          return localConversations;
         }
 
-        return localConversations;
+        const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations, this.isTeam());
+        return this.conversation_service.save_conversations_in_db(data);
       })
       .then(conversationsData => this.mapConversations(conversationsData))
       .then(conversationEntities => {
