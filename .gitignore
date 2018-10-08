@@ -6,6 +6,7 @@
 .DS_Store
 .grunt
 .Icon
+.vscode
 *.pyc
 /_SpecRunner.html
 /.idea/**/*.xml
@@ -19,6 +20,11 @@
 /aws/templates/auth
 /aws/templates/sw.js
 /aws/version
+/aws/routes
+/aws/config.*
+/aws/index.*
+/aws/Server.*
+/aws/timeUtil.*
 /bower_components
 /debug.log
 /deploy
