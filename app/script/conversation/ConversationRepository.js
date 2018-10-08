@@ -2780,6 +2780,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return conversationEntity;
     }
 
+    const isLeaveEvent = eventJson.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+    if (isLeaveEvent) {
+      // we ignore leave events as they come from the person leaving (thus not being in the list of conversation's participants anymore)
+      return conversationEntity;
+    }
+
     const {from: sender, id, type, time} = eventJson;
 
     if (sender) {
