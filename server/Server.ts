@@ -17,15 +17,17 @@
  *
  */
 
-import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
+
 import {ServerConfig} from './config';
-import healthCheckRoute from './routes/_health/healthCheckRoute';
-import {internalErrorRoute, notFoundRoute} from './routes/error/errorRoutes';
+import HealthCheckRoute from './routes/_health/HealthCheckRoute';
+import {internalErrorRoute, notFoundRoute} from './routes/error/ErrorRoutes';
+
+const STATUS_CODE_MOVED = 301;
 
 class Server {
   private app: express.Express;
@@ -36,16 +38,10 @@ class Server {
     this.init();
   }
 
-  init() {
+  init(): void {
     // The order is important here, please don't sort!
-    this.app.use((req, res, next) => {
-      bodyParser.json({limit: '200mb'})(req, res, error => {
-        if (error) {
-          return res.status(400).json({error: 'Payload is not valid JSON data.'});
-        }
-        return next();
-      });
-    });
+    this.initCaching();
+    this.initForceSSL();
     this.initSecurityHeaders();
     this.app.use(
       compression({
@@ -54,12 +50,12 @@ class Server {
       })
     );
     this.initStaticRoutes();
-    this.app.use(healthCheckRoute());
+    this.app.use(HealthCheckRoute());
     this.app.use(notFoundRoute());
     this.app.use(internalErrorRoute());
   }
 
-  initCaching() {
+  private initCaching() {
     if (this.config.DEVELOPMENT) {
       this.app.use(helmet.noCache());
     } else {
@@ -72,17 +68,16 @@ class Server {
     }
   }
 
-  initForceSSL() {
-    const STATUS_CODE_MOVED = 301;
-
+  private initForceSSL(): void {
     const SSLMiddleware: express.RequestHandler = (req, res, next) => {
       // Redirect to HTTPS
-      if (!req.secure || req.get('X-Forwarded-Proto') !== 'https') {
-        if (this.config.DEVELOPMENT || req.url.match(/_health\/?/)) {
-          return next();
-        }
+      const isDevelopment = this.config.DEVELOPMENT || req.url.match(/_health\/?/);
+      const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
+
+      if (isInsecure && !isDevelopment) {
         return res.redirect(STATUS_CODE_MOVED, `https://${req.headers.host}${req.url}`);
       }
+
       next();
     };
 
@@ -90,7 +85,7 @@ class Server {
     this.app.use(SSLMiddleware);
   }
 
-  initSecurityHeaders() {
+  private initSecurityHeaders() {
     this.app.disable('x-powered-by');
     this.app.use(
       helmet({
@@ -99,11 +94,32 @@ class Server {
     );
     this.app.use(helmet.noSniff());
     this.app.use(helmet.xssFilter());
+    this.app.use(
+      helmet.hsts({
+        includeSubdomains: true,
+        maxAge: 31536000,
+        preload: true,
+      })
+    );
+    this.app.use(
+      helmet.contentSecurityPolicy({
+        browserSniff: true,
+        directives: this.config.CSP,
+        disableAndroid: false,
+        loose: !this.config.DEVELOPMENT,
+        reportOnly: false,
+        setAllHeaders: false,
+      })
+    );
+    this.app.use(
+      helmet.referrerPolicy({
+        policy: 'same-origin',
+      })
+    );
   }
 
-  initStaticRoutes() {
+  private initStaticRoutes() {
     this.app.use('/', express.static(path.join(__dirname, 'static')));
-    this.app.use('/templates', express.static(path.join(__dirname, 'templates')));
   }
 
   start(): Promise<number> {

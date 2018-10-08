@@ -18,15 +18,70 @@
  */
 
 import * as dotenv from 'dotenv';
+import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 
 const {version}: {version: string} = require('../package.json');
 
 dotenv.config();
 
+const CSP: HelmetCSP = {
+  connectSrc: [
+    "'self'",
+    'blob:',
+    'data:',
+    'https://*.giphy.com',
+    'https://*.unsplash.com',
+    'https://*.wire.com',
+    'https://*.zinfra.io',
+    'https://api.mixpanel.com',
+    'https://api.raygun.io',
+    'https://apis.google.com',
+    'https://wire.com',
+    'https://www.google.com',
+    'wss://*.zinfra.io',
+    'wss://prod-nginz-ssl.wire.com',
+  ],
+  defaultSrc: ["'self'"],
+  fontSrc: ["'self'", 'data:'],
+  frameSrc: [
+    'https://*.soundcloud.com',
+    'https://*.spotify.com',
+    'https://*.vimeo.com',
+    'https://*.youtube-nocookie.com',
+    'https://accounts.google.com',
+  ],
+  imgSrc: [
+    "'self'",
+    'blob:',
+    'data:',
+    'https://*.cloudfront.net',
+    'https://*.giphy.com',
+    'https://*.wire.com',
+    'https://*.zinfra.io',
+    'https://1-ps.googleusercontent.com',
+    'https://api.mixpanel.com',
+    'https://csi.gstatic.com',
+  ],
+  mediaSrc: ["'self'", 'blob:', 'data:', '*'],
+  objectSrc: ["'self'", 'https://*.youtube-nocookie.com', 'https://1-ps.googleusercontent.com'],
+  scriptSrc: [
+    "'self'",
+    "'unsafe-eval'",
+    "'unsafe-inline'",
+    'https://*.wire.com',
+    'https://*.zinfra.io',
+    'https://api.mixpanel.com',
+    'https://api.raygun.io',
+    'https://apis.google.com',
+  ],
+  styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com', 'https://*.wire.com'],
+};
+
 export interface ServerConfig {
   CACHE_DURATION_SECONDS: number;
   COMPRESS_LEVEL: number;
   COMPRESS_MIN_SIZE: number;
+  CSP: typeof CSP;
   DEVELOPMENT?: boolean;
   ENVIRONMENT: string;
   PORT_HTTP: number;
@@ -37,7 +92,8 @@ const config: ServerConfig = {
   CACHE_DURATION_SECONDS: 300,
   COMPRESS_LEVEL: 6,
   COMPRESS_MIN_SIZE: 500,
-  ENVIRONMENT: process.env.ENVIRONMENT || 'prod',
+  CSP,
+  ENVIRONMENT: process.env.NODE_ENV || 'prod',
   PORT_HTTP: Number(process.env.PORT) || 21080,
   VERSION: version,
 };
