@@ -400,8 +400,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     });
   }
 
-  migrateConversationsData(conversationsDate, isProAccount) {
-    return conversationsDate.map(conversationData => {
+  migrateConversationsData(conversationsData, isProAccount) {
+    return conversationsData.map(conversationData => {
       const {muted_state, muted_timestamp} = conversationData;
       conversationData.notification_timestamp = muted_timestamp;
       conversationData.notification_state = this.getNotificationState(undefined, muted_state, isProAccount);
