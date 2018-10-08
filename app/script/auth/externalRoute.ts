@@ -20,7 +20,7 @@
 import {onEnvironment} from './Environment';
 
 const WEBAPP_ENV = onEnvironment({
-  onLocal: '/app',
+  onLocal: '/',
   onProduction: '/',
   onStaging: '/',
 });

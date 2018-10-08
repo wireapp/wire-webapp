@@ -35,6 +35,7 @@ class Server {
   private server?: http.Server;
 
   constructor(private config: ServerConfig) {
+    console.log(this.config);
     this.app = express();
     this.init();
   }
@@ -51,10 +52,29 @@ class Server {
       })
     );
     this.initStaticRoutes();
+    this.initWebpack();
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
+    this.openBrowser(this.config);
+  }
+
+  initWebpack() {
+    if (this.config.SERVER.DEVELOPMENT) {
+      const webpackCompiler = require('webpack')(require('../webpack.config.dev'));
+      const webpackDevMiddleware = require('webpack-dev-middleware');
+      const webpackHotMiddleware = require('webpack-hot-middleware');
+
+      this.app.use(webpackDevMiddleware(webpackCompiler));
+      this.app.use(webpackHotMiddleware(webpackCompiler));
+    }
+  }
+
+  openBrowser(config: ServerConfig) {
+    if (this.config.SERVER.DEVELOPMENT) {
+      require('opn')(`http://localhost:${config.SERVER.PORT_HTTP}`);
+    }
   }
 
   private initCaching() {

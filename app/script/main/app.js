@@ -751,7 +751,7 @@ z.main.App = class App {
           return window.location.replace(url);
         }
 
-        const baseUrl = z.util.Environment.frontend.isLocalhost() ? '/page/auth.html' : '/auth/';
+        const baseUrl = '/auth/';
         let url = `${baseUrl}${location.search}`;
         const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
         if (isImmediateSignOutReason) {

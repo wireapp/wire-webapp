@@ -18,46 +18,15 @@
  */
 
 const commonConfig = require('./webpack.config.common');
-const ip = require('ip');
 const path = require('path');
 const webpack = require('webpack');
 
-const localIP = ip.address();
-const serve = 'app/';
 const srcScript = 'app/script/auth/';
 
 module.exports = Object.assign(commonConfig, {
-  devServer: {
-    clientLogLevel: 'warning',
-    compress: true,
-    contentBase: path.resolve(__dirname, serve),
-    historyApiFallback: true,
-    host: '0.0.0.0',
-    hotOnly: true,
-    open: true,
-    openPage: 'page/auth.html',
-    overlay: true,
-    port: '8080',
-    proxy: {
-      /* eslint-disable sort-keys */
-      '/applogin': {pathRewrite: {'^/applogin': ''}, target: `http://${localIP}:8888/login/`},
-      '/app': {pathRewrite: {'^/app': ''}, target: `http://${localIP}:8888`},
-      '/audio': `http://${localIP}:8888`,
-      '/style': `http://${localIP}:8888`,
-      /* eslint-enable sort-keys */
-    },
-    public: 'localhost:8080',
-    publicPath: '/',
-    stats: {
-      chunks: false,
-    },
-  },
   entry: Object.assign(commonConfig.entry, {
-    script: ['react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.tsx')],
+    script: ['webpack-hot-middleware/client', 'react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.tsx')],
   }),
   mode: 'development',
-  output: Object.assign(commonConfig.output, {
-    path: path.resolve(__dirname, serve),
-  }),
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],
 });
