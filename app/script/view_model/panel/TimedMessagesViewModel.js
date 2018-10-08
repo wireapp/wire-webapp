@@ -73,6 +73,5 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
     const activeConversation = this.activeConversation();
     activeConversation.globalMessageTimer(value);
     this.conversationRepository.updateConversationMessageTimer(activeConversation, value);
-    this.onGoBack();
   }
 };

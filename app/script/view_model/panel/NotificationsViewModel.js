@@ -56,7 +56,6 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
   clickOnNotificationSetting({value}) {
     if (this.activeConversation()) {
       this.conversationRepository.setNotificationState(this.activeConversation(), value);
-      this.onGoBack();
     }
   }
 };
