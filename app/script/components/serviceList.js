@@ -51,7 +51,7 @@ z.components.ServiceList = class ServiceList {
 ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: services">
-      <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'show-arrow': $parent.altStyle}"></participant-item>
+      <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
     </div>
     <!-- ko if: isSearching() && !services().length -->
       <div class="no-results" data-bind="l10n_text: z.string.searchListNoMatches"></div>
