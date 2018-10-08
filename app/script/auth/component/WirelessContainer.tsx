@@ -17,11 +17,11 @@
  *
  */
 
-import {Link, Small, Logo, Header, Footer, Content, CloseIcon} from '@wireapp/react-ui-kit';
-import {footerStrings, cookiePolicyStrings} from '../../strings';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
-import EXTERNAL_ROUTE from '../externalRoute';
+import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/react-ui-kit';
 import * as React from 'react';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {cookiePolicyStrings, footerStrings} from '../../strings';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;

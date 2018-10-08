@@ -17,11 +17,11 @@
  *
  */
 
+import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 import * as React from 'react';
-import {injectIntl, FormattedHTMLMessage, InjectedIntlProps} from 'react-intl';
+import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {Link, H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '@wireapp/react-ui-kit';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;

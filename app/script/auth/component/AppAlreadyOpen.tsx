@@ -17,15 +17,14 @@
  *
  */
 
-import * as React from 'react';
-import {connect} from 'react-redux';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
-import {appAlreadyOpenStrings} from '../../strings';
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
-import * as CookieSelector from '../module/selector/CookieSelector';
-import {COOKIE_NAME_APP_OPENED} from '../module/selector/CookieSelector';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {appAlreadyOpenStrings} from '../../strings';
 import ROOT_ACTIONS from '../module/action/';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as CookieSelector from '../module/selector/CookieSelector';
 
 export interface Props extends React.HTMLAttributes<AppAlreadyOpen> {
   fullscreen?: boolean;
@@ -41,7 +40,7 @@ interface DispatchProps {
 
 class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
   onContinue = () => {
-    this.props.removeCookie(COOKIE_NAME_APP_OPENED);
+    this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED);
   };
 
   render = () => {
@@ -77,12 +76,12 @@ export default injectIntl(
     (state: RootState): ConnectedProps => {
       return {
         isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
-      }
+      };
     },
     (dispatch: ThunkDispatch): DispatchProps => {
       return {
-        removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name))
-      }
+        removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
+      };
     }
   )(AppAlreadyOpen)
 );

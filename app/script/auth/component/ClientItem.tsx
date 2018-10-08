@@ -17,26 +17,26 @@
  *
  */
 
-import * as React from 'react';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
-  DeviceIcon,
   COLOR,
+  ContainerXS,
+  DeviceIcon,
+  ErrorMessage,
   Form,
+  ICON_NAME,
   Input,
   InputSubmitCombo,
-  RoundIconButton,
-  ICON_NAME,
-  ContainerXS,
-  Text,
   Line,
+  RoundIconButton,
   Small,
-  ErrorMessage,
+  Text,
 } from '@wireapp/react-ui-kit';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import ValidationError from '../module/action/ValidationError';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {clientItemStrings} from '../../strings';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import ValidationError from '../module/action/ValidationError';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   selected: boolean;
@@ -65,11 +65,11 @@ class ClientItem extends React.Component<CombinedProps, State> {
   };
 
   static initialState: State = {
+    animationStep: 0,
+    isAnimating: false,
     password: '',
     validPassword: true,
     validationError: null,
-    animationStep: 0,
-    isAnimating: false,
   };
 
   formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
