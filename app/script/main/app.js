@@ -284,7 +284,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
-        return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
+        return Promise.all([this.repository.conversation.getConversations(), this.repository.user.get_connections()]);
       })
       .then(([conversationEntities, connectionEntities]) => {
         this.view.loading.updateProgress(25, z.string.initReceivedUserData);

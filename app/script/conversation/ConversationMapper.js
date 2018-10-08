@@ -99,16 +99,17 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @param {Array} conversationsData - Conversation data
    * @param {number} [timestamp=1] - Initial timestamp for conversation
+   * @param {boolean} [isTeam] - Type of account for state mapping
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  mapConversations(conversationsData, timestamp = 1) {
+  mapConversations(conversationsData, timestamp = 1, isTeam) {
     if (conversationsData === undefined) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
     if (!_.isArray(conversationsData) || !conversationsData.length) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
-    return conversationsData.map((data, index) => this._createConversationEntity(data, timestamp + index));
+    return conversationsData.map((data, index) => this._createConversationEntity(data, timestamp + index, isTeam));
   }
 
   /**
@@ -142,10 +143,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @param {Conversation} conversationEntity - Conversation to be updated
    * @param {SelfStatusUpdate} selfState - Conversation self data from the database
+   * @param {boolean} [isProAccount] - Type of account for state migration
    * @param {boolean} [disablePersistence=false] - Disable persistence of state changes during update
    * @returns {Conversation} Updated conversation entity
    */
-  updateSelfStatus(conversationEntity, selfState, disablePersistence = false) {
+  updateSelfStatus(conversationEntity, selfState, isProAccount, disablePersistence = false) {
     if (conversationEntity) {
       if (disablePersistence) {
         conversationEntity.setStateChangePersistence(false);
@@ -221,7 +223,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         const notificationTimestamp = new Date(selfState.otr_muted_ref).getTime();
         conversationEntity.setTimestamp(notificationTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.NOTIFICATION);
 
-        const notificationState = this.getNotificationState(selfState.otr_muted_status, otr_muted);
+        const notificationState = this.getNotificationState(selfState.otr_muted_status, otr_muted, isProAccount);
         conversationEntity.notificationState(notificationState);
       }
 
@@ -239,9 +241,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @private
    * @param {Object} conversationData - Either locally stored or backend data
    * @param {number} [initialTimestamp] - Initial timestamp for conversation in milliseconds
+   * @param {boolean} [isProAccount] - Type of account for state mapping
    * @returns {Conversation} Mapped conversation entity
    */
-  _createConversationEntity(conversationData, initialTimestamp) {
+  _createConversationEntity(conversationData, initialTimestamp, isProAccount) {
     if (conversationData === undefined) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
@@ -257,7 +260,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversationEntity.name(name ? name : '');
 
     const selfState = members ? members.self : conversationData;
-    conversationEntity = this.updateSelfStatus(conversationEntity, selfState);
+    conversationEntity = this.updateSelfStatus(conversationEntity, selfState, isProAccount);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
       conversationEntity.last_event_timestamp(initialTimestamp);
@@ -293,14 +296,16 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @param {z.conversation.NotificationSetting.STATE} [notificationState] - Bit mask based notification setting
    * @param {boolean} [deprecatedMutedState] - Outdated muted state
+   * @param {boolean} [isProAccount=false] - Type of account for default state migration
    * @returns {z.conversation.NotificationSetting.STATE} validated notification setting
    */
-  getNotificationState(notificationState, deprecatedMutedState) {
+  getNotificationState(notificationState, deprecatedMutedState, isProAccount = false) {
     const validNotifcationState = Object.values(z.conversation.NotificationSetting.STATE);
     if (!validNotifcationState.includes(notificationState)) {
-      return deprecatedMutedState
+      const migratedMutedState = isProAccount
         ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
-        : z.conversation.NotificationSetting.STATE.EVERYTHING;
+        : z.conversation.NotificationSetting.STATE.NOTHING;
+      return deprecatedMutedState ? migratedMutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
     }
 
     if (deprecatedMutedState !== undefined) {
@@ -324,17 +329,6 @@ z.conversation.ConversationMapper = class ConversationMapper {
     return remoteConversations.map((remoteConversationData, index) => {
       const conversationId = remoteConversationData.id;
       const localConversationData = localConversations.find(({id}) => id === conversationId) || {id: conversationId};
-
-      // Update legacy muted state from database
-      const updateLegacyData = localConversationData && typeof localConversationData.muted_state === 'boolean';
-      if (updateLegacyData) {
-        const {muted_state, muted_timestamp} = localConversationData;
-        localConversationData.notification_timestamp = muted_timestamp;
-        localConversationData.notification_state = this.getNotificationState(undefined, muted_state);
-
-        delete localConversationData.muted_state;
-        delete localConversationData.muted_timestamp;
-      }
 
       const {access, access_role, creator, members, message_timer, name, team, type} = remoteConversationData;
       const {others: othersStates, self: selfState} = members;
@@ -399,6 +393,19 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       return mergedConversation;
+    });
+  }
+
+  migrateConversationsData(conversationsDate, isProAccount) {
+    return this.migrateConversationsData.map(conversationData => {
+      const {muted_state, muted_timestamp} = conversationData;
+      conversationData.notification_timestamp = muted_timestamp;
+      conversationData.notification_state = this.getNotificationState(undefined, muted_state, isProAccount);
+
+      delete conversationData.muted_state;
+      delete conversationData.muted_timestamp;
+
+      return conversationData;
     });
   }
 

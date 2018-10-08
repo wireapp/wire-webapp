@@ -450,9 +450,21 @@ describe('Conversation Mapper', () => {
 
     it('returns states if only a muted state is given', () => {
       const expectTrueState = conversation_mapper.getNotificationState(undefined, true);
-      expect(expectTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+      expect(expectTrueState).toBe(NOTIFICATION_STATE.NOTHING);
 
       const expectFalseState = conversation_mapper.getNotificationState(undefined, false);
+      expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectTrueState = conversation_mapper.getNotificationState(undefined, true, false);
+      expect(expectTrueState).toBe(NOTIFICATION_STATE.NOTHING);
+
+      const expectFalseState = conversation_mapper.getNotificationState(undefined, false, false);
+      expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectTrueState = conversation_mapper.getNotificationState(undefined, true, true);
+      expect(expectTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+
+      const expectFalseState = conversation_mapper.getNotificationState(undefined, false, true);
       expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
 
