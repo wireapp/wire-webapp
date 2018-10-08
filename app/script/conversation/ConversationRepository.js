@@ -339,23 +339,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  get_conversations() {
-    const remote_conversations_promise = this.conversation_service.getAllConversations().catch(error => {
+  getConversations() {
+    const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
     });
 
-    return Promise.all([this.conversation_service.load_conversation_states_from_db(), remote_conversations_promise])
-      .then(([local_conversations, remote_conversations = []]) => {
-        if (remote_conversations.length) {
-          const conversations = this.conversationMapper.mergeConversation(local_conversations, remote_conversations);
-          return this.conversation_service.save_conversations_in_db(conversations);
+    return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsPromise])
+      .then(([localConversations, remoteConversations = []]) => {
+        const shouldMigrateData = localConversations.some(({muted_state}) => muted_state !== undefined);
+        if (shouldMigrateData) {
+          localConversations = this.conversationMapper.migrateConversationsData(localConversations, this.isTeam());
         }
 
-        return local_conversations;
+        if (!remoteConversations.length) {
+          return localConversations;
+        }
+
+        const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations, this.isTeam());
+        return this.conversation_service.save_conversations_in_db(data);
       })
-      .then(conversations => this.mapConversations(conversations))
-      .then(conversation_ets => {
-        this.save_conversations(conversation_ets);
+      .then(conversationsData => this.mapConversations(conversationsData))
+      .then(conversationEntities => {
+        this.save_conversations(conversationEntities);
         return this.conversations();
       });
   }
@@ -368,10 +373,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const unknownConversations = [];
 
         conversationsData.forEach(conversationData => {
-          const conversationEntity = this.conversations().find(({id}) => id === conversationData.id);
+          const localEntity = this.conversations().find(({id}) => id === conversationData.id);
 
-          if (conversationEntity) {
-            const entity = this.conversationMapper.updateSelfStatus(conversationEntity, conversationData, true);
+          if (localEntity) {
+            const entity = this.conversationMapper.updateSelfStatus(localEntity, conversationData, this.isTeam(), true);
             return handledConversationEntities.push(entity);
           }
 
@@ -639,7 +644,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.get_conversation_by_id(conversationEntity.id).then(conversationData => {
       const {name, message_timer} = conversationData;
       this.conversationMapper.updateProperties(conversationEntity, {name});
-      this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
+      this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer}, this.isTeam());
     });
   }
 
@@ -991,16 +996,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Map conversation payload.
    *
    * @param {JSON} payload - Payload to map
-   * @param {number} [initial_timestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
+   * @param {number} [initialTimestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
    * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
    */
-  mapConversations(payload, initial_timestamp = this.getLatestEventTimestamp()) {
-    const conversation_data = payload.length ? payload : [payload];
+  mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
+    const conversationsData = payload.length ? payload : [payload];
 
-    const conversation_ets = this.conversationMapper.mapConversations(conversation_data, initial_timestamp);
-    conversation_ets.forEach(conversation_et => this._handle_mapped_conversation(conversation_et));
+    const entitites = this.conversationMapper.mapConversations(conversationsData, this.isTeam(), initialTimestamp);
+    entitites.forEach(conversationEntity => this._handle_mapped_conversation(conversationEntity));
 
-    return payload.length ? conversation_ets : conversation_ets[0];
+    return payload.length ? entitites : entitites[0];
   }
 
   _handle_mapped_conversation(conversation_et) {
@@ -3247,7 +3252,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEntity) : undefined;
     const previouslyArchived = conversationEntity.is_archived();
 
-    this.conversationMapper.updateSelfStatus(conversationEntity, eventData);
+    this.conversationMapper.updateSelfStatus(conversationEntity, eventData, this.isTeam());
 
     const wasUnarchived = previouslyArchived && !conversationEntity.is_archived();
     if (wasUnarchived) {

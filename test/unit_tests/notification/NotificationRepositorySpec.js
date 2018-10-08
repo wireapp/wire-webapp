@@ -49,7 +49,7 @@ describe('z.notification.NotificationRepository', () => {
         // Create entities
         const conversationMapper = TestFactory.conversation_repository.conversationMapper;
         user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
-        [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
+        [conversation_et] = conversationMapper.mapConversations([entities.conversation], true);
         conversation_et.team_id = undefined;
 
         // Notification

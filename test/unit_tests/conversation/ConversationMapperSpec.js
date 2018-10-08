@@ -62,7 +62,7 @@ describe('Conversation Mapper', () => {
     it('maps a single conversation', () => {
       const {conversation} = entities;
       const initial_timestamp = Date.now();
-      const [conversation_et] = conversation_mapper.mapConversations([conversation], initial_timestamp);
+      const [conversation_et] = conversation_mapper.mapConversations([conversation], true, initial_timestamp);
 
       const expected_participant_ids = [
         conversation.members.others[0].id,
@@ -255,6 +255,21 @@ describe('Conversation Mapper', () => {
 
       expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
       expect(updated_conversation_et.notificationTimestamp()).toBe(timestamp);
+      expect(updated_conversation_et.notificationState()).toBe(z.conversation.NotificationSetting.STATE.NOTHING);
+    });
+
+    it('can update the self status in a pro account if a conversation is muted', () => {
+      const timestamp = Date.now();
+      conversation_et.last_event_timestamp(timestamp);
+
+      const self_status = {
+        otr_muted: true,
+        otr_muted_ref: new Date(timestamp).toISOString(),
+      };
+      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status, true);
+
+      expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
+      expect(updated_conversation_et.notificationTimestamp()).toBe(timestamp);
       expect(updated_conversation_et.notificationState()).toBe(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
     });
 
@@ -381,7 +396,7 @@ describe('Conversation Mapper', () => {
 
       remote_data.members.self = Object.assign(remote_data.members.self, self_update);
 
-      const [merged_conversation] = conversation_mapper.mergeConversation([local_data], [remote_data]);
+      const [merged_conversation] = conversation_mapper.mergeConversation([local_data], [remote_data], true);
 
       expect(merged_conversation.creator).toBe(remote_data.creator);
       expect(merged_conversation.name).toBe(remote_data.name);
@@ -450,10 +465,22 @@ describe('Conversation Mapper', () => {
 
     it('returns states if only a muted state is given', () => {
       const expectTrueState = conversation_mapper.getNotificationState(undefined, true);
-      expect(expectTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+      expect(expectTrueState).toBe(NOTIFICATION_STATE.NOTHING);
 
       const expectFalseState = conversation_mapper.getNotificationState(undefined, false);
       expect(expectFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectPersonalTrueState = conversation_mapper.getNotificationState(undefined, true, false);
+      expect(expectPersonalTrueState).toBe(NOTIFICATION_STATE.NOTHING);
+
+      const expectPersonalFalseState = conversation_mapper.getNotificationState(undefined, false, false);
+      expect(expectPersonalFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
+
+      const expectProTrueState = conversation_mapper.getNotificationState(undefined, true, true);
+      expect(expectProTrueState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+
+      const expectProFalseState = conversation_mapper.getNotificationState(undefined, false, true);
+      expect(expectProFalseState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
 
     it('returns states if congruent states are given', () => {
