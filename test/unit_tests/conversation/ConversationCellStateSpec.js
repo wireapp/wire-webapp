@@ -77,7 +77,6 @@ describe('z.conversation.ConversationCellState', () => {
         desription: "returns unread message's text if there is only a single text message",
         expected: {description: 'Hello there', icon: z.conversation.ConversationStatusIcon.UNREAD_MESSAGES},
         unreadState: Object.assign({}, defaultUnreadState, {
-          allEvents: [1],
           allMessages: [message],
         }),
       },
