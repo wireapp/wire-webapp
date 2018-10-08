@@ -2780,12 +2780,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return conversationEntity;
     }
 
-    const isLeaveEvent = eventJson.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
-    if (isLeaveEvent) {
-      // we ignore leave events as they come from the person leaving (thus not being in the list of conversation's participants anymore)
-      return conversationEntity;
-    }
-
     const {from: sender, id, type, time} = eventJson;
 
     if (sender) {
@@ -2793,6 +2787,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
+        const leavingEventTypes = [
+          z.event.Backend.CONVERSATION.MEMBER_LEAVE,
+          z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
+        ];
+        const isLeaveEvent = leavingEventTypes.includes(eventJson.type);
+        if (isLeaveEvent) {
+          const isFromLeavingUser = eventJson.data.user_ids.includes(sender);
+          if (isFromLeavingUser) {
+            // we ignore leave events that are sent by the user actually leaving
+            return conversationEntity;
+          }
+        }
+
         const message = `Received '${type}' event '${id}' from user '${sender}' unknown in '${conversationEntity.id}'`;
         this.logger.warn(message, eventJson);
 
