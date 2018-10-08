@@ -17,20 +17,20 @@
  *
  */
 
-import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, IsMobile} from '@wireapp/react-ui-kit';
-import {createPersonalAccountStrings} from '../../strings';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import {connect} from 'react-redux';
-import {Link as RRLink} from 'react-router-dom';
-import {withRouter, RouteComponentProps} from 'react-router';
-import * as React from 'react';
-import {ROUTE} from '../route';
-import AccountForm from '../component/AccountForm';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import Page from './Page';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import ROOT_ACTIONS from '../module/action/';
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile, Link} from '@wireapp/react-ui-kit';
+import * as React from 'react';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {createPersonalAccountStrings} from '../../strings';
+import AccountForm from '../component/AccountForm';
+import ROOT_ACTIONS from '../module/action/';
+import {RootState, ThunkDispatch} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import {ROUTE} from '../route';
+import Page from './Page';
 
 interface URLParams {
   invitationCode: string;
@@ -148,14 +148,14 @@ export default withRouter(
         isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
       }),
       (dispatch: ThunkDispatch): DispatchProps => ({
-        getInvitationFromCode: (invitationCode: string) =>
-          dispatch(ROOT_ACTIONS.authAction.getInvitationFromCode(invitationCode)),
-        enterPersonalInvitationCreationFlow: () =>
-          dispatch(ROOT_ACTIONS.authAction.enterPersonalInvitationCreationFlow()),
-        enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
-        enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
         doRegisterPersonal: (registrationData: RegisterData) =>
           dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
+        enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
+        enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
+        enterPersonalInvitationCreationFlow: () =>
+          dispatch(ROOT_ACTIONS.authAction.enterPersonalInvitationCreationFlow()),
+        getInvitationFromCode: (invitationCode: string) =>
+          dispatch(ROOT_ACTIONS.authAction.getInvitationFromCode(invitationCode)),
       })
     )(CreatePersonalAccount)
   )

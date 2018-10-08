@@ -17,15 +17,15 @@
  *
  */
 
-import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column, IsMobile} from '@wireapp/react-ui-kit';
-import {createAccountStrings} from '../../strings';
-import {injectIntl, InjectedIntlProps} from 'react-intl';
-import {Link as RRLink} from 'react-router-dom';
-import {withRouter, RouteComponentProps} from 'react-router';
-import Page from './Page';
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile, Link} from '@wireapp/react-ui-kit';
 import * as React from 'react';
-import {ROUTE} from '../route';
+import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {createAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
+import {ROUTE} from '../route';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
