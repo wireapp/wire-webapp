@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@1.1.1...@wireapp/bot-api@1.2.0) (2018-10-08)
+
+
+### Features
+
+* **bot-api:** Add message handlers for clearConversation, sendEditedText, sendFile, sendImage, sendLocation, sendPing and sendTyping ([#1152](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1152)) ([4be69f4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/4be69f4))
+
+
+
+
+
 ## [1.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@1.1.0...@wireapp/bot-api@1.1.1) (2018-10-05)
 
 **Note:** Version bump only for package @wireapp/bot-api
