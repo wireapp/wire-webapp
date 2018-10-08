@@ -46,6 +46,7 @@ z.components.UserList = class UserList {
     this.filter = params.filter;
     this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
+    this.searchRepository = params.searchRepository;
     this.userEntities = params.user;
     const highlightedUsers = params.highlightedUsers ? params.highlightedUsers() : [];
     this.highlightedUserIds = highlightedUsers.map(user => user.id);
@@ -76,14 +77,11 @@ z.components.UserList = class UserList {
       if (typeof this.filter === 'function') {
         const normalizedQuery = z.search.SearchRepository.normalizeQuery(this.filter());
         if (normalizedQuery) {
+          const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
-          const excludedEmojis = Array.from(normalizedQuery).filter(char => {
-            return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
-          });
-          return this.userEntities().filter(userEntity => {
-            return userEntity.matches(normalizedQuery, isHandle, excludedEmojis);
-          });
+          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+          return this.searchRepository.searchUserInSet(normalizedQuery, this.userEntities(), properties);
         }
       }
       return this.userEntities();

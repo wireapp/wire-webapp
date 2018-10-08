@@ -37,6 +37,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
 
     this.conversationRepository = this.repositories.conversation;
     this.integrationRepository = this.repositories.integration;
+    this.searchRepository = params.repositories.search;
     this.teamRepository = this.repositories.team;
     this.userRepository = this.repositories.user;
 

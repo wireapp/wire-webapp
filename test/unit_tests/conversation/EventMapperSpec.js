@@ -176,6 +176,37 @@ describe('Event Mapper', () => {
         })
         .catch(done.fail);
     });
+
+    it('filters mentions that are out of range', () => {
+      const mandy = '@Mandy';
+      const randy = '@Randy';
+      const text = `Hi ${mandy} and ${randy}.`;
+
+      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
+      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, z.util.createRandomUuid());
+
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+      const event = {
+        category: 16,
+        conversation: conversationEntity.id,
+        data: {
+          content: text,
+          mentions: [validMention.toProto().encode64(), outOfRangeMention.toProto().encode64()],
+          previews: [],
+        },
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
+        primary_key: 5,
+        time: '2018-09-27T15:23:14.177Z',
+        type: 'conversation.message-add',
+      };
+
+      event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
+        const mentions = messageEntity.get_first_asset().mentions();
+        expect(mentions.length).toBe(1);
+      });
+    });
   });
 
   describe('_mapAssetImage', () => {

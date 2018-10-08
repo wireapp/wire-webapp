@@ -560,12 +560,16 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         })
         .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
-      if (this.isTeam()) {
-        this.searchResults.contacts(this.teamRepository.searchForTeamUsers(normalizedQuery, isHandle));
-      } else {
-        this.searchResults.contacts(this.userRepository.search_for_connected_users(normalizedQuery, isHandle));
-      }
+      const localSearchSources = this.isTeam()
+        ? this.teamRepository.teamUsers()
+        : this.userRepository.connected_users();
 
+      const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+
+      const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
+
+      this.searchResults.contacts(contactResults);
       this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }

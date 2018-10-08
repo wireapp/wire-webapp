@@ -200,7 +200,7 @@ z.conversation.EventMapper = class EventMapper {
     messageEntity.type = type;
     messageEntity.version = version || 1;
 
-    if (messageEntity.is_content()) {
+    if (messageEntity.is_content() || messageEntity.is_ping()) {
       messageEntity.status(event.status || z.message.StatusType.SENT);
     }
 
