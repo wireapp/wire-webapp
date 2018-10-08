@@ -24,7 +24,8 @@
 /aws/config.*
 /aws/index.*
 /aws/Server.*
-/aws/timeUtil.*
+/aws/TimeUtil.*
+/aws/BrowserUtil.*
 /bower_components
 /debug.log
 /deploy

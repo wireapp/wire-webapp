@@ -1173,6 +1173,13 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
+"@types/express-useragent@0.2.21":
+  version "0.2.21"
+  resolved "https://registry.yarnpkg.com/@types/express-useragent/-/express-useragent-0.2.21.tgz#dbbc684e15aa5dfeef1118eabcbc0084716be59f"
+  integrity sha512-xVZ9GVsrYa5PFghnb9UGiWR0ZOrAWhxSwbTVhqI1tMGU0I1TnAvzCQi15P29GWhc8mR384IUEINlhrPy0mz1Pg==
+  dependencies:
+    "@types/express" "*"
+
 "@types/express@*", "@types/express@4.16.0":
   version "4.16.0"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.16.0.tgz#6d8bc42ccaa6f35cf29a2b7c3333cb47b5a32a19"
@@ -4986,6 +4993,11 @@ expect-ct@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.1.tgz#de84476a2dbcb85000d5903737e9bc8a5ba7b897"
   integrity sha512-ngXzTfoRGG7fYens3/RMb6yYoVLvLMfmsSllP/mZPxNHgFq41TmPSLF/nLY7fwoclI2vElvAmILFWGUYqdjfCg==
+
+express-useragent@1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/express-useragent/-/express-useragent-1.0.12.tgz#5bae0109a925ec9b35417f31a4e8ad13f191253a"
+  integrity sha1-W64BCakl7Js1QX8xpOitE/GRJTo=
 
 express@4.16.3:
   version "4.16.3"

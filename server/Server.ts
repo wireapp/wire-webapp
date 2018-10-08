@@ -27,6 +27,7 @@ import {ServerConfig} from './config';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
+import RedirectRoutes from './routes/RedirectRoutes';
 
 const STATUS_CODE_MOVED = 301;
 
@@ -143,6 +144,7 @@ class Server {
   }
 
   private initStaticRoutes() {
+    this.app.use(RedirectRoutes(this.config));
     this.app.use('/', express.static(path.join(__dirname, 'static')));
   }
 

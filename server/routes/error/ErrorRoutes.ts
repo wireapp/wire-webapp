@@ -19,7 +19,7 @@
 
 import * as express from 'express';
 import * as logdown from 'logdown';
-import {formatDate} from '../../timeUtil';
+import {formatDate} from '../../TimeUtil';
 
 const router = express.Router();
 
@@ -35,7 +35,7 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, ne
     message: 'Internal server error',
     stack: err.stack,
   };
-  return res.status(error.code).json(error);
+  return res.sendStatus(error.code);
 };
 
 const NotFoundRoute = () =>
@@ -44,7 +44,7 @@ const NotFoundRoute = () =>
       code: 404,
       message: 'Not found',
     };
-    return res.status(error.code).json(error);
+    return res.sendStatus(error.code);
   });
 
 export {InternalErrorRoute, NotFoundRoute};

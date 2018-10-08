@@ -19,7 +19,7 @@
 
 import config from './config';
 import Server from './Server';
-import {formatDate} from './timeUtil';
+import {formatDate} from './TimeUtil';
 
 const server = new Server(config);
 
@@ -30,16 +30,10 @@ server
 
 process.on('SIGINT', () => {
   console.log(`[${formatDate()}] Received "SIGINT" signal. Exiting.`);
-  try {
-    server.stop();
-  } catch (error) {}
 });
 
 process.on('SIGTERM', () => {
   console.log(`[${formatDate()}] Received "SIGTERM" signal. Exiting.`);
-  try {
-    server.stop();
-  } catch (error) {}
 });
 
 process.on('uncaughtException', error =>
