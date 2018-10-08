@@ -19,35 +19,163 @@
 
 const {MessageHandler} = require('@wireapp/bot-api');
 const {Account} = require('@wireapp/core');
+const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event');
+
 const UUID = require('pure-uuid');
 const UUID_VERSION = 4;
 
 describe('MessageHandler', () => {
   let mainHandler;
 
-  beforeEach(() => {
-    mainHandler = new MessageHandler();
+  const MainHandler = class extends MessageHandler {
+    constructor() {
+      super();
+    }
+    async handleEvent() {}
+  };
+
+  beforeEach(async () => {
+    mainHandler = new MainHandler();
+    mainHandler.account = new Account();
+    await mainHandler.account.init();
+    mainHandler.account.apiClient.createContext('', '');
+
+    spyOn(mainHandler.account.service.conversation, 'send').and.returnValue(Promise.resolve());
   });
 
-  describe('"sendImage"', () => {
-    it('calls send() with account and service', async () => {
-      mainHandler.account = new Account();
-      await mainHandler.account.init();
+  describe('"sendConnectionResponse"', () => {
+    it('sends the correct data when accepting the connection', async () => {
+      const userId = new UUID(UUID_VERSION).format();
+      const acceptConnection = true;
 
-      const imagePayload = {
-        data: new UUID(UUID_VERSION).format(),
+      spyOn(mainHandler.account.service.connection, 'acceptConnection').and.returnValue(Promise.resolve());
+      spyOn(mainHandler.account.service.connection, 'ignoreConnection').and.returnValue(Promise.resolve());
+
+      await mainHandler.sendConnectionResponse(userId, acceptConnection);
+      expect(mainHandler.account.service.connection.acceptConnection).toHaveBeenCalledWith(userId);
+      expect(mainHandler.account.service.connection.ignoreConnection).not.toHaveBeenCalled();
+    });
+
+    it('sends the correct data when ignoring the connection', async () => {
+      const userId = new UUID(UUID_VERSION).format();
+      const acceptConnection = false;
+
+      spyOn(mainHandler.account.service.connection, 'acceptConnection').and.returnValue(Promise.resolve());
+      spyOn(mainHandler.account.service.connection, 'ignoreConnection').and.returnValue(Promise.resolve());
+
+      await mainHandler.sendConnectionResponse(userId, acceptConnection);
+      expect(mainHandler.account.service.connection.ignoreConnection).toHaveBeenCalledWith(userId);
+      expect(mainHandler.account.service.connection.acceptConnection).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('"sendFile"', () => {
+    it('sends the correct data', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+      const file = new UUID(UUID_VERSION).format();
+      const metadata = new UUID(UUID_VERSION).format();
+
+      const filePayload = {
+        data: file,
+      };
+      const metadataPayload = {
+        id: new UUID(UUID_VERSION).format(),
       };
 
-      const image = {
-        data: new UUID(UUID_VERSION).format(),
+      spyOn(mainHandler.account.service.conversation, 'createFileMetadata').and.returnValue(metadataPayload);
+      spyOn(mainHandler.account.service.conversation, 'createFileData').and.returnValue(Promise.resolve(filePayload));
+      spyOn(mainHandler.account.service.conversation, 'createFileAbort').and.returnValue(Promise.resolve());
+
+      await mainHandler.sendFile(conversationId, file, metadata);
+      expect(mainHandler.account.service.conversation.createFileMetadata).toHaveBeenCalledWith(metadata);
+      expect(mainHandler.account.service.conversation.createFileData).toHaveBeenCalledWith(file, metadataPayload.id);
+      expect(mainHandler.account.service.conversation.createFileAbort).not.toHaveBeenCalled();
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(conversationId, filePayload);
+    });
+
+    it('sends the correct data if uploading fails', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+      const file = new UUID(UUID_VERSION).format();
+      const metadata = new UUID(UUID_VERSION).format();
+
+      const abortPayload = {
+        data: file,
+      };
+      const metadataPayload = {
+        id: new UUID(UUID_VERSION).format(),
       };
 
-      spyOn(mainHandler.account.service.conversation, 'send').and.returnValue(Promise.resolve());
-      spyOn(mainHandler.account.service.conversation, 'createImage').and.returnValue(Promise.resolve(imagePayload));
+      spyOn(mainHandler.account.service.conversation, 'createFileMetadata').and.returnValue(metadataPayload);
+      spyOn(mainHandler.account.service.conversation, 'createFileData').and.returnValue(Promise.reject(new Error()));
+      spyOn(mainHandler.account.service.conversation, 'createFileAbort').and.returnValue(Promise.resolve(abortPayload));
 
-      await mainHandler.sendImage('random-id', image);
-      expect(mainHandler.account.service.conversation.createImage).toHaveBeenCalledWith(image);
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith('random-id', imagePayload);
+      await mainHandler.sendFile(conversationId, file, metadata);
+      expect(mainHandler.account.service.conversation.createFileMetadata).toHaveBeenCalledWith(metadata);
+      expect(mainHandler.account.service.conversation.createFileData).toHaveBeenCalledWith(file, metadataPayload.id);
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(conversationId, abortPayload);
+    });
+  });
+
+  describe('"sendText"', () => {
+    it('sends the correct data', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+      const messageText = new UUID(UUID_VERSION).format();
+      const mentionData = [
+        {
+          data: new UUID(UUID_VERSION).format(),
+        },
+      ];
+
+      spyOn(mainHandler.account.service.conversation, 'createText').and.callThrough();
+
+      await mainHandler.sendText(conversationId, messageText, mentionData);
+
+      expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(messageText);
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
+        conversationId,
+        jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})})
+      );
+    });
+
+    it('sends the correct data with mentions', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+      const message = new UUID(UUID_VERSION).format();
+
+      spyOn(mainHandler.account.service.conversation, 'createText').and.callThrough();
+
+      await mainHandler.sendText(conversationId, message);
+
+      expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(message);
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
+        conversationId,
+        jasmine.objectContaining({content: jasmine.objectContaining({text: message})})
+      );
+    });
+  });
+
+  describe('"sendTyping"', () => {
+    it('sends the correct data when typing started', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+
+      spyOn(mainHandler.account.service.conversation, 'sendTypingStart').and.returnValue(Promise.resolve());
+      spyOn(mainHandler.account.service.conversation, 'sendTypingStop').and.returnValue(Promise.resolve());
+
+      await mainHandler.sendTyping(conversationId, CONVERSATION_TYPING.STARTED);
+
+      expect(mainHandler.account.service.conversation.sendTypingStart).toHaveBeenCalled();
+      expect(mainHandler.account.service.conversation.sendTypingStop).not.toHaveBeenCalled();
+    });
+
+    it('sends the correct data when typing stopped', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+
+      spyOn(mainHandler.account.service.conversation, 'sendTypingStart').and.returnValue(Promise.resolve());
+      spyOn(mainHandler.account.service.conversation, 'sendTypingStop').and.returnValue(Promise.resolve());
+
+      await mainHandler.sendTyping(conversationId, CONVERSATION_TYPING.STOPPED);
+
+      expect(mainHandler.account.service.conversation.sendTypingStart).not.toHaveBeenCalled();
+      expect(mainHandler.account.service.conversation.sendTypingStop).toHaveBeenCalled();
     });
   });
 });

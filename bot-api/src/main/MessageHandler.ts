@@ -17,9 +17,18 @@
  *
  */
 
+import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/event';
 import {Account} from '@wireapp/core';
-import {ImageContent} from '@wireapp/core/dist/conversation/content/';
+import {
+  FileContent,
+  FileMetaDataContent,
+  ImageContent,
+  LinkPreviewContent,
+  LocationContent,
+  MentionContent,
+} from '@wireapp/core/dist/conversation/content/';
 import {PayloadBundleIncoming, ReactionType} from '@wireapp/core/dist/conversation/root';
+import {Asset} from '@wireapp/protocol-messaging';
 
 abstract class MessageHandler {
   public account: Account | undefined = undefined;
@@ -32,23 +41,22 @@ abstract class MessageHandler {
     }
   }
 
+  async clearConversation(conversationId: string): Promise<void> {
+    if (this.account && this.account.service) {
+      await this.account.service.conversation.clearConversation(conversationId);
+    }
+  }
+
   public async removeUser(conversationId: string, userId: string): Promise<void> {
     if (this.account && this.account.service) {
       await this.account.service.conversation.removeUser(conversationId, userId);
     }
   }
 
-  public async sendImage(conversationId: string, image: ImageContent): Promise<void> {
+  public async sendConfirmation(conversationId: string, confirmMessageId: string): Promise<void> {
     if (this.account && this.account.service) {
-      const imagePayload = await this.account.service.conversation.createImage(image);
-      await this.account.service.conversation.send(conversationId, imagePayload);
-    }
-  }
-
-  public async sendText(conversationId: string, text: string): Promise<void> {
-    if (this.account && this.account.service) {
-      const textPayload = this.account.service.conversation.createText(text).build();
-      await this.account.service.conversation.send(conversationId, textPayload);
+      const confirmationPayload = this.account.service.conversation.createConfirmation(confirmMessageId);
+      await this.account.service.conversation.send(conversationId, confirmationPayload);
     }
   }
 
@@ -68,10 +76,113 @@ abstract class MessageHandler {
     }
   }
 
+  public async sendEditedText(
+    conversationId: string,
+    originalMessageId: string,
+    newMessageText: string,
+    newMentions?: MentionContent[],
+    newLinkPreview?: LinkPreviewContent
+  ): Promise<void> {
+    if (this.account && this.account.service) {
+      const editedPayload = this.account.service.conversation
+        .createEditedText(newMessageText, originalMessageId)
+        .withMentions(newMentions)
+        .build();
+
+      const editedMessage = await this.account.service.conversation.send(conversationId, editedPayload);
+
+      if (newLinkPreview) {
+        const linkPreviewPayload = await this.account.service.conversation.createLinkPreview(newLinkPreview);
+        const editedWithPreviewPayload = this.account.service.conversation
+          .createEditedText(newMessageText, originalMessageId, editedMessage.id)
+          .withLinkPreviews([linkPreviewPayload])
+          .withMentions(newMentions)
+          .build();
+
+        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload);
+      }
+    }
+  }
+
+  public async sendFile(conversationId: string, file: FileContent, metadata: FileMetaDataContent): Promise<void> {
+    if (this.account && this.account.service) {
+      const metadataPayload = this.account.service.conversation.createFileMetadata(metadata);
+      await this.account.service.conversation.send(conversationId, metadataPayload);
+
+      try {
+        const filePayload = await this.account.service.conversation.createFileData(file, metadataPayload.id);
+        await this.account.service.conversation.send(conversationId, filePayload);
+      } catch (error) {
+        const abortPayload = await this.account.service.conversation.createFileAbort(
+          Asset.NotUploaded.FAILED,
+          metadataPayload.id
+        );
+        await this.account.service.conversation.send(conversationId, abortPayload);
+      }
+    }
+  }
+
+  public async sendImage(conversationId: string, image: ImageContent): Promise<void> {
+    if (this.account && this.account.service) {
+      const imagePayload = await this.account.service.conversation.createImage(image);
+      await this.account.service.conversation.send(conversationId, imagePayload);
+    }
+  }
+
+  public async sendLocation(conversationId: string, location: LocationContent): Promise<void> {
+    if (this.account && this.account.service) {
+      const locationPayload = this.account.service.conversation.createLocation(location);
+      await this.account.service.conversation.send(conversationId, locationPayload);
+    }
+  }
+
+  public async sendPing(conversationId: string): Promise<void> {
+    if (this.account && this.account.service) {
+      const pingPayload = this.account.service.conversation.createPing();
+      await this.account.service.conversation.send(conversationId, pingPayload);
+    }
+  }
+
   public async sendReaction(conversationId: string, originalMessageId: string, type: ReactionType): Promise<void> {
     if (this.account && this.account.service) {
       const reactionPayload = this.account.service.conversation.createReaction(originalMessageId, type);
       await this.account.service.conversation.send(conversationId, reactionPayload);
+    }
+  }
+
+  public async sendText(
+    conversationId: string,
+    text: string,
+    mentions?: MentionContent[],
+    linkPreview?: LinkPreviewContent
+  ): Promise<void> {
+    if (this.account && this.account.service) {
+      const payload = await this.account.service.conversation
+        .createText(text)
+        .withMentions(mentions)
+        .build();
+      const sentMessage = await this.account.service.conversation.send(conversationId, payload);
+
+      if (linkPreview) {
+        const linkPreviewPayload = await this.account.service.conversation.createLinkPreview(linkPreview);
+        const editedWithPreviewPayload = this.account.service.conversation
+          .createText(text, sentMessage.id)
+          .withLinkPreviews([linkPreviewPayload])
+          .withMentions(mentions)
+          .build();
+
+        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload);
+      }
+    }
+  }
+
+  public async sendTyping(conversationId: string, status: CONVERSATION_TYPING): Promise<void> {
+    if (this.account && this.account.service) {
+      if (status === CONVERSATION_TYPING.STARTED) {
+        await this.account.service.conversation.sendTypingStart(conversationId);
+      } else {
+        await this.account.service.conversation.sendTypingStop(conversationId);
+      }
     }
   }
 }
