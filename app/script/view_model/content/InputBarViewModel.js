@@ -238,6 +238,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   setElements(nodes) {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text');
     this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input'));
+    this.updateSelectionState();
   }
 
   loadInitialStateForConversation(conversationEntity) {
@@ -360,9 +361,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
-      if (this.textarea) {
-        this._moveCursorToEnd(this.textarea);
-      }
+      this._moveCursorToEnd();
     }
   }
 
@@ -707,12 +706,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return isHittingUploadLimit;
   }
 
-  _moveCursorToEnd(input_element) {
-    window.setTimeout(() => {
-      const newSelectionStart = (input_element.selectionEnd = input_element.value.length * 2);
-      input_element.selectionStart = newSelectionStart;
-      this.updateSelectionState();
-    }, 0);
+  _moveCursorToEnd() {
+    z.util.afterRender(() => {
+      if (this.textarea) {
+        const endPosition = this.textarea.value.length;
+        this.textarea.setSelectionRange(endPosition, endPosition);
+        this.updateSelectionState();
+      }
+    });
   }
 
   _showUploadWarning(image) {
