@@ -26,7 +26,7 @@
         <!-- /ko -->
 
         <!-- ko ifnot: isSingleUserMode() -->
-        <div class="conversation-details__header">
+          <div class="conversation-details__header">
             <!-- ko if: isNameEditable() -->
               <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipConversationDetailsRename" data-uie-name="status-name">
                 <div class="conversation-details__name" data-bind="text: activeConversation() && activeConversation().display_name()"></div>
@@ -134,7 +134,7 @@
             <!-- /ko -->
           </div>
         <!-- /ko -->
-        <!-- ko if: isActivatedAccount() -->
+        <!-- ko if: isActivatedAccount() && isSingleUserMode()-->
           <div class="conversation-details__bottom-actions">
             <!-- ko if: showActionNotificationSettings() -->
               <div class="conversation-details__notifications">
