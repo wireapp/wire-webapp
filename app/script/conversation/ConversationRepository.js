@@ -1002,7 +1002,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
 
-    const entitites = this.conversationMapper.mapConversations(conversationsData, initialTimestamp, this.isTeam());
+    const entitites = this.conversationMapper.mapConversations(conversationsData, this.isTeam(), initialTimestamp);
     entitites.forEach(conversationEntity => this._handle_mapped_conversation(conversationEntity));
 
     return payload.length ? entitites : entitites[0];

@@ -98,18 +98,20 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Converts JSON conversations into conversation entities.
    *
    * @param {Array} conversationsData - Conversation data
+   * @param {boolean} isProAccount - Type of account for state mapping
    * @param {number} [timestamp=1] - Initial timestamp for conversation
-   * @param {boolean} [isTeam] - Type of account for state mapping
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  mapConversations(conversationsData, timestamp = 1, isTeam) {
+  mapConversations(conversationsData, isProAccount, timestamp = 1) {
     if (conversationsData === undefined) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
     }
     if (!_.isArray(conversationsData) || !conversationsData.length) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
     }
-    return conversationsData.map((data, index) => this._createConversationEntity(data, timestamp + index, isTeam));
+    return conversationsData.map((conversationData, index) => {
+      return this._createConversationEntity(conversationData, timestamp + index, isProAccount);
+    });
   }
 
   /**

@@ -287,7 +287,7 @@ describe('ConversationRepository', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
-      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
+      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation], true);
       TestFactory.conversation_repository.conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
