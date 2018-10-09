@@ -21,7 +21,7 @@ import * as express from 'express';
 import * as BrowserUtil from '../BrowserUtil';
 import {ServerConfig} from '../config';
 
-const REDIRECT_FOUND = 302;
+const STATUS_CODE_FOUND = 302;
 
 const router = express.Router();
 
@@ -29,13 +29,13 @@ const RedirectRoutes = (config: ServerConfig) => [
   router.get('/join/?', (req, res) => {
     const key = req.query.key;
     const code = req.query.code;
-    res.redirect(REDIRECT_FOUND, `/auth/?join_key=${key}&join_code=${code}#join-conversation`);
+    res.redirect(STATUS_CODE_FOUND, `/auth/?join_key=${key}&join_code=${code}#join-conversation`);
   }),
   router.get('/browser/?', (req, res) => {
     const userAgent = req.headers['user-agent'];
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     if (!parseResult) {
-      res.redirect(REDIRECT_FOUND, '/unsupported/');
+      res.redirect(STATUS_CODE_FOUND, '/unsupported/');
     } else {
       res.json(parseResult);
     }

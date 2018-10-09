@@ -17,6 +17,7 @@
  *
  */
 
+import * as express from 'express';
 import * as useragent from 'express-useragent';
 
 interface ParsedUserAgent {
