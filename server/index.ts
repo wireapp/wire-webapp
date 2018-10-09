@@ -28,14 +28,6 @@ server
   .then(port => console.info(`[${formatDate()}] Server is running on port ${port}.`))
   .catch(error => console.error(`[${formatDate()}] ${error.stack}`));
 
-process.on('SIGINT', () => {
-  console.log(`[${formatDate()}] Received "SIGINT" signal. Exiting.`);
-});
-
-process.on('SIGTERM', () => {
-  console.log(`[${formatDate()}] Received "SIGTERM" signal. Exiting.`);
-});
-
 process.on('uncaughtException', error =>
   console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error)
 );
