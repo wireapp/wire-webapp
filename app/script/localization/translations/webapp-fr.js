@@ -218,6 +218,7 @@ z.string.fr.modalPictureFileFormatMessage = 'Veuillez choisir un fichier PNG ou 
 z.string.fr.modalPictureTooLargeHeadline = 'La photo sélectionnée est trop volumineuse';
 
 z.string.fr.modalImproveWireAction = 'Accepter';
+z.string.fr.modalImproveWireSecondary = 'Non';
 
 z.string.fr.modalServiceUnavailableHeadline = 'L’ajout du service est impossible';
 z.string.fr.modalServiceUnavailableMessage = 'Le service est temporairement indisponible.';
@@ -368,9 +369,11 @@ z.string.fr.addParticipantsTabsPeople = 'Personnes';
 z.string.fr.addParticipantsTabsServices = 'Services';
 
 z.string.fr.conversationDetailsActionArchive = 'Archiver';
+z.string.fr.conversationDetailsActionAddParticipants = 'Ajouter un contact';
 z.string.fr.conversationDetailsActionCancelRequest = 'Annuler la demande';
 z.string.fr.conversationDetailsActionCreateGroup = 'Nouveau groupe';
 z.string.fr.conversationDetailsActionDevices = 'Appareils';
+z.string.fr.conversationDetailsActionNotifications = 'Notifications';
 z.string.fr.conversationDetailsGuestsOff = 'Désactiver';
 z.string.fr.conversationDetailsOptions = 'Options';
 z.string.fr.conversationDetailsParticipantsServicesMany = 'Services';
@@ -391,6 +394,8 @@ z.string.fr.guestOptionsCreateLink = 'Créer le lien';
 z.string.fr.guestOptionsInfoHeader = 'Inviter des personnes via un lien';
 z.string.fr.guestOptionsInfoText = 'N’importe qui avec le lien peut rejoindre la conversation, même s’ils n’utilisent pas Wire.';
 z.string.fr.guestOptionsRevokeLink = 'Révoquer le lien';
+
+z.string.fr.notificationSettingsTitle = 'Notifications';
 
 z.string.fr.participantDevicesDetailHeadline = 'Vérifiez que cela correspond à l’empreinte affichée sur {{html1}}l’appareil de {{user}}{{html2}}.';
 z.string.fr.participantDevicesDetailHowTo = 'Comment faire ?';

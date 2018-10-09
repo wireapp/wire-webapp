@@ -203,6 +203,7 @@ z.string.pt.modalIntegrationUnavailableMessage = 'Obrigado pelo seu interesse no
 
 
 z.string.pt.modalImproveWireAction = 'Aceitar';
+z.string.pt.modalImproveWireSecondary = 'Não';
 
 z.string.pt.modalSessionResetHeadline = 'A sessão foi reposta';
 z.string.pt.modalSessionResetMessage1 = 'Se o problema não está resolvido,';
@@ -341,6 +342,7 @@ z.string.pt.addParticipantsTabsServices = 'Serviços';
 z.string.pt.conversationDetailsActionArchive = 'Arquivar';
 z.string.pt.conversationDetailsActionCancelRequest = 'Cancelar pedido';
 z.string.pt.conversationDetailsActionDevices = 'Dispositivos';
+z.string.pt.conversationDetailsActionNotifications = 'Notificações';
 z.string.pt.conversationDetailsGuestsOff = 'Desligado';
 z.string.pt.conversationDetailsOptions = 'Opções';
 z.string.pt.conversationDetailsParticipantsServicesMany = 'Serviços';
@@ -355,6 +357,8 @@ z.string.pt.groupParticipantActionCancelRequest = 'Cancelar pedido';
 z.string.pt.groupParticipantActionDevices = 'Dispositivos';
 z.string.pt.groupParticipantActionPending = 'Pendente';
 z.string.pt.groupParticipantActionSendRequest = 'Ligar';
+
+z.string.pt.notificationSettingsTitle = 'Notificações';
 
 z.string.pt.participantDevicesDetailHeadline = 'Verifique se corresponde à impressão digital mostrada dispositivo {{html2}} do {{html1}}{{user}}.';
 z.string.pt.participantDevicesDetailHowTo = 'Como posso fazer isto?';
