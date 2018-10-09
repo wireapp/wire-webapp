@@ -161,12 +161,12 @@ class Server {
 
         const unsupportedBrowser = (() => {
           const browserName = parsedUserAgent.browser.name.toLowerCase();
-          const configEntry = this.config.CLIENT.SUPPORTED[browserName];
+          const supportedBrowserVersion = this.config.CLIENT.SUPPORTED[browserName];
 
           try {
             const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
             const browserVersion = parseInt(browserVersionString, 10);
-            return !configEntry || browserVersion < configEntry;
+            return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
           } catch (err) {
             return false;
           }
