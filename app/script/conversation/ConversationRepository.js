@@ -1268,14 +1268,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
+      const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
       const event = !!response
         ? response
-        : z.conversation.EventBuilder.buildMemberLeave(
-            conversationEntity,
-            userId,
-            true,
-            this.serverTimeOffsetRepository.getTimeOffset()
-          );
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, timeOffset);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1292,14 +1288,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   removeService(conversationEntity, userId) {
     return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
       const hasResponse = response && response.event;
+      const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(
-            conversationEntity,
-            userId,
-            true,
-            this.serverTimeOffsetRepository.getTimeOffset()
-          );
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, timeOffset);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1422,12 +1414,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
+    const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
-      otr_muted_ref: new Date(
-        conversation_et.get_last_known_timestamp(this.serverTimeOffsetRepository.getTimeOffset())
-      ).toISOString(),
+      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(timeOffset)).toISOString(),
       otr_muted_status: notificationState,
     };
 
@@ -1484,9 +1475,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const stateChange = conversationEntity.is_archived() !== newState;
 
-    const archiveTimestamp = conversationEntity.get_last_known_timestamp(
-      this.serverTimeOffsetRepository.getTimeOffset()
-    );
+    const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+    const archiveTimestamp = conversationEntity.get_last_known_timestamp(timeOffset);
     const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
 
@@ -1668,11 +1658,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: assetData.asset_token,
         };
 
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(
-          conversationEntity,
-          data,
-          this.serverTimeOffsetRepository.getTimeOffset()
-        );
+        const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, timeOffset);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -2220,10 +2207,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(
-          conversationEntity,
-          this.serverTimeOffsetRepository.getTimeOffset()
-        );
+        const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, timeOffset);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -2990,10 +2975,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const missed_event = z.conversation.EventBuilder.buildMissed(
-          conversation_et,
-          this.serverTimeOffsetRepository.getTimeOffset()
-        );
+        const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, timeOffset);
         this.eventRepository.injectEvent(missed_event);
       });
   }

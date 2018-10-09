@@ -131,10 +131,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   _checkChangeToVerified(conversationEntity) {
     if (this._willChangeToVerified(conversationEntity)) {
-      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(
-        conversationEntity,
-        this.serverTimeOffsetRepository.getTimeOffset()
-      );
+      const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, timeOffset);
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
@@ -166,12 +164,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
         throw new Error('Conversation degraded without affected users');
       }
 
-      const event = z.conversation.EventBuilder.buildDegraded(
-        conversationEntity,
-        userIds,
-        type,
-        this.serverTimeOffsetRepository.getTimeOffset()
-      );
+      const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, timeOffset);
       this.eventRepository.injectEvent(event);
 
       return true;
