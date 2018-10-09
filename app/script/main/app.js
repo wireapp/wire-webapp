@@ -91,7 +91,7 @@ z.main.App = class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
-    repositories.server = new z.server.ServerTimeOffsetRepository();
+    repositories.serverTimeOffset = new z.server.ServerTimeOffsetRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -104,7 +104,7 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.search,
-      repositories.server,
+      repositories.serverTimeOffset,
       repositories.client
     );
     repositories.event = new z.event.EventRepository(
@@ -113,7 +113,7 @@ z.main.App = class App {
       this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
-      repositories.server,
+      repositories.serverTimeOffset,
       repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
