@@ -25,7 +25,12 @@ const server = new Server(config);
 
 server
   .start()
-  .then(port => console.info(`[${formatDate()}] Server is running on port ${port}.`))
+  .then(port => {
+    console.info(`[${formatDate()}] Server is running on port ${port}.`);
+    if (config.SERVER.DEVELOPMENT) {
+      require('opn')(`http://localhost:${config.SERVER.PORT_HTTP}`);
+    }
+  })
   .catch(error => console.error(`[${formatDate()}] ${error.stack}`));
 
 process.on('uncaughtException', error =>

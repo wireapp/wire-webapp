@@ -60,7 +60,6 @@ class Server {
     this.app.use(ConfigRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
-    this.openBrowser(this.config);
   }
 
   initWebpack() {
@@ -71,12 +70,6 @@ class Server {
 
       this.app.use(webpackDevMiddleware(webpackCompiler));
       this.app.use(webpackHotMiddleware(webpackCompiler));
-    }
-  }
-
-  openBrowser(config: ServerConfig) {
-    if (this.config.SERVER.DEVELOPMENT) {
-      require('opn')(`http://localhost:${config.SERVER.PORT_HTTP}`);
     }
   }
 
