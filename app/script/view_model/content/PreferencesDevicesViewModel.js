@@ -29,7 +29,6 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
     this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
-    this.locationRepository = repositories.location;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
@@ -40,14 +39,11 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.currentClient = this.clientRepository.currentClient;
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
-    this.activationLocation = ko.observable([]);
     this.activationDate = ko.observable([]);
     this.devices = ko.observableArray();
     this.localFingerprint = ko.observableArray([]);
 
     this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
-
-    this._updateActivationLocation('?');
 
     // All clients except the current client
     this.clientRepository.clients.subscribe(clientEntities => {
@@ -62,22 +58,6 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.activationDate(sanitizedText);
   }
 
-  _updateActivationLocation(location, template = z.string.preferencesDevicesActivatedIn) {
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
-    this.activationLocation(sanitizedText);
-  }
-
-  _updateLocation({lat: latitude, lon: longitude}) {
-    if (latitude && longitude) {
-      this.locationRepository.getLocation(latitude, longitude).then(mappedLocation => {
-        if (mappedLocation) {
-          const {countryCode, place} = mappedLocation;
-          this._updateActivationLocation(`${place}, ${countryCode}`);
-        }
-      });
-    }
-  }
-
   clickOnShowDevice(clientEntity) {
     this.preferencesDeviceDetails.device(clientEntity);
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
@@ -90,12 +70,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   updateDeviceInfo() {
     if (this.currentClient() && !this.localFingerprint().length) {
-      const {location, time} = this.currentClient();
-      this._updateActivationDate(time);
-      if (location) {
-        this._updateLocation(location);
-      }
-
+      this._updateActivationDate(this.currentClient().time);
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
