@@ -136,12 +136,12 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
-    const notifyPromise = conversationEntity
+    const notifyInConversation = conversationEntity
       ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
-      : Promise.resolve(true);
+      : true;
 
-    return notifyPromise.then(shouldNotify => {
-      if (shouldNotify) {
+    return Promise.resolve(notifyInConversation).then(shouldNotifyInConversation => {
+      if (shouldNotifyInConversation) {
         this._notifySound(messageEntity);
         return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
       }

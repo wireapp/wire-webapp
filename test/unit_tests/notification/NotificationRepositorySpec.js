@@ -687,38 +687,34 @@ describe('z.notification.NotificationRepository', () => {
 
     it('returns the correct value for all notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
-      return shouldNotifyInConversation(conversationEntity, messageEntity, userId).then(shouldNotify => {
-        expect(shouldNotify).toBe(true);
-      });
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(true);
     });
 
     it('returns the correct value for no notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
-      return shouldNotifyInConversation(conversationEntity, messageEntity, userId).then(shouldNotify => {
-        expect(shouldNotify).toBe(false);
-      });
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(false);
     });
 
     it('returns the correct value for self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset(true));
-
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
-      return shouldNotifyInConversation(conversationEntity, messageEntity, userId).then(shouldNotify => {
-        expect(shouldNotify).toBe(true);
-      });
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(true);
     });
 
     it('returns the correct value for non-self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset());
-
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
-      return shouldNotifyInConversation(conversationEntity, messageEntity, userId).then(shouldNotify => {
-        expect(shouldNotify).toBe(false);
-      });
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(false);
     });
   });
 });
