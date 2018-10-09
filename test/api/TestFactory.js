@@ -382,6 +382,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.event_repository,
         undefined,
         undefined,
+        TestFactory.serverTimeOffsetRepository,
         TestFactory.team_repository,
         TestFactory.user_repository
       );

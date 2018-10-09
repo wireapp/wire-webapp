@@ -437,6 +437,9 @@ z.entity.Conversation = class Conversation {
   }
 
   get_next_iso_date(currentTimestamp) {
+    if (!_.isNumber(currentTimestamp)) {
+      currentTimestamp = Date.now();
+    }
     const timestamp = Math.max(this.last_server_timestamp() + 1, currentTimestamp);
     return new Date(timestamp).toISOString();
   }
