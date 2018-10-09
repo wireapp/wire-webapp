@@ -118,6 +118,7 @@ describe('z.conversation.ConversationCellState', () => {
       const expectedOne2One = expected.one2one || expected;
       conversation.unreadState = () => unreadState;
       const state = conversationCellState.generate(conversation);
+
       it(`${description} (1:1)`, () => {
         expect(state).toEqual(expectedOne2One);
       });
@@ -128,6 +129,7 @@ describe('z.conversation.ConversationCellState', () => {
       const expectedGroup = expected.group || expected;
       conversation.unreadState = () => unreadState;
       const state = conversationCellState.generate(conversation);
+
       it(`${description} (group)`, () => {
         expect(state).toEqual(expectedGroup);
       });
