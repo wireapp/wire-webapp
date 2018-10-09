@@ -180,7 +180,7 @@ class Server {
 
       const supportedBrowser = (() => {
         const browserName = parsedUserAgent.browser.name.toLowerCase();
-        const supportedBrowserVersion = this.config.CLIENT.SUPPORTED[browserName];
+        const supportedBrowserVersion = this.config.CLIENT.SUPPORTED_BROWSERS[browserName];
 
         try {
           const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];

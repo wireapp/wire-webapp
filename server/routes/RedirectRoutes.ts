@@ -18,30 +18,20 @@
  */
 
 import * as express from 'express';
-import * as path from 'path';
 
 import * as BrowserUtil from '../BrowserUtil';
 import {ServerConfig} from '../config';
-import {fileIsReadable} from '../FileUtil';
 
 const STATUS_CODE_FOUND = 302;
-const STATUS_CODE_NOT_FOUND = 404;
 
 const router = express.Router();
 
 const RedirectRoutes = (config: ServerConfig) => [
   router.get('/robots.txt', async (req, res) => {
-    const robotsDir = path.join(__dirname, '..', 'robots');
-    const robotsAllowFile = path.join(robotsDir, 'robots.txt');
-    const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
-
-    if (req.host === 'app.wire.com') {
-      const fileReadable = await fileIsReadable(robotsAllowFile);
-      return fileReadable ? res.sendFile(robotsAllowFile) : res.sendStatus(STATUS_CODE_NOT_FOUND);
-    } else {
-      const fileReadable = await fileIsReadable(robotsDisallowFile);
-      return fileReadable ? res.sendFile(robotsDisallowFile) : res.sendStatus(STATUS_CODE_NOT_FOUND);
-    }
+    const robotsContent = config.SERVER.ROBOTS.ALLOWED_HOSTS.includes(req.host)
+      ? config.SERVER.ROBOTS.ALLOW
+      : config.SERVER.ROBOTS.DISALLOW;
+    return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
   }),
   router.get('/join/?', (req, res) => {
     const key = req.query.key;
