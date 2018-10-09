@@ -89,6 +89,7 @@ export interface ServerConfig {
     VERSION: string;
   };
   SERVER: {
+    BASE: string;
     CACHE_DURATION_SECONDS: number;
     COMPRESS_LEVEL: number;
     COMPRESS_MIN_SIZE: number;
@@ -116,6 +117,7 @@ const config: ServerConfig = {
     VERSION: version,
   },
   SERVER: {
+    BASE: process.env.BASE,
     CACHE_DURATION_SECONDS: 300,
     COMPRESS_LEVEL: 6,
     COMPRESS_MIN_SIZE: 500,

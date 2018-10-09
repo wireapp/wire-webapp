@@ -19,9 +19,11 @@
 
 import * as compression from 'compression';
 import * as express from 'express';
+import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
+const expressSitemapXml = require('express-sitemap-xml');
 
 import * as BrowserUtil from './BrowserUtil';
 import {ServerConfig} from './config';
@@ -29,6 +31,7 @@ import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import RedirectRoutes from './routes/RedirectRoutes';
+import Root from './routes/Root';
 
 const STATUS_CODE_MOVED = 301;
 const STATUS_CODE_FOUND = 302;
@@ -45,8 +48,9 @@ class Server {
     this.init();
   }
 
-  init(): void {
+  private init(): void {
     // The order is important here, please don't sort!
+    this.initTemplateEngine();
     this.initCaching();
     this.initForceSSL();
     this.initSecurityHeaders();
@@ -59,13 +63,15 @@ class Server {
     this.initLatestBrowserRequired();
     this.initStaticRoutes();
     this.initWebpack();
+    this.initSiteMap(this.config);
+    this.app.use(Root(this.config));
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
 
-  initWebpack() {
+  private initWebpack() {
     if (this.config.SERVER.DEVELOPMENT) {
       const webpackCompiler = require('webpack')(require('../webpack.config.dev'));
       const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -144,10 +150,18 @@ class Server {
 
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config));
-    this.app.use('/', express.static(path.join(__dirname, 'static')));
+    // this.app.use('/', express.static(path.join(__dirname, 'static')));
+    this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
+    this.app.use('/audio', express.static(path.join(__dirname, 'static', 'audio')));
+    this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
+    this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
+    this.app.use('/style', express.static(path.join(__dirname, 'static', 'style')));
+    this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
+    this.app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'static', 'favicon.ico')));
+    this.app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, 'static', 'sw.js')));
   }
 
-  private initLatestBrowserRequired() {
+  public initLatestBrowserRequired() {
     this.app.use((req, res, next) => {
       const ignoredPath =
         /\.[^/]+$/.test(req.path) ||
@@ -183,6 +197,19 @@ class Server {
 
       return next();
     });
+  }
+
+  private initTemplateEngine() {
+    this.app.set('view engine', 'html');
+    this.app.engine('html', hbs.__express);
+    this.app.set('views', path.resolve(__dirname, 'static'));
+    hbs.localsAsTemplateData(this.app);
+    this.app.locals.config = this.config.CLIENT;
+  }
+
+  private initSiteMap(config: ServerConfig) {
+    const pages = () => [{url: '/auth/', changeFreq: 'weekly'}, {url: '/', changeFreq: 'weekly'}];
+    this.app.use(expressSitemapXml(pages, config.SERVER.BASE));
   }
 
   start(): Promise<number> {
