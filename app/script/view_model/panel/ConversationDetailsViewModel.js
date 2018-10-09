@@ -132,32 +132,32 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
 
-    this.showActionGuestOptions = ko.pureComputed(() => {
-      return this.isActiveGroupParticipant() && this.activeConversation() && this.activeConversation().inTeam();
-    });
-
     this.showActionLeave = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isLeavable());
 
     this.showActionMute = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
     });
 
-    this.showActionNotificationSettings = ko.pureComputed(() => {
+    this.showOptionGuests = ko.pureComputed(() => {
+      return this.isActiveGroupParticipant() && this.activeConversation().inTeam();
+    });
+
+    this.hasAdvancedNotifications = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
     });
 
-    this.showActionNotificationSettingsGroup = ko.pureComputed(() => {
-      return this.showActionNotificationSettings() && this.activeConversation().isGroup();
+    this.showOptionNotificationsGroup = ko.pureComputed(() => {
+      return this.hasAdvancedNotifications() && this.activeConversation().isGroup();
     });
 
-    this.showActionNotificationSettings1To1 = ko.pureComputed(() => {
-      return this.showActionNotificationSettings() && !this.activeConversation().isGroup();
+    this.showOptionNotifications1To1 = ko.pureComputed(() => {
+      return this.hasAdvancedNotifications() && !this.activeConversation().isGroup();
     });
 
-    this.showActionTimedMessages = this.isActiveGroupParticipant;
+    this.showOptionTimedMessages = this.isActiveGroupParticipant;
 
     this.showSectionOptions = ko.pureComputed(() => {
-      return this.showActionGuestOptions() || this.showActionNotificationSettings() || this.showActionTimedMessages();
+      return this.showOptionGuests() || this.showOptionNotificationsGroup() || this.showOptionTimedMessages();
     });
 
     this.participantsUserText = ko.pureComputed(() => {

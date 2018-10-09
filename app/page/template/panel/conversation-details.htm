@@ -80,7 +80,7 @@
               <!-- /ko -->
               <!-- ko if: showSectionOptions() -->
                 <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsOptions"></div>
-                <!-- ko if: showActionNotificationSettingsGroup() -->
+                <!-- ko if: showOptionNotificationsGroup() -->
                   <div class="conversation-details__notifications">
                     <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                       <notification-icon class="panel__action-item__icon"></notification-icon>
@@ -90,7 +90,7 @@
                     </div>
                   </div>
                 <!-- /ko -->
-                <!-- ko if: showActionTimedMessages() -->
+                <!-- ko if: showOptionTimedMessages() -->
                   <div class="conversation-details__timed-messages">
                     <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
                       <timer-icon class="panel__action-item__icon"></timer-icon>
@@ -100,7 +100,7 @@
                     </div>
                   </div>
                 <!-- /ko -->
-                <!-- ko if: showActionGuestOptions() -->
+                <!-- ko if: showOptionGuests() -->
                   <div class="conversation-details__guest-options">
                     <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
                       <guest-icon class="panel__action-item__icon"></guest-icon>
@@ -136,7 +136,7 @@
         <!-- /ko -->
         <!-- ko if: isActivatedAccount()-->
           <div class="conversation-details__bottom-actions">
-            <!-- ko if: showActionNotificationSettings1To1() -->
+            <!-- ko if: showOptionNotifications1To1() -->
               <div class="conversation-details__notifications">
                 <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                   <notification-icon class="panel__action-item__icon"></notification-icon>
