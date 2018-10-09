@@ -33,8 +33,8 @@ z.server.ServerTimeOffsetRepository = class ServerTimeOffsetRepository {
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this._timeOffset}' ms`);
   }
 
-  getTimeOffset() {
-    return this._timeOffset;
+  getAdjustedCurrentTimestamp() {
+    return this.adjustTimestamp(Date.now());
   }
 
   adjustTimestamp(timestamp = 0) {

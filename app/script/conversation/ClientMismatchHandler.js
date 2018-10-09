@@ -176,8 +176,13 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         if (noRemainingClients) {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
-            const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
-            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
+            const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
+            const event = z.conversation.EventBuilder.buildMemberLeave(
+              conversationEntity,
+              userId,
+              false,
+              currentTimestamp
+            );
 
             this.eventRepository.injectEvent(event);
           }

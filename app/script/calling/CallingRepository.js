@@ -1471,8 +1471,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
-    const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
-    const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, timeOffset);
+    const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
+    const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
     this.eventRepository.injectEvent(event, source);
   }
 

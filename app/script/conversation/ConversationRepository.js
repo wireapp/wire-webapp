@@ -171,7 +171,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   checkMessageTimer(messageEntity) {
-    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeOffsetRepository.getTimeOffset());
+    this.ephemeralHandler.checkMessageTimer(
+      messageEntity,
+      this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp()
+    );
   }
 
   _initStateUpdates() {
@@ -426,7 +429,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const firstMessageEntity = conversationEntity.getFirstMessage();
     const upperBound = firstMessageEntity
       ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeOffsetRepository.getTimeOffset()) + 1);
+      : new Date(
+          conversationEntity.get_latest_timestamp(this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp()) + 1
+        );
 
     return this.eventService
       .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
@@ -579,7 +584,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const lower_bound = new Date(conversation_et.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.serverTimeOffsetRepository.getTimeOffset()) + 1);
+      : new Date(
+          conversation_et.get_latest_timestamp(this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp()) + 1
+        );
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -1238,7 +1245,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _updateClearedTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeOffsetRepository.getTimeOffset());
+    const timestamp = conversationEntity.get_last_known_timestamp(
+      this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp()
+    );
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new z.proto.Cleared(conversationEntity.id, timestamp);
@@ -1268,10 +1277,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+      const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
       const event = !!response
         ? response
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1288,10 +1297,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   removeService(conversationEntity, userId) {
     return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
       const hasResponse = response && response.event;
-      const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+      const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1414,11 +1423,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
-    const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
+    const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
-      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(timeOffset)).toISOString(),
+      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(currentTimestamp)).toISOString(),
       otr_muted_status: notificationState,
     };
 
@@ -1475,8 +1484,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const stateChange = conversationEntity.is_archived() !== newState;
 
-    const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
-    const archiveTimestamp = conversationEntity.get_last_known_timestamp(timeOffset);
+    const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
+    const archiveTimestamp = conversationEntity.get_last_known_timestamp(currentTimestamp);
     const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
 
@@ -1595,7 +1604,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _updateLastReadTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeOffsetRepository.getTimeOffset());
+    const timestamp = conversationEntity.get_last_known_timestamp(
+      this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp()
+    );
     const conversationId = conversationEntity.id;
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ)) {
@@ -1658,8 +1669,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: assetData.asset_token,
         };
 
-        const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, timeOffset);
+        const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
+        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -2207,8 +2218,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, timeOffset);
+        const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
+        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -2975,8 +2986,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const timeOffset = this.serverTimeOffsetRepository.getTimeOffset();
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, timeOffset);
+        const currentTimestamp = this.serverTimeOffsetRepository.getAdjustedCurrentTimestamp();
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
