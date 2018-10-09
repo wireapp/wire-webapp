@@ -82,7 +82,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.conversationRepository.active_conversation(conversation);
       title_view_model.initiateTitleUpdates();
 
-      const expected_title = `(1) · ${conversation.name()} · ${suffix}`;
+      const expected_title = `(1) ${conversation.name()} · ${suffix}`;
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -136,7 +136,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       // Check title when there are messages in the selected conversation
       title_view_model.initiateTitleUpdates();
-      expected_title = `(1) · ${selected_conversation.name()} · ${suffix}`;
+      expected_title = `(1) ${selected_conversation.name()} · ${suffix}`;
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -202,7 +202,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
       let expectedWaitingPeople = '1';
-      let expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+      let expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
 
@@ -211,7 +211,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
         jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
         expectedWaitingPeople = '2';
         message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
-        expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+        expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
         expect(window.document.title).toBe(expected_title);
         done();
       });
