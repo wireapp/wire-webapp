@@ -86,11 +86,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         : false;
     });
 
-    this.isActiveParticipant = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isActiveParticipant();
-    });
-
-    this.isNameEditable = ko.pureComputed(() => {
+    this.isActiveGroupParticipant = ko.pureComputed(() => {
       return this.activeConversation()
         ? this.activeConversation().isGroup() && this.activeConversation().isActiveParticipant()
         : false;
@@ -116,9 +112,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
     });
 
-    this.showActionAddParticipants = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isGroup();
-    });
+    this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
+
+    this.showActionAddParticipants = this.isActiveGroupParticipant;
 
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
@@ -137,7 +133,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
 
     this.showActionGuestOptions = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().inTeam();
+      return this.isActiveGroupParticipant() && this.activeConversation() && this.activeConversation().inTeam();
     });
 
     this.showActionLeave = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isLeavable());
@@ -150,11 +146,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
     });
 
-    this.showActionTimedMessages = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().isGroup() && !this.activeConversation().isGuest()
-        : false;
-    });
+    this.showActionTimedMessages = this.isActiveGroupParticipant;
 
     this.showSectionOptions = ko.pureComputed(() => {
       return this.showActionGuestOptions() || this.showActionNotificationSettings() || this.showActionTimedMessages();
