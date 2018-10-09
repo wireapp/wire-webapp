@@ -23,6 +23,7 @@ import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
 
+import * as BrowserUtil from './BrowserUtil';
 import {ServerConfig} from './config';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
@@ -30,6 +31,7 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import RedirectRoutes from './routes/RedirectRoutes';
 
 const STATUS_CODE_MOVED = 301;
+const STATUS_CODE_FOUND = 302;
 
 class Server {
   private app: express.Express;
@@ -60,6 +62,7 @@ class Server {
     this.app.use(ConfigRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
+    this.initLatestBrowserRequired();
   }
 
   initWebpack() {
@@ -142,6 +145,19 @@ class Server {
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config));
     this.app.use('/', express.static(path.join(__dirname, 'static')));
+  }
+
+  private initLatestBrowserRequired() {
+    this.app.use((req, res, next) => {
+      if (!req.path.endsWith('/') && !req.path.endsWith('.html') && !req.path.startsWith('/test')) {
+        const userAgent = req.headers['user-agent'];
+        const parseResult = BrowserUtil.parseUserAgent(userAgent);
+        if (!parseResult || parseResult.is.mobile) {
+          return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
+        }
+        next();
+      }
+    });
   }
 
   start(): Promise<number> {
