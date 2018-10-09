@@ -24,6 +24,7 @@
 /aws/config.*
 /aws/index.*
 /aws/Server.*
+/aws/FileUtil.*
 /aws/TimeUtil.*
 /aws/BrowserUtil.*
 /bower_components

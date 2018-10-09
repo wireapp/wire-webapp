@@ -18,27 +18,47 @@
  */
 
 import * as express from 'express';
+import * as path from 'path';
+
 import * as BrowserUtil from '../BrowserUtil';
 import {ServerConfig} from '../config';
+import {fileIsReadable} from '../FileUtil';
 
 const STATUS_CODE_FOUND = 302;
+const STATUS_CODE_NOT_FOUND = 404;
 
 const router = express.Router();
 
 const RedirectRoutes = (config: ServerConfig) => [
+  router.get('/robots.txt', async (req, res) => {
+    const robotsDir = path.join(__dirname, '..', 'robots');
+    const robotsAllowFile = path.join(robotsDir, 'robots.txt');
+    const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
+
+    if (req.host === 'app.wire.com') {
+      const fileReadable = await fileIsReadable(robotsAllowFile);
+      return fileReadable ? res.sendFile(robotsAllowFile) : res.sendStatus(STATUS_CODE_NOT_FOUND);
+    } else {
+      const fileReadable = await fileIsReadable(robotsDisallowFile);
+      return fileReadable ? res.sendFile(robotsDisallowFile) : res.sendStatus(STATUS_CODE_NOT_FOUND);
+    }
+  }),
   router.get('/join/?', (req, res) => {
     const key = req.query.key;
     const code = req.query.code;
     res.redirect(STATUS_CODE_FOUND, `/auth/?join_key=${key}&join_code=${code}#join-conversation`);
   }),
-  router.get('/browser/?', (req, res) => {
+  router.get('/browser/?', (req, res, next) => {
+    if (config.SERVER.DEVELOPMENT) {
+      return next();
+    }
     const userAgent = req.headers['user-agent'];
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     if (!parseResult) {
-      res.redirect(STATUS_CODE_FOUND, '/unsupported/');
-    } else {
-      res.json(parseResult);
+      return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
     }
+
+    return res.json(parseResult);
   }),
   router.get('/test/agent/?', (req, res) => {
     const userAgent = req.headers['user-agent'];

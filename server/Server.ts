@@ -149,17 +149,23 @@ class Server {
 
   private initLatestBrowserRequired() {
     this.app.use((req, res, next) => {
+      if (this.config.SERVER.DEVELOPMENT) {
+        return next();
+      }
+
       const ignoredPath =
         /\.[^/]+$/.test(req.path) ||
         req.path.startsWith('/test') ||
         req.path.startsWith('/version') ||
-        req.path.startsWith('/_health');
+        req.path.startsWith('/_health') ||
+        req.path.startsWith('/unsupported');
+
       if (!ignoredPath) {
         const userAgent = req.headers['user-agent'];
         const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
         const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
 
-        const unsupportedBrowser = (() => {
+        const supportedBrowser = (() => {
           const browserName = parsedUserAgent.browser.name.toLowerCase();
           const supportedBrowserVersion = this.config.CLIENT.SUPPORTED[browserName];
 
@@ -172,7 +178,7 @@ class Server {
           }
         })();
 
-        if (!parsedUserAgent || invalidBrowser || unsupportedBrowser) {
+        if (!parsedUserAgent || invalidBrowser || !supportedBrowser) {
           return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
         }
         next();
