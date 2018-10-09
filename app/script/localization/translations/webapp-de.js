@@ -251,7 +251,7 @@ z.string.de.modalPictureTooLargeMessage = 'Du kannst Bilder mit bis zu {{number}
 z.string.de.modalPictureTooSmallHeadline = 'Ausgewähltes Bild zu klein';
 z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 × 320 Pixeln.';
 
-z.string.de.modalImproveWireAction = 'Annehmen';
+z.string.de.modalImproveWireAction = 'Ich willige ein';
 z.string.de.modalImproveWireSecondary = 'Nein';
 z.string.de.modalImproveWireHeadline = 'Hilf uns, Wire zu verbessern';
 z.string.de.modalImproveWireMessage = 'Ich willige ein, dass Wire anonymisierte Nutzungs- und Fehlerberichte erstellen und verwenden darf, um die Wire-App zu verbessern. Ich kann diese Einwilligung jederzeit widerrufen.';
@@ -437,7 +437,7 @@ z.string.de.conversationsSecondaryLineSummaryMentions = '{{number}} Erwähnungen
 z.string.de.conversationsSecondaryLineSummaryMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineSummaryMissedCalls = '{{number}} verpasste Anrufe';
 z.string.de.conversationsSecondaryLineSummaryPing = '{{number}} Ping';
-z.string.de.conversationsSecondaryLineSummaryPings = '{{number}} Ping';
+z.string.de.conversationsSecondaryLineSummaryPings = '{{number}} Pings';
 z.string.de.conversationsSecondaryLineYouLeft = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversationsSecondaryLineYouWereRemoved = 'Du wurdest entfent';
 
