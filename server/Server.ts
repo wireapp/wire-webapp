@@ -36,6 +36,9 @@ class Server {
   private server?: http.Server;
 
   constructor(private config: ServerConfig) {
+    if (this.config.SERVER.DEVELOPMENT) {
+      console.log(this.config);
+    }
     this.app = express();
     this.init();
   }
