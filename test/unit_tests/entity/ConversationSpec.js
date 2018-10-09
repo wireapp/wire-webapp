@@ -794,44 +794,115 @@ describe('Conversation', () => {
   });
 
   describe('shouldUnarchive', () => {
-    let time = undefined;
+    let timestamp = undefined;
+
+    const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+    const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+    selfUserEntity.is_me = true;
+    selfUserEntity.inTeam(true);
+    conversationEntity.self = selfUserEntity;
 
     beforeEach(() => {
-      time = Date.now();
-      conversation_et.archivedTimestamp(time);
-      conversation_et.archivedState(true);
-      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
+      timestamp = Date.now();
+      conversationEntity.archivedTimestamp(timestamp);
+      conversationEntity.archivedState(true);
     });
 
-    it('returns expected bool whether a conversation should be unarchived', () => {
-      conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    afterEach(() => conversationEntity.messages_unordered.removeAll());
 
-      conversation_et.last_event_timestamp(time);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    it('returns false if conversation is not archived', () => {
+      conversationEntity.archivedState(false);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+    });
 
-      conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    it('returns false if conversation is in no notification state', () => {
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+    });
 
-      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
-      conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    it('returns expected value if conversation is in only mentions notifications state', () => {
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
 
-      conversation_et.last_event_timestamp(time);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      const contentMessage = new z.entity.ContentMessage();
+      contentMessage.assets([new z.entity.Text('id', 'Hello there')]);
+      contentMessage.timestamp(timestamp + 100);
+      conversationEntity.messages_unordered.push(contentMessage);
 
-      conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.shouldUnarchive()).toBeTruthy();
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.archivedState(false);
-      conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      const pingMessage = new z.entity.PingMessage();
+      pingMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(pingMessage);
 
-      conversation_et.last_event_timestamp(time);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      const selfMentionMessage = new z.entity.ContentMessage();
+      const mentionEntity = new z.message.MentionEntity(0, 7, selfUserEntity.id);
+      const textAsset = new z.entity.Text('id', '@Gregor, Hello there');
+      textAsset.mentions.push(mentionEntity);
+      selfMentionMessage.assets([textAsset]);
+      selfMentionMessage.timestamp(timestamp + 300);
+      conversationEntity.messages_unordered.push(selfMentionMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
+    });
+
+    it('returns expected value if conversation is in everything notifications state', () => {
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+
+      const pingMessage = new z.entity.PingMessage();
+      pingMessage.timestamp(timestamp - 100);
+      conversationEntity.messages_unordered.push(pingMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const secondPingMessage = new z.entity.PingMessage();
+      secondPingMessage.timestamp(timestamp);
+      conversationEntity.messages_unordered.push(secondPingMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const thirdPingMessage = new z.entity.PingMessage();
+      thirdPingMessage.timestamp(timestamp + 100);
+      conversationEntity.messages_unordered.push(thirdPingMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
+
+      conversationEntity.messages_unordered.removeAll();
+
+      const memberLeaveMessage = new z.entity.MemberMessage();
+      memberLeaveMessage.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+      memberLeaveMessage.timestamp(timestamp + 100);
+      conversationEntity.messages_unordered.push(memberLeaveMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const callMessage = new z.entity.CallMessage();
+      callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+      callMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(callMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
+
+      conversationEntity.messages_unordered.removeAll();
+      conversationEntity.messages_unordered.push(memberLeaveMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const memberJoinMessage = new z.entity.MemberMessage();
+      memberJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+      memberJoinMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(memberJoinMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const selfJoinMessage = new z.entity.MemberMessage();
+      selfJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+      selfJoinMessage.userIds.push(selfUserEntity.id);
+      selfJoinMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(selfJoinMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
     });
   });
 

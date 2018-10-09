@@ -54,8 +54,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
 
-    this.hasUsers = ko.pureComputed(() => this.userEntities().length);
-
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
       return this.userEntities()
@@ -343,6 +341,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
   isMemberRemoval() {
     return this.isMemberLeave() || this.isTeamMemberLeave();
+  }
+
+  isUserAffected(userId) {
+    return this.userIds().includes(userId);
   }
 
   guestCount() {
