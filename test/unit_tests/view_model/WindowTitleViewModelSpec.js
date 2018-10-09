@@ -82,7 +82,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.conversationRepository.active_conversation(conversation);
       title_view_model.initiateTitleUpdates();
 
-      const expected_title = `(1) · ${conversation.name()} · ${suffix}`;
+      const expected_title = `(1) ${conversation.name()} · ${suffix}`;
       expect(window.document.title).toBe(expected_title);
     });
 
