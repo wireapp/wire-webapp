@@ -40,16 +40,17 @@ z.user.UserRepository = class UserRepository {
    * @param {z.user.UserService} user_service - Backend REST API user service implementation
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
+   * @param {z.server.ServerTimeOffsetRepository} serverTimeOffsetRepository - Handles time shift between server and client
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
    */
-  constructor(user_service, asset_service, search_service, client_repository) {
+  constructor(user_service, asset_service, search_service, serverTimeOffsetRepository, client_repository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
     this.connection_mapper = new z.user.UserConnectionMapper();
-    this.user_mapper = new z.user.UserMapper();
+    this.user_mapper = new z.user.UserMapper(serverTimeOffsetRepository);
     this.should_set_username = false;
 
     this.self = ko.observable();
