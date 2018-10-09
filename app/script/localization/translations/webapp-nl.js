@@ -205,6 +205,7 @@ z.string.nl.modalIntegrationUnavailableMessage = 'Dank je voor je intress voor b
 
 
 z.string.nl.modalImproveWireAction = 'Neem op';
+z.string.nl.modalImproveWireSecondary = 'Nee';
 
 z.string.nl.modalServiceUnavailableHeadline = 'Toevoegen van de service niet mogelijk';
 z.string.nl.modalServiceUnavailableMessage = 'De service is op dit moment niet beschikbaar.';
@@ -353,9 +354,11 @@ z.string.nl.addParticipantsTabsPeople = 'Deelnemers';
 z.string.nl.addParticipantsTabsServices = 'Services';
 
 z.string.nl.conversationDetailsActionArchive = 'Archiveren';
+z.string.nl.conversationDetailsActionAddParticipants = 'Personen toevoegen';
 z.string.nl.conversationDetailsActionCancelRequest = 'Annuleer verzoek';
 z.string.nl.conversationDetailsActionCreateGroup = 'Nieuwe groep';
 z.string.nl.conversationDetailsActionDevices = 'Apparaten';
+z.string.nl.conversationDetailsActionNotifications = 'Meldingen';
 z.string.nl.conversationDetailsGuestsOff = 'Uit';
 z.string.nl.conversationDetailsOptions = 'Opties';
 z.string.nl.conversationDetailsParticipantsServicesMany = 'Services';
@@ -370,6 +373,8 @@ z.string.nl.groupParticipantActionCancelRequest = 'Annuleer verzoek';
 z.string.nl.groupParticipantActionDevices = 'Apparaten';
 z.string.nl.groupParticipantActionPending = 'In behandeling';
 z.string.nl.groupParticipantActionSendRequest = 'Verbind';
+
+z.string.nl.notificationSettingsTitle = 'Meldingen';
 
 z.string.nl.participantDevicesDetailHeadline = 'Verifieer dat deze digitale vingerafdruk overeenkomt met {{html1}}{{user}}’s apparaat{{html2}}.';
 z.string.nl.participantDevicesDetailHowTo = 'Hoe doe ik dat?';

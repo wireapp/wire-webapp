@@ -202,6 +202,7 @@ z.string.cs.modalIntegrationUnavailableMessage = 'Děkujeme vám za váš zájem
 
 
 z.string.cs.modalImproveWireAction = 'Přijmout';
+z.string.cs.modalImproveWireSecondary = 'Ne';
 
 z.string.cs.modalSessionResetHeadline = 'Sezení bylo zresetováno';
 z.string.cs.modalSessionResetMessage1 = 'Pokud problém není vyřešen,';
@@ -339,6 +340,7 @@ z.string.cs.addParticipantsTabsServices = 'Služby';
 z.string.cs.conversationDetailsActionArchive = 'Archivovat';
 z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
 z.string.cs.conversationDetailsActionDevices = 'Přístroje';
+z.string.cs.conversationDetailsActionNotifications = 'Upozornění';
 z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
 z.string.cs.conversationDetailsOptions = 'Nastavení';
 z.string.cs.conversationDetailsParticipantsServicesMany = 'Služby';
@@ -353,6 +355,8 @@ z.string.cs.groupParticipantActionCancelRequest = 'Zrušit žádost';
 z.string.cs.groupParticipantActionDevices = 'Přístroje';
 z.string.cs.groupParticipantActionPending = 'Nevyřízené';
 z.string.cs.groupParticipantActionSendRequest = 'Připojit';
+
+z.string.cs.notificationSettingsTitle = 'Upozornění';
 
 z.string.cs.participantDevicesDetailHeadline = 'Ověřte, že to odpovídá identifikátoru zobrazeném na {{html1}}uživatele {{user}}{{html2}}.';
 z.string.cs.participantDevicesDetailHowTo = 'Jak to mám udělat?';

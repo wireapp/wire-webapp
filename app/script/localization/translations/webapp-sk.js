@@ -203,6 +203,7 @@ z.string.sk.modalIntegrationUnavailableMessage = 'Ďakujeme o Váš záujem o Bo
 
 
 z.string.sk.modalImproveWireAction = 'Prijať';
+z.string.sk.modalImproveWireSecondary = 'Nie';
 
 z.string.sk.modalSessionResetHeadline = 'Relácia bola obnovená';
 z.string.sk.modalSessionResetMessage1 = 'Ak problém nebol vyriešený,';
@@ -339,6 +340,7 @@ z.string.sk.addParticipantsTabsServices = 'Služby';
 z.string.sk.conversationDetailsActionArchive = 'Archív';
 z.string.sk.conversationDetailsActionCancelRequest = 'Zrušiť požiadavku';
 z.string.sk.conversationDetailsActionDevices = 'Zariadenia';
+z.string.sk.conversationDetailsActionNotifications = 'Notifikácie';
 z.string.sk.conversationDetailsGuestsOff = 'Vypnúť';
 z.string.sk.conversationDetailsOptions = 'Možnosti';
 z.string.sk.conversationDetailsParticipantsServicesMany = 'Služby';
@@ -353,6 +355,8 @@ z.string.sk.groupParticipantActionCancelRequest = 'Zrušiť požiadavku';
 z.string.sk.groupParticipantActionDevices = 'Zariadenia';
 z.string.sk.groupParticipantActionPending = 'Čaká sa';
 z.string.sk.groupParticipantActionSendRequest = 'Pripojiť';
+
+z.string.sk.notificationSettingsTitle = 'Notifikácie';
 
 z.string.sk.participantDevicesDetailHeadline = 'Overte, že to zodpovedá identifikátoru zobrazenému na {{html1}}zariadení {{user}}{{html2}}.';
 z.string.sk.participantDevicesDetailHowTo = 'Ako to urobiť?';

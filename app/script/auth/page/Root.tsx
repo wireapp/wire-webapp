@@ -43,7 +43,7 @@ import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
 
-const SUPPORTED_LOCALE = require('../supportedLocales');
+const SUPPORTED_LOCALE = require('../supportedLocales.js');
 
 addLocaleData([...de]);
 
