@@ -819,6 +819,29 @@ describe('Conversation', () => {
     it('returns false if conversation is in no notification state', () => {
       conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
       expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const contentMessage = new z.entity.ContentMessage();
+      contentMessage.assets([new z.entity.Text('id', 'Hello there')]);
+      contentMessage.timestamp(timestamp + 100);
+      conversationEntity.messages_unordered.push(contentMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const pingMessage = new z.entity.PingMessage();
+      pingMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(pingMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const selfMentionMessage = new z.entity.ContentMessage();
+      const mentionEntity = new z.message.MentionEntity(0, 7, selfUserEntity.id);
+      const textAsset = new z.entity.Text('id', '@Gregor, Hello there');
+      textAsset.mentions.push(mentionEntity);
+      selfMentionMessage.assets([textAsset]);
+      selfMentionMessage.timestamp(timestamp + 300);
+      conversationEntity.messages_unordered.push(selfMentionMessage);
+
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
