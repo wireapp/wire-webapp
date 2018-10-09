@@ -136,9 +136,11 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
-    return Promise.resolve().then(() => {
-      const shouldNotify = NotificationRepository.shouldNotify(conversationEntity, messageEntity, this.selfUser().id);
+    const notifyPromise = conversationEntity
+      ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
+      : Promise.resolve(true);
 
+    return notifyPromise.then(shouldNotify => {
       if (shouldNotify) {
         this._notifySound(messageEntity);
         return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
@@ -736,11 +738,9 @@ z.notification.NotificationRepository = class NotificationRepository {
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
 
-    if (hideNotification) {
-      const error = new z.notification.NotificationError(z.notification.NotificationError.TYPE.HIDE_NOTIFICATION);
-      return Promise.reject(error);
-    }
-    return Promise.resolve();
+    return hideNotification
+      ? Promise.reject(new z.notification.NotificationError(z.notification.NotificationError.TYPE.HIDE_NOTIFICATION))
+      : Promise.resolve();
   }
 
   /**
@@ -813,24 +813,26 @@ z.notification.NotificationRepository = class NotificationRepository {
   }
 
   /**
-   * @param {z.entity.Conversation} conversationEntity - The conversation to filter from.
+   * Check whether conversation is in state to trigger notitication.
+   *
+   * @param {z.entity.Conversation} conversationEntity - Conversation to notify in .
    * @param {z.entity.Message} messageEntity - The message to filter from.
    * @param {string} userId - The user id to check mentions for.
-   * @returns {boolean} If the conversation should send a notification.
+   * @returns {Promise<boolean>} Promise that resolves with whether the conversation should show notification.
    */
-  static shouldNotify(conversationEntity, messageEntity, userId) {
+  static shouldNotifyInConversation(conversationEntity, messageEntity, userId) {
     if (conversationEntity.showNotificationsNothing()) {
-      return false;
+      return Promise.resolve(false);
     }
 
     const isEventTypeToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
     const isEventToNotify = isEventTypeToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
 
     if (conversationEntity.showNotificationsEverything()) {
-      return isEventToNotify;
+      return Promise.resolve(isEventToNotify);
     }
 
     const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
-    return isEventToNotify && isSelfMentioned;
+    return Promise.resolve(isEventToNotify && isSelfMentioned);
   }
 };
