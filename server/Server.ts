@@ -150,7 +150,6 @@ class Server {
 
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config));
-    // this.app.use('/', express.static(path.join(__dirname, 'static')));
     this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
     this.app.use('/audio', express.static(path.join(__dirname, 'static', 'audio')));
     this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
@@ -208,7 +207,16 @@ class Server {
   }
 
   private initSiteMap(config: ServerConfig) {
-    const pages = () => [{url: '/auth/', changeFreq: 'weekly'}, {url: '/', changeFreq: 'weekly'}];
+    const pages = () => [
+      {
+        changeFreq: 'weekly',
+        url: '/auth/',
+      },
+      {
+        changeFreq: 'weekly',
+        url: '/',
+      },
+    ];
     this.app.use(expressSitemapXml(pages, config.SERVER.BASE));
   }
 

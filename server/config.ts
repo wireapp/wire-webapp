@@ -20,7 +20,6 @@
 import * as dotenv from 'dotenv';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as path from 'path';
-
 import {fileIsReadable, readFile} from './FileUtil';
 
 const {version}: {version: string} = require('../package.json');
