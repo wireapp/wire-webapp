@@ -53,6 +53,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
+   * @param {z.server.ServerTimeOffsetRepository} serverTimeOffsetRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user and connection interactions
    */
@@ -64,6 +65,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     eventRepository,
     giphy_repository,
     link_repository,
+    serverTimeOffsetRepository,
     team_repository,
     user_repository
   ) {
@@ -75,6 +77,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.cryptography_repository = cryptography_repository;
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
+    this.serverTimeOffsetRepository = serverTimeOffsetRepository;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
@@ -83,19 +86,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.event_mapper = new z.conversation.EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
-      this.eventRepository
+      this.eventRepository,
+      this.serverTimeOffsetRepository
     );
     this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
+      this.serverTimeOffsetRepository,
       this.user_repository
     );
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
-
-    this.timeOffset = 0;
 
     this.isTeam = this.team_repository.isTeam;
     this.isTeam.subscribe(() => this.map_guest_status_self());
@@ -168,7 +171,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   checkMessageTimer(messageEntity) {
-    this.ephemeralHandler.checkMessageTimer(messageEntity, this.timeOffset);
+    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeOffsetRepository.getTimeOffset());
   }
 
   _initStateUpdates() {
@@ -215,7 +218,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
       this.set_notification_handling_state.bind(this)
     );
-    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.updateTimeOffset.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
@@ -424,7 +426,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const firstMessageEntity = conversationEntity.getFirstMessage();
     const upperBound = firstMessageEntity
       ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.get_latest_timestamp(this.timeOffset) + 1);
+      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeOffsetRepository.getTimeOffset()) + 1);
 
     return this.eventService
       .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
@@ -577,7 +579,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const lower_bound = new Date(conversation_et.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.timeOffset) + 1);
+      : new Date(conversation_et.get_latest_timestamp(this.serverTimeOffsetRepository.getTimeOffset()) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -1091,15 +1093,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Update time offset.
-   * @param {number} timeOffset - Approximate time different to backend in milliseconds
-   * @returns {undefined} No return value
-   */
-  updateTimeOffset(timeOffset) {
-    this.timeOffset = timeOffset;
-  }
-
-  /**
    * Update participating users in a conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to be updated
@@ -1245,7 +1238,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _updateClearedTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
+    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeOffsetRepository.getTimeOffset());
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new z.proto.Cleared(conversationEntity.id, timestamp);
@@ -1277,7 +1270,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
       const event = !!response
         ? response
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(
+            conversationEntity,
+            userId,
+            true,
+            this.serverTimeOffsetRepository.getTimeOffset()
+          );
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1296,7 +1294,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const hasResponse = response && response.event;
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(
+            conversationEntity,
+            userId,
+            true,
+            this.serverTimeOffsetRepository.getTimeOffset()
+          );
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1422,7 +1425,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
-      otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(this.timeOffset)).toISOString(),
+      otr_muted_ref: new Date(
+        conversation_et.get_last_known_timestamp(this.serverTimeOffsetRepository.getTimeOffset())
+      ).toISOString(),
       otr_muted_status: notificationState,
     };
 
@@ -1479,7 +1484,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const stateChange = conversationEntity.is_archived() !== newState;
 
-    const archiveTimestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
+    const archiveTimestamp = conversationEntity.get_last_known_timestamp(
+      this.serverTimeOffsetRepository.getTimeOffset()
+    );
     const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
 
@@ -1598,7 +1605,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _updateLastReadTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
+    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeOffsetRepository.getTimeOffset());
     const conversationId = conversationEntity.id;
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ)) {
@@ -1661,7 +1668,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: assetData.asset_token,
         };
 
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, this.timeOffset);
+        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(
+          conversationEntity,
+          data,
+          this.serverTimeOffsetRepository.getTimeOffset()
+        );
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -2209,7 +2220,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, this.timeOffset);
+        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(
+          conversationEntity,
+          this.serverTimeOffsetRepository.getTimeOffset()
+        );
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -2976,7 +2990,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
+        const missed_event = z.conversation.EventBuilder.buildMissed(
+          conversation_et,
+          this.serverTimeOffsetRepository.getTimeOffset()
+        );
         this.eventRepository.injectEvent(missed_event);
       });
   }

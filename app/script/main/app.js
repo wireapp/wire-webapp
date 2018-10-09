@@ -136,6 +136,7 @@ z.main.App = class App {
       repositories.event,
       repositories.giphy,
       repositories.links,
+      repositories.serverTimeOffset,
       repositories.team,
       repositories.user
     );
@@ -161,6 +162,7 @@ z.main.App = class App {
       repositories.conversation,
       repositories.event,
       repositories.media,
+      repositories.serverTimeOffset,
       repositories.user
     );
     repositories.integration = new z.integration.IntegrationRepository(

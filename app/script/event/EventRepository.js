@@ -81,7 +81,6 @@ z.event.EventRepository = class EventRepository {
     this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
     this.currentClient = undefined;
-    this.timeOffset = 0;
 
     this.notificationHandlingState = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {
@@ -241,8 +240,6 @@ z.event.EventRepository = class EventRepository {
     return new Promise((resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
-          // TODO migrate all the timestamp diffing to the ServerTimeOffsetRepository and remove the call to _updateBaselineClock
-          this._updateBaselineClock(time);
           this.serverTimeOffsetRepository.computeTimeOffset(time);
         }
 
@@ -469,23 +466,6 @@ z.event.EventRepository = class EventRepository {
         this.logger.error(`Failed to handle notification stream: ${error.message}`, error);
         throw error;
       });
-  }
-
-  /**
-   * Update local time offset.
-   *
-   * @private
-   * @param {string} backendTime - Time as reported by backend
-   * @returns {undefined} No return value
-   */
-  _updateBaselineClock(backendTime) {
-    const updatedTimeOffset = new Date() - new Date(backendTime);
-
-    if (_.isNumber(updatedTimeOffset)) {
-      this.timeOffset = updatedTimeOffset;
-      amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.timeOffset);
-      this.logger.info(`Current backend time is '${backendTime}'. Time offset updated to '${this.timeOffset}' ms`);
-    }
   }
 
   /**
@@ -917,7 +897,7 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const correctedTimestamp = z.util.TimeUtil.adjustCurrentTimestamp(this.timeOffset);
+    const correctedTimestamp = this.serverTimeOffsetRepository.adjustTimestamp(new Date().getTime());
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const isForcedEventType = forcedEventTypes.includes(content.type);

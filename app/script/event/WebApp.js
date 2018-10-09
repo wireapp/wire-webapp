@@ -127,7 +127,6 @@ z.event.WebApp = {
   },
   EVENT: {
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling',
-    UPDATE_TIME_OFFSET: 'wire.webapp.event.update_time_offset',
   },
   EXTENSIONS: {
     GIPHY: {
