@@ -68,8 +68,9 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
           }).length;
 
         const unreadCount = connectionRequests + unreadConversations;
+        const unreadCountTitle = unreadCount > 0 ? ` (${unreadCount})` : '';
 
-        let specificTitle = unreadCount > 0 ? `(${unreadCount}) · ` : '';
+        let specificTitle = '';
 
         amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
@@ -125,7 +126,9 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         }
 
         const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
-        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
+        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(
+          z.string.wire
+        )}${unreadCountTitle}`;
       }
     }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   }
