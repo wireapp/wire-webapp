@@ -818,21 +818,21 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @param {z.entity.Conversation} conversationEntity - Conversation to notify in .
    * @param {z.entity.Message} messageEntity - The message to filter from.
    * @param {string} userId - The user id to check mentions for.
-   * @returns {Promise<boolean>} Promise that resolves with whether the conversation should show notification.
+   * @returns {boolean} True if the conversation should show notification.
    */
   static shouldNotifyInConversation(conversationEntity, messageEntity, userId) {
     if (conversationEntity.showNotificationsNothing()) {
-      return Promise.resolve(false);
+      return false;
     }
 
     const isEventTypeToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
     const isEventToNotify = isEventTypeToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
 
     if (conversationEntity.showNotificationsEverything()) {
-      return Promise.resolve(isEventToNotify);
+      return isEventToNotify;
     }
 
     const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
-    return Promise.resolve(isEventToNotify && isSelfMentioned);
+    return isEventToNotify && isSelfMentioned;
   }
 };
