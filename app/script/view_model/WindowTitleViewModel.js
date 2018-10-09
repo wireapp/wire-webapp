@@ -69,7 +69,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
         const unreadCount = connectionRequests + unreadConversations;
 
-        let specificTitle = unreadCount > 0 ? `(${unreadCount}) · ` : '';
+        let specificTitle = unreadCount > 0 ? `(${unreadCount}) ` : '';
 
         amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
