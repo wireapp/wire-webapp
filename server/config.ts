@@ -19,6 +19,8 @@
 
 import * as dotenv from 'dotenv';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import * as path from 'path';
+import {fileIsReadable, readFile} from './FileUtil';
 
 const {version}: {version: string} = require('../package.json');
 
@@ -83,12 +85,13 @@ export interface ServerConfig {
     BACKEND_HTTP: string;
     BACKEND_WS: string;
     ENVIRONMENT: string;
-    SUPPORTED: {
+    SUPPORTED_BROWSERS: {
       [name: string]: number;
     };
     VERSION: string;
   };
   SERVER: {
+    BASE: string;
     CACHE_DURATION_SECONDS: number;
     COMPRESS_LEVEL: number;
     COMPRESS_MIN_SIZE: number;
@@ -96,6 +99,11 @@ export interface ServerConfig {
     DEVELOPMENT?: boolean;
     ENVIRONMENT: string;
     PORT_HTTP: number;
+    ROBOTS: {
+      ALLOWED_HOSTS: string[];
+      ALLOW: string;
+      DISALLOW: string;
+    };
   };
 }
 
@@ -107,7 +115,7 @@ const config: ServerConfig = {
     BACKEND_HTTP: process.env.BACKEND_HTTP,
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
-    SUPPORTED: {
+    SUPPORTED_BROWSERS: {
       chrome: 56,
       firefox: 60,
       msedge: 15,
@@ -116,6 +124,7 @@ const config: ServerConfig = {
     VERSION: version,
   },
   SERVER: {
+    BASE: process.env.BASE,
     CACHE_DURATION_SECONDS: 300,
     COMPRESS_LEVEL: 6,
     COMPRESS_MIN_SIZE: 500,
@@ -123,7 +132,28 @@ const config: ServerConfig = {
     DEVELOPMENT: nodeEnvironment === 'development',
     ENVIRONMENT: nodeEnvironment,
     PORT_HTTP: Number(process.env.PORT) || 21080,
+    ROBOTS: {
+      ALLOW: '',
+      ALLOWED_HOSTS: ['app.wire.com'],
+      DISALLOW: '',
+    },
   },
 };
+
+const robotsDir = path.join(__dirname, 'robots');
+const robotsAllowFile = path.join(robotsDir, 'robots.txt');
+const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
+
+if (fileIsReadable(robotsAllowFile, true)) {
+  try {
+    config.SERVER.ROBOTS.ALLOW = readFile(robotsAllowFile, true);
+  } catch (error) {}
+}
+
+if (fileIsReadable(robotsDisallowFile, true)) {
+  try {
+    config.SERVER.ROBOTS.DISALLOW = readFile(robotsDisallowFile, true);
+  } catch (error) {}
+}
 
 export default config;
