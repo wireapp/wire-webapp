@@ -625,7 +625,7 @@ z.string.preferencesAVTryAgain= 'Try Again';
 
 
 z.string.preferencesDevicesActivatedIn = 'in {{location}}';
-z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';
+z.string.preferencesDevicesActivatedOn = 'Activated {{date}}';
 z.string.preferencesDevicesActive = 'Active';
 z.string.preferencesDevicesActiveDetail = 'If you don’t recognize a device above, remove it and reset your password.';
 z.string.preferencesDevicesCurrent = 'Current';
