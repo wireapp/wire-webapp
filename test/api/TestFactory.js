@@ -63,6 +63,14 @@ window.TestFactory.prototype.exposeAudioActors = function() {
   });
 };
 
+window.TestFactory.prototype.exposeServerActors = function() {
+  this.logger.info('- exposeServerActors');
+  return Promise.resolve().then(() => {
+    TestFactory.serverTimeOffsetRepository = new z.server.ServerTimeOffsetRepository();
+    return TestFactory.serverTimeOffsetRepository;
+  });
+};
+
 /**
  *
  * @returns {Promise<z.auth.AuthRepository>} The authentication repository.
@@ -245,6 +253,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
+        TestFactory.serverTimeOffsetRepository,
         TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
@@ -261,6 +270,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
   this.logger.info('- exposeUserActors');
   return Promise.resolve()
     .then(() => this.exposeClientActors())
+    .then(() => this.exposeServerActors())
     .then(() => {
       this.logger.info('✓ exposedClientActors');
 
@@ -274,6 +284,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.search_service,
+        TestFactory.serverTimeOffsetRepository,
         TestFactory.client_repository
       );
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
