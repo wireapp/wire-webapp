@@ -364,10 +364,6 @@
     },
     "@bower_components/wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
-    },
-    "simplebar": {
-      "js": "dist/simplebar.min.js",
-      "css": "dist/simplebar.min.css"
     }
   }
 }

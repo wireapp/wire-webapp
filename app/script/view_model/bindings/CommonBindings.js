@@ -399,6 +399,12 @@ ko.bindingHandlers.antiscroll = {
   },
 };
 
+ko.bindingHandlers.simplebar = {
+  init(element) {
+    new window.SimpleBar(element, {autoHide: false});
+  },
+};
+
 ko.bindingHandlers.electron_remove = {
   init(element) {
     if (z.util.Environment.electron) {
