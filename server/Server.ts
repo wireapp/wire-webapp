@@ -56,13 +56,13 @@ class Server {
         threshold: this.config.SERVER.COMPRESS_MIN_SIZE,
       })
     );
+    this.initLatestBrowserRequired();
     this.initStaticRoutes();
     this.initWebpack();
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
-    this.initLatestBrowserRequired();
   }
 
   initWebpack() {
@@ -149,7 +149,12 @@ class Server {
 
   private initLatestBrowserRequired() {
     this.app.use((req, res, next) => {
-      if (!req.path.endsWith('/') && !req.path.endsWith('.html') && !req.path.startsWith('/test')) {
+      const ignoredPath =
+        /\.[^/]+$/.test(req.path) ||
+        req.path.startsWith('/test') ||
+        req.path.startsWith('/version') ||
+        req.path.startsWith('/_health');
+      if (!ignoredPath) {
         const userAgent = req.headers['user-agent'];
         const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
         const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
@@ -170,6 +175,8 @@ class Server {
         if (!parsedUserAgent || invalidBrowser || unsupportedBrowser) {
           return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
         }
+        next();
+      } else {
         next();
       }
     });
