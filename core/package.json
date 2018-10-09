@@ -11,7 +11,7 @@
     "bazinga64": "5.3.13",
     "logdown": "3.2.7",
     "protobufjs": "6.8.8",
-    "pure-uuid": "1.5.4"
+    "pure-uuid": "1.5.5"
   },
   "devDependencies": {
     "@wireapp/commons": "0.6.23",
