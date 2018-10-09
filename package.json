@@ -24,7 +24,7 @@
     "karma": "3.0.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "1.1.2",
-    "karma-jasmine-diff-reporter": "1.2.1",
+    "karma-jasmine-diff-reporter": "2.0.0",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
     "nock": "10.0.1",
