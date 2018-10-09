@@ -151,8 +151,23 @@ class Server {
     this.app.use((req, res, next) => {
       if (!req.path.endsWith('/') && !req.path.endsWith('.html') && !req.path.startsWith('/test')) {
         const userAgent = req.headers['user-agent'];
-        const parseResult = BrowserUtil.parseUserAgent(userAgent);
-        if (!parseResult || parseResult.is.mobile) {
+        const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
+        const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
+
+        const unsupportedBrowser = (() => {
+          const browserName = parsedUserAgent.browser.name.toLowerCase();
+          const configEntry = this.config.CLIENT.SUPPORTED[browserName];
+
+          try {
+            const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
+            const browserVersion = parseInt(browserVersionString, 10);
+            return !configEntry || browserVersion < configEntry;
+          } catch (err) {
+            return false;
+          }
+        })();
+
+        if (!parsedUserAgent || invalidBrowser || unsupportedBrowser) {
           return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
         }
         next();

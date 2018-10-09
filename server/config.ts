@@ -83,6 +83,9 @@ export interface ServerConfig {
     BACKEND_HTTP: string;
     BACKEND_WS: string;
     ENVIRONMENT: string;
+    SUPPORTED: {
+      [name: string]: number;
+    };
     VERSION: string;
   };
   SERVER: {
@@ -104,6 +107,12 @@ const config: ServerConfig = {
     BACKEND_HTTP: process.env.BACKEND_HTTP,
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
+    SUPPORTED: {
+      chrome: 56,
+      firefox: 60,
+      msedge: 15,
+      opera: 43,
+    },
     VERSION: version,
   },
   SERVER: {
