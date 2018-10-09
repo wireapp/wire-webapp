@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "@types/dotenv": "4.0.3",
-    "@wireapp/core": "6.5.8",
+    "@wireapp/core": "6.5.9",
     "commander": "2.19.0",
     "dotenv": "6.0.0",
     "fs-extra": "7.0.0"
@@ -31,5 +31,5 @@
     "prepare": "yarn build"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "3.0.33"
+  "version": "3.0.34"
 }
