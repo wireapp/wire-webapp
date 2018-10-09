@@ -53,6 +53,8 @@ const MenuContent = styled(Content)<HTMLMenuProps>`
 
 const MenuItems = styled.div<HTMLMenuProps>`
   @media (${QUERY.tabletDown}){
+    display: flex;
+    overflow-y: auto;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -67,11 +69,10 @@ const MenuItems = styled.div<HTMLMenuProps>`
 
 const ScrollableItems = styled.div<HTMLMenuProps>`
   @media (${QUERY.tabletDown}){
+    margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: auto;
-    height: 100%;
 `;
 
 const MenuOpenButton = styled.div<HTMLMenuProps>`
@@ -112,52 +113,6 @@ const MenuLogo = styled.div<React.HTMLAttributes<HTMLDivElement>>`
   z-index: 2;
 `;
 
-interface MenuLinkProps {
-  button?: boolean;
-}
-
-const MenuLink = styled(Text)<MenuLinkProps & React.HTMLAttributes<HTMLAnchorElement>>`
-  text-decoration: none;
-  ${defaultTransition};
-  cursor: pointer;
-  color: ${COLOR.LINK};
-
-  &:hover {
-    color: ${Color(COLOR.LINK)
-      .mix(Color(COLOR.BLACK), 0.16)
-      .toString()};
-  }
-  @media (${QUERY.desktop}) {
-    margin: 12px 26px 0 10px;
-    text-transform: uppercase;
-    font-size: 11px;
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  ${props =>
-    props.button &&
-    `
-  padding: 10px 16px;
-  border: 1px solid rgb(219, 226, 231);
-  border-radius: 4px;
-  `}
-
-  @media (${QUERY.tabletDown}) {
-    border: none;
-    font-size: 32px !important;
-    text-transform: none !important;
-    font-weight: 300 !important;
-    padding: 8px 24px;
-    max-width: 480px;
-  }
-`;
-
 const DesktopStyledHeaderSubMenu = styled.span<React.HTMLAttributes<HTMLSpanElement>>`
   display: flex;
   flex-direction: column;
@@ -181,6 +136,83 @@ const DesktopStyledHeaderSubMenu = styled.span<React.HTMLAttributes<HTMLSpanElem
       background-color: ${COLOR.GRAY_LIGHTEN_72};
       border-radius: 4px;
     }
+  }
+`;
+
+interface MenuLinkProps {
+  button?: boolean;
+}
+
+const MenuLink = styled(Link)<MenuLinkProps & React.HTMLAttributes<HTMLAnchorElement>>`
+  @media (${QUERY.desktop}) {
+    margin: 12px 26px 0 10px;
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    ${DesktopStyledHeaderSubMenu} &:first-child {
+      margin-left: 10px;
+    }
+
+    ${DesktopStyledHeaderSubMenu} &:last-child {
+      margin-right: 26px;
+    }
+  }
+
+  ${props =>
+    props.button &&
+    `
+  padding: 10px 16px;
+  border: 1px solid rgb(219, 226, 231);
+  border-radius: 4px;
+  `}
+
+  @media (${QUERY.tabletDown}) {
+    border: none;
+    font-size: 32px !important;
+    text-transform: none !important;
+    font-weight: 300 !important;
+    padding: 8px 24px;
+    max-width: 480px;
+  }
+`;
+
+const MenuSubLink = styled(Text)<React.HTMLAttributes<HTMLAnchorElement>>`
+  text-decoration: none;
+  ${defaultTransition};
+  cursor: pointer;
+  color: ${COLOR.LINK};
+  font-weight: 600 !important;
+
+  &:hover {
+    color: ${Color(COLOR.LINK)
+      .mix(Color(COLOR.BLACK), 0.16)
+      .toString()};
+  }
+  @media (${QUERY.desktop}) {
+    margin: 12px 26px 0 10px;
+    text-transform: uppercase;
+    font-size: 11px;
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  @media (${QUERY.tabletDown}) {
+    border: none;
+    font-size: 32px !important;
+    text-transform: none !important;
+    font-weight: 300 !important;
+    padding: 8px 24px;
+    max-width: 480px;
   }
 `;
 
@@ -214,7 +246,7 @@ const HeaderSubMenu: React.SFC<HeaderSubMenuProps & React.HTMLAttributes<HTMLSpa
 }) => {
   const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
   return (
-    <MenuLink
+    <MenuSubLink
       {...props}
       style={{textAlign: 'center', display: 'inline-block', position: 'relative', cursor: 'pointer'}}
     >
@@ -247,7 +279,7 @@ const HeaderSubMenu: React.SFC<HeaderSubMenuProps & React.HTMLAttributes<HTMLSpa
       >
         <Slide
           in={isOpen && !isDesktop}
-          startValue={'-58%'}
+          startValue={'-56%'}
           endValue={'0'}
           timeout={DURATION.DEFAULT}
           mountOnEnter={false}
@@ -256,7 +288,7 @@ const HeaderSubMenu: React.SFC<HeaderSubMenuProps & React.HTMLAttributes<HTMLSpa
           <MobileStyledHeaderSubMenu>{children}</MobileStyledHeaderSubMenu>
         </Slide>
       </Opacity>
-    </MenuLink>
+    </MenuSubLink>
   );
 };
 
