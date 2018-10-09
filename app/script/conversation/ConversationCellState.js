@@ -323,7 +323,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     icon: () => z.conversation.ConversationStatusIcon.UNREAD_MESSAGES,
-    match: conversationEntity => conversationEntity.unreadState().allEvents.length > 0,
+    match: conversationEntity => conversationEntity.unreadState().allMessages.length > 0,
   };
 
   const _getStateUserName = {
