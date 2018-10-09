@@ -153,12 +153,6 @@ z.entity.Conversation = class Conversation {
     this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.removed_from_conversation());
     this.isMutable = ko.pureComputed(() => !this.is_request() && !this.removed_from_conversation());
 
-    this.removed_from_conversation.subscribe(is_removed => {
-      if (!is_removed) {
-        return this.archived_state(false);
-      }
-    });
-
     // Messages
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
@@ -490,16 +484,32 @@ z.entity.Conversation = class Conversation {
   }
 
   shouldUnarchive() {
-    if (this.archivedState()) {
-      const hasNewerMessage = this.last_event_timestamp() > this.archivedTimestamp();
-
-      const lastMessageEntity = this.getLastMessage();
-      const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
-
-      const hasUpdate = hasNewerMessage || hasNewerCall;
-      return hasUpdate && this.showNotificationsEverything();
+    if (!this.archivedState() || this.showNotificationsNothing()) {
+      return false;
     }
-    return false;
+
+    const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
+
+    if (this.showNotificationsOnlyMentions()) {
+      return this.unreadState().selfMentions.some(isNewerMessage);
+    }
+
+    const hasNewMessage = this.unreadState().allMessages.some(isNewerMessage);
+    if (hasNewMessage) {
+      return true;
+    }
+
+    return this.unreadState().allEvents.some(messageEntity => {
+      if (!isNewerMessage(messageEntity)) {
+        return false;
+      }
+
+      const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
+      const isMemberJoin = messageEntity.is_member() && messageEntity.isMemberJoin();
+      const wasSelfUserAdded = isMemberJoin && messageEntity.isUserAffected(this.self.id);
+
+      return isCallActivation || wasSelfUserAdded;
+    });
   }
 
   /**
