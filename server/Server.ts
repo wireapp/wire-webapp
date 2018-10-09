@@ -149,10 +149,6 @@ class Server {
 
   private initLatestBrowserRequired() {
     this.app.use((req, res, next) => {
-      if (this.config.SERVER.DEVELOPMENT) {
-        return next();
-      }
-
       const ignoredPath =
         /\.[^/]+$/.test(req.path) ||
         req.path.startsWith('/test') ||
@@ -160,31 +156,32 @@ class Server {
         req.path.startsWith('/_health') ||
         req.path.startsWith('/unsupported');
 
-      if (!ignoredPath) {
-        const userAgent = req.headers['user-agent'];
-        const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
-        const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
-
-        const supportedBrowser = (() => {
-          const browserName = parsedUserAgent.browser.name.toLowerCase();
-          const supportedBrowserVersion = this.config.CLIENT.SUPPORTED[browserName];
-
-          try {
-            const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
-            const browserVersion = parseInt(browserVersionString, 10);
-            return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
-          } catch (err) {
-            return false;
-          }
-        })();
-
-        if (!parsedUserAgent || invalidBrowser || !supportedBrowser) {
-          return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
-        }
-        next();
-      } else {
-        next();
+      if (ignoredPath || this.config.SERVER.DEVELOPMENT) {
+        return next();
       }
+
+      const userAgent = req.headers['user-agent'];
+      const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
+      const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
+
+      const supportedBrowser = (() => {
+        const browserName = parsedUserAgent.browser.name.toLowerCase();
+        const supportedBrowserVersion = this.config.CLIENT.SUPPORTED[browserName];
+
+        try {
+          const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
+          const browserVersion = parseInt(browserVersionString, 10);
+          return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
+        } catch (err) {
+          return false;
+        }
+      })();
+
+      if (!parsedUserAgent || invalidBrowser || !supportedBrowser) {
+        return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
+      }
+
+      return next();
     });
   }
 
