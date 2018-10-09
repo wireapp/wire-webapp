@@ -334,7 +334,7 @@ z.conversation.EventMapper = class EventMapper {
     const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
     messageEntity.visible(!isSingleModeConversation);
 
-    if (conversationEntity.is_group()) {
+    if (conversationEntity.isGroup()) {
       const messageFromCreator = sender === conversationEntity.creator;
       const creatorIndex = userIds.indexOf(sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;

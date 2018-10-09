@@ -80,6 +80,20 @@ z.ui.Shortcut = (() => {
         },
       },
     },
+    [z.ui.ShortcutType.NOTIFICATIONS]: {
+      event: z.event.WebApp.SHORTCUT.SILENCE,
+      shortcut: {
+        electron: {
+          macos: 'command + alt + m',
+          menu: true,
+          pc: 'ctrl + alt + m',
+        },
+        webapp: {
+          macos: 'command + alt + m',
+          pc: 'ctrl + alt + m',
+        },
+      },
+    },
     [z.ui.ShortcutType.PING]: {
       event: z.event.WebApp.SHORTCUT.PING,
       shortcut: {
@@ -105,20 +119,6 @@ z.ui.Shortcut = (() => {
         webapp: {
           macos: 'command + alt + shift + i',
           pc: 'ctrl + alt + i',
-        },
-      },
-    },
-    [z.ui.ShortcutType.SILENCE]: {
-      event: z.event.WebApp.SHORTCUT.SILENCE,
-      shortcut: {
-        electron: {
-          macos: 'command + alt + m',
-          menu: true,
-          pc: 'ctrl + alt + m',
-        },
-        webapp: {
-          macos: 'command + alt + m',
-          pc: 'ctrl + alt + m',
         },
       },
     },

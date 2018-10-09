@@ -41,25 +41,25 @@ describe('Conversation', () => {
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeTruthy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
@@ -69,39 +69,39 @@ describe('Conversation', () => {
       conversation_et.team_id = z.util.createRandomUuid();
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeTruthy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
@@ -671,12 +671,12 @@ describe('Conversation', () => {
       conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadEventsCount()).toBe(1);
+      expect(conversation_et.unreadState().allEvents.length).toBe(1);
 
       conversation_et.release();
 
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadEventsCount()).toBe(1);
+      expect(conversation_et.unreadState().allEvents.length).toBe(1);
     });
 
     it('should release messages if conversation has no unread messages', () => {
@@ -686,14 +686,14 @@ describe('Conversation', () => {
       conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadEventsCount()).toBe(0);
+      expect(conversation_et.unreadState().allEvents.length).toBe(0);
 
       conversation_et.release();
 
       expect(conversation_et.hasAdditionalMessages()).toBeTruthy();
       expect(conversation_et.is_loaded()).toBeFalsy();
       expect(conversation_et.messages().length).toBe(0);
-      expect(conversation_et.unreadEventsCount()).toBe(0);
+      expect(conversation_et.unreadState().allEvents.length).toBe(0);
     });
   });
 
@@ -768,88 +768,195 @@ describe('Conversation', () => {
     });
   });
 
-  describe('set_timestamp', () => {
+  describe('setTimestamp', () => {
     it('turns strings into numbers', () => {
       const lrt = conversation_et.last_read_timestamp();
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
-      conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.setTimestamp(new_lrt_string, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     });
 
     it('checks that new timestamp is newer that previous one', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
-      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(currentTimestamp);
     });
 
     it('allows to set an older timestamp with the forceUpdate flag', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
-      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ, true);
+      conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ, true);
       expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
     });
   });
 
   describe('shouldUnarchive', () => {
-    let time = undefined;
+    let timestamp = undefined;
+    let contentMessage = undefined;
+    let mutedTimestampMessage = undefined;
+    let outdatedMessage = undefined;
+    let pingMessage = undefined;
+    let selfMentionMessage = undefined;
+
+    const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+    const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+    selfUserEntity.is_me = true;
+    selfUserEntity.inTeam(true);
+    conversationEntity.self = selfUserEntity;
 
     beforeEach(() => {
-      time = Date.now();
-      conversation_et.archived_timestamp(time);
-      conversation_et.archived_state(true);
-      conversation_et.muted_state(true);
+      timestamp = Date.now();
+      conversationEntity.archivedTimestamp(timestamp);
+      conversationEntity.archivedState(true);
+
+      mutedTimestampMessage = new z.entity.PingMessage();
+      mutedTimestampMessage.timestamp(timestamp);
+
+      outdatedMessage = new z.entity.PingMessage();
+      outdatedMessage.timestamp(timestamp - 100);
+
+      contentMessage = new z.entity.ContentMessage();
+      contentMessage.assets([new z.entity.Text('id', 'Hello there')]);
+      contentMessage.timestamp(timestamp + 100);
+
+      pingMessage = new z.entity.PingMessage();
+      pingMessage.timestamp(timestamp + 200);
+
+      selfMentionMessage = new z.entity.ContentMessage();
+      const mentionEntity = new z.message.MentionEntity(0, 7, selfUserEntity.id);
+      const textAsset = new z.entity.Text('id', '@Gregor, Hello there');
+      textAsset.mentions.push(mentionEntity);
+      selfMentionMessage.assets([textAsset]);
+      selfMentionMessage.timestamp(timestamp + 300);
     });
 
-    it('returns expected bool whether a conversation should be unarchived', () => {
-      conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    afterEach(() => conversationEntity.messages_unordered.removeAll());
 
-      conversation_et.last_event_timestamp(time);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    it('returns false if conversation is not archived', () => {
+      conversationEntity.archivedState(false);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      conversationEntity.messages_unordered.push(outdatedMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.muted_state(false);
-      conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      conversationEntity.messages_unordered.push(mutedTimestampMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.last_event_timestamp(time);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      conversationEntity.messages_unordered.push(contentMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.shouldUnarchive()).toBeTruthy();
+      conversationEntity.messages_unordered.push(pingMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.archived_state(false);
-      conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      conversationEntity.messages_unordered.push(selfMentionMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+    });
 
-      conversation_et.last_event_timestamp(time);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+    it('returns false if conversation is in no notification state', () => {
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.shouldUnarchive()).toBeFalsy();
+      conversationEntity.messages_unordered.push(outdatedMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(mutedTimestampMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(contentMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(pingMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(selfMentionMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+    });
+
+    it('returns expected value if conversation is in only mentions notifications state', () => {
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(outdatedMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(mutedTimestampMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(contentMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(pingMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(selfMentionMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
+    });
+
+    it('returns expected value if conversation is in everything notifications state', () => {
+      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(outdatedMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(mutedTimestampMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      conversationEntity.messages_unordered.push(contentMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
+
+      conversationEntity.messages_unordered.removeAll();
+
+      const memberLeaveMessage = new z.entity.MemberMessage();
+      memberLeaveMessage.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+      memberLeaveMessage.timestamp(timestamp + 100);
+      conversationEntity.messages_unordered.push(memberLeaveMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const callMessage = new z.entity.CallMessage();
+      callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+      callMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(callMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
+
+      conversationEntity.messages_unordered.removeAll();
+      conversationEntity.messages_unordered.push(memberLeaveMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const memberJoinMessage = new z.entity.MemberMessage();
+      memberJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+      memberJoinMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(memberJoinMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
+
+      const selfJoinMessage = new z.entity.MemberMessage();
+      selfJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+      selfJoinMessage.userIds.push(selfUserEntity.id);
+      selfJoinMessage.timestamp(timestamp + 200);
+      conversationEntity.messages_unordered.push(selfJoinMessage);
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
     });
   });
 
-  describe('_increment_time_only', () => {
+  describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
-      expect(conversation_et._increment_time_only(first_timestamp, second_timestamp)).toBe(second_timestamp);
-      expect(conversation_et._increment_time_only(second_timestamp, first_timestamp)).toBeFalsy();
-      expect(conversation_et._increment_time_only(first_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._incrementTimeOnly(first_timestamp, second_timestamp)).toBe(second_timestamp);
+      expect(conversation_et._incrementTimeOnly(second_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._incrementTimeOnly(first_timestamp, first_timestamp)).toBeFalsy();
     });
   });
 
   describe('check subscribers', () =>
     it('to state updates', () => {
-      conversation_et.archived_state(false);
+      conversation_et.archivedState(false);
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.muted_state(false);
+      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
@@ -870,7 +977,7 @@ describe('Conversation', () => {
       const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
 
       const conversation_mapper = new z.conversation.ConversationMapper();
-      const new_conversation = conversation_mapper._create_conversation_et(payload_conversation);
+      const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);
       new_conversation.connection(connection_et);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);

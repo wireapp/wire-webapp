@@ -31,6 +31,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       GROUP_PARTICIPANT_SERVICE: 'PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE',
       GROUP_PARTICIPANT_USER: 'PanelViewModel.STATE.GROUP_PARTICIPANT_USER',
       GUEST_OPTIONS: 'PanelViewModel.STATE.GUEST_OPTIONS',
+      NOTIFICATIONS: 'PanelViewModel.STATE.NOTIFICATIONS',
       PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
       TIMED_MESSAGES: 'PanelViewModel.STATE.TIMED_MESSAGES',
     };
@@ -44,6 +45,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: z.viewModel.panel.GroupParticipantServiceViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: z.viewModel.panel.GroupParticipantUserViewModel,
       [PanelViewModel.STATE.GUEST_OPTIONS]: z.viewModel.panel.GuestsAndServicesViewModel,
+      [PanelViewModel.STATE.NOTIFICATIONS]: z.viewModel.panel.NotificationsViewModel,
       [PanelViewModel.STATE.PARTICIPANT_DEVICES]: z.viewModel.panel.ParticipantDevicesViewModel,
       [PanelViewModel.STATE.TIMED_MESSAGES]: z.viewModel.panel.TimedMessagesViewModel,
     };

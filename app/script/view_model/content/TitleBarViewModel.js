@@ -76,7 +76,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
         return false;
       }
 
-      const isSupportedConversation = this.conversationEntity().is_group() || this.conversationEntity().is_one2one();
+      const isSupportedConversation = this.conversationEntity().isGroup() || this.conversationEntity().is_one2one();
       const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
       const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
@@ -129,7 +129,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return this.showDetails();
     }
 
-    return this.conversationEntity().is_group()
+    return this.conversationEntity().isGroup()
       ? this.showDetails(true)
       : amplify.publish(
           z.event.WebApp.CONVERSATION.CREATE_GROUP,

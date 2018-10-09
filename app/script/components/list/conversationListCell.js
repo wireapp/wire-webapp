@@ -51,10 +51,10 @@ ko.components.register('conversation-list-cell', {
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
-        <!-- ko if: conversation.is_group() -->
+        <!-- ko if: conversation.isGroup() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko if: !conversation.is_group() && users().length -->
+        <!-- ko if: !conversation.isGroup() && users().length -->
           <div class="avatar-halo">
             <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
@@ -90,8 +90,8 @@ ko.components.register('conversation-list-cell', {
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
             <span class="conversation-list-cell-badge cell-badge-dark conversation-muted" data-uie-name="status-silence"><mute-icon class="svg-icon"></mute-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadMessagesCount() > 0 -->
-            <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadMessagesCount()" data-uie-name="status-unread"></span>
+          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadState().allMessages.length > 0 -->
+            <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadState().allMessages.length" data-uie-name="status-unread"></span>
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: showJoinButton -->

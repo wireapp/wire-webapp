@@ -209,6 +209,7 @@ z.string.el.modalIntegrationUnavailableHeadline = 'Προσωρινά δεν ε�
 z.string.el.modalPictureFileFormatMessage = 'Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
 
 z.string.el.modalImproveWireAction = 'Αποδοχή';
+z.string.el.modalImproveWireSecondary = '’Οχι';
 
 z.string.el.modalSessionResetHeadline = 'Η περίοδος λειτουργίας σύνδεσης έχει επαναφερθεί';
 z.string.el.modalSessionResetMessage1 = 'Εάν το πρόβλημα δεν επιλυθεί,';
@@ -362,6 +363,7 @@ z.string.el.conversationDetailsActionCancelRequest = 'Ακύρωση αιτήμ�
 z.string.el.conversationDetailsActionClear = 'Διαγραφή περιεχομένου';
 z.string.el.conversationDetailsActionCreateGroup = 'Δημιουργία ομάδος';
 z.string.el.conversationDetailsActionDevices = 'Συσκευές';
+z.string.el.conversationDetailsActionNotifications = 'Ειδοποιησεις';
 z.string.el.conversationDetailsGuestsOff = 'Ανενεργό';
 z.string.el.conversationDetailsOptions = 'Επιλογές';
 z.string.el.conversationDetailsParticipantsServicesOne = 'Υπηρεσία';
@@ -382,6 +384,8 @@ z.string.el.groupParticipantActionSendRequest = 'Σύνδεση';
 z.string.el.guestOptionsCopyLink = 'Αντιγραφή συνδέσμου';
 z.string.el.guestOptionsCreateLink = 'Δημιουργία συνδέσμου';
 z.string.el.guestOptionsRevokeLink = 'Ανάκληση συνδέσμου';
+
+z.string.el.notificationSettingsTitle = 'Ειδοποιησεις';
 
 z.string.el.participantDevicesDetailHeadline = 'Βεβαιωθείτε ότι αυτό αντιστοιχεί στο αποτύπωμα που εμφανίζεται στην συσκευή {{html1}} {{user}} {{html2}}.';
 z.string.el.participantDevicesDetailHowTo = 'Πώς μπορώ να το κάνω;';
