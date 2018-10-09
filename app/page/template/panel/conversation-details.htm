@@ -80,7 +80,7 @@
               <!-- /ko -->
               <!-- ko if: showSectionOptions() -->
                 <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsOptions"></div>
-                <!-- ko if: showActionNotificationSettings() -->
+                <!-- ko if: showActionNotificationSettingsGroup() -->
                   <div class="conversation-details__notifications">
                     <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                       <notification-icon class="panel__action-item__icon"></notification-icon>
@@ -134,9 +134,9 @@
             <!-- /ko -->
           </div>
         <!-- /ko -->
-        <!-- ko if: isActivatedAccount() && isSingleUserMode()-->
+        <!-- ko if: isActivatedAccount()-->
           <div class="conversation-details__bottom-actions">
-            <!-- ko if: showActionNotificationSettings() -->
+            <!-- ko if: showActionNotificationSettings1To1() -->
               <div class="conversation-details__notifications">
                 <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                   <notification-icon class="panel__action-item__icon"></notification-icon>

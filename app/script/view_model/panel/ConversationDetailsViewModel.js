@@ -146,6 +146,14 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
     });
 
+    this.showActionNotificationSettingsGroup = ko.pureComputed(() => {
+      return this.showActionNotificationSettings() && this.activeConversation().isGroup();
+    });
+
+    this.showActionNotificationSettings1To1 = ko.pureComputed(() => {
+      return this.showActionNotificationSettings() && !this.activeConversation().isGroup();
+    });
+
     this.showActionTimedMessages = this.isActiveGroupParticipant;
 
     this.showSectionOptions = ko.pureComputed(() => {
