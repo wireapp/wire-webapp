@@ -47,7 +47,7 @@ describe('z.conversation.ConversationCellState', () => {
     });
   });
 
-  describe('Second line description for 1:1 conversation', () => {
+  describe('Second line description for conversations', () => {
     const defaultUnreadState = {
       allEvents: [],
       allMessages: [],
@@ -61,41 +61,45 @@ describe('z.conversation.ConversationCellState', () => {
 
     const message = new z.entity.ContentMessage();
     const text = new z.entity.Text('id', 'Hello there');
+    message.unsafeSenderName = () => 'Felix';
     message.assets([text]);
 
     const ping = new z.entity.PingMessage();
 
     const tests = [
       {
-        desription: 'returns the number of missed calls',
+        description: 'returns the number of missed calls',
         expected: {description: '2 missed calls', icon: z.conversation.ConversationStatusIcon.MISSED_CALL},
         unreadState: Object.assign({}, defaultUnreadState, {
           calls: [{}, {}],
         }),
       },
       {
-        desription: "returns unread message's text if there is only a single text message",
-        expected: {description: 'Hello there', icon: z.conversation.ConversationStatusIcon.UNREAD_MESSAGES},
+        description: "returns unread message's text if there is only a single text message",
+        expected: {
+          group: {description: 'Felix: Hello there', icon: z.conversation.ConversationStatusIcon.UNREAD_MESSAGES},
+          one2one: {description: 'Hello there', icon: z.conversation.ConversationStatusIcon.UNREAD_MESSAGES},
+        },
         unreadState: Object.assign({}, defaultUnreadState, {
           allMessages: [message],
         }),
       },
       {
-        desription: 'returns the number of pings',
+        description: 'returns the number of pings',
         expected: {description: '2 pings', icon: z.conversation.ConversationStatusIcon.UNREAD_PING},
         unreadState: Object.assign({}, defaultUnreadState, {
           pings: [ping, ping],
         }),
       },
       {
-        desription: 'returns the number of mentions',
+        description: 'returns the number of mentions',
         expected: {description: '2 mentions', icon: z.conversation.ConversationStatusIcon.UNREAD_MENTION},
         unreadState: Object.assign({}, defaultUnreadState, {
           selfMentions: [1, 2],
         }),
       },
       {
-        desription: 'prioritizes mentions, calls, pings and messages',
+        description: 'prioritizes mentions, calls, pings and messages',
         expected: {
           description: '2 mentions, 2 missed calls, 2 pings, 2 messages',
           icon: z.conversation.ConversationStatusIcon.UNREAD_MENTION,
@@ -109,11 +113,23 @@ describe('z.conversation.ConversationCellState', () => {
       },
     ];
 
+    conversation.isGroup = () => false;
     tests.forEach(({description, expected, unreadState}) => {
-      it(description, () => {
-        conversation.unreadState = () => unreadState;
-        const state = conversationCellState.generate(conversation);
-        expect(state).toEqual(expected);
+      const expectedOne2One = expected.one2one || expected;
+      conversation.unreadState = () => unreadState;
+      const state = conversationCellState.generate(conversation);
+      it(`${description} (1:1)`, () => {
+        expect(state).toEqual(expectedOne2One);
+      });
+    });
+
+    conversation.isGroup = () => true;
+    tests.forEach(({description, expected, unreadState}) => {
+      const expectedGroup = expected.group || expected;
+      conversation.unreadState = () => unreadState;
+      const state = conversationCellState.generate(conversation);
+      it(`${description} (group)`, () => {
+        expect(state).toEqual(expectedGroup);
       });
     });
   });
