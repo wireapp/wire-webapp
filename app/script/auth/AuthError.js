@@ -23,37 +23,33 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.AuthError = class AuthError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || AuthError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case AuthError.TYPE.COOKIES_DISABLED:
-        this.message = 'Cookies are disabled';
-        break;
-      case AuthError.TYPE.INDEXED_DB_UNSUPPORTED:
-        this.message = 'IndexedDB is not supported';
-        break;
-      case AuthError.TYPE.MULTIPLE_TABS:
-        this.message = 'Cannot open in multiple tabs simultaneously';
-        break;
-      case AuthError.TYPE.PRIVATE_MODE:
-        this.message = 'Unsupported Private Mode';
-        break;
-      default:
-        this.message = 'Unknown AuthError';
-    }
+    this.message = message || AuthError.MESSAGE[this.type] || AuthError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      COOKIES_DISABLED: 'Cookies are disabled',
+      INDEXED_DB_UNSUPPORTED: 'IndexedDB is not supported',
+      MULTIPLE_TABS: 'Cannot open in multiple tabs simultaneously',
+      PRIVATE_MODE: 'Unsupported Private Mode',
+      UNKNOWN: 'Unknown AuthError',
+    };
   }
 
   static get TYPE() {
     return {
-      COOKIES_DISABLED: 'AuthError.TYPE.COOKIES_DISABLED',
-      INDEXED_DB_UNSUPPORTED: 'AuthError.TYPE.INDEXED_DB_UNSUPPORTED',
-      MULTIPLE_TABS: 'AuthError.TYPE.MULTIPLE_TABS',
-      PRIVATE_MODE: 'AuthError.TYPE.PRIVATE_MODE',
+      COOKIES_DISABLED: 'COOKIES_DISABLED',
+      INDEXED_DB_UNSUPPORTED: 'INDEXED_DB_UNSUPPORTED',
+      MULTIPLE_TABS: 'MULTIPLE_TABS',
+      PRIVATE_MODE: 'PRIVATE_MODE',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

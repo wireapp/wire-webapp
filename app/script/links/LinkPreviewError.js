@@ -23,34 +23,33 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewError = class LinkPreviewError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
+
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || LinkPreviewError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case LinkPreviewError.TYPE.NOT_SUPPORTED:
-        this.message = 'Your client cannot render link previews using Open Graph data.';
-        break;
-      case LinkPreviewError.TYPE.UNSUPPORTED_TYPE:
-        this.message = 'Open Graph data from the given link does not provide necessary attributes.';
-        break;
-      case LinkPreviewError.TYPE.NO_DATA_AVAILABLE:
-        this.message = 'Link does not provide Open Graph data.';
-        break;
-      default:
-        this.message = 'Unknown LinkPreviewError';
-    }
+    this.message = message || LinkPreviewError.MESSAGE[this.type] || LinkPreviewError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      BLACKLISTED: 'Skipped preview for blacklisted link',
+      NO_DATA_AVAILABLE: 'Link does not provide Open Graph data.',
+      NOT_SUPPORTED: 'Your client cannot render link previews using Open Graph data.',
+      UNKNOWN: 'Unknown LinkPreviewError',
+      UNSUPPORTED_TYPE: 'Open Graph data from the given link does not provide necessary attributes.',
+    };
   }
 
   static get TYPE() {
     return {
-      BLACKLISTED: 'LinkPreviewError.TYPE.BLACKLISTED',
-      NO_DATA_AVAILABLE: 'LinkPreviewError.TYPE.NO_DATA_AVAILABLE',
-      NOT_SUPPORTED: 'LinkPreviewError.TYPE.NOT_SUPPORTED',
-      UNKNOWN: 'LinkPreviewError.TYPE.UNKNOWN',
-      UNSUPPORTED_TYPE: 'LinkPreviewError.TYPE.UNSUPPORTED_TYPE',
+      BLACKLISTED: 'BLACKLISTED',
+      NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
+      UNKNOWN: 'UNKNOWN',
+      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }
 };

@@ -23,14 +23,14 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.ClientError = class ClientError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || ClientError.TYPE.UNKNOWN;
 
-    this.message = ClientError.MESSAGE[this.type] || ClientError.MESSAGE.UNKNOWN;
+    this.message = message || ClientError.MESSAGE[this.type] || ClientError.MESSAGE.UNKNOWN;
   }
 
   static get MESSAGE() {

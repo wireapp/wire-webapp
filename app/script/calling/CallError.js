@@ -30,71 +30,44 @@ z.calling.CallError = class CallError extends Error {
     this.stack = new Error().stack;
     this.type = type || CallError.TYPE.UNKNOWN;
 
-    if (message) {
-      this.message = message;
-    } else {
-      switch (this.type) {
-        case CallError.TYPE.MISTARGETED_MESSAGE:
-          this.message = 'Message targeted at another client';
-          break;
-        case CallError.TYPE.NO_CONVERSATION_ID:
-          this.message = 'No conversation ID given';
-          break;
-        case CallError.TYPE.NO_DATA_CHANNEL:
-          this.message = 'No established data channel for call';
-          break;
-        case CallError.TYPE.NO_REPLACEABLE_TRACK:
-          this.message = 'No replaceable MediaStreamTrack found';
-          break;
-        case CallError.TYPE.NO_USER_ID:
-          this.message = 'User ID to target message not given';
-          break;
-        case CallError.TYPE.NOT_FOUND:
-          this.message = 'No call for conversation ID found';
-          break;
-        case CallError.TYPE.NOT_SUPPORTED:
-          this.message = 'Calling is not supported';
-          break;
-        case CallError.TYPE.RTP_SENDER_NOT_SUPPORTED:
-          this.message = 'PeerConnection does not support RtcRtpSender extension';
-          break;
-        case CallError.TYPE.UNSUPPORTED_VERSION:
-          this.message = 'Unsupported version of the call protocol';
-          break;
-        case CallError.TYPE.WRONG_CONVERSATION_TYPE:
-          this.message = 'Wrong conversation type for call message';
-          break;
-        case CallError.TYPE.WRONG_PAYLOAD_FORMAT:
-          this.message = 'Payload for a call message is in wrong format';
-          break;
-        case CallError.TYPE.WRONG_SENDER:
-          this.message = 'Call change from wrong sender';
-          break;
-        case CallError.TYPE.WRONG_STATE:
-          this.message = 'Call in wrong state for change';
-          break;
-        default:
-          this.message = 'Unknown CallError';
-      }
-    }
+    this.message = message || CallError.MESSAGE[this.type] || CallError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      MISTARGETED_MESSAGE: 'Message targeted at another client',
+      NO_CONVERSATION_ID: 'No conversation ID given',
+      NO_DATA_CHANNEL: 'No established data channel for call',
+      NO_REPLACEABLE_TRACK: 'No replaceable MediaStreamTrack found',
+      NO_USER_ID: 'Missing user ID to target message',
+      NOT_FOUND: 'No call for conversation ID found',
+      NOT_SUPPORTED: 'Calling is not supported',
+      RTP_SENDER_NOT_SUPPORTED: 'PeerConnection does not support RtcRtpSender extension',
+      UNKNOWN: 'Unknown CallError',
+      UNSUPPORTED_VERSION: 'Unsupported version of the call protocol',
+      WRONG_CONVERSATION_TYPE: 'Wrong conversation type for call message',
+      WRONG_PAYLOAD_FORMAT: 'Payload for a call message is in wrong format',
+      WRONG_SENDER: 'Call change from wrong sender',
+      WRONG_STATE: 'Call in wrong state for change',
+    };
   }
 
   static get TYPE() {
     return {
-      MISTARGETED_MESSAGE: 'CallError.TYPE.MISTARGETED_MESSAGE',
-      NO_CONVERSATION_ID: 'CallError.TYPE.NO_CONVERSATION_ID',
-      NO_DATA_CHANNEL: 'CallError.TYPE.NO_DATA_CHANNEL',
-      NO_REPLACEABLE_TRACK: 'CallError.TYPE.NO_REPLACEABLE_TRACK',
-      NO_USER_ID: 'CallError.TYPE.NO_USER_ID',
-      NOT_FOUND: 'CallError.TYPE.NOT_FOUND',
-      NOT_SUPPORTED: 'CallError.TYPE.NOT_SUPPORTED',
-      RTP_SENDER_NOT_SUPPORTED: 'CallError.TYPE.RTP_SENDER_NOT_SUPPORTED',
-      UNKNOWN: 'CallError.TYPE.UNKNOWN',
-      UNSUPPORTED_VERSION: 'CallError.TYPE.UNSUPPORTED_VERSION',
-      WRONG_CONVERSATION_TYPE: 'CallError.TYPE.WRONG_CONVERSATION_TYPE',
-      WRONG_PAYLOAD_FORMAT: 'CallError.TYPE.WRONG_PAYLOAD_FORMAT',
-      WRONG_SENDER: 'CallError.TYPE.WRONG_SENDER',
-      WRONG_STATE: 'CallError.TYPE.WRONG_STATE',
+      MISTARGETED_MESSAGE: 'MISTARGETED_MESSAGE',
+      NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',
+      NO_DATA_CHANNEL: 'NO_DATA_CHANNEL',
+      NO_REPLACEABLE_TRACK: 'NO_REPLACEABLE_TRACK',
+      NO_USER_ID: 'NO_USER_ID',
+      NOT_FOUND: 'NOT_FOUND',
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
+      RTP_SENDER_NOT_SUPPORTED: 'RTP_SENDER_NOT_SUPPORTED',
+      UNKNOWN: 'UNKNOWN',
+      UNSUPPORTED_VERSION: 'UNSUPPORTED_VERSION',
+      WRONG_CONVERSATION_TYPE: 'WRONG_CONVERSATION_TYPE',
+      WRONG_PAYLOAD_FORMAT: 'WRONG_PAYLOAD_FORMAT',
+      WRONG_SENDER: 'WRONG_SENDER',
+      WRONG_STATE: 'WRONG_STATE',
     };
   }
 };

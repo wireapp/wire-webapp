@@ -23,14 +23,14 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationError = class ConversationError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || ConversationError.TYPE.UNKNOWN;
 
-    this.message = ConversationError.MESSAGE[this.type] || ConversationError.MESSAGE.UNKNOWN;
+    this.message = message || ConversationError.MESSAGE[this.type] || ConversationError.MESSAGE.UNKNOWN;
   }
 
   static get MESSAGE() {

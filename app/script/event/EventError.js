@@ -30,58 +30,38 @@ z.event.EventError = class EventError extends Error {
     this.stack = new Error().stack;
     this.type = type || EventError.TYPE.UNKNOWN;
 
-    if (message) {
-      this.message = message;
-    } else {
-      switch (this.type) {
-        case EventError.TYPE.DATABASE_FAILURE:
-          this.message = 'Event related database transaction failure';
-          break;
-        case EventError.TYPE.DEPRECATED_SCHEMA:
-          this.message = 'Event type is deprecated';
-          break;
-        case EventError.TYPE.NO_CLIENT_ID:
-          this.message = 'Missing client id';
-          break;
-        case EventError.TYPE.NO_EVENT:
-          this.message = 'Event is missing';
-          break;
-        case EventError.TYPE.NO_LAST_DATE:
-          this.message = 'Last event date not found in storage';
-          break;
-        case EventError.TYPE.NO_LAST_ID:
-          this.message = 'Last notification ID not found in storage';
-          break;
-        case EventError.TYPE.NO_NOTIFICATIONS:
-          this.message = 'No notifications found';
-          break;
-        case EventError.TYPE.OUTDATED_E_CALL_EVENT:
-          this.message = 'Ignoring outdated e-call event';
-          break;
-        case EventError.TYPE.REQUEST_FAILURE:
-          this.message = 'Event related backend request failure';
-          break;
-        case EventError.TYPE.VALIDATION_FAILED:
-          this.message = 'Event failed validation';
-          break;
-        default:
-          this.message = 'Unknown EventError';
-      }
-    }
+    this.message = message || EventError.MESSAGE[this.type] || EventError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      DATABASE_FAILURE: 'Event related database transaction failure',
+      DEPRECATED_SCHEMA: 'Event type is deprecated',
+      NO_CLIENT_ID: 'Missing client id',
+      NO_EVENT: 'Event is missing',
+      NO_LAST_DATE: 'Last event date not found in storage',
+      NO_LAST_ID: 'Last notification ID not found in storage',
+      NO_NOTIFICATIONS: 'No notifications found',
+      OUTDATED_E_CALL_EVENT: 'Ignoring outdated e-call event',
+      REQUEST_FAILURE: 'Event related backend request failure',
+      UNKNOWN: 'Unknown EventError',
+      VALIDATION_FAILED: 'Event failed validation',
+    };
   }
 
   static get TYPE() {
     return {
-      DATABASE_FAILURE: 'EventError.TYPE.DATABASE_FAILURE',
-      DEPRECATED_SCHEMA: 'EventError.TYPE.DEPRECATED_SCHEMA',
-      NO_CLIENT_ID: 'EventError.TYPE.NO_CLIENT_ID',
-      NO_EVENT: 'EventError.TYPE.NO_EVENT',
-      NO_LAST_DATE: 'EventError.TYPE.NO_LAST_DATE',
-      NO_LAST_ID: 'EventError.TYPE.NO_LAST_ID',
-      NO_NOTIFICATIONS: 'EventError.TYPE.NO_NOTIFICATIONS',
+      DATABASE_FAILURE: 'DATABASE_FAILURE',
+      DEPRECATED_SCHEMA: 'DEPRECATED_SCHEMA',
+      NO_CLIENT_ID: 'NO_CLIENT_ID',
+      NO_EVENT: 'NO_EVENT',
+      NO_LAST_DATE: 'NO_LAST_DATE',
+      NO_LAST_ID: 'NO_LAST_ID',
+      NO_NOTIFICATIONS: 'NO_NOTIFICATIONS',
       OUTDATED_E_CALL_EVENT: 'EventError.OUTDATED_E_CALL_EVENT',
-      REQUEST_FAILURE: 'EventError.TYPE.REQUEST_FAILURE',
-      VALIDATION_FAILED: 'EventError.TYPE.VALIDATION_FAILED',
+      REQUEST_FAILURE: 'REQUEST_FAILURE',
+      UNKNOWN: 'UNKNWON',
+      VALIDATION_FAILED: 'VALIDATION_FAILED',
     };
   }
 };

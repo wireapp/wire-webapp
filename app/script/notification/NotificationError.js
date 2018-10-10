@@ -23,26 +23,27 @@ window.z = window.z || {};
 window.z.notification = z.notification || {};
 
 z.notification.NotificationError = class NotificationError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || NotificationError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case NotificationError.TYPE.HIDE_NOTIFICATION:
-        this.message = 'Do not show notification for this message';
-        break;
-      default:
-        this.message = 'Unknown NotificationError';
-    }
+    this.message = message || NotificationError.MESSAGE[this.type] || NotificationError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      HIDE_NOTIFICATION: 'Do not show notification for this message',
+      UNKNOWN: 'Unknown NotificationError',
+    };
   }
 
   static get TYPE() {
     return {
-      HIDE_NOTIFICATION: 'NotificationError.TYPE.HIDE_NOTIFICATION',
-      UNKNOWN: 'NotificationError.TYPE.UNKNOWN',
+      HIDE_NOTIFICATION: 'HIDE_NOTIFICATION',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

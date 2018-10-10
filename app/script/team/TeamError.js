@@ -23,26 +23,27 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamError = class TeamError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || TeamError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case TeamError.TYPE.NO_PERMISSIONS:
-        this.message = 'No permissions provided';
-        break;
-      default:
-        this.message = 'Unknown TeamError';
-    }
+    this.message = message || TeamError.MESSAGE[this.type] || TeamError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      NO_PERMISSIONS: 'No permissions provided',
+      UNKNOWN: 'Unknown TeamError',
+    };
   }
 
   static get TYPE() {
     return {
-      NO_PERMISSIONS: 'TeamError.TYPE.NO_PERMISSIONS',
-      UNKNOWN: 'TeamError.TYPE.UNKNOWN',
+      NO_PERMISSIONS: 'NO_PERMISSIONS',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

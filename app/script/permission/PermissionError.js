@@ -23,39 +23,31 @@ window.z = window.z || {};
 window.z.permission = z.permission || {};
 
 z.permission.PermissionError = class PermissionError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
+
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || PermissionError.TYPE.UNKNOWN;
-    switch (this.type) {
-      case PermissionError.TYPE.DENIED: {
-        this.message = 'Permission was denied';
-        break;
-      }
 
-      case PermissionError.TYPE.UNSUPPORTED: {
-        this.message = 'Permissions API is not supported';
-        break;
-      }
+    this.message = message || PermissionError.MESSAGE[this.type] || PermissionError.MESSAGE.UNKNOWN;
+  }
 
-      case PermissionError.TYPE.UNSUPPORTED_TYPE: {
-        this.message = 'Permissions API does not support requested type';
-        break;
-      }
-
-      default: {
-        this.message = 'Unknown Permission Error';
-      }
-    }
+  static get MESSAGE() {
+    return {
+      DENIED: 'Permission was denied',
+      UNKNOWN: 'Unknown PermissionError',
+      UNSUPPORTED: 'Permissions API is not supported',
+      UNSUPPORTED_TYPE: 'Permissions API does not support requested type',
+    };
   }
 
   static get TYPE() {
     return {
-      DENIED: 'PermissionError.TYPE.DENIED',
-      UNKNOWN: 'PermissionError.TYPE.UNKNOWN',
-      UNSUPPORTED: 'PermissionError.TYPE.UNSUPPORTED',
-      UNSUPPORTED_TYPE: 'PermissionError.TYPE.UNSUPPORTED_TYPE',
+      DENIED: 'DENIED',
+      UNKNOWN: 'UNKNOWN',
+      UNSUPPORTED: 'UNSUPPORTED',
+      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }
 };

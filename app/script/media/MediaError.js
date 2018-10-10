@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.media = z.media || {};
 
 z.media.MediaError = class MediaError extends Error {
-  constructor(type, mediaType) {
+  constructor(type, mediaType, message) {
     super();
 
     this.name = this.constructor.name;
@@ -31,44 +31,32 @@ z.media.MediaError = class MediaError extends Error {
     this.stack = new Error().stack;
     this.type = type || MediaError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case MediaError.TYPE.MEDIA_STREAM_DEVICE:
-        this.message = 'Device related failure when getting MediaStream';
-        break;
-      case MediaError.TYPE.MEDIA_STREAM_MISC:
-        this.message = 'Other failure when getting MediaStream';
-        break;
-      case MediaError.TYPE.MEDIA_STREAM_PERMISSION:
-        this.message = 'Permission related failure when getting MediaStream';
-        break;
-      case MediaError.TYPE.NO_MEDIA_DEVICES_FOUND:
-        this.message = 'No MediaDevices found';
-        break;
-      case MediaError.TYPE.SCREEN_NOT_SUPPORTED:
-        this.message = 'Screen sharing is not yet supported by this browser';
-        break;
-      case MediaError.TYPE.STREAM_NOT_FOUND:
-        this.message = 'No local MediaStream found';
-        break;
-      case MediaError.TYPE.UNHANDLED_MEDIA_TYPE:
-        this.message = 'Media type unknown';
-        break;
-      default:
-        this.message = 'Unknown MediaError';
-    }
+    this.message = message || MediaError.MESSAGE[this.type] || MediaError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      MEDIA_STREAM_DEVICE: 'Device related failure when getting MediaStream',
+      MEDIA_STREAM_MISC: 'Other failure when getting MediaStream',
+      MEDIA_STREAM_PERMISSION: 'Permission related failure when getting MediaStream',
+      NO_MEDIA_DEVICES_FOUND: 'No MediaDevices found',
+      SCREEN_NOT_SUPPORTED: 'Screen sharing is not yet supported by this browser',
+      STREAM_NOT_FOUND: 'No local MediaStream found',
+      UNHANDLED_MEDIA_TYPE: 'Media type unknown',
+      UNKNOWN: 'Unknown MediaError',
+    };
   }
 
   static get TYPE() {
     return {
-      MEDIA_STREAM_DEVICE: 'MediaError.TYPE.MEDIA_STREAM_DEVICE',
-      MEDIA_STREAM_MISC: 'MediaError.TYPE.MEDIA_STREAM_MISC',
-      MEDIA_STREAM_PERMISSION: 'MediaError.TYPE.MEDIA_STREAM_PERMISSION',
-      NO_MEDIA_DEVICES_FOUND: 'MediaError.TYPE.NO_MEDIA_DEVICES_FOUND',
-      NO_VIDEO_INPUT_DEVICE_FOUND: 'MediaError.TYPE.NO_VIDEO_INPUT_DEVICE_FOUND',
-      SCREEN_NOT_SUPPORTED: 'MediaError.TYPE.SCREEN_NOT_SUPPORTED',
-      STREAM_NOT_FOUND: 'MediaError.TYPE.STREAM_NOT_FOUND',
+      MEDIA_STREAM_DEVICE: 'MEDIA_STREAM_DEVICE',
+      MEDIA_STREAM_MISC: 'MEDIA_STREAM_MISC',
+      MEDIA_STREAM_PERMISSION: 'MEDIA_STREAM_PERMISSION',
+      NO_MEDIA_DEVICES_FOUND: 'NO_MEDIA_DEVICES_FOUND',
+      SCREEN_NOT_SUPPORTED: 'SCREEN_NOT_SUPPORTED',
+      STREAM_NOT_FOUND: 'STREAM_NOT_FOUND',
       UNHANDLED_MEDIA_TYPE: 'MediaError.UNHANDLED_MEDIA_TYPE',
-      UNKNOWN: 'MediaError.TYPE.UNKNOWN',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

@@ -23,42 +23,35 @@ window.z = window.z || {};
 window.z.connect = z.connect || {};
 
 z.connect.ConnectError = class ConnectError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || ConnectError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case ConnectError.TYPE.GOOGLE_CLIENT:
-        this.message = 'Google Auth Client for JavaScript not loaded';
-        break;
-      case ConnectError.TYPE.GOOGLE_DOWNLOAD:
-        this.message = 'Failed to download contacts from Google';
-        break;
-      case ConnectError.TYPE.NO_CONTACTS:
-        this.message = 'No contacts found for matching';
-        break;
-      case ConnectError.TYPE.NOT_SUPPORTED:
-        this.message = 'Source not supported';
-        break;
-      case ConnectError.TYPE.UPLOAD:
-        this.message = 'Address book upload failed';
-        break;
-      default:
-        this.message = 'Unknown ConnectError';
-    }
+    this.message = message || ConnectError.MESSAGE[this.type] || ConnectError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      GOOGLE_CLIENT: 'Google Auth Client for JavaScript not loaded',
+      GOOGLE_DOWNLOAD: 'Failed to download contacts from Google',
+      NO_CONTACTS: 'No contacts found for matching',
+      NOT_SUPPORTED: 'Source not supported',
+      UNKNOWN: 'Unknown ConnectError',
+      UPLOAD: 'Address book upload failed',
+    };
   }
 
   static get TYPE() {
     return {
-      GOOGLE_CLIENT: 'ConnectError.TYPE.GOOGLE_CLIENT',
-      GOOGLE_DOWNLOAD: 'ConnectError.TYPE.GOOGLE_DOWNLOAD',
-      NO_CONTACTS: 'ConnectError.TYPE.NO_CONTACTS',
-      NOT_SUPPORTED: 'ConnectError.TYPE.NOT_SUPPORTED',
-      UNKNOWN: 'ConnectError.TYPE.UNKNOWN',
-      UPLOAD: 'ConnectError.TYPE.UPLOAD',
+      GOOGLE_CLIENT: 'GOOGLE_CLIENT',
+      GOOGLE_DOWNLOAD: 'GOOGLE_DOWNLOAD',
+      NO_CONTACTS: 'NO_CONTACTS',
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
+      UNKNOWN: 'UNKNOWN',
+      UPLOAD: 'UPLOAD',
     };
   }
 };

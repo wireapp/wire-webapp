@@ -23,36 +23,33 @@ window.z = window.z || {};
 window.z.audio = z.audio || {};
 
 z.audio.AudioError = class AudioError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
+
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || AudioError.TYPE.UNKNOWN;
-    switch (this.type) {
-      case AudioError.TYPE.ALREADY_PLAYING:
-        this.message = 'Sound is already playing';
-        break;
-      case AudioError.TYPE.FAILED_TO_PLAY:
-        this.message = 'Failed to play sound';
-        break;
-      case AudioError.TYPE.IGNORED_SOUND:
-        this.message = 'Ignored request to play sound';
-        break;
-      case AudioError.TYPE.NOT_FOUND:
-        this.message = 'AudioElement or ID not found';
-        break;
-      default:
-        this.message = 'Unknown AudioError';
-    }
+
+    this.message = message || AudioError.MESSAGE[this.type] || AudioError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      ALREADY_PLAYING: 'Sound is already playing',
+      FAILED_TO_PLAY: 'Failed to play sound',
+      IGNORED_SOUND: 'Ignored request to play sound',
+      NOT_FOUND: 'AudioElement or ID not found',
+      UNKNOWN: 'Unknown AudioError',
+    };
   }
 
   static get TYPE() {
     return {
-      ALREADY_PLAYING: 'AudioError.TYPE.ALREADY_PLAYING',
-      FAILED_TO_PLAY: 'AudioError.TYPE.FAILED_TO_PLAY',
-      IGNORED_SOUND: 'AudioError.TYPE.IGNORED_SOUND',
-      NOT_FOUND: 'AudioError.TYPE.NOT_FOUND',
-      UNKNOWN: 'AudioError.TYPE.UNKNOWN',
+      ALREADY_PLAYING: 'ALREADY_PLAYING',
+      FAILED_TO_PLAY: 'FAILED_TO_PLAY',
+      IGNORED_SOUND: 'IGNORED_SOUND',
+      NOT_FOUND: 'NOT_FOUND',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };
