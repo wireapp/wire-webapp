@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.ClientError = class ClientError extends z.error.BaseError {
+  constructor(type, message) {
+    super('ClientError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       CLIENT_NOT_SET: 'Local client is not yet set',

@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.PermissionError = class PermissionError extends z.error.BaseError {
+  constructor(type, message) {
+    super('PermissionError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       DENIED: 'Permission was denied',

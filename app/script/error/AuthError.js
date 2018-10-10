@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.AuthError = class AuthError extends z.error.BaseError {
+  constructor(type, message) {
+    super('AuthError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       COOKIES_DISABLED: 'Cookies are disabled',

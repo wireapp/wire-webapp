@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.EventError = class EventError extends z.error.BaseError {
+  constructor(type, message) {
+    super('EventError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       DATABASE_FAILURE: 'Event related database transaction failure',

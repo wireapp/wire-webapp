@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.ConversationError = class ConversationError extends z.error.BaseError {
+  constructor(type, message) {
+    super('ConversationError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       CONVERSATION_NOT_FOUND: 'Conversation not found',

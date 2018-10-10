@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.ConnectError = class ConnectError extends z.error.BaseError {
+  constructor(type, message) {
+    super('ConnectError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       GOOGLE_CLIENT: 'Google Auth Client for JavaScript not loaded',

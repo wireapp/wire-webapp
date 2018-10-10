@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.LinkPreviewError = class LinkPreviewError extends z.error.BaseError {
+  constructor(type, message) {
+    super('LinkPreviewError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       BLACKLISTED: 'Skipped preview for blacklisted link',

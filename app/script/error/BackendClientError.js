@@ -26,7 +26,7 @@ z.error.BackendClientError = class BackendClientError extends z.error.BaseError 
   constructor(params) {
     const message = params.message || `${params}`;
 
-    super(BackendClientError.TYPE.GENERIC, message);
+    super('BackendClientError', BackendClientError.TYPE.GENERIC, message);
 
     if (_.isObject(params)) {
       this.code = params.code;
