@@ -422,7 +422,7 @@ z.main.App = class App {
       }
 
       const isAccessTokenError = error instanceof z.error.AccessTokenError;
-      const isInvalidClient = type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+      const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isAccessTokenError || isInvalidClient) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);

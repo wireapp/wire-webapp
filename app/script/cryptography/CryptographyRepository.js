@@ -77,7 +77,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .catch(databaseError => {
         const message = `Failed cryptography-related db deletion on client validation error: ${databaseError.message}`;
         this.logger.error(message, databaseError);
-        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(() => deleteEverything);
   }

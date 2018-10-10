@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.client = z.client || {};
+window.z.error = z.error || {};
 
-z.client.ClientError = class ClientError extends Error {
+z.error.ClientError = class ClientError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || ClientError.TYPE.UNKNOWN;
-
-    this.message = message || ClientError.MESSAGE[this.type] || ClientError.MESSAGE.UNKNOWN;
+    const errorName = 'ClientError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {

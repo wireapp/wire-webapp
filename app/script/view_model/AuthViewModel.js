@@ -1488,7 +1488,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           throw error;
         }
 
-        const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        const client_not_validated = error.type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
         if (client_not_validated) {
           const client_et = this.client_repository.currentClient();
           this.client_repository.currentClient(undefined);
@@ -1605,7 +1605,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         });
       })
       .catch(error => {
-        const isTooManyClients = error.type === z.client.ClientError.TYPE.TOO_MANY_CLIENTS;
+        const isTooManyClients = error.type === z.error.ClientError.TYPE.TOO_MANY_CLIENTS;
         if (isTooManyClients) {
           this.logger.warn('User has already registered the maximum number of clients', error);
           return (window.location.hash = z.auth.AuthView.MODE.LIMIT);
