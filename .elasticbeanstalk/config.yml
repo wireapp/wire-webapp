@@ -1,6 +1,3 @@
-branch-defaults:
-  self-hosting:
-    environment: wire-selfhosting
 deploy:
   artifact: aws/s3/ebs.zip
 global:
