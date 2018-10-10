@@ -37,6 +37,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
 
     this.conversationRepository = this.repositories.conversation;
     this.integrationRepository = this.repositories.integration;
+    this.searchRepository = params.repositories.search;
     this.teamRepository = this.repositories.team;
     this.userRepository = this.repositories.user;
 
@@ -60,7 +61,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
       if (this.activeConversation()) {
         const firstUserEntity = this.activeConversation().firstUserEntity();
         const hasBotUser = firstUserEntity && firstUserEntity.isService;
-        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
+        const allowIntegrations = this.activeConversation().isGroup() || hasBotUser;
         return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }
     });

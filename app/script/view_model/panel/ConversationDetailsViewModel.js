@@ -38,8 +38,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
     this.conversationRepository = this.repositories.conversation;
-    this.teamRepository = this.repositories.team;
     this.integrationRepository = this.repositories.integration;
+    this.searchRepository = params.repositories.search;
+    this.teamRepository = this.repositories.team;
 
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
@@ -85,13 +86,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         : false;
     });
 
-    this.isActiveParticipant = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isActiveParticipant();
-    });
-
-    this.isNameEditable = ko.pureComputed(() => {
+    this.isActiveGroupParticipant = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().is_group() && this.activeConversation().isActiveParticipant()
+        ? this.activeConversation().isGroup() && this.activeConversation().isActiveParticipant()
         : false;
     });
 
@@ -115,9 +112,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
     });
 
-    this.showActionAddParticipants = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_group();
-    });
+    this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
+
+    this.showActionAddParticipants = this.isActiveGroupParticipant;
 
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
@@ -133,29 +130,35 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.activeConversation() && this.activeConversation().is_request();
     });
 
-    this.showActionClear = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
-        : false;
+    this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
+
+    this.showActionLeave = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isLeavable());
+
+    this.showActionMute = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
     });
 
-    this.showActionLeave = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation()
-        : false;
+    this.showOptionGuests = ko.pureComputed(() => {
+      return this.isActiveGroupParticipant() && this.activeConversation().inTeam();
     });
 
-    this.showActionGuestOptions = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().inTeam();
+    this.hasAdvancedNotifications = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
     });
 
-    this.showActionTimedMessages = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().is_group() && !this.activeConversation().isGuest()
-        : false;
+    this.showOptionNotificationsGroup = ko.pureComputed(() => {
+      return this.hasAdvancedNotifications() && this.activeConversation().isGroup();
     });
 
-    this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
+    this.showOptionNotifications1To1 = ko.pureComputed(() => {
+      return this.hasAdvancedNotifications() && !this.activeConversation().isGroup();
+    });
+
+    this.showOptionTimedMessages = this.isActiveGroupParticipant;
+
+    this.showSectionOptions = ko.pureComputed(() => {
+      return this.showOptionGuests() || this.showOptionNotificationsGroup() || this.showOptionTimedMessages();
+    });
 
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
@@ -173,6 +176,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.guestOptionsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
+    });
+
+    this.notificationStatusText = ko.pureComputed(() => {
+      return this.activeConversation()
+        ? z.conversation.NotificationSetting.getText(this.activeConversation().notificationState())
+        : '';
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
@@ -231,6 +240,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
+  clickOnNotifications() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+  }
+
   clickOnShowUser(userEntity) {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
@@ -266,7 +279,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToEditGroupName() {
-    if (this.isNameEditable()) {
+    if (this.isActiveGroupParticipant()) {
       this.isEditingName(true);
     }
   }

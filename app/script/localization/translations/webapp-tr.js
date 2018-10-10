@@ -203,6 +203,7 @@ z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekk�
 
 
 z.string.tr.modalImproveWireAction = 'Kabul et';
+z.string.tr.modalImproveWireSecondary = 'Hayır';
 
 z.string.tr.modalSessionResetHeadline = 'Oturum sıfırlandı';
 z.string.tr.modalSessionResetMessage1 = 'Eğer sorun çözülmemişse,';
@@ -341,6 +342,7 @@ z.string.tr.addParticipantsTabsServices = 'Servisler';
 z.string.tr.conversationDetailsActionArchive = 'Arşivle';
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
+z.string.tr.conversationDetailsActionNotifications = 'Bildirimler';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
 z.string.tr.conversationDetailsOptions = 'Ayarlar';
 z.string.tr.conversationDetailsParticipantsServicesMany = 'Servisler';
@@ -355,6 +357,8 @@ z.string.tr.groupParticipantActionCancelRequest = 'İsteği iptal et';
 z.string.tr.groupParticipantActionDevices = 'Cihazlar';
 z.string.tr.groupParticipantActionPending = 'Beklemede';
 z.string.tr.groupParticipantActionSendRequest = 'Bağlan';
+
+z.string.tr.notificationSettingsTitle = 'Bildirimler';
 
 z.string.tr.participantDevicesDetailHeadline = 'Bunun {{html1}}{{user}}s’in aygıtında gösterilen{{html2}} parmak iziyle eşleştiğini doğrulayın.';
 z.string.tr.participantDevicesDetailHowTo = 'Bunu nasıl yapıyoruz?';

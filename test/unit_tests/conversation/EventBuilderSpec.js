@@ -31,7 +31,7 @@ describe('z.conversation.EventBuilder', () => {
     self_user_et.is_me = true;
 
     conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
-    conversation_et.self = self_user_et;
+    conversation_et.selfUser(self_user_et);
 
     event_mapper = new z.conversation.EventMapper();
   });
@@ -44,7 +44,7 @@ describe('z.conversation.EventBuilder', () => {
         expect(messageEntity).toBeDefined();
         expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
         expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.VERIFIED);
-        expect(messageEntity.from).toBe(conversation_et.self.id);
+        expect(messageEntity.from).toBe(conversation_et.selfUser().id);
         expect(messageEntity.conversation_id).toBe(conversation_et.id);
         done();
       })
@@ -64,7 +64,7 @@ describe('z.conversation.EventBuilder', () => {
         expect(messageEntity).toBeDefined();
         expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
         expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.NEW_DEVICE);
-        expect(messageEntity.from).toBe(conversation_et.self.id);
+        expect(messageEntity.from).toBe(conversation_et.selfUser().id);
         expect(messageEntity.conversation_id).toBe(conversation_et.id);
         expect(messageEntity.userIds()).toEqual(user_ids);
         done();
@@ -79,7 +79,7 @@ describe('z.conversation.EventBuilder', () => {
       .then(messageEntity => {
         expect(messageEntity).toBeDefined();
         expect(messageEntity.super_type).toBe(z.message.SuperType.MISSED);
-        expect(messageEntity.from).toBe(conversation_et.self.id);
+        expect(messageEntity.from).toBe(conversation_et.selfUser().id);
         expect(messageEntity.conversation_id).toBe(conversation_et.id);
         done();
       })

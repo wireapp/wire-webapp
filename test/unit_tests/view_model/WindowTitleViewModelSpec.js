@@ -73,29 +73,35 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       message.id = z.util.createRandomUuid();
       message.timestamp(Date.now());
 
-      const conversation = new z.entity.Conversation(z.util.createRandomUuid());
-      conversation.add_message(message);
-      conversation.name('Birthday Bash');
-      conversation.type(z.conversation.ConversationType.GROUP);
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity.add_message(message);
+      conversationEntity.name('Birthday Bash');
+      conversationEntity.type(z.conversation.ConversationType.GROUP);
+      conversationEntity.selfUser(new z.entity.User(z.util.createRandomUuid()));
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversation);
-      title_view_model.conversationRepository.active_conversation(conversation);
+      title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
+      title_view_model.conversationRepository.active_conversation(conversationEntity);
       title_view_model.initiateTitleUpdates();
 
-      const expected_title = `(1) · ${conversation.name()} · ${suffix}`;
+      const expected_title = `(1) ${conversationEntity.name()} · ${suffix}`;
       expect(window.document.title).toBe(expected_title);
     });
 
     it('does not change the title if muted conversations receive messages', () => {
+      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      selfUserEntity.inTeam(true);
+
       const selected_conversation = new z.entity.Conversation(z.util.createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.GROUP);
+      selected_conversation.selfUser(selfUserEntity);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const muted_conversation = new z.entity.Conversation(z.util.createRandomUuid());
-      muted_conversation.muted_state(true);
+      muted_conversation.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
       muted_conversation.name('Muted Conversation');
       muted_conversation.type(z.conversation.ConversationType.GROUP);
+      muted_conversation.selfUser(selfUserEntity);
 
       // Add conversations to conversation repository
       expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(0);
@@ -117,7 +123,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       expect(muted_conversation.messages().length).toBe(1);
       expect(muted_conversation.messages_unordered().length).toBe(1);
-      expect(muted_conversation.unreadEvents().length).toBe(1);
+      expect(muted_conversation.unreadState().allEvents.length).toBe(1);
 
       // Check title when there are messages in the muted conversation
       title_view_model.initiateTitleUpdates();
@@ -131,7 +137,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       // Check title when there are messages in the selected conversation
       title_view_model.initiateTitleUpdates();
-      expected_title = `(1) · ${selected_conversation.name()} · ${suffix}`;
+      expected_title = `(1) ${selected_conversation.name()} · ${suffix}`;
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -197,7 +203,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
       let expectedWaitingPeople = '1';
-      let expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+      let expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
 
@@ -206,7 +212,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
         jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
         expectedWaitingPeople = '2';
         message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
-        expected_title = `(${expectedWaitingPeople}) · ${message} · ${suffix}`;
+        expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
         expect(window.document.title).toBe(expected_title);
         done();
       });
@@ -218,22 +224,23 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {
-      const message = new z.entity.ContentMessage();
-      message.id = z.util.createRandomUuid();
-      message.timestamp(Date.now());
+      const contentMessage = new z.entity.ContentMessage();
+      contentMessage.id = z.util.createRandomUuid();
+      contentMessage.timestamp(Date.now());
 
-      const conversation = new z.entity.Conversation(z.util.createRandomUuid());
-      conversation.add_message(message);
-      conversation.name('Birthday Bash');
-      conversation.type(z.conversation.ConversationType.GROUP);
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity.add_message(contentMessage);
+      conversationEntity.name('Birthday Bash');
+      conversationEntity.type(z.conversation.ConversationType.GROUP);
+      conversationEntity.selfUser(new z.entity.User(z.util.createRandomUuid()));
 
       amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
         expect(badgeCount).toBe(1);
         done();
       });
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversation);
-      title_view_model.conversationRepository.active_conversation(conversation);
+      title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
+      title_view_model.conversationRepository.active_conversation(conversationEntity);
 
       title_view_model.initiateTitleUpdates();
     });

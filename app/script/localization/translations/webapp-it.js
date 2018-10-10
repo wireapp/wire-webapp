@@ -198,6 +198,7 @@ z.string.it.modalConversationTooManyMembersHeadline = 'Chiamata piena';
 
 
 z.string.it.modalImproveWireAction = 'Accetta';
+z.string.it.modalImproveWireSecondary = 'No';
 
 z.string.it.modalSessionResetHeadline = 'La sessione è stata reimpostata';
 z.string.it.modalSessionResetMessage1 = 'Se il problema non viene risolto,';
@@ -334,6 +335,7 @@ z.string.it.addParticipantsTabsServices = 'Servizi';
 z.string.it.conversationDetailsActionArchive = 'Archivia';
 z.string.it.conversationDetailsActionCancelRequest = 'Annulla richiesta';
 z.string.it.conversationDetailsActionDevices = 'Dispositivi';
+z.string.it.conversationDetailsActionNotifications = 'Notifiche';
 z.string.it.conversationDetailsGuestsOff = 'Off';
 z.string.it.conversationDetailsOptions = 'Opzioni';
 z.string.it.conversationDetailsParticipantsServicesMany = 'Servizi';
@@ -348,6 +350,8 @@ z.string.it.groupParticipantActionCancelRequest = 'Annulla richiesta';
 z.string.it.groupParticipantActionDevices = 'Dispositivi';
 z.string.it.groupParticipantActionPending = 'In sospeso';
 z.string.it.groupParticipantActionSendRequest = 'Connetti';
+
+z.string.it.notificationSettingsTitle = 'Notifiche';
 
 z.string.it.participantDevicesDetailHeadline = 'Verifica che questo corrisponda all’impronta digitale sul {{html1}}dispositivo di {{user}}{{html2}}.';
 z.string.it.participantDevicesDetailHowTo = 'Come si fa?';

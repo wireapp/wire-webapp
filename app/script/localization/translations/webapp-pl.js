@@ -370,6 +370,7 @@ z.string.pl.addParticipantsTabsServices = 'Usługi';
 z.string.pl.conversationDetailsActionArchive = 'Archiwizuj';
 z.string.pl.conversationDetailsActionCancelRequest = 'Anuluj żądanie';
 z.string.pl.conversationDetailsActionDevices = 'Urządzenia';
+z.string.pl.conversationDetailsActionNotifications = 'Powiadomienia';
 z.string.pl.conversationDetailsGuestsOff = 'Wyłącz';
 z.string.pl.conversationDetailsOptions = 'Opcje';
 z.string.pl.conversationDetailsParticipantsServicesMany = 'Usługi';
@@ -384,6 +385,8 @@ z.string.pl.groupParticipantActionCancelRequest = 'Anuluj żądanie';
 z.string.pl.groupParticipantActionDevices = 'Urządzenia';
 z.string.pl.groupParticipantActionPending = 'W toku';
 z.string.pl.groupParticipantActionSendRequest = 'Połącz';
+
+z.string.pl.notificationSettingsTitle = 'Powiadomienia';
 
 z.string.pl.participantDevicesDetailHeadline = 'Sprawdź, czy to odpowiada kluczowi widocznemu na {{html1}}{{user}} urządzenia {{html2}}.';
 z.string.pl.participantDevicesDetailHowTo = 'Jak to zrobić?';

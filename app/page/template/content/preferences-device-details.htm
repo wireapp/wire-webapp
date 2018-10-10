@@ -14,7 +14,6 @@
         </div>
         <div class="preferences-devices-activated">
           <div data-bind="foreach: activationDate"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
-          <div data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         </div>
         <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferencesDevicesFingerprint"></div>
         <div class="preferences-devices-fingerprint" data-bind="foreach: fingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>

@@ -1,0 +1,22 @@
+<div id="notification-settings" class="panel__page notification-settings" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.NOTIFICATIONS]">
+  <!-- ko if: isVisible() -->
+    <div class="panel__header">
+      <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-notification-options"></arrow-left-icon>
+      <div class="panel__header__title" data-bind="l10n_text: z.string.notificationSettingsTitle"></div>
+      <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+    </div>
+    <div class="panel__content">
+      <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
+        <!-- ko foreach: {data: settings, afterRender: () => isRendered(true)} -->
+          <div class="panel__action-item" data-bind="click: $parent.clickOnNotificationSetting" data-uie-name="item-notification-option">
+            <div class="panel__action-item__text" data-bind="text: text"></div>
+              <!-- ko if: $parent.currentNotificationSetting() === value -->
+                <check-icon></check-icon>
+              <!-- /ko -->
+            </div>
+          <!-- /ko -->
+        <div class="panel__info-text notification-settings__disclaimer" data-bind="l10n_text: z.string.notificationSettingsDisclaimer"></div>
+      </div>
+    </div>
+  <!-- /ko -->
+</div>

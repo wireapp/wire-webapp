@@ -41,7 +41,7 @@ z.util.StringUtil = {
   },
 
   computeTransliteration: (string, excludedChars = {}) => {
-    const options = {custom: excludedChars};
+    const options = {custom: excludedChars, uric: true};
     return window.getSlug(string, options);
   },
 

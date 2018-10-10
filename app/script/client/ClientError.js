@@ -28,49 +28,36 @@ z.client.ClientError = class ClientError extends Error {
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.client.ClientError.TYPE.UNKNOWN;
+    this.type = type || ClientError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case ClientError.TYPE.CLIENT_NOT_SET:
-        this.message = 'Local client is not yet set';
-        break;
-      case ClientError.TYPE.DATABASE_FAILURE:
-        this.message = 'Client related database transaction failed';
-        break;
-      case ClientError.TYPE.NO_CLIENT_ID:
-        this.message = 'Client ID is not defined';
-        break;
-      case ClientError.TYPE.NO_USER_ID:
-        this.message = 'User ID is not defined';
-        break;
-      case ClientError.TYPE.NO_VALID_CLIENT:
-        this.message = 'No valid local client found';
-        break;
-      case ClientError.TYPE.REQUEST_FAILURE:
-        this.message = 'Client related backend request failed';
-        break;
-      case ClientError.TYPE.REQUEST_FORBIDDEN:
-        this.message = 'Client related backend request forbidden';
-        break;
-      case ClientError.TYPE.TOO_MANY_CLIENTS:
-        this.message = 'User has reached the maximum of allowed clients';
-        break;
-      default:
-        this.message = 'Unknown ClientError';
-    }
+    this.message = ClientError.MESSAGE[this.type] || ClientError.MESSAGE.UNKNOWN;
+  }
+
+  static get MESSAGE() {
+    return {
+      CLIENT_NOT_SET: 'Local client is not yet set',
+      DATABASE_FAILURE: 'Client related database transaction failed',
+      NO_CLIENT_ID: 'Client ID is not defined',
+      NO_USER_ID: 'User ID is not defined',
+      NO_VALID_CLIENT: 'No valid local client found',
+      REQUEST_FAILURE: 'Client related backend request failed',
+      REQUEST_FORBIDDEN: 'Client related backend request forbidden',
+      TOO_MANY_CLIENTS: 'User has reached the maximum of allowed clients',
+      UNKNOWN: 'Unknown ClientError',
+    };
   }
 
   static get TYPE() {
     return {
-      CLIENT_NOT_SET: 'ClientError.TYPE.CLIENT_NOT_SET',
-      DATABASE_FAILURE: 'ClientError.TYPE.DATABASE_FAILURE',
-      NO_CLIENT_ID: 'ClientError.TYPE.NO_CLIENT_ID',
-      NO_USER_ID: 'ClientError.TYPE.NO_USER_ID',
-      NO_VALID_CLIENT: 'ClientError.TYPE.NO_VALID_CLIENT',
-      REQUEST_FAILURE: 'ClientError.TYPE.REQUEST_FAILURE',
-      REQUEST_FORBIDDEN: 'ClientError.TYPE.REQUEST_FORBIDDEN',
-      TOO_MANY_CLIENTS: 'ClientError.TYPE.TOO_MANY_CLIENTS',
-      UNKNOWN: 'ClientError.TYPE.UNKNOWN',
+      CLIENT_NOT_SET: 'CLIENT_NOT_SET',
+      DATABASE_FAILURE: 'DATABASE_FAILURE',
+      NO_CLIENT_ID: 'NO_CLIENT_ID',
+      NO_USER_ID: 'NO_USER_ID',
+      NO_VALID_CLIENT: 'NO_VALID_CLIENT',
+      REQUEST_FAILURE: 'REQUEST_FAILURE',
+      REQUEST_FORBIDDEN: 'REQUEST_FORBIDDEN',
+      TOO_MANY_CLIENTS: 'TOO_MANY_CLIENTS',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

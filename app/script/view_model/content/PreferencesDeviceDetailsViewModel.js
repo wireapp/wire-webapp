@@ -37,12 +37,10 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
-    this.locationRepository = repositories.location;
 
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
 
-    this.activationLocation = ko.observableArray([]);
     this.activationDate = ko.observableArray([]);
     this.device = ko.observable();
     this.fingerprint = ko.observableArray([]);
@@ -50,23 +48,11 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
     this.device.subscribe(clientEntity => {
       if (clientEntity) {
-        const {location, time} = clientEntity;
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
-
         this._updateFingerprint();
-        this._updateActivationLocation('?');
-        this._updateActivationTime(time);
-        if (location) {
-          this._updateLocation(location);
-        }
+        this._updateActivationTime(clientEntity.time);
       }
     });
-  }
-
-  _updateActivationLocation(location) {
-    const stringTemplate = z.string.preferencesDevicesActivatedIn;
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', location);
-    this.activationLocation(sanitizedText);
   }
 
   _updateActivationTime(time) {
@@ -74,17 +60,6 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     const stringTemplate = z.string.preferencesDevicesActivatedOn;
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
-  }
-
-  _updateLocation({lat: latitude, lon: longitude}) {
-    if (latitude && longitude) {
-      this.locationRepository.getLocation(latitude, longitude).then(mappedLocation => {
-        if (mappedLocation) {
-          const {countryCode, place} = mappedLocation;
-          this._updateActivationLocation(`${place}, ${countryCode}`);
-        }
-      });
-    }
   }
 
   _updateFingerprint() {

@@ -47,11 +47,14 @@ describe('z.notification.NotificationRepository', () => {
         );
 
         // Create entities
+        const conversationMapper = TestFactory.conversation_repository.conversationMapper;
         user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
-        conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversations([
-          entities.conversation,
-        ])[0];
+        [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
         conversation_et.team_id = undefined;
+        const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+        selfUserEntity.is_me = true;
+        selfUserEntity.inTeam(true);
+        conversation_et.selfUser(selfUserEntity);
 
         // Notification
         const title = conversation_et.display_name();
@@ -103,7 +106,7 @@ describe('z.notification.NotificationRepository', () => {
               notification_content.options.data.messageType = _message.type;
               notification_content.trigger = trigger;
 
-              if (_conversation.is_group()) {
+              if (_conversation.isGroup()) {
                 const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
                 const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
 
@@ -247,7 +250,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the conversation is muted', done => {
-      conversation_et.muted_state(true);
+      conversation_et.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
 
       TestFactory.notification_repository
         .notify(message_et, undefined, conversation_et)
@@ -659,6 +662,67 @@ describe('z.notification.NotificationRepository', () => {
     it('as an ephemeral message', done => {
       message_et.ephemeral_expires(5000);
       verify_notification_ephemeral(done, conversation_et, message_et);
+    });
+  });
+
+  describe('shouldNotifyInConversation', () => {
+    let conversationEntity;
+    let messageEntity;
+    const userId = z.util.createRandomUuid();
+    const shouldNotifyInConversation = z.notification.NotificationRepository.shouldNotifyInConversation;
+
+    function generateTextAsset(selfMentioned = false) {
+      const mentionId = selfMentioned ? userId : z.util.createRandomUuid();
+
+      const textEntity = new z.entity.Text(z.util.createRandomUuid(), '@Gregor can you take a look?');
+      const mentionEntity = new z.message.MentionEntity(0, 7, mentionId);
+      textEntity.mentions([mentionEntity]);
+
+      return textEntity;
+    }
+
+    beforeEach(() => {
+      const selfUserEntity = new z.entity.User(userId);
+      selfUserEntity.is_me = true;
+      selfUserEntity.inTeam(true);
+
+      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity.selfUser(selfUserEntity);
+
+      messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      messageEntity.user(selfUserEntity);
+    });
+
+    it('returns the correct value for all notifications', () => {
+      messageEntity.add_asset(generateTextAsset());
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(true);
+    });
+
+    it('returns the correct value for no notifications', () => {
+      messageEntity.add_asset(generateTextAsset());
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(false);
+    });
+
+    it('returns the correct value for self mentioned messages', () => {
+      messageEntity.add_asset(generateTextAsset(true));
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(true);
+    });
+
+    it('returns the correct value for non-self mentioned messages', () => {
+      messageEntity.add_asset(generateTextAsset());
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
+
+      expect(notifyInConversation).toBe(false);
     });
   });
 });

@@ -31,14 +31,14 @@
 }
 
 .cell-badge {
+  display: flex;
   min-width: 32px;
   height: @badge-height;
+  align-items: center;
+  justify-content: center;
   border-radius: 10px;
   font-size: 12px;
   line-height: @badge-height;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
   &.disabled {
     cursor: default;
