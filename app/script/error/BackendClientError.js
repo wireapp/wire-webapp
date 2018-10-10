@@ -24,10 +24,9 @@ window.z.error = z.error || {};
 
 z.error.BackendClientError = class BackendClientError extends z.error.BaseError {
   constructor(params) {
-    const errorName = 'BackendClientError';
     const message = params.message || `${params}`;
 
-    super(errorName, undefined, message);
+    super(undefined, message);
 
     if (_.isObject(params)) {
       this.code = params.code;
