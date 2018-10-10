@@ -45,17 +45,22 @@ z.viewModel.ListViewModel = class ListViewModel {
    * @param {Object} repositories - Object containing all the repositories
    */
   constructor(mainViewModel, repositories) {
+    this.changeNotificationSetting = this.changeNotificationSetting.bind(this);
     this.switchList = this.switchList.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
 
     this.elementId = 'left-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
+    this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.contentViewModel = this.mainViewModel.content;
+    this.panelViewModel = mainViewModel.panel;
+
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
@@ -119,7 +124,16 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.clickToToggleMute.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
+    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+  }
+
+  changeNotificationSetting() {
+    if (this.isProAccount()) {
+      this.panelViewModel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+    } else {
+      this.clickToToggleMute();
+    }
   }
 
   goToNext() {
@@ -288,24 +302,31 @@ z.viewModel.ListViewModel = class ListViewModel {
   //##############################################################################
 
   onContextMenu(conversationEntity, event) {
-    let title;
     const entries = [];
 
-    const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
-    if (canToggleMute) {
-      const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
-      const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
-      const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
+    if (conversationEntity.isMutable()) {
+      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
 
-      const labelStringId = conversationEntity.is_muted()
-        ? z.string.conversationsPopoverNotify
-        : z.string.conversationsPopoverSilence;
-      title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
-      entries.push({
-        click: () => this.clickToToggleMute(conversationEntity),
-        label: z.l10n.text(labelStringId),
-        title: title,
-      });
+      if (this.isProAccount()) {
+        entries.push({
+          click: () => this.clickToOpenNotificationSettings(conversationEntity),
+          label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
+          title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
+        });
+      } else {
+        const labelStringId = conversationEntity.showNotificationsNothing()
+          ? z.string.conversationsPopoverNotify
+          : z.string.conversationsPopoverSilence;
+        const titleStringId = conversationEntity.showNotificationsNothing()
+          ? z.string.tooltipConversationsNotify
+          : z.string.tooltipConversationsSilence;
+
+        entries.push({
+          click: () => this.clickToToggleMute(conversationEntity),
+          label: z.l10n.text(labelStringId),
+          title: z.l10n.text(titleStringId, notificationsShortcut),
+        });
+      }
     }
 
     if (conversationEntity.is_archived()) {
@@ -330,15 +351,14 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    const canClear = !conversationEntity.is_request() && !conversationEntity.is_cleared();
-    if (canClear) {
+    if (conversationEntity.isClearable()) {
       entries.push({
         click: () => this.clickToClear(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverClear),
       });
     }
 
-    if (!conversationEntity.is_group()) {
+    if (!conversationEntity.isGroup()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.is_connected() || userEntity.is_request());
 
@@ -350,8 +370,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
     }
 
-    const canLeave = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
-    if (canLeave) {
+    if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverLeave),
@@ -393,6 +412,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   clickToToggleMute(conversationEntity = this.conversationRepository.active_conversation()) {
     this.actionsViewModel.toggleMuteConversation(conversationEntity);
+  }
+
+  clickToOpenNotificationSettings(conversationEntity = this.conversationRepository.active_conversation()) {
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   }
 
   clickToUnarchive(conversationEntity) {

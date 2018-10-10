@@ -202,6 +202,7 @@ z.string.fi.modalIntegrationUnavailableMessage = 'Kiitos mielenkiinnostasi botte
 
 
 z.string.fi.modalImproveWireAction = 'Hyväksy';
+z.string.fi.modalImproveWireSecondary = 'Ei';
 
 z.string.fi.modalSessionResetHeadline = 'Istunto on nollattu';
 z.string.fi.modalSessionResetMessage1 = 'Jos ongelma ei ole ratkennut';
@@ -340,6 +341,7 @@ z.string.fi.addParticipantsTabsServices = 'Palvelut';
 z.string.fi.conversationDetailsActionArchive = 'Arkistoi';
 z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
 z.string.fi.conversationDetailsActionDevices = 'Laitteet';
+z.string.fi.conversationDetailsActionNotifications = 'Ilmoitukset';
 z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
 z.string.fi.conversationDetailsOptions = 'Valinnat';
 z.string.fi.conversationDetailsParticipantsServicesMany = 'Palvelut';
@@ -354,6 +356,8 @@ z.string.fi.groupParticipantActionCancelRequest = 'Peru pyyntö';
 z.string.fi.groupParticipantActionDevices = 'Laitteet';
 z.string.fi.groupParticipantActionPending = 'Odottaa';
 z.string.fi.groupParticipantActionSendRequest = 'Yhdistä';
+
+z.string.fi.notificationSettingsTitle = 'Ilmoitukset';
 
 z.string.fi.participantDevicesDetailHeadline = 'Vahvista että tämä vastaa sormenjälkeä joka näkyy {{html1}}{{user}}’s n laitteella{{html2}}.';
 z.string.fi.participantDevicesDetailHowTo = 'Miten teen sen?';

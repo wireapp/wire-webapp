@@ -22,11 +22,23 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-z.conversation.TIMESTAMP_TYPE = {
-  ARCHIVED: 'z.conversation.TIMESTAMP_TYPE.ARCHIVED',
-  CLEARED: 'z.conversation.TIMESTAMP_TYPE.CLEARED',
-  LAST_EVENT: 'z.conversation.TIMESTAMP_TYPE.LAST_EVENT',
-  LAST_READ: 'z.conversation.TIMESTAMP_TYPE.LAST_READ',
-  LAST_SERVER: 'z.conversation.TIMESTAMP_TYPE.LAST_SERVER',
-  MUTED: 'z.conversation.TIMESTAMP_TYPE.MUTED',
+z.conversation.NotificationSetting = {
+  /* eslint-disable sort-keys */
+
+  STATE: {
+    EVERYTHING: 0b00,
+    ONLY_MENTIONS: 0b01,
+    NOTHING: 0b11,
+  },
+
+  /* eslint-enable sort-keys */
+
+  getText(status) {
+    const statusTexts = {
+      [z.conversation.NotificationSetting.STATE.EVERYTHING]: z.string.notificationSettingsEverything,
+      [z.conversation.NotificationSetting.STATE.ONLY_MENTIONS]: z.string.notificationSettingsOnlyMentions,
+      [z.conversation.NotificationSetting.STATE.NOTHING]: z.string.notificationSettingsNothing,
+    };
+    return z.l10n.text(statusTexts[status]);
+  },
 };

@@ -770,9 +770,11 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bower_components/amplify@wireapp/amplify#v1.1.6":
-  version "1.1.6"
-  resolved "https://codeload.github.com/wireapp/amplify/tar.gz/34705fbcae4672f3929c3251763089d1dddc2670"
+"@bower_components/amplify@wireapp/amplify#v1.1.7":
+  version "1.1.7"
+  resolved "https://codeload.github.com/wireapp/amplify/tar.gz/446e1fe1b6b6702818a0d37f9669720e95d5fa70"
+  dependencies:
+    "@types/jquery" "3.3.14"
 
 "@bower_components/antiscroll-2@wireapp/antiscroll-2#1.3.1":
   version "1.3.1"
@@ -1232,6 +1234,13 @@
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.0.tgz#2fac51050c68f7d6f96c5aafc631132522f4aa3f"
   integrity sha512-1A/RUAX4VtmGzNTGLSfmiPxQ3XwUSe/1YN4lW9GRa+j307oFK6MPjhlvw6jEHDodUBIvSvrA7/iHDchr5LS+0Q==
 
+"@types/jquery@3.3.14":
+  version "3.3.14"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.14.tgz#7c78e18f8c4bf9a8eae1de62815493ab1d7cc04f"
+  integrity sha512-M6m6Xm6RtsmYOlGk7YS0D7T19Axsc3x30+Mj9b7Fqb4c7c2hPmvBJsrMmuhwJy96iSx/3BQkOmbtEKijs2iQPg==
+  dependencies:
+    "@types/sizzle" "*"
+
 "@types/js-cookie@2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.0.tgz#ae2eabaa4bc892ba553c664cca21e6ee5224e5b5"
@@ -1299,10 +1308,10 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
   integrity sha512-HtKGu+qG1NPvYe1z7ezLsyIaXYyi8SoAVqWDZgDQ8dLrsZvSzUNCwZyfX33uhWxL/SU0ZDQZ3nwZ0nimt507Kw==
 
-"@types/react-dom@16.0.8":
-  version "16.0.8"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.0.8.tgz#6e1366ed629cadf55860cbfcc25db533f5d2fa7d"
-  integrity sha512-WF/KAOia7pskV+J8f+UlNuFeCRkJuJAkyyeYPPtNe6suw0y7cWyUP/DPdPXsGUwQEkv2qlLVSrgVaoCm/PmO0Q==
+"@types/react-dom@16.0.9":
+  version "16.0.9"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.0.9.tgz#73ceb7abe6703822eab6600e65c5c52efd07fb91"
+  integrity sha512-4Z0bW+75zeQgsEg7RaNuS1k9MKhci7oQqZXxrV5KUGIyXZHHAAL3KA4rjhdH8o6foZ5xsRMSqkoM5A3yRVPR5w==
   dependencies:
     "@types/node" "*"
     "@types/react" "*"
@@ -1359,6 +1368,11 @@
   dependencies:
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
+
+"@types/sizzle@*":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
+  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
@@ -1615,13 +1629,13 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@4.3.2":
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.2.tgz#db87bd7edc2ab3b055305b7b97bd122c0b358df2"
-  integrity sha512-QsJNMiMJSMpElEGcRXcIprgZ5r2L88xI+NPTRYs/BvqJ1WjQIRE8j+ZvuS6nlz4KgM4klaeu+aRPVjFHupkgAQ==
+"@wireapp/react-ui-kit@4.3.3":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.3.tgz#c71191d55676aeb96c979446fce1ac0fa3829d1f"
+  integrity sha512-W/txUsZwdPt568EF/rotbNe0ltlBmROMlbGrIW6MQCx3FWpxJuYglZBN5a15uIcwh8p1kHFqsR0GhTio7WgChw==
   dependencies:
     "@types/color" "3.0.0"
-    bazinga64 "5.3.13"
+    bazinga64 "5.3.14"
     color "3.0.0"
     react "16.5.2"
     react-dom "16.5.2"
@@ -2348,10 +2362,10 @@ bazinga64@5.2.18:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
   integrity sha1-b35EZA6crJVOQbQqelk/9WjZeU0=
 
-bazinga64@5.3.13:
-  version "5.3.13"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.13.tgz#19c24808d386b2664db56ff5c45e04ee7561b673"
-  integrity sha512-y+MffA4L5E59Z60DyEas1AzA1lwUQWroDHWQUDWueSc1fj+vWZ5HnqKtluy1piPWn1u28ZInX88NjLFmmMKQZg==
+bazinga64@5.3.14:
+  version "5.3.14"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.14.tgz#341f1f581ee4aa29ec133907f27acb7997429669"
+  integrity sha512-TRU9Pr46PqdkOOQyv/oybhrog+c5SOfIJNd4FDF/h/JHn+vGRjLTKdzhJTfEjqJq7Jpo9BtEcehayPQe6uVmGw==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -13261,10 +13275,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
-  integrity sha512-kk80vLW9iGtjMnIv11qyxLqZm20UklzuR2tL0QAnDIygIUIemcZMxlMWudl9OOt76H3ntVzcTiddQ1/pAAJMYg==
+typescript@3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.2.tgz#c03a5d16f30bb60ad8bb6fe8e7cb212eedeec950"
+  integrity sha512-gOoGJWbNnFAfP9FlrSV63LYD5DJqYJHG5ky1kOXSl3pCImn4rqWy/flyq1BRd4iChQsoCqjbQaqtmXO4yCVPCA==
 
 ua-parser-js@^0.7.9:
   version "0.7.18"
