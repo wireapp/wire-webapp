@@ -632,8 +632,6 @@ z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferen
 z.string.preferencesAVNoCamera = 'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
 z.string.preferencesAVTryAgain= 'Try Again';
 
-
-z.string.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.preferencesDevicesActivatedOn = 'Activated {{date}}';
 z.string.preferencesDevicesActive = 'Active';
 z.string.preferencesDevicesActiveDetail = 'If you don’t recognize a device above, remove it and reset your password.';
