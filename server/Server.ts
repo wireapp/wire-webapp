@@ -25,13 +25,13 @@ import * as http from 'http';
 import * as path from 'path';
 const expressSitemapXml = require('express-sitemap-xml');
 
-import * as BrowserUtil from './BrowserUtil';
 import {ServerConfig} from './config';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
+import * as BrowserUtil from './util/BrowserUtil';
 
 const STATUS_CODE_MOVED = 301;
 const STATUS_CODE_FOUND = 302;
@@ -201,7 +201,7 @@ class Server {
   private initTemplateEngine() {
     this.app.set('view engine', 'html');
     this.app.engine('html', hbs.__express);
-    this.app.set('views', path.resolve(__dirname, 'static'));
+    this.app.set('views', [path.resolve(__dirname, 'static'), path.resolve(__dirname, 'templates')]);
     hbs.localsAsTemplateData(this.app);
     this.app.locals.config = this.config.CLIENT;
   }

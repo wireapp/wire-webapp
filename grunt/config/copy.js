@@ -31,13 +31,6 @@ module.exports = {
     expand: true,
     src: '**/*',
   },
-
-  aws_templates: {
-    cwd: '<%= dir.aws.static %>/',
-    dest: '<%= dir.aws.templates %>',
-    expand: true,
-    src: ['**/*.html', 'sw.js'],
-  },
   //##############################################################################
   // Prod/Staging/Edge deployment related
   //##############################################################################
