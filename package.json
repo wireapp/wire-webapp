@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/color": "3.0.0",
     "bazinga64": "5.3.14",
-    "color": "3.0.0",
+    "color": "3.1.0",
     "react": "16.5.2",
     "react-dom": "16.5.2",
     "react-transition-group": "2.5.0",
