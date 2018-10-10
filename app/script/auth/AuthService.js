@@ -83,17 +83,17 @@ z.auth.AuthService = class AuthService {
       };
 
       config.error = (jqXHR, textStatus, errorThrown) => {
-        const isRequestForbidden = jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
+        const isRequestForbidden = jqXHR.status === z.error.BackendClientError.STATUS_CODE.FORBIDDEN;
         if (isRequestForbidden) {
           this.logger.warn(`Request for access token forbidden (Attempt '${retryAttempt}'): ${errorThrown}`, jqXHR);
-          return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
+          return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
 
         const exceededRetries = retryAttempt > AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT;
         if (exceededRetries) {
           this.saveAccessTokenInClient();
           this.logger.warn(`Exceeded limit of attempts to refresh access token': ${errorThrown}`, jqXHR);
-          return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
+          return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED));
         }
 
         retryAttempt++;
@@ -103,7 +103,7 @@ z.auth.AuthService = class AuthService {
             .then(resolve)
             .catch(reject);
 
-        const isConnectivityProblem = jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
+        const isConnectivityProblem = jqXHR.status === z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
         if (isConnectivityProblem) {
           this.logger.warn('Delaying request for access token due to suspected connectivity issue');
           this.client.clear_queue_unblock();

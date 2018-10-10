@@ -66,7 +66,7 @@ z.calling.SDPMapper = {
    */
   rewriteSdp(rtcSdp, sdpSource = z.calling.enum.SDP_SOURCE.REMOTE, flowEntity) {
     if (!rtcSdp) {
-      throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
+      throw new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
 
     const {sdp, type} = rtcSdp;

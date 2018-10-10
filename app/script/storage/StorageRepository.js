@@ -86,7 +86,7 @@ z.storage.StorageRepository = class StorageRepository {
       if (record && record.value) {
         return record.value;
       }
-      throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+      throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
     });
   }
 

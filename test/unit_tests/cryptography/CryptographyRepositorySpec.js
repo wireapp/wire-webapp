@@ -142,7 +142,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       try {
         await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
       } catch (error) {
-        expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+        expect(error.type).toBe(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
       }
 
       done();

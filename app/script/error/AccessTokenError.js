@@ -19,31 +19,25 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:storage/StorageService
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+z.error.AccessTokenError = class AccessTokenError extends z.error.BaseError {
+  static get MESSAGE() {
+    return {
+      NOT_FOUND_IN_CACHE: 'No cached access token found in Local Storage',
+      REQUEST_FAILED: 'Exceeded allowed number of retries to get Access Token',
+      REQUEST_FORBIDDEN: 'Request to POST for access token failed',
+      RETRIES_EXCEEDED: 'Request to POST for access token forbidden',
+    };
+  }
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
-
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
-
-  describe('save', () => {
-    it('does not save "null" values', done => {
-      TestFactory.storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(done.fail)
-        .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-          done();
-        });
-    });
-  });
-});
+  static get TYPE() {
+    return {
+      NOT_FOUND_IN_CACHE: 'NOT_FOUND_IN_CACHE',
+      REQUEST_FAILED: 'REQUEST_FAILED',
+      REQUEST_FORBIDDEN: 'REQUEST_FORBIDDEN',
+      RETRIES_EXCEEDED: 'RETRIES_EXCEEDED',
+    };
+  }
+};

@@ -20,29 +20,24 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.notification = z.notification || {};
+window.z.error = z.error || {};
 
-z.notification.NotificationError = class NotificationError extends Error {
-  constructor(type) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || NotificationError.TYPE.UNKNOWN;
-
-    switch (this.type) {
-      case NotificationError.TYPE.HIDE_NOTIFICATION:
-        this.message = 'Do not show notification for this message';
-        break;
-      default:
-        this.message = 'Unknown NotificationError';
-    }
+z.error.AudioError = class AudioError extends z.error.BaseError {
+  static get MESSAGE() {
+    return {
+      ALREADY_PLAYING: 'Sound is already playing',
+      FAILED_TO_PLAY: 'Failed to play sound',
+      IGNORED_SOUND: 'Ignored request to play sound',
+      NOT_FOUND: 'AudioElement or ID not found',
+    };
   }
 
   static get TYPE() {
     return {
-      HIDE_NOTIFICATION: 'NotificationError.TYPE.HIDE_NOTIFICATION',
-      UNKNOWN: 'NotificationError.TYPE.UNKNOWN',
+      ALREADY_PLAYING: 'ALREADY_PLAYING',
+      FAILED_TO_PLAY: 'FAILED_TO_PLAY',
+      IGNORED_SOUND: 'IGNORED_SOUND',
+      NOT_FOUND: 'NOT_FOUND',
     };
   }
 };

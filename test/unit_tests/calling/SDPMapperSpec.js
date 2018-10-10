@@ -41,7 +41,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
 
   describe('rewriteSdp', () => {
     it('fails if no SDP given', () => {
-      const expectedError = new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
+      const expectedError = new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
       expect(() => sdpMapper.rewriteSdp(undefined)).toThrow(expectedError);
     });
 

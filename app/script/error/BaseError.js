@@ -20,42 +20,40 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.permission = z.permission || {};
+window.z.error = z.error || {};
 
-z.permission.PermissionError = class PermissionError extends Error {
-  constructor(type) {
+z.error.BaseError = class BaseError extends Error {
+  constructor(type, message) {
     super();
+
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || PermissionError.TYPE.UNKNOWN;
-    switch (this.type) {
-      case PermissionError.TYPE.DENIED: {
-        this.message = 'Permission was denied';
-        break;
-      }
 
-      case PermissionError.TYPE.UNSUPPORTED: {
-        this.message = 'Permissions API is not supported';
-        break;
-      }
+    const ErrorInstanceClass = z.error[this.name];
+    const knownTypes = Object.assign({}, BaseError.TYPE, ErrorInstanceClass.TYPE);
+    const isValidType = Object.values(knownTypes).includes(type);
 
-      case PermissionError.TYPE.UNSUPPORTED_TYPE: {
-        this.message = 'Permissions API does not support requested type';
-        break;
-      }
+    this.type = isValidType ? type : BaseError.TYPE.UNKNOWN;
 
-      default: {
-        this.message = 'Unknown Permission Error';
-      }
+    this.message = message || ErrorInstanceClass.MESSAGE[this.type] || BaseError.MESSAGE[this.type];
+    if (!this.message) {
+      this.message = `${BaseError.MESSAGE.UNKNOWN} ${this.name}`;
     }
+  }
+
+  static get MESSAGE() {
+    return {
+      INVALID_PARAMETER: 'Invalid parameter passed',
+      MISSING_PARAMETER: 'Required parameter is not defined',
+      UNKNOWN: 'Unknown',
+    };
   }
 
   static get TYPE() {
     return {
-      DENIED: 'PermissionError.TYPE.DENIED',
-      UNKNOWN: 'PermissionError.TYPE.UNKNOWN',
-      UNSUPPORTED: 'PermissionError.TYPE.UNSUPPORTED',
-      UNSUPPORTED_TYPE: 'PermissionError.TYPE.UNSUPPORTED_TYPE',
+      INVALID_PARAMETER: 'INVALID_PARAMETER',
+      MISSING_PARAMETER: 'MISSING_PARAMETER',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

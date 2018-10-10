@@ -93,7 +93,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
       .getConversationCode(conversationEntity.id)
       .then(response => this.conversationMapper.mapAccessCode(conversationEntity, response))
       .catch(error => {
-        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (!isNotFound) {
           this._showModal(z.string.modalConversationGuestOptionsGetCodeMessage);
         }

@@ -20,29 +20,22 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.team = z.team || {};
+window.z.error = z.error || {};
 
-z.team.TeamError = class TeamError extends Error {
-  constructor(type) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || TeamError.TYPE.UNKNOWN;
-
-    switch (this.type) {
-      case TeamError.TYPE.NO_PERMISSIONS:
-        this.message = 'No permissions provided';
-        break;
-      default:
-        this.message = 'Unknown TeamError';
-    }
+z.error.PermissionError = class PermissionError extends z.error.BaseError {
+  static get MESSAGE() {
+    return {
+      DENIED: 'Permission was denied',
+      UNSUPPORTED: 'Permissions API is not supported',
+      UNSUPPORTED_TYPE: 'Permissions API does not support requested type',
+    };
   }
 
   static get TYPE() {
     return {
-      NO_PERMISSIONS: 'TeamError.TYPE.NO_PERMISSIONS',
-      UNKNOWN: 'TeamError.TYPE.UNKNOWN',
+      DENIED: 'DENIED',
+      UNSUPPORTED: 'UNSUPPORTED',
+      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }
 };

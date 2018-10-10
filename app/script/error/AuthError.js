@@ -19,31 +19,25 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:storage/StorageService
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+z.error.AuthError = class AuthError extends z.error.BaseError {
+  static get MESSAGE() {
+    return {
+      COOKIES_DISABLED: 'Cookies are disabled',
+      INDEXED_DB_UNSUPPORTED: 'IndexedDB is not supported',
+      MULTIPLE_TABS: 'Cannot open in multiple tabs simultaneously',
+      PRIVATE_MODE: 'Unsupported Private Mode',
+    };
+  }
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
-
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
-
-  describe('save', () => {
-    it('does not save "null" values', done => {
-      TestFactory.storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(done.fail)
-        .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-          done();
-        });
-    });
-  });
-});
+  static get TYPE() {
+    return {
+      COOKIES_DISABLED: 'COOKIES_DISABLED',
+      INDEXED_DB_UNSUPPORTED: 'INDEXED_DB_UNSUPPORTED',
+      MULTIPLE_TABS: 'MULTIPLE_TABS',
+      PRIVATE_MODE: 'PRIVATE_MODE',
+    };
+  }
+};

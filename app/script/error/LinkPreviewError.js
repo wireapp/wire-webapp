@@ -19,31 +19,25 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:storage/StorageService
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+z.error.LinkPreviewError = class LinkPreviewError extends z.error.BaseError {
+  static get MESSAGE() {
+    return {
+      BLACKLISTED: 'Skipped preview for blacklisted link',
+      NO_DATA_AVAILABLE: 'Link does not provide Open Graph data.',
+      NOT_SUPPORTED: 'Your client cannot render link previews using Open Graph data.',
+      UNSUPPORTED_TYPE: 'Open Graph data from the given link does not provide necessary attributes.',
+    };
+  }
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
-
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
-
-  describe('save', () => {
-    it('does not save "null" values', done => {
-      TestFactory.storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(done.fail)
-        .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-          done();
-        });
-    });
-  });
-});
+  static get TYPE() {
+    return {
+      BLACKLISTED: 'BLACKLISTED',
+      NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
+      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
+    };
+  }
+};
