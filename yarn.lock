@@ -774,15 +774,15 @@
   version "1.1.6"
   resolved "https://codeload.github.com/wireapp/amplify/tar.gz/34705fbcae4672f3929c3251763089d1dddc2670"
 
-"@bower_components/antiscroll-2@wireapp/antiscroll-2#1.3.1":
+"@bower_components/antiscroll-2@wireapp/antiscroll-2#v1.3.1":
   version "1.3.1"
   resolved "https://codeload.github.com/wireapp/antiscroll-2/tar.gz/36f68aeabfccf170d3f8cf78ce249f2a4f0bda55"
 
-"@bower_components/bazinga64@wireapp/bazinga64#5.0.3":
+"@bower_components/bazinga64@wireapp/bazinga64#v5.0.3":
   version "5.0.3"
   resolved "https://codeload.github.com/wireapp/bazinga64/tar.gz/dda8ab93bc0c985a1fd3d8990e7b3a21b26565f2"
 
-"@bower_components/bytebuffer@dcodeIO/ByteBuffer.js#~3":
+"@bower_components/bytebuffer@dcodeIO/ByteBuffer.js#3.5.5":
   version "3.5.5"
   resolved "https://codeload.github.com/dcodeIO/ByteBuffer.js/tar.gz/83b98043f13f6073b9e073f0eb39849dab5ae257"
   dependencies:
@@ -793,11 +793,11 @@
   version "3.1.9"
   resolved "https://codeload.github.com/brix/crypto-js/tar.gz/0596faee7aa619f6f25e43e770e545ae7233b095"
 
-"@bower_components/dexie@dfahlander/Dexie.js#2.0.4":
+"@bower_components/dexie@dfahlander/Dexie.js#v2.0.4":
   version "2.0.4"
   resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/70b22f3b85368762129639928075ea0c4865a199"
 
-"@bower_components/generic-message-proto@wireapp/generic-message-proto#1.21.6":
+"@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.21.6":
   version "1.21.6"
   resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/78abfcec1f97b047ef4bc3f3138c21575e48b5c1"
   dependencies:
@@ -815,15 +815,15 @@
   version "3.3.1"
   resolved "https://codeload.github.com/jquery/jquery/tar.gz/32b00373b3f42e5cdcb709df53f3b08b7184a944"
 
-"@bower_components/js-cookie@js-cookie/js-cookie#2.2.0":
+"@bower_components/js-cookie@js-cookie/js-cookie#v2.2.0":
   version "2.2.0"
   resolved "https://codeload.github.com/js-cookie/js-cookie/tar.gz/34f056cd261982828072b84a9bbdcd8c3d9931ad"
 
-"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#2.4.1":
+"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#v2.4.1":
   version "2.4.1"
   resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/4fa305890b8a99a64a190a0f4d6572cbf8b6b8ab"
 
-"@bower_components/knockout@knockout/knockout#3.4.1":
+"@bower_components/knockout@knockout/knockout#v3.4.1":
   version "3.4.1"
   resolved "https://codeload.github.com/knockout/knockout/tar.gz/7a83820efc96d47742e2f8c9b4fcd2459c81dd21"
 
@@ -833,15 +833,19 @@
   dependencies:
     libsodium "0.7.3"
 
-"@bower_components/linkifyjs@nfrasser/linkify-shim#2.1.6":
-  version "0.0.0"
-  resolved "https://codeload.github.com/nfrasser/linkify-shim/tar.gz/a6caa8d338d07551c842f4f6f71a1015948542bb"
+"@bower_components/linkifyjs@SoapBox/linkifyjs#v2.1.6":
+  version "2.1.6"
+  resolved "https://codeload.github.com/SoapBox/linkifyjs/tar.gz/e959ed227e51f592052cf6c3b3ce922ae076f8f3"
+  optionalDependencies:
+    jquery "^3.3.1"
+    react "^16.2.0"
+    react-dom "^16.2.0"
 
-"@bower_components/long@dcodeIO/Long.js#*":
+"@bower_components/long@dcodeIO/Long.js#3.2.0":
   version "3.2.0"
   resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
 
-"@bower_components/mixpanel@mixpanel/mixpanel-js#2.22.4":
+"@bower_components/mixpanel@mixpanel/mixpanel-js#v2.22.4":
   version "2.22.4"
   resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/40945bbee973dbc85d061653a687faa81f3cfd05"
 
@@ -878,7 +882,7 @@
     glob "^5.0.10"
     yargs "^3.10.0"
 
-"@bower_components/raygun4js@MindscapeHQ/raygun4js#2.13.0":
+"@bower_components/raygun4js@MindscapeHQ/raygun4js#v2.13.0":
   version "2.13.0"
   resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/ffec047cedf201d0d935fadd6a79e21292b19cdb"
 
@@ -894,11 +898,11 @@
   version "1.9.1"
   resolved "https://codeload.github.com/jashkenas/underscore/tar.gz/ae037f7c41323807ae6f1533c45512e6d31a1574"
 
-"@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#5.0.0":
+"@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#v5.0.0":
   version "5.0.0"
   resolved "https://codeload.github.com/jerrybendy/url-search-params-polyfill/tar.gz/edb62235e522bcaa7d2db97e15262e286b5971f6"
 
-"@bower_components/uuid@LiosK/UUID.js#4.0.3":
+"@bower_components/uuid@LiosK/UUID.js#v4.0.3":
   version "4.0.3"
   resolved "https://codeload.github.com/LiosK/UUID.js/tar.gz/900d6be34f52ac12f08770d3ad68416d54c71340"
 
@@ -912,7 +916,7 @@
   version "1.1.1"
   resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/e18530c1e0530d66c553dc9b54d5e64b60713b04"
 
-"@bower_components/webapp-module-modal@wireapp/webapp-module-modal#1.0.2":
+"@bower_components/webapp-module-modal@wireapp/webapp-module-modal#v1.0.2":
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-modal/tar.gz/9d7d42fb87cbc679989a842b55461df2600a6f44"
 
@@ -920,18 +924,18 @@
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
 
-"@bower_components/webrtc-adapter@webrtc/adapter#6.4.0":
+"@bower_components/webrtc-adapter@webrtc/adapter#v6.4.0":
   version "6.4.0"
   resolved "https://codeload.github.com/webrtc/adapter/tar.gz/3cbe85baab6d724ad739add4463d01a16de0a7f0"
   dependencies:
     rtcpeerconnection-shim "^1.2.14"
     sdp "^2.9.0"
 
-"@bower_components/wire-audio-files@wireapp/wire-audio-files#1.1.1":
+"@bower_components/wire-audio-files@wireapp/wire-audio-files#v1.1.1":
   version "1.1.1"
   resolved "https://codeload.github.com/wireapp/wire-audio-files/tar.gz/058725ae555ac0e1bbf37c3e020b9ad825afb760"
 
-"@bower_components/wire-theme@wireapp/wire-theme#1.0.6":
+"@bower_components/wire-theme@wireapp/wire-theme#v1.0.6":
   version "1.0.6"
   resolved "https://codeload.github.com/wireapp/wire-theme/tar.gz/8fb3b63a55a0cf96be9ac4718df6225784d5577a"
 
@@ -7368,7 +7372,7 @@ jest-validate@^23.5.0:
     leven "^2.1.0"
     pretty-format "^23.5.0"
 
-jquery@3.3.1:
+jquery@3.3.1, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
   integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
@@ -10949,7 +10953,7 @@ react-addons-test-utils@15.6.2:
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
   integrity sha1-wStu/cIkfBDae4dw0YUICnsEcVY=
 
-react-dom@16.5.2:
+react-dom@16.5.2, react-dom@^16.2.0:
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.5.2.tgz#b69ee47aa20bab5327b2b9d7c1fe2a30f2cfa9d7"
   integrity sha512-RC8LDw8feuZOHVgzEf7f+cxBr/DnKdqp56VU0lAs1f4UfKc4cU8wU4fTq/mgnvynLQo8OtlPC19NUFh/zjZPuA==
@@ -11064,7 +11068,7 @@ react-transition-group@2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react@16.5.2:
+react@16.5.2, react@^16.2.0:
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.5.2.tgz#19f6b444ed139baa45609eee6dc3d318b3895d42"
   integrity sha512-FDCSVd3DjVTmbEAjUNX6FgfAmQ+ypJfHUsqUJOYNCBUp1h8lqmtC+0mXJ+JjsWx4KAVTkk1vKd1hLQPvEviSuw==
