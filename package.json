@@ -387,6 +387,5 @@
     "@bower_components/wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
     }
-  },
-  "version": "0.0.0"
+  }
 }

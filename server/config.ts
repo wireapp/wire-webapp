@@ -22,8 +22,6 @@ import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as path from 'path';
 import {fileIsReadable, readFile} from './FileUtil';
 
-const {version}: {version: string} = require('../package.json');
-
 dotenv.config();
 
 const CSP: HelmetCSP = {
@@ -88,7 +86,7 @@ export interface ServerConfig {
     SUPPORTED_BROWSERS: {
       [name: string]: number;
     };
-    VERSION: string;
+    VERSION?: string;
   };
   SERVER: {
     BASE: string;
@@ -121,7 +119,7 @@ const config: ServerConfig = {
       msedge: 15,
       opera: 43,
     },
-    VERSION: version,
+    VERSION: undefined,
   },
   SERVER: {
     BASE: process.env.BASE,
@@ -143,6 +141,7 @@ const config: ServerConfig = {
 const robotsDir = path.join(__dirname, 'robots');
 const robotsAllowFile = path.join(robotsDir, 'robots.txt');
 const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
+const versionFile = path.join(__dirname, 'version');
 
 if (fileIsReadable(robotsAllowFile, true)) {
   try {
@@ -153,6 +152,12 @@ if (fileIsReadable(robotsAllowFile, true)) {
 if (fileIsReadable(robotsDisallowFile, true)) {
   try {
     config.SERVER.ROBOTS.DISALLOW = readFile(robotsDisallowFile, true);
+  } catch (error) {}
+}
+
+if (fileIsReadable(versionFile, true)) {
+  try {
+    config.CLIENT.VERSION = readFile(versionFile, true);
   } catch (error) {}
 }
 
