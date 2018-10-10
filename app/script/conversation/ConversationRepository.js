@@ -1522,7 +1522,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _checkChangedConversations() {
-    this.conversationsWithNewEvents.forEach(([, conversationEntity]) => {
+    this.conversationsWithNewEvents.forEach(conversationEntity => {
       if (conversationEntity.shouldUnarchive()) {
         this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
       }
