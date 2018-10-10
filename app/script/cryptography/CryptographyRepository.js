@@ -281,8 +281,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
-      const error = new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT));
     }
 
     // Check the length of the message

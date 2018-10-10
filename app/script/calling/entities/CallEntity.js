@@ -806,8 +806,7 @@ z.calling.entities.CallEntity = class CallEntity {
       }
     }
 
-    const error = new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'No participant found for user ID');
-    return Promise.reject(error);
+    return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'No participant found for user ID'));
   }
 
   /**

@@ -443,10 +443,10 @@ z.client.ClientRepository = class ClientRepository {
         this.logger.error(`Unable to delete client '${clientId}': ${error.message}`, error);
 
         const isForbidden = z.error.BackendClientError.STATUS_CODE.FORBIDDEN;
-        const error_type = isForbidden
+        const errorType = isForbidden
           ? z.error.ClientError.TYPE.REQUEST_FORBIDDEN
           : z.error.ClientError.TYPE.REQUEST_FAILURE;
-        throw new z.error.ClientError(error_type);
+        throw new z.error.ClientError(errorType);
       });
   }
 

@@ -329,8 +329,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversation_et;
       })
       .catch(() => {
-        const errorType = z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        const error = new z.error.ConversationError(errorType);
+        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
 
         this.fetching_conversations[conversation_id].forEach(({reject_fn}) => reject_fn(error));
         delete this.fetching_conversations[conversation_id];
@@ -714,8 +713,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   get_conversation_by_id(conversation_id) {
     if (!_.isString(conversation_id)) {
-      const error = new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CONVERSATION_ID);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CONVERSATION_ID));
     }
 
     return this.find_conversation_by_id(conversation_id)
@@ -1414,14 +1412,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   setNotificationState(conversationEntity, notificationState) {
     if (!conversationEntity || notificationState === undefined) {
-      const error = new z.error.ConversationError(z.error.ConversationError.TYPE.MISSING_PARAMETER);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.MISSING_PARAMETER));
     }
 
     const validNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
     if (!validNotificationStates.includes(notificationState)) {
-      const error = new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER));
     }
 
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
@@ -1990,8 +1986,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
-      const error = new z.error.ConversationError(z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES));
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
@@ -2732,8 +2727,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
-        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CONVERSATION);
-        return Promise.reject(error);
+        return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CONVERSATION));
       }
     }
 

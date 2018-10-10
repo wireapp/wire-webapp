@@ -43,8 +43,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    */
   mapGenericMessage(genericMessage, event) {
     if (!genericMessage) {
-      const error = new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
     }
 
     return Promise.resolve()
@@ -352,9 +351,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       return this._mapImageMedium(image, eventId);
     }
 
-    const error = new z.error.CryptographyError(z.error.CryptographyError.TYPE.IGNORED_PREVIEW);
-    this.logger.info(`Skipped event '${eventId}': ${error.message}`);
-    throw error;
+    this.logger.info(`Skipped event '${eventId}': ${z.error.CryptographyError.MESSAGE.IGNORED_PREVIEW}`);
+    throw new z.error.CryptographyError(z.error.CryptographyError.MESSAGE.IGNORED_PREVIEW);
   }
 
   _mapImageMedium(image, eventId) {

@@ -20,7 +20,6 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.event = z.event || {};
 window.z.error = z.error || {};
 
 z.error.EventError = class EventError extends z.error.BaseError {

@@ -20,7 +20,6 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
 window.z.error = z.error || {};
 
 z.error.CryptographyError = class CryptographyError extends z.error.BaseError {
