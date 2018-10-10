@@ -592,8 +592,7 @@ z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen 
 z.string.de.preferencesAVNoCamera = 'Wire hat keinen Zugriff auf die Kamera.[br][faqLink]Zur Behebung bitte diesen Support Artikel anschauen[/faqLink].';
 z.string.de.preferencesAVTryAgain = 'Erneut versuchen';
 
-z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
-z.string.de.preferencesDevicesActivatedOn = 'Aktiviert am {{date}}';
+z.string.de.preferencesDevicesActivatedOn = 'Aktiviert {{date}}';
 z.string.de.preferencesDevicesActive = 'Aktiv';
 z.string.de.preferencesDevicesActiveDetail = 'Falls du eines dieser Geräte nicht erkennst, entferne es und setze dein Passwort zurück.';
 z.string.de.preferencesDevicesCurrent = 'Dieses Gerät';
