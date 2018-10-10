@@ -23,10 +23,6 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.UserError = class UserError extends z.error.BaseError {
-  constructor(type, message) {
-    super(type, message);
-  }
-
   static get MESSAGE() {
     return {
       INVALID_UPDATE: 'False input data for requested update',

@@ -23,10 +23,6 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.CryptographyError = class CryptographyError extends z.error.BaseError {
-  constructor(type, message) {
-    super(type, message);
-  }
-
   static get MESSAGE() {
     return {
       BROKEN_EXTERNAL: 'Failed to map external message',

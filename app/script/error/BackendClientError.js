@@ -26,7 +26,7 @@ z.error.BackendClientError = class BackendClientError extends z.error.BaseError 
   constructor(params) {
     const message = params.message || `${params}`;
 
-    super(undefined, message);
+    super(BackendClientError.TYPE.GENERIC, message);
 
     if (_.isObject(params)) {
       this.code = params.code;
@@ -86,6 +86,12 @@ z.error.BackendClientError = class BackendClientError extends z.error.BaseError 
       REQUEST_TOO_LARGE: 413,
       TOO_MANY_REQUESTS: 429,
       UNAUTHORIZED: 401,
+    };
+  }
+
+  static get TYPE() {
+    return {
+      GENERIC: 'GENERIC',
     };
   }
 };

@@ -23,10 +23,6 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.CallError = class CallError extends z.error.BaseError {
-  constructor(type, message) {
-    super(type, message);
-  }
-
   static get MESSAGE() {
     return {
       MISTARGETED_MESSAGE: 'Message targeted at another client',

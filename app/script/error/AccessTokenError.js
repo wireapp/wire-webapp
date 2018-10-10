@@ -23,10 +23,6 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.AccessTokenError = class AccessTokenError extends z.error.BaseError {
-  constructor(type, message) {
-    super(type, message);
-  }
-
   static get MESSAGE() {
     return {
       NOT_FOUND_IN_CACHE: 'No cached access token found in Local Storage',

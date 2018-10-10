@@ -23,10 +23,6 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.StorageError = class StorageError extends z.error.BaseError {
-  constructor(type, message) {
-    super(type, message);
-  }
-
   static get MESSAGE() {
     return {
       DATA_STORE_NOT_FOUND: 'Data store not found',
