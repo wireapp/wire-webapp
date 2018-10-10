@@ -199,7 +199,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .updateParticipatingUserEntities(conversationEntity, false, true)
       .then(_conversationEntity => {
         return this.marked_message()
-          ? this.conversation_repository.get_messages_with_offset(_conversationEntity, this.marked_message())
+          ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, this.marked_message())
           : this.conversation_repository.getPrecedingMessages(_conversationEntity);
       })
       .then(() => {
@@ -351,14 +351,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (last_message && !this.conversation_reached_bottom) {
       this.capture_scrolling_event = false;
-      this.conversation_repository
-        .get_subsequent_messages(this.conversation(), last_message, false)
-        .then(message_ets => {
-          if (!message_ets.length) {
-            this.conversation_reached_bottom = true;
-          }
-          this.capture_scrolling_event = true;
-        });
+      this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(message_ets => {
+        if (!message_ets.length) {
+          this.conversation_reached_bottom = true;
+        }
+        this.capture_scrolling_event = true;
+      });
     }
   }
 

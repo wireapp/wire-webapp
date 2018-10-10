@@ -341,10 +341,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   getConversations() {
     const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+      return [];
     });
 
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsPromise])
-      .then(([localConversations, remoteConversations = []]) => {
+      .then(([localConversations, remoteConversations]) => {
         if (!remoteConversations.length) {
           return localConversations;
         }
@@ -487,47 +488,47 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Get specified message and load number preceding and subsequent messages defined by padding.
    *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message entity
+   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {Message} messageEntity - Message entity
    * @param {number} [padding=15] - Padding
    * @returns {Promise} Resolves with the message
    */
-  get_messages_with_offset(conversation_et, message_et, padding = 15) {
-    const message_date = new Date(message_et.timestamp());
+  getMessagesWithOffset(conversationEntity, messageEntity, padding = 15) {
+    const messageDate = new Date(messageEntity.timestamp());
+    const conversationId = conversationEntity.id;
 
-    conversation_et.is_pending(true);
+    conversationEntity.is_pending(true);
 
-    return Promise.all([
-      this.eventService.loadPrecedingEvents(conversation_et.id, new Date(0), message_date, padding),
-      this.eventService.loadFollowingEvents(conversation_et.id, message_date, padding),
-    ])
-      .then(([older_events, newer_events]) =>
-        this._addEventsToConversation(older_events.concat(newer_events), conversation_et)
-      )
-      .then(mapped_messages => {
-        conversation_et.is_pending(false);
-        return mapped_messages;
+    const preceedingPromise = this.eventService.loadPrecedingEvents(conversationId, new Date(0), messageDate, padding);
+    const followingPromise = this.eventService.loadFollowingEvents(conversationEntity.id, messageDate, padding);
+    return Promise.all([preceedingPromise, followingPromise])
+      .then(([olderEvents, newerEvents]) => {
+        this._addEventsToConversation(olderEvents.concat(newerEvents), conversationEntity);
+      })
+      .then(mappedMessageEntnties => {
+        conversationEntity.is_pending(false);
+        return mappedMessageEntnties;
       });
   }
 
   /**
    * Get subsequent messages starting with the given message.
    *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message entity
-   * @param {boolean} include_message - Include given message in the results
+   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {Message} messageEntity - Message entity
+   * @param {boolean} includeMessage - Include given message in the results
    * @returns {Promise} Resolves with the messages
    */
-  get_subsequent_messages(conversation_et, message_et, include_message) {
-    const message_date = new Date(message_et.timestamp());
-    conversation_et.is_pending(true);
+  getSubsequentMessages(conversationEntity, messageEntity, includeMessage) {
+    const messageDate = new Date(messageEntity.timestamp());
+    conversationEntity.is_pending(true);
 
     return this.eventService
-      .loadFollowingEvents(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
-      .then(events => this._addEventsToConversation(events, conversation_et))
-      .then(mapped_messages => {
-        conversation_et.is_pending(false);
-        return mapped_messages;
+      .loadFollowingEvents(conversationEntity.id, messageDate, z.config.MESSAGES_FETCH_LIMIT, includeMessage)
+      .then(events => this._addEventsToConversation(events, conversationEntity))
+      .then(mappedNessageEntities => {
+        conversationEntity.is_pending(false);
+        return mappedNessageEntities;
       });
   }
 
@@ -1353,10 +1354,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.sendSessionReset(user_id, client_id, conversation_id);
       })
       .catch(error => {
-        this.logger.warn(
-          `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`,
-          error
-        );
+        const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
+        this.logger.warn(logMessage, error);
         throw error;
       });
   }
@@ -1681,10 +1680,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_asset_metadata(conversation_et, file) {
     return z.assets.AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
-        this.logger.warn(
-          `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`,
-          error
-        );
+        const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
+        this.logger.warn(logMessage, error);
         return undefined;
       })
       .then(metadata => {
@@ -1715,10 +1712,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._send_and_inject_generic_message(conversation_et, generic_message);
       })
       .catch(error => {
-        this.logger.warn(
-          `Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`,
-          error
-        );
+        const log = `Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`;
+        this.logger.warn(log, error);
 
         if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
