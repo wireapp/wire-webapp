@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.calling = z.calling || {};
+window.z.error = z.error || {};
 
-z.calling.CallError = class CallError extends Error {
+z.error.CallError = class CallError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || CallError.TYPE.UNKNOWN;
-
-    this.message = message || CallError.MESSAGE[this.type] || CallError.MESSAGE.UNKNOWN;
+    const errorName = 'CallError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {

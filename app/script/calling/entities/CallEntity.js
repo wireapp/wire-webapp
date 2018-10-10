@@ -723,7 +723,7 @@ z.calling.entities.CallEntity = class CallEntity {
     return this.getParticipantById(userId)
       .then(participantEntity => this._updateParticipant(participantEntity, negotiate, callMessageEntity))
       .catch(error => {
-        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (isNotFound) {
           return this._addParticipant(userId, negotiate, callMessageEntity);
         }
@@ -784,7 +784,7 @@ z.calling.entities.CallEntity = class CallEntity {
         return this;
       })
       .catch(error => {
-        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (isNotFound) {
           return this;
         }
@@ -806,7 +806,7 @@ z.calling.entities.CallEntity = class CallEntity {
       }
     }
 
-    const error = new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant found for user ID');
+    const error = new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'No participant found for user ID');
     return Promise.reject(error);
   }
 
@@ -844,7 +844,7 @@ z.calling.entities.CallEntity = class CallEntity {
         return this;
       }
 
-      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
+      throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
     });
   }
 
@@ -860,7 +860,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const isSelfUser = userId === this.selfUser.id;
     if (isSelfUser) {
       const errorMessage = 'Self user should not be added as call participant';
-      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.WRONG_STATE, errorMessage));
+      return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.WRONG_STATE, errorMessage));
     }
 
     return this.userRepository.get_user_by_id(userId).then(userEntity => {

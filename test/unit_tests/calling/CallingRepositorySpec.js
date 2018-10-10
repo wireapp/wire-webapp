@@ -33,7 +33,7 @@ describe('z.calling.CallingRepository', () => {
 
   describe('toggleMedia', () => {
     it('does nothing if the conversation is not found', () => {
-      spyOn(callingRepository, 'getCallById').and.returnValue(Promise.reject(z.calling.CallError.TYPE.NOT_FOUND));
+      spyOn(callingRepository, 'getCallById').and.returnValue(Promise.reject(z.error.CallError.TYPE.NOT_FOUND));
       spyOn(callingRepository, '_toggleMediaState');
       return callingRepository.toggleMedia('notfoundid', 'audio').then(() => {
         expect(callingRepository._toggleMediaState).not.toHaveBeenCalled();

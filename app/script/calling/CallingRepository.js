@@ -165,7 +165,7 @@ z.calling.CallingRepository = class CallingRepository {
     if (isCall) {
       const isSupportedVersion = eventContent.version === z.calling.entities.CallMessageEntity.CONFIG.VERSION;
       if (!isSupportedVersion) {
-        throw new z.calling.CallError(z.calling.CallError.TYPE.UNSUPPORTED_VERSION);
+        throw new z.error.CallError(z.error.CallError.TYPE.UNSUPPORTED_VERSION);
       }
 
       const callMessageEntity = z.calling.CallMessageMapper.mapEvent(event);
@@ -303,7 +303,7 @@ z.calling.CallingRepository = class CallingRepository {
           });
         })
         .catch(error => {
-          const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+          const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
           if (!isNotFound) {
             throw error;
           }
@@ -339,7 +339,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.getCallById(conversationId)
       .then(callEntity => {
         if (callEntity.isOutgoing()) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Remote user leaving outgoing call');
+          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Remote user leaving outgoing call');
         }
 
         const isSelfUser = userId === this.selfUserId();
@@ -458,7 +458,7 @@ z.calling.CallingRepository = class CallingRepository {
       .then(callEntity => {
         const isSelfUser = userId !== this.selfUserId();
         if (!isSelfUser) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
+          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
         }
 
         if (!callEntity.selfClientJoined()) {
@@ -561,11 +561,11 @@ z.calling.CallingRepository = class CallingRepository {
    * Throw error is not expected types.
    *
    * @private
-   * @param {z.calling.CallError|Error} error - Error thrown during call message handling
+   * @param {z.error.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
    */
   _throwMessageError(error) {
-    const expectedErrorTypes = [z.calling.CallError.TYPE.MISTARGETED_MESSAGE, z.calling.CallError.TYPE.NOT_FOUND];
+    const expectedErrorTypes = [z.error.CallError.TYPE.MISTARGETED_MESSAGE, z.error.CallError.TYPE.NOT_FOUND];
     const isExpectedError = expectedErrorTypes.includes(error.type);
 
     if (!isExpectedError) {
@@ -578,7 +578,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.calling.CallError|Error} error - Error thrown during call message handling
+   * @param {z.error.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
    */
   _validateIncomingCall(callMessageEntity, source, error) {
@@ -637,7 +637,7 @@ z.calling.CallingRepository = class CallingRepository {
       const mistargetedMessage = !isSelfUser || !isCurrentClient;
       if (mistargetedMessage) {
         this.callLogger.log(`Ignored '${type}' call message for targeted at client '${clientId}' of user '${userId}'`);
-        throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
+        throw new z.error.CallError(z.error.CallError.TYPE.MISTARGETED_MESSAGE);
       }
     }
 
@@ -662,16 +662,16 @@ z.calling.CallingRepository = class CallingRepository {
         ];
 
         if (groupMessageTypes.includes(type)) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
+          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
       } else if (conversationEntity.isGroup()) {
         const one2oneMessageTypes = [z.calling.enum.CALL_MESSAGE_TYPE.SETUP];
 
         if (one2oneMessageTypes.includes(type)) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
+          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
       } else {
-        throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
+        throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
       }
 
       return conversationEntity;
@@ -691,7 +691,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   sendCallMessage(conversationEntity, callMessageEntity) {
     if (!_.isObject(callMessageEntity)) {
-      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
+      throw new z.error.CallError(z.error.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
 
     const {conversationId, remoteUserId, response, type} = callMessageEntity;
@@ -699,14 +699,14 @@ z.calling.CallingRepository = class CallingRepository {
     return this.getCallById(conversationId || conversationEntity.id)
       .then(callEntity => {
         if (!CallingRepository.CONFIG.DATA_CHANNEL_MESSAGE_TYPES.includes(type)) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
+          throw new z.error.CallError(z.error.CallError.TYPE.NO_DATA_CHANNEL);
         }
 
         return callEntity.getParticipantById(remoteUserId);
       })
       .then(({flowEntity}) => flowEntity.sendMessage(callMessageEntity))
       .catch(error => {
-        const expectedErrorTypes = [z.calling.CallError.TYPE.NO_DATA_CHANNEL, z.calling.CallError.TYPE.NOT_FOUND];
+        const expectedErrorTypes = [z.error.CallError.TYPE.NO_DATA_CHANNEL, z.error.CallError.TYPE.NOT_FOUND];
         const isExpectedError = expectedErrorTypes.includes(error.type);
 
         if (!isExpectedError) {
@@ -753,7 +753,7 @@ z.calling.CallingRepository = class CallingRepository {
       : callEntity
           .confirmMessage(incomingCallMessageEntity)
           .catch(error => {
-            const isNotDataChannel = error.type === z.calling.CallError.TYPE.NO_DATA_CHANNEL;
+            const isNotDataChannel = error.type === z.error.CallError.TYPE.NO_DATA_CHANNEL;
             if (!isNotDataChannel) {
               throw error;
             }
@@ -941,7 +941,7 @@ z.calling.CallingRepository = class CallingRepository {
       .then(callEntity => this._toggleMediaState(mediaType).then(() => callEntity))
       .then(callEntity => callEntity.toggleMedia(mediaType))
       .catch(error => {
-        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (!isNotFound) {
           if (mediaType === z.media.MediaType.VIDEO || mediaType === z.media.MediaType.AUDIO_VIDEO) {
             this.mediaRepository.showNoCameraModal();
@@ -981,19 +981,19 @@ z.calling.CallingRepository = class CallingRepository {
       const noConversationParticipants = !conversationEntity.participating_user_ids().length;
       if (noConversationParticipants) {
         this._showModal(z.string.modalCallEmptyConversationHeadline, z.string.modalCallEmptyConversationMessage);
-        throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
+        throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
 
       const isOutgoingCall = callState === z.calling.enum.CALL_STATE.OUTGOING;
       if (isOutgoingCall && !z.calling.CallingRepository.supportsCalling) {
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
-        throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
+        throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
 
       const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
       if (isVideoCall && !conversationEntity.supportsVideoCall(isOutgoingCall)) {
         this._showModal(z.string.modalCallNoGroupVideoHeadline, z.string.modalCallNoGroupVideoMessage);
-        throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
+        throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
     });
   }
@@ -1042,7 +1042,7 @@ z.calling.CallingRepository = class CallingRepository {
 
           default: {
             this.callLogger.error(`Tried to join second call in unexpected state '${callState}'`);
-            throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_STATE);
+            throw new z.error.CallError(z.error.CallError.TYPE.WRONG_STATE);
           }
         }
 
@@ -1094,7 +1094,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _handleJoinCallError(error, conversationId) {
-    const isNotSupported = error.type === z.calling.CallError.TYPE.NOT_SUPPORTED;
+    const isNotSupported = error.type === z.error.CallError.TYPE.NOT_SUPPORTED;
     if (!isNotSupported) {
       this.deleteCall(conversationId);
       const isMediaError = error instanceof z.media.MediaError;
@@ -1112,7 +1112,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _handleNotFoundError(error) {
-    const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+    const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
     if (!isNotFound) {
       throw error;
     }
@@ -1495,7 +1495,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   getCallById(conversationId) {
     if (!conversationId) {
-      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NO_CONVERSATION_ID));
+      return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.NO_CONVERSATION_ID));
     }
 
     for (const callEntity of this.calls()) {
@@ -1505,7 +1505,7 @@ z.calling.CallingRepository = class CallingRepository {
       }
     }
 
-    return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND));
+    return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND));
   }
 
   /**
