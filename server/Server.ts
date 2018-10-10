@@ -17,6 +17,7 @@
  *
  */
 
+import {CommonConfig} from '@wireapp/commons';
 import * as compression from 'compression';
 import * as express from 'express';
 import * as hbs from 'hbs';
@@ -179,7 +180,8 @@ class Server {
 
       const supportedBrowser = (() => {
         const browserName = parsedUserAgent.browser.name.toLowerCase();
-        const supportedBrowserVersion = this.config.CLIENT.SUPPORTED_BROWSERS[browserName];
+        const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
+        const supportedBrowserVersion = supportedBrowserVersionObject && supportedBrowserVersionObject.major;
 
         try {
           const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
