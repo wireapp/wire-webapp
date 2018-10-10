@@ -521,8 +521,7 @@ z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
 z.string.de.guestOptionsTitle = 'Gäste und Dienste';
 
 z.string.de.notificationSettingsTitle = 'Benachrichtigungen';
-z.string.de.notificationSettingsDisclaimer =
-  'Immer benachrichtigen (einschließlich Audio- und Videoanrufe) oder nur bei Erwähnungen.';
+z.string.de.notificationSettingsDisclaimer = 'Immer benachrichtigen (einschließlich Audio- und Videoanrufe) oder nur bei Erwähnungen.';
 z.string.de.notificationSettingsEverything = 'Alles';
 z.string.de.notificationSettingsOnlyMentions = 'Nur Erwähnungen';
 z.string.de.notificationSettingsNothing = 'Nichts';
