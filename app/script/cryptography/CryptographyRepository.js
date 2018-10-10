@@ -162,7 +162,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
       .catch(error => {
-        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
           throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
@@ -179,7 +179,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   getUsersPreKeys(recipients) {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+      const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
         throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
       }

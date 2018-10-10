@@ -649,7 +649,7 @@ z.user.UserRepository = class UserRepository {
         .get_users(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.map_users_from_object(response) : []))
         .catch(error => {
-          const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             return [];
           }
@@ -740,7 +740,7 @@ z.user.UserRepository = class UserRepository {
       .get_username(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
-        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
         }
       });
@@ -934,7 +934,7 @@ z.user.UserRepository = class UserRepository {
         this.self().username(valid_suggestions[0]);
       })
       .catch(error => {
-        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
 
@@ -958,8 +958,8 @@ z.user.UserRepository = class UserRepository {
         .catch(({code: error_code}) => {
           if (
             [
-              z.service.BackendClientError.STATUS_CODE.CONFLICT,
-              z.service.BackendClientError.STATUS_CODE.BAD_REQUEST,
+              z.error.BackendClientError.STATUS_CODE.CONFLICT,
+              z.error.BackendClientError.STATUS_CODE.BAD_REQUEST,
             ].includes(error_code)
           ) {
             throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
@@ -989,10 +989,10 @@ z.user.UserRepository = class UserRepository {
     return this.user_service
       .check_username(username)
       .catch(({code: error_code}) => {
-        if (error_code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
         }
-        if (error_code === z.service.BackendClientError.STATUS_CODE.BAD_REQUEST) {
+        if (error_code === z.error.BackendClientError.STATUS_CODE.BAD_REQUEST) {
           throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
         }
         throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);

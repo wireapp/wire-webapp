@@ -200,7 +200,7 @@ z.connect.ConnectRepository = class ConnectRepository {
           case z.error.ConnectError.TYPE.NO_CONTACTS:
             return {};
           default:
-            if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
+            if (error.code === z.error.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
               this.logger.error(`Backend refused upload of '${source}' contacts: Endpoint used too frequent`, error);
             } else {
               this.logger.error(`Upload of '${source}' contacts failed`, error);

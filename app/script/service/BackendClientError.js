@@ -20,22 +20,20 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.service = z.service || {};
+window.z.error = z.error || {};
 
-z.service.BackendClientError = class BackendClientError extends Error {
+z.error.BackendClientError = class BackendClientError extends z.error.BaseError {
   constructor(params) {
-    super();
+    const errorName = 'BackendClientError';
+    const message = params.message || `${params}`;
 
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
+    super(errorName, undefined, message);
 
     if (_.isObject(params)) {
       this.code = params.code;
       this.label = params.label;
-      this.message = params.message;
     } else if (_.isNumber(params)) {
       this.code = params;
-      this.message = `${params}`;
     }
   }
 

@@ -1181,15 +1181,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleAddToConversationError(error, conversationEntity, userIds) {
     switch (error.label) {
-      case z.service.BackendClientError.LABEL.NOT_CONNECTED: {
+      case z.error.BackendClientError.LABEL.NOT_CONNECTED: {
         this._handleUsersNotConnected(userIds);
         break;
       }
 
-      case z.service.BackendClientError.LABEL.BAD_GATEWAY:
-      case z.service.BackendClientError.LABEL.SERVER_ERROR:
-      case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
-      case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
+      case z.error.BackendClientError.LABEL.BAD_GATEWAY:
+      case z.error.BackendClientError.LABEL.SERVER_ERROR:
+      case z.error.BackendClientError.LABEL.SERVICE_DISABLED:
+      case z.error.BackendClientError.LABEL.TOO_MANY_BOTS: {
         const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
         const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
 
@@ -1197,7 +1197,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         break;
       }
 
-      case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
+      case z.error.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
         this._handleTooManyMembersError(conversationEntity.getNumberOfParticipants());
         break;
       }
@@ -1505,7 +1505,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
           this.logger.error(logMessage);
 
-          const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
           if (!isNotFound) {
             throw error;
           }
@@ -1550,10 +1550,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleConversationCreateError(error, userIds) {
     switch (error.label) {
-      case z.service.BackendClientError.LABEL.CLIENT_ERROR:
+      case z.error.BackendClientError.LABEL.CLIENT_ERROR:
         this._handleTooManyMembersError();
         break;
-      case z.service.BackendClientError.LABEL.NOT_CONNECTED:
+      case z.error.BackendClientError.LABEL.NOT_CONNECTED:
         this._handleUsersNotConnected(userIds);
         break;
       default:
@@ -2339,7 +2339,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .catch(error => {
-        const isRequestTooLarge = error.code === z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
+        const isRequestTooLarge = error.code === z.error.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
         if (isRequestTooLarge) {
           return this._sendExternalGenericMessage(eventInfoEntity);
         }
@@ -2374,7 +2374,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        const isUnknownClient = error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        const isUnknownClient = error.label === z.error.BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           return this.client_repository.removeLocalClient();
         }
@@ -2627,7 +2627,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._delete_message_by_id(conversationEntity, messageId);
       })
       .catch(error => {
-        const isConversationNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isConversationNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isConversationNotFound) {
           this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
           return this.deleteMessage(conversationEntity, messageEntity);

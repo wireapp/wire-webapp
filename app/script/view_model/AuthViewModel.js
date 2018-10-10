@@ -435,25 +435,25 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           this.pending_server_request(false);
           if (navigator.onLine) {
             switch (error.label) {
-              case z.service.BackendClientError.LABEL.BAD_REQUEST:
+              case z.error.BackendClientError.LABEL.BAD_REQUEST:
                 this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
                 break;
-              case z.service.BackendClientError.LABEL.INVALID_PHONE:
+              case z.error.BackendClientError.LABEL.INVALID_PHONE:
                 this._add_error(z.string.authErrorPhoneNumberUnknown, z.auth.AuthView.TYPE.PHONE);
                 break;
-              case z.service.BackendClientError.LABEL.PASSWORD_EXISTS:
+              case z.error.BackendClientError.LABEL.PASSWORD_EXISTS:
                 this._set_hash(z.auth.AuthView.MODE.VERIFY_PASSWORD);
                 break;
-              case z.service.BackendClientError.LABEL.PENDING_LOGIN:
+              case z.error.BackendClientError.LABEL.PENDING_LOGIN:
                 _on_code_request_success(error);
                 break;
-              case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
+              case z.error.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
                 this._add_error(z.string.authErrorPhoneNumberBudget, z.auth.AuthView.TYPE.PHONE);
                 break;
-              case z.service.BackendClientError.LABEL.SUSPENDED:
+              case z.error.BackendClientError.LABEL.SUSPENDED:
                 this._add_error(z.string.authErrorSuspended);
                 break;
-              case z.service.BackendClientError.LABEL.UNAUTHORIZED:
+              case z.error.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.authErrorPhoneNumberForbidden, z.auth.AuthView.TYPE.PHONE);
                 break;
               default:
@@ -480,7 +480,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         .change_own_password(this.password())
         .catch(error => {
           this.logger.warn(`Could not change user password: ${error.message}`, error);
-          if (error.code !== z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
+          if (error.code !== z.error.BackendClientError.STATUS_CODE.FORBIDDEN) {
             throw error;
           }
         })
@@ -496,13 +496,13 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           this.pending_server_request(false);
           if (error) {
             switch (error.label) {
-              case z.service.BackendClientError.LABEL.BLACKLISTED_EMAIL:
+              case z.error.BackendClientError.LABEL.BLACKLISTED_EMAIL:
                 this._add_error(z.string.authErrorEmailForbidden, z.auth.AuthView.TYPE.EMAIL);
                 break;
-              case z.service.BackendClientError.LABEL.KEY_EXISTS:
+              case z.error.BackendClientError.LABEL.KEY_EXISTS:
                 this._add_error(z.string.authErrorEmailExists, z.auth.AuthView.TYPE.EMAIL);
                 break;
-              case z.service.BackendClientError.LABEL.INVALID_EMAIL:
+              case z.error.BackendClientError.LABEL.INVALID_EMAIL:
                 this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
                 break;
               default:
@@ -553,7 +553,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           $('#wire-verify-password').focus();
           if (navigator.onLine) {
             if (error.label) {
-              if (error.label === z.service.BackendClientError.LABEL.PENDING_ACTIVATION) {
+              if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
                 this._add_error(z.string.authErrorPending);
               } else {
                 this._add_error(z.string.authErrorSignIn, z.auth.AuthView.TYPE.PASSWORD);
@@ -1577,7 +1577,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         return this.event_repository.setStreamState(clientObservable().id, true);
       })
       .catch(error => {
-        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
           return this.logger.warn(`Cannot set starting point on notification stream: ${error.message}`, error);
         }
