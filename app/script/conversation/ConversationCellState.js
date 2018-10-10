@@ -259,7 +259,7 @@ z.conversation.ConversationCellState = (() => {
   const _getStateRemoved = {
     description: conversationEntity => {
       const lastMessageEntity = conversationEntity.getLastMessage();
-      const selfUserId = conversationEntity.self.id;
+      const selfUserId = conversationEntity.selfUser().id;
 
       const isMemberRemoval = lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.isMemberRemoval();
       const wasSelfRemoved = isMemberRemoval && lastMessageEntity.userIds().includes(selfUserId);

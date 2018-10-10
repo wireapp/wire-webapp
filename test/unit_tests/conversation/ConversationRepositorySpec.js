@@ -287,7 +287,7 @@ describe('ConversationRepository', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
-      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation], true);
+      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
       TestFactory.conversation_repository.conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
@@ -1067,7 +1067,7 @@ describe('ConversationRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.self = {id: 'felix'};
+        conversation.selfUser({id: 'felix'});
         const messageText = 'hello there';
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });

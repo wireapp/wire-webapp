@@ -346,16 +346,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsPromise])
       .then(([localConversations, remoteConversations = []]) => {
-        const shouldMigrateData = localConversations.some(({muted_state}) => muted_state !== undefined);
-        if (shouldMigrateData) {
-          localConversations = this.conversationMapper.migrateConversationsData(localConversations, this.isTeam());
-        }
-
         if (!remoteConversations.length) {
           return localConversations;
         }
 
-        const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations, this.isTeam());
+        const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations);
         return this.conversation_service.save_conversations_in_db(data);
       })
       .then(conversationsData => this.mapConversations(conversationsData))
@@ -376,7 +371,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const localEntity = this.conversations().find(({id}) => id === conversationData.id);
 
           if (localEntity) {
-            const entity = this.conversationMapper.updateSelfStatus(localEntity, conversationData, this.isTeam(), true);
+            const entity = this.conversationMapper.updateSelfStatus(localEntity, conversationData, true);
             return handledConversationEntities.push(entity);
           }
 
@@ -644,7 +639,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.get_conversation_by_id(conversationEntity.id).then(conversationData => {
       const {name, message_timer} = conversationData;
       this.conversationMapper.updateProperties(conversationEntity, {name});
-      this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer}, this.isTeam());
+      this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
     });
   }
 
@@ -1002,16 +997,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
 
-    const entitites = this.conversationMapper.mapConversations(conversationsData, this.isTeam(), initialTimestamp);
-    entitites.forEach(conversationEntity => this._handle_mapped_conversation(conversationEntity));
+    const entitites = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
+    entitites.forEach(conversationEntity => {
+      this._mapGuestStatusSelf(conversationEntity);
+      conversationEntity.selfUser(this.selfUser());
+      conversationEntity.setStateChangePersistence(true);
+    });
 
     return payload.length ? entitites : entitites[0];
-  }
-
-  _handle_mapped_conversation(conversation_et) {
-    this._mapGuestStatusSelf(conversation_et);
-    conversation_et.self = this.selfUser();
-    conversation_et.setStateChangePersistence(true);
   }
 
   map_guest_status_self() {
@@ -1425,8 +1418,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(error);
     }
 
-    const validStates = Object.values(z.conversation.NotificationSetting.STATE);
-    if (!validStates.includes(notificationState)) {
+    const validNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
+    if (!validNotificationStates.includes(notificationState)) {
       const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
       return Promise.reject(error);
     }
@@ -3265,7 +3258,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEntity) : undefined;
     const previouslyArchived = conversationEntity.is_archived();
 
-    this.conversationMapper.updateSelfStatus(conversationEntity, eventData, this.isTeam());
+    this.conversationMapper.updateSelfStatus(conversationEntity, eventData);
 
     const wasUnarchived = previouslyArchived && !conversationEntity.is_archived();
     if (wasUnarchived) {

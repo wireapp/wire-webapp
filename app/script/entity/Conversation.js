@@ -30,7 +30,7 @@ z.entity.Conversation = class Conversation {
       LAST_EVENT: 'last_event_timestamp',
       LAST_READ: 'last_read_timestamp',
       LAST_SERVER: 'last_server_timestamp',
-      NOTIFICATION: 'notificationTimestamp',
+      MUTED: 'mutedTimestamp',
     };
   }
 
@@ -56,7 +56,7 @@ z.entity.Conversation = class Conversation {
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
-    this.self = undefined;
+    this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
 
@@ -89,7 +89,7 @@ z.entity.Conversation = class Conversation {
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup() && this.self.inTeam();
+      return hasGuestUser && this.isGroup() && this.selfUser() && this.selfUser().inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
@@ -103,7 +103,7 @@ z.entity.Conversation = class Conversation {
 
     // E2EE conversation states
     this.archivedState = ko.observable(false).extend({notify: 'always'});
-    this.notificationState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
+    this.mutedState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
     this.verification_state = ko.observable(z.conversation.ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
@@ -111,19 +111,42 @@ z.entity.Conversation = class Conversation {
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
-    this.notificationTimestamp = ko.observable(0);
+    this.mutedTimestamp = ko.observable(0);
 
     // Conversation states for view
+    this.notificationState = ko.pureComputed(() => {
+      if (!this.selfUser()) {
+        return z.conversation.NotificationSetting.STATE.NOTHING;
+      }
+
+      const knownNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
+      if (knownNotificationStates.includes(this.mutedState())) {
+        const isStateOnlyMentions = this.mutedState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+        const isInvalidState = isStateOnlyMentions && !this.selfUser().inTeam();
+
+        return isInvalidState ? z.conversation.NotificationSetting.STATE.NOTHING : this.mutedState();
+      }
+
+      if (typeof this.mutedState() === 'boolean') {
+        const migratedMutedState = this.selfUser().inTeam()
+          ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
+          : z.conversation.NotificationSetting.STATE.NOTHING;
+        return this.mutedState() ? migratedMutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
+      }
+
+      return z.conversation.NotificationSetting.STATE.EVERYTHING;
+    });
+
     this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
       const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-      const isInitialized = this.self && hasMappedUsers;
+      const isInitialized = this.selfUser() && hasMappedUsers;
       if (!isInitialized) {
         return undefined;
       }
 
-      const allUserEntities = [this.self].concat(this.participating_user_ets());
+      const allUserEntities = [this.selfUser()].concat(this.participating_user_ets());
       return allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
@@ -131,17 +154,10 @@ z.entity.Conversation = class Conversation {
       return this.notificationState() === z.conversation.NotificationSetting.STATE.EVERYTHING;
     });
     this.showNotificationsNothing = ko.pureComputed(() => {
-      if (this.self) {
-        return this.self.inTeam()
-          ? this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING
-          : this.notificationState() !== z.conversation.NotificationSetting.STATE.EVERYTHING;
-      }
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
     });
     this.showNotificationsOnlyMentions = ko.pureComputed(() => {
-      if (this.self) {
-        const isMentionsState = this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
-        return this.self.inTeam() ? isMentionsState : false;
-      }
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -201,7 +217,7 @@ z.entity.Conversation = class Conversation {
           const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
-          const isSelfMention = isMessage && this.self && messageEntity.isUserMentioned(this.self.id);
+          const isSelfMention = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
 
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity);
@@ -290,9 +306,9 @@ z.entity.Conversation = class Conversation {
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
+      this.mutedState,
+      this.mutedTimestamp,
       this.name,
-      this.notificationState,
-      this.notificationTimestamp,
       this.participating_user_ids,
       this.status,
       this.type,
@@ -445,7 +461,7 @@ z.entity.Conversation = class Conversation {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
           : accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
-      }, this.self.devices().length);
+      }, this.selfUser().devices().length);
     }
 
     return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
@@ -506,7 +522,7 @@ z.entity.Conversation = class Conversation {
 
       const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
       const isMemberJoin = messageEntity.is_member() && messageEntity.isMemberJoin();
-      const wasSelfUserAdded = isMemberJoin && messageEntity.isUserAffected(this.self.id);
+      const wasSelfUserAdded = isMemberJoin && messageEntity.isUserAffected(this.selfUser().id);
 
       return isCallActivation || wasSelfUserAdded;
     });
@@ -676,12 +692,16 @@ z.entity.Conversation = class Conversation {
   }
 
   getTemporaryGuests() {
-    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    const userEntities = this.selfUser()
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
     return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
   }
 
   getUsersWithUnverifiedClients() {
-    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    const userEntities = this.selfUser()
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
@@ -697,7 +717,7 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    if (this.self.inTeam()) {
+    if (this.selfUser().inTeam()) {
       return true;
     }
 
@@ -721,9 +741,9 @@ z.entity.Conversation = class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
+      muted_state: this.mutedState(),
+      muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
-      notification_state: this.notificationState(),
-      notification_timestamp: this.notificationTimestamp(),
       others: this.participating_user_ids(),
       status: this.status(),
       team_id: this.team_id,

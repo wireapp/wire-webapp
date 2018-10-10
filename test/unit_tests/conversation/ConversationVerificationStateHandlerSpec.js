@@ -30,7 +30,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
   let conversation_b = undefined;
   let conversation_c = undefined;
 
-  let user_self = undefined;
+  let selfUserEntity = undefined;
   let user_a = undefined;
   let user_b = undefined;
 
@@ -49,8 +49,8 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
         conversation_b = new z.entity.Conversation(z.util.createRandomUuid());
         conversation_c = new z.entity.Conversation(z.util.createRandomUuid());
 
-        user_self = conversation_repository.selfUser();
-        user_self.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
+        selfUserEntity = conversation_repository.selfUser();
+        selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
         user_a = new z.entity.User(z.util.createRandomUuid());
         user_b = new z.entity.User(z.util.createRandomUuid());
@@ -63,17 +63,17 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
         client_b.meta.isVerified(true);
         user_b.devices.push(client_b);
 
-        conversation_ab.self = user_self;
+        conversation_ab.selfUser(selfUserEntity);
         conversation_ab.participating_user_ids.push(user_a.id, user_b.id);
         conversation_ab.participating_user_ets.push(user_a, user_b);
         conversation_ab.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
 
-        conversation_b.self = user_self;
+        conversation_b.selfUser(selfUserEntity);
         conversation_b.participating_user_ids.push(user_b.id);
         conversation_b.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
         conversation_b.participating_user_ets.push(user_b);
 
-        conversation_c.self = user_self;
+        conversation_c.selfUser(selfUserEntity);
         conversation_c.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
 
         conversation_repository.conversations.removeAll();
@@ -147,9 +147,9 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
       const new_client = new z.client.ClientEntity();
       new_client.meta.isVerified(false);
-      user_self.devices.push(new_client);
+      selfUserEntity.devices.push(new_client);
 
-      state_handler.onClientAdded(user_self.id);
+      state_handler.onClientAdded(selfUserEntity.id);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
@@ -157,8 +157,8 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(z.conversation.EventBuilder.buildDegraded.calls.count()).toEqual(3);
       expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
-      user_self.devices.remove(new_client);
-      state_handler.onClientRemoved(user_self.id);
+      selfUserEntity.devices.remove(new_client);
+      state_handler.onClientRemoved(selfUserEntity.id);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
@@ -177,9 +177,9 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
       const new_client = new z.client.ClientEntity();
       new_client.meta.isVerified(false);
-      user_self.devices.push(new_client);
+      selfUserEntity.devices.push(new_client);
 
-      state_handler.onClientAdded(user_self.id);
+      state_handler.onClientAdded(selfUserEntity.id);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
@@ -187,8 +187,8 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(z.conversation.EventBuilder.buildDegraded.calls.count()).toEqual(3);
       expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
-      user_self.devices.remove(new_client);
-      state_handler.onClientsUpdated(user_self.id);
+      selfUserEntity.devices.remove(new_client);
+      state_handler.onClientsUpdated(selfUserEntity.id);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
