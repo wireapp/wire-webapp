@@ -31,31 +31,31 @@ describe('Conversation Mapper', () => {
       const functionCallUndefinedParam = () => conversation_mapper.mapConversations();
       expect(functionCallUndefinedParam).toThrowError(
         z.error.ConversationError,
-        z.error.ConversationError.MESSAGE.MISSING_PARAMETER
+        z.error.BaseError.MESSAGE.MISSING_PARAMETER
       );
 
       const functionCallEmtpyArray = () => conversation_mapper.mapConversations([]);
       expect(functionCallEmtpyArray).toThrowError(
         z.error.ConversationError,
-        z.error.ConversationError.MESSAGE.INVALID_PARAMETER
+        z.error.BaseError.MESSAGE.INVALID_PARAMETER
       );
 
       const functionCallWrongType = () => conversation_mapper.mapConversations('Conversation');
       expect(functionCallWrongType).toThrowError(
         z.error.ConversationError,
-        z.error.ConversationError.MESSAGE.INVALID_PARAMETER
+        z.error.BaseError.MESSAGE.INVALID_PARAMETER
       );
 
       const functionCallUndefinedInArray = () => conversation_mapper.mapConversations([undefined]);
       expect(functionCallUndefinedInArray).toThrowError(
         z.error.ConversationError,
-        z.error.ConversationError.MESSAGE.MISSING_PARAMETER
+        z.error.BaseError.MESSAGE.MISSING_PARAMETER
       );
 
       const functionCallStringInArray = () => conversation_mapper.mapConversations(['Conversation']);
       expect(functionCallStringInArray).toThrowError(
         z.error.ConversationError,
-        z.error.ConversationError.MESSAGE.INVALID_PARAMETER
+        z.error.BaseError.MESSAGE.INVALID_PARAMETER
       );
     });
 

@@ -30,16 +30,26 @@ z.error.BaseError = class BaseError extends Error {
     this.stack = new Error().stack;
     this.type = type || BaseError.TYPE.UNKNOWN;
 
-    this.message = message || z.error[errorName].MESSAGE[this.type] || `${BaseError.MESSAGE.UNKNOWN} ${errorName}`;
+    this.message = message || z.error[errorName].MESSAGE[this.type] || BaseError.MESSAGE[this.type];
+    if (!message) {
+      this.message = `${BaseError.MESSAGE.UNKNOWN} ${errorName}`;
+    }
   }
+
   static get MESSAGE() {
     return {
-      UNKNOWN: 'UNKNOWN',
+      INVALID_PARAMETER: 'Invalid parameter passed',
+      MISSING_PARAMETER: 'Required parameter is not defined',
+      NOT_FOUND: '',
+      UNKNOWN: 'Unknown',
     };
   }
 
   static get TYPE() {
     return {
+      INVALID_PARAMETER: 'INVALID_PARAMETER',
+      MISSING_PARAMETER: 'MISSING_PARAMETER',
+      NOT_FOUND: 'NOT_FOUND',
       UNKNOWN: 'UNKNOWN',
     };
   }

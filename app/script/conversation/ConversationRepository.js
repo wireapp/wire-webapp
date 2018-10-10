@@ -1412,12 +1412,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   setNotificationState(conversationEntity, notificationState) {
     if (!conversationEntity || notificationState === undefined) {
-      return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.MISSING_PARAMETER));
+      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
     const validNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
     if (!validNotificationStates.includes(notificationState)) {
-      return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER));
+      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
