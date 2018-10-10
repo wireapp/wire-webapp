@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.links = z.links || {};
+window.z.error = z.error || {};
 
-z.links.LinkPreviewError = class LinkPreviewError extends Error {
+z.error.LinkPreviewError = class LinkPreviewError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || LinkPreviewError.TYPE.UNKNOWN;
-
-    this.message = message || LinkPreviewError.MESSAGE[this.type] || LinkPreviewError.MESSAGE.UNKNOWN;
+    const errorName = 'LinkPreviewError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -38,7 +33,6 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
       BLACKLISTED: 'Skipped preview for blacklisted link',
       NO_DATA_AVAILABLE: 'Link does not provide Open Graph data.',
       NOT_SUPPORTED: 'Your client cannot render link previews using Open Graph data.',
-      UNKNOWN: 'Unknown LinkPreviewError',
       UNSUPPORTED_TYPE: 'Open Graph data from the given link does not provide necessary attributes.',
     };
   }
@@ -48,7 +42,6 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
       BLACKLISTED: 'BLACKLISTED',
       NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
       NOT_SUPPORTED: 'NOT_SUPPORTED',
-      UNKNOWN: 'UNKNOWN',
       UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }
