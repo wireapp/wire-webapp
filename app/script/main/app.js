@@ -444,15 +444,14 @@ z.main.App = class App {
 
         default: {
           this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
-          const isStorageError = error instanceof z.error.StorageError;
-          if (isStorageError) {
-            Raygun.send(error);
-          }
 
           const isAccessTokenError = error instanceof z.error.AccessTokenError;
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
+          } else {
+            Raygun.send(error);
           }
+
           return this.logout(z.auth.SIGN_OUT_REASON.APP_INIT);
         }
       }
