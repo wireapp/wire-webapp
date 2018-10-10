@@ -352,7 +352,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
 
     this.logger.info(`Skipped event '${eventId}': ${z.error.CryptographyError.MESSAGE.IGNORED_PREVIEW}`);
-    throw new z.error.CryptographyError(z.error.CryptographyError.MESSAGE.IGNORED_PREVIEW);
+    throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.IGNORED_PREVIEW);
   }
 
   _mapImageMedium(image, eventId) {
