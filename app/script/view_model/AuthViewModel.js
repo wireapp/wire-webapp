@@ -241,7 +241,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._init_url_hash();
       })
       .catch(error => {
-        if (!(error instanceof z.auth.AuthError)) {
+        if (!(error instanceof z.error.AuthError)) {
           throw error;
         }
       });
@@ -297,7 +297,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     const cookies_disabled = () => {
       if (current_hash !== z.auth.AuthView.MODE.BLOCKED_COOKIES) {
         this._set_hash(z.auth.AuthView.MODE.BLOCKED_COOKIES);
-        throw new z.auth.AuthError(z.auth.AuthError.TYPE.COOKIES_DISABLED);
+        throw new z.error.AuthError(z.error.AuthError.TYPE.COOKIES_DISABLED);
       }
     };
 
@@ -362,7 +362,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         }
 
-        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+        return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
       }
     }
 
@@ -394,7 +394,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         })
         .catch(error => {
-          const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+          const isMultipleTabs = error.type === z.error.AuthError.TYPE.MULTIPLE_TABS;
           if (!isMultipleTabs) {
             throw error;
           }

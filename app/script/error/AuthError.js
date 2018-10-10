@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.auth = z.auth || {};
+window.z.error = z.error || {};
 
-z.auth.AuthError = class AuthError extends Error {
+z.error.AuthError = class AuthError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || AuthError.TYPE.UNKNOWN;
-
-    this.message = message || AuthError.MESSAGE[this.type] || AuthError.MESSAGE.UNKNOWN;
+    const errorName = 'AuthError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -39,7 +34,6 @@ z.auth.AuthError = class AuthError extends Error {
       INDEXED_DB_UNSUPPORTED: 'IndexedDB is not supported',
       MULTIPLE_TABS: 'Cannot open in multiple tabs simultaneously',
       PRIVATE_MODE: 'Unsupported Private Mode',
-      UNKNOWN: 'Unknown AuthError',
     };
   }
 
@@ -49,7 +43,6 @@ z.auth.AuthError = class AuthError extends Error {
       INDEXED_DB_UNSUPPORTED: 'INDEXED_DB_UNSUPPORTED',
       MULTIPLE_TABS: 'MULTIPLE_TABS',
       PRIVATE_MODE: 'PRIVATE_MODE',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };
