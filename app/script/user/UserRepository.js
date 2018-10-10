@@ -453,7 +453,7 @@ z.user.UserRepository = class UserRepository {
   _update_connection_status(user_et, status, show_conversation = false) {
     if (!user_et) {
       this.logger.error('Cannot update connection without a user');
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
+      return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
     }
 
     if (user_et.connection().status() === status) {
@@ -691,7 +691,7 @@ z.user.UserRepository = class UserRepository {
       }
     }
 
-    return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
+    return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
   }
 
   /**
@@ -720,14 +720,14 @@ z.user.UserRepository = class UserRepository {
   get_user_by_id(user_id) {
     return this.findUserById(user_id)
       .catch(error => {
-        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
           return this.fetchUserById(user_id);
         }
         throw error;
       })
       .catch(error => {
-        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
           this.logger.error(`Failed to get user '${user_id}': ${error.message}`, error);
         }
@@ -759,7 +759,7 @@ z.user.UserRepository = class UserRepository {
 
     const _find_user = user_id => {
       return this.findUserById(user_id).catch(error => {
-        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+        if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
         return user_id;
@@ -800,7 +800,7 @@ z.user.UserRepository = class UserRepository {
    */
   save_user(user_et, is_me = false) {
     return this.findUserById(user_et.id).catch(error => {
-      if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+      if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
         throw error;
       }
 
@@ -823,7 +823,7 @@ z.user.UserRepository = class UserRepository {
       return this.findUserById(user_et.id)
         .then(() => undefined)
         .catch(error => {
-          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
           return user_et;
@@ -846,7 +846,7 @@ z.user.UserRepository = class UserRepository {
   updateUserById(userId) {
     const getLocalUser = () =>
       this.findUserById(userId).catch(error => {
-        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
           return new z.entity.User();
         }
@@ -906,7 +906,7 @@ z.user.UserRepository = class UserRepository {
         .then(() => this.user_update({user: {id: this.self().id, name: name}}));
     }
 
-    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -962,13 +962,13 @@ z.user.UserRepository = class UserRepository {
               z.service.BackendClientError.STATUS_CODE.BAD_REQUEST,
             ].includes(error_code)
           ) {
-            throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+            throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
           }
-          throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+          throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
         });
     }
 
-    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -993,15 +993,15 @@ z.user.UserRepository = class UserRepository {
           return username;
         }
         if (error_code === z.service.BackendClientError.STATUS_CODE.BAD_REQUEST) {
-          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+          throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
         }
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
       })
       .then(verified_username => {
         if (verified_username) {
           return verified_username;
         }
-        throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+        throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
       });
   }
 

@@ -1483,7 +1483,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
-        const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
+        const user_missing_email = error.type === z.error.UserError.TYPE.USER_MISSING_EMAIL;
         if (user_missing_email) {
           throw error;
         }
@@ -1510,7 +1510,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._register_client(auto_login);
       })
       .catch(error => {
-        if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+        if (error.type !== z.error.UserError.TYPE.USER_MISSING_EMAIL) {
           this.logger.error(`Login failed: ${error.message}`, error);
           this._add_error(z.string.authErrorMisc);
           this._has_errors();
@@ -1537,7 +1537,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         const isIncompletePhoneUser = hasPhoneNumber && !hasEmailAddress;
         if (isIncompletePhoneUser) {
           this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
-          throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
+          throw new z.error.UserError(z.error.UserError.TYPE.USER_MISSING_EMAIL);
         }
 
         return this.storageService.init(this.self_user().id);

@@ -620,7 +620,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         .get_user_by_id(userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
-          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
         });

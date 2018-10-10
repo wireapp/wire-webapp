@@ -164,11 +164,11 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .catch(error => {
         const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
-          throw new z.user.UserError(z.user.UserError.TYPE.PRE_KEY_NOT_FOUND);
+          throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
 
         this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
       });
   }
 
@@ -181,11 +181,11 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
       const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
-        throw new z.user.UserError(z.user.UserError.TYPE.PRE_KEY_NOT_FOUND);
+        throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
       }
 
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+      throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
     });
   }
 
