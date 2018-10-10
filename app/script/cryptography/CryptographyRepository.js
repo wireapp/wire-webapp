@@ -281,7 +281,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
-      const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT);
+      const error = new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT);
       return Promise.reject(error);
     }
 
@@ -307,7 +307,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this._decryptEvent(event)
       .then(genericMessage => this.cryptographyMapper.mapGenericMessage(genericMessage, event))
       .catch(error => {
-        const isUnhandledType = error.type === z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE;
+        const isUnhandledType = error.type === z.error.CryptographyError.TYPE.UNHANDLED_TYPE;
         if (isUnhandledType) {
           throw error;
         }
@@ -470,12 +470,12 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const isOutdatedMessage = error instanceof Proteus.errors.DecryptError.OutdatedMessage;
     // We don't need to show these message errors to the user
     if (isDuplicateMessage || isOutdatedMessage) {
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
 
-    const isCryptographyError = error instanceof z.cryptography.CryptographyError;
-    if (isCryptographyError && error.type === z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED) {
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+    const isCryptographyError = error instanceof z.error.CryptographyError;
+    if (isCryptographyError && error.type === z.error.CryptographyError.TYPE.PREVIOUSLY_STORED) {
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
 
     const remoteClientId = eventData.sender;

@@ -21,16 +21,12 @@
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
+window.z.error = z.error || {};
 
-z.cryptography.CryptographyError = class CryptographyError extends Error {
+z.error.CryptographyError = class CryptographyError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || CryptographyError.TYPE.UNKNOWN;
-
-    this.message = message || CryptographyError.MESSAGE[this.type] || CryptographyError.MESSAGE.UNKNOWN;
+    const errorName = 'CryptographyError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -42,7 +38,6 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
       NO_GENERIC_MESSAGE: 'No GenericMessage found',
       PREVIOUSLY_STORED: 'Message was previously stored',
       UNHANDLED_TYPE: 'Unhandled event type',
-      UNKNOWN: 'Unknown CryptographyError',
     };
   }
 
@@ -55,7 +50,6 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
       NO_GENERIC_MESSAGE: 'NO_GENERIC_MESSAGE',
       PREVIOUSLY_STORED: 'PREVIOUSLY_STORED',
       UNHANDLED_TYPE: 'UNHANDLED_TYPE',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };

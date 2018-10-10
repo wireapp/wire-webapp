@@ -27,10 +27,10 @@ z.event.EventRepository = class EventRepository {
     return {
       E_CALL_EVENT_LIFETIME: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
-        z.cryptography.CryptographyError.TYPE.IGNORED_ASSET,
-        z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW,
-        z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED,
-        z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
+        z.error.CryptographyError.TYPE.IGNORED_ASSET,
+        z.error.CryptographyError.TYPE.IGNORED_PREVIEW,
+        z.error.CryptographyError.TYPE.PREVIOUSLY_STORED,
+        z.error.CryptographyError.TYPE.UNHANDLED_TYPE,
         z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT,
         z.event.EventError.TYPE.VALIDATION_FAILED,
       ],

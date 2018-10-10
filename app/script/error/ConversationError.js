@@ -22,9 +22,9 @@
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.AuthError = class AuthError extends z.error.BaseError {
+z.error.ConversationError = class ConversationError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'AuthError';
+    const errorName = 'ConversationError';
     super(errorName, type, message);
   }
 
