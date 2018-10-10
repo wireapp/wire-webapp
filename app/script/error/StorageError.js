@@ -40,7 +40,6 @@ z.error.StorageError = class StorageError extends z.error.BaseError {
       NO_TIME: 'Missing time',
       NON_SEQUENTIAL_UPDATE: 'Update is non sequential',
       NOT_FOUND: 'Record matching primary key was not found',
-      UNKNOWN: 'Unknown StorageError',
     };
   }
 
@@ -56,7 +55,6 @@ z.error.StorageError = class StorageError extends z.error.BaseError {
       NO_TIME: 'NO_TIME',
       NON_SEQUENTIAL_UPDATE: 'NON_SEQUENTIAL_UPDATE',
       NOT_FOUND: 'NOT_FOUND',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };

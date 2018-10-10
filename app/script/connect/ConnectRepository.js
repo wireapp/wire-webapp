@@ -77,7 +77,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       })
       .catch(error => {
         this.logger.info(`Google Contacts SDK error: ${error.message}`, error);
-        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
+        throw new z.error.ConnectError(z.error.ConnectError.TYPE.GOOGLE_DOWNLOAD);
       });
   }
 
@@ -98,7 +98,7 @@ z.connect.ConnectRepository = class ConnectRepository {
   _parseMacosContacts() {
     return new Promise((resolve, reject) => {
       if (!window.wAddressBook) {
-        return reject(new z.connect.ConnectError(z.connect.ConnectError.TYPE.NOT_SUPPORTED));
+        return reject(new z.error.ConnectError(z.error.ConnectError.TYPE.NOT_SUPPORTED));
       }
       const addressBook = window.wAddressBook;
       const phoneBook = new z.connect.PhoneBook();
@@ -182,7 +182,7 @@ z.connect.ConnectRepository = class ConnectRepository {
 
     if (!cards.length) {
       this.logger.warn('No contacts found for upload');
-      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
+      throw new z.error.ConnectError(z.error.ConnectError.TYPE.NO_CONTACTS);
     }
 
     this.logger.info(`Uploading hashes of '${cards.length}' contacts for matching`, phoneBook);
@@ -195,9 +195,9 @@ z.connect.ConnectRepository = class ConnectRepository {
       })
       .catch(error => {
         switch (error.type) {
-          case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
+          case z.error.ConnectError.TYPE.GOOGLE_DOWNLOAD:
             throw error;
-          case z.connect.ConnectError.TYPE.NO_CONTACTS:
+          case z.error.ConnectError.TYPE.NO_CONTACTS:
             return {};
           default:
             if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
@@ -205,7 +205,7 @@ z.connect.ConnectRepository = class ConnectRepository {
             } else {
               this.logger.error(`Upload of '${source}' contacts failed`, error);
             }
-            throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
+            throw new z.error.ConnectError(z.error.ConnectError.TYPE.UPLOAD);
         }
       });
   }

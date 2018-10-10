@@ -512,7 +512,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         this.showMatches(true);
       })
       .catch(error => {
-        const isNoContacts = error.type === z.connect.ConnectError.TYPE.NO_CONTACTS;
+        const isNoContacts = error.type === z.error.ConnectError.TYPE.NO_CONTACTS;
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 

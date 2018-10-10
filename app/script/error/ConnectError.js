@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.connect = z.connect || {};
+window.z.error = z.error || {};
 
-z.connect.ConnectError = class ConnectError extends Error {
+z.error.ConnectError = class ConnectError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || ConnectError.TYPE.UNKNOWN;
-
-    this.message = message || ConnectError.MESSAGE[this.type] || ConnectError.MESSAGE.UNKNOWN;
+    const errorName = 'ConnectError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -39,7 +34,6 @@ z.connect.ConnectError = class ConnectError extends Error {
       GOOGLE_DOWNLOAD: 'Failed to download contacts from Google',
       NO_CONTACTS: 'No contacts found for matching',
       NOT_SUPPORTED: 'Source not supported',
-      UNKNOWN: 'Unknown ConnectError',
       UPLOAD: 'Address book upload failed',
     };
   }
@@ -50,7 +44,6 @@ z.connect.ConnectError = class ConnectError extends Error {
       GOOGLE_DOWNLOAD: 'GOOGLE_DOWNLOAD',
       NO_CONTACTS: 'NO_CONTACTS',
       NOT_SUPPORTED: 'NOT_SUPPORTED',
-      UNKNOWN: 'UNKNOWN',
       UPLOAD: 'UPLOAD',
     };
   }
