@@ -301,7 +301,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       .then(() => this._hasPermissionToAccess(mediaType))
       .then(hasPermission => this._requestMediaStream(mediaType, mediaStreamConstraints, hasPermission))
       .catch(error => {
-        const isPermissionDenied = error.type === z.permission.PermissionError.TYPE.DENIED;
+        const isPermissionDenied = error.type === z.error.PermissionError.TYPE.DENIED;
         throw isPermissionDenied
           ? new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, mediaType)
           : error;
@@ -372,7 +372,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
           const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
           if (isPermissionDenied) {
             this.logger.warn(`Permission for '${permissionType}' is denied`, permissions);
-            return Promise.reject(new z.permission.PermissionError(z.permission.PermissionError.TYPE.DENIED));
+            return Promise.reject(new z.error.PermissionError(z.error.PermissionError.TYPE.DENIED));
           }
         }
 

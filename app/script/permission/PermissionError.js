@@ -20,23 +20,17 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.permission = z.permission || {};
+window.z.error = z.error || {};
 
-z.permission.PermissionError = class PermissionError extends Error {
+z.error.PermissionError = class PermissionError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || PermissionError.TYPE.UNKNOWN;
-
-    this.message = message || PermissionError.MESSAGE[this.type] || PermissionError.MESSAGE.UNKNOWN;
+    const errorName = 'PermissionError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
     return {
       DENIED: 'Permission was denied',
-      UNKNOWN: 'Unknown PermissionError',
       UNSUPPORTED: 'Permissions API is not supported',
       UNSUPPORTED_TYPE: 'Permissions API does not support requested type',
     };
@@ -45,7 +39,6 @@ z.permission.PermissionError = class PermissionError extends Error {
   static get TYPE() {
     return {
       DENIED: 'DENIED',
-      UNKNOWN: 'UNKNOWN',
       UNSUPPORTED: 'UNSUPPORTED',
       UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
