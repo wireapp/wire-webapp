@@ -18,7 +18,7 @@
  */
 
 const jQuery = require('jquery');
-import * as amplify from '@bower_components/amplify';
+import {amplify} from '@bower_components/amplify';
 import * as bazinga64 from 'bazinga64';
 import * as platform from 'platform';
 import '../config';
@@ -36,7 +36,7 @@ import '../util/util';
 declare global {
   interface Window {
     $: any;
-    amplify: any;
+    amplify: amplify.Static;
     bazinga64: any;
     jQuery: any;
     platform: any;
