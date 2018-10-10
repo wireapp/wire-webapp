@@ -29,9 +29,8 @@ z.error.BaseError = class BaseError extends Error {
     this.name = this.constructor.name;
     this.stack = new Error().stack;
 
-    const specificTypes = Object.values(z.error[this.name].TYPE);
-    const knownTypes = Object.vales(BaseError.TYPE).concat(specificTypes);
-    const isValidType = knownTypes.includes(type);
+    const knownTypes = Object.assign({}, BaseError.TYPE, z.error[this.name].TYPE);
+    const isValidType = Object.values(knownTypes).includes(type);
 
     this.type = isValidType ? type : BaseError.TYPE.UNKNOWN;
 
