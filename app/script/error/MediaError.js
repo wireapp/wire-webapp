@@ -24,7 +24,7 @@ window.z.error = z.error || {};
 
 z.error.MediaError = class MediaError extends z.error.BaseError {
   constructor(type, mediaType, message) {
-    super(type, message);
+    super('MediaError', type, message);
 
     this.mediaType = mediaType;
   }

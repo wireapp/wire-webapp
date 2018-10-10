@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.TeamError = class TeamError extends z.error.BaseError {
+  constructor(type, message) {
+    super('TeamError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       NO_PERMISSIONS: 'No permissions provided',

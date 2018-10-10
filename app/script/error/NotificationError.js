@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.NotificationError = class NotificationError extends z.error.BaseError {
+  constructor(type, message) {
+    super('NotificationError', type, message);
+  }
+
   static get MESSAGE() {
     return {
       HIDE_NOTIFICATION: 'Do not show notification for this message',

@@ -23,13 +23,13 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.BaseError = class BaseError extends Error {
-  constructor(type, message) {
+  constructor(name, type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
 
-    const ErrorInstanceClass = z.error[this.name];
+    const ErrorInstanceClass = z.error[name];
     const knownTypes = Object.assign({}, BaseError.TYPE, ErrorInstanceClass.TYPE);
     const isValidType = Object.values(knownTypes).includes(type);
 
@@ -37,7 +37,7 @@ z.error.BaseError = class BaseError extends Error {
 
     this.message = message || ErrorInstanceClass.MESSAGE[this.type] || BaseError.MESSAGE[this.type];
     if (!this.message) {
-      this.message = `${BaseError.MESSAGE.UNKNOWN} ${this.name}`;
+      this.message = `${BaseError.MESSAGE.UNKNOWN} ${name}`;
     }
   }
 
