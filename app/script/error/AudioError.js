@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.audio = z.audio || {};
+window.z.error = z.error || {};
 
-z.audio.AudioError = class AudioError extends Error {
+z.error.AudioError = class AudioError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || AudioError.TYPE.UNKNOWN;
-
-    this.message = message || AudioError.MESSAGE[this.type] || AudioError.MESSAGE.UNKNOWN;
+    const errorName = 'AudioError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -39,7 +34,6 @@ z.audio.AudioError = class AudioError extends Error {
       FAILED_TO_PLAY: 'Failed to play sound',
       IGNORED_SOUND: 'Ignored request to play sound',
       NOT_FOUND: 'AudioElement or ID not found',
-      UNKNOWN: 'Unknown AudioError',
     };
   }
 
@@ -49,7 +43,6 @@ z.audio.AudioError = class AudioError extends Error {
       FAILED_TO_PLAY: 'FAILED_TO_PLAY',
       IGNORED_SOUND: 'IGNORED_SOUND',
       NOT_FOUND: 'NOT_FOUND',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };
