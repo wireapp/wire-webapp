@@ -21,16 +21,12 @@
 
 window.z = window.z || {};
 window.z.event = z.event || {};
+window.z.error = z.error || {};
 
-z.event.EventError = class EventError extends Error {
+z.error.EventError = class EventError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || EventError.TYPE.UNKNOWN;
-
-    this.message = message || EventError.MESSAGE[this.type] || EventError.MESSAGE.UNKNOWN;
+    const errorName = 'EventError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -44,7 +40,6 @@ z.event.EventError = class EventError extends Error {
       NO_NOTIFICATIONS: 'No notifications found',
       OUTDATED_E_CALL_EVENT: 'Ignoring outdated e-call event',
       REQUEST_FAILURE: 'Event related backend request failure',
-      UNKNOWN: 'Unknown EventError',
       VALIDATION_FAILED: 'Event failed validation',
     };
   }
@@ -60,7 +55,6 @@ z.event.EventError = class EventError extends Error {
       NO_NOTIFICATIONS: 'NO_NOTIFICATIONS',
       OUTDATED_E_CALL_EVENT: 'EventError.OUTDATED_E_CALL_EVENT',
       REQUEST_FAILURE: 'REQUEST_FAILURE',
-      UNKNOWN: 'UNKNWON',
       VALIDATION_FAILED: 'VALIDATION_FAILED',
     };
   }
