@@ -20,30 +20,23 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.team = z.team || {};
+window.z.error = z.error || {};
 
-z.team.TeamError = class TeamError extends Error {
+z.error.TeamError = class TeamError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || TeamError.TYPE.UNKNOWN;
-
-    this.message = message || TeamError.MESSAGE[this.type] || TeamError.MESSAGE.UNKNOWN;
+    const errorName = 'TeamError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
     return {
       NO_PERMISSIONS: 'No permissions provided',
-      UNKNOWN: 'Unknown TeamError',
     };
   }
 
   static get TYPE() {
     return {
       NO_PERMISSIONS: 'NO_PERMISSIONS',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };
