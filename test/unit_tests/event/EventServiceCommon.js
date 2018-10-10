@@ -412,7 +412,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
-            expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_CHANGE);
           });
       });
 
@@ -618,8 +618,8 @@ window.testEventServiceClass = (testedServiceName, className) => {
           .updateEvent(12, undefined)
           .then(() => fail('should have thrown'))
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-            expect(error.type).toBe(z.conversation.ConversationError.TYPE.NO_CHANGES);
+            expect(error).toEqual(jasmine.any(z.error.ConversationError));
+            expect(error.type).toBe(z.error.ConversationError.TYPE.NO_CHANGES);
           });
       });
     });

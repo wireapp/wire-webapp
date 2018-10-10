@@ -38,7 +38,6 @@ z.error.ClientError = class ClientError extends z.error.BaseError {
       REQUEST_FAILURE: 'Client related backend request failed',
       REQUEST_FORBIDDEN: 'Client related backend request forbidden',
       TOO_MANY_CLIENTS: 'User has reached the maximum of allowed clients',
-      UNKNOWN: 'Unknown ClientError',
     };
   }
 
@@ -52,7 +51,6 @@ z.error.ClientError = class ClientError extends z.error.BaseError {
       REQUEST_FAILURE: 'REQUEST_FAILURE',
       REQUEST_FORBIDDEN: 'REQUEST_FORBIDDEN',
       TOO_MANY_CLIENTS: 'TOO_MANY_CLIENTS',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };

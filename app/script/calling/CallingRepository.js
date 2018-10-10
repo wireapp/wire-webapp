@@ -612,7 +612,7 @@ z.calling.CallingRepository = class CallingRepository {
           }
         })
         .catch(_error => {
-          const isDegraded = _error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+          const isDegraded = _error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
           if (!isDegraded) {
             throw _error;
           }

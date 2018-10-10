@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+window.z.error = z.error || {};
 
-z.conversation.ConversationError = class ConversationError extends Error {
+z.error.AuthError = class AuthError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || ConversationError.TYPE.UNKNOWN;
-
-    this.message = message || ConversationError.MESSAGE[this.type] || ConversationError.MESSAGE.UNKNOWN;
+    const errorName = 'AuthError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
@@ -44,7 +39,6 @@ z.conversation.ConversationError = class ConversationError extends Error {
       NO_CONVERSATION_ID: 'Conversation ID is not defined',
       NO_MESSAGE_CHANGES: 'Edited message equals original message',
       REQUEST_FAILURE: 'Conversation related backend request failed',
-      UNKNOWN: 'Unknown ConversationError',
       WRONG_CHANGE: 'Attempted unsupported change on conversation',
       WRONG_CONVERSATION: 'Message was sent in the wrong conversation',
       WRONG_TYPE: 'Wrong message to for action',
@@ -63,7 +57,6 @@ z.conversation.ConversationError = class ConversationError extends Error {
       NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',
       NO_MESSAGE_CHANGES: 'NO_MESSAGE_CHANGES',
       REQUEST_FAILURE: 'REQUEST_FAILURE',
-      UNKNOWN: 'UNKNOWN',
       WRONG_CHANGE: 'WRONG_CHANGE',
       WRONG_CONVERSATION: 'WRONG_CONVERSATION',
       WRONG_TYPE: 'WRONG_TYPE',

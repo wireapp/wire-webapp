@@ -44,7 +44,7 @@ z.event.EventService = class EventService {
   loadEvent(conversationId, eventId) {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
+      const error = new z.error.ConversationError(z.error.ConversationError.TYPE.MISSING_PARAMETER);
       return Promise.reject(error);
     }
 
@@ -224,12 +224,12 @@ z.event.EventService = class EventService {
     return Promise.resolve(primaryKey).then(key => {
       const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
       }
 
       const hasVersionedUpdates = !!updates.version;
       if (hasVersionedUpdates) {
-        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
         error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
         throw error;
       }
@@ -250,7 +250,7 @@ z.event.EventService = class EventService {
     return Promise.resolve(primaryKey).then(key => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
       }
 
       // Create a DB transaction to avoid concurrent sequential update.

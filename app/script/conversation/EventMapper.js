@@ -71,7 +71,7 @@ z.conversation.EventMapper = class EventMapper {
     return Promise.resolve()
       .then(() => this._mapJsonEvent(event, conversationEntity, createDummyImage))
       .catch(error => {
-        const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        const isMessageNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (isMessageNotFound) {
           throw error;
         }
@@ -81,7 +81,7 @@ z.conversation.EventMapper = class EventMapper {
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
         Raygun.send(new Error(errorMessage), customData);
 
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
       });
   }
 
@@ -185,7 +185,7 @@ z.conversation.EventMapper = class EventMapper {
 
       default: {
         this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
       }
     }
 
