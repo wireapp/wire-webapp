@@ -521,7 +521,7 @@ z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
 z.string.de.guestOptionsTitle = 'Gäste und Dienste';
 
 z.string.de.notificationSettingsTitle = 'Benachrichtigungen';
-z.string.de.notificationSettingsDisclaimer = 'Du kannst über alles benachrichtigt werden (einschließlich Audio- und Videoanrufe) oder nur, wenn du erwähnt wirst.';
+z.string.de.notificationSettingsDisclaimer = 'Immer benachrichtigen (einschließlich Audio- und Videoanrufe) oder nur bei Erwähnungen.';
 z.string.de.notificationSettingsEverything = 'Alles';
 z.string.de.notificationSettingsOnlyMentions = 'Nur Erwähnungen';
 z.string.de.notificationSettingsNothing = 'Nichts';
@@ -592,8 +592,7 @@ z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen 
 z.string.de.preferencesAVNoCamera = 'Wire hat keinen Zugriff auf die Kamera.[br][faqLink]Zur Behebung bitte diesen Support Artikel anschauen[/faqLink].';
 z.string.de.preferencesAVTryAgain = 'Erneut versuchen';
 
-z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
-z.string.de.preferencesDevicesActivatedOn = 'Aktiviert am {{date}}';
+z.string.de.preferencesDevicesActivatedOn = 'Aktiviert {{date}}';
 z.string.de.preferencesDevicesActive = 'Aktiv';
 z.string.de.preferencesDevicesActiveDetail = 'Falls du eines dieser Geräte nicht erkennst, entferne es und setze dein Passwort zurück.';
 z.string.de.preferencesDevicesCurrent = 'Dieses Gerät';
