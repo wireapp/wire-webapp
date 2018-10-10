@@ -20,18 +20,14 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.media = z.media || {};
+window.z.error = z.error || {};
 
-z.media.MediaError = class MediaError extends Error {
+z.error.MediaError = class MediaError extends z.error.BaseError {
   constructor(type, mediaType, message) {
-    super();
+    const errorName = 'MediaError';
+    super(errorName, type, message);
 
-    this.name = this.constructor.name;
     this.mediaType = mediaType;
-    this.stack = new Error().stack;
-    this.type = type || MediaError.TYPE.UNKNOWN;
-
-    this.message = message || MediaError.MESSAGE[this.type] || MediaError.MESSAGE.UNKNOWN;
   }
 
   static get MESSAGE() {
@@ -43,7 +39,6 @@ z.media.MediaError = class MediaError extends Error {
       SCREEN_NOT_SUPPORTED: 'Screen sharing is not yet supported by this browser',
       STREAM_NOT_FOUND: 'No local MediaStream found',
       UNHANDLED_MEDIA_TYPE: 'Media type unknown',
-      UNKNOWN: 'Unknown MediaError',
     };
   }
 
@@ -56,7 +51,6 @@ z.media.MediaError = class MediaError extends Error {
       SCREEN_NOT_SUPPORTED: 'SCREEN_NOT_SUPPORTED',
       STREAM_NOT_FOUND: 'STREAM_NOT_FOUND',
       UNHANDLED_MEDIA_TYPE: 'MediaError.UNHANDLED_MEDIA_TYPE',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };

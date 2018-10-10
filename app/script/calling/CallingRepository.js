@@ -1097,7 +1097,7 @@ z.calling.CallingRepository = class CallingRepository {
     const isNotSupported = error.type === z.error.CallError.TYPE.NOT_SUPPORTED;
     if (!isNotSupported) {
       this.deleteCall(conversationId);
-      const isMediaError = error instanceof z.media.MediaError;
+      const isMediaError = error instanceof z.error.MediaError;
       if (!isMediaError) {
         throw error;
       }
@@ -1136,8 +1136,8 @@ z.calling.CallingRepository = class CallingRepository {
         this.callLogger.warn(logMessage, joinError);
 
         const accessErrors = [
-          z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE,
-          z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
+          z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE,
+          z.error.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
         ];
         const isAccessError = accessErrors.includes(joinError.type);
         if (isAccessError) {
@@ -1318,7 +1318,7 @@ z.calling.CallingRepository = class CallingRepository {
       }
 
       default: {
-        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+        throw new z.error.MediaError(z.error.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
       }
     }
   }
@@ -1409,7 +1409,7 @@ z.calling.CallingRepository = class CallingRepository {
       .catch(error => {
         this.deleteCall(conversationId);
 
-        const isMediaError = error instanceof z.media.MediaError;
+        const isMediaError = error instanceof z.error.MediaError;
         if (!isMediaError) {
           throw error;
         }
