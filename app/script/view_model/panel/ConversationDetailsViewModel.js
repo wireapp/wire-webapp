@@ -279,7 +279,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToEditGroupName() {
-    if (this.isNameEditable()) {
+    if (this.isActiveGroupParticipant()) {
       this.isEditingName(true);
     }
   }
