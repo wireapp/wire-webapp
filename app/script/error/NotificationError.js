@@ -20,30 +20,23 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.notification = z.notification || {};
+window.z.error = z.error || {};
 
-z.notification.NotificationError = class NotificationError extends Error {
+z.error.NotificationError = class NotificationError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || NotificationError.TYPE.UNKNOWN;
-
-    this.message = message || NotificationError.MESSAGE[this.type] || NotificationError.MESSAGE.UNKNOWN;
+    const errorName = 'NotificationError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {
     return {
       HIDE_NOTIFICATION: 'Do not show notification for this message',
-      UNKNOWN: 'Unknown NotificationError',
     };
   }
 
   static get TYPE() {
     return {
       HIDE_NOTIFICATION: 'HIDE_NOTIFICATION',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };
