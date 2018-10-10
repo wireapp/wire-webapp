@@ -133,7 +133,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   clickOnMessage(messageEntity) {
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity(), messageEntity);
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
   }
 
   clickOnBackButton() {

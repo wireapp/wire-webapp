@@ -49,7 +49,6 @@ module.exports = grunt => {
     'aws_version_file',
     'clean:aws',
     'copy:aws',
-    'copy:aws_templates',
     'clean:aws_app',
     'clean:aws_s3',
     'shell:aws_pack',

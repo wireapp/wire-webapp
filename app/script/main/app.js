@@ -284,7 +284,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
-        return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
+        return Promise.all([this.repository.conversation.getConversations(), this.repository.user.get_connections()]);
       })
       .then(([conversationEntities, connectionEntities]) => {
         this.view.loading.updateProgress(25, z.string.initReceivedUserData);
@@ -339,7 +339,6 @@ z.main.App = class App {
         this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-        amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })

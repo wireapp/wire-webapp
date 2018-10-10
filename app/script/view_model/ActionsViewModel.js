@@ -72,8 +72,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   clearConversation(conversationEntity) {
     if (conversationEntity) {
-      const canLeaveConversation = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
-      const modalType = canLeaveConversation
+      const modalType = conversationEntity.isLeavable()
         ? z.viewModel.ModalsViewModel.TYPE.OPTION
         : z.viewModel.ModalsViewModel.TYPE.CONFIRM;
 
@@ -237,7 +236,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   toggleMuteConversation(conversationEntity) {
     if (conversationEntity) {
-      this.conversationRepository.toggle_silence_conversation(conversationEntity);
+      const notificationState = conversationEntity.showNotificationsEverything()
+        ? z.conversation.NotificationSetting.STATE.NOTHING
+        : z.conversation.NotificationSetting.STATE.EVERYTHING;
+      this.conversationRepository.setNotificationState(conversationEntity, notificationState);
     }
   }
 

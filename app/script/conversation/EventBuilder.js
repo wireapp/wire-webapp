@@ -39,26 +39,22 @@ z.conversation.EventBuilder = {
     };
   },
   buildAllVerified(conversationEntity, timeOffset) {
-    const {id, self} = conversationEntity;
-
     return {
-      conversation: id,
+      conversation: conversationEntity.id,
       data: {
         type: z.message.VerificationMessageType.VERIFIED,
       },
-      from: self.id,
+      from: conversationEntity.selfUser().id,
       id: z.util.createRandomUuid(),
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   },
   buildAssetAdd(conversationEntity, data, timeOffset) {
-    const {id, self} = conversationEntity;
-
     return {
-      conversation: id,
+      conversation: conversationEntity.id,
       data: data,
-      from: self.id,
+      from: conversationEntity.selfUser().id,
       status: z.message.StatusType.SENDING,
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.ASSET_ADD,
@@ -74,15 +70,13 @@ z.conversation.EventBuilder = {
     };
   },
   buildDegraded(conversationEntity, userIds, type, timeOffset) {
-    const {id, self} = conversationEntity;
-
     return {
-      conversation: id,
+      conversation: conversationEntity.id,
       data: {
         type: type,
         userIds: userIds,
       },
-      from: self.id,
+      from: conversationEntity.selfUser().id,
       id: z.util.createRandomUuid(),
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.VERIFICATION,
@@ -101,13 +95,14 @@ z.conversation.EventBuilder = {
     };
   },
   buildGroupCreation(conversationEntity, isTemporaryGuest = false, timestamp) {
-    const {creator: creatorId, id, self: selfUser} = conversationEntity;
+    const {creator: creatorId, id} = conversationEntity;
+    const selfUserId = conversationEntity.selfUser().id;
     const isoDate = new Date(timestamp || 0).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
-    const createdBySelf = creatorId === selfUser.id || isTemporaryGuest;
+    const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
-      userIds.push(selfUser.id);
+      userIds.push(selfUserId);
     }
 
     return {
@@ -117,7 +112,7 @@ z.conversation.EventBuilder = {
         name: conversationEntity.name(),
         userIds: userIds,
       },
-      from: isTemporaryGuest ? selfUser.id : creatorId,
+      from: isTemporaryGuest ? selfUserId : creatorId,
       id: z.util.createRandomUuid(),
       time: isoDate,
       type: z.event.Client.CONVERSATION.GROUP_CREATION,
@@ -151,36 +146,30 @@ z.conversation.EventBuilder = {
     };
   },
   buildMemberLeave(conversationEntity, userId, removedBySelfUser, timeOffset) {
-    const {id, self} = conversationEntity;
-
     return {
-      conversation: id,
+      conversation: conversationEntity.id,
       data: {
         user_ids: [userId],
       },
-      from: removedBySelfUser ? self.id : userId,
+      from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     };
   },
   buildMessageAdd(conversationEntity, timeOffset) {
-    const {id, self} = conversationEntity;
-
     return {
-      conversation: id,
+      conversation: conversationEntity.id,
       data: {},
-      from: self.id,
+      from: conversationEntity.selfUser().id,
       status: z.message.StatusType.SENDING,
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   },
   buildMissed(conversationEntity, timeOffset) {
-    const {id, self} = conversationEntity;
-
     return {
-      conversation: id,
-      from: self.id,
+      conversation: conversationEntity.id,
+      from: conversationEntity.selfUser().id,
       id: z.util.createRandomUuid(),
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.MISSED_MESSAGES,

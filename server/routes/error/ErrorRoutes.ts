@@ -19,11 +19,11 @@
 
 import * as express from 'express';
 import * as logdown from 'logdown';
-import {formatDate} from '../../TimeUtil';
+import {formatDate} from '../../util/TimeUtil';
 
 const router = express.Router();
 
-const logger = logdown('@wireapp/wire-web-ets/routes/error/errorRoutes', {
+const logger = logdown('@wireapp/wire-webapp/routes/error/errorRoutes', {
   logger: console,
   markdown: false,
 });
@@ -35,7 +35,15 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, ne
     message: 'Internal server error',
     stack: err.stack,
   };
-  return res.sendStatus(error.code);
+  const request = {
+    date: req.headers.date,
+    host: req.hostname,
+    ip: req.ip,
+    url: req.url,
+  };
+  req.app.locals.error = error;
+  req.app.locals.request = request;
+  return res.render('error');
 };
 
 const NotFoundRoute = () =>
@@ -44,7 +52,15 @@ const NotFoundRoute = () =>
       code: 404,
       message: 'Not found',
     };
-    return res.sendStatus(error.code);
+    const request = {
+      date: req.headers.date,
+      host: req.hostname,
+      ip: req.ip,
+      url: req.url,
+    };
+    req.app.locals.error = error;
+    req.app.locals.request = request;
+    return res.render('error');
   });
 
 export {InternalErrorRoute, NotFoundRoute};

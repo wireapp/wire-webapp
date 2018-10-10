@@ -167,7 +167,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         const noRemainingClients = !clientIdsOfUser.length;
 
         if (noRemainingClients) {
-          const isGroupConversation = conversationEntity && conversationEntity.is_group();
+          const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
             const timeOffset = this.conversationRepository.timeOffset;
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);

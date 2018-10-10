@@ -29,9 +29,9 @@ z.ui.ShortcutType = {
   CALL_REJECT: 'reject',
   DEBUG: 'debug',
   NEXT: 'next',
+  NOTIFICATIONS: 'notifications',
   PEOPLE: 'people',
   PING: 'ping',
   PREV: 'prev',
-  SILENCE: 'silence',
   START: 'start',
 };

@@ -188,6 +188,7 @@ z.string.hr.modalConversationTooManyMembersHeadline = 'Puna kuća';
 
 
 z.string.hr.modalImproveWireAction = 'Prihvati';
+z.string.hr.modalImproveWireSecondary = 'Ne';
 
 z.string.hr.modalSessionResetHeadline = 'Sesija je resetirana';
 z.string.hr.modalSessionResetMessage1 = 'Ako problem nije razriješen,';
@@ -307,6 +308,7 @@ z.string.hr.addParticipantsTabsServices = 'Usluge';
 z.string.hr.conversationDetailsActionArchive = 'Arhiviraj';
 z.string.hr.conversationDetailsActionCancelRequest = 'Poništi zahtjev';
 z.string.hr.conversationDetailsActionDevices = 'Uređaji';
+z.string.hr.conversationDetailsActionNotifications = 'Obavijesti';
 z.string.hr.conversationDetailsGuestsOff = 'Isključi';
 z.string.hr.conversationDetailsOptions = 'Opcije';
 z.string.hr.conversationDetailsParticipantsServicesMany = 'Usluge';
@@ -321,6 +323,8 @@ z.string.hr.groupParticipantActionCancelRequest = 'Poništi zahtjev';
 z.string.hr.groupParticipantActionDevices = 'Uređaji';
 z.string.hr.groupParticipantActionPending = 'Na čekanju';
 z.string.hr.groupParticipantActionSendRequest = 'Poveži se';
+
+z.string.hr.notificationSettingsTitle = 'Obavijesti';
 
 z.string.hr.participantDevicesDetailHeadline = 'Provjerite da je otisak prikazan na {{html1}}{{user}}’s device{{html2}}.';
 z.string.hr.participantDevicesDetailHowTo = 'Kako to da učinim?';
