@@ -40,7 +40,6 @@ z.error.BaseError = class BaseError extends Error {
     return {
       INVALID_PARAMETER: 'Invalid parameter passed',
       MISSING_PARAMETER: 'Required parameter is not defined',
-      NOT_FOUND: '',
       UNKNOWN: 'Unknown',
     };
   }
@@ -49,7 +48,6 @@ z.error.BaseError = class BaseError extends Error {
     return {
       INVALID_PARAMETER: 'INVALID_PARAMETER',
       MISSING_PARAMETER: 'MISSING_PARAMETER',
-      NOT_FOUND: 'NOT_FOUND',
       UNKNOWN: 'UNKNOWN',
     };
   }
