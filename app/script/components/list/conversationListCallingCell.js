@@ -38,7 +38,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.conversationParticipants = this.conversation.participating_user_ets;
     this.joinedCall = callingRepository.joinedCall;
     this.selfStreamState = callingRepository.selfStreamState;
-    this.selfUser = this.conversation.self;
+    this.selfUser = this.conversation.selfUser();
 
     this.isConnected = this.call().isConnected;
 

@@ -26,24 +26,29 @@ describe('z.conversation.ConversationCellState', () => {
   const NOTIFICATION_STATES = z.conversation.NotificationSetting.STATE;
 
   describe('Notification state icon', () => {
-    const conversation = new z.entity.Conversation();
+    const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+    const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+    selfUserEntity.is_me = true;
+    selfUserEntity.inTeam(true);
+    conversationEntity.selfUser(selfUserEntity);
 
     it('returns empty state if notifications are set to everything', () => {
-      conversation.notificationState(NOTIFICATION_STATES.EVERYTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
-      expect(conversationCellState.generate(conversation)).toEqual({description: '', icon: 'none'});
+      expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'none'});
     });
 
     it('returns the muted icon if only mentions are set', () => {
-      conversation.notificationState(NOTIFICATION_STATES.ONLY_MENTIONS);
+      conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
 
-      expect(conversationCellState.generate(conversation)).toEqual({description: '', icon: 'muted'});
+      expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
 
     it('returns the muted icon if no notifications are allowed', () => {
-      conversation.notificationState(NOTIFICATION_STATES.NOTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
 
-      expect(conversationCellState.generate(conversation)).toEqual({description: '', icon: 'muted'});
+      expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
   });
 
@@ -56,15 +61,22 @@ describe('z.conversation.ConversationCellState', () => {
       pings: [],
       selfMentions: [],
     };
-    const conversation = new z.entity.Conversation();
-    conversation.notificationState(NOTIFICATION_STATES.EVERYTHING);
 
-    const message = new z.entity.ContentMessage();
+    const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+    const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+    selfUserEntity.is_me = true;
+    selfUserEntity.inTeam(true);
+    conversationEntity.selfUser(selfUserEntity);
+
+    conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
+
+    const contentMessage = new z.entity.ContentMessage();
     const text = new z.entity.Text('id', 'Hello there');
-    message.unsafeSenderName = () => 'Felix';
-    message.assets([text]);
+    contentMessage.unsafeSenderName = () => 'Felix';
+    contentMessage.assets([text]);
 
-    const ping = new z.entity.PingMessage();
+    const pingMessage = new z.entity.PingMessage();
 
     const tests = [
       {
@@ -81,14 +93,14 @@ describe('z.conversation.ConversationCellState', () => {
           one2one: {description: 'Hello there', icon: z.conversation.ConversationStatusIcon.UNREAD_MESSAGES},
         },
         unreadState: Object.assign({}, defaultUnreadState, {
-          allMessages: [message],
+          allMessages: [contentMessage],
         }),
       },
       {
         description: 'returns the number of pings',
         expected: {description: '2 pings', icon: z.conversation.ConversationStatusIcon.UNREAD_PING},
         unreadState: Object.assign({}, defaultUnreadState, {
-          pings: [ping, ping],
+          pings: [pingMessage, pingMessage],
         }),
       },
       {
@@ -113,22 +125,22 @@ describe('z.conversation.ConversationCellState', () => {
       },
     ];
 
-    conversation.isGroup = () => false;
+    conversationEntity.isGroup = () => false;
     tests.forEach(({description, expected, unreadState}) => {
       const expectedOne2One = expected.one2one || expected;
-      conversation.unreadState = () => unreadState;
-      const state = conversationCellState.generate(conversation);
+      conversationEntity.unreadState = () => unreadState;
+      const state = conversationCellState.generate(conversationEntity);
 
       it(`${description} (1:1)`, () => {
         expect(state).toEqual(expectedOne2One);
       });
     });
 
-    conversation.isGroup = () => true;
+    conversationEntity.isGroup = () => true;
     tests.forEach(({description, expected, unreadState}) => {
       const expectedGroup = expected.group || expected;
-      conversation.unreadState = () => unreadState;
-      const state = conversationCellState.generate(conversation);
+      conversationEntity.unreadState = () => unreadState;
+      const state = conversationCellState.generate(conversationEntity);
 
       it(`${description} (group)`, () => {
         expect(state).toEqual(expectedGroup);

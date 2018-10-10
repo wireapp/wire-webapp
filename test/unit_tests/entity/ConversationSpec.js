@@ -512,9 +512,9 @@ describe('Conversation', () => {
       const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new z.entity.User();
+      const self_user_et = new z.entity.User(z.util.createRandomUuid());
       self_user_et.is_me = true;
-      conversation_et.self = self_user_et;
+      conversation_et.selfUser(self_user_et);
 
       const user_et = new z.entity.User();
       user_et.devices.push(verified_client_et);
@@ -531,7 +531,7 @@ describe('Conversation', () => {
       const self_user_et = new z.entity.User();
       self_user_et.is_me = true;
       self_user_et.devices.push(verified_client_et);
-      conversation_et.self = self_user_et;
+      conversation_et.selfUser(self_user_et);
 
       const user_et = new z.entity.User();
       user_et.devices.push(unverified_client_et);
@@ -552,7 +552,7 @@ describe('Conversation', () => {
       const self_user_et = new z.entity.User();
       self_user_et.is_me = true;
       self_user_et.devices.push(verified_client_et);
-      conversation_et.self = self_user_et;
+      conversation_et.selfUser(self_user_et);
 
       const user_et = new z.entity.User();
       user_et.devices.push(verified_client_et);
@@ -573,7 +573,7 @@ describe('Conversation', () => {
       const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
-      conversation_et.self = selfUserEntity;
+      conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
       const userEntity = new z.entity.User(z.util.createRandomUuid());
@@ -597,7 +597,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
-      conversation_et.self.inTeam(false);
+      selfUserEntity.inTeam(false);
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
       expect(conversation_et.hasGuest()).toBe(false);
 
@@ -806,7 +806,7 @@ describe('Conversation', () => {
     const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
     selfUserEntity.is_me = true;
     selfUserEntity.inTeam(true);
-    conversationEntity.self = selfUserEntity;
+    conversationEntity.selfUser(selfUserEntity);
 
     beforeEach(() => {
       timestamp = Date.now();
@@ -857,7 +857,7 @@ describe('Conversation', () => {
     });
 
     it('returns false if conversation is in no notification state', () => {
-      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -877,7 +877,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
-      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -897,7 +897,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in everything notifications state', () => {
-      conversationEntity.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -956,7 +956,7 @@ describe('Conversation', () => {
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.notificationState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      conversation_et.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
@@ -982,6 +982,60 @@ describe('Conversation', () => {
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
       expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);
+    });
+  });
+
+  describe('notificationState', () => {
+    it('returns expected values', () => {
+      const NOTIFICATION_STATES = z.conversation.NotificationSetting.STATE;
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
+      conversationEntity.selfUser(selfUserEntity);
+      conversationEntity.mutedState(undefined);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      conversationEntity.mutedState('true');
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      conversationEntity.mutedState(true);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
+      conversationEntity.mutedState(false);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
+      conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
+      conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      selfUserEntity.inTeam(true);
+      conversationEntity.mutedState(undefined);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      conversationEntity.mutedState('true');
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      conversationEntity.mutedState(true);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
+
+      conversationEntity.mutedState(false);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
+      conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
+      conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
+
+      conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
     });
   });
 });
