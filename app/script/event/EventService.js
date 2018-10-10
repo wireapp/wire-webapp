@@ -257,7 +257,7 @@ z.event.EventService = class EventService {
       return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
         return this.storageService.load(this.EVENT_STORE_NAME, key).then(record => {
           if (!record) {
-            throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+            throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
           }
 
           const databaseVersion = record.version || 1;
@@ -276,7 +276,7 @@ z.event.EventService = class EventService {
           this.logger.error(logMessage, logObject);
 
           Raygun.send(new Error(logMessage), logObject);
-          throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+          throw new z.error.StorageError(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
         });
       });
     });

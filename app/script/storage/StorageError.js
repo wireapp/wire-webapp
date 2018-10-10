@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.storage = z.storage || {};
+window.z.error = z.error || {};
 
-z.storage.StorageError = class StorageError extends Error {
+z.error.StorageError = class StorageError extends z.error.BaseError {
   constructor(type, message) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || StorageError.TYPE.UNKNOWN;
-
-    this.message = message || StorageError.MESSAGE[this.type] || StorageError.MESSAGE.UNKNOWN;
+    const errorName = 'StorageError';
+    super(errorName, type, message);
   }
 
   static get MESSAGE() {

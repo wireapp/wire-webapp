@@ -444,7 +444,7 @@ z.main.App = class App {
 
         default: {
           this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
-          const is_storage_error = error instanceof z.storage.StorageError;
+          const is_storage_error = error instanceof z.error.StorageError;
           if (is_storage_error) {
             Raygun.send(error);
           }

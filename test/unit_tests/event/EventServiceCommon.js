@@ -425,7 +425,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
-            expect(error.type).toBe(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+            expect(error.type).toBe(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
           });
       });
 
@@ -439,7 +439,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
-            expect(error.type).toBe(z.storage.StorageError.TYPE.NOT_FOUND);
+            expect(error.type).toBe(z.error.StorageError.TYPE.NOT_FOUND);
           });
       });
 
