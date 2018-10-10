@@ -17,36 +17,18 @@
  *
  */
 
-import {onEnvironment} from './Environment';
-
-const WEBAPP_ENV = onEnvironment({
-  onLocal: '/',
-  onProduction: '/',
-  onStaging: '/',
-});
-const WIRE_WEBSITE = onEnvironment({
-  onProduction: 'https://wire.com/',
-  onStaging: 'https://wire-website-staging.zinfra.io/',
-});
-const WIRE_ACCOUNT = onEnvironment({
-  onProduction: 'https://account.wire.com/',
-  onStaging: 'https://wire-account-staging.zinfra.io/',
-});
-const WIRE_PWA = onEnvironment({
-  onProduction: '/',
-  onStaging: 'https://wire-pwa-staging.zinfra.io/',
-});
+import * as config from './config';
 
 export default {
-  PHONE_LOGIN: `${WEBAPP_ENV}login/`,
-  PWA: WIRE_PWA,
-  PWA_LOGIN: `${WIRE_PWA}login/`,
-  WEBAPP: WEBAPP_ENV,
-  WIRE_ACCOUNT,
-  WIRE_ACCOUNT_PASSWORD_RESET: `${WIRE_ACCOUNT}forgot/`,
-  WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}legal/#privacy`,
-  WIRE_TEAM_FEATURES: `${WIRE_WEBSITE}create-team/#features`,
-  WIRE_TERMS_PERSONAL: `${WIRE_WEBSITE}legal/terms/#personal`,
-  WIRE_TERMS_TEAMS: `${WIRE_WEBSITE}legal/terms/#teams`,
-  WIRE_WEBSITE,
+  PHONE_LOGIN: `/login/`,
+  PWA: config.EXTERNAL_MOBILE_BASE,
+  PWA_LOGIN: `${config.EXTERNAL_MOBILE_BASE}login/`,
+  WEBAPP: '/',
+  WIRE_ACCOUNT: config.EXTERNAL_ACCOUNT_BASE,
+  WIRE_ACCOUNT_PASSWORD_RESET: `${config.EXTERNAL_ACCOUNT_BASE}forgot/`,
+  WIRE_PRIVACY_POLICY: `${config.EXTERNAL_WEBSITE_BASE}legal/#privacy`,
+  WIRE_TEAM_FEATURES: `${config.EXTERNAL_WEBSITE_BASE}create-team/#features`,
+  WIRE_TERMS_PERSONAL: `${config.EXTERNAL_WEBSITE_BASE}legal/terms/#personal`,
+  WIRE_TERMS_TEAMS: `${config.EXTERNAL_WEBSITE_BASE}legal/terms/#teams`,
+  WIRE_WEBSITE: config.EXTERNAL_WEBSITE_BASE,
 };

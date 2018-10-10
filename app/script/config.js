@@ -95,21 +95,21 @@ window.z.config = {
 
   URL: {
     ACCOUNT: {
-      PRODUCTION: 'https://account.wire.com',
+      PRODUCTION: window.EXTERNAL_ACCOUNT_BASE || 'https://account.wire.com',
       STAGING: 'https://wire-account-staging.zinfra.io',
     },
     SUPPORT: 'https://support.wire.com',
     TEAM_SETTINGS: {
-      PRODUCTION: 'https://teams.wire.com',
+      PRODUCTION: window.EXTERNAL_TEAMS_BASE || 'https://teams.wire.com',
       STAGING: 'https://wire-admin-staging.zinfra.io',
     },
     WEBAPP: {
       INTERNAL: 'https://wire-webapp-staging.wire.com',
-      PRODUCTION: 'https://app.wire.com',
+      PRODUCTION: window.BASE || 'https://app.wire.com',
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },
     WEBSITE: {
-      PRODUCTION: 'https://wire.com',
+      PRODUCTION: window.EXTERNAL_WEBSITE_BASE || 'https://wire.com',
       STAGING: 'https://wire-website-staging.zinfra.io',
     },
   },

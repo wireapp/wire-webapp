@@ -23,10 +23,14 @@ const ConfigRoute = (config: ServerConfig) =>
   Router().get('/config.js', (req, res) => {
     res.type('application/javascript').send(`
       window.APP_NAME = '${config.CLIENT.APP_NAME}';
+      window.BASE = '${config.SERVER.BASE}';
       window.BACKEND_HTTP = '${config.CLIENT.BACKEND_HTTP}';
       window.BACKEND_WS = '${config.CLIENT.BACKEND_WS}';
       window.ENVIRONMENT = '${config.CLIENT.ENVIRONMENT}';
       window.VERSION = '${config.CLIENT.VERSION}';
+      window.EXTERNAL_ACCOUNT_BASE = '${config.CLIENT.EXTERNAL_ACCOUNT_BASE}';
+      window.EXTERNAL_WEBSITE_BASE = '${config.CLIENT.EXTERNAL_WEBSITE_BASE}';
+      window.EXTERNAL_MOBILE_BASE = '${config.CLIENT.EXTERNAL_MOBILE_BASE}';
     `);
   });
 
