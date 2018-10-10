@@ -29,12 +29,13 @@ z.error.BaseError = class BaseError extends Error {
     this.name = this.constructor.name;
     this.stack = new Error().stack;
 
-    const knownTypes = Object.assign({}, BaseError.TYPE, z.error[this.name].TYPE);
+    const ErrorInstanceClass = z.error[this.name];
+    const knownTypes = Object.assign({}, BaseError.TYPE, ErrorInstanceClass.TYPE);
     const isValidType = Object.values(knownTypes).includes(type);
 
     this.type = isValidType ? type : BaseError.TYPE.UNKNOWN;
 
-    this.message = message || z.error[this.name].MESSAGE[this.type] || BaseError.MESSAGE[this.type];
+    this.message = message || ErrorInstanceClass.MESSAGE[this.type] || BaseError.MESSAGE[this.type];
     if (!this.message) {
       this.message = `${BaseError.MESSAGE.UNKNOWN} ${this.name}`;
     }
