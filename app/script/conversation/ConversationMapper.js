@@ -292,20 +292,18 @@ z.conversation.ConversationMapper = class ConversationMapper {
   /**
    * Get the valid muted state.
    *
-   * @param {boolean} deprecatedMutedState - Outdated muted state
+   * @param {boolean} mutedState - Outdated muted state
    * @param {z.conversation.NotificationSetting.STATE} [notificationState] - Bit mask based notification setting
    * @returns {z.conversation.NotificationSetting.STATE} validated notification setting
    */
-  getMutedState(deprecatedMutedState, notificationState) {
+  getMutedState(mutedState, notificationState) {
     const validNotifcationStates = Object.values(z.conversation.NotificationSetting.STATE);
     if (validNotifcationStates.includes(notificationState)) {
       // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
-      return deprecatedMutedState ? notificationState | 0b1 : z.conversation.NotificationSetting.STATE.EVERYTHING;
+      return mutedState ? notificationState | 0b1 : z.conversation.NotificationSetting.STATE.EVERYTHING;
     }
 
-    return typeof deprecatedMutedState === 'boolean'
-      ? deprecatedMutedState
-      : z.conversation.NotificationSetting.STATE.EVERYTHING;
+    return typeof mutedState === 'boolean' ? mutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
   }
 
   /**
