@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.AccessTokenError = class AccessTokenError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'AccessTokenError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

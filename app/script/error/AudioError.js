@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.AudioError = class AudioError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'AudioError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

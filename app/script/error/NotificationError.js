@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.NotificationError = class NotificationError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'NotificationError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

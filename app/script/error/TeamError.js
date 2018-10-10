@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.TeamError = class TeamError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'TeamError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

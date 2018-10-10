@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.StorageError = class StorageError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'StorageError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

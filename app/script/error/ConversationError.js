@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.ConversationError = class ConversationError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'ConversationError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

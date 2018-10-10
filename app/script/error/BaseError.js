@@ -23,16 +23,16 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.BaseError = class BaseError extends Error {
-  constructor(errorName, type, message) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
     this.type = type || BaseError.TYPE.UNKNOWN;
 
-    this.message = message || z.error[errorName].MESSAGE[this.type] || BaseError.MESSAGE[this.type];
-    if (!message) {
-      this.message = `${BaseError.MESSAGE.UNKNOWN} ${errorName}`;
+    this.message = message || z.error[this.name].MESSAGE[this.type] || BaseError.MESSAGE[this.type];
+    if (!this.message) {
+      this.message = `${BaseError.MESSAGE.UNKNOWN} ${this.name}`;
     }
   }
 

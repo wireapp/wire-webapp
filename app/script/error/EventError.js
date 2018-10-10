@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.EventError = class EventError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'EventError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

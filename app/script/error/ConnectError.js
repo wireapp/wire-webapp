@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.ConnectError = class ConnectError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'ConnectError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

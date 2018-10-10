@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.PermissionError = class PermissionError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'PermissionError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

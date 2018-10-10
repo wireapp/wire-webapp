@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.LinkPreviewError = class LinkPreviewError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'LinkPreviewError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

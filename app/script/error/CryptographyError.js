@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.CryptographyError = class CryptographyError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'CryptographyError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {

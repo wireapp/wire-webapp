@@ -24,8 +24,7 @@ window.z.error = z.error || {};
 
 z.error.CallError = class CallError extends z.error.BaseError {
   constructor(type, message) {
-    const errorName = 'CallError';
-    super(errorName, type, message);
+    super(type, message);
   }
 
   static get MESSAGE() {
