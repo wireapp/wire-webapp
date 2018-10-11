@@ -83,9 +83,9 @@ export interface ServerConfig {
     BACKEND_HTTP: string;
     BACKEND_WS: string;
     ENVIRONMENT: string;
-    SUPPORTED_BROWSERS: {
-      [name: string]: number;
-    };
+    EXTERNAL_ACCOUNT_BASE: string;
+    EXTERNAL_MOBILE_BASE: string;
+    EXTERNAL_WEBSITE_BASE: string;
     VERSION?: string;
   };
   SERVER: {
@@ -113,12 +113,9 @@ const config: ServerConfig = {
     BACKEND_HTTP: process.env.BACKEND_HTTP,
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
-    SUPPORTED_BROWSERS: {
-      chrome: 56,
-      firefox: 60,
-      msedge: 15,
-      opera: 43,
-    },
+    EXTERNAL_ACCOUNT_BASE: process.env.EXTERNAL_ACCOUNT_BASE,
+    EXTERNAL_MOBILE_BASE: process.env.EXTERNAL_MOBILE_BASE,
+    EXTERNAL_WEBSITE_BASE: process.env.EXTERNAL_WEBSITE_BASE,
     VERSION: undefined,
   },
   SERVER: {
