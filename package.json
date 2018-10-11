@@ -216,6 +216,7 @@
     "fix:assets": "yarn prettier --write && yarn stylelint",
     "fix:js": "yarn test:js --fix",
     "fix:ts": "yarn test:ts --fix",
+    "postinstall": "grunt init",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "concurrently \"yarn start:dev\" \"grunt\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
@@ -292,7 +293,7 @@
       "js": "dist/browsers-sumo/sodium.js"
     },
     "@bower_components/linkifyjs": {
-      "js": "linkify{-html,}.min.js"
+      "js": "src/linkify{-html,}.min.js"
     },
     "@bower_components/long": {
       "js": "dist/long.js"
