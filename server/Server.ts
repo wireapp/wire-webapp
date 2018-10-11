@@ -18,7 +18,6 @@
  */
 
 import {CommonConfig} from '@wireapp/commons';
-import * as compression from 'compression';
 import * as express from 'express';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
@@ -55,12 +54,6 @@ class Server {
     this.initCaching();
     this.initForceSSL();
     this.initSecurityHeaders();
-    this.app.use(
-      compression({
-        level: this.config.SERVER.COMPRESS_LEVEL,
-        threshold: this.config.SERVER.COMPRESS_MIN_SIZE,
-      })
-    );
     this.initLatestBrowserRequired();
     this.initStaticRoutes();
     this.initWebpack();

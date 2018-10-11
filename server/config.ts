@@ -91,8 +91,6 @@ export interface ServerConfig {
   SERVER: {
     BASE: string;
     CACHE_DURATION_SECONDS: number;
-    COMPRESS_LEVEL: number;
-    COMPRESS_MIN_SIZE: number;
     CSP: typeof CSP;
     DEVELOPMENT?: boolean;
     ENVIRONMENT: string;
@@ -121,8 +119,6 @@ const config: ServerConfig = {
   SERVER: {
     BASE: process.env.BASE,
     CACHE_DURATION_SECONDS: 300,
-    COMPRESS_LEVEL: 6,
-    COMPRESS_MIN_SIZE: 500,
     CSP,
     DEVELOPMENT: nodeEnvironment === 'development',
     ENVIRONMENT: nodeEnvironment,
