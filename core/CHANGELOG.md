@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.5.9...@wireapp/core@6.5.10) (2018-10-11)
+
+
+### Bug Fixes
+
+* **core:** Add missing users on message sending ([#1224](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1224)) ([29ac8f0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/29ac8f0))
+
+
+
+
+
 ## [6.5.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.5.8...@wireapp/core@6.5.9) (2018-10-09)
 
 **Note:** Version bump only for package @wireapp/core
