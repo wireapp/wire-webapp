@@ -31,7 +31,7 @@ declare global {
     EXTERNAL_MOBILE_BASE: string;
     VERSION: string;
     FEATURE: {
-      CHECK_CONSENT: string;
+      CHECK_CONSENT: boolean;
     };
   }
 }
