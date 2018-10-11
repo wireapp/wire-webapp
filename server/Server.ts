@@ -52,9 +52,7 @@ class Server {
     // The order is important here, please don't sort!
     this.initTemplateEngine();
     this.initCaching();
-    if (false) {
-      this.initForceSSL();
-    }
+    this.initForceSSL();
     this.initSecurityHeaders();
     this.initLatestBrowserRequired();
     this.initStaticRoutes();
