@@ -17,7 +17,6 @@
     "@bower_components/keyboardjs": "RobertWHurst/KeyboardJS#v2.4.1",
     "@bower_components/knockout": "knockout/knockout#v3.4.1",
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
-    "@bower_components/linkifyjs": "SoapBox/linkifyjs#v2.1.6",
     "@bower_components/long": "dcodeIO/Long.js#3.2.0",
     "@bower_components/mixpanel": "mixpanel/mixpanel-js#v2.22.4",
     "@bower_components/moment": "moment/moment#2.22.2",
@@ -216,7 +215,7 @@
     "fix:assets": "yarn prettier --write && yarn stylelint",
     "fix:js": "yarn test:js --fix",
     "fix:ts": "yarn test:ts --fix",
-    "postinstall": "grunt init",
+    "postinstall": "node ./bin/postinstall.js",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "concurrently \"yarn start:dev\" \"grunt\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
@@ -291,9 +290,6 @@
     },
     "@bower_components/libsodium.js": {
       "js": "dist/browsers-sumo/sodium.js"
-    },
-    "@bower_components/linkifyjs": {
-      "js": "src/linkify{-html,}.min.js"
     },
     "@bower_components/long": {
       "js": "dist/long.js"
