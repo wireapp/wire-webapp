@@ -23,8 +23,6 @@ import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
-const expressSitemapXml = require('express-sitemap-xml');
-
 import {ServerConfig} from './config';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
@@ -32,6 +30,8 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
 import * as BrowserUtil from './util/BrowserUtil';
+
+const expressSitemapXml = require('express-sitemap-xml');
 
 const STATUS_CODE_MOVED = 301;
 const STATUS_CODE_FOUND = 302;
@@ -52,7 +52,9 @@ class Server {
     // The order is important here, please don't sort!
     this.initTemplateEngine();
     this.initCaching();
-    this.initForceSSL();
+    if (false) {
+      this.initForceSSL();
+    }
     this.initSecurityHeaders();
     this.initLatestBrowserRequired();
     this.initStaticRoutes();
