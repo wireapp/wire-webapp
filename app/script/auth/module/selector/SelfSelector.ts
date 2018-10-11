@@ -18,6 +18,7 @@
 */
 
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import * as config from '../../config';
 import {RootState} from '../reducer';
 
 const unsetSelf: Self = {
@@ -41,4 +42,5 @@ export const getSelfError = (state: RootState) => state.selfState.error;
 export const isFetching = (state: RootState) => state.selfState.fetching;
 export const getConsents = (state: RootState) => state.selfState.consents || {};
 const getConsent = (state: RootState, consentType: number) => getConsents(state)[consentType];
-export const hasUnsetConsent = (state: RootState, consentType: number) => getConsent(state, consentType) === undefined;
+export const hasUnsetConsent = (state: RootState, consentType: number) =>
+  !config.FEATURE.CHECK_CONSENT ? false : getConsent(state, consentType) === undefined;

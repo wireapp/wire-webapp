@@ -30,6 +30,9 @@ declare global {
     EXTERNAL_WEBSITE_BASE: string;
     EXTERNAL_MOBILE_BASE: string;
     VERSION: string;
+    FEATURE: {
+      CHECK_CONSENT: string;
+    };
   }
 }
 
@@ -42,4 +45,7 @@ export const EXTERNAL_ACCOUNT_BASE = window.EXTERNAL_ACCOUNT_BASE || 'https://ac
 export const EXTERNAL_WEBSITE_BASE = window.EXTERNAL_WEBSITE_BASE || 'https://wire.com/';
 export const EXTERNAL_MOBILE_BASE = window.EXTERNAL_MOBILE_BASE || '/';
 export const VERSION = window.VERSION || '0.0.0';
+export const FEATURE = window.FEATURE || {
+  CHECK_CONSENT: true,
+};
 export const APP_INSTANCE_ID = UUID();

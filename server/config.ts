@@ -86,6 +86,9 @@ export interface ServerConfig {
     EXTERNAL_ACCOUNT_BASE: string;
     EXTERNAL_MOBILE_BASE: string;
     EXTERNAL_WEBSITE_BASE: string;
+    FEATURE: {
+      CHECK_CONSENT: string;
+    };
     VERSION?: string;
   };
   SERVER: {
@@ -114,6 +117,9 @@ const config: ServerConfig = {
     EXTERNAL_ACCOUNT_BASE: process.env.EXTERNAL_ACCOUNT_BASE,
     EXTERNAL_MOBILE_BASE: process.env.EXTERNAL_MOBILE_BASE,
     EXTERNAL_WEBSITE_BASE: process.env.EXTERNAL_WEBSITE_BASE,
+    FEATURE: {
+      CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT,
+    },
     VERSION: undefined,
   },
   SERVER: {
