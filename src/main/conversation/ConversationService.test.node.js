@@ -86,10 +86,13 @@ describe('ConversationService', () => {
     });
 
     it('adds missing prekeys', async () => {
-      const recipientId = new UUID(4).format();
-      const missingClientId = new UUID(4).format();
+      const aliceId = new UUID(4).format();
+      const aliceClientId = new UUID(4).format();
+      const bobId = new UUID(4).format();
+      const bobClientId = new UUID(4).format();
+
       const initialPreKeyBundles = {
-        [recipientId]: {
+        [aliceId]: {
           [new UUID(4).format()]: {},
         },
       };
@@ -97,14 +100,15 @@ describe('ConversationService', () => {
       spyOn(account.apiClient.conversation.api, 'postOTRMessage').and.callFake(
         (sendingClientId, conversationId, message) =>
           new Promise((resolve, reject) => {
-            if (message.recipients[recipientId] && !message.recipients[recipientId][missingClientId]) {
+            if (message.recipients[aliceId] && !message.recipients[aliceId][aliceClientId]) {
               // eslint-disable-next-line prefer-promise-reject-errors
               reject({
                 response: {
                   data: {
                     deleted: {},
                     missing: {
-                      [recipientId]: [missingClientId],
+                      [aliceId]: [aliceClientId],
+                      [bobId]: [bobClientId],
                     },
                     redundant: {},
                     time: new Date().toISOString(),
@@ -119,40 +123,47 @@ describe('ConversationService', () => {
       );
       spyOn(account.apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(
         Promise.resolve({
-          [recipientId]: {
-            [missingClientId]: {},
+          [aliceId]: {
+            [aliceClientId]: {},
+          },
+          [bobId]: {
+            [bobClientId]: {},
           },
         })
       );
 
       const payload = createMessage('Hello, world!');
       const recipients = await account.service.cryptography.encrypt(payload, initialPreKeyBundles);
-      expect(recipients[recipientId][missingClientId]).toBeUndefined();
+      expect(recipients[aliceId]).toBeDefined();
+      expect(recipients[aliceId][aliceClientId]).toBeUndefined();
+      expect(recipients[bobId]).toBeUndefined();
 
-      await account.service.conversation.sendOTRMessage(recipientId, new UUID(4).format(), recipients, payload);
-      expect(recipients[recipientId][missingClientId]).toBeDefined();
+      await account.service.conversation.sendOTRMessage(aliceId, new UUID(4).format(), recipients, payload);
+      expect(recipients[aliceId][aliceClientId]).toBeDefined();
+      expect(recipients[bobId][bobClientId]).toBeDefined();
     });
 
     it('removes deleted prekeys', async () => {
-      const recipientId = new UUID(4).format();
-      const deletedClientId = new UUID(4).format();
+      const aliceId = new UUID(4).format();
+      const aliceClientId = new UUID(4).format();
+
       const initialPreKeyBundles = {
-        [recipientId]: {
+        [aliceId]: {
           [new UUID(4).format()]: {},
-          [deletedClientId]: {},
+          [aliceClientId]: {},
         },
       };
 
       spyOn(account.apiClient.conversation.api, 'postOTRMessage').and.callFake(
         (sendingClientId, conversationId, message) =>
           new Promise((resolve, reject) => {
-            if (message.recipients[recipientId] && message.recipients[recipientId][deletedClientId]) {
+            if (message.recipients[aliceId] && message.recipients[aliceId][aliceClientId]) {
               // eslint-disable-next-line prefer-promise-reject-errors
               reject({
                 response: {
                   data: {
                     deleted: {
-                      [recipientId]: [deletedClientId],
+                      [aliceId]: [aliceClientId],
                     },
                     missing: {},
                     redundant: {},
@@ -170,10 +181,11 @@ describe('ConversationService', () => {
 
       const payload = createMessage('Hello, world!');
       const recipients = await account.service.cryptography.encrypt(payload, initialPreKeyBundles);
-      expect(recipients[recipientId][deletedClientId]).toBeDefined();
+      expect(recipients[aliceId][aliceClientId]).toBeDefined();
 
-      await account.service.conversation.sendOTRMessage(recipientId, new UUID(4).format(), recipients, payload);
-      expect(recipients[recipientId][deletedClientId]).toBeUndefined();
+      await account.service.conversation.sendOTRMessage(aliceId, new UUID(4).format(), recipients, payload);
+      expect(recipients[aliceId]).toBeDefined();
+      expect(recipients[aliceId][aliceClientId]).toBeUndefined();
     });
   });
 
