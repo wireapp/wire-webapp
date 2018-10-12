@@ -217,7 +217,7 @@
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "concurrently \"yarn start:dev\" \"grunt\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
-    "start:server:dev": "cross-env \"NODE_ENV=development\" node ./aws/index.js",
+    "start:server:dev": "node ./aws/index.js",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:types && yarn test:assets && yarn test:js && yarn test:ts && grunt check && grunt test",
