@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.5.10...@wireapp/core@7.0.0) (2018-10-12)
+
+
+### Code Refactoring
+
+* **api-client,core,cryptobox,proteus:** Rename root to index ([#1200](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1200)) ([6b937ac](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/6b937ac))
+
+
+### BREAKING CHANGES
+
+* **api-client,core,cryptobox,proteus:** Some modules can't be imported with `/root` anymore - use `/index` instead.
+
+
+
+
+
 ## [6.5.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.5.9...@wireapp/core@6.5.10) (2018-10-11)
 
 
