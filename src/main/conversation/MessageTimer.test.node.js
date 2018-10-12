@@ -1,4 +1,4 @@
-const {MessageTimer} = require('../../../dist/conversation/root');
+const {MessageTimer} = require('../../../dist/conversation/');
 
 describe('TimerService', () => {
   describe('"getMessageTimer"', () => {

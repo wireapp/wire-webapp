@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactionType} from '../root';
+import {ReactionType} from '../';
 
 interface ReactionContent {
   originalMessageId: string;

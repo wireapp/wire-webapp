@@ -21,7 +21,7 @@
 const bazinga64 = require('bazinga64');
 const Proteus = require('@wireapp/proteus');
 const {Cryptobox} = require('@wireapp/cryptobox');
-const {CryptographyService} = require('@wireapp/core/dist/cryptography/root');
+const {CryptographyService} = require('@wireapp/core/dist/cryptography/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {decryptAsset, encryptAsset} = require('@wireapp/core/dist/cryptography/AssetCryptography.browser');
 

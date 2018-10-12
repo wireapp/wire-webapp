@@ -18,16 +18,16 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
+import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Decoder, Encoder} from 'bazinga64';
 import * as logdown from 'logdown';
-import {SessionPayloadBundle} from '../cryptography/root';
+import {SessionPayloadBundle} from '../cryptography/';
 import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
 
 export interface MetaClient extends RegisteredClient {

@@ -17,7 +17,7 @@
  *
  */
 
-const auth = require('../../../dist/auth/root');
+const auth = require('../../../dist/auth/');
 
 describe('LoginSanitizer', () => {
   describe('"removeNonPrintableCharacters"', () => {

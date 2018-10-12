@@ -20,8 +20,8 @@
 import {APIClient} from '@wireapp/api-client';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/commonjs/asset/AssetRetentionPolicy';
 import {FileContent, ImageContent} from '../conversation/content/';
+import {EncryptedAssetUploaded} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {EncryptedAssetUploaded} from '../cryptography/root';
 
 export interface AssetOptions {
   public: boolean;

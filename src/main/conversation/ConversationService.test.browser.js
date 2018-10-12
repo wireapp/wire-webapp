@@ -17,7 +17,7 @@
  *
  */
 
-const {ConversationService} = require('@wireapp/core/dist/conversation/root');
+const {ConversationService} = require('@wireapp/core/dist/conversation/');
 
 describe('ConversationService', () => {
   describe('"createId"', () => {

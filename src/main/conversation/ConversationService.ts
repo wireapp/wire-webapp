@@ -42,7 +42,7 @@ import {
   PayloadBundleState,
   PayloadBundleType,
   ReactionType,
-} from '../conversation/root';
+} from '../conversation/';
 
 import {
   Article,
@@ -86,8 +86,8 @@ import {
 
 import {TextContentBuilder} from './TextContentBuilder';
 
+import {CryptographyService, EncryptedAsset} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
 import {APIClient} from '@wireapp/api-client';
 

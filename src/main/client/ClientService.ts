@@ -18,19 +18,14 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {
-  ClientClassification,
-  ClientType,
-  NewClient,
-  RegisteredClient,
-} from '@wireapp/api-client/dist/commonjs/client/index';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/';
+import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import * as logdown from 'logdown';
-import {CryptographyService} from '../cryptography/root';
+import {CryptographyService} from '../cryptography/';
+import {ClientInfo} from './';
 import ClientBackendRepository from './ClientBackendRepository';
 import ClientDatabaseRepository from './ClientDatabaseRepository';
-import {ClientInfo} from './root';
 
 const pkg = require('../../package.json');
 

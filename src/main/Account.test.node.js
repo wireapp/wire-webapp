@@ -19,7 +19,7 @@
 
 const nock = require('nock');
 const {Account} = require('@wireapp/core');
-const {PayloadBundleState, PayloadBundleType} = require('@wireapp/core/dist/conversation/root');
+const {PayloadBundleState, PayloadBundleType} = require('@wireapp/core/dist/conversation/');
 const {APIClient} = require('@wireapp/api-client');
 const {AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
