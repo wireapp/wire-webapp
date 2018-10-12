@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.16.10...@wireapp/api-client@2.0.0) (2018-10-12)
+
+
+### Code Refactoring
+
+* **api-client,core,cryptobox,proteus:** Rename root to index ([#1200](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1200)) ([6b937ac](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6b937ac))
+
+
+### BREAKING CHANGES
+
+* **api-client,core,cryptobox,proteus:** Some modules can't be imported with `/root` anymore - use `/index` instead.
+
+
+
+
+
 ## [1.16.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.16.9...@wireapp/api-client@1.16.10) (2018-10-11)
 
 **Note:** Version bump only for package @wireapp/api-client
