@@ -37,6 +37,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import * as Long from 'long';
 import {LoginSanitizer} from './auth/';
+import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {
@@ -62,6 +63,7 @@ import {CryptographyService} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {NotificationService} from './notification/';
 import {SelfService} from './self/';
+import {TeamService} from './team/';
 
 import {APIClient} from '@wireapp/api-client';
 import * as EventEmitter from 'events';
@@ -77,6 +79,7 @@ class Account extends EventEmitter {
   private readonly apiClient: APIClient;
   public service?: {
     asset: AssetService;
+    broadcast: BroadcastService;
     client: ClientService;
     connection: ConnectionService;
     conversation: ConversationService;
@@ -84,6 +87,7 @@ class Account extends EventEmitter {
     giphy: GiphyService;
     notification: NotificationService;
     self: SelfService;
+    team: TeamService;
     user: UserService;
   };
 
@@ -104,10 +108,14 @@ class Account extends EventEmitter {
     const conversationService = new ConversationService(this.apiClient, cryptographyService, assetService);
     const notificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
     const selfService = new SelfService(this.apiClient);
-    const userService = new UserService(this.apiClient);
+    const teamService = new TeamService(this.apiClient);
+
+    const broadcastService = new BroadcastService(this.apiClient, conversationService, cryptographyService);
+    const userService = new UserService(this.apiClient, broadcastService);
 
     this.service = {
       asset: assetService,
+      broadcast: broadcastService,
       client: clientService,
       connection: connectionService,
       conversation: conversationService,
@@ -115,6 +123,7 @@ class Account extends EventEmitter {
       giphy: giphyService,
       notification: notificationService,
       self: selfService,
+      team: teamService,
       user: userService,
     };
   }
