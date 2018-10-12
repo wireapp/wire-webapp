@@ -17,7 +17,6 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode} from '.';
 import {
   IdentifierExistsError,
   InvalidCredentialsError,
@@ -25,11 +24,11 @@ import {
   MissingCookieError,
   SuspendedAccountError,
   TokenExpiredError,
-} from '../auth';
-import {ConversationIsUnknownError, ConversationOperationError} from '../conversation';
-import {InviteEmailInUseError, ServiceNotFoundError} from '../team';
-import {InvalidInvitationCodeError} from '../team/index';
-import {UnconnectedUserError, UserIsUnknownError} from '../user';
+} from '../auth/';
+import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
+import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
+import {UnconnectedUserError, UserIsUnknownError} from '../user/';
+import {BackendError, BackendErrorLabel, StatusCode} from './';
 
 class BackendErrorMapper {
   public static get ERRORS(): {

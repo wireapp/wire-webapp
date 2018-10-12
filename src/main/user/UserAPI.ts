@@ -19,10 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {ClientPreKey, PreKeyBundle} from '../auth';
+import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {PublicClient} from '../client/';
 import {UserClients} from '../conversation/UserClients';
-import {HttpClient} from '../http';
+import {HttpClient} from '../http/';
 import {
   Activate,
   ActivationResponse,
@@ -35,7 +35,7 @@ import {
   User,
   UserPreKeyBundleMap,
   VerifyDelete,
-} from '../user';
+} from '../user/';
 
 class UserAPI {
   static readonly URL = {

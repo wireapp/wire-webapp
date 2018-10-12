@@ -17,10 +17,10 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
-import {AccessTokenData} from '../../auth';
-import {HttpClient} from '../../http';
+import {AccessTokenData} from '../../auth/';
+import {HttpClient} from '../../http/';
 
 export const retrieveCookie = (
   response: AxiosResponse<AccessTokenData>,

@@ -17,7 +17,7 @@
  *
  */
 
-import {Contact} from '../user';
+import {Contact} from '../user/';
 
 interface SearchResult {
   documents: Contact[];

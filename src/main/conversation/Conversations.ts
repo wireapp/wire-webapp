@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from '../conversation';
+import {Conversation} from '../conversation/';
 
 interface Conversations {
   conversations: Conversation[];

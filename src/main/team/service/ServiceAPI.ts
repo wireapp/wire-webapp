@@ -19,7 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http';
+import {HttpClient} from '../../http/';
 import {Provider, Service, ServiceWhitelistData, Services} from './';
 
 class ServiceAPI {

@@ -22,7 +22,7 @@ import {
   CONVERSATION_ACCESS_ROLE,
   Conversation,
   ConversationMessageTimerUpdate,
-} from '../conversation';
+} from '../conversation/';
 import {BackendEvent} from './BackendEvent';
 
 enum CONVERSATION_EVENT {

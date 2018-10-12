@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationMembers} from '../conversation';
+import {ConversationMembers} from '../conversation/';
 
 enum CONVERSATION_TYPE {
   REGULAR = 0,

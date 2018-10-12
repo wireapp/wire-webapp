@@ -19,6 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
+import {HttpClient} from '../../http/';
 import {
   PaymentBillingData,
   PaymentData,
@@ -27,8 +28,7 @@ import {
   PaymentStripeCharge,
   PaymentStripeInvoices,
   PaymentStripePlan,
-} from '.';
-import {HttpClient} from '../../http';
+} from './';
 
 class PaymentAPI {
   static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;

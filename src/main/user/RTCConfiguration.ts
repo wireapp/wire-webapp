@@ -17,7 +17,7 @@
  *
  */
 
-import {RTCIceServer} from '../user';
+import {RTCIceServer} from '../user/';
 
 interface RTCConfiguration {
   ttl: number;
