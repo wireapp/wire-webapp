@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.0.0...@wireapp/core@7.1.0) (2018-10-12)
+
+
+### Features
+
+* **api-client,core:** Set availability status (WEBFOUND-50) ([#1223](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1223)) ([b9e064c](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/b9e064c))
+
+
+
+
+
 # [7.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@6.5.10...@wireapp/core@7.0.0) (2018-10-12)
 
 
