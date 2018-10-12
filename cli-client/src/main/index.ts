@@ -23,7 +23,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {Account} from '@wireapp/core';
-import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/root';
+import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {FileEngine} from '@wireapp/store-engine';
 import {AxiosError} from 'axios';
 import * as program from 'commander';

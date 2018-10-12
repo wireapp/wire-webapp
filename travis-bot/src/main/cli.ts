@@ -22,7 +22,7 @@
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 import * as path from 'path';
-import {MessageData, TravisBot} from './index';
+import {MessageData, TravisBot} from './';
 
 const logdown = require('logdown');
 const {version}: {version: string} = require('../package.json');

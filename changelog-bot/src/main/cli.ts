@@ -22,8 +22,8 @@
 import * as program from 'commander';
 import * as logdown from 'logdown';
 
-import {Parameters} from './interfaces';
-import {start as startChangelogBot} from './start';
+import {Parameters} from './Interfaces';
+import {start as startChangelogBot} from './Start';
 
 const {description, version}: {description: string; version: string} = require('../package.json');
 

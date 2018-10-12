@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {Self} from '@wireapp/api-client/dist/commonjs/self/index';
+import {Self} from '@wireapp/api-client/dist/commonjs/self/';
 
 export default class SelfService {
   constructor(private readonly apiClient: APIClient) {}

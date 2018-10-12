@@ -26,10 +26,10 @@ import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 import CryptoboxSession from './CryptoboxSession';
 import DecryptionError from './DecryptionError';
-import {CryptoboxError} from './error/root';
+import {CryptoboxError} from './error/';
 import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
 import {SerializedCryptobox} from './SerializedCryptobox';
-import {CryptoboxCRUDStore} from './store/root';
+import {CryptoboxCRUDStore} from './store/';
 
 const DEFAULT_CAPACITY = 1000;
 const {version}: {version: string} = require('../../package.json');

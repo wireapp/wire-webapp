@@ -17,7 +17,7 @@
  *
  */
 
-import {SupportedCurrency} from '../payment';
+import {SupportedCurrency} from '../payment/';
 
 interface TeamData {
   binding: boolean;

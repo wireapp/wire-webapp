@@ -25,7 +25,7 @@ import {promisify} from 'util';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 import {MemoryEngine} from '@wireapp/store-engine';
-import {ChangelogData, LoginDataBackend} from './interfaces';
+import {ChangelogData, LoginDataBackend} from './Interfaces';
 
 const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
   logger: console,

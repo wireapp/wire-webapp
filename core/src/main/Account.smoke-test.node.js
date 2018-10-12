@@ -22,7 +22,7 @@
 require('dotenv').config();
 
 const AccountHelper = require('./test/AccountHelper');
-const {PayloadBundleType} = require('@wireapp/core/dist/conversation/root');
+const {PayloadBundleType} = require('@wireapp/core/dist/conversation/');
 const {ValidationUtil} = require('@wireapp/commons');
 const {UnconnectedUserError} = require('@wireapp/api-client/dist/commonjs/user/');
 const logdown = require('logdown');

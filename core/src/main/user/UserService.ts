@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {User} from '@wireapp/api-client/dist/commonjs/user';
+import {User} from '@wireapp/api-client/dist/commonjs/user/';
 
 class UserService {
   constructor(private readonly apiClient: APIClient) {}

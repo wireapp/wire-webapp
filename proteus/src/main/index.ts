@@ -17,11 +17,11 @@
  *
  */
 
-import * as derived from './derived/root';
-import * as errors from './errors/root';
-import * as keys from './keys/root';
-import * as message from './message/root';
-import * as session from './session/root';
-import * as util from './util/root';
+import * as derived from './derived/';
+import * as errors from './errors/';
+import * as keys from './keys/';
+import * as message from './message/';
+import * as session from './session/';
+import * as util from './util/';
 
 export {derived, errors, keys, message, session, util};

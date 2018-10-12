@@ -18,9 +18,9 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/index';
-import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import * as logdown from 'logdown';
 import NotificationBackendRepository from './NotificationBackendRepository';
 import NotificationDatabaseRepository from './NotificationDatabaseRepository';

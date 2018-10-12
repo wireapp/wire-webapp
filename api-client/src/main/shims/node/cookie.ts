@@ -18,7 +18,7 @@
  */
 
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as logdown from 'logdown';
 import {Cookie as ToughCookie} from 'tough-cookie';

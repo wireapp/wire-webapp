@@ -17,8 +17,8 @@
  *
  */
 
-import {ServiceRef} from '../conversation';
-import {UserAsset} from '../user';
+import {ServiceRef} from '../conversation/';
+import {UserAsset} from '../user/';
 
 interface User {
   accent_id?: number;

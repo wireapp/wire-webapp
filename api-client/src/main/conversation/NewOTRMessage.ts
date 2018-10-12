@@ -17,7 +17,7 @@
  *
  */
 
-import {OTRRecipients} from '../conversation';
+import {OTRRecipients} from '../conversation/';
 
 interface NewOTRMessage {
   data?: any; // Defaults to Protocol Buffer. Use type 'string' for JSON.

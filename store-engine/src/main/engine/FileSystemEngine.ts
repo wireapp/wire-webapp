@@ -20,8 +20,7 @@
 import * as fs from 'bro-fs';
 import CRUDEngine from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
-import {RecordAlreadyExistsError, RecordNotFoundError, UnsupportedError} from './error';
-import {RecordTypeError} from './error/';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error/';
 
 export interface FileSystemEngineOptions {
   fileExtension: string;

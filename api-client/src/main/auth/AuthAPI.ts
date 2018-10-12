@@ -17,13 +17,13 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
-import {AccessTokenData, LoginData} from '../auth';
+import {AccessTokenData, LoginData} from '../auth/';
 import {ClientType} from '../client/';
-import {HttpClient} from '../http';
+import {HttpClient} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
-import {User} from '../user';
+import {User} from '../user/';
 import {RegisterData} from './RegisterData';
 
 class AuthAPI {

@@ -17,8 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/event';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/event/';
 import {Account} from '@wireapp/core';
+import {PayloadBundleIncoming, ReactionType} from '@wireapp/core/dist/conversation/';
 import {
   FileContent,
   FileMetaDataContent,
@@ -27,7 +28,6 @@ import {
   LocationContent,
   MentionContent,
 } from '@wireapp/core/dist/conversation/content/';
-import {PayloadBundleIncoming, ReactionType} from '@wireapp/core/dist/conversation/root';
 import {Asset} from '@wireapp/protocol-messaging';
 
 abstract class MessageHandler {

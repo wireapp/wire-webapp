@@ -17,7 +17,7 @@
  *
  */
 
-import {LinkPreviewUploadedContent, MentionContent} from '../content';
+import {LinkPreviewUploadedContent, MentionContent} from '../content/';
 
 interface TextContent {
   linkPreviews?: LinkPreviewUploadedContent[];

@@ -1,6 +1,6 @@
 import CRUDEngine from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error/';
 
 export default class LocalStorageEngine implements CRUDEngine {
   public storeName = '';

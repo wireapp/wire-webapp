@@ -17,7 +17,7 @@
  *
  */
 
-import {PreKey} from '../auth';
+import {PreKey} from '../auth/';
 
 interface ClientPreKey {
   client: string;

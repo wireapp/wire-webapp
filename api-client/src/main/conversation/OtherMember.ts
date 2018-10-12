@@ -17,7 +17,7 @@
  *
  */
 
-import {ServiceRef} from '../conversation';
+import {ServiceRef} from '../conversation/';
 
 interface OtherMember {
   id: string;

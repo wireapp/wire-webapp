@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection';
-import {HttpClient} from '../http';
+import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
+import {HttpClient} from '../http/';
 
 class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}

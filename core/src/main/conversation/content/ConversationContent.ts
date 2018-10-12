@@ -1,5 +1,5 @@
 import {Connection} from '@wireapp/api-client/dist/commonjs/connection/';
-import {ClientActionType} from '../root';
+import {ClientActionType} from '../';
 import {
   AssetContent,
   ClearedContent,
@@ -16,7 +16,7 @@ import {
   LocationContent,
   ReactionContent,
   TextContent,
-} from './index';
+} from './';
 
 type ConversationContent =
   | AssetContent

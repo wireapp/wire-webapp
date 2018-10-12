@@ -1,8 +1,8 @@
 import {keys as ProteusKeys, session as ProteusSession} from '@wireapp/proteus';
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Decoder, Encoder} from 'bazinga64';
-import {PersistedRecord, SerialisedRecord} from '../store/root';
+import {PersistedRecord, SerialisedRecord} from '../store/';
 
 export enum CRUDStoreKeys {
   LOCAL_IDENTITY = 'local_identity',

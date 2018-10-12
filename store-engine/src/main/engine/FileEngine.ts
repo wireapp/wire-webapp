@@ -8,7 +8,7 @@ import {
   RecordNotFoundError,
   RecordTypeError,
   UnsupportedError,
-} from './error';
+} from './error/';
 
 export default class FileEngine implements CRUDEngine {
   public storeName = '';

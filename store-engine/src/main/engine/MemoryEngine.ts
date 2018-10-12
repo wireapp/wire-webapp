@@ -1,5 +1,5 @@
 import CRUDEngine from './CRUDEngine';
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error/';
 
 export default class MemoryEngine implements CRUDEngine {
   public storeName = '';

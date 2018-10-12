@@ -20,12 +20,12 @@
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 import {Account} from '@wireapp/core';
-import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/root';
+import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {MemoryEngine} from '@wireapp/store-engine';
 import * as logdown from 'logdown';
 import UUID from 'pure-uuid';
 
-import {BotConfig, BotCredentials} from './interfaces';
+import {BotConfig, BotCredentials} from './Interfaces';
 import {MessageHandler} from './MessageHandler';
 
 const defaultConfig: Required<BotConfig> = {

@@ -20,7 +20,7 @@
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 
 import {ChangelogBot} from './ChangelogBot';
-import {ChangelogData, LoginDataBackend, Parameters} from './interfaces';
+import {ChangelogData, LoginDataBackend, Parameters} from './Interfaces';
 
 export async function start(parameters: Parameters): Promise<void> {
   const {backend, conversationIds, email, password, travisCommitRange, travisRepoSlug} = parameters;

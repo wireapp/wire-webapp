@@ -17,8 +17,8 @@
  *
  */
 
+import {PayloadBundleOutgoingUnsent} from '../conversation/';
 import {LinkPreviewUploadedContent, MentionContent, TextContent} from '../conversation/content/';
-import {PayloadBundleOutgoingUnsent} from '../conversation/root';
 
 class TextContentBuilder {
   constructor(private readonly payloadBundle: PayloadBundleOutgoingUnsent) {

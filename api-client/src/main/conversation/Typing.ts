@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPING} from '../event/index';
+import {CONVERSATION_TYPING} from '../event/';
 
 interface Typing {
   status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;

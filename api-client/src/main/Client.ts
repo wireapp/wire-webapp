@@ -17,17 +17,16 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import * as logdown from 'logdown';
 
 import {AssetAPI} from './asset/';
-import {AuthAPI, Context, LoginData, RegisterData} from './auth';
-import {AccessTokenStore} from './auth/';
+import {AccessTokenStore, AuthAPI, Context, LoginData, RegisterData} from './auth/';
 import {ClientAPI, ClientType} from './client/';
 import {Config} from './Config';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
-import {Backend} from './env';
+import {Backend} from './env/';
 import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
 import {InvitationAPI} from './invitation/';

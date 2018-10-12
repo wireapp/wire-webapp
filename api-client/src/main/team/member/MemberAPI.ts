@@ -20,7 +20,7 @@
 import {AxiosRequestConfig} from 'axios';
 
 import {MemberData} from '../';
-import {HttpClient} from '../../http';
+import {HttpClient} from '../../http/';
 import {TeamAPI} from '../team/TeamAPI';
 
 class MemberAPI {

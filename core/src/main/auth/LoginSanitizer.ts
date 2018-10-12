@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/index';
+import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 
 class LoginSanitizer {
   constructor() {}

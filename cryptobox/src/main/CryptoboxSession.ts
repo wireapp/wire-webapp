@@ -19,7 +19,7 @@
 
 import {message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
 import DecryptionError from './DecryptionError';
-import {CryptoboxCRUDStore} from './store/root';
+import {CryptoboxCRUDStore} from './store/';
 
 class CryptoboxSession {
   public id: string;

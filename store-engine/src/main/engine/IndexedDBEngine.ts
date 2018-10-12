@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 import CRUDEngine from './CRUDEngine';
-import {UnsupportedError} from './error';
+import {UnsupportedError} from './error/';
 import RecordAlreadyExistsError from './error/RecordAlreadyExistsError';
 import RecordNotFoundError from './error/RecordNotFoundError';
 import RecordTypeError from './error/RecordTypeError';
