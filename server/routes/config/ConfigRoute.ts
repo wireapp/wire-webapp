@@ -28,8 +28,8 @@ const ConfigRoute = (config: ServerConfig) =>
       window.BACKEND_WS = '${config.CLIENT.BACKEND_WS}';
       window.ENVIRONMENT = '${config.CLIENT.ENVIRONMENT}';
       window.VERSION = '${config.CLIENT.VERSION}';
-      window.EXTERNAL = '${config.CLIENT.EXTERNAL}';
-      window.FEATURE = '${config.CLIENT.FEATURE}';
+      window.EXTERNAL = '${JSON.stringify(config.CLIENT.EXTERNAL)}';
+      window.FEATURE = '${JSON.stringify(config.CLIENT.FEATURE)}';
     `);
   });
 
