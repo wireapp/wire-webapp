@@ -26,9 +26,11 @@ declare global {
     BACKEND_HTTP: string;
     BACKEND_WS: string;
     ENVIRONMENT: string;
-    EXTERNAL_ACCOUNT_BASE: string;
-    EXTERNAL_WEBSITE_BASE: string;
-    EXTERNAL_MOBILE_BASE: string;
+    EXTERNAL: {
+      ACCOUNT_BASE: string;
+      MOBILE_BASE: string;
+      WEBSITE_BASE: string;
+    };
     VERSION: string;
     FEATURE: {
       CHECK_CONSENT: boolean;
@@ -41,9 +43,11 @@ export const BACKEND_HTTP = window.BACKEND_HTTP || 'https://prod-nginz-https.wir
 export const BACKEND_WS = window.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
 export const ENVIRONMENT = window.ENVIRONMENT || 'production';
 export const BASE = window.BASE || 'https://app.wire.com/';
-export const EXTERNAL_ACCOUNT_BASE = window.EXTERNAL_ACCOUNT_BASE || 'https://account.wire.com/';
-export const EXTERNAL_WEBSITE_BASE = window.EXTERNAL_WEBSITE_BASE || 'https://wire.com/';
-export const EXTERNAL_MOBILE_BASE = window.EXTERNAL_MOBILE_BASE || '/';
+export const EXTERNAL = window.EXTERNAL || {
+  ACCOUNT_BASE: 'https://account.wire.com/',
+  MOBILE_BASE: '/',
+  WEBSITE_BASE: 'https://wire.com/',
+};
 export const VERSION = window.VERSION || '0.0.0';
 export const FEATURE = window.FEATURE || {
   CHECK_CONSENT: true,
