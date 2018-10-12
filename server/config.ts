@@ -24,22 +24,16 @@ import {fileIsReadable, readFile} from './util/FileUtil';
 
 dotenv.config();
 
-const CSP: HelmetCSP = {
+const defaultCSP: HelmetCSP = {
   connectSrc: [
     "'self'",
     'blob:',
     'data:',
-    'https://*.giphy.com',
-    'https://*.unsplash.com',
-    'https://*.wire.com',
-    'https://*.zinfra.io',
-    'https://api.mixpanel.com',
-    'https://api.raygun.io',
-    'https://apis.google.com',
     'https://wire.com',
     'https://www.google.com',
-    'wss://*.zinfra.io',
-    'wss://prod-nginz-ssl.wire.com',
+    'https://*.giphy.com',
+    'https://*.unsplash.com',
+    'https://apis.google.com',
   ],
   defaultSrc: ["'self'"],
   fontSrc: ["'self'", 'data:'],
@@ -56,26 +50,33 @@ const CSP: HelmetCSP = {
     'data:',
     'https://*.cloudfront.net',
     'https://*.giphy.com',
-    'https://*.wire.com',
-    'https://*.zinfra.io',
     'https://1-ps.googleusercontent.com',
-    'https://api.mixpanel.com',
     'https://csi.gstatic.com',
   ],
   mediaSrc: ["'self'", 'blob:', 'data:', '*'],
   objectSrc: ["'self'", 'https://*.youtube-nocookie.com', 'https://1-ps.googleusercontent.com'],
-  scriptSrc: [
-    "'self'",
-    "'unsafe-eval'",
-    "'unsafe-inline'",
-    'https://*.wire.com',
-    'https://*.zinfra.io',
-    'https://api.mixpanel.com',
-    'https://api.raygun.io',
-    'https://apis.google.com',
-  ],
-  styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com', 'https://*.wire.com'],
+  scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
+  styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
 };
+
+function mergedCSP(): HelmetCSP {
+  return {
+    connectSrc: [
+      ...defaultCSP.connectSrc,
+      process.env.BACKEND_HTTP,
+      process.env.BACKEND_WS,
+      ...JSON.parse(process.env.CSP_CONNECT_SRC || '[]'),
+    ],
+    defaultSrc: [...defaultCSP.defaultSrc, ...JSON.parse(process.env.CSP_DEFAULT_SRC || '[]')],
+    fontSrc: [...defaultCSP.fontSrc, ...JSON.parse(process.env.CSP_FONT_SRC || '[]')],
+    frameSrc: [...defaultCSP.frameSrc, ...JSON.parse(process.env.CSP_FRAME_SRC || '[]')],
+    imgSrc: [...defaultCSP.imgSrc, ...JSON.parse(process.env.CSP_IMG_SRC || '[]')],
+    mediaSrc: [...defaultCSP.mediaSrc, ...JSON.parse(process.env.CSP_MEDIA_SRC || '[]')],
+    objectSrc: [...defaultCSP.objectSrc, ...JSON.parse(process.env.CSP_OBJECT_SRC || '[]')],
+    scriptSrc: [...defaultCSP.scriptSrc, ...JSON.parse(process.env.CSP_SCRIPT_SRC || '[]')],
+    styleSrc: [...defaultCSP.styleSrc, ...JSON.parse(process.env.CSP_STYLE_SRC || '[]')],
+  };
+}
 
 export interface ServerConfig {
   CLIENT: {
@@ -83,9 +84,11 @@ export interface ServerConfig {
     BACKEND_HTTP: string;
     BACKEND_WS: string;
     ENVIRONMENT: string;
-    EXTERNAL_ACCOUNT_BASE: string;
-    EXTERNAL_MOBILE_BASE: string;
-    EXTERNAL_WEBSITE_BASE: string;
+    EXTERNAL: {
+      ACCOUNT_BASE: string;
+      WEBSITE_BASE: string;
+      MOBILE_BASE: string;
+    };
     FEATURE: {
       CHECK_CONSENT: string;
     };
@@ -94,7 +97,7 @@ export interface ServerConfig {
   SERVER: {
     BASE: string;
     CACHE_DURATION_SECONDS: number;
-    CSP: typeof CSP;
+    CSP: HelmetCSP;
     DEVELOPMENT?: boolean;
     ENVIRONMENT: string;
     PORT_HTTP: number;
@@ -114,9 +117,11 @@ const config: ServerConfig = {
     BACKEND_HTTP: process.env.BACKEND_HTTP,
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
-    EXTERNAL_ACCOUNT_BASE: process.env.EXTERNAL_ACCOUNT_BASE,
-    EXTERNAL_MOBILE_BASE: process.env.EXTERNAL_MOBILE_BASE,
-    EXTERNAL_WEBSITE_BASE: process.env.EXTERNAL_WEBSITE_BASE,
+    EXTERNAL: {
+      ACCOUNT_BASE: process.env.EXTERNAL_ACCOUNT_BASE,
+      MOBILE_BASE: process.env.EXTERNAL_MOBILE_BASE,
+      WEBSITE_BASE: process.env.EXTERNAL_WEBSITE_BASE,
+    },
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT,
     },
@@ -125,7 +130,7 @@ const config: ServerConfig = {
   SERVER: {
     BASE: process.env.BASE,
     CACHE_DURATION_SECONDS: 300,
-    CSP,
+    CSP: mergedCSP(),
     DEVELOPMENT: nodeEnvironment === 'development',
     ENVIRONMENT: nodeEnvironment,
     PORT_HTTP: Number(process.env.PORT) || 21080,
