@@ -25,6 +25,7 @@ import {fileIsReadable, readFile} from './util/FileUtil';
 dotenv.config();
 
 const defaultCSP: HelmetCSP = {
+  childSrc: [],
   connectSrc: [
     "'self'",
     'blob:',
@@ -53,14 +54,18 @@ const defaultCSP: HelmetCSP = {
     'https://1-ps.googleusercontent.com',
     'https://csi.gstatic.com',
   ],
+  manifestSrc: [],
   mediaSrc: ["'self'", 'blob:', 'data:', '*'],
   objectSrc: ["'self'", 'https://*.youtube-nocookie.com', 'https://1-ps.googleusercontent.com'],
+  prefetchSrc: [],
   scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
+  workerSrc: [],
 };
 
 function mergedCSP(): HelmetCSP {
   return {
+    childSrc: [...defaultCSP.childSrc, ...JSON.parse(process.env.CSP_CHILD_SRC || '[]')],
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_HTTP,
@@ -71,10 +76,13 @@ function mergedCSP(): HelmetCSP {
     fontSrc: [...defaultCSP.fontSrc, ...JSON.parse(process.env.CSP_FONT_SRC || '[]')],
     frameSrc: [...defaultCSP.frameSrc, ...JSON.parse(process.env.CSP_FRAME_SRC || '[]')],
     imgSrc: [...defaultCSP.imgSrc, ...JSON.parse(process.env.CSP_IMG_SRC || '[]')],
+    manifestSrc: [...defaultCSP.manifestSrc, ...JSON.parse(process.env.CSP_MANIFEST_SRC || '[]')],
     mediaSrc: [...defaultCSP.mediaSrc, ...JSON.parse(process.env.CSP_MEDIA_SRC || '[]')],
     objectSrc: [...defaultCSP.objectSrc, ...JSON.parse(process.env.CSP_OBJECT_SRC || '[]')],
+    prefetchSrc: [...defaultCSP.prefetchSrc, ...JSON.parse(process.env.CSP_PREFETCH_SRC || '[]')],
     scriptSrc: [...defaultCSP.scriptSrc, ...JSON.parse(process.env.CSP_SCRIPT_SRC || '[]')],
     styleSrc: [...defaultCSP.styleSrc, ...JSON.parse(process.env.CSP_STYLE_SRC || '[]')],
+    workerSrc: [...defaultCSP.workerSrc, ...JSON.parse(process.env.CSP_WORKER_SRC || '[]')],
   };
 }
 
