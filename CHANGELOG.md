@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@2.0.0...@wireapp/api-client@2.1.0) (2018-10-12)
+
+
+### Features
+
+* **api-client,core:** Set availability status (WEBFOUND-50) ([#1223](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1223)) ([b9e064c](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b9e064c))
+
+
+
+
+
 # [2.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.16.10...@wireapp/api-client@2.0.0) (2018-10-12)
 
 
