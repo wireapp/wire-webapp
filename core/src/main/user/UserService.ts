@@ -19,9 +19,13 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {User} from '@wireapp/api-client/dist/commonjs/user/';
+import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {AvailabilityType, BroadcastService} from '../broadcast/';
+
+const UUID = require('pure-uuid');
 
 class UserService {
-  constructor(private readonly apiClient: APIClient) {}
+  constructor(private readonly apiClient: APIClient, private readonly broadcastService: BroadcastService) {}
 
   public async getUsers(userId: string): Promise<User>;
   public async getUsers(userIds: string[]): Promise<User[]>;
@@ -30,6 +34,15 @@ class UserService {
       userIds = [userIds];
     }
     return this.apiClient.user.api.getUsersByIds(userIds);
+  }
+
+  public setAvailability(teamId: string, type: AvailabilityType): Promise<void> {
+    const genericMessage = GenericMessage.create({
+      availability: new Availability({type}),
+      messageId: new UUID(4).format(),
+    });
+
+    return this.broadcastService.broadcastGenericMessage(teamId, genericMessage);
   }
 }
 

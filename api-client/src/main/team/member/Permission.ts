@@ -17,9 +17,21 @@
  *
  */
 
-interface PermissionsData {
-  copy: number;
-  self: number;
+enum Permission {
+  ADD_CONVERSATION_MEMBER = 1 << 4,
+  ADD_TEAM_MEMBER = 1 << 2,
+  CREATE_CONVERSATION = 1 << 0,
+  DELETE_CONVERSATION = 1 << 1,
+  DELETE_TEAM = 1 << 11,
+  GET_BILLING = 1 << 6,
+  GET_MEMBER_PERMISSIONS = 1 << 9,
+  GET_TEAM_CONVERSATIONS = 1 << 10,
+  NONE = 0,
+  REMOVE_CONVERSATION_MEMBER = 1 << 5,
+  REMOVE_TEAM_MEMBER = 1 << 3,
+  SET_BILLING = 1 << 7,
+  SET_MEMBER_PERMISSIONS = 1 << 12,
+  SET_TEAM_DATA = 1 << 8,
 }
 
-export {PermissionsData};
+export {Permission};

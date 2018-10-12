@@ -17,9 +17,8 @@
  *
  */
 
-interface PermissionsData {
-  copy: number;
-  self: number;
-}
+import {Availability} from '@wireapp/protocol-messaging';
 
-export {PermissionsData};
+type AvailabilityType = Availability.Type;
+
+export {AvailabilityType};

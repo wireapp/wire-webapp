@@ -17,9 +17,10 @@
  *
  */
 
-interface PermissionsData {
-  copy: number;
-  self: number;
+import {MemberData} from './MemberData';
+
+interface Members {
+  members: MemberData[];
 }
 
-export {PermissionsData};
+export {Members};

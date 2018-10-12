@@ -1,18 +1,43 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 const nock = require('nock');
 
 const {Account} = require('@wireapp/core');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
+const {MemberAPI} = require('@wireapp/api-client/dist/commonjs/team/member/');
+const {TeamAPI} = require('@wireapp/api-client/dist/commonjs/team/team/');
+const {BroadcastAPI} = require('@wireapp/api-client/dist/commonjs/broadcast/');
 const {StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {Backend} = require('@wireapp/api-client/dist/commonjs/env/');
+const {Permission} = require('@wireapp/api-client/dist/commonjs/team/member/');
 
 const PayloadHelper = require('../test/PayloadHelper');
 
-const HTTPS_URL = Backend.PRODUCTION.rest;
-
 describe('UserService', () => {
+  let hasState;
+
+  afterAll(() => nock.cleanAll());
+
   beforeAll(() => {
-    nock(HTTPS_URL)
-      .get(`${UserAPI.URL.USERS}`)
+    nock(Backend.PRODUCTION.rest)
+      .get(UserAPI.URL.USERS)
       .query(() => true)
       .reply(uri => {
         const ids = PayloadHelper.getUrlParameter(uri, 'ids');
@@ -24,7 +49,70 @@ describe('UserService', () => {
         return [StatusCode.OK, JSON.stringify(userPayloads)];
       })
       .persist();
+
+    nock(Backend.PRODUCTION.rest)
+      .post(BroadcastAPI.URL.BROADCAST, requestBody => {
+        hasState[requestBody.sender] = true;
+        return true;
+      })
+      .query(() => true)
+      .reply((uri, requestBody) => {
+        const userClients = {};
+        const requestedRecipients = requestBody.recipients;
+
+        for (const recipient in requestedRecipients) {
+          userClients[recipient] = [];
+          for (const device in requestedRecipients[recipient]) {
+            userClients[recipient].push(device);
+          }
+        }
+
+        return [StatusCode.OK, JSON.stringify(userClients)];
+      })
+      .persist();
+
+    nock(Backend.PRODUCTION.rest)
+      .get(new RegExp(`${TeamAPI.URL.TEAMS}/.*/${MemberAPI.URL.MEMBERS}`))
+      .query(() => true)
+      .reply(() => {
+        const data = {
+          members: [
+            {
+              permissions: {
+                copy: Permission.DELETE_TEAM | Permission.GET_BILLING | Permission.SET_BILLING,
+                self: Permission.DELETE_TEAM | Permission.GET_BILLING | Permission.SET_BILLING,
+              },
+              user: PayloadHelper.getUUID(),
+            },
+          ],
+        };
+
+        return [StatusCode.OK, JSON.stringify(data)];
+      })
+      .persist();
+
+    nock(Backend.PRODUCTION.rest)
+      .get(new RegExp(`${UserAPI.URL.USERS}/.*/${UserAPI.URL.PRE_KEYS}`))
+      .query(() => true)
+      .reply(uri => {
+        const requestedUserId = uri.replace(`${UserAPI.URL.USERS}/`, '').replace(`/${UserAPI.URL.PRE_KEYS}`, '');
+
+        const data = {
+          clients: [
+            {
+              client: PayloadHelper.getUUID(),
+              prekey: {},
+            },
+          ],
+          user: requestedUserId,
+        };
+
+        return [StatusCode.OK, JSON.stringify(data)];
+      })
+      .persist();
   });
+
+  beforeEach(() => (hasState = {}));
 
   describe('getUsers', () => {
     it('fetches users', async () => {
@@ -33,6 +121,21 @@ describe('UserService', () => {
       await account.init();
       const users = await account.service.user.getUsers(userIds);
       expect(users.length).toBe(userIds.length);
+    });
+  });
+
+  describe('setAvailability', () => {
+    it('sets the availability', async () => {
+      const teamId = PayloadHelper.getUUID();
+      const account = new Account();
+      await account.init();
+      const clientId = PayloadHelper.getUUID();
+
+      account.service.conversation.setClientID(clientId);
+      expect(hasState[clientId]).toBeUndefined();
+
+      await account.service.user.setAvailability(teamId, 1);
+      expect(hasState[clientId]).toBe(true);
     });
   });
 });

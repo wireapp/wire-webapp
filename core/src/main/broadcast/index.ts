@@ -17,9 +17,5 @@
  *
  */
 
-interface PermissionsData {
-  copy: number;
-  self: number;
-}
-
-export {PermissionsData};
+export * from './AvailabilityType';
+export * from './BroadcastService';

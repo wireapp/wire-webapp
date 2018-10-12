@@ -17,9 +17,4 @@
  *
  */
 
-interface PermissionsData {
-  copy: number;
-  self: number;
-}
-
-export {PermissionsData};
+export * from './BroadcastAPI';
