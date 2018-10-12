@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {MemberData} from '../';
 import {HttpClient} from '../../http/';
+import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/TeamAPI';
 
 class MemberAPI {
@@ -32,13 +32,13 @@ class MemberAPI {
     };
   }
 
-  public getMembers(teamId: string): Promise<MemberData[]> {
+  public getMembers(teamId: string): Promise<Members> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}`,
     };
 
-    return this.client.sendJSON<MemberData[]>(config).then(response => response.data);
+    return this.client.sendJSON<Members>(config).then(response => response.data);
   }
 
   public getMember(teamId: string, userId: string): Promise<void> {
