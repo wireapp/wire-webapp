@@ -95,12 +95,12 @@ window.z.config = {
 
   URL: {
     ACCOUNT: {
-      PRODUCTION: (window.EXTERNAL ? window.EXTERNAL.ACCOUNT_BASE : undefined) || 'https://account.wire.com',
+      PRODUCTION: (window.EXTERNAL && window.EXTERNAL.ACCOUNT_BASE) || 'https://account.wire.com',
       STAGING: 'https://wire-account-staging.zinfra.io',
     },
     SUPPORT: 'https://support.wire.com',
     TEAM_SETTINGS: {
-      PRODUCTION: (window.EXTERNAL ? window.EXTERNAL.TEAMS_BASE : undefined) || 'https://teams.wire.com',
+      PRODUCTION: (window.EXTERNAL && window.EXTERNAL.TEAMS_BASE) || 'https://teams.wire.com',
       STAGING: 'https://wire-admin-staging.zinfra.io',
     },
     WEBAPP: {
@@ -109,7 +109,7 @@ window.z.config = {
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },
     WEBSITE: {
-      PRODUCTION: (window.EXTERNAL ? window.EXTERNAL.WEBSITE_BASE : undefined) || 'https://wire.com',
+      PRODUCTION: (window.EXTERNAL && window.EXTERNAL.WEBSITE_BASE) || 'https://wire.com',
       STAGING: 'https://wire-website-staging.zinfra.io',
     },
   },
