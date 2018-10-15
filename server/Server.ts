@@ -202,17 +202,19 @@ class Server {
   }
 
   private initSiteMap(config: ServerConfig) {
-    const pages = () => [
-      {
-        changeFreq: 'weekly',
-        url: '/auth/',
-      },
-      {
-        changeFreq: 'weekly',
-        url: '/',
-      },
-    ];
-    this.app.use(expressSitemapXml(pages, config.SERVER.BASE));
+    if (config.SERVER.BASE) {
+      const pages = () => [
+        {
+          changeFreq: 'weekly',
+          url: '/auth/',
+        },
+        {
+          changeFreq: 'weekly',
+          url: '/',
+        },
+      ];
+      this.app.use(expressSitemapXml(pages, config.SERVER.BASE));
+    }
   }
 
   start(): Promise<number> {
