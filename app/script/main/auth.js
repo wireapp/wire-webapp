@@ -49,13 +49,13 @@ z.main.Auth = class Auth {
 $(() => {
   const defaultEnvironment = z.util.Environment.frontend.isProduction()
     ? z.service.BackendEnvironment.PRODUCTION
-    : z.service.BackendEnvironment.STAGING;
+    : z.service.BackendEnvironment.DEVELOPMENT;
   const env = z.util.URLUtil.getParameter(z.auth.URLParameter.ENVIRONMENT) || defaultEnvironment;
 
-  const isStaging = env === z.service.BackendEnvironment.STAGING;
+  const isStaging = env === z.service.BackendEnvironment.DEVELOPMENT;
   const settings = isStaging
     ? {
-        environment: z.service.BackendEnvironment.STAGING,
+        environment: z.service.BackendEnvironment.DEVELOPMENT,
         restUrl: 'https://staging-nginz-https.zinfra.io',
         webSocketUrl: 'wss://staging-nginz-ssl.zinfra.io',
       }
