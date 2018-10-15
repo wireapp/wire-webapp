@@ -1388,10 +1388,10 @@
     "@webassemblyjs/wast-parser" "1.7.8"
     "@xtuc/long" "4.2.1"
 
-"@wireapp/api-client@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-2.1.1.tgz#51a78801522d2d6014ee79670392ace9ab4d188c"
-  integrity sha512-yfwA/FJ3tlGyMV8g1EtZjXErCQxaX2saqGUTx9DrEXP5wh3uZG1FQaIfZ9fYycRjhwLhT2UmaxYS6/bCYm34xA==
+"@wireapp/api-client@2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-2.1.2.tgz#9347c47ba845db73694edb3ce7a7a521efa1fa81"
+  integrity sha512-Lir3CsdDRIJ3rXOihITYtoEo8Bd3PSUO8NdpQESwkbNwktThN4AiwSMTu6VtqWZq1liusx0/KsaB/hDWfFlg0A==
   dependencies:
     "@types/node" "10.11.7"
     "@types/spark-md5" "3.0.1"
@@ -1410,13 +1410,13 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.91.tgz#2458cde8287dabd65d6e73479182ecaebc203182"
   integrity sha512-s37dDSC34XKvJFZiJR94hNDconZ2U80scLhBEoT4S29oJqHU5EUiTYzSEiTr70HvGtKi4VxeizexMib/7GSvoA==
 
-"@wireapp/core@7.1.1":
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-7.1.1.tgz#e19156fb08acf625ff5cc4d20d3d426879b574a1"
-  integrity sha512-LOb4BA0xb0Fqa4aSuMEIcdHJIA4b6nLeIIxwT4tpCD7sxvbWfksIgam5hu1g40ywAKUHMcFxqp2IyFmJUTNvrw==
+"@wireapp/core@7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-7.1.2.tgz#44ca211c553488ad8eb07a1e6280c3af44338df7"
+  integrity sha512-51zB6v427sqkhW69MqKE3fXele98eQgaoseG7+CJY/o/hBOSKEdNq/YoEH7m62aw3OP6cp/iNj9BRKTLTxpBrA==
   dependencies:
     "@types/node" "10.11.7"
-    "@wireapp/api-client" "2.1.1"
+    "@wireapp/api-client" "2.1.2"
     "@wireapp/cryptobox" "9.0.2"
     "@wireapp/protocol-messaging" "1.21.6"
     "@wireapp/store-engine" "1.0.1"
