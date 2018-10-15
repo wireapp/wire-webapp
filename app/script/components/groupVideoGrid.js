@@ -28,10 +28,10 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       CONTAIN_CLASS: 'group-video-grid__element-video--contain',
       RATIO_THRESHOLD: 0.4,
       VIDEO_ELEMENT_SIZE: {
-        FOURTH_SCREEN: 'fourth_screen',
         FULL_SCREEN: 'full_screen',
         HALF_SCREEN: 'half_screen',
         HIDDEN: 'hidden',
+        QUARTER_SCREEN: 'quarter_screen',
       },
     };
   }
@@ -120,7 +120,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     } else if (!hasVerticalNeighbor) {
       return SIZES.HALF_SCREEN;
     }
-    return SIZES.FOURTH_SCREEN;
+    return SIZES.QUARTER_SCREEN;
   }
 
   getClassNameForVideo(index, isMirrored) {
@@ -130,7 +130,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       [SIZES.EMPTY]: 'group-video-grid__element--empty',
       [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
       [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
-      [SIZES.FOURTH_SCREEN]: '',
+      [SIZES.QUARTER_SCREEN]: '',
     };
 
     const roundedClass = this.streams().length === 1 && this.minimized ? ' group-video-grid__element--rounded' : '';
@@ -145,7 +145,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       [SIZES.EMPTY]: '',
       [SIZES.FULL_SCREEN]: 'full',
       [SIZES.HALF_SCREEN]: 'half',
-      [SIZES.FOURTH_SCREEN]: 'fourth',
+      [SIZES.QUARTER_SCREEN]: 'quarter',
     };
     return extraClasses[size];
   }

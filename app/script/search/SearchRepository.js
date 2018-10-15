@@ -104,13 +104,21 @@ z.search.SearchRepository = class SearchRepository {
   }
 
   _matches(term, property, userEntity) {
-    const excludedEmojis = Array.from(term).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
+    const excludedEmojis = Array.from(term).reduce((emojis, char) => {
+      const isEmoji = z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+      return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
+    }, {});
     const value = ko.unwrap(userEntity[property]) || '';
 
-    const isStrictMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);
+    const isStrictMatch = value.toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
       return 100;
+    }
+    const isStrictTransliteratedMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);
+    if (isStrictTransliteratedMatch) {
+      // give a little less points if the pattern strictly matches the transliterated string
+      return 50;
     }
     const isLoosyMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, false);
     if (!isLoosyMatch) {
@@ -118,7 +126,7 @@ z.search.SearchRepository = class SearchRepository {
       return 0;
     }
 
-    const tokens = z.util.StringUtil.computeTransliteration(value).split(/\W+/g);
+    const tokens = z.util.StringUtil.computeTransliteration(value).split(/-/g);
     // computing the match value by testing all components of the property
     return tokens.reverse().reduce((weight, token, index) => {
       const indexWeight = index + 1;
@@ -164,7 +172,9 @@ z.search.SearchRepository = class SearchRepository {
       })
       .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => {
-        return userEntities.filter(userEntity => !userEntity.is_connected() && !userEntity.isTeamMember());
+        return userEntities.filter(userEntity => {
+          return !userEntity.is_me && !userEntity.is_connected() && !userEntity.isTeamMember();
+        });
       })
       .then(userEntities => {
         if (isHandle) {

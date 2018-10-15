@@ -39,6 +39,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.clickOnToggleGuestMode = this.clickOnToggleGuestMode.bind(this);
 
     this.conversationRepository = repositories.conversation;
+    this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.isTeam = this.teamRepository.isTeam;

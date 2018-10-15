@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "lib": ["dom", "es2017"],
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "outDir": "app/script/auth",
+    "rootDir": "app/script",
+    "sourceMap": true,
+    "target": "ES6"
+  },
+  "exclude": ["node_modules"]
+}

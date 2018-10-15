@@ -51,23 +51,23 @@ ko.components.register('conversation-list-cell', {
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
-        <!-- ko if: conversation.is_group() -->
+        <!-- ko if: conversation.isGroup() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko if: !conversation.is_group() && users().length -->
+        <!-- ko if: !conversation.isGroup() && users().length -->
           <div class="avatar-halo">
             <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
-        <!-- ko if: conversation.is_one2one() && conversation.self.inTeam() -->
+        <!-- ko if: conversation.is_one2one() && conversation.selfUser().inTeam() -->
           <availability-state class="conversation-list-cell-availability"
                               data-uie-name="status-availability-item"
                               params="availability: conversation.availabilityOfUser, label: conversation.display_name(), theme: is_selected(conversation)">
           </availability-state>
         <!-- /ko -->
-        <!-- ko ifnot: conversation.is_one2one() && conversation.self.inTeam() -->
+        <!-- ko ifnot: conversation.is_one2one() && conversation.selfUser().inTeam() -->
           <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
         <!-- /ko -->
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
@@ -76,22 +76,22 @@ ko.components.register('conversation-list-cell', {
         <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options"></span>
         <!-- ko ifnot: showJoinButton -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
-            <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
+            <span class="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending"><pending-icon class="svg-icon"></pending-icon></span>
           <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MENTION -->
-            <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention">@</span>
+            <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention"><mention-icon class="svg-icon"></mention-icon></span>
           <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_PING -->
-            <span class="conversation-list-cell-badge cell-badge-light icon-ping" data-uie-name="status-ping"></span>
+            <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-ping"><ping-icon class="svg-icon"></ping-icon></span>
           <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MISSED_CALL -->
-            <span class="conversation-list-cell-badge cell-badge-light icon-end-call" data-uie-name="status-missed-call"></span>
+            <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-missed-call"><hangup-icon class="svg-icon"></hangup-icon></span>
           <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
-            <span class="conversation-list-cell-badge cell-badge-dark icon-silence conversation-muted" data-uie-name="status-silence"></span>
+            <span class="conversation-list-cell-badge cell-badge-dark conversation-muted" data-uie-name="status-silence"><mute-icon class="svg-icon"></mute-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadMessagesCount() > 0 -->
-            <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadMessagesCount()" data-uie-name="status-unread"></span>
+          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadState().allMessages.length > 0 -->
+            <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadState().allMessages.length" data-uie-name="status-unread"></span>
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: showJoinButton -->

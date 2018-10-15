@@ -435,6 +435,7 @@ z.string.conversationsPopoverBlock = 'Block…';
 z.string.conversationsPopoverCancel = 'Cancel request…';
 z.string.conversationsPopoverClear = 'Delete content…';
 z.string.conversationsPopoverLeave = 'Leave group…';
+z.string.conversationsPopoverNotificationSettings = 'Notifications…';
 z.string.conversationsPopoverNotify = 'Unmute';
 z.string.conversationsPopoverSilence = 'Mute';
 z.string.conversationsPopoverUnarchive = 'Unarchive';
@@ -493,8 +494,8 @@ z.string.extensionsGiphyRandom = 'Random';
 // Panel
 // Panel: Add participants
 z.string.addParticipantsConfirmLabel = 'Add';
-z.string.addParticipantsHeader = 'Add people';
-z.string.addParticipantsHeaderWithCounter = 'Add people ({{number}})';
+z.string.addParticipantsHeader = 'Add participants';
+z.string.addParticipantsHeaderWithCounter = 'Add participants ({{number}})';
 z.string.addParticipantsManageServices = 'Manage services';
 z.string.addParticipantsManageServicesNoResults = 'Manage services';
 z.string.addParticipantsNoServicesManager = 'Services are helpers that can improve your workflow.';
@@ -515,6 +516,7 @@ z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guests and services';
 z.string.conversationDetailsActionTimedMessages = 'Timed messages';
+z.string.conversationDetailsActionNotifications = 'Notifications';
 z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
 z.string.conversationDetailsGuestsOn = 'On';
@@ -552,6 +554,13 @@ z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link…';
 z.string.guestOptionsTitle = 'Guests and services';
+
+// Panel: Notifications
+z.string.notificationSettingsTitle = 'Notifications';
+z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when you are mentioned.';
+z.string.notificationSettingsEverything = 'Everything';
+z.string.notificationSettingsOnlyMentions = 'Only mentions';
+z.string.notificationSettingsNothing = 'Nothing';
 
 // Panel: Timed messages
 z.string.timedMessagesTitle = 'Timed messages';
@@ -623,9 +632,7 @@ z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferen
 z.string.preferencesAVNoCamera = 'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
 z.string.preferencesAVTryAgain= 'Try Again';
 
-
-z.string.preferencesDevicesActivatedIn = 'in {{location}}';
-z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';
+z.string.preferencesDevicesActivatedOn = 'Activated {{date}}';
 z.string.preferencesDevicesActive = 'Active';
 z.string.preferencesDevicesActiveDetail = 'If you don’t recognize a device above, remove it and reset your password.';
 z.string.preferencesDevicesCurrent = 'Current';
@@ -827,6 +834,7 @@ z.string.tooltipConversationVideoCall = 'Video Call';
 z.string.tooltipConversationsArchive = 'Archive ({{shortcut}})';
 z.string.tooltipConversationsArchived = 'Show archive ({{number}})';
 z.string.tooltipConversationsMore = 'More';
+z.string.tooltipConversationsNotifications = 'Open notification settings ({{shortcut}})';
 z.string.tooltipConversationsNotify = 'Unmute ({{shortcut}})';
 z.string.tooltipConversationsPreferences = 'Open preferences';
 z.string.tooltipConversationsSilence = 'Mute ({{shortcut}})';

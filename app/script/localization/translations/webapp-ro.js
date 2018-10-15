@@ -213,6 +213,7 @@ z.string.ro.modalIntegrationUnavailableMessage = 'Mulțumim că ești interesat 
 
 
 z.string.ro.modalImproveWireAction = 'Acceptă';
+z.string.ro.modalImproveWireSecondary = 'Nu';
 
 z.string.ro.modalServiceUnavailableHeadline = 'Adăugarea serviciului nu este posibilă';
 z.string.ro.modalServiceUnavailableMessage = 'Acest serviciu este indisponibil momentan.';
@@ -361,9 +362,11 @@ z.string.ro.addParticipantsTabsPeople = 'Persoane';
 z.string.ro.addParticipantsTabsServices = 'Servicii';
 
 z.string.ro.conversationDetailsActionArchive = 'Arhivă';
+z.string.ro.conversationDetailsActionAddParticipants = 'Adaugă persoane';
 z.string.ro.conversationDetailsActionCancelRequest = 'Anulează cererea';
 z.string.ro.conversationDetailsActionCreateGroup = 'Grup nou';
 z.string.ro.conversationDetailsActionDevices = 'Dispozitive';
+z.string.ro.conversationDetailsActionNotifications = 'Notificări';
 z.string.ro.conversationDetailsGuestsOff = 'Închis';
 z.string.ro.conversationDetailsOptions = 'Opțiuni';
 z.string.ro.conversationDetailsParticipantsServicesMany = 'Servicii';
@@ -378,6 +381,8 @@ z.string.ro.groupParticipantActionCancelRequest = 'Anulează cererea';
 z.string.ro.groupParticipantActionDevices = 'Dispozitive';
 z.string.ro.groupParticipantActionPending = 'În așteptare';
 z.string.ro.groupParticipantActionSendRequest = 'Conectare';
+
+z.string.ro.notificationSettingsTitle = 'Notificări';
 
 z.string.ro.participantDevicesDetailHeadline = 'Verifică dacă aceasta se potrivește cu amprenta arătată în {{html1}}dispozitivul al lui {{user}}{{html2}}.';
 z.string.ro.participantDevicesDetailHowTo = 'Cum fac asta?';

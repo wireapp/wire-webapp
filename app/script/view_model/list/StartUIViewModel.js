@@ -230,8 +230,16 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
-  clickToOpenTeamAdmin() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
+  clickOpenManageTeam() {
+    this._openTeamSettings(z.config.URL_PATH.MANAGE_TEAM);
+  }
+
+  clickOpenManageServices() {
+    this._openTeamSettings(z.config.URL_PATH.MANAGE_SERVICES);
+  }
+
+  _openTeamSettings(pagePath) {
+    const path = `${pagePath}?utm_source=client_landing&utm_term=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
@@ -552,12 +560,16 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         })
         .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
-      if (this.isTeam()) {
-        this.searchResults.contacts(this.teamRepository.searchForTeamUsers(normalizedQuery, isHandle));
-      } else {
-        this.searchResults.contacts(this.userRepository.search_for_connected_users(normalizedQuery, isHandle));
-      }
+      const localSearchSources = this.isTeam()
+        ? this.teamRepository.teamUsers()
+        : this.userRepository.connected_users();
 
+      const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+
+      const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
+
+      this.searchResults.contacts(contactResults);
       this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }

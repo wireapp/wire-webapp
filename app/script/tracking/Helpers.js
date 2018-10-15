@@ -83,7 +83,7 @@ z.tracking.helpers = {
     if (isTeamConversation) {
       const isAllowGuests = !conversationEntity.isTeamOnly();
       const _getUserType = _conversationEntity => {
-        if (_conversationEntity.self.isTemporaryGuest()) {
+        if (_conversationEntity.selfUser().isTemporaryGuest()) {
           return z.tracking.attribute.UserType.TEMPORARY_GUEST;
         }
 

@@ -197,6 +197,7 @@ z.string.sl.modalConversationTooManyMembersHeadline = 'Polna hiša';
 
 
 z.string.sl.modalImproveWireAction = 'Sprejmi';
+z.string.sl.modalImproveWireSecondary = 'Ne';
 
 z.string.sl.modalSessionResetHeadline = 'Seja je bila ponastavljena';
 z.string.sl.modalSessionResetMessage1 = 'Če težave niste odpravili,';
@@ -331,6 +332,7 @@ z.string.sl.addParticipantsTabsServices = 'Storitve';
 z.string.sl.conversationDetailsActionArchive = 'Arhiviraj';
 z.string.sl.conversationDetailsActionCancelRequest = 'Prekliči prošnjo';
 z.string.sl.conversationDetailsActionDevices = 'Naprave';
+z.string.sl.conversationDetailsActionNotifications = 'Obvestila';
 z.string.sl.conversationDetailsGuestsOff = 'Izklopljeno';
 z.string.sl.conversationDetailsOptions = 'Možnosti';
 z.string.sl.conversationDetailsParticipantsServicesMany = 'Storitve';
@@ -345,6 +347,8 @@ z.string.sl.groupParticipantActionCancelRequest = 'Prekliči prošnjo';
 z.string.sl.groupParticipantActionDevices = 'Naprave';
 z.string.sl.groupParticipantActionPending = 'V teku';
 z.string.sl.groupParticipantActionSendRequest = 'Poveži';
+
+z.string.sl.notificationSettingsTitle = 'Obvestila';
 
 z.string.sl.participantDevicesDetailHeadline = 'Preveri, da se to ujema s prstnim odtisom na {{html1}}napravi od {{user}}{{html2}}.';
 z.string.sl.participantDevicesDetailHowTo = 'Kako to storim?';

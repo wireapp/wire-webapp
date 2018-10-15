@@ -54,7 +54,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.sessionId = sessionId;
     this.callingRepository = callingRepository;
 
-    const {id: conversationId, is_group} = conversationEntity;
+    const {id: conversationId, isGroup} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfStreamState, telemetry, userRepository} = this.callingRepository;
     this.messageLog = this.callingRepository.messageLog;
 
@@ -82,7 +82,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.terminationReason = undefined;
 
     this.isConnected = ko.observable(false);
-    this.isGroup = is_group();
+    this.isGroup = isGroup();
 
     this.selfClientJoined = ko.observable(false);
     this.selfUserJoined = ko.observable(false);

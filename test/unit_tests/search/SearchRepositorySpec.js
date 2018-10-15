@@ -104,6 +104,31 @@ describe('z.search.SearchRepository', () => {
       });
     });
 
+    it('does not replace numbers with emojis', () => {
+      const felix10 = generateUser('simple10', 'Felix10');
+
+      const unsortedUsers = [felix10];
+
+      const suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+      expect(suggestions.map(serializeUser)).toEqual([]);
+    });
+
+    it('prioritize exact matches with special characters', () => {
+      const smilyFelix = generateUser('smily', '😋Felix');
+      const atFelix = generateUser('at', '@Felix');
+      const simplyFelix = generateUser('simple', 'Felix');
+
+      const unsortedUsers = [atFelix, smilyFelix, simplyFelix];
+
+      let suggestions = TestFactory.search_repository.searchUserInSet('felix', unsortedUsers);
+      let expected = [simplyFelix, smilyFelix, atFelix];
+      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
+
+      suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+      expected = [smilyFelix];
+      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
+    });
+
     it('handles sorting matching results', () => {
       const first = generateUser('xxx', '_surname');
       const second = generateUser('xxx', 'surname _lastname');

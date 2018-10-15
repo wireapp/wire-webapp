@@ -37,6 +37,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
 
     this.conversationRepository = this.repositories.conversation;
     this.integrationRepository = this.repositories.integration;
+    this.searchRepository = params.repositories.search;
     this.teamRepository = this.repositories.team;
     this.userRepository = this.repositories.user;
 
@@ -60,7 +61,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
       if (this.activeConversation()) {
         const firstUserEntity = this.activeConversation().firstUserEntity();
         const hasBotUser = firstUserEntity && firstUserEntity.isService;
-        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
+        const allowIntegrations = this.activeConversation().isGroup() || hasBotUser;
         return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }
     });
@@ -136,8 +137,8 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.onGoBack();
   }
 
-  clickToOpenTeamAdmin() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
+  clickOpenManageServices() {
+    const path = `${z.config.URL_PATH.MANAGE_SERVICES}?utm_source=client_landing&utm_term=desktop`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }

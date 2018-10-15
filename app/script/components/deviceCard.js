@@ -25,9 +25,8 @@ window.z.components = z.components || {};
 z.components.DeviceCard = class DeviceCard {
   constructor(params, componentInfo) {
     this.device = ko.unwrap(params.device) || {};
-    this.locationRepository = params.locationRepository;
 
-    const {class: deviceClass, id, label, location = {}, model} = this.device;
+    const {class: deviceClass, id, label, model} = this.device;
     this.class = deviceClass || '?';
     this.formattedId = id ? this.device.formatId() : [];
     this.id = id || '';
@@ -39,13 +38,6 @@ z.components.DeviceCard = class DeviceCard {
     this.click = params.click;
 
     this.dataUieName = `device-card-info${this.isCurrentClient ? '-current' : ''}`;
-
-    this.activationLocation = ko.observableArray([]);
-
-    this._updateActivationLocation('?');
-    if (this.detailed) {
-      this._updateLocation(location);
-    }
 
     if (this.detailed || !this.click) {
       $(componentInfo.element).addClass('device-card-no-hover');
@@ -60,23 +52,6 @@ z.components.DeviceCard = class DeviceCard {
       this.click(this.device);
     }
   }
-
-  _updateActivationLocation(locationName) {
-    const stringTemplate = z.string.preferencesDevicesActivatedIn;
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', locationName);
-    this.activationLocation(sanitizedText);
-  }
-
-  _updateLocation({lat: latitude, lon: longitude}) {
-    if (latitude && longitude) {
-      this.locationRepository.getLocation(latitude, longitude).then(mappedLocation => {
-        if (mappedLocation) {
-          const {countryCode, place} = mappedLocation;
-          this._updateActivationLocation(`${place}, ${countryCode}`);
-        }
-      });
-    }
-  }
 };
 
 ko.components.register('device-card', {
@@ -89,7 +64,6 @@ ko.components.register('device-card', {
           <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
-        <div class="label-xs" data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         <div class="label-xs" data-bind="text: z.util.TimeUtil.formatTimestamp(device.time)"></div>
       <!-- /ko -->
       <!-- ko ifnot: detailed -->

@@ -435,6 +435,7 @@ z.string.hu.conversationDetailsActionClear = 'Tartalom törlése';
 z.string.hu.conversationDetailsActionCreateGroup = 'Új csoport';
 z.string.hu.conversationDetailsActionDevices = 'Eszközök';
 z.string.hu.conversationDetailsActionGuestOptions = 'Vendég opciók';
+z.string.hu.conversationDetailsActionNotifications = 'Értesítések';
 z.string.hu.conversationDetailsActionLeave = 'Kilépés a csoportból';
 z.string.hu.conversationDetailsGuestsOff = 'Kikapcsolva';
 z.string.hu.conversationDetailsGuestsOn = 'Be';
@@ -469,6 +470,8 @@ z.string.hu.guestOptionsInfoHeader = 'Hívj meg másokat egy hivatkozással';
 z.string.hu.guestOptionsInfoText = 'Bárki, akinek megvan ez a hivatkozás, csatlakozhat a beszélgetéshez 24 órán belül, akkor is, ha egyébként nincsenek a Wire-ön.';
 z.string.hu.guestOptionsRevokeLink = 'Link visszavonása';
 z.string.hu.guestOptionsTitle = 'Vendég opciók';
+
+z.string.hu.notificationSettingsTitle = 'Értesítések';
 
 z.string.hu.participantDevicesDetailHeadline = 'Ellenőrizd, hogy ez egyezik-e {{html1}}{{user}} eszközén látható{{html2}} ujjlenyomattal.';
 z.string.hu.participantDevicesDetailHowTo = 'Hogyan csináljam?';
