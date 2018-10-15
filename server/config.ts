@@ -59,22 +59,30 @@ const defaultCSP: HelmetCSP = {
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
 };
 
+function parseCommaSeparatedList(list: string = ''): string[] {
+  const cleanedList = list.replace(/\s/g, '');
+  if (!cleanedList) {
+    return [];
+  }
+  return cleanedList.split(',');
+}
+
 function mergedCSP(): HelmetCSP {
   return {
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_HTTP,
       process.env.BACKEND_WS,
-      ...JSON.parse(process.env.EXTRA_CSP_CONNECT_SRC || '[]'),
+      ...parseCommaSeparatedList(process.env.EXTRA_CSP_CONNECT_SRC),
     ],
-    defaultSrc: [...defaultCSP.defaultSrc, ...JSON.parse(process.env.EXTRA_CSP_DEFAULT_SRC || '[]')],
-    fontSrc: [...defaultCSP.fontSrc, ...JSON.parse(process.env.EXTRA_CSP_FONT_SRC || '[]')],
-    frameSrc: [...defaultCSP.frameSrc, ...JSON.parse(process.env.EXTRA_CSP_FRAME_SRC || '[]')],
-    imgSrc: [...defaultCSP.imgSrc, ...JSON.parse(process.env.EXTRA_CSP_IMG_SRC || '[]')],
-    mediaSrc: [...defaultCSP.mediaSrc, ...JSON.parse(process.env.EXTRA_CSP_MEDIA_SRC || '[]')],
-    objectSrc: [...defaultCSP.objectSrc, ...JSON.parse(process.env.EXTRA_CSP_OBJECT_SRC || '[]')],
-    scriptSrc: [...defaultCSP.scriptSrc, ...JSON.parse(process.env.EXTRA_CSP_SCRIPT_SRC || '[]')],
-    styleSrc: [...defaultCSP.styleSrc, ...JSON.parse(process.env.EXTRA_CSP_STYLE_SRC || '[]')],
+    defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_DEFAULT_SRC)],
+    fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_FONT_SRC)],
+    frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_FRAME_SRC)],
+    imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_IMG_SRC)],
+    mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_MEDIA_SRC)],
+    objectSrc: [...defaultCSP.objectSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_OBJECT_SRC)],
+    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_SCRIPT_SRC)],
+    styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.EXTRA_CSP_STYLE_SRC)],
   };
 }
 
