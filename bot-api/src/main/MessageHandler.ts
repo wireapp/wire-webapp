@@ -81,7 +81,8 @@ abstract class MessageHandler {
     originalMessageId: string,
     newMessageText: string,
     newMentions?: MentionContent[],
-    newLinkPreview?: LinkPreviewContent
+    newLinkPreview?: LinkPreviewContent,
+    userIds?: string[]
   ): Promise<void> {
     if (this.account && this.account.service) {
       const editedPayload = this.account.service.conversation
@@ -89,7 +90,7 @@ abstract class MessageHandler {
         .withMentions(newMentions)
         .build();
 
-      const editedMessage = await this.account.service.conversation.send(conversationId, editedPayload);
+      const editedMessage = await this.account.service.conversation.send(conversationId, editedPayload, userIds);
 
       if (newLinkPreview) {
         const linkPreviewPayload = await this.account.service.conversation.createLinkPreview(newLinkPreview);
@@ -99,7 +100,7 @@ abstract class MessageHandler {
           .withMentions(newMentions)
           .build();
 
-        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload);
+        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload, userIds);
       }
     }
   }
@@ -154,14 +155,15 @@ abstract class MessageHandler {
     conversationId: string,
     text: string,
     mentions?: MentionContent[],
-    linkPreview?: LinkPreviewContent
+    linkPreview?: LinkPreviewContent,
+    userIds?: string[]
   ): Promise<void> {
     if (this.account && this.account.service) {
       const payload = await this.account.service.conversation
         .createText(text)
         .withMentions(mentions)
         .build();
-      const sentMessage = await this.account.service.conversation.send(conversationId, payload);
+      const sentMessage = await this.account.service.conversation.send(conversationId, payload, userIds);
 
       if (linkPreview) {
         const linkPreviewPayload = await this.account.service.conversation.createLinkPreview(linkPreview);
@@ -171,7 +173,7 @@ abstract class MessageHandler {
           .withMentions(mentions)
           .build();
 
-        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload);
+        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload, userIds);
       }
     }
   }

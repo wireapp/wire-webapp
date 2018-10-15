@@ -133,7 +133,8 @@ describe('MessageHandler', () => {
       expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(messageText);
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         conversationId,
-        jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})})
+        jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})}),
+        undefined
       );
     });
 
@@ -148,7 +149,25 @@ describe('MessageHandler', () => {
       expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(message);
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         conversationId,
-        jasmine.objectContaining({content: jasmine.objectContaining({text: message})})
+        jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+        undefined
+      );
+    });
+
+    it('sends the correct data to target users', async () => {
+      const conversationId = new UUID(UUID_VERSION).format();
+      const message = new UUID(UUID_VERSION).format();
+      const userIds = [new UUID(UUID_VERSION).format(), new UUID(UUID_VERSION).format()];
+
+      spyOn(mainHandler.account.service.conversation, 'createText').and.callThrough();
+
+      await mainHandler.sendText(conversationId, message, undefined, undefined, userIds);
+
+      expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(message);
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
+        conversationId,
+        jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+        userIds
       );
     });
   });
