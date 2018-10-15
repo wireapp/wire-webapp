@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@2.0.1...@wireapp/bot-api@2.1.0) (2018-10-15)
+
+
+### Features
+
+* **bot-api:** Expose `userId` parameter when sending messages ([#1226](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1226)) ([b7c1a98](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/b7c1a98))
+
+
+
+
+
 ## [2.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@2.0.0...@wireapp/bot-api@2.0.1) (2018-10-12)
 
 **Note:** Version bump only for package @wireapp/bot-api
