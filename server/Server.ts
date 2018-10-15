@@ -205,7 +205,7 @@ class Server {
   }
 
   private initSiteMap(config: ServerConfig) {
-    if (config.SERVER.BASE) {
+    if (config.SERVER.APP_BASE) {
       const pages = () => [
         {
           changeFreq: 'weekly',
@@ -216,7 +216,7 @@ class Server {
           url: '/',
         },
       ];
-      this.app.use(expressSitemapXml(pages, config.SERVER.BASE));
+      this.app.use(expressSitemapXml(pages, config.SERVER.APP_BASE));
     }
   }
 

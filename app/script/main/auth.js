@@ -61,7 +61,7 @@ $(() => {
       }
     : {
         environment: z.service.BackendEnvironment.PRODUCTION,
-        restUrl: window.BACKEND_HTTP || 'https://prod-nginz-https.wire.com',
+        restUrl: window.BACKEND_REST || 'https://prod-nginz-https.wire.com',
         webSocketUrl: window.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com',
       };
 
