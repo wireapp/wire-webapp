@@ -20,11 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.server = z.server || {};
+window.z.time = z.time || {};
 
-z.server.ServerTimeOffsetRepository = class ServerTimeOffsetRepository {
+z.time.ServerTimeRepository = class ServerTimeRepository {
   constructor() {
-    this.logger = new z.util.Logger('z.server.ServerTimeOffsetRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
     this._timeOffset = undefined;
   }
 

@@ -66,7 +66,7 @@ window.TestFactory.prototype.exposeAudioActors = function() {
 window.TestFactory.prototype.exposeServerActors = function() {
   this.logger.info('- exposeServerActors');
   return Promise.resolve().then(() => {
-    TestFactory.serverTimeOffsetRepository = new z.server.ServerTimeOffsetRepository();
+    TestFactory.serverTimeOffsetRepository = new z.time.ServerTimeRepository();
     return TestFactory.serverTimeOffsetRepository;
   });
 };

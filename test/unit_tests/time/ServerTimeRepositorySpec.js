@@ -17,39 +17,39 @@
  *
  */
 
-// grunt test_init && grunt test_run:server/ServerTimeOffsetRepository
+// grunt test_init && grunt test_run:time/ServerTimeRepository
 
 'use strict';
 
-describe('z.server.ServerTimeOffsetRepository', () => {
-  let serverTimeOffsetRepository;
+describe('z.time.ServerTimeRepository', () => {
+  let serverTimeRepository;
   const testFactory = new window.TestFactory();
 
   beforeEach(() => {
-    return testFactory.exposeServerActors().then(_serverTimeOffsetRepository => {
-      serverTimeOffsetRepository = _serverTimeOffsetRepository;
+    return testFactory.exposeServerActors().then(_serverTimeRepository => {
+      serverTimeRepository = _serverTimeRepository;
     });
   });
 
   describe('adjustTimestamp', () => {
     it('warns that adjustments cannot be done when server time is not set', () => {
-      spyOn(serverTimeOffsetRepository.logger, 'warn');
+      spyOn(serverTimeRepository.logger, 'warn');
       const timestamp = 10;
 
-      const adjustedTimestamp = serverTimeOffsetRepository.adjustTimestamp(timestamp);
+      const adjustedTimestamp = serverTimeRepository.adjustTimestamp(timestamp);
 
       expect(adjustedTimestamp).toEqual(timestamp);
-      expect(serverTimeOffsetRepository.logger.warn).toHaveBeenCalled();
+      expect(serverTimeRepository.logger.warn).toHaveBeenCalled();
     });
 
     it('adjust timestamp according to time shift between server and client', () => {
       const serverTime = new Date();
       const timeOffset = 10;
       serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
-      serverTimeOffsetRepository.computeTimeOffset(serverTime.toISOString());
+      serverTimeRepository.computeTimeOffset(serverTime.toISOString());
       const timestamp = 10;
 
-      const adjustedTimestamp = serverTimeOffsetRepository.adjustTimestamp(timestamp);
+      const adjustedTimestamp = serverTimeRepository.adjustTimestamp(timestamp);
 
       expect(adjustedTimestamp).toEqual(timestamp - timeOffset);
     });

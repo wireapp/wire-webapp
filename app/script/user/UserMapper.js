@@ -26,11 +26,11 @@ z.user.UserMapper = class UserMapper {
   /**
    * Construct a new User Mapper.
    * @class z.user.UserMapper
-   * @param {z.server.ServerTimeOffsetRepository} serverTimeOffsetRepository - Handles time shift between server and client
+   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
-  constructor(serverTimeOffsetRepository) {
+  constructor(serverTimeRepository) {
     this.logger = new z.util.Logger('z.user.UserMapper', z.config.LOGGER.OPTIONS);
-    this.serverTimeOffsetRepository = serverTimeOffsetRepository;
+    this.serverTimeRepository = serverTimeRepository;
   }
 
   /**
@@ -128,7 +128,7 @@ z.user.UserMapper = class UserMapper {
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
-      const adjustedTimestamp = this.serverTimeOffsetRepository.adjustTimestamp(new Date(expirationDate).getTime());
+      const adjustedTimestamp = this.serverTimeRepository.adjustTimestamp(new Date(expirationDate).getTime());
       userEntity.setGuestExpiration(adjustedTimestamp);
     }
 

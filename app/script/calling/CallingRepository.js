@@ -57,7 +57,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    * @param {EventRepository} eventRepository -  Repository that handles events
    * @param {MediaRepository} mediaRepository -  Repository for media interactions
-   * @param {z.server.ServerTimeOffsetRepository} serverTimeOffsetRepository - Handles time shift between server and client
+   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {UserRepository} userRepository -  Repository for all user and connection interactions
    */
   constructor(
@@ -66,7 +66,7 @@ z.calling.CallingRepository = class CallingRepository {
     conversationRepository,
     eventRepository,
     mediaRepository,
-    serverTimeOffsetRepository,
+    serverTimeRepository,
     userRepository
   ) {
     this.getConfig = this.getConfig.bind(this);
@@ -76,7 +76,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.mediaRepository = mediaRepository;
-    this.serverTimeOffsetRepository = serverTimeOffsetRepository;
+    this.serverTimeRepository = serverTimeRepository;
     this.userRepository = userRepository;
 
     this.messageLog = [];
@@ -1471,7 +1471,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
-    const currentTimestamp = this.serverTimeOffsetRepository.adjustTimestamp();
+    const currentTimestamp = this.serverTimeRepository.adjustTimestamp();
     const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
     this.eventRepository.injectEvent(event, source);
   }
