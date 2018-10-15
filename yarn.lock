@@ -1476,19 +1476,19 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@4.3.3":
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.3.tgz#c71191d55676aeb96c979446fce1ac0fa3829d1f"
-  integrity sha512-W/txUsZwdPt568EF/rotbNe0ltlBmROMlbGrIW6MQCx3FWpxJuYglZBN5a15uIcwh8p1kHFqsR0GhTio7WgChw==
+"@wireapp/react-ui-kit@4.3.4":
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.4.tgz#de33f05c34aa471a3e413a431ea3412ad7e1b2ee"
+  integrity sha512-eDWkEgnBOgoWSwraVQShUBU8AYZVbMSouhAkihSjuSUFKs5tSaPyiu8Y5PZEjqgYG8PtTlijjvk5eUxJk5w1nA==
   dependencies:
     "@types/color" "3.0.0"
-    bazinga64 "5.3.14"
-    color "3.0.0"
+    bazinga64 "5.3.15"
+    color "3.1.0"
     react "16.5.2"
     react-dom "16.5.2"
     react-transition-group "2.5.0"
     recompose "0.30.0"
-    styled-components "3.4.9"
+    styled-components "3.4.10"
     styled-normalize "8.0.1"
     styled-transition-group "1.0.0"
 
@@ -2173,10 +2173,10 @@ bazinga64@5.2.18:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
   integrity sha1-b35EZA6crJVOQbQqelk/9WjZeU0=
 
-bazinga64@5.3.14:
-  version "5.3.14"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.14.tgz#341f1f581ee4aa29ec133907f27acb7997429669"
-  integrity sha512-TRU9Pr46PqdkOOQyv/oybhrog+c5SOfIJNd4FDF/h/JHn+vGRjLTKdzhJTfEjqJq7Jpo9BtEcehayPQe6uVmGw==
+bazinga64@5.3.15:
+  version "5.3.15"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.15.tgz#8428e7be4c3f3aaa6be3d137d86948ea5b01f3c0"
+  integrity sha512-RWDfKUHGRvNF4LH4/m15xaH/4MGzFfV9Q7/lEl3+luwbM0pijqWsi2N3JIvptd0uO4VY4c0D2wdVT/zzaha07g==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2988,10 +2988,10 @@ color-string@^1.4.0, color-string@^1.5.2:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
 
-color@3.0.0, color@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/color/-/color-3.0.0.tgz#d920b4328d534a3ac8295d68f7bd4ba6c427be9a"
-  integrity sha512-jCpd5+s0s0t7p3pHQKpnJ0TpQKKdleP71LWcA0aqiljpiuAkOSUFN/dyH8ZwF0hRmFlrIuRhufds1QyEP9EB+w==
+color@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/color/-/color-3.1.0.tgz#d8e9fb096732875774c84bf922815df0308d0ffc"
+  integrity sha512-CwyopLkuRYO5ei2EpzpIh6LqJMt6Mt+jZhO5VI5f/wJLZriXQE32/SSqzmrh+QB+AZT81Cj8yv+7zwToW8ahZg==
   dependencies:
     color-convert "^1.9.1"
     color-string "^1.5.2"
@@ -3012,6 +3012,14 @@ color@^1.0.3:
   dependencies:
     color-convert "^1.8.2"
     color-string "^1.4.0"
+
+color@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/color/-/color-3.0.0.tgz#d920b4328d534a3ac8295d68f7bd4ba6c427be9a"
+  integrity sha512-jCpd5+s0s0t7p3pHQKpnJ0TpQKKdleP71LWcA0aqiljpiuAkOSUFN/dyH8ZwF0hRmFlrIuRhufds1QyEP9EB+w==
+  dependencies:
+    color-convert "^1.9.1"
+    color-string "^1.5.2"
 
 colorguard@^1.2.0:
   version "1.2.1"
@@ -11891,10 +11899,10 @@ style-search@^0.1.0:
   resolved "https://registry.yarnpkg.com/style-search/-/style-search-0.1.0.tgz#7958c793e47e32e07d2b5cafe5c0bf8e12e77902"
   integrity sha1-eVjHk+R+MuB9K1yv5cC/jhLneQI=
 
-styled-components@3.4.9:
-  version "3.4.9"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.4.9.tgz#519abeb351b37be5b7de6a15ff9e4efeb9d772da"
-  integrity sha512-3z3IEkAeDOUa0RBxJUQDK5V5gqL56sqGxyK2Ycaryz2jn3PMgmEMkisSR9RdbFP/RDTDu9n761rNhLC89vofBA==
+styled-components@3.4.10:
+  version "3.4.10"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.4.10.tgz#9a654c50ea2b516c36ade57ddcfa296bf85c96e1"
+  integrity sha512-TA8ip8LoILgmSAFd3r326pKtXytUUGu5YWuqZcOQVwVVwB6XqUMn4MHW2IuYJ/HAD81jLrdQed8YWfLSG1LX4Q==
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
