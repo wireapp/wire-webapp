@@ -19,31 +19,29 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:storage/StorageService
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+z.error.AudioError = class AudioError extends z.error.BaseError {
+  constructor(type, message) {
+    super('AudioError', type, message);
+  }
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  static get MESSAGE() {
+    return {
+      ALREADY_PLAYING: 'Sound is already playing',
+      FAILED_TO_PLAY: 'Failed to play sound',
+      IGNORED_SOUND: 'Ignored request to play sound',
+      NOT_FOUND: 'AudioElement or ID not found',
+    };
+  }
 
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
-
-  describe('save', () => {
-    it('does not save "null" values', done => {
-      TestFactory.storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(done.fail)
-        .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-          done();
-        });
-    });
-  });
-});
+  static get TYPE() {
+    return {
+      ALREADY_PLAYING: 'ALREADY_PLAYING',
+      FAILED_TO_PLAY: 'FAILED_TO_PLAY',
+      IGNORED_SOUND: 'IGNORED_SOUND',
+      NOT_FOUND: 'NOT_FOUND',
+    };
+  }
+};

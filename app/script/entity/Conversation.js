@@ -353,7 +353,7 @@ z.entity.Conversation = class Conversation {
 
     const entityTimestamp = this[type];
     if (!entityTimestamp) {
-      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.INVALID_PARAMETER);
+      throw new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER);
     }
 
     const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);

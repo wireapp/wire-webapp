@@ -378,7 +378,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         };
         Raygun.send(new Error('Media Stream missing when negotiation call'), customData);
 
-        throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
+        throw new z.error.MediaError(z.error.MediaError.TYPE.STREAM_NOT_FOUND);
       }
 
       this._addMediaStream(mediaStream);
@@ -665,12 +665,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
       } catch (error) {
         if (!response) {
           this.callLogger.warn(`Failed to send calling message via data channel: ${error.name}`, error);
-          throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
+          throw new z.error.CallError(z.error.CallError.TYPE.NO_DATA_CHANNEL);
         }
       }
     }
 
-    throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
+    throw new z.error.CallError(z.error.CallError.TYPE.NO_DATA_CHANNEL);
   }
 
   /**
@@ -1388,11 +1388,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
           return rtpSender;
         }
 
-        throw new z.calling.CallError(z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
+        throw new z.error.CallError(z.error.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
       }
     }
 
-    throw new z.calling.CallError(z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK);
+    throw new z.error.CallError(z.error.CallError.TYPE.NO_REPLACEABLE_TRACK);
   }
 
   /**

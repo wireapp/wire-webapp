@@ -91,13 +91,13 @@ z.event.NotificationService = class NotificationService {
       .load(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT)
       .catch(error => {
         this.logger.error(`Failed to get last event timestamp from storage: ${error.message}`, error);
-        throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
+        throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
         if (record && record.value) {
           return record.value;
         }
-        throw new z.event.EventError(z.event.EventError.TYPE.NO_LAST_DATE);
+        throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_DATE);
       });
   }
 
@@ -110,13 +110,13 @@ z.event.NotificationService = class NotificationService {
       .load(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
       .catch(error => {
         this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
-        throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
+        throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
         if (record && record.value) {
           return record.value;
         }
-        throw new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID);
+        throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_ID);
       });
   }
 

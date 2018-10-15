@@ -19,31 +19,23 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:storage/StorageService
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+z.error.TeamError = class TeamError extends z.error.BaseError {
+  constructor(type, message) {
+    super('TeamError', type, message);
+  }
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  static get MESSAGE() {
+    return {
+      NO_PERMISSIONS: 'No permissions provided',
+    };
+  }
 
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
-
-  describe('save', () => {
-    it('does not save "null" values', done => {
-      TestFactory.storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(done.fail)
-        .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-          done();
-        });
-    });
-  });
-});
+  static get TYPE() {
+    return {
+      NO_PERMISSIONS: 'NO_PERMISSIONS',
+    };
+  }
+};

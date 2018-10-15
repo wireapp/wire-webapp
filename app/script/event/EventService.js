@@ -44,8 +44,7 @@ z.event.EventService = class EventService {
   loadEvent(conversationId, eventId) {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
     return this.storageService.db[this.EVENT_STORE_NAME]
@@ -224,12 +223,12 @@ z.event.EventService = class EventService {
     return Promise.resolve(primaryKey).then(key => {
       const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
       }
 
       const hasVersionedUpdates = !!updates.version;
       if (hasVersionedUpdates) {
-        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
         error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
         throw error;
       }
@@ -250,14 +249,14 @@ z.event.EventService = class EventService {
     return Promise.resolve(primaryKey).then(key => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
       }
 
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
         return this.storageService.load(this.EVENT_STORE_NAME, key).then(record => {
           if (!record) {
-            throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+            throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
           }
 
           const databaseVersion = record.version || 1;
@@ -276,7 +275,7 @@ z.event.EventService = class EventService {
           this.logger.error(logMessage, logObject);
 
           Raygun.send(new Error(logMessage), logObject);
-          throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+          throw new z.error.StorageError(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
         });
       });
     });

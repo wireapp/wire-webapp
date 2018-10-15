@@ -54,12 +54,12 @@ z.permission.PermissionRepository = class PermissionRepository {
       const setPermissionState = permissionState => this.permissionState[permissionType](permissionState);
 
       if (!z.util.Environment.browser.supports.permissions) {
-        throw new z.permission.PermissionError(z.permission.PermissionError.TYPE.UNSUPPORTED);
+        throw new z.error.PermissionError(z.error.PermissionError.TYPE.UNSUPPORTED);
       }
 
       const isMediaPermission = PermissionRepository.CONFIG.MEDIA_TYPES.includes(permissionType);
       if (isMediaPermission && !z.util.Environment.browser.supports.mediaPermissions) {
-        throw new z.permission.PermissionError(z.permission.PermissionError.TYPE.UNSUPPORTED_TYPE);
+        throw new z.error.PermissionError(z.error.PermissionError.TYPE.UNSUPPORTED_TYPE);
       }
 
       return navigator.permissions.query({name: permissionType}).then(permissionStatus => {

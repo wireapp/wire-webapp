@@ -92,7 +92,7 @@ describe('User Service', () => {
         .get_users(['7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(done.fail)
         .catch(error => {
-          expect(error.code).toBe(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
+          expect(error.code).toBe(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
           done();
         });
 
@@ -131,7 +131,7 @@ describe('User Service', () => {
         .get_users(['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(done.fail)
         .catch(error => {
-          expect(error.code).toBe(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
+          expect(error.code).toBe(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
           done();
         });
 

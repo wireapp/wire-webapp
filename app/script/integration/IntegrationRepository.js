@@ -117,7 +117,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
           return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);
         }
 
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
