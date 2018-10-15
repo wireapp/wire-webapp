@@ -33,6 +33,11 @@ z.server.ServerTimeOffsetRepository = class ServerTimeOffsetRepository {
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this._timeOffset}' ms`);
   }
 
+  /**
+   * Will adjust the give timestamp according to the time shift between the client and the server.
+   * @param {number} [timestamp = Date.now()] - the initial timestamp
+   * @returns {number} adjustedTimestamp - the timestamp adjusted with the client/server time shift
+   */
   adjustTimestamp(timestamp = Date.now()) {
     if (this._timeOffset === undefined) {
       this.logger.warn('Trying to adjust timestamp, but no server timestamp set');
