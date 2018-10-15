@@ -90,7 +90,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
         return undefined;
       })
-      .then(mixpanelInstance => this._initMixpanel(mixpanelInstance))
+      .then(mixpanelInstance => this._initAnalytics(mixpanelInstance))
       .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference));
   }
 
