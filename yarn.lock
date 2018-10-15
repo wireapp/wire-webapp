@@ -851,9 +851,10 @@
   version "2.22.2"
   resolved "https://codeload.github.com/moment/moment/tar.gz/2e2a5b35439665d4b0200143d808a7c26d6cd30f"
 
-"@bower_components/normalize-css@necolas/normalize.css#3.0.3":
-  version "3.0.3"
-  resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
+"@bower_components/normalize-css@necolas/normalize.css#8.0.0":
+  version "8.0.0"
+  uid "4ab3de5bdd26b161c3c82a5a2f72df3e57a8e4bf"
+  resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/4ab3de5bdd26b161c3c82a5a2f72df3e57a8e4bf"
 
 "@bower_components/pako@nodeca/pako#1.0.6":
   version "1.0.6"
