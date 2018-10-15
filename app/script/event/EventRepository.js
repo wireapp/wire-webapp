@@ -59,6 +59,7 @@ z.event.EventRepository = class EventRepository {
    * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
+   * @param {z.server.ServerTimeOffsetRepository} serverTimeOffsetRepository - Handles time shift between server and client
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
   constructor(
@@ -67,6 +68,7 @@ z.event.EventRepository = class EventRepository {
     webSocketService,
     conversationService,
     cryptographyRepository,
+    serverTimeOffsetRepository,
     userRepository
   ) {
     this.eventService = eventService;
@@ -74,6 +76,7 @@ z.event.EventRepository = class EventRepository {
     this.webSocketService = webSocketService;
     this.conversationService = conversationService;
     this.cryptographyRepository = cryptographyRepository;
+    this.serverTimeOffsetRepository = serverTimeOffsetRepository;
     this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
@@ -238,7 +241,9 @@ z.event.EventRepository = class EventRepository {
     return new Promise((resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
+          // TODO migrate all the timestamp diffing to the ServerTimeOffsetRepository and remove the call to _updateBaselineClock
           this._updateBaselineClock(time);
+          this.serverTimeOffsetRepository.computeTimeOffset(time);
         }
 
         if (notifications.length > 0) {
