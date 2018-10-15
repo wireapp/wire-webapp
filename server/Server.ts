@@ -145,6 +145,7 @@ class Server {
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config));
     this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
+    this.app.use('/ext', express.static(path.join(__dirname, 'static', 'ext')));
     this.app.use('/audio', express.static(path.join(__dirname, 'static', 'audio')));
     this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
     this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
