@@ -464,12 +464,11 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
 window.TestFactory.prototype.exposeTrackingActors = function() {
   this.logger.info('- exposeTrackingActors');
   return Promise.resolve()
-    .then(() => this.exposeConversationActors())
+    .then(() => this.exposeTeamActors())
     .then(() => {
-      this.logger.info('✓ exposedConversationActors');
+      this.logger.info('✓ exposesTeamActors');
 
       TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(
-        TestFactory.conversation_repository,
         TestFactory.team_repository,
         TestFactory.user_repository
       );

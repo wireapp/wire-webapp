@@ -3775,7 +3775,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (actionType) {
       const attributes = {
         action: actionType,
-        conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
+        conversation_type: z.tracking.helpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),

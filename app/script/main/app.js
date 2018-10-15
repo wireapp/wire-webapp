@@ -123,6 +123,7 @@ z.main.App = class App {
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
+    repositories.eventTracker = new z.tracking.EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new z.conversation.ConversationRepository(
       this.service.conversation,
@@ -157,11 +158,6 @@ z.main.App = class App {
       repositories.conversation,
       repositories.event,
       repositories.media,
-      repositories.user
-    );
-    repositories.eventTracker = new z.tracking.EventTrackingRepository(
-      repositories.conversation,
-      repositories.team,
       repositories.user
     );
     repositories.integration = new z.integration.IntegrationRepository(
