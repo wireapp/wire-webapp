@@ -1047,6 +1047,10 @@ z.user.UserRepository = class UserRepository {
   }
 
   getMarketingConsent() {
+    if (!window.FEATURE.CHECK_CONSENT) {
+      this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
+      return Promise.resolve();
+    }
     return this.user_service
       .getConsent()
       .then(consents => {

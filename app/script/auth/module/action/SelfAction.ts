@@ -64,10 +64,11 @@ export class SelfAction {
 
   doGetConsents = (): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
-      dispatch(SelfActionCreator.startGetConsents());
       if (!FEATURE.CHECK_CONSENT) {
+        console.warn('Consent check feature is disabled.');
         return Promise.resolve();
       }
+      dispatch(SelfActionCreator.startGetConsents());
       return apiClient.self.api
         .getConsents()
         .then(({results}) => {
@@ -82,10 +83,11 @@ export class SelfAction {
 
   doSetConsent = (consentType: ConsentType, value: number): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
-      dispatch(SelfActionCreator.startSetConsent());
       if (!FEATURE.CHECK_CONSENT) {
+        console.warn('Consent check feature is disabled.');
         return Promise.resolve();
       }
+      dispatch(SelfActionCreator.startSetConsent());
       const consent = {
         source: `${APP_NAME} ${window.z.util.Environment.version(false)}`,
         type: consentType,
