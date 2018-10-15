@@ -22,7 +22,7 @@ import {ServerConfig} from '../../config';
 const ConfigRoute = (config: ServerConfig) =>
   Router().get('/config.js', (req, res) => {
     res.type('application/javascript').send(`
-      window.wire = wire ? wire : {};
+      window.wire = window.wire ? window.wire : {};
       window.wire.env = {
         APP_BASE: '${config.SERVER.APP_BASE}',
         APP_NAME: '${config.CLIENT.APP_NAME}',
