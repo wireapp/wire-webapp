@@ -400,8 +400,13 @@ ko.bindingHandlers.antiscroll = {
 };
 
 ko.bindingHandlers.simplebar = {
-  init(element) {
-    new window.SimpleBar(element, {autoHide: false});
+  init(element, valueAccessor) {
+    const simpleBar = new window.SimpleBar(element, {autoHide: false});
+    const triggerValue = valueAccessor();
+    if (ko.isObservable(triggerValue)) {
+      const triggerSubscription = triggerValue.subscribe(() => simpleBar.recalculate());
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => triggerSubscription.dispose());
+    }
   },
 };
 

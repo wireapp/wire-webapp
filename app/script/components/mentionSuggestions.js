@@ -56,7 +56,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
     });
 
     this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
-    this.shouldUpdateScrollbar.subscribe(() => this.setWrapperSize(), null, 'beforeChange');
+    /*this.shouldUpdateScrollbar.subscribe(() => this.setWrapperSize(), null, 'beforeChange');
     this.shouldUpdateScrollbar.subscribe(() => {
       z.util.afterRender(() => {
         const items = Array.from(document.querySelectorAll('.mention-suggestion-list__item'));
@@ -65,7 +65,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
           this.setWrapperSize(`${maxWidth}px`);
         }
       });
-    });
+    });*/
   }
 
   setWrapperSize(size = '') {
@@ -175,8 +175,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
 ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
-    <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position()">
-      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion'}, simplebar: true">
+    <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position(), simplebar: shouldUpdateScrollbar">
+      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion'}">
         <div class="mention-suggestion-list__item" data-bind="click: $parent.onSuggestionClick, css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()}, attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === $parent.selectedSuggestion()}" data-uie-name="item-mention-suggestion">
           <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
           <div class="mention-suggestion-list__item__name" data-bind="text: suggestion.name()" data-uie-name="status-name"></div>
