@@ -36,7 +36,6 @@ import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
-import {FEATURE} from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -78,9 +77,7 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   componentDidMount() {
     const suggestions = createSuggestions(this.props.name);
-    if (FEATURE.CHECK_CONSENT) {
-      this.props.doGetConsents();
-    }
+    this.props.doGetConsents();
     this.props
       .checkHandles(suggestions)
       .then(handle => this.setState({handle}))
