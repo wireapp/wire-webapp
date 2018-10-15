@@ -37,6 +37,7 @@ window.z.config = {
       domains: {
         'app.wire.com': () => 0,
         localhost: () => 300,
+        'wire.link': () => 300,
         'wire.ms': () => 300,
         'wire-webapp-staging.wire.com': () => 300,
         'zinfra.io': () => 300,
