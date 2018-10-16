@@ -40,7 +40,6 @@ declare global {
     bazinga64: any;
     jQuery: any;
     platform: any;
-    wire: any;
     z: any;
   }
   // https://github.com/Microsoft/TypeScript/issues/26728
@@ -59,7 +58,6 @@ window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-// Expose wire object in global namespace to satisfy wrapper check
-const configureEnvironment = () => (window.wire = {});
+const configureEnvironment = () => {};
 
 export {configureEnvironment};
