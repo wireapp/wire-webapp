@@ -401,23 +401,17 @@ describe('Conversation', () => {
 
   describe('get_next_iso_date', () => {
     it('should return an expected ISO string', () => {
-      const reference_date = new Date(Date.now() - 1);
-      const reference_iso_date = reference_date.toISOString();
+      const referenceTimestamp = Date.now() - 1;
+      const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
-      expect(conversation_et.get_next_iso_date()).toBeGreaterThan(reference_iso_date);
-      expect(conversation_et.get_next_iso_date(1000)).toBeLessThan(reference_iso_date);
-      expect(conversation_et.get_next_iso_date(-1000)).toBeGreaterThan(
-        new Date(reference_date.getTime() + 1000).toISOString()
-      );
+      expect(conversation_et.get_next_iso_date(referenceTimestamp)).toBe(reference_iso_date);
       expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
 
-      const last_server_timestamp = Date.now() + 10000;
+      const last_server_timestamp = referenceTimestamp + 10000;
       conversation_et.last_server_timestamp(last_server_timestamp);
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 
-      expect(conversation_et.get_next_iso_date()).toEqual(expected_iso_date);
-      expect(conversation_et.get_next_iso_date(1000)).toEqual(expected_iso_date);
-      expect(conversation_et.get_next_iso_date(-1000)).toEqual(expected_iso_date);
+      expect(conversation_et.get_next_iso_date(referenceTimestamp)).toEqual(expected_iso_date);
       expect(conversation_et.get_next_iso_date('foo')).toEqual(expected_iso_date);
     });
   });
