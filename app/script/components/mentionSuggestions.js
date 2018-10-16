@@ -56,16 +56,6 @@ z.components.MentionSuggestions = class MentionSuggestions {
     });
 
     this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
-    /*this.shouldUpdateScrollbar.subscribe(() => this.setWrapperSize(), null, 'beforeChange');
-    this.shouldUpdateScrollbar.subscribe(() => {
-      z.util.afterRender(() => {
-        const items = Array.from(document.querySelectorAll('.mention-suggestion-list__item'));
-        if (items.length) {
-          const maxWidth = items.reduce((currentMax, item) => Math.max(currentMax, item.offsetWidth), 0);
-          this.setWrapperSize(`${maxWidth}px`);
-        }
-      });
-    });*/
   }
 
   setWrapperSize(size = '') {
