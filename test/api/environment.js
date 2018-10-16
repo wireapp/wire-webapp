@@ -23,6 +23,7 @@ navigator.__defineGetter__('language', () => {
   return 'en';
 });
 
+// This configurations usually get set by the config.js which is delivered by the server.
 window.wire = {
   env: {
     ENVIRONMENT: 'development',
