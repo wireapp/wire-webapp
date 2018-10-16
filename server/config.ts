@@ -25,7 +25,6 @@ import {fileIsReadable, readFile} from './util/FileUtil';
 dotenv.config();
 
 const defaultCSP: HelmetCSP = {
-  childSrc: [],
   connectSrc: [
     "'self'",
     'blob:',
@@ -73,7 +72,6 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 
 function mergedCSP(): HelmetCSP {
   const csp: HelmetCSP = {
-    childSrc: [...defaultCSP.childSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_CHILD_SRC)],
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_REST,
