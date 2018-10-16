@@ -208,7 +208,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         return this._initTracking();
       })
       .then(mixpanelInstance => this._initAnalytics(mixpanelInstance))
-      .then(() => this._trackRvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
+      .then(() => this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
   }
 
   _initTracking() {
