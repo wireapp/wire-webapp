@@ -107,7 +107,7 @@ export interface ServerConfig {
       MOBILE_BASE: string;
     };
     FEATURE: {
-      CHECK_CONSENT: string;
+      CHECK_CONSENT: boolean;
     };
     VERSION?: string;
   };
@@ -135,7 +135,7 @@ const config: ServerConfig = {
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
-      CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT,
+      CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
     },
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
