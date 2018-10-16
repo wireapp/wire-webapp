@@ -171,7 +171,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   checkMessageTimer(messageEntity) {
-    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeRepository.adjustTimestamp());
+    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeRepository.getTimeOffset());
   }
 
   _initStateUpdates() {
