@@ -63,36 +63,44 @@ const defaultCSP: HelmetCSP = {
   workerSrc: [],
 };
 
+function parseCommaSeparatedList(list: string = ''): string[] {
+  const cleanedList = list.replace(/\s/g, '');
+  if (!cleanedList) {
+    return [];
+  }
+  return cleanedList.split(',');
+}
+
 function mergedCSP(): HelmetCSP {
   return {
-    childSrc: [...defaultCSP.childSrc, ...JSON.parse(process.env.CSP_CHILD_SRC || '[]')],
+    childSrc: [...defaultCSP.childSrc, ...parseCommaSeparatedList(process.env.CSP_CHILD_SRC)],
     connectSrc: [
       ...defaultCSP.connectSrc,
-      process.env.BACKEND_HTTP,
+      process.env.BACKEND_REST,
       process.env.BACKEND_WS,
-      ...JSON.parse(process.env.CSP_CONNECT_SRC || '[]'),
+      ...parseCommaSeparatedList(process.env.CSP_EXTRA_CONNECT_SRC),
     ],
-    defaultSrc: [...defaultCSP.defaultSrc, ...JSON.parse(process.env.CSP_DEFAULT_SRC || '[]')],
-    fontSrc: [...defaultCSP.fontSrc, ...JSON.parse(process.env.CSP_FONT_SRC || '[]')],
-    frameSrc: [...defaultCSP.frameSrc, ...JSON.parse(process.env.CSP_FRAME_SRC || '[]')],
-    imgSrc: [...defaultCSP.imgSrc, ...JSON.parse(process.env.CSP_IMG_SRC || '[]')],
-    manifestSrc: [...defaultCSP.manifestSrc, ...JSON.parse(process.env.CSP_MANIFEST_SRC || '[]')],
-    mediaSrc: [...defaultCSP.mediaSrc, ...JSON.parse(process.env.CSP_MEDIA_SRC || '[]')],
-    objectSrc: [...defaultCSP.objectSrc, ...JSON.parse(process.env.CSP_OBJECT_SRC || '[]')],
-    prefetchSrc: [...defaultCSP.prefetchSrc, ...JSON.parse(process.env.CSP_PREFETCH_SRC || '[]')],
-    scriptSrc: [...defaultCSP.scriptSrc, ...JSON.parse(process.env.CSP_SCRIPT_SRC || '[]')],
-    styleSrc: [...defaultCSP.styleSrc, ...JSON.parse(process.env.CSP_STYLE_SRC || '[]')],
-    workerSrc: [...defaultCSP.workerSrc, ...JSON.parse(process.env.CSP_WORKER_SRC || '[]')],
+    defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_DEFAULT_SRC)],
+    fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FONT_SRC)],
+    frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FRAME_SRC)],
+    imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_IMG_SRC)],
+    manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(process.env.CSP_MANIFEST_SRC)],
+    mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MEDIA_SRC)],
+    objectSrc: [...defaultCSP.objectSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_OBJECT_SRC)],
+    prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(process.env.CSP_PREFETCH_SRC)],
+    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_SCRIPT_SRC)],
+    styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_STYLE_SRC)],
+    workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_WORKER_SRC)],
   };
 }
 
 export interface ServerConfig {
   CLIENT: {
     APP_NAME: string;
-    BACKEND_HTTP: string;
+    BACKEND_REST: string;
     BACKEND_WS: string;
     ENVIRONMENT: string;
-    EXTERNAL: {
+    URL: {
       ACCOUNT_BASE: string;
       WEBSITE_BASE: string;
       MOBILE_BASE: string;
@@ -103,7 +111,7 @@ export interface ServerConfig {
     VERSION?: string;
   };
   SERVER: {
-    BASE: string;
+    APP_BASE: string;
     CACHE_DURATION_SECONDS: number;
     CSP: HelmetCSP;
     DEVELOPMENT?: boolean;
@@ -122,21 +130,21 @@ const nodeEnvironment = process.env.NODE_ENV || 'production';
 const config: ServerConfig = {
   CLIENT: {
     APP_NAME: process.env.APP_NAME,
-    BACKEND_HTTP: process.env.BACKEND_HTTP,
+    BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
-    EXTERNAL: {
-      ACCOUNT_BASE: process.env.EXTERNAL_ACCOUNT_BASE,
-      MOBILE_BASE: process.env.EXTERNAL_MOBILE_BASE,
-      WEBSITE_BASE: process.env.EXTERNAL_WEBSITE_BASE,
-    },
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT,
+    },
+    URL: {
+      ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
+      MOBILE_BASE: process.env.URL_MOBILE_BASE,
+      WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
     VERSION: undefined,
   },
   SERVER: {
-    BASE: process.env.BASE,
+    APP_BASE: process.env.APP_BASE,
     CACHE_DURATION_SECONDS: 300,
     CSP: mergedCSP(),
     DEVELOPMENT: nodeEnvironment === 'development',

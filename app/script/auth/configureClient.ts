@@ -50,7 +50,7 @@ const configureClient = () => {
     store: new IndexedDBEngine(),
     urls: {
       name: config.ENVIRONMENT,
-      rest: config.BACKEND_HTTP,
+      rest: config.BACKEND_REST,
       ws: config.BACKEND_WS,
     },
   });

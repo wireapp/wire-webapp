@@ -97,7 +97,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
         return response;
       })
       .catch(error => {
-        const isUnknownClient = error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        const isUnknownClient = error.label === z.error.BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           this.clientRepository.removeLocalClient();
         }

@@ -21,35 +21,39 @@ import * as UUID from 'uuid/v4';
 
 declare global {
   interface Window {
-    APP_NAME: string;
-    BASE: string;
-    BACKEND_HTTP: string;
-    BACKEND_WS: string;
-    ENVIRONMENT: string;
-    EXTERNAL: {
-      ACCOUNT_BASE: string;
-      MOBILE_BASE: string;
-      WEBSITE_BASE: string;
-    };
-    VERSION: string;
-    FEATURE: {
-      CHECK_CONSENT: boolean;
+    wire: {
+      env: {
+        APP_BASE: string;
+        APP_NAME: string;
+        BACKEND_REST: string;
+        BACKEND_WS: string;
+        ENVIRONMENT: string;
+        URL: {
+          ACCOUNT_BASE: string;
+          MOBILE_BASE: string;
+          WEBSITE_BASE: string;
+        };
+        VERSION: string;
+        FEATURE: {
+          CHECK_CONSENT: boolean;
+        };
+      };
     };
   }
 }
 
-export const APP_NAME = window.APP_NAME || 'Webapp';
-export const BACKEND_HTTP = window.BACKEND_HTTP || 'https://prod-nginz-https.wire.com';
-export const BACKEND_WS = window.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
-export const ENVIRONMENT = window.ENVIRONMENT || 'production';
-export const BASE = window.BASE || 'https://app.wire.com/';
-export const EXTERNAL = window.EXTERNAL || {
+export const APP_NAME = window.wire.env.APP_NAME || 'Webapp';
+export const BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
+export const BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
+export const ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
+export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com/';
+export const URL = window.wire.env.URL || {
   ACCOUNT_BASE: 'https://account.wire.com/',
   MOBILE_BASE: '/',
   WEBSITE_BASE: 'https://wire.com/',
 };
-export const VERSION = window.VERSION || '0.0.0';
-export const FEATURE = window.FEATURE || {
+export const VERSION = window.wire.env.VERSION || '0.0.0';
+export const FEATURE = window.wire.env.FEATURE || {
   CHECK_CONSENT: true,
 };
 export const APP_INSTANCE_ID = UUID();

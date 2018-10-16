@@ -22,14 +22,17 @@ import {ServerConfig} from '../../config';
 const ConfigRoute = (config: ServerConfig) =>
   Router().get('/config.js', (req, res) => {
     res.type('application/javascript').send(`
-      window.APP_NAME = '${config.CLIENT.APP_NAME}';
-      window.BASE = '${config.SERVER.BASE}';
-      window.BACKEND_HTTP = '${config.CLIENT.BACKEND_HTTP}';
-      window.BACKEND_WS = '${config.CLIENT.BACKEND_WS}';
-      window.ENVIRONMENT = '${config.CLIENT.ENVIRONMENT}';
-      window.VERSION = '${config.CLIENT.VERSION}';
-      window.EXTERNAL = '${config.CLIENT.EXTERNAL}';
-      window.FEATURE = '${config.CLIENT.FEATURE}';
+      window.wire = window.wire ? window.wire : {};
+      window.wire.env = {
+        APP_BASE: '${config.SERVER.APP_BASE}',
+        APP_NAME: '${config.CLIENT.APP_NAME}',
+        BACKEND_REST: '${config.CLIENT.BACKEND_REST}',
+        BACKEND_WS: '${config.CLIENT.BACKEND_WS}',
+        ENVIRONMENT: '${config.CLIENT.ENVIRONMENT}',
+        VERSION: '${config.CLIENT.VERSION}',
+        URL: '${JSON.stringify(config.CLIENT.URL)}',
+        FEATURE: '${JSON.stringify(config.CLIENT.FEATURE)}',
+      };
     `);
   });
 

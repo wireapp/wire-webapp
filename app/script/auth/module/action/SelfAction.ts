@@ -18,7 +18,7 @@
  */
 
 import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
-import {APP_NAME} from '../../config';
+import {APP_NAME, FEATURE} from '../../config';
 import {ThunkAction} from '../reducer';
 import {SelfActionCreator} from './creator/';
 
@@ -64,6 +64,10 @@ export class SelfAction {
 
   doGetConsents = (): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
+      if (!FEATURE.CHECK_CONSENT) {
+        console.warn('Consent check feature is disabled.');
+        return Promise.resolve();
+      }
       dispatch(SelfActionCreator.startGetConsents());
       return apiClient.self.api
         .getConsents()
@@ -79,6 +83,10 @@ export class SelfAction {
 
   doSetConsent = (consentType: ConsentType, value: number): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
+      if (!FEATURE.CHECK_CONSENT) {
+        console.warn('Consent check feature is disabled.');
+        return Promise.resolve();
+      }
       dispatch(SelfActionCreator.startSetConsent());
       const consent = {
         source: `${APP_NAME} ${window.z.util.Environment.version(false)}`,

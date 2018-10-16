@@ -41,7 +41,7 @@ describe('z.links.LinkPreviewRepository', () => {
         .getLinkPreview()
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
+          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NOT_SUPPORTED);
           done();
         });
     });
@@ -54,7 +54,7 @@ describe('z.links.LinkPreviewRepository', () => {
         .then(done.fail)
         .catch(error => {
           expect(link_preview_repository._fetchOpenGraphData).toHaveBeenCalled();
-          expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
         });
     });
@@ -66,7 +66,7 @@ describe('z.links.LinkPreviewRepository', () => {
         .getLinkPreview('youtube.com')
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.links.LinkPreviewError.TYPE.BLACKLISTED);
+          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.BLACKLISTED);
           done();
         });
     });

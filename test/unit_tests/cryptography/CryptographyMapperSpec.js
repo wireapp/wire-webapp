@@ -439,8 +439,8 @@ describe('z.cryptography.CryptographyMapper', () => {
         .mapGenericMessage(generic_message, event)
         .then(done.fail)
         .catch(error => {
-          expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
-          expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW);
+          expect(error instanceof z.error.CryptographyError).toBeTruthy();
+          expect(error.type).toBe(z.error.CryptographyError.TYPE.IGNORED_PREVIEW);
           done();
         });
     });
@@ -530,8 +530,8 @@ describe('z.cryptography.CryptographyMapper', () => {
         .mapGenericMessage(undefined, {id: 'ABC'})
         .then(done.fail)
         .catch(error => {
-          expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
-          expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+          expect(error instanceof z.error.CryptographyError).toBeTruthy();
+          expect(error.type).toBe(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
           done();
         });
     });

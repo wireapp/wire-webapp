@@ -178,12 +178,12 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
           message: `State change requested from '{0}' while we are connected to '{1}'`,
         };
         this.callLogger.warn(logMessage, this);
-        throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
+        throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER);
       }
 
       this.flowEntity.remoteClientId = clientId;
     } else {
-      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
+      throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
     }
   }
 };

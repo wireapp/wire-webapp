@@ -186,7 +186,7 @@ describe('z.user.UserRepository', () => {
           .findUserById('1')
           .then(done.fail)
           .catch(error => {
-            expect(error.type).toBe(z.user.UserError.TYPE.USER_NOT_FOUND);
+            expect(error.type).toBe(z.error.UserError.TYPE.USER_NOT_FOUND);
             done();
           });
       });

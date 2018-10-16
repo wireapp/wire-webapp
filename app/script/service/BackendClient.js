@@ -48,25 +48,25 @@ z.service.BackendClient = class BackendClient {
 
   static get IGNORED_BACKEND_ERRORS() {
     return [
-      z.service.BackendClientError.STATUS_CODE.BAD_GATEWAY,
-      z.service.BackendClientError.STATUS_CODE.CONFLICT,
-      z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
-      z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
-      z.service.BackendClientError.STATUS_CODE.NOT_FOUND,
-      z.service.BackendClientError.STATUS_CODE.PRECONDITION_FAILED,
-      z.service.BackendClientError.STATUS_CODE.REQUEST_TIMEOUT,
-      z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE,
-      z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS,
+      z.error.BackendClientError.STATUS_CODE.BAD_GATEWAY,
+      z.error.BackendClientError.STATUS_CODE.CONFLICT,
+      z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
+      z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
+      z.error.BackendClientError.STATUS_CODE.NOT_FOUND,
+      z.error.BackendClientError.STATUS_CODE.PRECONDITION_FAILED,
+      z.error.BackendClientError.STATUS_CODE.REQUEST_TIMEOUT,
+      z.error.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE,
+      z.error.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS,
     ];
   }
 
   static get IGNORED_BACKEND_LABELS() {
     return [
-      z.service.BackendClientError.LABEL.INVALID_CREDENTIALS,
-      z.service.BackendClientError.LABEL.PASSWORD_EXISTS,
-      z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS,
-      z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS,
-      z.service.BackendClientError.LABEL.UNKNOWN_CLIENT,
+      z.error.BackendClientError.LABEL.INVALID_CREDENTIALS,
+      z.error.BackendClientError.LABEL.PASSWORD_EXISTS,
+      z.error.BackendClientError.LABEL.TOO_MANY_CLIENTS,
+      z.error.BackendClientError.LABEL.TOO_MANY_MEMBERS,
+      z.error.BackendClientError.LABEL.UNKNOWN_CLIENT,
     ];
   }
 
@@ -312,14 +312,14 @@ z.service.BackendClient = class BackendClient {
         })
         .fail(({responseJSON: response, status: statusCode, wire: wireRequest}) => {
           switch (statusCode) {
-            case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
+            case z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
               this._prepend_request_queue(config, resolve, reject);
 
               return this.execute_on_connectivity().then(() => this.execute_request_queue());
             }
 
-            case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
+            case z.error.BackendClientError.STATUS_CODE.FORBIDDEN: {
               if (response) {
                 const errorLabel = response.label;
                 const errorMessage = `Server request forbidden: ${errorLabel}`;
@@ -340,10 +340,10 @@ z.service.BackendClient = class BackendClient {
               break;
             }
 
-            case z.service.BackendClientError.STATUS_CODE.ACCEPTED:
-            case z.service.BackendClientError.STATUS_CODE.CREATED:
-            case z.service.BackendClientError.STATUS_CODE.NO_CONTENT:
-            case z.service.BackendClientError.STATUS_CODE.OK: {
+            case z.error.BackendClientError.STATUS_CODE.ACCEPTED:
+            case z.error.BackendClientError.STATUS_CODE.CREATED:
+            case z.error.BackendClientError.STATUS_CODE.NO_CONTENT:
+            case z.error.BackendClientError.STATUS_CODE.OK: {
               // Prevent empty valid response from being rejected
               if (!response) {
                 return resolve({});
@@ -351,7 +351,7 @@ z.service.BackendClient = class BackendClient {
               break;
             }
 
-            case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
+            case z.error.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
               this._prepend_request_queue(config, resolve, reject);
 
               const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
@@ -372,7 +372,7 @@ z.service.BackendClient = class BackendClient {
             }
           }
 
-          reject(response || new z.service.BackendClientError(statusCode));
+          reject(response || new z.error.BackendClientError(statusCode));
         });
     });
   }

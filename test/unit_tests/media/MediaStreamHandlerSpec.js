@@ -44,8 +44,8 @@ describe('z.media.MediaStreamHandler', () => {
       try {
         streamHandler.addRemoteMediaStream(newMediaStream);
       } catch (error) {
-        expect(error instanceof z.media.MediaError).toBe(true);
-        expect(error.type).toEqual(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+        expect(error instanceof z.error.MediaError).toBe(true);
+        expect(error.type).toEqual(z.error.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
       }
     });
 
