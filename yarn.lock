@@ -1164,6 +1164,13 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
+"@types/express-sitemap-xml@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.0.1.tgz#017e9a3997c990cc6963e6b111a9c82cecfee3a3"
+  integrity sha512-QSVOsSwJgQ1rnK73zSWcHTbVzIhjhUOmej6Fk3woie5Uzoy2JxVUaT2Ie4b9aE3sRXKtNhL/wg3suGwb0sOl6w==
+  dependencies:
+    "@types/express" "*"
+
 "@types/express-useragent@0.2.21":
   version "0.2.21"
   resolved "https://registry.yarnpkg.com/@types/express-useragent/-/express-useragent-0.2.21.tgz#dbbc684e15aa5dfeef1118eabcbc0084716be59f"

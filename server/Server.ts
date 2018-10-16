@@ -19,6 +19,7 @@
 
 import {CommonConfig} from '@wireapp/commons';
 import * as express from 'express';
+import expressSitemapXml from 'express-sitemap-xml';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
@@ -30,8 +31,6 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
 import * as BrowserUtil from './util/BrowserUtil';
-
-const expressSitemapXml = require('express-sitemap-xml');
 
 const STATUS_CODE_MOVED = 301;
 const STATUS_CODE_FOUND = 302;
