@@ -36,6 +36,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     this.generateUrl = undefined;
     this.identifier = undefined;
 
+    this.loadPromise = undefined;
+
     this.logger = new z.util.Logger('z.assets.AssetRemoteData', z.config.LOGGER.OPTIONS);
   }
 
@@ -112,7 +114,11 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   load() {
     let type;
 
-    return this._loadBuffer()
+    if (this.loadPromise) {
+      return this.loadPromise;
+    }
+
+    this.loadPromise = this._loadBuffer()
       .then(({buffer, mimeType}) => {
         type = mimeType;
         const isEncryptedAsset = this.otrKey && this.sha256;
@@ -130,7 +136,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
         if (!isExpectedError) {
           throw error;
         }
-      });
+      })
+      .finally(() => (this.loadPromise = undefined));
+
+    return this.loadPromise;
   }
 
   _loadBuffer() {
