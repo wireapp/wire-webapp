@@ -31,23 +31,22 @@ describe('z.time.ServerTimeRepository', () => {
     });
   });
 
-  describe('toServerTimestamp', () => {
-    it('warns that adjustments cannot be done when server time is not set', () => {
+  describe('getTimeOffset', () => {
+    it('warns that offset cannot be retrieved when server time is not set', () => {
       spyOn(serverTimeRepository.logger, 'warn');
-      const timestamp = 10;
 
-      const adjustedTimestamp = serverTimeRepository.toServerTimestamp(timestamp);
+      const offset = serverTimeRepository.getTimeOffset();
 
-      expect(adjustedTimestamp).toEqual(timestamp);
+      expect(offset).toEqual(0);
       expect(serverTimeRepository.logger.warn).toHaveBeenCalled();
     });
+  });
 
-    it('converts a local timestamp to a server timestamp', () => {
-      const serverTime = new Date();
+  describe('toServerTimestamp', () => {
+    it('converts a local timestamp to a server one', () => {
       const timeOffset = 10;
-      serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
-      serverTimeRepository.computeTimeOffset(serverTime.toISOString());
-      const timestamp = 10;
+      const timestamp = 100;
+      spyOn(serverTimeRepository, 'getTimeOffset').and.returnValue(timeOffset);
 
       const adjustedTimestamp = serverTimeRepository.toServerTimestamp(timestamp);
 
@@ -56,22 +55,10 @@ describe('z.time.ServerTimeRepository', () => {
   });
 
   describe('toLocalTimestamp', () => {
-    it('warns that adjustments cannot be done when server time is not set', () => {
-      spyOn(serverTimeRepository.logger, 'warn');
-      const timestamp = 10;
-
-      const adjustedTimestamp = serverTimeRepository.toLocalTimestamp(timestamp);
-
-      expect(adjustedTimestamp).toEqual(timestamp);
-      expect(serverTimeRepository.logger.warn).toHaveBeenCalled();
-    });
-
-    it('converts a server timestamp to a local timestamp', () => {
-      const serverTime = new Date();
+    it('converts a server timestamp to a local one', () => {
       const timeOffset = 10;
-      serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
-      serverTimeRepository.computeTimeOffset(serverTime.toISOString());
-      const timestamp = 10;
+      const timestamp = 100;
+      spyOn(serverTimeRepository, 'getTimeOffset').and.returnValue(timeOffset);
 
       const adjustedTimestamp = serverTimeRepository.toLocalTimestamp(timestamp);
 
@@ -81,11 +68,10 @@ describe('z.time.ServerTimeRepository', () => {
 
   describe('toLocalTimestamp and toServerTimestamp', () => {
     it('should return the initial timestamp if the two reverse operations are applied', () => {
-      const localTime = Date.now();
-      const serverTime = new Date();
       const timeOffset = 10;
-      serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
-      serverTimeRepository.computeTimeOffset(serverTime.toISOString());
+      spyOn(serverTimeRepository, 'getTimeOffset').and.returnValue(timeOffset);
+
+      const localTime = Date.now();
 
       const computedServerTime = serverTimeRepository.toServerTimestamp(localTime);
       const computedLocalTime = serverTimeRepository.toLocalTimestamp(computedServerTime);
