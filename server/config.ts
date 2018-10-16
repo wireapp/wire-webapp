@@ -72,7 +72,7 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 }
 
 function mergedCSP(): HelmetCSP {
-  return {
+  const csp: HelmetCSP = {
     childSrc: [...defaultCSP.childSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_CHILD_SRC)],
     connectSrc: [
       ...defaultCSP.connectSrc,
@@ -92,6 +92,9 @@ function mergedCSP(): HelmetCSP {
     styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_STYLE_SRC)],
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_WORKER_SRC)],
   };
+  return Object.entries(csp)
+    .filter(([key, value]) => !!value.length)
+    .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
 export interface ServerConfig {
