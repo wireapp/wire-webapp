@@ -35,7 +35,9 @@ describe('PromiseQueue', () => {
       const queue = new z.util.PromiseQueue();
       queue.push(promiseFn);
       queue.push(promiseFn);
-      return queue.push(promiseFn).then(() => expect(result).toEqual([0, 1, 2]));
+      return queue.push(promiseFn).then(() => {
+        expect(result).toEqual([0, 1, 2]);
+      });
     });
 
     it('should process promises that are added during execution', done => {

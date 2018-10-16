@@ -108,6 +108,7 @@ describe('z.calling.VideoGridRepository', () => {
       tests.forEach(({grid, participants, expected, scenario}) => {
         it(scenario, () => {
           const result = groupVideoGrid.computeGrid(grid, participants);
+
           expect(result).toEqual(expected, scenario);
         });
       });
@@ -126,6 +127,7 @@ describe('z.calling.VideoGridRepository', () => {
       tests.forEach(({grid, participants, expected, scenario}) => {
         it(scenario, () => {
           const result = groupVideoGrid.computeGrid(grid, participants);
+
           expect(result).toEqual(expected, scenario);
         });
       });
@@ -285,6 +287,7 @@ describe('z.calling.VideoGridRepository', () => {
           },
         })
       );
+
       expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);
     });
   });

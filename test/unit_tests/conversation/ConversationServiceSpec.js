@@ -51,9 +51,9 @@ describe('ConversationService', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       const [conversation_et] = conversation_mapper.mapConversations([conversation_payload]);
 
-      return conversation_service
-        .save_conversation_state_in_db(conversation_et)
-        .then(conversation_record => expect(conversation_record.name()).toBe(conversation_payload.name));
+      return conversation_service.save_conversation_state_in_db(conversation_et).then(conversation_record => {
+        expect(conversation_record.name()).toBe(conversation_payload.name);
+      });
     });
   });
 

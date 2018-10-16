@@ -39,6 +39,7 @@ describe('z.tracking.EventTrackingRepository', () => {
 
       const properties = new z.properties.PropertiesEntity();
       const privacyPreference = properties.settings.privacy.improve_wire;
+
       expect(privacyPreference).toBeFalsy();
 
       const mixpanelMock = {
@@ -59,6 +60,7 @@ describe('z.tracking.EventTrackingRepository', () => {
         register: jasmine.createSpy('register'),
         track: jasmine.createSpy('track'),
       };
+
       expect(TestFactory.tracking_repository.isErrorReportingActivated).toBe(false);
       expect(TestFactory.tracking_repository.isUserAnalyticsActivated).toBe(false);
 
@@ -68,15 +70,19 @@ describe('z.tracking.EventTrackingRepository', () => {
         expect(TestFactory.tracking_repository.isUserAnalyticsActivated).toBe(true);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
+
         expect(mixpanelMock.track).toHaveBeenCalledTimes(1);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_another_event');
+
         expect(mixpanelMock.track).toHaveBeenCalledTimes(2);
 
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, false);
+
         expect(mixpanelMock.track).toHaveBeenCalledTimes(3);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_not_tracking');
+
         expect(mixpanelMock.track).toHaveBeenCalledTimes(3);
       });
     });
@@ -96,6 +102,7 @@ describe('z.tracking.EventTrackingRepository', () => {
 
     it('immediately reports events', () => {
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
+
       expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalled();
       expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledTimes(1);
     });
@@ -108,6 +115,7 @@ describe('z.tracking.EventTrackingRepository', () => {
       };
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
+
       expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledWith(event_name, attributes);
     });
   });
@@ -133,18 +141,22 @@ describe('z.tracking.EventTrackingRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       let error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload);
+
       expect(error_payload).toBe(raygun_payload);
 
       _.times(100, () => (error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload)));
+
       expect(error_payload).toBe(false);
 
       jasmine.clock().mockDate(Date.now());
       jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD * 2);
 
       error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload);
+
       expect(error_payload).toBe(raygun_payload);
 
       error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload);
+
       expect(error_payload).toBe(false);
     });
   });

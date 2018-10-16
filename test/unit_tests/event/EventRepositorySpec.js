@@ -130,6 +130,7 @@ describe('Event Repository', () => {
       last_notification_id = z.util.createRandomUuid();
       TestFactory.event_repository.connectWebSocket();
       websocket_service_mock.publish({id: z.util.createRandomUuid(), payload: []});
+
       expect(TestFactory.event_repository._bufferWebSocketNotification).toHaveBeenCalled();
       expect(TestFactory.event_repository._handleNotification).not.toHaveBeenCalled();
       expect(TestFactory.event_repository.notificationHandlingState()).toBe(z.event.NOTIFICATION_HANDLING_STATE.STREAM);

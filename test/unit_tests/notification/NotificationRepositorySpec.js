@@ -109,6 +109,7 @@ describe('z.notification.NotificationRepository', () => {
           }
 
           const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
+
           expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
         });
       };
@@ -124,6 +125,7 @@ describe('z.notification.NotificationRepository', () => {
           notification_content.trigger = trigger;
 
           const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
+
           expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
         });
       };
@@ -149,6 +151,7 @@ describe('z.notification.NotificationRepository', () => {
           notification_content.options.data.messageType = _message.type;
 
           const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
+
           expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
         });
       };
@@ -169,6 +172,7 @@ describe('z.notification.NotificationRepository', () => {
           }
 
           const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
+
           expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
         });
       };
@@ -184,9 +188,9 @@ describe('z.notification.NotificationRepository', () => {
     it('if the browser does not support them', () => {
       z.util.Environment.browser.supports.notifications = false;
 
-      return TestFactory.notification_repository
-        .notify(message_et, undefined, conversation_et)
-        .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
     });
 
     it('if the browser tab has focus and conversation is active', () => {
@@ -203,23 +207,25 @@ describe('z.notification.NotificationRepository', () => {
 
           return TestFactory.notification_repository.notify(message_et, undefined, conversation_et);
         })
-        .then(() => expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1));
+        .then(() => {
+          expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+        });
     });
 
     it('if the event was triggered by the user', () => {
       message_et.user().is_me = true;
 
-      return TestFactory.notification_repository
-        .notify(message_et, undefined, conversation_et)
-        .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
     });
 
     it('if the conversation is muted', () => {
       conversation_et.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
 
-      return TestFactory.notification_repository
-        .notify(message_et, undefined, conversation_et)
-        .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
     });
 
     it('for a successfully completed call', () => {
@@ -227,25 +233,25 @@ describe('z.notification.NotificationRepository', () => {
       message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
       message_et.finished_reason = z.calling.enum.TERMINATION_REASON.COMPLETED;
 
-      return TestFactory.notification_repository
-        .notify(message_et, undefined, conversation_et)
-        .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
     });
 
     it('if preference is set to none', () => {
       TestFactory.notification_repository.notificationsPreference(z.notification.NotificationPreference.NONE);
 
-      return TestFactory.notification_repository
-        .notify(message_et, undefined, conversation_et)
-        .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
     });
 
     it('if the user permission was denied', () => {
       TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.DENIED);
 
-      return TestFactory.notification_repository
-        .notify(message_et, undefined, conversation_et)
-        .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -507,9 +513,9 @@ describe('z.notification.NotificationRepository', () => {
       it('with one user being removed from the conversation', () => {
         message_et.userEntities([other_user_et]);
 
-        return TestFactory.notification_repository
-          .notify(message_et, undefined, conversation_et)
-          .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+        return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+          expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+        });
       });
 
       it('with you being removed from the conversation', () => {
@@ -524,17 +530,17 @@ describe('z.notification.NotificationRepository', () => {
         const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(payload.users.get.many);
         message_et.userEntities(user_ets);
 
-        return TestFactory.notification_repository
-          .notify(message_et, undefined, conversation_et)
-          .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+        return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+          expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+        });
       });
 
       it('with someone leaving the conversation by himself', () => {
         message_et.userEntities([message_et.user()]);
 
-        return TestFactory.notification_repository
-          .notify(message_et, undefined, conversation_et)
-          .then(() => expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled());
+        return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+          expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+        });
       });
     });
   });

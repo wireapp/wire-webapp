@@ -37,11 +37,13 @@ describe('z.cache.CacheRepository', () => {
 
     it('deletes cached keys', () => {
       const deleted_keys = cache_repository.clearCache(false);
+
       expect(deleted_keys.length).toBe(2);
     });
 
     it('preserves cached conversation inputs while deleting other keys', () => {
       const deleted_keys = cache_repository.clearCache(true);
+
       expect(deleted_keys.length).toBe(1);
       expect(deleted_keys[0]).toBe(TEMP_KEY);
     });

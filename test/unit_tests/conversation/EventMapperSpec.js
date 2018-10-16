@@ -152,9 +152,9 @@ describe('Event Mapper', () => {
       const bad_message = {"conversation":conversation_et.id,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Knock, are you there? :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      return event_mapper
-        .mapJsonEvents([good_message, bad_message], conversation_et)
-        .then(messageEntities => expect(messageEntities.length).toBe(1));
+      return event_mapper.mapJsonEvents([good_message, bad_message], conversation_et).then(messageEntities => {
+        expect(messageEntities.length).toBe(1);
+      });
     });
 
     it('filters mentions that are out of range', () => {
@@ -184,6 +184,7 @@ describe('Event Mapper', () => {
 
       event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
         const mentions = messageEntity.get_first_asset().mentions();
+
         expect(mentions.length).toBe(1);
       });
     });
@@ -214,6 +215,7 @@ describe('Event Mapper', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const message_et = event_mapper._mapEventUnableToDecrypt(event);
+
       expect(message_et.error_code).toBe('205');
       expect(message_et.client_id).toBe('c0a70d96aaeb87b6');
     });

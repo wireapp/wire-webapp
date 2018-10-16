@@ -24,16 +24,19 @@
 describe('containsOnlyLink', () => {
   it('should return true if text only contains url (naked domain)', () => {
     const text = 'wire.com';
+
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBeTruthy();
   });
 
   it('should return true if text only contains url (http domain)', () => {
     const text = 'http://wire.com';
+
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBeTruthy();
   });
 
   it('should return true if text only contains url (https domain)', () => {
     const text = 'https://wire.com';
+
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBeTruthy();
   });
 
@@ -44,11 +47,13 @@ describe('containsOnlyLink', () => {
 
   it('should return false for multiple domains', () => {
     const text = 'http://wire.com http://wire.com';
+
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBeFalsy();
   });
 
   it('should return false when text contains domain and other text', () => {
     const text = 'see this http://wire.com';
+
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBeFalsy();
   });
 });
@@ -56,23 +61,27 @@ describe('containsOnlyLink', () => {
 describe('getFirstLinkWithOffset', () => {
   it('should return undefined for simple text', () => {
     const text = 'foo bar baz';
+
     expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(text)).not.toBeDefined();
   });
 
   it('should return correct link and offset for single link without text)', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('wire.com');
+
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link with text in front)', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('Hey check wire.com');
+
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link surrounded by text )', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('Hey check wire.com PLEASE!');
+
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
@@ -81,6 +90,7 @@ describe('getFirstLinkWithOffset', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset(
       'wire.com wire.com wire.com wire.com wire.com'
     );
+
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });

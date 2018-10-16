@@ -20,7 +20,7 @@
 'use strict';
 
 describe('z.assets.AssetRemoteData', () => {
-  describe('load unencrypted asset', () => {
+  describe('load unencrypted v1 asset', () => {
     let remote_data = null;
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
@@ -34,14 +34,14 @@ describe('z.assets.AssetRemoteData', () => {
       );
     });
 
-    it('should load and decrypt asset', () => {
+    it('should load and decrypt v1 asset', () => {
       return remote_data.load().then(blob => {
         expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
       });
     });
   });
 
-  describe('load encrypted asset', () => {
+  describe('load encrypted v2 asset', () => {
     let remote_data = null;
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
@@ -60,7 +60,7 @@ describe('z.assets.AssetRemoteData', () => {
       });
     });
 
-    it('should load and decrypt asset', () => {
+    it('should load and decrypt v2 asset', () => {
       return remote_data.load().then(blob => {
         expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
       });

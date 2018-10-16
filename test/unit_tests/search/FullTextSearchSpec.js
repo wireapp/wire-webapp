@@ -59,6 +59,7 @@ describe('z.search.FullTextSearch', () => {
       expect(
         z.search.FullTextSearch.search('https://www.link.com/something-to-read?q=12&second#reader', 'something to read')
       ).toBeTruthy();
+
       expect(z.search.FullTextSearch.search('@peter', 'peter')).toBeTruthy();
       // expect(z.search.FullTextSearch.search('René', 'rene')).toBeTruthy()
       // expect(z.search.FullTextSearch.search('Håkon Bø', 'Ha')).toBeTruthy()

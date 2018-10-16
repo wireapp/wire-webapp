@@ -163,6 +163,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
 
       if (mockCryptobox) {
+        // eslint-disable-next-line jasmine/no-unsafe-spy
         spyOn(TestFactory.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
       }
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);

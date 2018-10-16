@@ -65,6 +65,7 @@ describe('z.location.LocationService', () => {
   describe('getMapsUrl', () => {
     it('should return the proper urls', () => {
       const locationService = new z.location.LocationService({});
+
       expect(locationService.getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
       expect(locationService.getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
       expect(locationService.getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');

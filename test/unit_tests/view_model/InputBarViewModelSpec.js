@@ -53,6 +53,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
       userEntity.name(userName);
 
       const mentionEntity = viewModel._createMentionEntity(userEntity);
+
       expect(mentionEntity.startIndex).toBe(3);
       expect(mentionEntity.length).toBe(38);
     });

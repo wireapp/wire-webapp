@@ -39,20 +39,24 @@ describe('z.auth.AuthRepository', () => {
     it('renews the access token immediately if expiring in the past', () => {
       const expiration_timestamp = Date.now() - 30000;
       TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
+
       expect(TestFactory.auth_repository.renewAccessToken).toHaveBeenCalled();
     });
 
     it('renews the access token immediately if expiring within the next minute', () => {
       const expiration_timestamp = Date.now() + 30000;
       TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
+
       expect(TestFactory.auth_repository.renewAccessToken).toHaveBeenCalled();
     });
 
     it('renews the access token at the scheduled time', () => {
       const expiration_timestamp = Date.now() + 60500;
       TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
+
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       jasmine.clock().tick(1000);
+
       expect(TestFactory.auth_repository.renewAccessToken).toHaveBeenCalled();
     });
 
@@ -62,13 +66,17 @@ describe('z.auth.AuthRepository', () => {
       const second_timestamp = Date.now() + 61000;
 
       TestFactory.auth_repository._scheduleTokenRefresh(first_timestamp);
+
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       jasmine.clock().tick(250);
+
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       TestFactory.auth_repository._scheduleTokenRefresh(second_timestamp);
+
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       expect(window.clearTimeout).toHaveBeenCalled();
       jasmine.clock().tick(1000);
+
       expect(TestFactory.auth_repository.renewAccessToken).toHaveBeenCalled();
     });
   });

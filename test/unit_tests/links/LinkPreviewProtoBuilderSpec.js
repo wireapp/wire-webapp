@@ -37,11 +37,13 @@ describe('LinkPreviewProtoBuilder', () => {
 
   it('returns undefined if no data is given', () => {
     const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData();
+
     expect(link_preview).not.toBeDefined();
   });
 
   it('returns undefined if data is an empty object', () => {
     const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData({});
+
     expect(link_preview).not.toBeDefined();
   });
 
@@ -50,6 +52,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getWireMock();
     delete mock.title;
     const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
+
     expect(link_preview).not.toBeDefined();
   });
 

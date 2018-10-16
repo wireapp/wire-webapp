@@ -111,17 +111,17 @@ describe('z.media.MediaStreamHandler', () => {
     it('toggles the audio state if MediaStream is available', () => {
       mediaStreamHandler.localMediaStream(true);
 
-      return mediaStreamHandler
-        .toggleAudioSend()
-        .then(() => expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled());
+      return mediaStreamHandler.toggleAudioSend().then(() => {
+        expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled();
+      });
     });
 
     it('toggles the audio state if MediaStream is unavailable', () => {
       mediaStreamHandler.localMediaStream(undefined);
 
-      return mediaStreamHandler
-        .toggleAudioSend()
-        .then(() => expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled());
+      return mediaStreamHandler.toggleAudioSend().then(() => {
+        expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled();
+      });
     });
   });
 

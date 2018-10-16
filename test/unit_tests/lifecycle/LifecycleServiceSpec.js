@@ -54,7 +54,9 @@ describe('z.lifecycle.LifecycleService', () => {
       const response_body = {version: '2017-03-14-15-05-prod'};
       window.fetch.returns(mock_response(response_body, 200));
 
-      return TestFactory.lifecycle_service.getVersion().then(version => expect(version).toBe(response_body.version));
+      return TestFactory.lifecycle_service.getVersion().then(version => {
+        expect(version).toBe(response_body.version);
+      });
     });
   });
 });

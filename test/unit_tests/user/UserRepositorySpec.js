@@ -53,9 +53,9 @@ describe('z.user.UserRepository', () => {
       });
 
       it('sets the connection status to cancelled', () => {
-        return TestFactory.user_repository
-          .cancelConnectionRequest(user_et)
-          .then(() => expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled());
+        return TestFactory.user_repository.cancelConnectionRequest(user_et).then(() => {
+          expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
+        });
       });
 
       it('it switches the conversation if requested', () => {
@@ -90,9 +90,11 @@ describe('z.user.UserRepository', () => {
         let connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
           connection_et_a.conversation_id
         );
+
         expect(connection_et).toBe(connection_et_a);
 
         connection_et = TestFactory.user_repository.get_connection_by_conversation_id('');
+
         expect(connection_et).not.toBeDefined();
       });
     });
@@ -134,7 +136,9 @@ describe('z.user.UserRepository', () => {
             expect(response.length).toBe(0);
             return TestFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
           })
-          .then(response => expect(response.length).toBe(0));
+          .then(response => {
+            expect(response.length).toBe(0);
+          });
       });
     });
 
@@ -151,7 +155,9 @@ describe('z.user.UserRepository', () => {
       });
 
       it('should find an existing user', () => {
-        return TestFactory.user_repository.findUserById(user.id).then(user_et => expect(user_et).toEqual(user));
+        return TestFactory.user_repository.findUserById(user.id).then(user_et => {
+          expect(user_et).toEqual(user);
+        });
       });
 
       it('should not find an unknown user', done => {
@@ -238,9 +244,9 @@ describe('z.user.UserRepository', () => {
           JSON.stringify(usernames),
         ]);
 
-        return TestFactory.user_repository
-          .verify_usernames(usernames)
-          .then(_usernames => expect(_usernames).toEqual(usernames));
+        return TestFactory.user_repository.verify_usernames(usernames).then(_usernames => {
+          expect(_usernames).toEqual(usernames);
+        });
       });
 
       it('rejects when username is taken', () => {
@@ -251,9 +257,9 @@ describe('z.user.UserRepository', () => {
           JSON.stringify([]),
         ]);
 
-        return TestFactory.user_repository
-          .verify_usernames(usernames)
-          .then(_usernames => expect(_usernames.length).toBe(0));
+        return TestFactory.user_repository.verify_usernames(usernames).then(_usernames => {
+          expect(_usernames.length).toBe(0);
+        });
       });
     });
 
@@ -266,9 +272,9 @@ describe('z.user.UserRepository', () => {
           '',
         ]);
 
-        return TestFactory.user_repository
-          .verify_username(username)
-          .then(_username => expect(_username).toBe(username));
+        return TestFactory.user_repository.verify_username(username).then(_username => {
+          expect(_username).toBe(username);
+        });
       });
 
       it('rejects when username is taken', done => {

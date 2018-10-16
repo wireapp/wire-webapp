@@ -52,7 +52,9 @@ describe('z.util.StringUtil', () => {
 
   describe('getRandomChar', () => {
     it('always returns an alphanumeric character', () => {
-      _.range(1000).map(() => expect(z.util.StringUtil.getRandomChar()).toMatch(/(\w|\d){1}/));
+      _.range(1000).map(() => {
+        expect(z.util.StringUtil.getRandomChar()).toMatch(/(\w|\d){1}/);
+      });
     });
   });
 
@@ -84,6 +86,7 @@ describe('z.util.StringUtil', () => {
       const text =
         'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ';
       const obfuscated = z.util.StringUtil.obfuscate(text);
+
       expect(obfuscated).not.toBe(text);
       expect(obfuscated.length).toBe(text.length);
     });
@@ -91,6 +94,7 @@ describe('z.util.StringUtil', () => {
     it('obfuscates a text keeping its length (commas)', () => {
       const text = ',,,,,,';
       const obfuscated = z.util.StringUtil.obfuscate(text);
+
       expect(obfuscated).not.toBe(text);
       expect(obfuscated.length).toBe(text.length);
     });
@@ -98,6 +102,7 @@ describe('z.util.StringUtil', () => {
     it('obfuscates a text keeping its length (dots)', () => {
       const text = '......';
       const obfuscated = z.util.StringUtil.obfuscate(text);
+
       expect(obfuscated).not.toBe(text);
       expect(obfuscated.length).toBe(text.length);
     });
@@ -131,6 +136,7 @@ describe('z.util.StringUtil', () => {
       const text = `Secure ${pivot} for everyone.`;
 
       const actual = z.util.StringUtil.splitAtPivotElement(text, pivot, replacement);
+
       expect(actual.length).toBe(3);
       expect(actual[1].text).toBe(replacement);
       expect(actual[0].isStyled).toBe(false);
@@ -144,6 +150,7 @@ describe('z.util.StringUtil', () => {
       const turkish = `${pivot} ’da aktif edildi`;
 
       const actual = z.util.StringUtil.splitAtPivotElement(turkish, pivot, replacement);
+
       expect(actual.length).toBe(2);
       expect(actual[0].text).toBe(replacement);
       expect(actual[0].isStyled).toBe(true);
@@ -156,6 +163,7 @@ describe('z.util.StringUtil', () => {
       const greek = `Ενεργοποιήθηκε στις ${pivot}`;
 
       const actual = z.util.StringUtil.splitAtPivotElement(greek, pivot, replacement);
+
       expect(actual.length).toBe(2);
       expect(actual[1].text).toBe(replacement);
       expect(actual[1].isStyled).toBe(true);
@@ -168,6 +176,7 @@ describe('z.util.StringUtil', () => {
       const finish = `Aktivoitu ${pivot}: ssa`;
 
       const actual = z.util.StringUtil.splitAtPivotElement(finish, pivot, replacement);
+
       expect(actual.length).toBe(3);
       expect(actual[0].isStyled).toBe(false);
       expect(actual[1].text).toBe(replacement);
@@ -181,6 +190,7 @@ describe('z.util.StringUtil', () => {
       const english = `Activated on ${pivot}`;
 
       const actual = z.util.StringUtil.splitAtPivotElement(english, pivot, replacement);
+
       expect(actual.length).toBe(2);
       expect(actual[0].isStyled).toBe(false);
       expect(actual[1].text).toBe(replacement);
@@ -190,6 +200,7 @@ describe('z.util.StringUtil', () => {
     it('returns the initial string when no pivot element is provided', () => {
       const english = `Activated on 22:42`;
       const actual = z.util.StringUtil.splitAtPivotElement(english);
+
       expect(actual.length).toBe(1);
       expect(actual[0].isStyled).toBe(false);
       expect(actual[0].text).toBe(english);
@@ -212,24 +223,28 @@ describe('z.util.StringUtil', () => {
   describe('truncate', () => {
     it('returns the full string if it is shorter than the target length', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 90);
+
       expect(text.length).toBe(80);
       expect(text.charAt(79)).not.toBe('…');
     });
 
     it('returns a truncated string of correct length if it is longer than the target length', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 70);
+
       expect(text.length).toBe(64);
       expect(text.charAt(63)).toBe('…');
     });
 
     it('returns a truncated string of correct length if word boundary is disabled', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 70, false);
+
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');
     });
 
     it('returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.replace(/\s/g, '').substr(0, 80)}`, 70);
+
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');
     });

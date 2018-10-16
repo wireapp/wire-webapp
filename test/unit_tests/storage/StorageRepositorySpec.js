@@ -33,9 +33,9 @@ describe('z.storage.StorageRepository', () => {
       const primary_key = 'test_key';
       const primitive_value = 'test_value';
 
-      return TestFactory.storage_repository
-        .saveValue(primary_key, primitive_value)
-        .then(storage_key => expect(storage_key).toBe(primary_key));
+      return TestFactory.storage_repository.saveValue(primary_key, primitive_value).then(storage_key => {
+        expect(storage_key).toBe(primary_key);
+      });
     });
   });
 });

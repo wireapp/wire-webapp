@@ -46,11 +46,13 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
   describe('initiateTitleUpdates', () => {
     beforeEach(() => jasmine.clock().install());
+
     afterEach(() => jasmine.clock().uninstall());
 
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(suffix);
     });
 
@@ -62,6 +64,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${selected_conversation.name()} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -81,6 +84,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.initiateTitleUpdates();
 
       const expected_title = `(1) ${conversationEntity.name()} · ${suffix}`;
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -105,11 +109,13 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       title_view_model.conversationRepository.conversations_unarchived.push(selected_conversation);
       title_view_model.conversationRepository.conversations_unarchived.push(muted_conversation);
+
       expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(2);
 
       // Check title when there are no messages
       title_view_model.initiateTitleUpdates();
       let expected_title = `${selected_conversation.name()} · ${suffix}`;
+
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the muted conversation
@@ -124,6 +130,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       // Check title when there are messages in the muted conversation
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the selected conversation
@@ -135,6 +142,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       // Check title when there are messages in the selected conversation
       title_view_model.initiateTitleUpdates();
       expected_title = `(1) ${selected_conversation.name()} · ${suffix}`;
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -143,6 +151,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${z.string.preferencesAbout} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -151,6 +160,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${z.string.preferencesAccount} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -159,6 +169,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${z.string.preferencesAV} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -167,6 +178,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${z.string.preferencesDeviceDetails} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -175,6 +187,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${z.string.preferencesDevices} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -183,6 +196,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
 
       const expected_title = `${z.string.preferencesOptions} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
     });
 
@@ -202,6 +216,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       let expectedWaitingPeople = '1';
       let expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
+
       expect(window.document.title).toBe(expected_title);
 
       // Test multiple connect request messages and observe the title change
@@ -210,6 +225,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
         expectedWaitingPeople = '2';
         message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
         expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
+
         expect(window.document.title).toBe(expected_title);
         done();
       });
