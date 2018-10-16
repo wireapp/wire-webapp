@@ -18,7 +18,7 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {ClientInfo} from '@wireapp/core/dist/client/';
+import {ClientInfo} from '@wireapp/core/dist/client/root';
 import * as Environment from '../../Environment';
 import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';

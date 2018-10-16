@@ -27,7 +27,6 @@ import {Link as RRLink} from 'react-router-dom';
 import {verifyStrings} from '../../strings';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
@@ -36,7 +35,7 @@ import Page from './Page';
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
-  account: RegistrationDataState;
+  account: RegisterData;
   authError: Error;
   currentFlow: string;
 }
