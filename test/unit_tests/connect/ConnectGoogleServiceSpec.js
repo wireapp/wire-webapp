@@ -24,12 +24,7 @@
 describe('z.connect.ConnectGoogleService', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeConnectActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeConnectActors());
 
   describe('getContacts', () => {
     const access_token = 'access_token';
@@ -40,19 +35,18 @@ describe('z.connect.ConnectGoogleService', () => {
       spyOn(TestFactory.connectGoogleService, '_getContacts').and.returnValue(Promise.resolve());
     });
 
-    it('initializes the authentication library if previously was not', done => {
+    it('initializes the authentication library if previously was not', () => {
       spyOn(TestFactory.connectGoogleService, '_getAccessToken').and.returnValue(Promise.resolve());
 
-      TestFactory.connectGoogleService.getContacts().then(() => {
+      return TestFactory.connectGoogleService.getContacts().then(() => {
         expect(TestFactory.connectGoogleService._initLibrary).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._loadLibrary).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._getAccessToken).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._getContacts).toHaveBeenCalled();
-        done();
       });
     });
 
-    it('it requests an access token if none has been set', done => {
+    it('it requests an access token if none has been set', () => {
       window.gapi = {
         auth: {
           getToken() {
@@ -65,18 +59,17 @@ describe('z.connect.ConnectGoogleService', () => {
       spyOn(window.gapi.auth, 'getToken').and.callThrough();
       spyOn(TestFactory.connectGoogleService, '_authenticate').and.returnValue(Promise.resolve());
 
-      TestFactory.connectGoogleService.getContacts().then(() => {
+      return TestFactory.connectGoogleService.getContacts().then(() => {
         expect(TestFactory.connectGoogleService._initLibrary).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._loadLibrary).not.toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._getAccessToken).toHaveBeenCalled();
         expect(window.gapi.auth.getToken).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._authenticate).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._getContacts).toHaveBeenCalled();
-        done();
       });
     });
 
-    it('it uses an available access token to request contacts', done => {
+    it('it uses an available access token to request contacts', () => {
       window.gapi = {
         auth: {
           getToken() {
@@ -89,14 +82,13 @@ describe('z.connect.ConnectGoogleService', () => {
       spyOn(window.gapi.auth, 'getToken').and.callThrough();
       spyOn(TestFactory.connectGoogleService, '_authenticate');
 
-      TestFactory.connectGoogleService.getContacts().then(() => {
+      return TestFactory.connectGoogleService.getContacts().then(() => {
         expect(TestFactory.connectGoogleService._initLibrary).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._loadLibrary).not.toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._getAccessToken).toHaveBeenCalled();
         expect(window.gapi.auth.getToken).toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._authenticate).not.toHaveBeenCalled();
         expect(TestFactory.connectGoogleService._getContacts).toHaveBeenCalled();
-        done();
       });
     });
   });

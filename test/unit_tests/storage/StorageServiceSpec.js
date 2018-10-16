@@ -24,16 +24,9 @@
 describe('z.storage.StorageRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeStorageActors());
 
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
+  beforeEach(() => TestFactory.storage_repository.clearStores());
 
   describe('save', () => {
     it('does not save "null" values', done => {

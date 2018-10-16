@@ -28,20 +28,14 @@ describe('ClientMismatchHandler', () => {
 
   beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
-  beforeEach(done => {
-    testFactory
-      .exposeConversationActors()
-      .then(conversationRepository => {
-        conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
-        return conversationRepository.save_conversation(conversationEntity);
-      })
-      .then(done)
-      .catch(done.fail);
+  beforeEach(() => {
+    return testFactory.exposeConversationActors().then(conversationRepository => {
+      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      return conversationRepository.save_conversation(conversationEntity);
+    });
   });
 
-  afterEach(() => {
-    TestFactory.conversation_repository.conversations.removeAll();
-  });
+  afterEach(() => TestFactory.conversation_repository.conversations.removeAll());
 
   describe('onClientMismatch', () => {
     let clientMismatch = undefined;
