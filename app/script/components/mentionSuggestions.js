@@ -107,9 +107,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
   }
 
   updateScrollPosition(selectedNumber) {
-    const scrollContent = document.querySelector(
-      '.conversation-input-bar-mention-suggestion > .simplebar-scroll-content'
-    );
+    const scrollContentSelector = '.conversation-input-bar-mention-suggestion > .simplebar-scroll-content';
+    const scrollContent = document.querySelector(scrollContentSelector);
     if (!scrollContent) {
       return;
     }
