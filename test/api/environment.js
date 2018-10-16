@@ -22,3 +22,9 @@
 navigator.__defineGetter__('language', () => {
   return 'en';
 });
+
+window.wire = {
+  env: {
+    ENVIRONMENT: 'development',
+  },
+};
