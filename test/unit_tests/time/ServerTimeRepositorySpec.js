@@ -31,27 +31,51 @@ describe('z.time.ServerTimeRepository', () => {
     });
   });
 
-  describe('adjustTimestamp', () => {
+  describe('toServerTimestamp', () => {
     it('warns that adjustments cannot be done when server time is not set', () => {
       spyOn(serverTimeRepository.logger, 'warn');
       const timestamp = 10;
 
-      const adjustedTimestamp = serverTimeRepository.adjustTimestamp(timestamp);
+      const adjustedTimestamp = serverTimeRepository.toServerTimestamp(timestamp);
 
       expect(adjustedTimestamp).toEqual(timestamp);
       expect(serverTimeRepository.logger.warn).toHaveBeenCalled();
     });
 
-    it('adjust timestamp according to time shift between server and client', () => {
+    it('converts a local timestamp to a server timestamp', () => {
       const serverTime = new Date();
       const timeOffset = 10;
       serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
       serverTimeRepository.computeTimeOffset(serverTime.toISOString());
       const timestamp = 10;
 
-      const adjustedTimestamp = serverTimeRepository.adjustTimestamp(timestamp);
+      const adjustedTimestamp = serverTimeRepository.toServerTimestamp(timestamp);
 
       expect(adjustedTimestamp).toEqual(timestamp - timeOffset);
+    });
+  });
+
+  describe('toLocalTimestamp', () => {
+    it('warns that adjustments cannot be done when server time is not set', () => {
+      spyOn(serverTimeRepository.logger, 'warn');
+      const timestamp = 10;
+
+      const adjustedTimestamp = serverTimeRepository.toLocalTimestamp(timestamp);
+
+      expect(adjustedTimestamp).toEqual(timestamp);
+      expect(serverTimeRepository.logger.warn).toHaveBeenCalled();
+    });
+
+    it('converts a server timestamp to a local timestamp', () => {
+      const serverTime = new Date();
+      const timeOffset = 10;
+      serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
+      serverTimeRepository.computeTimeOffset(serverTime.toISOString());
+      const timestamp = 10;
+
+      const adjustedTimestamp = serverTimeRepository.toLocalTimestamp(timestamp);
+
+      expect(adjustedTimestamp).toEqual(timestamp + timeOffset);
     });
   });
 });

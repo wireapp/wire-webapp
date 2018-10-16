@@ -897,7 +897,7 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const correctedTimestamp = this.serverTimeRepository.adjustTimestamp(new Date().getTime());
+    const correctedTimestamp = this.serverTimeRepository.toServerTimestamp();
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const isForcedEventType = forcedEventTypes.includes(content.type);

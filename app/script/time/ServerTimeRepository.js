@@ -34,19 +34,28 @@ z.time.ServerTimeRepository = class ServerTimeRepository {
   }
 
   getTimeOffset() {
+    if (this._timeOffset === undefined) {
+      this.logger.warn('Trying to adjust timestamp, but no server timestamp set');
+      return 0;
+    }
     return this._timeOffset;
   }
 
   /**
-   * Will adjust the give timestamp according to the time shift between the client and the server.
-   * @param {number} [timestamp = Date.now()] - the initial timestamp
-   * @returns {number} adjustedTimestamp - the timestamp adjusted with the client/server time shift
+   * Converts a local timestamp to a server timestamp.
+   * @param {number} [localTimestamp = Date.now()] - the local timestamp to convert
+   * @returns {number} serverTimestamp - the timestamp adjusted with the client/server time shift
    */
-  adjustTimestamp(timestamp = Date.now()) {
-    if (this._timeOffset === undefined) {
-      this.logger.warn('Trying to adjust timestamp, but no server timestamp set');
-      return timestamp;
-    }
-    return timestamp - this._timeOffset;
+  toServerTimestamp(localTimestamp = Date.now()) {
+    return localTimestamp - this.getTimeOffset();
+  }
+
+  /**
+   * Converts a server timestamp to a local timestamp.
+   * @param {number} [serverTimestamp = Date.now()] - the server timestamp to convert
+   * @returns {number} localTimestamp - the timestamp adjusted with the client/server time shift
+   */
+  toLocalTimestamp(serverTimestamp = Date.now()) {
+    return serverTimestamp + this.getTimeOffset();
   }
 };

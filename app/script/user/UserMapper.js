@@ -128,7 +128,7 @@ z.user.UserMapper = class UserMapper {
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
-      const adjustedTimestamp = this.serverTimeRepository.adjustTimestamp(new Date(expirationDate).getTime());
+      const adjustedTimestamp = this.serverTimeRepository.toLocalTimestamp(new Date(expirationDate).getTime());
       userEntity.setGuestExpiration(adjustedTimestamp);
     }
 
