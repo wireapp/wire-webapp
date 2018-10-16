@@ -38,7 +38,7 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
     };
   },
-  buildAllVerified(conversationEntity, timeOffset) {
+  buildAllVerified(conversationEntity, currentTimestamp) {
     return {
       conversation: conversationEntity.id,
       data: {
@@ -46,17 +46,17 @@ z.conversation.EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: z.util.createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   },
-  buildAssetAdd(conversationEntity, data, timeOffset) {
+  buildAssetAdd(conversationEntity, data, currentTimestamp) {
     return {
       conversation: conversationEntity.id,
       data: data,
       from: conversationEntity.selfUser().id,
       status: z.message.StatusType.SENDING,
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   },
@@ -69,7 +69,7 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CALL.E_CALL,
     };
   },
-  buildDegraded(conversationEntity, userIds, type, timeOffset) {
+  buildDegraded(conversationEntity, userIds, type, currentTimestamp) {
     return {
       conversation: conversationEntity.id,
       data: {
@@ -78,7 +78,7 @@ z.conversation.EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: z.util.createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   },
@@ -145,33 +145,33 @@ z.conversation.EventBuilder = {
       type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
     };
   },
-  buildMemberLeave(conversationEntity, userId, removedBySelfUser, timeOffset) {
+  buildMemberLeave(conversationEntity, userId, removedBySelfUser, currentTimestamp) {
     return {
       conversation: conversationEntity.id,
       data: {
         user_ids: [userId],
       },
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     };
   },
-  buildMessageAdd(conversationEntity, timeOffset) {
+  buildMessageAdd(conversationEntity, currentTimestamp) {
     return {
       conversation: conversationEntity.id,
       data: {},
       from: conversationEntity.selfUser().id,
       status: z.message.StatusType.SENDING,
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   },
-  buildMissed(conversationEntity, timeOffset) {
+  buildMissed(conversationEntity, currentTimestamp) {
     return {
       conversation: conversationEntity.id,
       from: conversationEntity.selfUser().id,
       id: z.util.createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(timeOffset),
+      time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: z.event.Client.CONVERSATION.MISSED_MESSAGES,
     };
   },
@@ -213,9 +213,9 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   },
-  buildVoiceChannelDeactivate(callMessageEntity, reason, timeOffset = 0) {
+  buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp = 0) {
     const {conversationId, userId} = callMessageEntity;
-    const time = callMessageEntity.time || new Date(z.util.TimeUtil.adjustCurrentTimestamp(timeOffset)).toISOString();
+    const time = callMessageEntity.time || new Date(currentTimestamp).toISOString();
 
     return {
       conversation: conversationId,

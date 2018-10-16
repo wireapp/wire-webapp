@@ -20,11 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.server = z.server || {};
+window.z.time = z.time || {};
 
-z.server.ServerTimeOffsetRepository = class ServerTimeOffsetRepository {
+z.time.ServerTimeRepository = class ServerTimeRepository {
   constructor() {
-    this.logger = new z.util.Logger('z.server.ServerTimeOffsetRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
     this._timeOffset = undefined;
   }
 
@@ -33,11 +33,29 @@ z.server.ServerTimeOffsetRepository = class ServerTimeOffsetRepository {
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this._timeOffset}' ms`);
   }
 
-  adjustTimestamp(timestamp = 0) {
+  getTimeOffset() {
     if (this._timeOffset === undefined) {
-      this.logger.warn('Trying to adjust timestamp, but no server timestamp set');
-      return timestamp;
+      this.logger.warn('Trying to get server/client time offset, but no server time has been set.');
+      return 0;
     }
-    return timestamp - this._timeOffset;
+    return this._timeOffset;
+  }
+
+  /**
+   * Converts a local timestamp to a server timestamp.
+   * @param {number} [localTimestamp = Date.now()] - the local timestamp to convert
+   * @returns {number} serverTimestamp - the timestamp adjusted with the client/server time shift
+   */
+  toServerTimestamp(localTimestamp = Date.now()) {
+    return localTimestamp - this.getTimeOffset();
+  }
+
+  /**
+   * Converts a server timestamp to a local timestamp.
+   * @param {number} [serverTimestamp = Date.now()] - the server timestamp to convert
+   * @returns {number} localTimestamp - the timestamp adjusted with the client/server time shift
+   */
+  toLocalTimestamp(serverTimestamp = Date.now()) {
+    return serverTimestamp + this.getTimeOffset();
   }
 };

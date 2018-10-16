@@ -22,7 +22,7 @@
 // grunt test_init && grunt test_run:user/UserMapper
 
 describe('User Mapper', () => {
-  const mapper = new z.user.UserMapper();
+  const mapper = new z.user.UserMapper(new z.time.ServerTimeRepository());
 
   let self_user_payload = null;
 
@@ -123,6 +123,22 @@ describe('User Mapper', () => {
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
+    });
+
+    it("converts user's expiration date to local timestamp", () => {
+      const userEntity = new z.entity.User();
+      userEntity.id = entities.user.john_doe.id;
+      const expirationDate = new Date('2018-10-16T09:16:41.294Z');
+      const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
+
+      spyOn(mapper.serverTimeRepository, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
+      spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp =>
+        expect(timestamp).toEqual(adjustedExpirationDate.getTime())
+      );
+
+      const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
+      mapper.updateUserFromObject(userEntity, data);
+      expect(mapper.serverTimeRepository.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
     it('cannot update the user name of a wrong user', () => {

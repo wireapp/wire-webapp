@@ -37,7 +37,7 @@ describe('z.conversation.EventBuilder', () => {
   });
 
   it('buildAllVerified', done => {
-    const event = z.conversation.EventBuilder.buildAllVerified(conversation_et);
+    const event = z.conversation.EventBuilder.buildAllVerified(conversation_et, 0);
     event_mapper
       .mapJsonEvent(event, conversation_et)
       .then(messageEntity => {
@@ -56,7 +56,8 @@ describe('z.conversation.EventBuilder', () => {
     const event = z.conversation.EventBuilder.buildDegraded(
       conversation_et,
       user_ids,
-      z.message.VerificationMessageType.NEW_DEVICE
+      z.message.VerificationMessageType.NEW_DEVICE,
+      0
     );
     event_mapper
       .mapJsonEvent(event, conversation_et)
@@ -73,7 +74,7 @@ describe('z.conversation.EventBuilder', () => {
   });
 
   it('buildMissed', done => {
-    const event = z.conversation.EventBuilder.buildMissed(conversation_et);
+    const event = z.conversation.EventBuilder.buildMissed(conversation_et, 0);
     event_mapper
       .mapJsonEvent(event, conversation_et)
       .then(messageEntity => {

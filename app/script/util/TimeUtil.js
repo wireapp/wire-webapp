@@ -48,11 +48,6 @@ z.util.TimeUtil = {
     YEAR: 1000 * 60 * 60 * 24 * 365,
   },
 
-  adjustCurrentTimestamp: function(timeOffset) {
-    timeOffset = _.isNumber(timeOffset) ? timeOffset : 0;
-    return Date.now() - timeOffset;
-  },
-
   durationUnits: () => {
     return [
       {
