@@ -825,9 +825,10 @@
   version "2.4.1"
   resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/4fa305890b8a99a64a190a0f4d6572cbf8b6b8ab"
 
-"@bower_components/knockout@knockout/knockout#3.4.1":
-  version "3.4.1"
-  resolved "https://codeload.github.com/knockout/knockout/tar.gz/7a83820efc96d47742e2f8c9b4fcd2459c81dd21"
+"@bower_components/knockout@knockout/knockout#v3.4.2":
+  version "3.4.2"
+  uid "4888305843439159bf100bd74e41768fd8650d1d"
+  resolved "https://codeload.github.com/knockout/knockout/tar.gz/4888305843439159bf100bd74e41768fd8650d1d"
 
 "@bower_components/libsodium.js@jedisct1/libsodium.js#0.7.3":
   version "0.7.3"
