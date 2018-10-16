@@ -84,9 +84,7 @@ describe('z.client.ClientRepository', () => {
       server.autoRespond = true;
     });
 
-    afterEach(() => {
-      server.restore();
-    });
+    afterEach(() => server.restore());
 
     it('resolves with a valid client', () => {
       spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
@@ -152,21 +150,18 @@ describe('z.client.ClientRepository', () => {
     it('returns a proper primary key for a client', () => {
       const actualPrimaryKey = TestFactory.client_repository._constructPrimaryKey(userId, clientId);
       const expectedPrimaryKey = `${userId}@${clientId}`;
-      return;
 
       expect(actualPrimaryKey).toEqual(expectedPrimaryKey);
     });
 
     it('throws an error if missing user ID', () => {
       const functionCall = () => TestFactory.client_repository._constructPrimaryKey(undefined, clientId);
-      return;
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
     });
 
-    return it('throws and error if missing client ID', () => {
+    it('throws and error if missing client ID', () => {
       const functionCall = () => TestFactory.client_repository._constructPrimaryKey(userId, undefined);
-      return;
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
     });
@@ -231,9 +226,7 @@ describe('z.client.ClientRepository', () => {
   });
 
   describe('_isCurrentClient', () => {
-    beforeEach(() => {
-      TestFactory.client_repository.currentClient(undefined);
-    });
+    beforeEach(() => TestFactory.client_repository.currentClient(undefined));
 
     it('returns true if user ID and client ID match', () => {
       const clientEntity = new z.client.ClientEntity();
