@@ -56,7 +56,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
       this.updateScrollPosition(this.selectedSuggestionIndex());
     });
 
-    this.shouldUpdateScrollbar = ko.pureComputed(() => this.suggestions()).extend({notify: 'always', rateLimit: 100});
+    this.shouldUpdateScrollbar = ko.pureComputed(this.suggestions).extend({notify: 'always', rateLimit: 100});
   }
 
   setWrapperSize(size = '') {
