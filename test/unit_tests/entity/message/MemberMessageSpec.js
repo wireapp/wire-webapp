@@ -33,6 +33,7 @@ describe('Message Entities', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
+
       expect(message_et._generateNameString()).toBe('[bold]John[/bold]');
     });
 
@@ -42,6 +43,7 @@ describe('Message Entities', () => {
       const user_b = new z.entity.User(z.util.createRandomUuid());
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
+
       expect(message_et._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
@@ -53,6 +55,7 @@ describe('Message Entities', () => {
       const user_c = new z.entity.User(z.util.createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
+
       expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
 
@@ -68,6 +71,7 @@ describe('Message Entities', () => {
       const user_c = new z.entity.User(z.util.createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
+
       expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
   });
@@ -81,6 +85,7 @@ describe('Message Entities', () => {
 
     it('should return true when message is not a file', () => {
       message_et.assets.push(new z.entity.Text());
+
       expect(message_et.is_deletable()).toBeTruthy();
     });
 
@@ -89,9 +94,11 @@ describe('Message Entities', () => {
       message_et.assets.push(file_et);
 
       file_et.status(z.assets.AssetTransferState.DOWNLOADING);
+
       expect(message_et.is_deletable()).toBeFalsy();
 
       file_et.status(z.assets.AssetTransferState.UPLOADING);
+
       expect(message_et.is_deletable()).toBeFalsy();
     });
 
@@ -99,6 +106,7 @@ describe('Message Entities', () => {
       const file_et = new z.entity.File();
       file_et.status(z.assets.AssetTransferState.UPLOADED);
       message_et.assets.push(file_et);
+
       expect(message_et.is_deletable()).toBeTruthy();
     });
   });
@@ -116,11 +124,13 @@ describe('Message Entities', () => {
 
     it('should return false for Text asset', () => {
       message_et.assets.push(new z.entity.Text());
+
       expect(message_et.has_asset_file()).toBeFalsy();
     });
 
     it('should return true for File asset', () => {
       message_et.assets.push(new z.entity.File());
+
       expect(message_et.has_asset_file()).toBeTruthy();
     });
   });

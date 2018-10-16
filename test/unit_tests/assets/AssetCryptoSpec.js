@@ -26,7 +26,9 @@ describe('AssetsCrypto', () => {
 
     return z.assets.AssetCrypto.encryptAesAsset(bytes.buffer)
       .then(({cipherText, keyBytes, sha256}) => z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, sha256))
-      .then(buffer => expect(buffer).toEqual(bytes.buffer));
+      .then(buffer => {
+        expect(buffer).toEqual(bytes.buffer);
+      });
   });
 
   it('should not decrypt when hash is missing', done => {

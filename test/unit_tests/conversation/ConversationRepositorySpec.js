@@ -133,6 +133,7 @@ describe('ConversationRepository', () => {
         expect(TestFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
         const [firstAsset] = message_et.assets();
+
         expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
         expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
         expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
@@ -174,11 +175,14 @@ describe('ConversationRepository', () => {
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversation_et)
       );
+
       expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
 
       return TestFactory.conversation_repository
         .deleteMessageForEveryone(conversation_et, messageEntityToDelete)
-        .then(() => expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined());
+        .then(() => {
+          expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined();
+        });
     });
   });
 
@@ -190,6 +194,7 @@ describe('ConversationRepository', () => {
         expect(
           _find_conversation(self_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeNull();
+
         expect(
           _find_conversation(self_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeNull();
@@ -206,6 +211,7 @@ describe('ConversationRepository', () => {
         expect(
           _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeNull();
+
         expect(
           _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeNull();
@@ -222,6 +228,7 @@ describe('ConversationRepository', () => {
         expect(
           _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeNull();
+
         expect(
           _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeNull();
@@ -238,6 +245,7 @@ describe('ConversationRepository', () => {
         expect(
           _find_conversation(pending_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeNull();
+
         expect(
           _find_conversation(pending_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeNull();
@@ -305,28 +313,35 @@ describe('ConversationRepository', () => {
 
     it('should return expected matches', () => {
       let result = TestFactory.conversation_repository.getGroupsByName('Web Dudes');
+
       expect(result.length).toBe(1);
 
       result = TestFactory.conversation_repository.getGroupsByName('Dudes');
+
       expect(result.length).toBe(1);
 
       result = TestFactory.conversation_repository.getGroupsByName('e');
+
       expect(result.length).toBe(3);
 
       result = TestFactory.conversation_repository.getGroupsByName('Rene');
+
       expect(result.length).toBe(1);
 
       result = TestFactory.conversation_repository.getGroupsByName('John');
+
       expect(result.length).toBe(1);
     });
 
     it('should return a cleared group with the user still being member of it', () => {
       const result = TestFactory.conversation_repository.getGroupsByName('Cleared');
+
       expect(result.length).toBe(1);
     });
 
     it('should not return a cleared group that the user left', () => {
       const result = TestFactory.conversation_repository.getGroupsByName('Removed');
+
       expect(result.length).toBe(0);
     });
   });
@@ -335,21 +350,25 @@ describe('ConversationRepository', () => {
     it('should return number of pending uploads if there are pending uploads', () => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
     });
 
     it('should return 0 if there are no pending uploads', () => {
       conversation_et.add_message(new z.entity.Message(z.util.createRandomUuid()));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(0);
     });
   });
@@ -372,7 +391,9 @@ describe('ConversationRepository', () => {
         .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
         .catch(() => storage_service.save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
-        .then(loaded_events => expect(loaded_events.length).toBe(1));
+        .then(loaded_events => {
+          expect(loaded_events.length).toBe(1);
+        });
     });
   });
 
@@ -558,12 +579,14 @@ describe('ConversationRepository', () => {
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
             return TestFactory.conversation_repository._handleConversationEvent(upload_cancel);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(0);
           });
       });
@@ -588,12 +611,14 @@ describe('ConversationRepository', () => {
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
             return TestFactory.conversation_repository._handleConversationEvent(upload_cancel);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(0);
           });
       });
@@ -618,12 +643,14 @@ describe('ConversationRepository', () => {
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
             return TestFactory.conversation_repository._handleConversationEvent(upload_failed);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
           });
       });
@@ -918,7 +945,9 @@ describe('ConversationRepository', () => {
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeTruthy());
+        .then(shouldSendAsExternal => {
+          expect(shouldSendAsExternal).toBeTruthy();
+        });
     });
 
     it('should return false for small payload', () => {
@@ -934,7 +963,9 @@ describe('ConversationRepository', () => {
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeFalsy());
+        .then(shouldSendAsExternal => {
+          expect(shouldSendAsExternal).toBeFalsy();
+        });
     });
   });
 
@@ -959,6 +990,7 @@ describe('ConversationRepository', () => {
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
         (conversationId, genericMessage, payload, preconditionOption) => {
           const {content, ephemeral} = genericMessage;
+
           expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
           expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
           expect(ephemeral.expire_after_millis.toString()).toBe(expectedValues.shift());

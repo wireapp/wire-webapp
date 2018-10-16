@@ -33,6 +33,7 @@ describe('User Mapper', () => {
   describe('map_user_from_object', () => {
     it('can convert JSON into a single user entity', () => {
       const user_et = mapper.map_user_from_object(self_user_payload);
+
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.phone()).toBe('+49177123456');
@@ -42,6 +43,7 @@ describe('User Mapper', () => {
 
     it('returns undefined if input was undefined', () => {
       const user = mapper.map_user_from_object(undefined);
+
       expect(user).toBeUndefined();
     });
 
@@ -49,12 +51,14 @@ describe('User Mapper', () => {
       self_user_payload.picture[0].info.public = false;
       self_user_payload.picture[1].info.public = false;
       const user_et = mapper.map_user_from_object(self_user_payload);
+
       expect(user_et.name()).toBe('John Doe');
     });
 
     it('will return default accent color if null/undefined', () => {
       self_user_payload.accent_id = null;
       const user_et = mapper.map_user_from_object(self_user_payload);
+
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
@@ -62,6 +66,7 @@ describe('User Mapper', () => {
     it('will return default accent color if backend returns 0', () => {
       self_user_payload.accent_id = 0;
       const user_et = mapper.map_user_from_object(self_user_payload);
+
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.joaatHash).toBe(526273169);
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
@@ -71,6 +76,7 @@ describe('User Mapper', () => {
   describe('map_self_user_from_object', () =>
     it('can convert JSON into a single user entity', () => {
       const user_et = mapper.map_self_user_from_object(self_user_payload);
+
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.phone()).toBe('+49177123456');
@@ -82,6 +88,7 @@ describe('User Mapper', () => {
   describe('map_users_from_object', () => {
     it('can convert JSON into multiple user entities', () => {
       const user_ets = mapper.map_users_from_object(payload.users.get.many);
+
       expect(user_ets.length).toBe(2);
       expect(user_ets[0].email()).toBe('jd@wire.com');
       expect(user_ets[1].name()).toBe('Jane Roe');
@@ -89,12 +96,14 @@ describe('User Mapper', () => {
 
     it('returns an empty array if input was undefined', () => {
       const user_ets = mapper.map_users_from_object(undefined);
+
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
     });
 
     it('returns an empty array if input was an empty array', () => {
       const user_ets = mapper.map_users_from_object([]);
+
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
     });
@@ -106,6 +115,7 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
+
       expect(updated_user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
 
@@ -114,6 +124,7 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
+
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
 
@@ -122,6 +133,7 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
+
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
 
@@ -132,12 +144,13 @@ describe('User Mapper', () => {
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
 
       spyOn(mapper.serverTimeRepository, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
-      spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp =>
-        expect(timestamp).toEqual(adjustedExpirationDate.getTime())
-      );
+      spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp => {
+        expect(timestamp).toEqual(adjustedExpirationDate.getTime());
+      });
 
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data);
+
       expect(mapper.serverTimeRepository.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
@@ -146,6 +159,7 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
       const functionCall = () => mapper.updateUserFromObject(user_et, data);
+
       expect(functionCall).toThrow();
     });
 
@@ -161,6 +175,7 @@ describe('User Mapper', () => {
         name: entities.user.jane_roe.name,
       };
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
+
       expect(updated_user_et.previewPictureResource()).toBeDefined();
       expect(updated_user_et.mediumPictureResource()).toBeDefined();
     });

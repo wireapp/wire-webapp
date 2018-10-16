@@ -26,6 +26,7 @@ describe('z.tracking.helpers', () => {
     it('returns correct type for one on one conversation', () => {
       const conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(z.tracking.helpers.getConversationType(conversation_et)).toBe(
         z.tracking.attribute.ConversationType.ONE_TO_ONE
       );
@@ -34,6 +35,7 @@ describe('z.tracking.helpers', () => {
     it('returns correct type for group conversation', () => {
       const conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(z.tracking.helpers.getConversationType(conversation_et)).toBe(z.tracking.attribute.ConversationType.GROUP);
     });
 

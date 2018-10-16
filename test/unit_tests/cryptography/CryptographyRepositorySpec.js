@@ -102,6 +102,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       const database = TestFactory.storage_service.db;
       const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
       const alice = TestFactory.cryptography_repository.cryptobox.identity;
+
       expect(alice).toBeDefined();
 
       const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
@@ -133,6 +134,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+
       expect(decrypted.data.content).toBe(plainText);
 
       try {
@@ -155,9 +157,9 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      return TestFactory.cryptography_repository
-        .handleEncryptedEvent(event)
-        .then(mapped_event => expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT));
+      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
+      });
     });
 
     it('only accepts reasonable sized payloads (text key)', () => {
@@ -173,9 +175,9 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      return TestFactory.cryptography_repository
-        .handleEncryptedEvent(event)
-        .then(mapped_event => expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG));
+      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+      });
     });
 
     it('only accepts reasonable sized payloads (data key)', () => {
@@ -191,9 +193,9 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      return TestFactory.cryptography_repository
-        .handleEncryptedEvent(event)
-        .then(mapped_event => expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG));
+      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+      });
     });
   });
 });

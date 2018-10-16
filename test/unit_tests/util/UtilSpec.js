@@ -25,12 +25,14 @@ describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {
     const expected =
       'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>';
+
     expect(z.util.renderMessage('Check this: http://www.wire.com/')).toBe(expected);
   });
 
   it('renders a normal link without protocol', () => {
     const expected =
       'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow noopener noreferrer">wire.com/about/</a>';
+
     expect(z.util.renderMessage('Check this: wire.com/about/')).toBe(expected);
   });
 
@@ -38,12 +40,14 @@ describe('z.util.renderMessage', () => {
     const link =
       'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&amp;crop=(0,27,848,506.0960451977401)&amp;cropxunits=848&amp;cropyunits=595&amp;format=jpg&amp;quality=90&amp;width=752&amp;maxheight=42';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+
     expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
     const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
+
     expect(z.util.renderMessage(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
@@ -51,47 +55,55 @@ describe('z.util.renderMessage', () => {
     const link =
       'https://www.nike.com/events-registration/event?id=6245&amp;languageLocale=de_de&amp;cp=EUNS_KW_DE_&amp;s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+
     expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs without a trailing slash', () => {
     const link = 'http://www.underscore.com';
     const expected = `e.g. <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>.`;
+
     expect(z.util.renderMessage(`e.g. ${link}.`)).toBe(expected);
   });
 
   it('renders localhost links', () => {
     const link = 'http://localhost:8888/';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+
     expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders links with IP addresses', () => {
     const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+
     expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs correctly', () => {
     const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+
     expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
+
     expect(z.util.renderMessage(`Just click ${link} and download it`)).toBe(expected);
   });
 
   it('escapes links when they are posted as plain HTML', () => {
     const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
+
     expect(z.util.renderMessage('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
   });
 
   it('renders an escaped version of an xss attempt', () => {
     const expected =
       '<a href="http://wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e" target="_blank" rel="nofollow noopener noreferrer">wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e</a>';
+
     expect(
       z.util.renderMessage(
         'wire.de/jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e'
@@ -102,24 +114,28 @@ describe('z.util.renderMessage', () => {
   it('renders an email address', () => {
     const expected =
       'send it over to <a href="mailto:hello@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
+
     expect(z.util.renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
       'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
+
     expect(z.util.renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
       'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+
     expect(z.util.renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
       'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+
     expect(z.util.renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
@@ -207,6 +223,7 @@ describe('z.util.renderMessage', () => {
 
       it(testCase, () => {
         const result = z.util.renderMessage(text, 'self-id', mentionEntities);
+
         expect(result).toEqual(expected);
       });
     });
@@ -252,6 +269,7 @@ describe('z.util.base64ToBlob', () => {
     const base64 = z.util.arrayToBase64(new Uint8Array([1, 2, 3]));
     const data_uri = `data:application/octet-binary;base64,${base64}`;
     const blob = z.util.base64ToBlob(data_uri);
+
     expect(blob.type).toBe('application/octet-binary');
   });
 });
@@ -342,6 +360,7 @@ describe('z.util.koArrayPushAll', () => {
   it('appends multiple items', () => {
     const actual = ko.observableArray([1, 2]);
     z.util.koArrayPushAll(actual, [3, 4]);
+
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
@@ -350,6 +369,7 @@ describe('z.util.koArrayUnshiftAll', () => {
   it('prepends multiple items', () => {
     const actual = ko.observableArray([3, 4]);
     z.util.koArrayUnshiftAll(actual, [1, 2]);
+
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
@@ -4040,6 +4060,7 @@ describe('z.util.base64ToArray', () => {
     const array = new Uint8Array(buffer);
     const bufferEncoded = z.util.arrayToBase64(array);
     const bufferDecoded = z.util.base64ToArray(bufferEncoded);
+
     expect(bufferDecoded).toEqual(array);
   });
 });
@@ -4053,6 +4074,7 @@ describe('z.util.stripDataUri', () => {
     const base64Gif = z.util.stripDataUri(`data:image/gif;base64,${base64}`);
     const base64Png = z.util.stripDataUri(`data:image/png;base64,${base64}`);
     const base64Jpg = z.util.stripDataUri(`data:image/jpg;base64,${base64}`);
+
     expect(plainText).toBe(base64);
     expect(textHtml).toBe(base64);
     expect(base64TextPlain).toBe(base64);
@@ -4085,6 +4107,7 @@ describe('z.util.getContentTypeFromDataUrl', () =>
     const actual = z.util.getContentTypeFromDataUrl(
       'data:image/gif;base64,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'
     );
+
     expect(actual).toEqual('image/gif');
   }));
 
@@ -4248,6 +4271,7 @@ describe('Markdown for code snippets', () => {
   it('doesn’t render links within code blocks', () => {
     const expected =
       '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br /><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br /></code></pre>';
+
     expect(
       z.util.renderMessage(
         '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```'
@@ -4258,6 +4282,7 @@ describe('Markdown for code snippets', () => {
   it('renders escaped Ruby code blocks', () => {
     const expected =
       '<pre><code class="lang-ruby"><span class="hljs-built_in">require</span> <span class="hljs-string">\'redcarpet\'</span><br />markdown = Redcarpet.<span class="hljs-keyword">new</span>(<span class="hljs-string">"Hello World!"</span>)<br />puts markdown.to_html<br /></code></pre>';
+
     expect(
       z.util.renderMessage(
         '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```'
@@ -4268,6 +4293,7 @@ describe('Markdown for code snippets', () => {
   it('renders escaped JavaScript code blocks', () => {
     const expected =
       '<pre><code class="lang-js">$(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{<br />  $(<span class="hljs-string">\'pre code\'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>';
+
     expect(
       z.util.renderMessage(
         "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```"
@@ -4278,6 +4304,7 @@ describe('Markdown for code snippets', () => {
   it('renders escaped CoffeeScript code blocks', () => {
     const expected =
       '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span><br /><span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span><br />  z.util.convert_timestamps = <span class="hljs-function">-&gt;</span><br />    <span class="hljs-keyword">if</span> $(<span class="hljs-string">\'time\'</span>).length &gt; <span class="hljs-number">0</span><br /><span class="hljs-function">      <span class="hljs-title">recalculate</span> = -&gt;</span><br /></code></pre>';
+
     expect(
       z.util.renderMessage(
         "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```"
@@ -4288,6 +4315,7 @@ describe('Markdown for code snippets', () => {
   it('renders escaped HTML code blocks', () => {
     const expected =
       '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;<br /></code></pre>';
+
     expect(z.util.renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
       expected
     );
@@ -4295,6 +4323,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped HTML code spans', () => {
     const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
+
     expect(z.util.renderMessage('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
   });
 });
@@ -4343,6 +4372,7 @@ describe('Ignored Markdown syntax', () => {
   it('does not render tables', () => {
     const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
     const expected = `First Header | Second Header<br />------------ | -------------<br />Cell 1 | Cell 2`;
+
     expect(z.util.renderMessage(input)).toBe(expected);
   });
 });
@@ -4351,11 +4381,13 @@ describe('Ignored Markdown syntax', () => {
 describe('Markdown exceptions', () => {
   it('handles the URLs that start with : after the protocol', () => {
     const text = 'http://:';
+
     expect(z.util.renderMessage(text)).toBe(text);
   });
 
   it('does not render underscores to italic when they are within a sentence', () => {
     const text = 'calling__voice_channel__fulltitle';
+
     expect(z.util.renderMessage(text)).toBe(text);
   });
 });

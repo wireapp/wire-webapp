@@ -50,18 +50,22 @@ describe('z.util.Crypto', () => {
     it('returns the expected hash values for some test strings', () => {
       let key = '25f79335-6a5b-410e-90ea-653bd18b66da';
       let actual = z.util.Crypto.Hashing.joaatHash(key);
+
       expect(actual).toEqual(sample[key]);
 
       key = 'b88a6d46-b2ae-4122-8022-d6ed66a25f09';
       actual = z.util.Crypto.Hashing.joaatHash(key);
+
       expect(actual).toEqual(sample[key]);
 
       key = 'e50759ee-d32b-438f-bdbd-2605f48773e6';
       actual = z.util.Crypto.Hashing.joaatHash(key);
+
       expect(actual).toEqual(sample[key]);
 
       key = 'e1b6e9f0-aafd-4ba9-8030-6dd053531afd';
       actual = z.util.Crypto.Hashing.joaatHash(key);
+
       expect(actual).toEqual(sample[key]);
     });
 
@@ -71,6 +75,7 @@ describe('z.util.Crypto', () => {
 
     it('returns the same value for upper and lowercase strings', () => {
       const key = 'E1b6e9f0-aafd-4ba9-8030-6Dd053531afd';
+
       expect(z.util.Crypto.Hashing.joaatHash(key)).toEqual(sample[key.toLowerCase()]);
     });
   });

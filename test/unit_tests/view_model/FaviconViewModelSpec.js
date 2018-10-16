@@ -52,6 +52,7 @@ describe('z.viewModel.FaviconViewModel', () => {
       const unreads = [1, 2, 3, 4, 0];
       unreads.forEach(unread => {
         dispatcher.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unread);
+
         expect(faviconViewModel.unreadCount()).toBe(unread);
       });
     });
@@ -67,6 +68,7 @@ describe('z.viewModel.FaviconViewModel', () => {
       tests.forEach(({faviconName, unreadCount}) => {
         faviconViewModel.unreadCount(unreadCount);
         const faviconLink = document.querySelector('link[rel*=icon]');
+
         expect(faviconLink.href).toContain(faviconName);
       });
     });

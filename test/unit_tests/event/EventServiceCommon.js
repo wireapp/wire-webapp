@@ -350,6 +350,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
           expect(TestFactory.storage_repository.update).not.toHaveBeenCalled();
         });
       });
+
       it('sets asset data and update event', () => {
         const initialEvent = {
           id: 'event-id',
@@ -386,6 +387,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
           expect(TestFactory.storage_repository.update).not.toHaveBeenCalled();
         });
       });
+
       it('sets asset data and update event', () => {
         const initialEvent = {
           id: 'event-id',

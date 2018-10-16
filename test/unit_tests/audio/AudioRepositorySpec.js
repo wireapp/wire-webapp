@@ -47,9 +47,9 @@ describe('z.audio.AudioRepository', () => {
 
   describe('_getSoundById', () => {
     it('finds an available sound', () => {
-      return TestFactory.audio_repository
-        ._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION)
-        .then(audio_element => expect(audio_element).toEqual(jasmine.any(HTMLAudioElement)));
+      return TestFactory.audio_repository._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION).then(audio_element => {
+        expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
+      });
     });
 
     it('handles a missing sound', done => {

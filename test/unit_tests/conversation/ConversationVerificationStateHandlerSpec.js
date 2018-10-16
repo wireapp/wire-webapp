@@ -240,6 +240,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       client_a.meta.isVerified(false);
 
       state_handler.onClientVerificationChanged(user_a.id, client_a.id);
+
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_ab.is_verified()).toBeFalsy();

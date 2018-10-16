@@ -85,9 +85,11 @@ describe('z.service.BackendClient', () => {
         .catch(done.fail);
 
       jasmine.clock().tick(250);
+
       expect(backend_client.status).toHaveBeenCalled();
       expect(backend_client.status).toHaveBeenCalledTimes(1);
       jasmine.clock().tick(2500);
+
       expect(backend_client.status).toHaveBeenCalledTimes(2);
       done();
     });
@@ -102,9 +104,11 @@ describe('z.service.BackendClient', () => {
         .catch(done.fail);
 
       jasmine.clock().tick(500);
+
       expect(backend_client.status).toHaveBeenCalled();
       expect(backend_client.status).toHaveBeenCalledTimes(1);
       jasmine.clock().tick(2100);
+
       expect(backend_client.status).toHaveBeenCalledTimes(2);
       server.requests[1].respond(401);
     });
@@ -116,8 +120,10 @@ describe('z.service.BackendClient', () => {
         .catch(done.fail);
 
       jasmine.clock().tick(750);
+
       expect(backend_client.status).toHaveBeenCalled();
       jasmine.clock().tick(2500);
+
       expect(backend_client.status).toHaveBeenCalledTimes(2);
       done();
     });
@@ -165,6 +171,7 @@ describe('z.service.BackendClient', () => {
       server.requests[0].respond(401);
 
       jasmine.clock().tick(750);
+
       expect(backend_client.request_queue.getLength()).toBe(1);
       expect(token_refresh).toHaveBeenCalled();
       done();
@@ -179,6 +186,7 @@ describe('z.service.BackendClient', () => {
         .catch(done.fail);
 
       jasmine.clock().tick(150);
+
       expect(backend_client.request_queue.getLength()).toBe(1);
       expect(backend_client.execute_on_connectivity).toHaveBeenCalled();
       done();
