@@ -1476,13 +1476,13 @@
   dependencies:
     protobufjs "6.8.6"
 
-"@wireapp/react-ui-kit@4.3.4":
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.4.tgz#de33f05c34aa471a3e413a431ea3412ad7e1b2ee"
-  integrity sha512-eDWkEgnBOgoWSwraVQShUBU8AYZVbMSouhAkihSjuSUFKs5tSaPyiu8Y5PZEjqgYG8PtTlijjvk5eUxJk5w1nA==
+"@wireapp/react-ui-kit@4.3.5":
+  version "4.3.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.5.tgz#62fbf87b35a2453e03c4aa289bc1e4c3ed248a10"
+  integrity sha512-RNMdByzEuss1rtrBvka1rwJkGS0oVHsJxXAx9hNEmUhR8koZRwErEw3+l/MNwU4HtLuEcHt5vJ8M2grIY4B65g==
   dependencies:
     "@types/color" "3.0.0"
-    bazinga64 "5.3.15"
+    bazinga64 "5.3.16"
     color "3.1.0"
     react "16.5.2"
     react-dom "16.5.2"
@@ -2173,10 +2173,10 @@ bazinga64@5.2.18:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.18.tgz#6f7e44640e9cac954e41b42a7a593ff568d9794d"
   integrity sha1-b35EZA6crJVOQbQqelk/9WjZeU0=
 
-bazinga64@5.3.15:
-  version "5.3.15"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.15.tgz#8428e7be4c3f3aaa6be3d137d86948ea5b01f3c0"
-  integrity sha512-RWDfKUHGRvNF4LH4/m15xaH/4MGzFfV9Q7/lEl3+luwbM0pijqWsi2N3JIvptd0uO4VY4c0D2wdVT/zzaha07g==
+bazinga64@5.3.16:
+  version "5.3.16"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.16.tgz#d4718b0cfd798cb80ac0175a90c2214adbb6e7d1"
+  integrity sha512-oB/g7ZdmzBQPwTTF+DO4afRoRHh2qxd7EE7MrNewwBpsrsWtX83OuVqN9dMOkOSFATIBYRC5aW+K0vYyEUq9og==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
