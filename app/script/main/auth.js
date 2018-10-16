@@ -65,7 +65,7 @@ $(() => {
         webSocketUrl: window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com',
       };
 
-  window.wire = {
+  window.wire = Object.assign(window.wire || {}, {
     auth: new z.main.Auth(settings),
-  };
+  });
 });
