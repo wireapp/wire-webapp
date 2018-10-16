@@ -24,12 +24,7 @@
 describe('z.auth.AuthRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeAuthActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeAuthActors());
 
   describe('_scheduleTokenRefresh', () => {
     beforeEach(() => {
@@ -37,13 +32,9 @@ describe('z.auth.AuthRepository', () => {
       jasmine.clock().install();
     });
 
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
+    afterEach(() => jasmine.clock().uninstall());
 
-    afterAll(() => {
-      jasmine.clock().uninstall();
-    });
+    afterAll(() => jasmine.clock().uninstall());
 
     it('renews the access token immediately if expiring in the past', () => {
       const expiration_timestamp = Date.now() - 30000;

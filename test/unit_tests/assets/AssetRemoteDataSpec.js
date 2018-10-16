@@ -34,14 +34,10 @@ describe('z.assets.AssetRemoteData', () => {
       );
     });
 
-    it('should load and decrypt asset', done => {
-      remote_data
-        .load()
-        .then(blob => {
-          expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
-          done();
-        })
-        .catch(done.fail);
+    it('should load and decrypt asset', () => {
+      return remote_data.load().then(blob => {
+        expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
+      });
     });
   });
 
@@ -50,33 +46,24 @@ describe('z.assets.AssetRemoteData', () => {
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
 
-    beforeEach(done => {
-      z.assets.AssetCrypto.encryptAesAsset(video_bytes)
-        .then(({cipherText, keyBytes, sha256}) => {
-          const conversation_id = z.util.createRandomUuid();
-          const asset_id = z.util.createRandomUuid();
-          remote_data = z.assets.AssetRemoteData.v2(
-            conversation_id,
-            asset_id,
-            new Uint8Array(keyBytes),
-            new Uint8Array(sha256)
-          );
-          spyOn(remote_data, '_loadBuffer').and.returnValue(
-            Promise.resolve({buffer: cipherText, mimeType: video_type})
-          );
-          done();
-        })
-        .catch(done.fail);
+    beforeEach(() => {
+      return z.assets.AssetCrypto.encryptAesAsset(video_bytes).then(({cipherText, keyBytes, sha256}) => {
+        const conversation_id = z.util.createRandomUuid();
+        const asset_id = z.util.createRandomUuid();
+        remote_data = z.assets.AssetRemoteData.v2(
+          conversation_id,
+          asset_id,
+          new Uint8Array(keyBytes),
+          new Uint8Array(sha256)
+        );
+        spyOn(remote_data, '_loadBuffer').and.returnValue(Promise.resolve({buffer: cipherText, mimeType: video_type}));
+      });
     });
 
-    it('should load and decrypt asset', done => {
-      remote_data
-        .load()
-        .then(blob => {
-          expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
-          done();
-        })
-        .catch(done.fail);
+    it('should load and decrypt asset', () => {
+      return remote_data.load().then(blob => {
+        expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
+      });
     });
   });
 });

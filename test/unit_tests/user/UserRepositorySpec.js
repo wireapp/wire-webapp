@@ -25,12 +25,7 @@ describe('z.user.UserRepository', () => {
   let server = null;
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeUserActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeUserActors());
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
@@ -57,28 +52,20 @@ describe('z.user.UserRepository', () => {
         spyOn(TestFactory.user_repository, '_update_connection_status').and.returnValue(Promise.resolve());
       });
 
-      it('sets the connection status to cancelled', done => {
-        TestFactory.user_repository
+      it('sets the connection status to cancelled', () => {
+        return TestFactory.user_repository
           .cancelConnectionRequest(user_et)
-          .then(() => {
-            expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+          .then(() => expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled());
       });
 
-      it('it switches the conversation if requested', done => {
+      it('it switches the conversation if requested', () => {
         const spy = jasmine.createSpy('conversation_show');
         amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, spy);
 
-        TestFactory.user_repository
-          .cancelConnectionRequest(user_et, new z.entity.Conversation())
-          .then(() => {
-            expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
-            expect(spy).toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.user_repository.cancelConnectionRequest(user_et, new z.entity.Conversation()).then(() => {
+          expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
+          expect(spy).toHaveBeenCalled();
+        });
       });
     });
 
@@ -140,45 +127,31 @@ describe('z.user.UserRepository', () => {
 
   describe('users', () => {
     describe('fetchUserById', () => {
-      it('should handle malformed input', done => {
-        TestFactory.user_repository
+      it('should handle malformed input', () => {
+        return TestFactory.user_repository
           .fetchUsersById()
           .then(response => {
             expect(response.length).toBe(0);
             return TestFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
           })
-          .then(response => {
-            expect(response.length).toBe(0);
-            done();
-          })
-          .catch(done.fail);
+          .then(response => expect(response.length).toBe(0));
       });
     });
 
     describe('findUserById', () => {
       let user = null;
 
-      beforeEach(done => {
-        user = new z.entity.User();
-        user.id = entities.user.john_doe.id;
-        TestFactory.user_repository
-          .save_user(user)
-          .then(done)
-          .catch(done.fail);
+      beforeEach(() => {
+        user = new z.entity.User(entities.user.john_doe.id);
+        return TestFactory.user_repository.save_user(user);
       });
 
       afterEach(() => {
         TestFactory.user_repository.users.removeAll();
       });
 
-      it('should find an existing user', done => {
-        TestFactory.user_repository
-          .findUserById(user.id)
-          .then(user_et => {
-            expect(user_et).toEqual(user);
-            done();
-          })
-          .catch(done.fail);
+      it('should find an existing user', () => {
+        return TestFactory.user_repository.findUserById(user.id).then(user_et => expect(user_et).toEqual(user));
       });
 
       it('should not find an unknown user', done => {
@@ -193,37 +166,27 @@ describe('z.user.UserRepository', () => {
     });
 
     describe('save_user', () => {
-      afterEach(() => {
-        TestFactory.user_repository.users.removeAll();
-      });
+      afterEach(() => TestFactory.user_repository.users.removeAll());
 
-      it('saves a user', done => {
+      it('saves a user', () => {
         const user = new z.entity.User();
         user.id = entities.user.jane_roe.id;
 
-        TestFactory.user_repository
-          .save_user(user)
-          .then(() => {
-            expect(TestFactory.user_repository.users().length).toBe(1);
-            expect(TestFactory.user_repository.users()[0]).toBe(user);
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.user_repository.save_user(user).then(() => {
+          expect(TestFactory.user_repository.users().length).toBe(1);
+          expect(TestFactory.user_repository.users()[0]).toBe(user);
+        });
       });
 
-      it('saves self user', done => {
+      it('saves self user', () => {
         const user = new z.entity.User();
         user.id = entities.user.jane_roe.id;
 
-        TestFactory.user_repository
-          .save_user(user, true)
-          .then(() => {
-            expect(TestFactory.user_repository.users().length).toBe(1);
-            expect(TestFactory.user_repository.users()[0]).toBe(user);
-            expect(TestFactory.user_repository.self()).toBe(user);
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.user_repository.save_user(user, true).then(() => {
+          expect(TestFactory.user_repository.users().length).toBe(1);
+          expect(TestFactory.user_repository.users()[0]).toBe(user);
+          expect(TestFactory.user_repository.self()).toBe(user);
+        });
       });
     });
 
@@ -231,53 +194,43 @@ describe('z.user.UserRepository', () => {
       let user_jane_roe = null;
       let user_john_doe = null;
 
-      beforeEach(done => {
+      beforeEach(() => {
         user_jane_roe = new z.entity.User(entities.user.jane_roe.id);
         user_john_doe = new z.entity.User(entities.user.john_doe.id);
 
-        TestFactory.user_repository
-          .save_users([user_jane_roe, user_john_doe])
-          .then(() => {
-            const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
-              entities.clients.john_doe.permanent
-            );
-            const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
-            const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
-              entities.clients.john_doe.temporary
-            );
-            const recipients = {
-              [entities.user.john_doe.id]: [permanent_client, temporary_client],
-              [entities.user.jane_roe.id]: [plain_client],
-            };
+        return TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]).then(() => {
+          const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
+            entities.clients.john_doe.permanent
+          );
+          const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
+          const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
+            entities.clients.john_doe.temporary
+          );
+          const recipients = {
+            [entities.user.john_doe.id]: [permanent_client, temporary_client],
+            [entities.user.jane_roe.id]: [plain_client],
+          };
 
-            spyOn(TestFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
-            done();
-          })
-          .catch(done.fail);
+          spyOn(TestFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
+        });
       });
 
-      afterEach(() => {
-        TestFactory.user_repository.users.removeAll();
-      });
+      afterEach(() => TestFactory.user_repository.users.removeAll());
 
-      it('assigns all available clients to the users', done => {
-        TestFactory.user_repository
-          ._assignAllClients()
-          .then(() => {
-            expect(TestFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
-            expect(user_jane_roe.devices().length).toBe(1);
-            expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
-            expect(user_john_doe.devices().length).toBe(2);
-            expect(user_john_doe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
-            expect(user_john_doe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
-            done();
-          })
-          .catch(done.fail);
+      it('assigns all available clients to the users', () => {
+        return TestFactory.user_repository._assignAllClients().then(() => {
+          expect(TestFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
+          expect(user_jane_roe.devices().length).toBe(1);
+          expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
+          expect(user_john_doe.devices().length).toBe(2);
+          expect(user_john_doe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
+          expect(user_john_doe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
+        });
       });
     });
 
     describe('verify_usernames', () => {
-      it('resolves with username when username is not taken', done => {
+      it('resolves with username when username is not taken', () => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
           200,
@@ -285,16 +238,12 @@ describe('z.user.UserRepository', () => {
           JSON.stringify(usernames),
         ]);
 
-        TestFactory.user_repository
+        return TestFactory.user_repository
           .verify_usernames(usernames)
-          .then(_usernames => {
-            expect(_usernames).toEqual(usernames);
-            done();
-          })
-          .catch(done.fail);
+          .then(_usernames => expect(_usernames).toEqual(usernames));
       });
 
-      it('rejects when username is taken', done => {
+      it('rejects when username is taken', () => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
           200,
@@ -302,18 +251,14 @@ describe('z.user.UserRepository', () => {
           JSON.stringify([]),
         ]);
 
-        TestFactory.user_repository
+        return TestFactory.user_repository
           .verify_usernames(usernames)
-          .then(_usernames => {
-            expect(_usernames.length).toBe(0);
-            done();
-          })
-          .catch(done.fail);
+          .then(_usernames => expect(_usernames.length).toBe(0));
       });
     });
 
     describe('verify_username', () => {
-      it('resolves with username when username is not taken', done => {
+      it('resolves with username when username is not taken', () => {
         const username = 'john_doe';
         server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
           404,
@@ -321,13 +266,9 @@ describe('z.user.UserRepository', () => {
           '',
         ]);
 
-        TestFactory.user_repository
+        return TestFactory.user_repository
           .verify_username(username)
-          .then(_username => {
-            expect(_username).toBe(username);
-            done();
-          })
-          .catch(done.fail);
+          .then(_username => expect(_username).toBe(username));
       });
 
       it('rejects when username is taken', done => {

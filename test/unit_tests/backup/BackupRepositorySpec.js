@@ -36,12 +36,7 @@ const messages = [
 describe('z.backup.BackupRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeBackupActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeBackupActors());
 
   beforeEach(() => jasmine.clock().install());
 

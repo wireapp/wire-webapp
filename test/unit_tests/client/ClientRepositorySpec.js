@@ -26,25 +26,16 @@ describe('z.client.ClientRepository', () => {
   const clientId = '5021d77752286cac';
   let userId = undefined;
 
-  beforeAll(done => {
-    testFactory
-      .exposeClientActors()
-      .then(() => {
-        userId = TestFactory.client_repository.selfUser().id;
-        done();
-      })
-      .catch(done.fail);
+  beforeAll(() => {
+    return testFactory.exposeClientActors().then(() => {
+      userId = TestFactory.client_repository.selfUser().id;
+    });
   });
 
-  beforeEach(done => {
-    TestFactory.storage_repository
-      .clearStores()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeEach(() => TestFactory.storage_repository.clearStores());
 
   describe('getClientsByUserId', () =>
-    it('maps client entities from client payloads by the backend', done => {
+    it('maps client entities from client payloads by the backend', () => {
       TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: clientId}));
       spyOn(TestFactory.client_service, 'getClientsByUserId').and.returnValue(
         Promise.resolve([
@@ -56,15 +47,11 @@ describe('z.client.ClientRepository', () => {
         ])
       );
 
-      TestFactory.client_repository
-        .getClientsByUserId(entities.user.john_doe.id)
-        .then(clientEntities => {
-          const [firstClientEntity] = clientEntities;
-          expect(firstClientEntity instanceof z.client.ClientEntity).toBeTruthy();
-          expect(Object.keys(clientEntities).length).toBe(5);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
+        const [firstClientEntity] = clientEntities;
+        expect(firstClientEntity instanceof z.client.ClientEntity).toBeTruthy();
+        expect(Object.keys(clientEntities).length).toBe(5);
+      });
     }));
 
   describe('getValidLocalClient', () => {
@@ -100,7 +87,7 @@ describe('z.client.ClientRepository', () => {
       server.restore();
     });
 
-    it('resolves with a valid client', done => {
+    it('resolves with a valid client', () => {
       spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
 
       server.respondWith('GET', clientUrl, [
@@ -109,14 +96,10 @@ describe('z.client.ClientRepository', () => {
         JSON.stringify(clientPayloadServer),
       ]);
 
-      TestFactory.client_repository
-        .getValidLocalClient()
-        .then(clientObservable => {
-          expect(clientObservable).toBeDefined();
-          expect(clientObservable().id).toBe(clientId);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.client_repository.getValidLocalClient().then(clientObservable => {
+        expect(clientObservable).toBeDefined();
+        expect(clientObservable().id).toBe(clientId);
+      });
     });
 
     it('rejects with an error if no client found locally', done => {

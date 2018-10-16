@@ -26,25 +26,22 @@ describe('z.viewModel.WindowTitleViewModel', () => {
   let test_factory = undefined;
   let title_view_model = undefined;
 
-  beforeEach(done => {
+  beforeEach(() => {
     test_factory = new TestFactory();
-    test_factory
-      .exposeConversationActors()
-      .then(conversationRepository => {
-        title_view_model = new z.viewModel.WindowTitleViewModel(
-          {
-            content: {
-              state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
-            },
+
+    return test_factory.exposeConversationActors().then(conversationRepository => {
+      title_view_model = new z.viewModel.WindowTitleViewModel(
+        {
+          content: {
+            state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
           },
-          {
-            conversation: conversationRepository,
-            user: TestFactory.user_repository,
-          }
-        );
-        done();
-      })
-      .catch(done.fail);
+        },
+        {
+          conversation: conversationRepository,
+          user: TestFactory.user_repository,
+        }
+      );
+    });
   });
 
   describe('initiateTitleUpdates', () => {

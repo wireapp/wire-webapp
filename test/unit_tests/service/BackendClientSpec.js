@@ -119,7 +119,7 @@ describe('z.service.BackendClient', () => {
       expect(backend_client.status).toHaveBeenCalled();
       jasmine.clock().tick(2500);
       expect(backend_client.status).toHaveBeenCalledTimes(2);
-      return done();
+      done();
     });
   });
 
