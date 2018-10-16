@@ -123,8 +123,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
       .catch(error => {
         const errorMessage = (error && error.message) || '';
-        const isAssetNotFound = errorMessage.endsWith(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
-        const isServerError = errorMessage.endsWith(z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
+        const isAssetNotFound = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
+        const isServerError = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 
         const isExpectedError = isAssetNotFound || isServerError;
         if (!isExpectedError) {

@@ -152,7 +152,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
     const conversationPromise = conversationId
       ? this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
-          const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+          const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
           if (!isConversationNotFound) {
             throw error;
           }
@@ -167,7 +167,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         const noRemainingClients = !clientIdsOfUser.length;
 
         if (noRemainingClients) {
-          const isGroupConversation = conversationEntity && conversationEntity.is_group();
+          const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
             const timeOffset = this.conversationRepository.timeOffset;
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);

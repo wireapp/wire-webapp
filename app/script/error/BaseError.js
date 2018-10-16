@@ -20,29 +20,40 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.notification = z.notification || {};
+window.z.error = z.error || {};
 
-z.notification.NotificationError = class NotificationError extends Error {
-  constructor(type) {
+z.error.BaseError = class BaseError extends Error {
+  constructor(name, type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || NotificationError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case NotificationError.TYPE.HIDE_NOTIFICATION:
-        this.message = 'Do not show notification for this message';
-        break;
-      default:
-        this.message = 'Unknown NotificationError';
+    const ErrorInstanceClass = z.error[name];
+    const knownTypes = Object.assign({}, BaseError.TYPE, ErrorInstanceClass.TYPE);
+    const isValidType = Object.values(knownTypes).includes(type);
+
+    this.type = isValidType ? type : BaseError.TYPE.UNKNOWN;
+
+    this.message = message || ErrorInstanceClass.MESSAGE[this.type] || BaseError.MESSAGE[this.type];
+    if (!this.message) {
+      this.message = `${BaseError.MESSAGE.UNKNOWN} ${name}`;
     }
+  }
+
+  static get MESSAGE() {
+    return {
+      INVALID_PARAMETER: 'Invalid parameter passed',
+      MISSING_PARAMETER: 'Required parameter is not defined',
+      UNKNOWN: 'Unknown',
+    };
   }
 
   static get TYPE() {
     return {
-      HIDE_NOTIFICATION: 'NotificationError.TYPE.HIDE_NOTIFICATION',
-      UNKNOWN: 'NotificationError.TYPE.UNKNOWN',
+      INVALID_PARAMETER: 'INVALID_PARAMETER',
+      MISSING_PARAMETER: 'MISSING_PARAMETER',
+      UNKNOWN: 'UNKNOWN',
     };
   }
 };

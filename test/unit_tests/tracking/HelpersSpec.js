@@ -22,11 +22,11 @@
 // grunt test_init && grunt test_run:tracking/EventTrackingRepository
 
 describe('z.tracking.helpers', () => {
-  describe('get_conversation_type', () => {
+  describe('getConversationType', () => {
     it('returns correct type for one on one conversation', () => {
       const conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(z.tracking.helpers.get_conversation_type(conversation_et)).toBe(
+      expect(z.tracking.helpers.getConversationType(conversation_et)).toBe(
         z.tracking.attribute.ConversationType.ONE_TO_ONE
       );
     });
@@ -34,51 +34,12 @@ describe('z.tracking.helpers', () => {
     it('returns correct type for group conversation', () => {
       const conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
-      expect(z.tracking.helpers.get_conversation_type(conversation_et)).toBe(
-        z.tracking.attribute.ConversationType.GROUP
-      );
+      expect(z.tracking.helpers.getConversationType(conversation_et)).toBe(z.tracking.attribute.ConversationType.GROUP);
     });
 
     it('returns undefined if type cannot be determined', () => {
-      expect(z.tracking.helpers.get_conversation_type({})).not.toBeDefined();
-      expect(z.tracking.helpers.get_conversation_type()).not.toBeDefined();
-    });
-  });
-
-  describe('get_message_type', () => {
-    it('returns correct type for text message', () => {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.Text());
-      expect(z.tracking.helpers.get_message_type(message_et)).toBe(z.tracking.attribute.MessageType.TEXT);
-    });
-
-    it('returns correct type for image message', () => {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.MediumImage());
-      expect(z.tracking.helpers.get_message_type(message_et)).toBe(z.tracking.attribute.MessageType.IMAGE);
-    });
-
-    it('returns correct type for text message', () => {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.File());
-      expect(z.tracking.helpers.get_message_type(message_et)).toBe(z.tracking.attribute.MessageType.FILE);
-    });
-
-    it('returns correct type for ping message', () => {
-      expect(z.tracking.helpers.get_message_type(new z.entity.PingMessage())).toBe(
-        z.tracking.attribute.MessageType.PING
-      );
-    });
-
-    it('returns correct type for system message', () => {
-      expect(z.tracking.helpers.get_message_type(new z.entity.SystemMessage())).toBe(
-        z.tracking.attribute.MessageType.SYSTEM
-      );
-    });
-
-    it('returns undefined if type cannot be determined', () => {
-      expect(z.tracking.helpers.get_message_type({})).not.toBeDefined();
-      expect(z.tracking.helpers.get_message_type()).not.toBeDefined();
+      expect(z.tracking.helpers.getConversationType({})).not.toBeDefined();
+      expect(z.tracking.helpers.getConversationType()).not.toBeDefined();
     });
   });
 });

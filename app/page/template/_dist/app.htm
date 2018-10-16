@@ -29,28 +29,42 @@
 <script src="/script/util/PopupUtil.js"></script>
 <!-- Config -->
 <script src="/script/config.js"></script>
+<!-- Error -->
+<script src="/script/error/BaseError.js"></script>
+<script src="/script/error/AccessTokenError.js"></script>
+<script src="/script/error/AuthError.js"></script>
+<script src="/script/error/AudioError.js"></script>
+<script src="/script/error/BackendClientError.js"></script>
+<script src="/script/error/CallError.js"></script>
+<script src="/script/error/ClientError.js"></script>
+<script src="/script/error/ConnectError.js"></script>
+<script src="/script/error/ConversationError.js"></script>
+<script src="/script/error/CryptographyError.js"></script>
+<script src="/script/error/EventError.js"></script>
+<script src="/script/error/LinkPreviewError.js"></script>
+<script src="/script/error/MediaError.js"></script>
+<script src="/script/error/NotificationError.js"></script>
+<script src="/script/error/PermissionError.js"></script>
+<script src="/script/error/StorageError.js"></script>
+<script src="/script/error/TeamError.js"></script>
+<script src="/script/error/UserError.js"></script>
 <!-- Audio -->
-<script src="/script/audio/AudioError.js"></script>
 <script src="/script/audio/AudioRepository.js"></script>
 <script src="/script/audio/AudioPreference.js"></script>
 <script src="/script/audio/AudioType.js"></script>
 <script src="/script/audio/AudioPlayingType.js"></script>
 <!-- Authentication -->
-<script src="/script/auth/AccessTokenError.js"></script>
-<script src="/script/auth/AuthError.js"></script>
 <script src="/script/auth/AuthService.js"></script>
 <script src="/script/auth/AuthRepository.js"></script>
 <script src="/script/auth/SignOutReason.js"></script>
 <script src="/script/auth/URLParameter.js"></script>
 <!-- Service -->
-<script src="/script/service/BackendClientError.js"></script>
 <script src="/script/service/BackendClient.js"></script>
 <script src="/script/service/BackendEnvironment.js"></script>
 <script src="/script/service/QueueState.js"></script>
 <!-- Initialization -->
 <script src="/script/main/auth.js"></script>
 <!-- Storage -->
-<script src="/script/storage/StorageError.js"></script>
 <script src="/script/storage/StorageKey.js"></script>
 <script src="/script/storage/StorageRepository.js"></script>
 <script src="/script/storage/StorageSchemata.js"></script>
@@ -132,7 +146,6 @@
 <script src="/script/calling/entities/FlowAudioEntity.js"></script>
 <script src="/script/calling/entities/ParticipantEntity.js"></script>
 <!-- Calling -->
-<script src="/script/calling/CallError.js"></script>
 <script src="/script/calling/CallingRepository.js"></script>
 <script src="/script/calling/CallingService.js"></script>
 <script src="/script/calling/CallMessageBuilder.js"></script>
@@ -140,7 +153,6 @@
 <script src="/script/calling/SDPMapper.js"></script>
 <script src="/script/calling/VideoGridRepository.js"></script>
 <!-- Connect -->
-<script src="/script/connect/ConnectError.js"></script>
 <script src="/script/connect/ConnectGoogleService.js"></script>
 <script src="/script/connect/ConnectService.js"></script>
 <script src="/script/connect/ConnectRepository.js"></script>
@@ -148,7 +160,6 @@
 <script src="/script/connect/PhoneBook.js"></script>
 <!-- Client -->
 <script src="/script/client/ClientEntity.js"></script>
-<script src="/script/client/ClientError.js"></script>
 <script src="/script/client/ClientMapper.js"></script>
 <script src="/script/client/ClientRepository.js"></script>
 <script src="/script/client/ClientService.js"></script>
@@ -161,7 +172,6 @@
 <script src="/script/conversation/ClientMismatchHandler.js"></script>
 <script src="/script/conversation/ConversationCellState.js"></script>
 <script src="/script/conversation/ConversationEphemeralHandler.js"></script>
-<script src="/script/conversation/ConversationError.js"></script>
 <script src="/script/conversation/ConversationMapper.js"></script>
 <script src="/script/conversation/ConversationRepository.js"></script>
 <script src="/script/conversation/ConversationService.js"></script>
@@ -174,9 +184,8 @@
 <script src="/script/conversation/EventBuilder.js"></script>
 <script src="/script/conversation/EventInfoEntity.js"></script>
 <script src="/script/conversation/EventMapper.js"></script>
-<script src="/script/conversation/TimestampType.js"></script>
+<script src="/script/conversation/NotificationSetting.js"></script>
 <!-- Cryptography -->
-<script src="/script/cryptography/CryptographyError.js"></script>
 <script src="/script/cryptography/CryptographyMapper.js"></script>
 <script src="/script/cryptography/CryptographyRepository.js"></script>
 <script src="/script/cryptography/CryptographyService.js"></script>
@@ -187,7 +196,6 @@
 <!-- Events -->
 <script src="/script/event/Backend.js"></script>
 <script src="/script/event/Client.js"></script>
-<script src="/script/event/EventError.js"></script>
 <script src="/script/event/EventRepository.js"></script>
 <script src="/script/event/EventService.js"></script>
 <script src="/script/event/EventServiceNoCompound.js"></script>
@@ -214,7 +222,6 @@
 <script src="/script/lifecycle/LifecycleRepository.js"></script>
 <script src="/script/lifecycle/UpdateSource.js"></script>
 <!-- Link Previews -->
-<script src="/script/links/LinkPreviewError.js"></script>
 <script src="/script/links/LinkPreviewHelpers.js"></script>
 <script src="/script/links/LinkPreviewMetaDataType.js"></script>
 <script src="/script/links/LinkPreviewProtoBuilder.js"></script>
@@ -229,7 +236,6 @@
 <script src="/script/media/MediaDeviceType.js"></script>
 <script src="/script/media/MediaElementHandler.js"></script>
 <script src="/script/media/MediaEmbeds.js"></script>
-<script src="/script/media/MediaError.js"></script>
 <script src="/script/media/MediaParser.js"></script>
 <script src="/script/media/MediaRepository.js"></script>
 <script src="/script/media/MediaStreamError.js"></script>
@@ -243,11 +249,9 @@
 <script src="/script/motion/MotionDuration.js"></script>
 <!-- Notification -->
 <script src="/script/notification/PermissionState.js"></script>
-<script src="/script/notification/NotificationError.js"></script>
 <script src="/script/notification/NotificationPreference.js"></script>
 <script src="/script/notification/NotificationRepository.js"></script>
 <!-- Permission -->
-<script src="/script/permission/PermissionError.js"></script>
 <script src="/script/permission/PermissionRepository.js"></script>
 <script src="/script/permission/PermissionStatusState.js"></script>
 <script src="/script/permission/PermissionType.js"></script>
@@ -260,9 +264,10 @@
 <script src="/script/search/FullTextSearch.js"></script>
 <script src="/script/search/SearchService.js"></script>
 <script src="/script/search/SearchRepository.js"></script>
+<!-- Server -->
+<script src="/script/server/ServerTimeOffsetRepository.js"></script>
 <!-- Team -->
 <script src="/script/team/TeamEntity.js"></script>
-<script src="/script/team/TeamError.js"></script>
 <script src="/script/team/TeamMapper.js"></script>
 <script src="/script/team/TeamMemberEntity.js"></script>
 <script src="/script/team/TeamPermission.js"></script>
@@ -288,7 +293,6 @@
 <script src="/script/user/ConnectionStatus.js"></script>
 <script src="/script/user/ConsentType.js"></script>
 <script src="/script/user/ConsentValue.js"></script>
-<script src="/script/user/UserError.js"></script>
 <script src="/script/user/UserService.js"></script>
 <script src="/script/user/UserMapper.js"></script>
 <script src="/script/user/UserConnectionMapper.js"></script>
@@ -296,6 +300,7 @@
 <script src="/script/user/UserHandleGenerator.js"></script>
 <!-- View Models -->
 <script src="/script/view_model/ActionsViewModel.js"></script>
+<script src="/script/view_model/FaviconViewModel.js"></script>
 <script src="/script/view_model/ImageDetailViewViewModel.js"></script>
 <script src="/script/view_model/LoadingViewModel.js"></script>
 <script src="/script/view_model/MainViewModel.js"></script>
@@ -339,6 +344,7 @@
 <script src="/script/view_model/panel/GroupParticipantUserViewModel.js"></script>
 <script src="/script/view_model/panel/GroupParticipantServiceViewModel.js"></script>
 <script src="/script/view_model/panel/GuestsAndServicesViewModel.js"></script>
+<script src="/script/view_model/panel/NotificationsViewModel.js"></script>
 <script src="/script/view_model/panel/TimedMessagesViewModel.js"></script>
 <script src="/script/view_model/panel/ParticipantDevicesViewModel.js"></script>
 <!-- View Models: List -->

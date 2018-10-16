@@ -131,7 +131,7 @@ z.auth.AuthRepository = class AuthRepository {
         })
         .catch(error => {
           const {message, type} = error;
-          const isRequestForbidden = type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
+          const isRequestForbidden = type === z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
           if (isRequestForbidden || z.util.Environment.frontend.isLocalhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
             Raygun.send(error);
@@ -172,7 +172,7 @@ z.auth.AuthRepository = class AuthRepository {
         return resolve();
       }
 
-      return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
+      return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
     });
   }
 

@@ -41,7 +41,7 @@ describe('z.storage.StorageRepository', () => {
         .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toEqual(z.storage.StorageError.TYPE.NO_DATA);
+          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
           done();
         });
     });

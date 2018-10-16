@@ -240,6 +240,7 @@ z.string.da.modalPictureTooSmallHeadline = 'Billede for lille';
 z.string.da.modalPictureTooSmallMessage = 'Vælg venligst et billede, der er mindst 320 x 320 px.';
 
 z.string.da.modalImproveWireAction = 'Besvar';
+z.string.da.modalImproveWireSecondary = 'Nej';
 
 z.string.da.modalServiceUnavailableHeadline = 'Tilføje tjeneste ikke muligt';
 z.string.da.modalServiceUnavailableMessage = 'Tjenesten er utilgængelig i øjeblikket.';
@@ -418,6 +419,7 @@ z.string.da.conversationDetailsActionClear = 'Slet indhold…';
 z.string.da.conversationDetailsActionCreateGroup = 'Opret gruppe';
 z.string.da.conversationDetailsActionDevices = 'Enheder';
 z.string.da.conversationDetailsActionGuestOptions = 'Gæst indstillinger';
+z.string.da.conversationDetailsActionNotifications = 'Notifikationer';
 z.string.da.conversationDetailsActionLeave = 'Forlad gruppen…';
 z.string.da.conversationDetailsGuestsOff = 'Slået Fra';
 z.string.da.conversationDetailsGuestsOn = 'Aktiv';
@@ -452,6 +454,8 @@ z.string.da.guestOptionsInfoHeader = 'Inviter andre med et link';
 z.string.da.guestOptionsInfoText = 'Alle med linket kan tilføje sig til samtalen, også selvom de ikke har Wire.';
 z.string.da.guestOptionsRevokeLink = 'Tilbagekald link…';
 z.string.da.guestOptionsTitle = 'Gæst indstillinger';
+
+z.string.da.notificationSettingsTitle = 'Notifikationer';
 
 z.string.da.participantDevicesDetailHeadline = 'Bekræft at dette passer med fingeraftrykket vist på {{html1}}{{user}}’s enhed{{html2}}.';
 z.string.da.participantDevicesDetailHowTo = 'Hvordan gør jeg det?';

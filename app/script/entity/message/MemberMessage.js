@@ -54,8 +54,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
 
-    this.hasUsers = ko.pureComputed(() => this.userEntities().length);
-
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
       return this.userEntities()
@@ -85,7 +83,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : z.util.SanitizationUtil.getFirstName(this.user());
+      return isTeamMemberLeave
+        ? this.name()
+        : z.util.SanitizationUtil.getFirstName(this.user(), z.string.Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
@@ -343,6 +343,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
   isMemberRemoval() {
     return this.isMemberLeave() || this.isTeamMemberLeave();
+  }
+
+  isUserAffected(userId) {
+    return this.userIds().includes(userId);
   }
 
   guestCount() {

@@ -141,7 +141,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
       return Promise.resolve(streamConstraints);
     }
 
-    return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
+    return Promise.reject(new z.error.MediaError(z.error.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
   }
 
   /**

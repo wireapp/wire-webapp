@@ -104,7 +104,7 @@ describe('Event Repository', () => {
       spyOn(TestFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
         return last_notification_id
           ? Promise.resolve(last_notification_id)
-          : Promise.reject(new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID));
+          : Promise.reject(new z.error.EventError(z.error.EventError.TYPE.NO_LAST_ID));
       });
 
       spyOn(TestFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(
@@ -378,8 +378,8 @@ describe('Event Repository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -393,8 +393,8 @@ describe('Event Repository', () => {
         ._handleEventSaving(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -408,8 +408,8 @@ describe('Event Repository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -422,8 +422,8 @@ describe('Event Repository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -437,8 +437,8 @@ describe('Event Repository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -454,8 +454,8 @@ describe('Event Repository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -690,8 +690,8 @@ describe('Event Repository', () => {
         ._handleEventValidation({type: z.event.Backend.CONVERSATION.TYPING})
         .then(fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
         });
     });
 
@@ -712,8 +712,8 @@ describe('Event Repository', () => {
         ._handleEventValidation(event, z.event.EventRepository.SOURCE.STREAM)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.event.EventError));
-          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(z.error.EventError));
+          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
         });
     });
   });

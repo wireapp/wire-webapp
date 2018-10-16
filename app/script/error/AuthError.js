@@ -20,13 +20,28 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+window.z.error = z.error || {};
 
-z.conversation.TIMESTAMP_TYPE = {
-  ARCHIVED: 'z.conversation.TIMESTAMP_TYPE.ARCHIVED',
-  CLEARED: 'z.conversation.TIMESTAMP_TYPE.CLEARED',
-  LAST_EVENT: 'z.conversation.TIMESTAMP_TYPE.LAST_EVENT',
-  LAST_READ: 'z.conversation.TIMESTAMP_TYPE.LAST_READ',
-  LAST_SERVER: 'z.conversation.TIMESTAMP_TYPE.LAST_SERVER',
-  MUTED: 'z.conversation.TIMESTAMP_TYPE.MUTED',
+z.error.AuthError = class AuthError extends z.error.BaseError {
+  constructor(type, message) {
+    super('AuthError', type, message);
+  }
+
+  static get MESSAGE() {
+    return {
+      COOKIES_DISABLED: 'Cookies are disabled',
+      INDEXED_DB_UNSUPPORTED: 'IndexedDB is not supported',
+      MULTIPLE_TABS: 'Cannot open in multiple tabs simultaneously',
+      PRIVATE_MODE: 'Unsupported Private Mode',
+    };
+  }
+
+  static get TYPE() {
+    return {
+      COOKIES_DISABLED: 'COOKIES_DISABLED',
+      INDEXED_DB_UNSUPPORTED: 'INDEXED_DB_UNSUPPORTED',
+      MULTIPLE_TABS: 'MULTIPLE_TABS',
+      PRIVATE_MODE: 'PRIVATE_MODE',
+    };
+  }
 };

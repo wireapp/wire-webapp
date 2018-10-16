@@ -97,10 +97,10 @@ z.client.ClientRepository = class ClientRepository {
    */
   getClientByIdFromBackend(clientId) {
     return this.clientService.getClientById(clientId).catch(error => {
-      const clientNotFoundBackend = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+      const clientNotFoundBackend = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
-        throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
+        throw new z.error.ClientError(z.error.ClientError.TYPE.NO_VALID_CLIENT);
       }
 
       throw error;
@@ -115,12 +115,12 @@ z.client.ClientRepository = class ClientRepository {
     return this.clientService
       .loadClientFromDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
-        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(clientPayload => {
         if (_.isString(clientPayload)) {
           this.logger.info('No local client found in database');
-          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
+          throw new z.error.ClientError(z.error.ClientError.TYPE.NO_VALID_CLIENT);
         }
 
         const currentClient = this.clientMapper.mapClient(clientPayload, true);
@@ -140,10 +140,10 @@ z.client.ClientRepository = class ClientRepository {
    */
   _constructPrimaryKey(userId, clientId) {
     if (!userId) {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.NO_USER_ID);
+      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_USER_ID);
     }
     if (!clientId) {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.NO_CLIENT_ID);
+      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_CLIENT_ID);
     }
     return `${userId}@${clientId}`;
   }
@@ -258,7 +258,7 @@ z.client.ClientRepository = class ClientRepository {
         return this.currentClient;
       })
       .catch(error => {
-        const clientNotValidated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        const clientNotValidated = error.type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
         if (!clientNotValidated) {
           this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
         }
@@ -282,12 +282,12 @@ z.client.ClientRepository = class ClientRepository {
       .generateClientKeys()
       .then(keys => this.clientService.postClients(this._createRegistrationPayload(clientType, password, keys)))
       .catch(error => {
-        const tooManyClients = error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS;
+        const tooManyClients = error.label === z.error.BackendClientError.LABEL.TOO_MANY_CLIENTS;
         if (tooManyClients) {
-          throw new z.client.ClientError(z.client.ClientError.TYPE.TOO_MANY_CLIENTS);
+          throw new z.error.ClientError(z.error.ClientError.TYPE.TOO_MANY_CLIENTS);
         }
         this.logger.error(`Client registration request failed: ${error.message}`, error);
-        throw new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);
+        throw new z.error.ClientError(z.error.ClientError.TYPE.REQUEST_FAILURE);
       })
       .then(response => {
         const {cookie, id, type} = response;
@@ -297,13 +297,13 @@ z.client.ClientRepository = class ClientRepository {
         return this._saveCurrentClientInDb(response);
       })
       .catch(error => {
-        const handledErrors = [z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS];
+        const handledErrors = [z.error.ClientError.TYPE.REQUEST_FAILURE, z.error.ClientError.TYPE.TOO_MANY_CLIENTS];
 
         if (handledErrors.includes(error.type)) {
           throw error;
         }
         this.logger.error(`Failed to save client: ${error.message}`, error);
-        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(clientPayload => this._transferCookieLabel(clientType, clientPayload.cookie))
       .then(() => this.currentClient)
@@ -428,7 +428,7 @@ z.client.ClientRepository = class ClientRepository {
   deleteClient(clientId, password) {
     if (!password) {
       this.logger.error(`Could not delete client '${clientId}' because password is missing`);
-      return Promise.reject(new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FORBIDDEN));
+      return Promise.reject(new z.error.ClientError(z.error.ClientError.TYPE.REQUEST_FORBIDDEN));
     }
 
     return this.clientService
@@ -442,11 +442,11 @@ z.client.ClientRepository = class ClientRepository {
       .catch(error => {
         this.logger.error(`Unable to delete client '${clientId}': ${error.message}`, error);
 
-        const isForbidden = z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
-        const error_type = isForbidden
-          ? z.client.ClientError.TYPE.REQUEST_FORBIDDEN
-          : z.client.ClientError.TYPE.REQUEST_FAILURE;
-        throw new z.client.ClientError(error_type);
+        const isForbidden = z.error.BackendClientError.STATUS_CODE.FORBIDDEN;
+        const errorType = isForbidden
+          ? z.error.ClientError.TYPE.REQUEST_FORBIDDEN
+          : z.error.ClientError.TYPE.REQUEST_FAILURE;
+        throw new z.error.ClientError(errorType);
       });
   }
 
@@ -535,7 +535,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   isCurrentClientPermanent() {
     if (!this.currentClient()) {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);
+      throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
     }
     return z.util.Environment.electron || this.currentClient().isPermanent();
   }
@@ -646,13 +646,13 @@ z.client.ClientRepository = class ClientRepository {
    */
   _isCurrentClient(userId, clientId) {
     if (!this.currentClient()) {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);
+      throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
     }
     if (!userId) {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.NO_USER_ID);
+      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_USER_ID);
     }
     if (!clientId) {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.NO_CLIENT_ID);
+      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_CLIENT_ID);
     }
     return userId === this.selfUser().id && clientId === this.currentClient().id;
   }

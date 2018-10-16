@@ -171,8 +171,8 @@ describe('ConversationRepository', () => {
         .deleteMessageForEveryone(conversation_et, message_to_delete_et)
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-          expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
+          expect(error).toEqual(jasmine.any(z.error.ConversationError));
+          expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
           done();
         });
     });
@@ -286,8 +286,8 @@ describe('ConversationRepository', () => {
       const team1to1Conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const conversationMapper = TestFactory.conversation_repository.conversation_mapper;
-      const [newConversationEntity] = conversationMapper.map_conversations([team1to1Conversation]);
+      const conversationMapper = TestFactory.conversation_repository.conversationMapper;
+      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
       TestFactory.conversation_repository.conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
@@ -319,12 +319,12 @@ describe('ConversationRepository', () => {
       const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
-      group_cleared.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
+      group_cleared.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
 
       const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
-      group_removed.set_timestamp(Date.now(), z.conversation.TIMESTAMP_TYPE.CLEARED);
+      group_removed.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
       group_removed.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       Promise.all([
@@ -689,7 +689,7 @@ describe('ConversationRepository', () => {
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
-        spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'mapConversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
@@ -702,7 +702,7 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(createEvent)
           .then(() => {
             expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(createEvent.data, 1);
+            expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(createEvent.data, 1);
             done();
           })
           .catch(done.fail);
@@ -716,7 +716,7 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(createEvent)
           .then(() => {
             expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
+            expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
               createEvent.data,
               time.getTime()
             );
@@ -813,8 +813,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(message_delete_event)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-            expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(z.error.ConversationError));
+            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
@@ -940,8 +940,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-            expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(z.error.ConversationError));
+            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
             done();
@@ -1054,7 +1054,7 @@ describe('ConversationRepository', () => {
         Promise.resolve(new z.entity.Message())
       );
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
-      spyOn(conversationRepository.conversation_mapper, 'map_conversations').and.returnValue(conversationPromise);
+      spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
         (conversationId, genericMessage, payload, preconditionOption) => {
           const {content, ephemeral} = genericMessage;
@@ -1067,7 +1067,7 @@ describe('ConversationRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.self = {id: 'felix'};
+        conversation.selfUser({id: 'felix'});
         const messageText = 'hello there';
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });

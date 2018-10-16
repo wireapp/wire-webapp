@@ -136,12 +136,12 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
-    return Promise.resolve().then(() => {
-      const isEventToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
-      const isMuted = conversationEntity && conversationEntity.is_muted();
+    const notifyInConversation = conversationEntity
+      ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
+      : true;
 
-      const shouldNotify = isEventToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview() && !isMuted;
-      if (shouldNotify) {
+    return Promise.resolve(notifyInConversation).then(shouldNotifyInConversation => {
+      if (shouldNotifyInConversation) {
         this._notifySound(messageEntity);
         return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
       }
@@ -299,7 +299,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity) {
-    const isGroup = conversationEntity && conversationEntity.is_group();
+    const isGroup = conversationEntity && conversationEntity.isGroup();
 
     switch (messageEntity.memberMessageType) {
       case z.message.SystemMessageType.NORMAL:
@@ -412,7 +412,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         if (optionsBody) {
           return this._shouldObfuscateNotificationSender(messageEntity);
         }
-        throw new z.notification.NotificationError(z.notification.NotificationError.TYPE.HIDE_NOTIFICATION);
+        throw new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION);
       })
       .then(shouldObfuscateSender => {
         return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
@@ -538,7 +538,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     let title;
     if (conversationName) {
-      title = conversationEntity.is_group()
+      title = conversationEntity.isGroup()
         ? z.l10n.text(z.string.notificationTitleGroup, {conversation: conversationName, user: userEntity.first_name()})
         : conversationName;
     }
@@ -570,7 +570,8 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     const containsSelfMention = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
-      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, messageEntity, true);
+      const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
+      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, showOptions);
     }
 
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
@@ -637,7 +638,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         });
       })
       .catch(error => {
-        const hideNotification = error.type === z.notification.NotificationError.TYPE.HIDE_NOTIFICATION;
+        const hideNotification = error.type === z.error.NotificationError.TYPE.HIDE_NOTIFICATION;
         if (!hideNotification) {
           throw error;
         }
@@ -737,11 +738,9 @@ z.notification.NotificationRepository = class NotificationRepository {
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
 
-    if (hideNotification) {
-      const error = new z.notification.NotificationError(z.notification.NotificationError.TYPE.HIDE_NOTIFICATION);
-      return Promise.reject(error);
-    }
-    return Promise.resolve();
+    return hideNotification
+      ? Promise.reject(new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION))
+      : Promise.resolve();
   }
 
   /**
@@ -811,5 +810,29 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     this.notifications.push(notification);
     this.logger.info(`Added notification for ${messageInfo} in '${conversationId}' to queue.`);
+  }
+
+  /**
+   * Check whether conversation is in state to trigger notitication.
+   *
+   * @param {z.entity.Conversation} conversationEntity - Conversation to notify in .
+   * @param {z.entity.Message} messageEntity - The message to filter from.
+   * @param {string} userId - The user id to check mentions for.
+   * @returns {boolean} True if the conversation should show notification.
+   */
+  static shouldNotifyInConversation(conversationEntity, messageEntity, userId) {
+    if (conversationEntity.showNotificationsNothing()) {
+      return false;
+    }
+
+    const isEventTypeToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
+    const isEventToNotify = isEventTypeToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
+
+    if (conversationEntity.showNotificationsEverything()) {
+      return isEventToNotify;
+    }
+
+    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
+    return isEventToNotify && isSelfMentioned;
   }
 };

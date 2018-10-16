@@ -17,12 +17,28 @@
  *
  */
 
-.timed-messages {
-  &__disclaimer {
-    margin: 16px;
-  }
+'use strict';
 
-  .panel__action-item:first-child {
-    margin-top: 24px;
-  }
-}
+window.z = window.z || {};
+window.z.conversation = z.conversation || {};
+
+z.conversation.NotificationSetting = {
+  /* eslint-disable sort-keys */
+
+  STATE: {
+    EVERYTHING: 0b00,
+    ONLY_MENTIONS: 0b01,
+    NOTHING: 0b11,
+  },
+
+  /* eslint-enable sort-keys */
+
+  getText(status) {
+    const statusTexts = {
+      [z.conversation.NotificationSetting.STATE.EVERYTHING]: z.string.notificationSettingsEverything,
+      [z.conversation.NotificationSetting.STATE.ONLY_MENTIONS]: z.string.notificationSettingsOnlyMentions,
+      [z.conversation.NotificationSetting.STATE.NOTHING]: z.string.notificationSettingsNothing,
+    };
+    return z.l10n.text(statusTexts[status]);
+  },
+};

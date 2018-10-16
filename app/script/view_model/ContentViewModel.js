@@ -156,11 +156,19 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    *  Conversation_et can also just be the conversation ID
    *
    * @param {z.entity.Conversation|string} conversation - Conversation entity or conversation ID
-   * @param {z.entity.Message} [messageEntity] - Message to scroll to
-   * @param {boolean} [openFirstSelfMention=false] - Open first self mention instead of passed message
+   * @param {Object} options - State to open conversation in
+   * @param {z.entity.Message} [options.exposeMessage] - Scroll to message and highlight it
+   * @param {boolean} [options.openFirstSelfMention=false] - Open first self mention instead of passed message
+   * @param {boolean} [options.openNotificationSettings=false] - Open notification settings of conversation
    * @returns {undefined} No return value
    */
-  showConversation(conversation, messageEntity, openFirstSelfMention = false) {
+  showConversation(conversation, options = {}) {
+    const {
+      exposeMessage: exposeMessageEntity,
+      openFirstSelfMention = false,
+      openNotificationSettings = false,
+    } = options;
+
     if (!conversation) {
       return this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
@@ -178,8 +186,12 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     conversationPromise.then(conversationEntity => {
       const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
       const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
+      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
-      if (conversationEntity && isActiveConversation && isConversationState) {
+      if (isOpenedConversation) {
+        if (openNotificationSettings) {
+          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        }
         return;
       }
 
@@ -191,13 +203,13 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         this.conversationRepository.active_conversation(conversationEntity);
       }
 
-      if (openFirstSelfMention) {
-        messageEntity = conversationEntity.getFirstUnreadSelfMention();
-      }
-
+      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
         this.previousConversation = this.conversationRepository.active_conversation();
+        if (openNotificationSettings) {
+          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        }
       });
     });
   }

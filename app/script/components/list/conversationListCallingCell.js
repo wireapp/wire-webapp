@@ -38,7 +38,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.conversationParticipants = this.conversation.participating_user_ets;
     this.joinedCall = callingRepository.joinedCall;
     this.selfStreamState = callingRepository.selfStreamState;
-    this.selfUser = this.conversation.self;
+    this.selfUser = this.conversation.selfUser();
 
     this.isConnected = this.call().isConnected;
 
@@ -64,7 +64,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       }
       return false;
     });
-    this.showParticipantsButton = ko.pureComputed(() => this.isConnected() && this.conversation.is_group());
+    this.showParticipantsButton = ko.pureComputed(() => this.isConnected() && this.conversation.isGroup());
     this.showVideoButton = ko.pureComputed(() => this.isVideoCall() || this.isConnected());
 
     this.disableVideoButton = ko.pureComputed(() => {
@@ -156,10 +156,10 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
-          <!-- ko if: conversation.is_group() -->
+          <!-- ko if: conversation.isGroup() -->
             <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
-          <!-- ko if: !conversation.is_group() && conversationParticipants().length -->
+          <!-- ko if: !conversation.isGroup() && conversationParticipants().length -->
             <participant-avatar params="participant: conversationParticipants()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
         </div>

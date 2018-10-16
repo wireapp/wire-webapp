@@ -77,7 +77,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .catch(databaseError => {
         const message = `Failed cryptography-related db deletion on client validation error: ${databaseError.message}`;
         this.logger.error(message, databaseError);
-        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(() => deleteEverything);
   }
@@ -162,13 +162,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
       .catch(error => {
-        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
-          throw new z.user.UserError(z.user.UserError.TYPE.PRE_KEY_NOT_FOUND);
+          throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
 
         this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
       });
   }
 
@@ -179,13 +179,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   getUsersPreKeys(recipients) {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+      const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
-        throw new z.user.UserError(z.user.UserError.TYPE.PRE_KEY_NOT_FOUND);
+        throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
       }
 
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+      throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
     });
   }
 
@@ -281,8 +281,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
-      const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT));
     }
 
     // Check the length of the message
@@ -307,7 +306,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this._decryptEvent(event)
       .then(genericMessage => this.cryptographyMapper.mapGenericMessage(genericMessage, event))
       .catch(error => {
-        const isUnhandledType = error.type === z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE;
+        const isUnhandledType = error.type === z.error.CryptographyError.TYPE.UNHANDLED_TYPE;
         if (isUnhandledType) {
           throw error;
         }
@@ -470,12 +469,12 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const isOutdatedMessage = error instanceof Proteus.errors.DecryptError.OutdatedMessage;
     // We don't need to show these message errors to the user
     if (isDuplicateMessage || isOutdatedMessage) {
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
 
-    const isCryptographyError = error instanceof z.cryptography.CryptographyError;
-    if (isCryptographyError && error.type === z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED) {
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+    const isCryptographyError = error instanceof z.error.CryptographyError;
+    if (isCryptographyError && error.type === z.error.CryptographyError.TYPE.PREVIOUSLY_STORED) {
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
 
     const remoteClientId = eventData.sender;

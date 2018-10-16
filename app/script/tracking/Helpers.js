@@ -25,57 +25,15 @@ window.z.tracking = z.tracking || {};
 z.tracking.helpers = {
   /**
    * Get corresponding tracking attribute for conversation type.
-   * @param {z.entity.Conversation} conversation_et - Conversation to map type of
+   * @param {z.entity.Conversation} conversationEntity - Conversation to map type of
    * @returns {z.tracking.attribute.ConversationType} Mapped conversation type
    */
-  get_conversation_type(conversation_et) {
-    if (conversation_et instanceof z.entity.Conversation) {
-      if (conversation_et.is_one2one()) {
-        return z.tracking.attribute.ConversationType.ONE_TO_ONE;
-      }
-      return z.tracking.attribute.ConversationType.GROUP;
+  getConversationType(conversationEntity) {
+    if (conversationEntity instanceof z.entity.Conversation) {
+      return conversationEntity.is_one2one()
+        ? z.tracking.attribute.ConversationType.ONE_TO_ONE
+        : z.tracking.attribute.ConversationType.GROUP;
     }
-  },
-
-  /**
-   * Get corresponding tracking attribute for message type.
-   * @param {z.entity.Message} message_et - Message to map type of
-   * @returns {z.tracking.attribute.MessageType} Mapped message type
-   */
-  get_message_type(message_et) {
-    if (message_et instanceof z.entity.Message) {
-      switch (false) {
-        case !message_et.is_system():
-          return z.tracking.attribute.MessageType.SYSTEM;
-        case !message_et.is_ping():
-          return z.tracking.attribute.MessageType.PING;
-        case !message_et.has_asset():
-          return z.tracking.attribute.MessageType.FILE;
-        case !message_et.has_asset_image():
-          return z.tracking.attribute.MessageType.IMAGE;
-        case !message_et.has_asset_location():
-          return z.tracking.attribute.MessageType.LOCATION;
-        default:
-          return z.tracking.attribute.MessageType.TEXT;
-      }
-    }
-  },
-
-  /**
-   * Get the platform identifier.
-   * @returns {z.tracking.attribute.PlatformType} Mapped platform type
-   */
-  get_platform() {
-    if (z.util.Environment.desktop) {
-      if (z.util.Environment.os.win) {
-        return z.tracking.attribute.PlatformType.DESKTOP_WINDOWS;
-      }
-      if (z.util.Environment.os.mac) {
-        return z.tracking.attribute.PlatformType.DESKTOP_MACOS;
-      }
-      return z.tracking.attribute.PlatformType.DESKTOP_LINUX;
-    }
-    return z.tracking.attribute.PlatformType.BROWSER_APP;
   },
 
   getGuestAttributes(conversationEntity) {
@@ -83,7 +41,7 @@ z.tracking.helpers = {
     if (isTeamConversation) {
       const isAllowGuests = !conversationEntity.isTeamOnly();
       const _getUserType = _conversationEntity => {
-        if (_conversationEntity.self.isTemporaryGuest()) {
+        if (_conversationEntity.selfUser().isTemporaryGuest()) {
           return z.tracking.attribute.UserType.TEMPORARY_GUEST;
         }
 
@@ -115,5 +73,22 @@ z.tracking.helpers = {
 
       return accumulator;
     }, initialValue);
+  },
+
+  /**
+   * Get the platform identifier.
+   * @returns {z.tracking.attribute.PlatformType} Mapped platform type
+   */
+  getPlatform() {
+    if (!z.util.Environment.desktop) {
+      return z.tracking.attribute.PlatformType.BROWSER_APP;
+    }
+
+    if (z.util.Environment.os.win) {
+      return z.tracking.attribute.PlatformType.DESKTOP_WINDOWS;
+    }
+    return z.util.Environment.os.mac
+      ? z.tracking.attribute.PlatformType.DESKTOP_MACOS
+      : z.tracking.attribute.PlatformType.DESKTOP_LINUX;
   },
 };

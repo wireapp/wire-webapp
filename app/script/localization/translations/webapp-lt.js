@@ -473,6 +473,7 @@ z.string.lt.conversationDetailsActionCreateGroup = 'Nauja grupė';
 z.string.lt.conversationDetailsActionDevices = 'Įrenginiai';
 z.string.lt.conversationDetailsActionGuestOptions = 'Svečių nustatymai';
 z.string.lt.conversationDetailsActionTimedMessages = 'Laikinos žinutės';
+z.string.lt.conversationDetailsActionNotifications = 'Pranešimai';
 z.string.lt.conversationDetailsActionLeave = 'Išeiti iš grupės';
 z.string.lt.conversationDetailsGuestsOff = 'Išjungta';
 z.string.lt.conversationDetailsGuestsOn = 'Įjungti';
@@ -507,6 +508,8 @@ z.string.lt.guestOptionsInfoHeader = 'Kviesti kitus naudojant nuorodą';
 z.string.lt.guestOptionsInfoText = 'Bet kas turintis nuorodą gali prisijungti prie susirašinėjimo 24 valandoms, net jei neturi „Wire“.';
 z.string.lt.guestOptionsRevokeLink = 'Atšaukti nuorodą';
 z.string.lt.guestOptionsTitle = 'Svečių nustatymai';
+
+z.string.lt.notificationSettingsTitle = 'Pranešimai';
 
 z.string.lt.timedMessagesTitle = 'Laikinos žinutės';
 z.string.lt.timedMessageDisclaimer = 'Laikinos žinutės bus įjungtos visiems šio pokalbio dalyviams.';
@@ -550,7 +553,7 @@ z.string.lt.preferencesAboutWebsite = 'Wire svetainė';
 z.string.lt.preferencesAccountAvaibilityUnset = 'Pasirinkite būseną';
 z.string.lt.preferencesAccountCreateTeam = 'Sukurti komandą';
 z.string.lt.preferencesAccountData = 'Duomenų naudojimo leidimas';
-z.string.lt.preferencesAccountDataCheckbox = 'Siųsti anoniminę nformaciją';
+z.string.lt.preferencesAccountDataCheckbox = 'Siųsti anoniminę informaciją';
 z.string.lt.preferencesAccountDataDetail = 'Pagerinkite „Wire“ siųsdami anoniminę naudojimosi ir trikčių ataskaitą.';
 z.string.lt.preferencesAccountDelete = 'Ištrinti paskyrą';
 z.string.lt.preferencesAccountLeaveGuestRoom = 'Išeiti iš svečių kambario';

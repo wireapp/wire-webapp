@@ -54,7 +54,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.sessionId = sessionId;
     this.callingRepository = callingRepository;
 
-    const {id: conversationId, is_group} = conversationEntity;
+    const {id: conversationId, isGroup} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfStreamState, telemetry, userRepository} = this.callingRepository;
     this.messageLog = this.callingRepository.messageLog;
 
@@ -82,7 +82,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.terminationReason = undefined;
 
     this.isConnected = ko.observable(false);
-    this.isGroup = is_group();
+    this.isGroup = isGroup();
 
     this.selfClientJoined = ko.observable(false);
     this.selfUserJoined = ko.observable(false);
@@ -723,7 +723,7 @@ z.calling.entities.CallEntity = class CallEntity {
     return this.getParticipantById(userId)
       .then(participantEntity => this._updateParticipant(participantEntity, negotiate, callMessageEntity))
       .catch(error => {
-        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (isNotFound) {
           return this._addParticipant(userId, negotiate, callMessageEntity);
         }
@@ -784,7 +784,7 @@ z.calling.entities.CallEntity = class CallEntity {
         return this;
       })
       .catch(error => {
-        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (isNotFound) {
           return this;
         }
@@ -806,8 +806,7 @@ z.calling.entities.CallEntity = class CallEntity {
       }
     }
 
-    const error = new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant found for user ID');
-    return Promise.reject(error);
+    return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'No participant found for user ID'));
   }
 
   /**
@@ -844,7 +843,7 @@ z.calling.entities.CallEntity = class CallEntity {
         return this;
       }
 
-      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
+      throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
     });
   }
 
@@ -860,7 +859,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const isSelfUser = userId === this.selfUser.id;
     if (isSelfUser) {
       const errorMessage = 'Self user should not be added as call participant';
-      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.WRONG_STATE, errorMessage));
+      return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.WRONG_STATE, errorMessage));
     }
 
     return this.userRepository.get_user_by_id(userId).then(userEntity => {

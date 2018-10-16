@@ -23,6 +23,17 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.Conversation = class Conversation {
+  static get TIMESTAMP_TYPE() {
+    return {
+      ARCHIVED: 'archivedTimestamp',
+      CLEARED: 'cleared_timestamp',
+      LAST_EVENT: 'last_event_timestamp',
+      LAST_READ: 'last_read_timestamp',
+      LAST_SERVER: 'last_server_timestamp',
+      MUTED: 'mutedTimestamp',
+    };
+  }
+
   /**
    * Constructs a new conversation entity.
    * @class z.entity.Conversation
@@ -45,7 +56,7 @@ z.entity.Conversation = class Conversation {
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
-    this.self = undefined;
+    this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
 
@@ -65,7 +76,7 @@ z.entity.Conversation = class Conversation {
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
-    this.is_group = ko.pureComputed(() => {
+    this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
@@ -78,7 +89,7 @@ z.entity.Conversation = class Conversation {
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.is_group() && this.self.inTeam();
+      return hasGuestUser && this.isGroup() && this.selfUser() && this.selfUser().inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
@@ -91,30 +102,62 @@ z.entity.Conversation = class Conversation {
     });
 
     // E2EE conversation states
-    this.archived_state = ko.observable(false).extend({notify: 'always'});
-    this.muted_state = ko.observable(false);
+    this.archivedState = ko.observable(false).extend({notify: 'always'});
+    this.mutedState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
     this.verification_state = ko.observable(z.conversation.ConversationVerificationState.UNVERIFIED);
 
-    this.archived_timestamp = ko.observable(0);
+    this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
-    this.muted_timestamp = ko.observable(0);
+    this.mutedTimestamp = ko.observable(0);
 
     // Conversation states for view
-    this.is_archived = this.archived_state;
+    this.notificationState = ko.pureComputed(() => {
+      if (!this.selfUser()) {
+        return z.conversation.NotificationSetting.STATE.NOTHING;
+      }
+
+      const knownNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
+      if (knownNotificationStates.includes(this.mutedState())) {
+        const isStateOnlyMentions = this.mutedState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+        const isInvalidState = isStateOnlyMentions && !this.selfUser().inTeam();
+
+        return isInvalidState ? z.conversation.NotificationSetting.STATE.NOTHING : this.mutedState();
+      }
+
+      if (typeof this.mutedState() === 'boolean') {
+        const migratedMutedState = this.selfUser().inTeam()
+          ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
+          : z.conversation.NotificationSetting.STATE.NOTHING;
+        return this.mutedState() ? migratedMutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
+      }
+
+      return z.conversation.NotificationSetting.STATE.EVERYTHING;
+    });
+
+    this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
-    this.is_muted = this.muted_state;
     this.is_verified = ko.pureComputed(() => {
       const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-      const isInitialized = this.self && hasMappedUsers;
+      const isInitialized = this.selfUser() && hasMappedUsers;
       if (!isInitialized) {
         return undefined;
       }
 
-      const allUserEntities = [this.self].concat(this.participating_user_ets());
+      const allUserEntities = [this.selfUser()].concat(this.participating_user_ets());
       return allUserEntities.every(userEntity => userEntity.is_verified());
+    });
+
+    this.showNotificationsEverything = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.EVERYTHING;
+    });
+    this.showNotificationsNothing = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
+    });
+    this.showNotificationsOnlyMentions = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -122,12 +165,9 @@ z.entity.Conversation = class Conversation {
       return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
-
-    this.removed_from_conversation.subscribe(is_removed => {
-      if (!is_removed) {
-        return this.archived_state(false);
-      }
-    });
+    this.isClearable = ko.pureComputed(() => !this.is_request() && !this.is_cleared());
+    this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.removed_from_conversation());
+    this.isMutable = ko.pureComputed(() => !this.is_request() && !this.removed_from_conversation());
 
     // Messages
     this.localMessageTimer = ko.observable(null);
@@ -156,30 +196,48 @@ z.entity.Conversation = class Conversation {
     this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
     this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
-    this.unreadEvents = ko.pureComputed(() => {
-      const unreadEvents = [];
-      const messages = this.messages();
+    this.unreadState = ko.pureComputed(() => {
+      const unreadState = {
+        allEvents: [],
+        allMessages: [],
+        calls: [],
+        otherMessages: [],
+        pings: [],
+        selfMentions: [],
+      };
 
-      for (let index = messages.length - 1; index >= 0; index--) {
-        const messageEntity = messages[index];
+      for (let index = this.messages().length - 1; index >= 0; index--) {
+        const messageEntity = this.messages()[index];
         if (messageEntity.visible()) {
-          if (messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me) {
+          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
+          if (isReadMessage) {
             break;
           }
-          unreadEvents.push(messageEntity);
+
+          const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+          const isPing = messageEntity.is_ping();
+          const isMessage = messageEntity.is_content();
+          const isSelfMention = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
+
+          if (isMissedCall || isPing || isMessage) {
+            unreadState.allMessages.push(messageEntity);
+          }
+
+          if (isSelfMention) {
+            unreadState.selfMentions.push(messageEntity);
+          } else if (isMissedCall) {
+            unreadState.calls.push(messageEntity);
+          } else if (isPing) {
+            unreadState.pings.push(messageEntity);
+          } else if (isMessage) {
+            unreadState.otherMessages.push(messageEntity);
+          }
+
+          unreadState.allEvents.push(messageEntity);
         }
       }
 
-      return unreadEvents;
-    });
-
-    this.unreadEventsCount = ko.pureComputed(() => this.unreadEvents().length);
-
-    this.unreadMessagesCount = ko.pureComputed(() => {
-      return this.unreadEvents().filter(message_et => {
-        const is_missed_call = message_et.is_call() && message_et.was_missed();
-        return is_missed_call || message_et.is_ping() || message_et.is_content();
-      }).length;
+      return unreadState;
     });
 
     /**
@@ -206,7 +264,7 @@ z.entity.Conversation = class Conversation {
         return userName ? userName : '…';
       }
 
-      if (this.is_group()) {
+      if (this.isGroup()) {
         if (this.name()) {
           return this.name();
         }
@@ -240,16 +298,16 @@ z.entity.Conversation = class Conversation {
 
   _initSubscriptions() {
     [
-      this.archived_state,
-      this.archived_timestamp,
+      this.archivedState,
+      this.archivedTimestamp,
       this.cleared_timestamp,
       this.messageTimer,
       this.isGuest,
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
-      this.muted_state,
-      this.muted_timestamp,
+      this.mutedState,
+      this.mutedTimestamp,
       this.name,
       this.participating_user_ids,
       this.status,
@@ -273,7 +331,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   release() {
-    if (!this.unreadEventsCount()) {
+    if (!this.unreadState().allEvents.length) {
       this.remove_messages();
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
@@ -284,58 +342,37 @@ z.entity.Conversation = class Conversation {
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
    * @param {string|number} timestamp - Timestamp to be set
-   * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
+   * @param {Conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
    * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  set_timestamp(timestamp, type, forceUpdate = false) {
-    let entity_timestamp;
+  setTimestamp(timestamp, type, forceUpdate = false) {
     if (_.isString(timestamp)) {
       timestamp = window.parseInt(timestamp, 10);
     }
 
-    switch (type) {
-      case z.conversation.TIMESTAMP_TYPE.ARCHIVED:
-        entity_timestamp = this.archived_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.CLEARED:
-        entity_timestamp = this.cleared_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.LAST_EVENT:
-        entity_timestamp = this.last_event_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.LAST_READ:
-        entity_timestamp = this.last_read_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.LAST_SERVER:
-        entity_timestamp = this.last_server_timestamp;
-        break;
-      case z.conversation.TIMESTAMP_TYPE.MUTED:
-        entity_timestamp = this.muted_timestamp;
-        break;
-      default:
-        break;
+    const entityTimestamp = this[type];
+    if (!entityTimestamp) {
+      throw new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER);
     }
 
-    const updatedTimestamp = forceUpdate ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+    const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);
 
     if (updatedTimestamp !== false) {
-      entity_timestamp(updatedTimestamp);
+      entityTimestamp(updatedTimestamp);
     }
     return updatedTimestamp;
   }
 
   /**
    * Increment only on timestamp update
-   * @param {number} current_timestamp - Current timestamp
-   * @param {number} updated_timestamp - Timestamp from update
+   * @param {number} currentTimestamp - Current timestamp
+   * @param {number} updatedTimestamp - Timestamp from update
    * @returns {number|boolean} Updated timestamp or false if not increased
    */
-  _increment_time_only(current_timestamp, updated_timestamp) {
-    if (updated_timestamp > current_timestamp) {
-      return updated_timestamp;
-    }
-    return false;
+  _incrementTimeOnly(currentTimestamp, updatedTimestamp) {
+    const timestampIncreased = updatedTimestamp > currentTimestamp;
+    return timestampIncreased ? updatedTimestamp : false;
   }
 
   /**
@@ -385,12 +422,9 @@ z.entity.Conversation = class Conversation {
   }
 
   getFirstUnreadSelfMention() {
-    return this.unreadEvents()
-      .slice()
-      .reverse()
-      .find(messageEntity => {
-        return messageEntity.visible() && messageEntity.is_content() && messageEntity.isUserMentioned(this.self.id);
-      });
+    return this.unreadState()
+      .selfMentions.slice()
+      .pop();
   }
 
   get_last_known_timestamp(time_offset) {
@@ -427,7 +461,7 @@ z.entity.Conversation = class Conversation {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
           : accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
-      }, this.self.devices().length);
+      }, this.selfUser().devices().length);
     }
 
     return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
@@ -466,16 +500,32 @@ z.entity.Conversation = class Conversation {
   }
 
   shouldUnarchive() {
-    if (this.archived_state()) {
-      const hasNewerMessage = this.last_event_timestamp() > this.archived_timestamp();
-
-      const lastMessageEntity = this.getLastMessage();
-      const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
-
-      const hasUpdate = hasNewerMessage || hasNewerCall;
-      return hasUpdate && !this.is_muted();
+    if (!this.archivedState() || this.showNotificationsNothing()) {
+      return false;
     }
-    return false;
+
+    const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
+
+    if (this.showNotificationsOnlyMentions()) {
+      return this.unreadState().selfMentions.some(isNewerMessage);
+    }
+
+    const hasNewMessage = this.unreadState().allMessages.some(isNewerMessage);
+    if (hasNewMessage) {
+      return true;
+    }
+
+    return this.unreadState().allEvents.some(messageEntity => {
+      if (!isNewerMessage(messageEntity)) {
+        return false;
+      }
+
+      const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
+      const isMemberJoin = messageEntity.is_member() && messageEntity.isMemberJoin();
+      const wasSelfUserAdded = isMemberJoin && messageEntity.isUserAffected(this.selfUser().id);
+
+      return isCallActivation || wasSelfUserAdded;
+    });
   }
 
   /**
@@ -512,7 +562,7 @@ z.entity.Conversation = class Conversation {
       const timestamp = new Date(time).getTime();
 
       if (!_.isNaN(timestamp)) {
-        this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
     }
   }
@@ -530,11 +580,11 @@ z.entity.Conversation = class Conversation {
 
       if (timestamp <= this.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+          this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
           const from_self = message_et.user() && message_et.user().is_me;
           if (from_self) {
-            this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+            this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
         }
       }
@@ -642,12 +692,16 @@ z.entity.Conversation = class Conversation {
   }
 
   getTemporaryGuests() {
-    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    const userEntities = this.selfUser()
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
     return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
   }
 
   getUsersWithUnverifiedClients() {
-    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    const userEntities = this.selfUser()
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
@@ -663,7 +717,7 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    if (this.self.inTeam()) {
+    if (this.selfUser().inTeam()) {
       return true;
     }
 
@@ -676,8 +730,8 @@ z.entity.Conversation = class Conversation {
 
   serialize() {
     return {
-      archived_state: this.archived_state(),
-      archived_timestamp: this.archived_timestamp(),
+      archived_state: this.archivedState(),
+      archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
@@ -687,8 +741,8 @@ z.entity.Conversation = class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
-      muted_state: this.muted_state(),
-      muted_timestamp: this.muted_timestamp(),
+      muted_state: this.mutedState(),
+      muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
       others: this.participating_user_ids(),
       status: this.status(),
