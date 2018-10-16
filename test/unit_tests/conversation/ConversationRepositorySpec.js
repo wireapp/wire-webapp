@@ -692,16 +692,17 @@ describe('ConversationRepository', () => {
     });
 
     describe('"conversation.member-join"', () => {
-      let member_join_event = null;
+      let memberJoinEvent = null;
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onMemberJoin').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([]));
 
-        member_join_event = {
+        memberJoinEvent = {
           conversation: conversation_et.id,
           data: {
-            user_ids: [],
+            user_ids: ['9028624e-bfef-490a-ba61-01683f5ccc83'],
           },
           from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
           id: '3.800122000a5dcd58',
@@ -711,7 +712,7 @@ describe('ConversationRepository', () => {
       });
 
       it('should process member-join event when joining a group conversation', () => {
-        return TestFactory.conversation_repository._handleConversationEvent(member_join_event).then(() => {
+        return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
           expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
           expect(TestFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
         });
@@ -719,12 +720,12 @@ describe('ConversationRepository', () => {
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
         // conversation has a corresponding pending connection
-        const connection_et_a = new z.entity.Connection();
-        connection_et_a.conversation_id = conversation_et.id;
-        connection_et_a.status(z.user.ConnectionStatus.PENDING);
-        TestFactory.user_repository.connections.push(connection_et_a);
+        const connectionEntity = new z.entity.Connection();
+        connectionEntity.conversation_id = conversation_et.id;
+        connectionEntity.status(z.user.ConnectionStatus.PENDING);
+        TestFactory.user_repository.connections.push(connectionEntity);
 
-        return TestFactory.conversation_repository._handleConversationEvent(member_join_event).then(() => {
+        return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
           expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
           expect(TestFactory.conversation_repository.updateParticipatingUserEntities).not.toHaveBeenCalled();
         });
