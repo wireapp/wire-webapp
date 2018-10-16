@@ -401,6 +401,20 @@ ko.bindingHandlers.antiscroll = {
   },
 };
 
+ko.bindingHandlers.simplebar = {
+  init(element, valueAccessor) {
+    const {trigger = valueAccessor(), onInit} = valueAccessor();
+    const simpleBar = new window.SimpleBar(element, {autoHide: false});
+    if (ko.isObservable(trigger)) {
+      const triggerSubscription = trigger.subscribe(() => simpleBar.recalculate());
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => triggerSubscription.dispose());
+    }
+    if (onInit) {
+      onInit(simpleBar);
+    }
+  },
+};
+
 ko.bindingHandlers.electron_remove = {
   init(element) {
     if (z.util.Environment.electron) {

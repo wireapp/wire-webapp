@@ -18,8 +18,11 @@
  */
 
 .conversation-input-bar-mention-suggestion {
-  position: fixed;
-  z-index: @z-index-context;
+  position: absolute;
+  z-index: @z-index-panel - 1;
+  right: 16px;
+  left: 64px;
+  max-height: 168px;
   border: 0 solid rgba(151, 151, 151, 0.24);
   background-color: #fff;
   border-radius: 8px;
@@ -29,13 +32,10 @@
 .mention-suggestion-list {
   position: relative;
   display: flex;
-  max-height: 148px;
   flex: 1;
   flex-direction: column;
   padding: 4px 0;
   cursor: pointer;
-  overflow-x: hidden;
-  overflow-y: scroll;
   white-space: nowrap;
 
   &__item {
