@@ -73,7 +73,7 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 
 function mergedCSP(): HelmetCSP {
   return {
-    childSrc: [...defaultCSP.childSrc, ...parseCommaSeparatedList(process.env.CSP_CHILD_SRC)],
+    childSrc: [...defaultCSP.childSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_CHILD_SRC)],
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_REST,
@@ -84,13 +84,13 @@ function mergedCSP(): HelmetCSP {
     fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FONT_SRC)],
     frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FRAME_SRC)],
     imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_IMG_SRC)],
-    manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(process.env.CSP_MANIFEST_SRC)],
+    manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MANIFEST_SRC)],
     mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MEDIA_SRC)],
     objectSrc: [...defaultCSP.objectSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_OBJECT_SRC)],
-    prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(process.env.CSP_PREFETCH_SRC)],
+    prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_PREFETCH_SRC)],
     scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_SCRIPT_SRC)],
     styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_STYLE_SRC)],
-    workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_WORKER_SRC)],
+    workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_WORKER_SRC)],
   };
 }
 
