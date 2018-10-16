@@ -36,7 +36,7 @@
                 <service-icon class="search__no-services__icon"></service-icon>
                 <!-- ko if: isTeamManager() -->
                   <div class="search__no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
-                  <div class="search__no-services__manage-button search__no-services__manage-button--alternate" data-bind="l10n_text: z.string.addParticipantsManageServicesNoResults, click: clickToOpenManageServices" data-uie-name="go-enable-services"></div>
+                  <div class="search__no-services__manage-button search__no-services__manage-button--alternate" data-bind="l10n_text: z.string.addParticipantsManageServicesNoResults, click: clickOpenManageServices" data-uie-name="go-enable-services"></div>
                 <!-- /ko -->
                 <!-- ko ifnot: isTeamManager() -->
                   <div class="search__no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesMember" data-uie-name="label-no-services-enabled"></div>

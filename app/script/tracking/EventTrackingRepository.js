@@ -53,86 +53,84 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   /**
    * Construct a new repository for user actions and errors reporting.
    *
-   * @param {z.conversation.ConversationRepository} conversation_repository - Repository that handles conversations
-   * @param {z.team.TeamRepository} team_repository - Repository that handles teams
-   * @param {z.user.UserRepository} user_repository - Repository that handles users
+   * @param {z.team.TeamRepository} teamRepository - Repository that handles teams
+   * @param {z.user.UserRepository} userRepository - Repository that handles users
    * @returns {EventTrackingRepository} The new repository for user actions
    */
-  constructor(conversation_repository, team_repository, user_repository) {
-    this.update_privacy_preference = this.update_privacy_preference.bind(this);
+  constructor(teamRepository, userRepository) {
+    this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
     this.logger = new z.util.Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
 
-    this.conversation_repository = conversation_repository;
-    this.team_repository = team_repository;
-    this.user_repository = user_repository;
+    this.teamRepository = teamRepository;
+    this.userRepository = userRepository;
 
-    this.last_report = undefined;
+    this.lastReportTimestamp = undefined;
     this.mixpanel = undefined;
-    this.privacy_preference = undefined;
+    this.privacyPreference = undefined;
 
-    this.is_error_reporting_activated = false;
-    this.is_user_analytics_activated = false;
+    this.isErrorReportingActivated = false;
+    this.isUserAnalyticsActivated = false;
   }
 
   /**
    * Init the repository.
-   * @param {boolean} privacy_preference - Privacy preference
+   * @param {boolean} privacyPreference - Privacy preference
    * @returns {Promise} Resolves after initialization
    */
-  init(privacy_preference) {
-    this.privacy_preference = privacy_preference;
-    this.logger.info(`Initialize tracking and error reporting: ${this.privacy_preference}`);
+  init(privacyPreference) {
+    this.privacyPreference = privacyPreference;
+    this.logger.info(`Initialize tracking and error reporting: ${this.privacyPreference}`);
 
     return Promise.resolve()
       .then(() => {
-        if (this._is_domain_allowed_for_tracking() && this.privacy_preference) {
-          this._enable_error_reporting();
-          return this._init_tracking();
+        if (this._isDomainAllowedForTracking() && this.privacyPreference) {
+          this._enableErrorReporting();
+          return this._initTracking();
         }
         return undefined;
       })
-      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance))
-      .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.update_privacy_preference));
+      .then(mixpanelInstance => this._initAnalytics(mixpanelInstance))
+      .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference));
   }
 
-  update_privacy_preference(privacy_preference) {
-    if (privacy_preference !== this.privacy_preference) {
-      this.privacy_preference = privacy_preference;
+  updatePrivacyPreference(privacyPreference) {
+    if (privacyPreference !== this.privacyPreference) {
+      this.privacyPreference = privacyPreference;
 
-      if (privacy_preference) {
-        this._enable_error_reporting();
-        if (this._is_domain_allowed_for_tracking()) {
-          this._re_enable_tracking();
+      if (privacyPreference) {
+        this._enableErrorReporting();
+        if (this._isDomainAllowedForTracking()) {
+          this._reEnableTracking();
         }
       } else {
-        this._disable_error_reporting();
-        this._disable_tracking();
+        this._disableErrorReporting();
+        this._disableTracking();
       }
     }
   }
 
-  _init_mixpanel(mixpanel_instance) {
-    if (mixpanel_instance) {
-      this._set_super_properties();
-      this._subscribe_to_tracking_events();
+  _initAnalytics(analyticsProvider) {
+    if (analyticsProvider) {
+      this._setSuperProperties();
+      this._subscribeToTrackingEvents();
     }
   }
 
-  _subscribe_to_tracking_events() {
+  _subscribeToTrackingEvents() {
     amplify.subscribe(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
-      if (this.is_user_analytics_activated) {
-        this._set_super_property(...args);
+      if (this.isUserAnalyticsActivated) {
+        this._setSuperProperty(...args);
       }
     });
 
     amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this, (...args) => {
-      if (this.is_user_analytics_activated) {
-        this._track_event(...args);
+      if (this.isUserAnalyticsActivated) {
+        this._trackEvent(...args);
       }
     });
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._reset_super_properties.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
   }
 
   /**
@@ -140,65 +138,65 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * @see https://mixpanel.com/blog/2015/09/21/community-tip-maintaining-user-identity/
    * @returns {undefined}
    */
-  _reset_super_properties() {
+  _resetSuperProperties() {
     if (this.mixpanel) {
       this.mixpanel.reset();
     }
   }
 
-  _unsubscribe_from_tracking_events() {
+  _unsubscribeFromTrackingEvents() {
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
   }
 
-  _set_super_properties() {
-    this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._set_super_property(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
-    this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
+  _setSuperProperties() {
+    this._setSuperProperty(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._setSuperProperty(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
+    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.getPlatform());
     if (z.util.Environment.desktop) {
-      this._set_super_property(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
+      this._setSuperProperty(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
     }
 
-    if (this.user_repository) {
-      this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
-      this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.isTeam());
-      this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.teamSize());
+    if (this.userRepository) {
+      this._setSuperProperty(z.tracking.SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
+      this._setSuperProperty(z.tracking.SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
+      this._setSuperProperty(z.tracking.SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
     }
   }
 
-  _set_super_property(superPropertyName, value) {
+  _setSuperProperty(superPropertyName, value) {
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
     this.mixpanel.register({[superPropertyName]: value});
   }
 
-  _track_event(event_name, attributes) {
+  _trackEvent(eventName, attributes) {
     const logMessage = attributes
-      ? `Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`
-      : `Tracking event '${event_name}' without attributes`;
+      ? `Tracking event '${eventName}' with attributes: ${JSON.stringify(attributes)}`
+      : `Tracking event '${eventName}' without attributes`;
     this.logger.info(logMessage);
 
-    const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(event_name);
+    const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
     if (!isDisabledEvent) {
-      this.mixpanel.track(event_name, attributes);
+      this.mixpanel.track(eventName, attributes);
     }
   }
 
-  _disable_tracking() {
+  _disableTracking() {
     this.logger.debug('Tracking was disabled due to user preferences');
-    this.is_user_analytics_activated = false;
+    this.isUserAnalyticsActivated = false;
 
-    this._unsubscribe_from_tracking_events();
+    this._unsubscribeFromTrackingEvents();
 
     if (this.mixpanel) {
-      this._track_event(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
+      this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
       this.mixpanel.register({
         $ignore: true,
       });
     }
   }
 
-  _re_enable_tracking() {
-    this.is_user_analytics_activated = true;
+  _reEnableTracking() {
+    this.isUserAnalyticsActivated = true;
 
     Promise.resolve()
       .then(() => {
@@ -207,14 +205,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           return this.mixpanel;
         }
 
-        return this._init_tracking();
+        return this._initTracking();
       })
-      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance))
-      .then(() => this._track_event(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
+      .then(mixpanelInstance => this._initAnalytics(mixpanelInstance))
+      .then(() => this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
   }
 
-  _init_tracking() {
-    this.is_user_analytics_activated = true;
+  _initTracking() {
+    this.isUserAnalyticsActivated = true;
 
     if (this.mixpanel) {
       return Promise.resolve(this.mixpanel);
@@ -244,14 +242,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     });
   }
 
-  _is_domain_allowed_for_tracking() {
+  _isDomainAllowedForTracking() {
     if (!z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING)) {
-      for (const domain of EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS) {
+      return !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
-          return false;
+          return true;
         }
-      }
+      });
     }
 
     return true;
@@ -265,34 +263,34 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * Checks if a Raygun payload should be reported.
    *
    * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
-   * @param {JSON} raygun_payload - Error payload about to be send
+   * @param {JSON} raygunPayload - Error payload about to be send
    * @returns {JSON|boolean} Payload if error will be reported, otherwise "false"
    */
-  _check_error_payload(raygun_payload) {
-    if (!this.last_report) {
-      this.last_report = Date.now();
-      return raygun_payload;
+  _checkErrorPayload(raygunPayload) {
+    if (!this.lastReportTimestamp) {
+      this.lastReportTimestamp = Date.now();
+      return raygunPayload;
     }
 
-    const time_since_last_report = Date.now() - this.last_report;
-    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD) {
-      this.last_report = Date.now();
-      return raygun_payload;
+    const timeSinceLastReport = Date.now() - this.lastReportTimestamp;
+    if (timeSinceLastReport > EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD) {
+      this.lastReportTimestamp = Date.now();
+      return raygunPayload;
     }
 
     return false;
   }
 
-  _disable_error_reporting() {
+  _disableErrorReporting() {
     this.logger.debug('Disabling Raygun error reporting');
-    this.is_error_reporting_activated = false;
+    this.isErrorReportingActivated = false;
     Raygun.detach();
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
   }
 
-  _enable_error_reporting() {
+  _enableErrorReporting() {
     this.logger.debug('Enabling Raygun error reporting');
-    this.is_error_reporting_activated = true;
+    this.isErrorReportingActivated = true;
 
     const options = {
       disableErrorTracking: false,
@@ -318,6 +316,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     if (z.util.Environment.desktop) {
       Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
-    Raygun.onBeforeSend(this._check_error_payload.bind(this));
+    Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
   }
 };

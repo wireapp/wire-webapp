@@ -152,6 +152,7 @@ describe('ClientMismatchHandler', () => {
 
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db).then(() => {
         const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+        eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
         return TestFactory.conversation_repository.clientMismatchHandler
           .onClientMismatch(eventInfoEntity, clientMismatch, payload)
           .then(updatedPayload => {

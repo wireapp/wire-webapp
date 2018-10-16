@@ -71,7 +71,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       this.user_service,
       this.asset_service,
       undefined,
-      this.client_repository
+      this.client_repository,
+      new z.time.ServerTimeRepository()
     );
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
