@@ -26,6 +26,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
   constructor(params) {
     this.onInput = this.onInput.bind(this);
     this.onSuggestionClick = this.onSuggestionClick.bind(this);
+    this.onInitSimpleBar = this.onInitSimpleBar.bind(this);
 
     this.isVisible = ko.observable(false);
     this.onSelectionValidated = params.onSelectionValidated || z.util.noop;
@@ -63,6 +64,10 @@ z.components.MentionSuggestions = class MentionSuggestions {
     if (wrapper) {
       wrapper.style.width = size;
     }
+  }
+
+  onInitSimpleBar(simpleBar) {
+    this.scrollElement = simpleBar.getScrollElement();
   }
 
   onInput(keyboardEvent) {
@@ -107,25 +112,23 @@ z.components.MentionSuggestions = class MentionSuggestions {
   }
 
   updateScrollPosition(selectedNumber) {
-    const scrollContentSelector = '.conversation-input-bar-mention-suggestion > .simplebar-scroll-content';
-    const scrollContent = document.querySelector(scrollContentSelector);
-    if (!scrollContent) {
+    if (!this.scrollElement) {
       return;
     }
-    const listItems = scrollContent.querySelectorAll('.mention-suggestion-list__item');
+    const listItems = this.scrollElement.querySelectorAll('.mention-suggestion-list__item');
     const selectedItem = listItems[listItems.length - 1 - selectedNumber];
     if (!selectedItem) {
       return;
     }
-    const listRect = scrollContent.getBoundingClientRect();
+    const scrollRect = this.scrollElement.getBoundingClientRect();
     const itemRect = selectedItem.getBoundingClientRect();
-    const topDiff = listRect.top - itemRect.top;
+    const topDiff = scrollRect.top - itemRect.top;
     if (topDiff > 0) {
-      return (scrollContent.scrollTop -= topDiff + 4);
+      return (this.scrollElement.scrollTop -= topDiff + 4);
     }
-    const bottomDiff = itemRect.bottom - listRect.bottom + 20;
+    const bottomDiff = itemRect.bottom - scrollRect.bottom + 20;
     if (bottomDiff > 0) {
-      return (scrollContent.scrollTop += bottomDiff + 4);
+      return (this.scrollElement.scrollTop += bottomDiff + 4);
     }
   }
 
@@ -165,7 +168,7 @@ z.components.MentionSuggestions = class MentionSuggestions {
 ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
-    <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position(), simplebar: shouldUpdateScrollbar">
+    <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position(), simplebar: {trigger: shouldUpdateScrollbar, onInit: onInitSimpleBar}">
       <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion'}">
         <div class="mention-suggestion-list__item" data-bind="click: $parent.onSuggestionClick, css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()}, attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === $parent.selectedSuggestion()}" data-uie-name="item-mention-suggestion">
           <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
