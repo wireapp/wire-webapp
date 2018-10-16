@@ -117,24 +117,26 @@ z.components.MentionSuggestions = class MentionSuggestions {
   }
 
   updateScrollPosition(selectedNumber) {
-    const suggestionList = document.querySelector('.mention-suggestion-list');
-    if (!suggestionList) {
+    const scrollContent = document.querySelector(
+      '.conversation-input-bar-mention-suggestion > .simplebar-scroll-content'
+    );
+    if (!scrollContent) {
       return;
     }
-    const listItems = suggestionList.querySelectorAll('.mention-suggestion-list__item');
+    const listItems = scrollContent.querySelectorAll('.mention-suggestion-list__item');
     const selectedItem = listItems[listItems.length - 1 - selectedNumber];
     if (!selectedItem) {
       return;
     }
-    const listRect = suggestionList.getBoundingClientRect();
+    const listRect = scrollContent.getBoundingClientRect();
     const itemRect = selectedItem.getBoundingClientRect();
     const topDiff = listRect.top - itemRect.top;
     if (topDiff > 0) {
-      return (suggestionList.scrollTop -= topDiff + 4);
+      return (scrollContent.scrollTop -= topDiff + 4);
     }
-    const bottomDiff = itemRect.bottom - listRect.bottom;
+    const bottomDiff = itemRect.bottom - listRect.bottom + 20;
     if (bottomDiff > 0) {
-      return (suggestionList.scrollTop += bottomDiff + 4);
+      return (scrollContent.scrollTop += bottomDiff + 4);
     }
   }
 
@@ -146,9 +148,8 @@ z.components.MentionSuggestions = class MentionSuggestions {
   updatePosition() {
     const inputBoundingRect = this.targetInput.getBoundingClientRect();
     const bottom = window.innerHeight - inputBoundingRect.top + 24;
-    const left = inputBoundingRect.left;
 
-    this.position({bottom: `${bottom}px`, left: `${left}px`});
+    this.position({bottom: `${bottom}px`});
   }
 
   updateSelectedIndexBoundaries(suggestions) {
