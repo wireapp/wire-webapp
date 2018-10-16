@@ -170,7 +170,7 @@ class Server {
         return next();
       }
 
-      const userAgent = req.headers['user-agent'];
+      const userAgent = req.header('User-Agent');
       const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
       const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
 

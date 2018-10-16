@@ -42,7 +42,7 @@ const RedirectRoutes = (config: ServerConfig) => [
     if (config.SERVER.DEVELOPMENT) {
       return next();
     }
-    const userAgent = req.headers['user-agent'];
+    const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     if (!parseResult) {
       return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
@@ -51,7 +51,7 @@ const RedirectRoutes = (config: ServerConfig) => [
     return res.json(parseResult);
   }),
   router.get('/test/agent/?', (req, res) => {
-    const userAgent = req.headers['user-agent'];
+    const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     return res.json(parseResult);
   }),
