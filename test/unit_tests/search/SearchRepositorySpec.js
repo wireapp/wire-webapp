@@ -107,9 +107,7 @@ describe('z.search.SearchRepository', () => {
 
     it('does not replace numbers with emojis', () => {
       const felix10 = generateUser('simple10', 'Felix10');
-
       const unsortedUsers = [felix10];
-
       const suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
 
       expect(suggestions.map(serializeUser)).toEqual([]);
@@ -126,7 +124,6 @@ describe('z.search.SearchRepository', () => {
       let expected = [simplyFelix, smilyFelix, atFelix];
 
       expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
-
       suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
       expected = [smilyFelix];
 

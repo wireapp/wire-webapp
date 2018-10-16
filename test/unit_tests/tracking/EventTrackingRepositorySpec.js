@@ -68,19 +68,15 @@ describe('z.tracking.EventTrackingRepository', () => {
       return TestFactory.tracking_repository.init(true).then(() => {
         expect(TestFactory.tracking_repository.isErrorReportingActivated).toBe(true);
         expect(TestFactory.tracking_repository.isUserAnalyticsActivated).toBe(true);
-
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
 
         expect(mixpanelMock.track).toHaveBeenCalledTimes(1);
-
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_another_event');
 
         expect(mixpanelMock.track).toHaveBeenCalledTimes(2);
-
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, false);
 
         expect(mixpanelMock.track).toHaveBeenCalledTimes(3);
-
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_not_tracking');
 
         expect(mixpanelMock.track).toHaveBeenCalledTimes(3);

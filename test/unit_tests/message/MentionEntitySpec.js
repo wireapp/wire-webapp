@@ -34,23 +34,18 @@ describe('MentionEntity', () => {
       const functionCall = () => mentionEntity.validate(textMessage);
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_START_INDEX);
-
       mentionEntity.startIndex = 'fourteen';
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_START_INDEX);
-
       mentionEntity.startIndex = 14;
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_LENGTH);
-
       mentionEntity.length = 'ten';
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_LENGTH);
-
       mentionEntity.length = 10;
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_USER_ID);
-
       mentionEntity.userId = 1337;
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_USER_ID);
@@ -61,23 +56,18 @@ describe('MentionEntity', () => {
       const functionCall = () => mentionEntity.validate(textMessage);
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_START_INDEX);
-
       mentionEntity.startIndex = 14;
       mentionEntity.length = -1;
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_LENGTH);
-
       mentionEntity.length = 40;
 
       expect(() => mentionEntity.validate('')).toThrowError(z.message.MentionEntity.ERROR.OUT_OF_BOUNDS);
-
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.OUT_OF_BOUNDS);
-
       mentionEntity.length = 10;
       mentionEntity.userId = '1337';
 
       expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_USER_ID);
-
       mentionEntity.userId = userId;
       const functionToThrow = () => mentionEntity.validate('Hello, World! Please read!');
 
@@ -88,12 +78,10 @@ describe('MentionEntity', () => {
       const mentionEntity = new z.message.MentionEntity(14, 10, userId);
 
       expect(mentionEntity.validate(textMessage)).toBe(true);
-
       const beginningTextMessage = '@Gregor Can you please take a look?';
       const beginningMentionEntity = new z.message.MentionEntity(0, 7, userId);
 
       expect(beginningMentionEntity.validate(beginningTextMessage)).toBe(true);
-
       const endTextMessage = 'Can you please take a look? @Gregor';
       const endMentionEntity = new z.message.MentionEntity(28, 7, userId);
 

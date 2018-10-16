@@ -887,23 +887,18 @@ describe('Conversation', () => {
       conversationEntity.archivedState(false);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(outdatedMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(contentMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(pingMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(selfMentionMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
@@ -913,23 +908,18 @@ describe('Conversation', () => {
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(outdatedMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(contentMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(pingMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(selfMentionMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
@@ -939,23 +929,18 @@ describe('Conversation', () => {
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(outdatedMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(contentMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(pingMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(selfMentionMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(true);
@@ -965,19 +950,15 @@ describe('Conversation', () => {
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(outdatedMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(contentMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(true);
-
       conversationEntity.messages_unordered.removeAll();
 
       const memberLeaveMessage = new z.entity.MemberMessage();
@@ -993,19 +974,16 @@ describe('Conversation', () => {
       conversationEntity.messages_unordered.push(callMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(true);
-
       conversationEntity.messages_unordered.removeAll();
       conversationEntity.messages_unordered.push(memberLeaveMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       const memberJoinMessage = new z.entity.MemberMessage();
       memberJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
       memberJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(memberJoinMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       const selfJoinMessage = new z.entity.MemberMessage();
       selfJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
       selfJoinMessage.userIds.push(selfUserEntity.id);
@@ -1066,61 +1044,47 @@ describe('Conversation', () => {
       const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.selfUser(selfUserEntity);
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState('true');
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState(true);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       selfUserEntity.inTeam(true);
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState('true');
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState(true);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
-
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
