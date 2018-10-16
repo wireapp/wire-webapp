@@ -35,7 +35,7 @@ z.time.ServerTimeRepository = class ServerTimeRepository {
 
   getTimeOffset() {
     if (this._timeOffset === undefined) {
-      this.logger.warn('Trying to adjust timestamp, but no server timestamp set');
+      this.logger.warn('Trying to get server/client time offset, but no server time has been set.');
       return 0;
     }
     return this._timeOffset;
