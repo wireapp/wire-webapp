@@ -78,4 +78,19 @@ describe('z.time.ServerTimeRepository', () => {
       expect(adjustedTimestamp).toEqual(timestamp + timeOffset);
     });
   });
+
+  describe('toLocalTimestamp and toServerTimestamp', () => {
+    it('should return the initial timestamp if the two reverse operations are applied', () => {
+      const localTime = Date.now();
+      const serverTime = new Date();
+      const timeOffset = 10;
+      serverTime.setMilliseconds(serverTime.getMilliseconds() - timeOffset);
+      serverTimeRepository.computeTimeOffset(serverTime.toISOString());
+
+      const computedServerTime = serverTimeRepository.toServerTimestamp(localTime);
+      const computedLocalTime = serverTimeRepository.toLocalTimestamp(computedServerTime);
+
+      expect(computedLocalTime).toEqual(localTime);
+    });
+  });
 });
