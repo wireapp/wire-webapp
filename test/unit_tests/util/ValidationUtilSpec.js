@@ -154,10 +154,16 @@ describe('z.util.ValidationUtil', () => {
 
   describe('"isValidApiPath"', () => {
     it('detects a valid API path', () => {
-      const path = '/search/contacts';
-      const actual = z.util.ValidationUtil.isValidApiPath(path);
+      const urlPaths = [
+        '/search/contacts',
+        '/search/contacts/',
+        '/search/contacts/?ignore_missing=true',
+        '/search/contacts/?ignore_missing=true&foo=bar',
+      ];
 
-      expect(actual).toBe(true);
+      urlPaths.forEach(urlPath => {
+        expect(z.util.ValidationUtil.isValidApiPath(urlPath)).toBe(true);
+      });
     });
 
     it('detects a invalid API path', done => {
