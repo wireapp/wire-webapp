@@ -121,7 +121,7 @@ z.service.BackendClient = class BackendClient {
    * @param {string} path - API endpoint path to be suffixed to REST API environment
    * @returns {string} REST API endpoint URL
    */
-  create_url(path) {
+  createUrl(path) {
     z.util.ValidationUtil.isValidApiPath(path);
     return `${this.restUrl}${path}`;
   }
@@ -134,7 +134,7 @@ z.service.BackendClient = class BackendClient {
     return $.ajax({
       timeout: BackendClient.CONFIG.CONNECTIVITY_CHECK.REQUEST_TIMEOUT,
       type: 'HEAD',
-      url: this.create_url('/self'),
+      url: this.createUrl('/self'),
     });
   }
 
@@ -279,36 +279,33 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolves when request has been executed
    */
   _send_request(config) {
+    const {cache, contentType, data, headers, processData, timeout, type, url, withCredentials} = config;
+    const ajaxConfig = {cache, contentType, data, headers, processData, timeout, type};
+
     if (this.access_token) {
-      config.headers = $.extend(config.headers || {}, {
+      ajaxConfig.headers = Object.assign({}, headers, {
         Authorization: `${this.access_token_type} ${this.access_token}`,
       });
     }
 
-    if (config.withCredentials) {
-      config.xhrFields = {withCredentials: true};
+    if (url) {
+      ajaxConfig.url = this.createUrl(url);
+    }
+
+    if (withCredentials) {
+      ajaxConfig.xhrFields = {withCredentials: true};
     }
 
     this.number_of_requests(this.number_of_requests() + 1);
 
     return new Promise((resolve, reject) => {
-      $.ajax({
-        cache: config.cache,
-        contentType: config.contentType,
-        data: config.data,
-        headers: config.headers,
-        processData: config.processData,
-        timeout: config.timeout,
-        type: config.type,
-        url: config.url,
-        xhrFields: config.xhrFields,
-      })
-        .done((data, textStatus, {wire: wireRequest}) => {
+      $.ajax(ajaxConfig)
+        .done((responseData, textStatus, {wire: wireRequest}) => {
           const requestId = wireRequest ? wireRequest.requestId : 'ID not set';
           const logMessage = `Server response to '${config.type}' request '${config.url}' - '${requestId}':`;
-          this.logger.debug(this.logger.levels.OFF, logMessage, data);
+          this.logger.debug(this.logger.levels.OFF, logMessage, responseData);
 
-          resolve(data);
+          resolve(responseData);
         })
         .fail(({responseJSON: response, status: statusCode, wire: wireRequest}) => {
           switch (statusCode) {

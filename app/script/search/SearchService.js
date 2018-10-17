@@ -47,7 +47,7 @@ z.search.SearchService = class SearchService {
         size,
       },
       type: 'GET',
-      url: this.client.create_url('/search/contacts'),
+      url: '/search/contacts',
     });
   }
 };

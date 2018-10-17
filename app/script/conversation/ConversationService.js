@@ -63,7 +63,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_json({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
+      url: ConversationService.CONFIG.URL_CONVERSATIONS,
     });
   }
 
@@ -87,7 +87,7 @@ z.conversation.ConversationService = class ConversationService {
         start: conversation_id,
       },
       type: 'GET',
-      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
+      url: ConversationService.CONFIG.URL_CONVERSATIONS,
     });
   }
 
@@ -123,7 +123,7 @@ z.conversation.ConversationService = class ConversationService {
   get_conversation_by_id(conversation_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
     });
   }
 
@@ -140,7 +140,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_json({
       data: {name},
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`,
     });
   }
 
@@ -157,7 +157,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_json({
       data: {message_timer: messageTimer},
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`,
     });
   }
   /**
@@ -173,7 +173,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_json({
       data: payload,
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/self`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/self`,
     });
   }
 
@@ -191,7 +191,7 @@ z.conversation.ConversationService = class ConversationService {
   deleteConversationCode(conversationId) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
   }
 
@@ -205,7 +205,7 @@ z.conversation.ConversationService = class ConversationService {
   getConversationCode(conversationId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
   }
 
@@ -219,7 +219,7 @@ z.conversation.ConversationService = class ConversationService {
   postConversationCode(conversationId) {
     return this.client.send_request({
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
   }
 
@@ -238,7 +238,7 @@ z.conversation.ConversationService = class ConversationService {
         key: key,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/join`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/join`,
     });
   }
 
@@ -259,7 +259,7 @@ z.conversation.ConversationService = class ConversationService {
         access_role: accessRole,
       },
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/access`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/access`,
     });
   }
 
@@ -277,7 +277,7 @@ z.conversation.ConversationService = class ConversationService {
   deleteBots(conversationId, userId) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`,
     });
   }
 
@@ -293,9 +293,7 @@ z.conversation.ConversationService = class ConversationService {
   deleteMembers(conversationId, userId) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`
-      ),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
     });
   }
 
@@ -314,7 +312,7 @@ z.conversation.ConversationService = class ConversationService {
         service: serviceId,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots`,
     });
   }
 
@@ -341,7 +339,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Promise that resolves when the message was sent
    */
   post_encrypted_message(conversation_id, payload, precondition_option) {
-    let url = this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`);
+    let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
 
     if (_.isArray(precondition_option)) {
       url = `${url}?report_missing=${precondition_option.join(',')}`;
@@ -371,7 +369,7 @@ z.conversation.ConversationService = class ConversationService {
         users: userIds,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members`,
     });
   }
 

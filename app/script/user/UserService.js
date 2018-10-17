@@ -91,7 +91,7 @@ z.user.UserService = class UserService {
         user: user_id,
       },
       type: 'POST',
-      url: this.client.create_url(UserService.URL.CONNECTIONS),
+      url: UserService.URL.CONNECTIONS,
     });
   }
 
@@ -112,7 +112,7 @@ z.user.UserService = class UserService {
         start: user_id,
       },
       type: 'GET',
-      url: this.client.create_url(UserService.URL.CONNECTIONS),
+      url: UserService.URL.CONNECTIONS,
     });
   }
 
@@ -130,7 +130,7 @@ z.user.UserService = class UserService {
         status: status,
       },
       type: 'PUT',
-      url: this.client.create_url(`${UserService.URL.CONNECTIONS}/${user_id}`),
+      url: `${UserService.URL.CONNECTIONS}/${user_id}`,
     });
   }
 
@@ -148,7 +148,7 @@ z.user.UserService = class UserService {
         phone: phone_number,
       },
       type: 'POST',
-      url: this.client.create_url(UserService.URL.PASSWORD_RESET),
+      url: UserService.URL.PASSWORD_RESET,
     });
   }
 
@@ -170,7 +170,7 @@ z.user.UserService = class UserService {
         phone: phone_number,
       },
       type: 'POST',
-      url: this.client.create_url(`${UserService.URL.PASSWORD_RESET}/complete`),
+      url: `${UserService.URL.PASSWORD_RESET}/complete`,
     });
   }
 
@@ -182,7 +182,7 @@ z.user.UserService = class UserService {
   get_own_user() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(UserService.URL.SELF),
+      url: UserService.URL.SELF,
     });
   }
 
@@ -194,7 +194,7 @@ z.user.UserService = class UserService {
     return this.client
       .send_request({
         type: 'GET',
-        url: this.client.create_url(`${UserService.URL.SELF}/consent`),
+        url: `${UserService.URL.SELF}/consent`,
       })
       .then(data => data.results);
   }
@@ -215,7 +215,7 @@ z.user.UserService = class UserService {
         value: value,
       },
       type: 'PUT',
-      url: this.client.create_url(`${UserService.URL.SELF}/consent`),
+      url: `${UserService.URL.SELF}/consent`,
     });
   }
 
@@ -232,7 +232,7 @@ z.user.UserService = class UserService {
     return this.client.send_json({
       data: data,
       type: 'PUT',
-      url: this.client.create_url(UserService.URL.SELF),
+      url: UserService.URL.SELF,
     });
   }
 
@@ -248,7 +248,7 @@ z.user.UserService = class UserService {
         email: email,
       },
       type: 'PUT',
-      url: this.client.create_url(`${UserService.URL.SELF}/email`),
+      url: `${UserService.URL.SELF}/email`,
     });
   }
 
@@ -263,7 +263,7 @@ z.user.UserService = class UserService {
         handle: username,
       },
       type: 'PUT',
-      url: this.client.create_url(`${UserService.URL.SELF}/handle`),
+      url: `${UserService.URL.SELF}/handle`,
     });
   }
 
@@ -281,7 +281,7 @@ z.user.UserService = class UserService {
         old_password: old_password,
       },
       type: 'PUT',
-      url: this.client.create_url(`${UserService.URL.SELF}/password`),
+      url: `${UserService.URL.SELF}/password`,
     });
   }
 
@@ -297,7 +297,7 @@ z.user.UserService = class UserService {
         phone: phone_number,
       },
       type: 'PUT',
-      url: this.client.create_url(`${UserService.URL.SELF}/phone`),
+      url: `${UserService.URL.SELF}/phone`,
     });
   }
 
@@ -311,7 +311,7 @@ z.user.UserService = class UserService {
         todo: 'Change this to normal request!',
       },
       type: 'DELETE',
-      url: this.client.create_url(UserService.URL.SELF),
+      url: UserService.URL.SELF,
     });
   }
 
@@ -324,14 +324,14 @@ z.user.UserService = class UserService {
   check_username(username) {
     return this.client.send_request({
       type: 'HEAD',
-      url: this.client.create_url(`${UserService.URL.USERS}/handles/${username}`),
+      url: `${UserService.URL.USERS}/handles/${username}`,
     });
   }
 
   get_username(username) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${UserService.URL.USERS}/handles/${username}`),
+      url: `${UserService.URL.USERS}/handles/${username}`,
     });
   }
 
@@ -350,7 +350,7 @@ z.user.UserService = class UserService {
         return: amount,
       },
       type: 'POST',
-      url: this.client.create_url(`${UserService.URL.USERS}/handles`),
+      url: `${UserService.URL.USERS}/handles`,
     });
   }
 
@@ -367,7 +367,7 @@ z.user.UserService = class UserService {
         ids: users.join(','),
       },
       type: 'GET',
-      url: this.client.create_url(UserService.URL.USERS),
+      url: UserService.URL.USERS,
     });
   }
 
@@ -380,7 +380,7 @@ z.user.UserService = class UserService {
   get_user_by_id(user_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${UserService.URL.USERS}/${user_id}`),
+      url: `${UserService.URL.USERS}/${user_id}`,
     });
   }
 };

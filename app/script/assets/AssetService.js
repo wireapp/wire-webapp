@@ -136,7 +136,7 @@ z.assets.AssetService = class AssetService {
   generateAssetUrl(assetId, conversationId, forceCaching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
-      const url = this.client.create_url(`/assets/${assetId}`);
+      const url = this.client.createUrl(`/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
       const conversationIdParam = `&conv_id=${window.encodeURIComponent(conversationId)}`;
 
@@ -156,7 +156,7 @@ z.assets.AssetService = class AssetService {
   generateAssetUrlV2(assetId, conversationId, forceCaching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
-      const url = this.client.create_url(`/conversations/${conversationId}/otr/assets/${assetId}`);
+      const url = this.client.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
       return `${url}?access_token=${this.client.access_token}${cachingParam}`;
@@ -174,7 +174,7 @@ z.assets.AssetService = class AssetService {
   generateAssetUrlV3(assetKey, assetToken, forceCaching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.v3(assetKey, assetToken);
-      const url = `${this.client.create_url(`/assets/v3/${assetKey}`)}`;
+      const url = `${this.client.createUrl(`/assets/v3/${assetKey}`)}`;
       const assetTokenParam = assetToken ? `&asset_token=${window.encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
@@ -231,14 +231,11 @@ z.assets.AssetService = class AssetService {
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', this.client.create_url('/assets/v3'));
+      xhr.open('POST', this.client.createUrl('/assets/v3'));
       xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
       xhr.setRequestHeader('Authorization', `${this.client.access_token_type} ${this.client.access_token}`);
       xhr.onload = function(event) {
-        if (this.status === 201) {
-          return resolve(JSON.parse(this.response));
-        }
-        return reject(event);
+        return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };
       xhr.onerror = reject;
 

@@ -63,7 +63,7 @@ z.event.NotificationService = class NotificationService {
         size: size,
       },
       type: 'GET',
-      url: this.client.create_url(NotificationService.CONFIG.URL_NOTIFICATIONS),
+      url: NotificationService.CONFIG.URL_NOTIFICATIONS,
     });
   }
 
@@ -78,7 +78,7 @@ z.event.NotificationService = class NotificationService {
         client: clientId,
       },
       type: 'GET',
-      url: this.client.create_url(NotificationService.CONFIG.URL_NOTIFICATIONS_LAST),
+      url: NotificationService.CONFIG.URL_NOTIFICATIONS_LAST,
     });
   }
 

@@ -42,21 +42,21 @@ z.team.TeamService = class TeamService {
   getTeamById(teamId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}`),
+      url: `${TeamService.URL.TEAMS}/${teamId}`,
     });
   }
 
   getTeamMember(teamId, userId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/members/${userId}`),
+      url: `${TeamService.URL.TEAMS}/${teamId}/members/${userId}`,
     });
   }
 
   getTeamMembers(teamId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/members`),
+      url: `${TeamService.URL.TEAMS}/${teamId}/members`,
     });
   }
 
@@ -67,7 +67,7 @@ z.team.TeamService = class TeamService {
         start: teamIds,
       },
       type: 'GET',
-      url: this.client.create_url(TeamService.URL.TEAMS),
+      url: TeamService.URL.TEAMS,
     });
   }
 
@@ -78,7 +78,7 @@ z.team.TeamService = class TeamService {
         size,
       },
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/services/whitelisted`),
+      url: `${TeamService.URL.TEAMS}/${teamId}/services/whitelisted`,
     });
   }
 };

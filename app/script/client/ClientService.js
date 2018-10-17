@@ -62,7 +62,7 @@ z.client.ClientService = class ClientService {
         password,
       },
       type: 'DELETE',
-      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${clientId}`),
+      url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
   }
 
@@ -75,7 +75,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       data: {},
       type: 'DELETE',
-      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${clientId}`),
+      url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
   }
 
@@ -89,7 +89,7 @@ z.client.ClientService = class ClientService {
   getClientById(clientId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${clientId}`),
+      url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
   }
 
@@ -101,7 +101,7 @@ z.client.ClientService = class ClientService {
   getClients() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(ClientService.URL_CLIENTS),
+      url: ClientService.URL_CLIENTS,
     });
   }
 
@@ -115,7 +115,7 @@ z.client.ClientService = class ClientService {
   getClientsByUserId(userId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`),
+      url: `${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`,
     });
   }
 
@@ -128,7 +128,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(ClientService.URL_CLIENTS),
+      url: ClientService.URL_CLIENTS,
     });
   }
 

@@ -47,7 +47,7 @@ z.calling.CallingService = class CallingService {
         limit,
       },
       type: 'GET',
-      url: this.client.create_url('/calls/config/v2'),
+      url: '/calls/config/v2',
     });
   }
 };

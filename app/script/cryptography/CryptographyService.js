@@ -50,7 +50,7 @@ z.cryptography.CryptographyService = class CryptographyService {
   getUserPreKeyByIds(userId, clientId) {
     return this.client.send_json({
       type: 'GET',
-      url: this.client.create_url(`${CryptographyService.CONFIG.URL_USERS}/${userId}/prekeys/${clientId}`),
+      url: `${CryptographyService.CONFIG.URL_USERS}/${userId}/prekeys/${clientId}`,
     });
   }
 
@@ -65,7 +65,7 @@ z.cryptography.CryptographyService = class CryptographyService {
     return this.client.send_json({
       data: recipients,
       type: 'POST',
-      url: this.client.create_url(`${CryptographyService.CONFIG.URL_USERS}/prekeys`),
+      url: `${CryptographyService.CONFIG.URL_USERS}/prekeys`,
     });
   }
 
@@ -82,7 +82,7 @@ z.cryptography.CryptographyService = class CryptographyService {
         prekeys: serializedPreKeys,
       },
       type: 'PUT',
-      url: this.client.create_url(`${CryptographyService.CONFIG.URL_CLIENTS}/${clientId}`),
+      url: `${CryptographyService.CONFIG.URL_CLIENTS}/${clientId}`,
     });
   }
 };
