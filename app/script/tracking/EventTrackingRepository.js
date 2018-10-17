@@ -24,9 +24,6 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const MIXPANEL_TOKEN = z.util.Environment.frontend.isProduction()
-      ? 'c7dcb15893f14932b1c31b5fb33ff669'
-      : '537da3b3bc07df1e420d07e2921a6f6f';
     const RAYGUN_API_KEY = z.util.Environment.frontend.isProduction()
       ? 'lAkLCPLx3ysnsXktajeHmw=='
       : '5hvAMmz8wTXaHBYqu2TFUQ==';
@@ -37,7 +34,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
-        API_KEY: MIXPANEL_TOKEN,
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         DISABLED_EVENTS: [
@@ -65,8 +61,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
 
+    this.providerAPI = undefined;
     this.lastReportTimestamp = undefined;
-    this.mixpanel = undefined;
     this.privacyPreference = undefined;
 
     this.isErrorReportingActivated = false;
@@ -90,7 +86,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
         return undefined;
       })
-      .then(mixpanelInstance => this._initAnalytics(mixpanelInstance))
+      .then(providerInstance => this._initAnalytics(providerInstance))
       .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference));
   }
 
@@ -135,12 +131,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   /**
    * Calling the reset method will clear the Distinct Id and all super properties.
-   * @see https://mixpanel.com/blog/2015/09/21/community-tip-maintaining-user-identity/
    * @returns {undefined}
    */
   _resetSuperProperties() {
-    if (this.mixpanel) {
-      this.mixpanel.reset();
+    if (this.providerAPI) {
+      // reset super properties on provider
     }
   }
 
@@ -166,7 +161,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _setSuperProperty(superPropertyName, value) {
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
-    this.mixpanel.register({[superPropertyName]: value});
   }
 
   _trackEvent(eventName, attributes) {
@@ -177,7 +171,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
     if (!isDisabledEvent) {
-      this.mixpanel.track(eventName, attributes);
+      // send event to provider
     }
   }
 
@@ -187,59 +181,27 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     this._unsubscribeFromTrackingEvents();
 
-    if (this.mixpanel) {
+    if (this.providerAPI) {
       this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
-      this.mixpanel.register({
-        $ignore: true,
-      });
+      // disable provider
+      this.providerAPI = undefined;
     }
   }
 
   _reEnableTracking() {
     this.isUserAnalyticsActivated = true;
 
-    Promise.resolve()
-      .then(() => {
-        if (this.mixpanel) {
-          this.mixpanel.unregister('$ignore');
-          return this.mixpanel;
-        }
-
-        return this._initTracking();
-      })
-      .then(mixpanelInstance => this._initAnalytics(mixpanelInstance))
+    // check if provider API is available and reuse if possible
+    const providerPromise = this.providerAPI ? Promise.resolve(this.providerAPI) : this._initTracking();
+    return providerPromise
+      .then(providerInstance => this._initAnalytics(providerInstance))
       .then(() => this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
   }
 
   _initTracking() {
     this.isUserAnalyticsActivated = true;
-
-    if (this.mixpanel) {
-      return Promise.resolve(this.mixpanel);
-    }
-
-    return new Promise(resolve => {
-      mixpanel.init(
-        EventTrackingRepository.CONFIG.USER_ANALYTICS.API_KEY,
-        {
-          autotrack: false,
-          debug: !z.util.Environment.frontend.isProduction(),
-          loaded: mixpanel => {
-            mixpanel.register({
-              $city: null,
-              $initial_referrer: null,
-              $initial_referring_domain: null,
-              $referrer: null,
-              $referring_domain: null,
-              $region: null,
-            });
-            this.mixpanel = mixpanel;
-            resolve(mixpanel);
-          },
-        },
-        Date.now()
-      );
-    });
+    // initialize provider API
+    return Promise.resolve(this.providerAPI);
   }
 
   _isDomainAllowedForTracking() {

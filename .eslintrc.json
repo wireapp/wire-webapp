@@ -31,7 +31,6 @@
     "LRUCache": true,
     "marked": true,
     "moment": true,
-    "mixpanel": true,
     "OpenGraphMocks": true,
     "pako": true,
     "payload": true,
