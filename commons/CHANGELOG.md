@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.6.27...@wireapp/commons@0.7.0) (2018-10-17)
+
+
+### Features
+
+* **commons:** Add AccentColor ([#1234](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1234)) ([9a46330](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/9a46330))
+
+
+
+
+
 ## [0.6.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.6.26...@wireapp/commons@0.6.27) (2018-10-17)
 
 **Note:** Version bump only for package @wireapp/commons
