@@ -46,7 +46,7 @@ z.properties.PropertiesService = class PropertiesService {
   deleteProperties() {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
+      url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
   }
 
@@ -59,7 +59,7 @@ z.properties.PropertiesService = class PropertiesService {
   deletePropertiesByKey(key) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
+      url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 
@@ -71,7 +71,7 @@ z.properties.PropertiesService = class PropertiesService {
   getProperties() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
+      url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
   }
 
@@ -85,7 +85,7 @@ z.properties.PropertiesService = class PropertiesService {
   getPropertiesByKey(key) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
+      url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 
@@ -101,7 +101,7 @@ z.properties.PropertiesService = class PropertiesService {
     return this.client.send_json({
       data: properties,
       type: 'PUT',
-      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
+      url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 };

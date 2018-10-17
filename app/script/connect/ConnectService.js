@@ -43,7 +43,7 @@ z.connect.ConnectService = class ConnectService {
     return this.client.send_json({
       data: phoneBook,
       type: 'POST',
-      url: this.client.create_url('/onboarding/v3'),
+      url: '/onboarding/v3',
     });
   }
 };

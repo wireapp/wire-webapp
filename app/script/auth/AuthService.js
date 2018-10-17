@@ -47,7 +47,7 @@ z.auth.AuthService = class AuthService {
   getCookies() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
+      url: AuthService.CONFIG.URL_COOKIES,
     });
   }
 
@@ -64,7 +64,7 @@ z.auth.AuthService = class AuthService {
       const config = {
         crossDomain: true,
         type: 'POST',
-        url: this.client.create_url(AuthService.CONFIG.URL_ACCESS),
+        url: AuthService.CONFIG.URL_ACCESS,
         xhrFields: {
           withCredentials: true,
         },
@@ -144,7 +144,7 @@ z.auth.AuthService = class AuthService {
         password: password,
       },
       type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_COOKIES}/remove`),
+      url: `${AuthService.CONFIG.URL_COOKIES}/remove`,
     });
   }
 
@@ -174,7 +174,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${persistParam}`,
+        url: `${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`,
         xhrFields: {
           withCredentials: true,
         },
@@ -197,7 +197,7 @@ z.auth.AuthService = class AuthService {
     return this.client.send_json({
       data: requestCode,
       type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_LOGIN}/send`),
+      url: `${AuthService.CONFIG.URL_LOGIN}/send`,
     });
   }
 
@@ -209,7 +209,7 @@ z.auth.AuthService = class AuthService {
   postLogout() {
     return this.client.send_request({
       type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_ACCESS}/logout`),
+      url: `${AuthService.CONFIG.URL_ACCESS}/logout`,
       withCredentials: true,
     });
   }
