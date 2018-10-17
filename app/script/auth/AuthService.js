@@ -61,28 +61,28 @@ z.auth.AuthService = class AuthService {
    */
   postAccess(retryAttempt = 1) {
     return new Promise((resolve, reject) => {
-      const config = {
+      const ajaxConfig = {
         crossDomain: true,
         type: 'POST',
-        url: AuthService.CONFIG.URL_ACCESS,
+        url: this.client.createUrl(AuthService.CONFIG.URL_ACCESS),
         xhrFields: {
           withCredentials: true,
         },
       };
 
       if (this.client.access_token) {
-        config.headers = {
+        ajaxConfig.headers = {
           Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`,
         };
       }
 
-      config.success = data => {
+      ajaxConfig.success = data => {
         this.client.clear_queue_unblock();
         this.saveAccessTokenInClient(data.token_type, data.access_token);
         resolve(data);
       };
 
-      config.error = (jqXHR, textStatus, errorThrown) => {
+      ajaxConfig.error = (jqXHR, textStatus, errorThrown) => {
         const isRequestForbidden = jqXHR.status === z.error.BackendClientError.STATUS_CODE.FORBIDDEN;
         if (isRequestForbidden) {
           this.logger.warn(`Request for access token forbidden (Attempt '${retryAttempt}'): ${errorThrown}`, jqXHR);
@@ -124,7 +124,7 @@ z.auth.AuthService = class AuthService {
         }, AuthService.CONFIG.POST_ACCESS_RETRY_TIMEOUT);
       };
 
-      $.ajax(config);
+      $.ajax(ajaxConfig);
     });
   }
 
@@ -174,7 +174,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`,
+        url: this.client.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
         xhrFields: {
           withCredentials: true,
         },
