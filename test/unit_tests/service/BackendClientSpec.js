@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:service/Client
+// grunt test_init && grunt test_run:service/BackendClient
 
 'use strict';
 
@@ -131,13 +131,12 @@ describe('z.service.BackendClient', () => {
 
   describe('_send_request', () => {
     let config = undefined;
-    const url = 'http://localhost/user';
 
     beforeAll(() => {
       config = {
         timeout: 100,
         type: 'GET',
-        url: url,
+        url: '/users',
       };
     });
 
