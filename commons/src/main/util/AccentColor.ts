@@ -102,5 +102,5 @@ export const DEPRECATED_ACCENT_COLORS: AccentColor[] = [
  * @param id - AccentColor ID
  * @returns AccentColor with given ID | undefined
  */
-export const DEPCRECATED_getById = (id: number): AccentColor | undefined =>
+export const DEPRECATED_getById = (id: number): AccentColor | undefined =>
   DEPRECATED_ACCENT_COLORS.find(color => color.id === id);
