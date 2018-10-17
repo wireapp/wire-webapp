@@ -19,7 +19,6 @@
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
     "@bower_components/linkifyjs": "nfrasser/linkify-shim#2.1.6",
     "@bower_components/long": "dcodeIO/Long.js#*",
-    "@bower_components/mixpanel": "mixpanel/mixpanel-js#2.22.4",
     "@bower_components/moment": "moment/moment#2.22.2",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
     "@bower_components/pako": "nodeca/pako#1.0.6",
@@ -274,12 +273,6 @@
     },
     "@bower_components/long": {
       "js": "dist/long.js"
-    },
-    "@bower_components/mixpanel": {
-      "js": [
-        "mixpanel-jslib-snippet.js",
-        "mixpanel.min.js"
-      ]
     },
     "@bower_components/moment": {
       "js": [
