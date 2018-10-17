@@ -28,6 +28,7 @@ import {createPersonalAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
+import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
@@ -39,7 +40,7 @@ interface URLParams {
 interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
 
 interface ConnectedProps {
-  account: RegisterData;
+  account: RegistrationDataState;
   currentFlow: string;
   isPersonalFlow: boolean;
   isPersonalInvitationFlow: boolean;
