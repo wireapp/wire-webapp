@@ -37,6 +37,12 @@ export const STRONG_LIME_GREEN: AccentColor = {
   name: 'StrongLimeGreen',
 };
 
+export const DEPRECATED_YELLOW: AccentColor = {
+  color: '#febf02',
+  id: 3,
+  name: 'Yellow',
+};
+
 export const VIVID_RED: AccentColor = {
   color: '#fb0807',
   id: 4,
@@ -62,14 +68,39 @@ export const VIOLET: AccentColor = {
 };
 
 export const ACCENT_COLORS: AccentColor[] = [
-  STRONG_BLUE,
-  STRONG_LIME_GREEN,
-  VIVID_RED,
   BRIGHT_ORANGE,
   SOFT_PINK,
+  STRONG_BLUE,
+  STRONG_LIME_GREEN,
   VIOLET,
+  VIVID_RED,
 ];
 
 export const getById = (id: number): AccentColor | undefined => ACCENT_COLORS.find(color => color.id === id);
-
 export const getRandom = (): AccentColor => RandomUtil.randomArrayElement(ACCENT_COLORS);
+
+/**
+ * Use with caution:
+ * This only exists to support deprecated color schemes and
+ * is only permitted for usage in a read only manner.
+ */
+export const DEPRECATED_ACCENT_COLORS: AccentColor[] = [
+  BRIGHT_ORANGE,
+  DEPRECATED_YELLOW,
+  SOFT_PINK,
+  STRONG_BLUE,
+  STRONG_LIME_GREEN,
+  VIOLET,
+  VIVID_RED,
+];
+
+/**
+ * Use with caution:
+ * This only exists to support deprecated color schemes and
+ * is only permitted for usage in a read only manner.
+ *
+ * @param id - AccentColor ID
+ * @returns AccentColor with given ID | undefined
+ */
+export const DEPCRECATED_getById = (id: number): AccentColor | undefined =>
+  DEPRECATED_ACCENT_COLORS.find(color => color.id === id);
