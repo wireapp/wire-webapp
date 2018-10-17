@@ -48,7 +48,7 @@ z.auth.AuthRepository = class AuthRepository {
     this.authService = authService;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
 
-    this.queueState = this.authService.client.queue_state;
+    this.queueState = this.authService.client.queueState;
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
   }
@@ -121,12 +121,12 @@ z.auth.AuthRepository = class AuthRepository {
 
     if (!isRefreshingToken) {
       this.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
-      this.authService.client.schedule_queue_unblock();
+      this.authService.client.scheduleQueueUnblock();
       this.logger.info(`Access token renewal started. Source: ${renewalTrigger}`);
 
       this.getAccessToken()
         .then(() => {
-          this.authService.client.execute_request_queue();
+          this.authService.client.executeRequestQueue();
           amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
         })
         .catch(error => {
@@ -166,7 +166,7 @@ z.auth.AuthRepository = class AuthRepository {
       const accessTokenType = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (accessToken) {
-        this.logger.info('Cached access token found in Local Storage', {access_token: accessToken});
+        this.logger.info('Cached access token found in Local Storage', {accessToken});
         this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
         this._scheduleTokenRefresh(z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
@@ -200,31 +200,16 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Object} Access token data
    */
   saveAccessToken(accessTokenData) {
+    const {access_token: accessToken, expires_in: expiresIn, type: accessTokenType} = accessTokenData;
     const expiresInMillis = accessTokenData.expires_in * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
-      accessTokenData.access_token,
-      accessTokenData.expires_in
-    );
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
-      expirationTimestamp,
-      accessTokenData.expires_in
-    );
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL,
-      expiresInMillis,
-      accessTokenData.expires_in
-    );
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
-      accessTokenData.token_type,
-      accessTokenData.expires_in
-    );
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenData.token_type, expiresIn);
 
-    this.authService.saveAccessTokenInClient(accessTokenData.token_type, accessTokenData.access_token);
+    this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 
     this._logAccessTokenUpdate(accessTokenData, expirationTimestamp);
     this._scheduleTokenRefresh(expirationTimestamp);

@@ -44,7 +44,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves when all properties for user have been cleared
    */
   deleteProperties() {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'DELETE',
       url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
@@ -57,7 +57,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves when the requested property for user has been cleared
    */
   deletePropertiesByKey(key) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'DELETE',
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
@@ -69,7 +69,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves with an array of the property keys stored for the user
    */
   getProperties() {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
@@ -83,7 +83,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves with the property set for the given key
    */
   getPropertiesByKey(key) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
@@ -98,7 +98,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves when the property has been stored
    */
   putPropertiesByKey(key, properties) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: properties,
       type: 'PUT',
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,

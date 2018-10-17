@@ -140,7 +140,7 @@ z.assets.AssetService = class AssetService {
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
       const conversationIdParam = `&conv_id=${window.encodeURIComponent(conversationId)}`;
 
-      return `${url}?access_token=${this.client.access_token}${conversationIdParam}${cachingParam}`;
+      return `${url}?access_token=${this.client.accessToken}${conversationIdParam}${cachingParam}`;
     });
   }
 
@@ -159,7 +159,7 @@ z.assets.AssetService = class AssetService {
       const url = this.client.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.client.access_token}${cachingParam}`;
+      return `${url}?access_token=${this.client.accessToken}${cachingParam}`;
     });
   }
 
@@ -178,7 +178,7 @@ z.assets.AssetService = class AssetService {
       const assetTokenParam = assetToken ? `&asset_token=${window.encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.client.access_token}${assetTokenParam}${cachingParam}`;
+      return `${url}?access_token=${this.client.accessToken}${assetTokenParam}${cachingParam}`;
     });
   }
 
@@ -233,7 +233,7 @@ z.assets.AssetService = class AssetService {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', this.client.createUrl('/assets/v3'));
       xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
-      xhr.setRequestHeader('Authorization', `${this.client.access_token_type} ${this.client.access_token}`);
+      xhr.setRequestHeader('Authorization', `${this.client.accessTokenType} ${this.client.accessToken}`);
       xhr.onload = function(event) {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };

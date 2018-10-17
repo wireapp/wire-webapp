@@ -372,7 +372,7 @@ z.main.App = class App {
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
     this.auth.client
-      .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
+      .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
       .then(() => {
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
@@ -427,10 +427,10 @@ z.main.App = class App {
 
       if (isAccessTokenError || isInvalidClient) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-        const trigger_source = isAccessTokenError
+        const triggerSource = isAccessTokenError
           ? z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.auth.client.execute_on_connectivity(trigger_source).then(() => window.location.reload(false));
+        return this.auth.client.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
       }
     }
 
@@ -740,7 +740,7 @@ z.main.App = class App {
   _redirectToLogin(signOutReason) {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     this.auth.client
-      .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
+      .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
         const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
         const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();

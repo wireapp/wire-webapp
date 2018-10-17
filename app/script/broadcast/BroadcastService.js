@@ -58,7 +58,7 @@ z.broadcast.BroadcastService = class BroadcastService {
       url = `${url}?ignore_missing=true`;
     }
 
-    return this.client.send_json({
+    return this.client.sendJson({
       data: payload,
       type: 'POST',
       url: url,

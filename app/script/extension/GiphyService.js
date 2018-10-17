@@ -45,7 +45,7 @@ z.extension.GiphyService = class GiphyService {
   getById(ids) {
     ids = [].concat(ids);
 
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`,
     });
@@ -57,7 +57,7 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with random gifs for given tag
    */
   getRandom(tag) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         tag: tag,
       },
@@ -77,7 +77,7 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with matches
    */
   getSearch(options) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: Object.assign(
         {
           limit: 25,

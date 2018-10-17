@@ -56,7 +56,7 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the retrieved notifications
    */
   getNotifications(clientId, notificationId, size) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         client: clientId,
         since: notificationId,
@@ -73,7 +73,7 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the last known notification ID for given client
    */
   getNotificationsLast(clientId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         client: clientId,
       },

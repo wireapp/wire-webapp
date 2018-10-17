@@ -80,11 +80,11 @@ z.location.LocationService = (() => {
             latlng: `${latitude},${longitude}`,
           },
           type: 'GET',
-          url: this.backendClient.create_url(GOOGLE_GEOCODE_PROXY_BASE_URL),
+          url: this.backendClient.createUrl(GOOGLE_GEOCODE_PROXY_BASE_URL),
         };
 
         return this.backendClient
-          .send_request(requestConfig)
+          .sendRequest(requestConfig)
           .then(response => {
             const isStatusOk = response.status === 'OK';
             return isStatusOk ? resolve(_parseResults(response.results)) : resolve();

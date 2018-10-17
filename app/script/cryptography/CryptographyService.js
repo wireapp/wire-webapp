@@ -48,7 +48,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    * @returns {Promise} Resolves with a pre-key for given the client of the user
    */
   getUserPreKeyByIds(userId, clientId) {
-    return this.client.send_json({
+    return this.client.sendJson({
       type: 'GET',
       url: `${CryptographyService.CONFIG.URL_USERS}/${userId}/prekeys/${clientId}`,
     });
@@ -62,7 +62,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
   getUsersPreKeys(recipients) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: recipients,
       type: 'POST',
       url: `${CryptographyService.CONFIG.URL_USERS}/prekeys`,
@@ -77,7 +77,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    * @returns {Promise} Resolves once the pre-keys are accepted
    */
   putClientPreKeys(clientId, serializedPreKeys) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         prekeys: serializedPreKeys,
       },

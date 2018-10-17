@@ -57,7 +57,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves once the deletion of the client is complete
    */
   deleteClient(clientId, password) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         password,
       },
@@ -72,7 +72,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} - Resolves once the deletion of the temporary client is complete
    */
   deleteTemporaryClient(clientId) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {},
       type: 'DELETE',
       url: `${ClientService.URL_CLIENTS}/${clientId}`,
@@ -87,7 +87,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the requested client
    */
   getClientById(clientId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
@@ -99,7 +99,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the clients of the self user
    */
   getClients() {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: ClientService.URL_CLIENTS,
     });
@@ -113,7 +113,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the clients of a user
    */
   getClientsByUserId(userId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`,
     });
@@ -125,7 +125,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the registered client information
    */
   postClients(payload) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: payload,
       type: 'POST',
       url: ClientService.URL_CLIENTS,

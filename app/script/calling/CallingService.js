@@ -41,7 +41,7 @@ z.calling.CallingService = class CallingService {
    * @returns {Promise} Resolves with call config information
    */
   getConfig(limit) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       cache: false,
       data: {
         limit,

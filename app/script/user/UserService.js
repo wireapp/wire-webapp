@@ -84,7 +84,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when the connection request was created
    */
   create_connection(user_id, name) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         message: ' ',
         name: name,
@@ -106,7 +106,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves with user connections
    */
   get_own_connections(limit = 500, user_id) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         size: limit,
         start: user_id,
@@ -125,7 +125,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when the status was updated
    */
   update_connection_status(user_id, status) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         status: status,
       },
@@ -142,7 +142,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when password reset process has been triggered
    */
   post_password_reset(email, phone_number) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         email: email,
         phone: phone_number,
@@ -162,7 +162,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when password reset process has been triggered
    */
   post_password_reset_complete(code, new_password, email, phone_number) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         code: code,
         email: email,
@@ -180,7 +180,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that will resolve with the self user
    */
   get_own_user() {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: UserService.URL.SELF,
     });
@@ -192,7 +192,7 @@ z.user.UserService = class UserService {
    */
   getConsent() {
     return this.client
-      .send_request({
+      .sendRequest({
         type: 'GET',
         url: `${UserService.URL.SELF}/consent`,
       })
@@ -208,7 +208,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that will resolve with the self user
    */
   putConsent(consentType, value, source) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         source: source,
         type: consentType,
@@ -229,7 +229,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   update_own_user_profile(data) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: data,
       type: 'PUT',
       url: UserService.URL.SELF,
@@ -243,7 +243,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when email changing process has been started on backend
    */
   change_own_email(email) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         email: email,
       },
@@ -258,7 +258,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when username changing process has been started on backend
    */
   change_own_username(username) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         handle: username,
       },
@@ -275,7 +275,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when password has been changed on backend
    */
   change_own_password(new_password, old_password) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         new_password: new_password,
         old_password: old_password,
@@ -292,7 +292,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when phone number change process has been started on backend
    */
   change_own_phone_number(phone_number) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         phone: phone_number,
       },
@@ -306,7 +306,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Promise that resolves when account deletion has been initiated
    */
   delete_self() {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         todo: 'Change this to normal request!',
       },
@@ -322,14 +322,14 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   check_username(username) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'HEAD',
       url: `${UserService.URL.USERS}/handles/${username}`,
     });
   }
 
   get_username(username) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${UserService.URL.USERS}/handles/${username}`,
     });
@@ -344,7 +344,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   check_usernames(usernames, amount = 1) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: {
         handles: usernames,
         return: amount,
@@ -362,7 +362,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   get_users(users) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         ids: users.join(','),
       },
@@ -378,7 +378,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   get_user_by_id(user_id) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${UserService.URL.USERS}/${user_id}`,
     });

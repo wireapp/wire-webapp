@@ -85,20 +85,18 @@ z.service.BackendClient = class BackendClient {
     this.restUrl = settings.restUrl;
     this.webSocketUrl = settings.webSocketUrl;
 
-    this.connectivity_timeout = undefined;
-    this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
+    this.connectivityTimeout = undefined;
+    this.connectivityQueue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.request_queue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
-    this.queue_state = ko.observable(z.service.QUEUE_STATE.READY);
-    this.queue_timeout = undefined;
+    this.requestQueue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
+    this.queueState = ko.observable(z.service.QUEUE_STATE.READY);
+    this.queueTimeout = undefined;
 
-    this.access_token = '';
-    this.access_token_type = '';
+    this.accessToken = '';
+    this.accessTokenType = '';
 
-    this.number_of_requests = ko.observable(0);
-    this.number_of_requests.subscribe(new_value =>
-      amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value)
-    );
+    this.numberOfRequests = ko.observable(0);
+    this.numberOfRequests.subscribe(newValue => amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, newValue));
 
     // Only allow JSON response by default
     $.ajaxSetup({
@@ -108,10 +106,10 @@ z.service.BackendClient = class BackendClient {
 
     // http://stackoverflow.com/a/18996758/451634
     $.ajaxPrefilter((options, originalOptions, jqXHR) => {
-      jqXHR.wire = {
+      jqXHR.wireRequest = {
         originalRequestOptions: originalOptions,
-        requestId: this.number_of_requests(),
-        requested: new Date(),
+        requestDate: new Date(),
+        requestId: this.numberOfRequests(),
       };
     });
   }
@@ -143,76 +141,71 @@ z.service.BackendClient = class BackendClient {
    * @param {BackendClient.CONNECTIVITY_CHECK_TRIGGER} [source=BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN] - Trigger that requested connectivity check
    * @returns {Promise} Resolves once the connectivity is verified
    */
-  execute_on_connectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN) {
+  executeOnConnectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN) {
     this.logger.info(`Connectivity check requested by '${source}'`);
+    const {INITIAL_TIMEOUT, RECHECK_TIMEOUT} = BackendClient.CONFIG.CONNECTIVITY_CHECK;
 
-    const _reset_queue = () => {
-      if (this.connectivity_timeout) {
-        window.clearTimeout(this.connectivity_timeout);
-        this.connectivity_queue.pause(false);
+    const _resetQueue = () => {
+      if (this.connectivityTimeout) {
+        window.clearTimeout(this.connectivityTimeout);
+        this.connectivityQueue.pause(false);
       }
-      this.connectivity_timeout = undefined;
+      this.connectivityTimeout = undefined;
     };
 
-    const _check_status = () => {
+    const _checkStatus = () => {
       return this.status()
         .done(jqXHR => {
           this.logger.info('Connectivity verified', jqXHR);
-          _reset_queue();
+          _resetQueue();
         })
         .fail(jqXHR => {
           if (jqXHR.readyState === 4) {
             this.logger.info(`Connectivity verified by server error '${jqXHR.status}'`, jqXHR);
-            _reset_queue();
+            _resetQueue();
           } else {
             this.logger.warn('Connectivity could not be verified... retrying');
-            this.connectivity_queue.pause();
-            this.connectivity_timeout = window.setTimeout(
-              _check_status,
-              BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT
-            );
+            this.connectivityQueue.pause();
+            this.connectivityTimeout = window.setTimeout(_checkStatus, RECHECK_TIMEOUT);
           }
         });
     };
 
-    this.connectivity_queue.pause();
-    const queued_promise = this.connectivity_queue.push(() => Promise.resolve());
-    if (!this.connectivity_timeout) {
-      this.connectivity_timeout = window.setTimeout(
-        _check_status,
-        BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT
-      );
+    this.connectivityQueue.pause();
+    const queuedPromise = this.connectivityQueue.push(() => Promise.resolve());
+    if (!this.connectivityTimeout) {
+      this.connectivityTimeout = window.setTimeout(_checkStatus, INITIAL_TIMEOUT);
     }
 
-    return queued_promise;
+    return queuedPromise;
   }
 
   /**
    * Execute queued requests.
    * @returns {undefined} No return value
    */
-  execute_request_queue() {
-    this.queue_state(z.service.QUEUE_STATE.READY);
-    if (this.access_token && this.request_queue.getLength()) {
-      this.logger.info(`Executing '${this.request_queue.getLength()}' queued requests`);
-      this.request_queue.resume();
+  executeRequestQueue() {
+    this.queueState(z.service.QUEUE_STATE.READY);
+    if (this.accessToken && this.requestQueue.getLength()) {
+      this.logger.info(`Executing '${this.requestQueue.getLength()}' queued requests`);
+      this.requestQueue.resume();
     }
   }
 
-  clear_queue_unblock() {
-    if (this.queue_timeout) {
-      window.clearTimeout(this.queue_timeout);
-      this.queue_timeout = undefined;
+  clearQueueUnblockTimeout() {
+    if (this.queueTimeout) {
+      window.clearTimeout(this.queueTimeout);
+      this.queueTimeout = undefined;
     }
   }
 
-  schedule_queue_unblock() {
-    this.clear_queue_unblock();
-    this.queue_timeout = window.setTimeout(() => {
-      const is_refreshing_token = this.queue_state() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
-      if (is_refreshing_token) {
-        this.logger.log(`Unblocked queue on timeout during '${this.queue_state()}'`);
-        this.queue_state(z.service.QUEUE_STATE.READY);
+  scheduleQueueUnblock() {
+    this.clearQueueUnblockTimeout();
+    this.queueTimeout = window.setTimeout(() => {
+      const isRefreshingToken = this.queueState() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
+      if (isRefreshingToken) {
+        this.logger.log(`Unblocked queue on timeout during '${this.queueState()}'`);
+        this.queueState(z.service.QUEUE_STATE.READY);
       }
     }, BackendClient.CONFIG.QUEUE_CHECK_TIMEOUT);
   }
@@ -221,22 +214,20 @@ z.service.BackendClient = class BackendClient {
    * Send jQuery AJAX request with compressed JSON body.
    *
    * @note ContentType will be overwritten with 'application/json; charset=utf-8'
-   * @see send_request for valid parameters
+   * @see sendRequest for valid parameters
    *
    * @param {Object} config - AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
-  send_json(config) {
-    const json_config = {
+  sendJson(config) {
+    const jsonConfig = {
       contentType: 'application/json; charset=utf-8',
       data: config.data ? pako.gzip(JSON.stringify(config.data)) : undefined,
-      headers: {
-        'Content-Encoding': 'gzip',
-      },
+      headers: {'Content-Encoding': 'gzip'},
       processData: false,
     };
 
-    return this.send_request($.extend(config, json_config, true));
+    return this.sendRequest($.extend(config, jsonConfig, true));
   }
 
   /**
@@ -254,20 +245,20 @@ z.service.BackendClient = class BackendClient {
    * @param {boolean} config.withCredentials - Request send with credentials
    * @returns {Promise} Resolves when the request has been executed
    */
-  send_request(config) {
-    if (this.queue_state() !== z.service.QUEUE_STATE.READY) {
-      const logMessage = `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`;
+  sendRequest(config) {
+    if (this.queueState() !== z.service.QUEUE_STATE.READY) {
+      const logMessage = `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queueState()}'`;
       this.logger.info(logMessage, config);
     }
 
-    return this.request_queue.push(() => this._send_request(config));
+    return this.requestQueue.push(() => this._sendRequest(config));
   }
 
-  _prepend_request_queue(config, resolve_fn, reject_fn) {
-    this.request_queue.pause().unshift(() => {
-      return this._send_request(config)
-        .then(resolve_fn)
-        .catch(reject_fn);
+  _prependRequestQueue(config, resolveFn, rejectFn) {
+    this.requestQueue.pause().unshift(() => {
+      return this._sendRequest(config)
+        .then(resolveFn)
+        .catch(rejectFn);
     });
   }
 
@@ -278,14 +269,13 @@ z.service.BackendClient = class BackendClient {
    * @param {Object} config - Request configuration
    * @returns {Promise} Resolves when request has been executed
    */
-  _send_request(config) {
+  _sendRequest(config) {
     const {cache, contentType, data, headers, processData, timeout, type, url, withCredentials} = config;
     const ajaxConfig = {cache, contentType, data, headers, processData, timeout, type};
 
     if (this.access_token) {
-      ajaxConfig.headers = Object.assign({}, headers, {
-        Authorization: `${this.access_token_type} ${this.access_token}`,
-      });
+      const authorizationHeader = `${this.access_token_type} ${this.access_token}`;
+      ajaxConfig.headers = Object.assign({}, headers, {Authorization: authorizationHeader});
     }
 
     if (url) {
@@ -296,24 +286,24 @@ z.service.BackendClient = class BackendClient {
       ajaxConfig.xhrFields = {withCredentials: true};
     }
 
-    this.number_of_requests(this.number_of_requests() + 1);
+    this.numberOfRequests(this.numberOfRequests() + 1);
 
     return new Promise((resolve, reject) => {
       $.ajax(ajaxConfig)
-        .done((responseData, textStatus, {wire: wireRequest}) => {
+        .done((responseData, textStatus, {wireRequest}) => {
           const requestId = wireRequest ? wireRequest.requestId : 'ID not set';
           const logMessage = `Server response to '${config.type}' request '${config.url}' - '${requestId}':`;
           this.logger.debug(this.logger.levels.OFF, logMessage, responseData);
 
           resolve(responseData);
         })
-        .fail(({responseJSON: response, status: statusCode, wire: wireRequest}) => {
+        .fail(({responseJSON: response, status: statusCode, wireRequest}) => {
           switch (statusCode) {
             case z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
-              this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
+              this.queueState(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
               this._prepend_request_queue(config, resolve, reject);
 
-              return this.execute_on_connectivity().then(() => this.execute_request_queue());
+              return this.executeOnConnectivity().then(() => this.executeRequestQueue());
             }
 
             case z.error.BackendClientError.STATUS_CODE.FORBIDDEN: {

@@ -40,7 +40,7 @@ z.connect.ConnectService = class ConnectService {
    * @returns {Promise} Resolves with the matched contacts from the user's phone book
    */
   postOnboarding(phoneBook) {
-    return this.client.send_json({
+    return this.client.sendJson({
       data: phoneBook,
       type: 'POST',
       url: '/onboarding/v3',

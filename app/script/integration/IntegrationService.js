@@ -41,21 +41,21 @@ z.integration.IntegrationService = class IntegrationService {
   }
 
   getProvider(providerId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}`,
     });
   }
 
   getProviderServices(providerId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}`,
     });
   }
 
   getService(providerId, serviceId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}/${serviceId}`,
     });
@@ -67,7 +67,7 @@ z.integration.IntegrationService = class IntegrationService {
       params.start = start;
     }
 
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: params,
       type: 'GET',
       url: IntegrationService.URL.SERVICES,

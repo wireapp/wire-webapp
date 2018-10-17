@@ -33,8 +33,8 @@ describe('z.location.LocationService', () => {
       const longitude = 13.4138;
 
       const backendClientMock = {
-        create_url: () => {},
-        send_request: () => Promise.resolve({results: locations, status: 'OK'}),
+        createUrl: () => {},
+        sendRequest: () => Promise.resolve({results: locations, status: 'OK'}),
       };
       const locationService = new z.location.LocationService(backendClientMock);
       return locationService.getLocation(latitude, longitude).then(location => {
@@ -50,8 +50,8 @@ describe('z.location.LocationService', () => {
       const longitude = 13.4138;
 
       const backendClientMock = {
-        create_url: () => {},
-        send_request: () => Promise.resolve({results: locations, status: 'OK'}),
+        createUrl: () => {},
+        sendRequest: () => Promise.resolve({results: locations, status: 'OK'}),
       };
 
       const locationService = new z.location.LocationService(backendClientMock);

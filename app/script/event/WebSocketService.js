@@ -83,7 +83,7 @@ z.event.WebSocketService = class WebSocketService {
     this.onNotification = onNotification;
 
     return new Promise((resolve, reject) => {
-      this.connectionUrl = `${this.client.webSocketUrl}/await?access_token=${this.client.access_token}`;
+      this.connectionUrl = `${this.client.webSocketUrl}/await?access_token=${this.client.accessToken}`;
       if (this.clientId) {
         this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }

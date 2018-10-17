@@ -40,28 +40,28 @@ z.team.TeamService = class TeamService {
   }
 
   getTeamById(teamId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${TeamService.URL.TEAMS}/${teamId}`,
     });
   }
 
   getTeamMember(teamId, userId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${TeamService.URL.TEAMS}/${teamId}/members/${userId}`,
     });
   }
 
   getTeamMembers(teamId) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       type: 'GET',
       url: `${TeamService.URL.TEAMS}/${teamId}/members`,
     });
   }
 
   getTeams(limit = 100, teamIds) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         size: limit,
         start: teamIds,
@@ -72,7 +72,7 @@ z.team.TeamService = class TeamService {
   }
 
   getWhitelistedServices(teamId, size = 100, prefix) {
-    return this.client.send_request({
+    return this.client.sendRequest({
       data: {
         prefix,
         size,
