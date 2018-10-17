@@ -17,9 +17,10 @@
  *
  */
 
+const expressSitemapXml = require('express-sitemap-xml');
+
 import {CommonConfig} from '@wireapp/commons';
 import * as express from 'express';
-import expressSitemapXml from 'express-sitemap-xml';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
