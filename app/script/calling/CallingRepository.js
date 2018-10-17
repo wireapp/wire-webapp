@@ -772,15 +772,14 @@ z.calling.CallingRepository = class CallingRepository {
     const {remoteClientId, remoteUser, remoteUserId, response, type} = callMessageEntity;
     let recipientsPromise;
 
-    const isTypeReject = type === z.calling.enum.CALL_MESSAGE_TYPE.REJECT;
-    if (isTypeReject) {
-      recipientsPromise = Promise.resolve({selfUserEntity: this.userRepository.self()});
-    } else if (remoteUser) {
+    if (remoteUser) {
       recipientsPromise = Promise.resolve({remoteUserEntity: remoteUser, selfUserEntity: this.userRepository.self()});
-    } else {
+    } else if (remoteUserId) {
       recipientsPromise = this.userRepository
         .get_user_by_id(remoteUserId)
         .then(remoteUserEntity => ({remoteUserEntity, selfUserEntity: this.userRepository.self()}));
+    } else {
+      recipientsPromise = Promise.resolve({selfUserEntity: this.userRepository.self()});
     }
 
     return recipientsPromise.then(({remoteUserEntity, selfUserEntity}) => {
