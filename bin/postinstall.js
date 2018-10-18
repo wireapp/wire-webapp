@@ -9,6 +9,7 @@ if (process.env.NODE_ENV === 'production') {
 const {spawn} = require('child_process');
 
 const child = spawn('grunt', ['init'], {
+  // Shell needs to be activated to exit child processes on Windows with "Ctrl + C" (SIGINT events)
   shell: true,
   stdio: 'inherit',
 });
