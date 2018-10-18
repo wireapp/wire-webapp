@@ -49,7 +49,7 @@ z.user.UserRepository = class UserRepository {
     this.client_repository = client_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
-    this.connection_mapper = new z.user.UserConnectionMapper();
+    this.connectionMapper = new z.connection.ConnectionMapper();
     this.user_mapper = new z.user.UserMapper(serverTimeRepository);
     this.should_set_username = false;
 
@@ -173,13 +173,13 @@ z.user.UserRepository = class UserRepository {
 
     if (connection_et) {
       previous_status = connection_et.status();
-      this.connection_mapper.update_user_connection_from_json(connection_et, event_json);
+      this.connectionMapper.updateConnectionFromJson(connection_et, event_json);
     } else {
-      connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
+      connection_et = this.connectionMapper.mapConnectionFromJson(event_json);
     }
 
     this.update_user_connections([connection_et]).then(() => {
-      const shouldUpdateUser = previous_status === z.user.ConnectionStatus.SENT && connection_et.is_connected();
+      const shouldUpdateUser = previous_status === z.connection.ConnectionStatus.SENT && connection_et.is_connected();
       if (shouldUpdateUser) {
         this.updateUserById(connection_et.to);
       }
@@ -244,7 +244,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection request was accepted
    */
   acceptConnectionRequest(userEntity, showConversation = false) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.ACCEPTED, showConversation);
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -256,7 +256,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the user was blocked
    */
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.BLOCKED).then(() => {
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -272,7 +272,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancelConnectionRequest(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.CANCELLED).then(() => {
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -334,7 +334,7 @@ z.user.UserRepository = class UserRepository {
       .get_own_connections(limit, user_id)
       .then(({connections, has_more}) => {
         if (connections.length) {
-          const new_connection_ets = this.connection_mapper.map_user_connections_from_json(connections);
+          const new_connection_ets = this.connectionMapper.mapConnectionsFromJson(connections);
           connection_ets = connection_ets.concat(new_connection_ets);
         }
 
@@ -361,7 +361,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when an incoming connection request was ignored
    */
   ignoreConnectionRequest(userEntity) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.IGNORED);
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.IGNORED);
   }
 
   /**
@@ -371,7 +371,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when a user was unblocked
    */
   unblockUser(userEntity, showConversation = true) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.ACCEPTED, showConversation);
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -485,12 +485,12 @@ z.user.UserRepository = class UserRepository {
    * Send the user connection notification.
    * @param {z.entity.Connection} connectionEntity - Connection entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.user.ConnectionStatus} previousStatus - Previous connection status
+   * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
    */
   _send_user_connection_notification(connectionEntity, source, previousStatus) {
     // We accepted the connection request or unblocked the user
-    const expectedPreviousStatus = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING];
+    const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.is_connected() && wasExpectedPreviousStatus;
     const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
@@ -502,13 +502,13 @@ z.user.UserRepository = class UserRepository {
         messageEntity.user(userEntity);
 
         switch (connectionEntity.status()) {
-          case z.user.ConnectionStatus.PENDING: {
+          case z.connection.ConnectionStatus.PENDING: {
             messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
             break;
           }
 
-          case z.user.ConnectionStatus.ACCEPTED: {
-            const statusWasSent = previousStatus === z.user.ConnectionStatus.SENT;
+          case z.connection.ConnectionStatus.ACCEPTED: {
+            const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
             messageEntity.memberMessageType = statusWasSent
               ? z.message.SystemMessageType.CONNECTION_ACCEPTED
               : z.message.SystemMessageType.CONNECTION_CONNECTED;

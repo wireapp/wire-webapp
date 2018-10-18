@@ -121,13 +121,13 @@ z.user.UserService = class UserService {
    * @example status: ['accepted', 'blocked', 'pending', 'ignored', 'sent' or 'cancelled']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    * @param {string} user_id - User ID of the other user
-   * @param {z.user.ConnectionStatus} status - New relation status
+   * @param {z.connection.ConnectionStatus} connectionStatus - New relation status
    * @returns {Promise} Promise that resolves when the status was updated
    */
-  update_connection_status(user_id, status) {
+  update_connection_status(user_id, connectionStatus) {
     return this.backendClient.sendJson({
       data: {
-        status: status,
+        status: connectionStatus,
       },
       type: 'PUT',
       url: `${UserService.URL.CONNECTIONS}/${user_id}`,

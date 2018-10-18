@@ -44,7 +44,7 @@ describe('ConversationRepository', () => {
 
   const _generate_conversation = (
     conversation_type = z.conversation.ConversationType.GROUP,
-    connection_status = z.user.ConnectionStatus.ACCEPTED
+    connection_status = z.connection.ConnectionStatus.ACCEPTED
   ) => {
     const conversation = new z.entity.Conversation(z.util.createRandomUuid());
     conversation.type(conversation_type);
@@ -204,7 +204,7 @@ describe('ConversationRepository', () => {
     it('should not contain a blocked conversations', () => {
       const blocked_conversation_et = _generate_conversation(
         z.conversation.ConversationType.ONE2ONE,
-        z.user.ConnectionStatus.BLOCKED
+        z.connection.ConnectionStatus.BLOCKED
       );
 
       return TestFactory.conversation_repository.save_conversation(blocked_conversation_et).then(() => {
@@ -221,7 +221,7 @@ describe('ConversationRepository', () => {
     it('should not contain the conversation for a cancelled connection request', () => {
       const cancelled_conversation_et = _generate_conversation(
         z.conversation.ConversationType.ONE2ONE,
-        z.user.ConnectionStatus.CANCELLED
+        z.connection.ConnectionStatus.CANCELLED
       );
 
       return TestFactory.conversation_repository.save_conversation(cancelled_conversation_et).then(() => {
@@ -238,7 +238,7 @@ describe('ConversationRepository', () => {
     it('should not contain the conversation for a pending connection request', () => {
       const pending_conversation_et = _generate_conversation(
         z.conversation.ConversationType.ONE2ONE,
-        z.user.ConnectionStatus.PENDING
+        z.connection.ConnectionStatus.PENDING
       );
 
       return TestFactory.conversation_repository.save_conversation(pending_conversation_et).then(() => {
@@ -424,7 +424,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a connection to a new conversation', () => {
-      connection_et.status(z.user.ConnectionStatus.ACCEPTED);
+      connection_et.status(z.connection.ConnectionStatus.ACCEPTED);
       TestFactory.conversation_repository.conversations.removeAll();
 
       return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
@@ -435,7 +435,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a cancelled connection to an existing conversation and filter it', () => {
-      connection_et.status(z.user.ConnectionStatus.CANCELLED);
+      connection_et.status(z.connection.ConnectionStatus.CANCELLED);
 
       return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
         expect(_conversation.connection()).toBe(connection_et);
@@ -722,7 +722,7 @@ describe('ConversationRepository', () => {
         // conversation has a corresponding pending connection
         const connectionEntity = new z.entity.Connection();
         connectionEntity.conversation_id = conversation_et.id;
-        connectionEntity.status(z.user.ConnectionStatus.PENDING);
+        connectionEntity.status(z.connection.ConnectionStatus.PENDING);
         TestFactory.user_repository.connections.push(connectionEntity);
 
         return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {

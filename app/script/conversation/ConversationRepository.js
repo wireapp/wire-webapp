@@ -125,9 +125,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations = ko.pureComputed(() => {
       return this.conversations().filter(conversation_et => {
         const states_to_filter = [
-          z.user.ConnectionStatus.BLOCKED,
-          z.user.ConnectionStatus.CANCELLED,
-          z.user.ConnectionStatus.PENDING,
+          z.connection.ConnectionStatus.BLOCKED,
+          z.connection.ConnectionStatus.CANCELLED,
+          z.connection.ConnectionStatus.PENDING,
         ];
 
         if (conversation_et.is_self() || states_to_filter.includes(conversation_et.connection().status())) {
@@ -3130,7 +3130,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.user_repository.get_connection_by_conversation_id(conversationEntity.id);
-    const isPendingConnection = connectionEntity && connectionEntity.status() === z.user.ConnectionStatus.PENDING;
+    const isPendingConnection = connectionEntity && connectionEntity.status() === z.connection.ConnectionStatus.PENDING;
     if (isPendingConnection) {
       return Promise.resolve();
     }

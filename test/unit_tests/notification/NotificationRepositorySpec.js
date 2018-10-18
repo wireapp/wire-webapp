@@ -552,8 +552,8 @@ describe('z.notification.NotificationRepository', () => {
     beforeEach(() => {
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
 
-      const user_connection_mapper = new z.user.UserConnectionMapper();
-      connection_et = user_connection_mapper.map_user_connection_from_json(entities.connection);
+      const connectionMapper = new z.connection.ConnectionMapper();
+      connection_et = connectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
     });

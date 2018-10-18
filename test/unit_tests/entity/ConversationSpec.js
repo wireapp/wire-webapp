@@ -1025,8 +1025,8 @@ describe('Conversation', () => {
       const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const user_connection_mapper = new z.user.UserConnectionMapper();
-      const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
+      const connectionMapper = new z.connection.ConnectionMapper();
+      const connection_et = connectionMapper.mapConnectionFromJson(payload_connection);
 
       const conversation_mapper = new z.conversation.ConversationMapper();
       const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);
