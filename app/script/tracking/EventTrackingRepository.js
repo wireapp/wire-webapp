@@ -24,16 +24,13 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const RAYGUN_API_KEY = z.util.Environment.frontend.isProduction()
-      ? 'lAkLCPLx3ysnsXktajeHmw=='
-      : '5hvAMmz8wTXaHBYqu2TFUQ==';
-
     return {
       ERROR_REPORTING: {
-        API_KEY: RAYGUN_API_KEY,
+        API_KEY: window.wire.env.RAYGUN_API_KEY,
         REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
+        API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         DISABLED_EVENTS: [

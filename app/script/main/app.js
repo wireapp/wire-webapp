@@ -225,7 +225,7 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return z.util.Environment.frontend.isProduction() ? {} : {debug: new z.util.DebugUtil(this.repository)};
+    return window.wire.env.DEBUG_UTIL ? {debug: new z.util.DebugUtil(this.repository)} : {};
   }
 
   /**

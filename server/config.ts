@@ -97,6 +97,8 @@ function mergedCSP(): HelmetCSP {
 
 export interface ServerConfig {
   CLIENT: {
+    ANALYTICS_API_KEY: string;
+    RAYGUN_API_KEY: string;
     APP_NAME: string;
     BACKEND_REST: string;
     BACKEND_WS: string;
@@ -108,6 +110,7 @@ export interface ServerConfig {
     };
     FEATURE: {
       CHECK_CONSENT: boolean;
+      DEBUG_UTIL: boolean;
     };
     VERSION?: string;
   };
@@ -130,13 +133,16 @@ const nodeEnvironment = process.env.NODE_ENV || 'production';
 
 const config: ServerConfig = {
   CLIENT: {
+    ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
     APP_NAME: process.env.APP_NAME,
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
+      DEBUG_UTIL: process.env.FEATURE_DEBUG_UTIL == 'true' ? true : false,
     },
+    RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
