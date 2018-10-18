@@ -25,7 +25,6 @@ window.z.user = z.user || {};
 z.user.UserService = class UserService {
   static get URL() {
     return {
-      CONNECTIONS: '/connections',
       PASSWORD_RESET: '/password-reset',
       SELF: '/self',
       USERS: '/users',
@@ -75,64 +74,6 @@ z.user.UserService = class UserService {
   //##############################################################################
   // Backend interactions
   //##############################################################################
-
-  /**
-   * Create a connection request to another user.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/createConnection
-   * @param {string} user_id - User ID of the user to request a connection with
-   * @param {string} name - Name of the conversation being initiated (1 - 256 characters)
-   * @returns {Promise} Promise that resolves when the connection request was created
-   */
-  create_connection(user_id, name) {
-    return this.backendClient.sendJson({
-      data: {
-        message: ' ',
-        name: name,
-        user: user_id,
-      },
-      type: 'POST',
-      url: UserService.URL.CONNECTIONS,
-    });
-  }
-
-  /**
-   * Retrieves a list of connections to other users.
-   * than the limit, you only have to pass the User ID (which is not from the self user)
-   * of the last connection item from the received list.
-   * @note The list is already pre-ordered by the backend, so in order to fetch more connections
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connections
-   * @param {number} limit - Number of results to return (default 100, max 500)
-   * @param {string} user_id - User ID to start from
-   * @returns {Promise} Promise that resolves with user connections
-   */
-  get_own_connections(limit = 500, user_id) {
-    return this.backendClient.sendRequest({
-      data: {
-        size: limit,
-        start: user_id,
-      },
-      type: 'GET',
-      url: UserService.URL.CONNECTIONS,
-    });
-  }
-
-  /**
-   * Updates a connection to another user.
-   * @example status: ['accepted', 'blocked', 'pending', 'ignored', 'sent' or 'cancelled']
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
-   * @param {string} user_id - User ID of the other user
-   * @param {z.connection.ConnectionStatus} connectionStatus - New relation status
-   * @returns {Promise} Promise that resolves when the status was updated
-   */
-  update_connection_status(user_id, connectionStatus) {
-    return this.backendClient.sendJson({
-      data: {
-        status: connectionStatus,
-      },
-      type: 'PUT',
-      url: `${UserService.URL.CONNECTIONS}/${user_id}`,
-    });
-  }
 
   /**
    * Initiate a password reset.
