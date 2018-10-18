@@ -32,8 +32,7 @@ window.z.connect = z.connect || {};
  * max-results
  */
 z.connect.ConnectGoogleService = class ConnectGoogleService {
-  constructor(client) {
-    this.client = client;
+  constructor() {
     this.logger = new z.util.Logger('z.connect.ConnectGoogleService', z.config.LOGGER.OPTIONS);
     this.client_id = '481053726221-71f8tbhghg4ug5put5v3j5pluv0di2fc.apps.googleusercontent.com';
     this.scopes = 'https://www.googleapis.com/auth/contacts.readonly';

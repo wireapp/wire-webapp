@@ -35,8 +35,8 @@ z.auth.AuthService = class AuthService {
     };
   }
 
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.auth.AuthService', z.config.LOGGER.OPTIONS);
   }
 
@@ -45,7 +45,7 @@ z.auth.AuthService = class AuthService {
    * @returns {Promise} Promise that resolves with an array of cookies.
    */
   getCookies() {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
       url: AuthService.CONFIG.URL_COOKIES,
     });
@@ -64,22 +64,23 @@ z.auth.AuthService = class AuthService {
       const ajaxConfig = {
         crossDomain: true,
         type: 'POST',
-        url: this.client.createUrl(AuthService.CONFIG.URL_ACCESS),
+        url: this.backendClient.createUrl(AuthService.CONFIG.URL_ACCESS),
         xhrFields: {
           withCredentials: true,
         },
       };
 
-      if (this.client.access_token) {
+      if (this.backendClient.accessToken) {
         ajaxConfig.headers = {
-          Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`,
+          Authorization: `Bearer ${window.decodeURIComponent(this.backendClient.accessToken)}`,
         };
       }
 
-      ajaxConfig.success = data => {
-        this.client.clear_queue_unblock();
-        this.saveAccessTokenInClient(data.token_type, data.access_token);
-        resolve(data);
+      ajaxConfig.success = accessTokenData => {
+        const {access_token: accessToken, token_type: accessTokenType} = accessTokenData;
+        this.backendClient.clearQueueUnblockTimeout();
+        this.saveAccessTokenInClient(accessTokenType, accessToken);
+        resolve(accessTokenData);
       };
 
       ajaxConfig.error = (jqXHR, textStatus, errorThrown) => {
@@ -98,22 +99,23 @@ z.auth.AuthService = class AuthService {
 
         retryAttempt++;
 
-        const _retry = () =>
-          this.postAccess(retryAttempt)
+        const _retry = () => {
+          return this.postAccess(retryAttempt)
             .then(resolve)
             .catch(reject);
+        };
 
         const isConnectivityProblem = jqXHR.status === z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
         if (isConnectivityProblem) {
           this.logger.warn('Delaying request for access token due to suspected connectivity issue');
-          this.client.clear_queue_unblock();
+          this.backendClient.clearQueueUnblockTimeout();
 
-          return this.client
-            .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+          return this.backendClient
+            .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
             .then(() => {
               this.logger.info('Continuing to request access token after verifying connectivity');
-              this.client.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
-              this.client.schedule_queue_unblock();
+              this.backendClient.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+              this.backendClient.scheduleQueueUnblock();
               return _retry();
             });
         }
@@ -137,7 +139,7 @@ z.auth.AuthService = class AuthService {
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
   postCookiesRemove(email, password, labels) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {
         email: email,
         labels: labels,
@@ -174,7 +176,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: this.client.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
+        url: this.backendClient.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
         xhrFields: {
           withCredentials: true,
         },
@@ -194,7 +196,7 @@ z.auth.AuthService = class AuthService {
    * @returns {Promise} Promise that resolves on successful login code request
    */
   postLoginSend(requestCode) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: requestCode,
       type: 'POST',
       url: `${AuthService.CONFIG.URL_LOGIN}/send`,
@@ -207,7 +209,7 @@ z.auth.AuthService = class AuthService {
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
   postLogout() {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'POST',
       url: `${AuthService.CONFIG.URL_ACCESS}/logout`,
       withCredentials: true,
@@ -222,7 +224,7 @@ z.auth.AuthService = class AuthService {
    * @returns {undefined}
    */
   saveAccessTokenInClient(type = '', value = '') {
-    this.client.access_token_type = type;
-    this.client.access_token = value;
+    this.backendClient.accessTokenType = type;
+    this.backendClient.accessToken = value;
   }
 };
