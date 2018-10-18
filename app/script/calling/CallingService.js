@@ -25,10 +25,10 @@ window.z.calling = z.calling || {};
 z.calling.CallingService = class CallingService {
   /**
    * Construct an new CallingService.
-   * @param {z.client.ClientEntity} clientEntity - Local client entity
+   * @param {BackendClient} backendClient - Client for the API calls
    */
-  constructor(clientEntity) {
-    this.client = clientEntity;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
   }
 
   /**
@@ -41,7 +41,7 @@ z.calling.CallingService = class CallingService {
    * @returns {Promise} Resolves with call config information
    */
   getConfig(limit) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       cache: false,
       data: {
         limit,

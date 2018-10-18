@@ -33,29 +33,29 @@ z.integration.IntegrationService = class IntegrationService {
   /**
    * Construct a new Integration Service.
    * @class z.integration.IntegrationService
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.integration.IntegrationService', z.config.LOGGER.OPTIONS);
   }
 
   getProvider(providerId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}`,
     });
   }
 
   getProviderServices(providerId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}`,
     });
   }
 
   getService(providerId, serviceId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}/${serviceId}`,
     });
@@ -67,7 +67,7 @@ z.integration.IntegrationService = class IntegrationService {
       params.start = start;
     }
 
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       data: params,
       type: 'GET',
       url: IntegrationService.URL.SERVICES,

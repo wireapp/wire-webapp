@@ -48,7 +48,7 @@ z.auth.AuthRepository = class AuthRepository {
     this.authService = authService;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
 
-    this.queueState = this.authService.client.queueState;
+    this.queueState = this.authService.backendClient.queueState;
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
   }
@@ -121,12 +121,12 @@ z.auth.AuthRepository = class AuthRepository {
 
     if (!isRefreshingToken) {
       this.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
-      this.authService.client.scheduleQueueUnblock();
+      this.authService.backendClient.scheduleQueueUnblock();
       this.logger.info(`Access token renewal started. Source: ${renewalTrigger}`);
 
       this.getAccessToken()
         .then(() => {
-          this.authService.client.executeRequestQueue();
+          this.authService.backendClient.executeRequestQueue();
           amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
         })
         .catch(error => {

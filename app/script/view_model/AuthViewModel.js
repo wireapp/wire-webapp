@@ -37,36 +37,37 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   /**
    * View model for the auth page.
-   * @param {z.main.Auth} auth - App authentication
+   * @param {z.main.Auth} authComponent - App authentication
    * @param {z.location.LocationRepository} locationRepository - Location Repository
    */
-  constructor(auth) {
+  constructor(authComponent) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
     this.elementId = 'auth-page';
-    this.auth = auth;
     this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
-    this.audio_repository = this.auth.audio;
+    this.authRepository = authComponent.repository;
+    this.audio_repository = authComponent.audio;
 
+    const backendClient = authComponent.backendClient;
     // Cryptography
-    this.asset_service = new z.assets.AssetService(this.auth.client);
+    this.asset_service = new z.assets.AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
     this.storageService = new z.storage.StorageService();
     this.storage_repository = new z.storage.StorageRepository(this.storageService);
 
-    const locationService = new z.location.LocationService(this.auth.client);
+    const locationService = new z.location.LocationService(backendClient);
     this.locationRepository = new z.location.LocationRepository(locationService);
 
-    this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth.client);
+    this.cryptography_service = new z.cryptography.CryptographyRepository(backendClient);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
       this.storage_repository
     );
-    this.client_service = new z.client.ClientService(this.auth.client, this.storageService);
+    this.client_service = new z.client.ClientService(backendClient, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.user_service = new z.user.UserService(this.auth.client);
+    this.user_service = new z.user.UserService(backendClient);
     this.user_repository = new z.user.UserRepository(
       this.user_service,
       this.asset_service,
@@ -78,8 +79,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
 
     const eventService = new z.event.EventService(this.storageService);
-    this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
-    this.web_socket_service = new z.event.WebSocketService(this.auth.client);
+    this.notification_service = new z.event.NotificationService(backendClient, this.storageService);
+    this.web_socket_service = new z.event.WebSocketService(backendClient);
     this.event_repository = new z.event.EventRepository(
       eventService,
       this.notification_service,
@@ -429,7 +430,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       this.pending_server_request(true);
       const payload = this._create_payload(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
 
-      this.auth.repository
+      this.authRepository
         .requestLoginCode(payload)
         .then(response => _on_code_request_success(response))
         .catch(error => {
@@ -524,7 +525,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       this.pending_server_request(true);
       const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_CODE);
 
-      this.auth.repository
+      this.authRepository
         .login(payload, this.persist())
         .then(() => this._authentication_successful())
         .catch(() => {
@@ -546,7 +547,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       this.pending_server_request(true);
       const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_PASSWORD);
 
-      this.auth.repository
+      this.authRepository
         .login(payload, this.persist())
         .then(() => this._authentication_successful())
         .catch(error => {
@@ -1450,8 +1451,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   logout() {
-    this.auth.repository.logout().then(() => {
-      this.auth.repository.deleteAccessToken();
+    this.authRepository.logout().then(() => {
+      this.authRepository.deleteAccessToken();
       window.location.replace('/login');
     });
   }

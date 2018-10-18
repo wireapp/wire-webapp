@@ -146,7 +146,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.sending_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    this.conversation_service.client.queueState.subscribe(queueState => {
+    this.conversation_service.backendClient.queueState.subscribe(queueState => {
       const queueReady = queueState === z.service.QUEUE_STATE.READY;
       this.sending_queue.pause(!queueReady || this.block_event_handling());
     });

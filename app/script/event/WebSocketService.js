@@ -49,12 +49,12 @@ z.event.WebSocketService = class WebSocketService {
 
   /**
    * Construct a new WebSocket Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
+  constructor(backendClient) {
     this.sendPing = this.sendPing.bind(this);
 
-    this.client = client;
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
 
     this.clientId = undefined;
@@ -83,7 +83,7 @@ z.event.WebSocketService = class WebSocketService {
     this.onNotification = onNotification;
 
     return new Promise((resolve, reject) => {
-      this.connectionUrl = `${this.client.webSocketUrl}/await?access_token=${this.client.accessToken}`;
+      this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.backendClient.accessToken}`;
       if (this.clientId) {
         this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
@@ -100,7 +100,7 @@ z.event.WebSocketService = class WebSocketService {
       delete this.socket.URL;
 
       this.socket.onopen = () => {
-        this.logger.info(`Connected WebSocket to: ${this.client.webSocketUrl}/await`);
+        this.logger.info(`Connected WebSocket to: ${this.backendClient.webSocketUrl}/await`);
         this.pingIntervalId = window.setInterval(this.sendPing, WebSocketService.CONFIG.PING_INTERVAL);
         resolve();
       };

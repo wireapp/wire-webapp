@@ -46,17 +46,17 @@ z.main.App = class App {
 
   /**
    * Construct a new app.
-   * @param {z.main.Auth} auth - Authentication component
+   * @param {z.main.Auth} authComponent - Authentication component
    */
-  constructor(auth) {
-    this.auth = auth;
+  constructor(authComponent) {
+    this.backendClient = authComponent.backendClient;
     this.logger = new z.util.Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
     this.telemetry = new z.telemetry.app_init.AppInitTelemetry();
     this.windowHandler = new z.ui.WindowHandler().init();
 
-    this.service = this._setupServices();
-    this.repository = this._setupRepositories();
+    this.service = this._setupServices(authComponent);
+    this.repository = this._setupRepositories(authComponent);
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
@@ -81,12 +81,14 @@ z.main.App = class App {
 
   /**
    * Create all app repositories.
+   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All repositories
    */
-  _setupRepositories() {
+  _setupRepositories(authComponent) {
     const repositories = {};
 
-    repositories.audio = this.auth.audio;
+    repositories.audio = authComponent.audio;
+    repositories.auth = authComponent.repository;
     repositories.cache = new z.cache.CacheRepository();
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
@@ -183,36 +185,38 @@ z.main.App = class App {
 
   /**
    * Create all app services.
+   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All services
    */
-  _setupServices() {
+  _setupServices(authComponent) {
     const storageService = new z.storage.StorageService();
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
     return {
-      asset: new z.assets.AssetService(this.auth.client),
+      asset: new z.assets.AssetService(this.backendClient),
+      auth: authComponent.service,
       backup: new z.backup.BackupService(storageService),
-      broadcast: new z.broadcast.BroadcastService(this.auth.client),
-      calling: new z.calling.CallingService(this.auth.client),
-      client: new z.client.ClientService(this.auth.client, storageService),
-      connect: new z.connect.ConnectService(this.auth.client),
-      connectGoogle: new z.connect.ConnectGoogleService(this.auth.client),
-      conversation: new z.conversation.ConversationService(this.auth.client, eventService, storageService),
-      cryptography: new z.cryptography.CryptographyService(this.auth.client),
+      broadcast: new z.broadcast.BroadcastService(this.backendClient),
+      calling: new z.calling.CallingService(this.backendClient),
+      client: new z.client.ClientService(this.backendClient, storageService),
+      connect: new z.connect.ConnectService(this.backendClient),
+      connectGoogle: new z.connect.ConnectGoogleService(),
+      conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
+      cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
-      giphy: new z.extension.GiphyService(this.auth.client),
-      integration: new z.integration.IntegrationService(this.auth.client),
+      giphy: new z.extension.GiphyService(this.backendClient),
+      integration: new z.integration.IntegrationService(this.backendClient),
       lifecycle: new z.lifecycle.LifecycleService(),
-      location: new z.location.LocationService(this.auth.client),
-      notification: new z.event.NotificationService(this.auth.client, storageService),
-      properties: new z.properties.PropertiesService(this.auth.client),
-      search: new z.search.SearchService(this.auth.client),
+      location: new z.location.LocationService(this.backendClient),
+      notification: new z.event.NotificationService(this.backendClient, storageService),
+      properties: new z.properties.PropertiesService(this.backendClient),
+      search: new z.search.SearchService(this.backendClient),
       storage: storageService,
-      team: new z.team.TeamService(this.auth.client),
-      user: new z.user.UserService(this.auth.client, storageService),
-      webSocket: new z.event.WebSocketService(this.auth.client),
+      team: new z.team.TeamService(this.backendClient),
+      user: new z.user.UserService(this.backendClient, storageService),
+      webSocket: new z.event.WebSocketService(this.backendClient),
     };
   }
 
@@ -371,7 +375,7 @@ z.main.App = class App {
    */
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.auth.client
+    this.backendClient
       .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
       .then(() => {
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
@@ -430,7 +434,7 @@ z.main.App = class App {
         const triggerSource = isAccessTokenError
           ? z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.auth.client.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
+        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
       }
     }
 
@@ -550,7 +554,7 @@ z.main.App = class App {
     const isLoginRedirect = referrer.includes('/auth') || referrer.includes('/login');
     const getCachedToken = isLocalhost || isLoginRedirect;
 
-    return getCachedToken ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
+    return getCachedToken ? this.repository.auth.getCachedAccessToken() : this.repository.auth.getAccessToken();
   }
 
   //##############################################################################
@@ -691,7 +695,7 @@ z.main.App = class App {
 
     const _logoutOnBackend = () => {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
-      return this.auth.repository
+      return this.repository.auth
         .logout()
         .then(() => _logout())
         .catch(() => _redirectToLogin());
@@ -739,7 +743,7 @@ z.main.App = class App {
    */
   _redirectToLogin(signOutReason) {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    this.auth.client
+    this.backendClient
       .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
         const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);

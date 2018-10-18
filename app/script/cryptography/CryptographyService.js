@@ -32,10 +32,10 @@ z.cryptography.CryptographyService = class CryptographyService {
 
   /**
    * Construct a new Cryptography Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
   }
 
@@ -48,7 +48,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    * @returns {Promise} Resolves with a pre-key for given the client of the user
    */
   getUserPreKeyByIds(userId, clientId) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       type: 'GET',
       url: `${CryptographyService.CONFIG.URL_USERS}/${userId}/prekeys/${clientId}`,
     });
@@ -62,7 +62,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
   getUsersPreKeys(recipients) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: recipients,
       type: 'POST',
       url: `${CryptographyService.CONFIG.URL_USERS}/prekeys`,
@@ -77,7 +77,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    * @returns {Promise} Resolves once the pre-keys are accepted
    */
   putClientPreKeys(clientId, serializedPreKeys) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {
         prekeys: serializedPreKeys,
       },

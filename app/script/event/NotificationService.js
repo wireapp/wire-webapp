@@ -36,11 +36,11 @@ z.event.NotificationService = class NotificationService {
   /**
    * Construct a new Notification Service.
    *
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    * @param {z.storage.StorageService} storageService - Service for all storage related tasks
    */
-  constructor(client, storageService) {
-    this.client = client;
+  constructor(backendClient, storageService) {
+    this.backendClient = backendClient;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
 
@@ -56,7 +56,7 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the retrieved notifications
    */
   getNotifications(clientId, notificationId, size) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       data: {
         client: clientId,
         since: notificationId,
@@ -73,7 +73,7 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the last known notification ID for given client
    */
   getNotificationsLast(clientId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       data: {
         client: clientId,
       },

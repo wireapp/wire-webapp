@@ -301,7 +301,7 @@ z.service.BackendClient = class BackendClient {
           switch (statusCode) {
             case z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.queueState(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
-              this._prepend_request_queue(config, resolve, reject);
+              this._prependRequestQueue(config, resolve, reject);
 
               return this.executeOnConnectivity().then(() => this.executeRequestQueue());
             }
@@ -339,7 +339,7 @@ z.service.BackendClient = class BackendClient {
             }
 
             case z.error.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-              this._prepend_request_queue(config, resolve, reject);
+              this._prependRequestQueue(config, resolve, reject);
 
               const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
               return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);

@@ -25,10 +25,10 @@ window.z.search = z.search || {};
 z.search.SearchService = class SearchService {
   /**
    * Construct a new Search Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.search.SearchService', z.config.LOGGER.OPTIONS);
   }
 
@@ -40,7 +40,7 @@ z.search.SearchService = class SearchService {
    * @returns {Promise} Resolves with the search results
    */
   getContacts(query, size) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       data: {
         // eslint-disable-next-line id-length
         q: query,

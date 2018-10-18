@@ -26,10 +26,10 @@ window.z.assets = z.assets || {};
 z.assets.AssetService = class AssetService {
   /**
    * Construct a new Asset Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.assets.AssetService', z.config.LOGGER.OPTIONS);
   }
 
@@ -136,11 +136,11 @@ z.assets.AssetService = class AssetService {
   generateAssetUrl(assetId, conversationId, forceCaching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
-      const url = this.client.createUrl(`/assets/${assetId}`);
+      const url = this.backendClient.createUrl(`/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
       const conversationIdParam = `&conv_id=${window.encodeURIComponent(conversationId)}`;
 
-      return `${url}?access_token=${this.client.accessToken}${conversationIdParam}${cachingParam}`;
+      return `${url}?access_token=${this.backendClient.accessToken}${conversationIdParam}${cachingParam}`;
     });
   }
 
@@ -156,10 +156,10 @@ z.assets.AssetService = class AssetService {
   generateAssetUrlV2(assetId, conversationId, forceCaching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
-      const url = this.client.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
+      const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.client.accessToken}${cachingParam}`;
+      return `${url}?access_token=${this.backendClient.accessToken}${cachingParam}`;
     });
   }
 
@@ -174,11 +174,11 @@ z.assets.AssetService = class AssetService {
   generateAssetUrlV3(assetKey, assetToken, forceCaching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.v3(assetKey, assetToken);
-      const url = `${this.client.createUrl(`/assets/v3/${assetKey}`)}`;
+      const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
       const assetTokenParam = assetToken ? `&asset_token=${window.encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.client.accessToken}${assetTokenParam}${cachingParam}`;
+      return `${url}?access_token=${this.backendClient.accessToken}${assetTokenParam}${cachingParam}`;
     });
   }
 
@@ -231,9 +231,9 @@ z.assets.AssetService = class AssetService {
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', this.client.createUrl('/assets/v3'));
+      xhr.open('POST', this.backendClient.createUrl('/assets/v3'));
       xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
-      xhr.setRequestHeader('Authorization', `${this.client.accessTokenType} ${this.client.accessToken}`);
+      xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
       xhr.onload = function(event) {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };

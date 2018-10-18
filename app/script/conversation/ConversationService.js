@@ -32,12 +32,12 @@ z.conversation.ConversationService = class ConversationService {
 
   /**
    * Construct a new Conversation Service.
-   * @param {BackendClient} client - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {EventService} eventService - Service that handles events
    * @param {StorageService} storageService - Service for all storage interactions
    */
-  constructor(client, eventService, storageService) {
-    this.client = client;
+  constructor(backendClient, eventService, storageService) {
+    this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
@@ -60,7 +60,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the conversation was created
    */
   postConversations(payload) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
       url: ConversationService.CONFIG.URL_CONVERSATIONS,
@@ -81,7 +81,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the conversation information
    */
   getConversations(limit = 100, conversation_id) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       data: {
         size: limit,
         start: conversation_id,
@@ -121,7 +121,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   get_conversation_by_id(conversation_id) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'GET',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
     });
@@ -137,7 +137,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   updateConversationName(conversationId, name) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {name},
       type: 'PUT',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`,
@@ -154,7 +154,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   updateConversationMessageTimer(conversationId, messageTimer) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {message_timer: messageTimer},
       type: 'PUT',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`,
@@ -170,7 +170,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   update_member_properties(conversation_id, payload) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'PUT',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/self`,
@@ -189,7 +189,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   deleteConversationCode(conversationId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
@@ -203,7 +203,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   getConversationCode(conversationId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'GET',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
@@ -217,7 +217,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postConversationCode(conversationId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'POST',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
@@ -232,7 +232,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postConversationJoin(key, code) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {
         code: code,
         key: key,
@@ -253,7 +253,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   putConversationAccess(conversationId, accessModes, accessRole) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {
         access: accessModes,
         access_role: accessRole,
@@ -275,7 +275,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   deleteBots(conversationId, userId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`,
     });
@@ -291,7 +291,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   deleteMembers(conversationId, userId) {
-    return this.client.sendRequest({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
     });
@@ -306,7 +306,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postBots(conversationId, providerId, serviceId) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {
         provider: providerId,
         service: serviceId,
@@ -347,7 +347,7 @@ z.conversation.ConversationService = class ConversationService {
       url = `${url}?ignore_missing=true`;
     }
 
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
       url: url,
@@ -364,7 +364,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postMembers(conversationId, userIds) {
-    return this.client.sendJson({
+    return this.backendClient.sendJson({
       data: {
         users: userIds,
       },
