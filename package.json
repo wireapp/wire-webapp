@@ -39,7 +39,7 @@
     "@bower_components/webrtc-adapter": "webrtcHacks/adapter#6.4.3",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
-    "@wireapp/core": "7.1.2",
+    "@wireapp/core": "7.1.6",
     "@wireapp/react-ui-kit": "4.3.5",
     "babel-plugin-react-intl": "3.0.1",
     "dexie-batch": "0.4.1",
