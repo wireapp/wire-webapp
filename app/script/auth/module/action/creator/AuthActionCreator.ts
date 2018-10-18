@@ -18,7 +18,6 @@
  */
 
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
-import {Invitation} from '@wireapp/api-client/dist/commonjs/invitation';
 import {AppAction} from '.';
 import {RegistrationDataState} from '../../reducer/authReducer';
 
@@ -104,11 +103,7 @@ export type AuthActions =
   | PushRegistrationDataAction
   | EnterTeamCreationFlowAction
   | EnterPersonalCreationFlowAction
-  | EnterGenericInvitationCreationFlowAction
-  | EnterPersonalInvitationCreationFlowAction
-  | GetInvitationFromCodeStartAction
-  | GetInvitationFromCodeSuccessAction
-  | GetInvitationFromCodeFailedAction;
+  | EnterGenericInvitationCreationFlowAction;
 
 export interface LoginStartAction extends AppAction {
   readonly type: AUTH_ACTION.LOGIN_START;
@@ -230,21 +225,6 @@ export interface EnterPersonalCreationFlowAction extends AppAction {
 }
 export interface EnterGenericInvitationCreationFlowAction extends AppAction {
   readonly type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW;
-}
-export interface EnterPersonalInvitationCreationFlowAction extends AppAction {
-  readonly type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW;
-}
-
-export interface GetInvitationFromCodeStartAction extends AppAction {
-  readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_START;
-}
-export interface GetInvitationFromCodeSuccessAction extends AppAction {
-  readonly payload: Invitation;
-  readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS;
-}
-export interface GetInvitationFromCodeFailedAction extends AppAction {
-  readonly type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED;
-  readonly error: Error;
 }
 
 export class AuthActionCreator {
@@ -431,29 +411,6 @@ export class AuthActionCreator {
   static enterGenericInviteCreationFlow = (): EnterGenericInvitationCreationFlowAction => {
     return {
       type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
-    };
-  };
-  static enterPersonalInvitationCreationFlow = (): EnterPersonalInvitationCreationFlowAction => {
-    return {
-      type: AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW,
-    };
-  };
-
-  static startGetInvitationFromCode = (): GetInvitationFromCodeStartAction => {
-    return {
-      type: AUTH_ACTION.GET_INVITATION_FROM_CODE_START,
-    };
-  };
-  static successfulGetInvitationFromCode = (invitation: Invitation): GetInvitationFromCodeSuccessAction => {
-    return {
-      payload: invitation,
-      type: AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS,
-    };
-  };
-  static failedGetInvitationFromCode = (error: Error): GetInvitationFromCodeFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.GET_INVITATION_FROM_CODE_FAILED,
     };
   };
 }
