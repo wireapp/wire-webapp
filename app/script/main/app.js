@@ -106,6 +106,7 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.connection,
+      this.service.self,
       repositories.client,
       repositories.serverTime
     );
@@ -214,6 +215,7 @@ z.main.App = class App {
       notification: new z.event.NotificationService(this.backendClient, storageService),
       properties: new z.properties.PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
+      self: new z.self.SelfService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
       user: new z.user.UserService(this.backendClient, storageService),
