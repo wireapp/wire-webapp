@@ -23,54 +23,58 @@ window.z = window.z || {};
 window.z.user = z.user || {};
 
 z.user.AvailabilityMapper = (() => {
-  const nameFromType = availabilityType => {
-    switch (availabilityType) {
-      case z.user.AvailabilityType.AVAILABLE:
-        return z.l10n.text(z.string.userAvailabilityAvailable);
-      case z.user.AvailabilityType.AWAY:
-        return z.l10n.text(z.string.userAvailabilityAway);
-      case z.user.AvailabilityType.BUSY:
-        return z.l10n.text(z.string.userAvailabilityBusy);
-      case z.user.AvailabilityType.NONE:
-        return z.l10n.text(z.string.userAvailabilityNone);
-      default:
-        throw new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE);
-    }
-  };
-
-  const protoFromType = availabilityType => {
-    switch (availabilityType) {
-      case z.user.AvailabilityType.AVAILABLE:
-        return z.proto.Availability.Type.AVAILABLE;
-      case z.user.AvailabilityType.AWAY:
-        return z.proto.Availability.Type.AWAY;
-      case z.user.AvailabilityType.BUSY:
-        return z.proto.Availability.Type.BUSY;
-      case z.user.AvailabilityType.NONE:
-        return z.proto.Availability.Type.NONE;
-      default:
-        throw new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE);
-    }
-  };
-
   const valueFromType = availabilityType => {
     switch (availabilityType) {
-      case z.user.AvailabilityType.AVAILABLE:
+      case z.user.AvailabilityType.AVAILABLE: {
         return 'available';
-      case z.user.AvailabilityType.AWAY:
+      }
+
+      case z.user.AvailabilityType.AWAY: {
         return 'away';
-      case z.user.AvailabilityType.BUSY:
+      }
+
+      case z.user.AvailabilityType.BUSY: {
         return 'busy';
-      case z.user.AvailabilityType.NONE:
+      }
+
+      case z.user.AvailabilityType.NONE: {
         return 'none';
-      default:
-        throw new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE);
+      }
+
+      default: {
+        throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+      }
     }
   };
 
   return {
-    nameFromType,
-    protoFromType,
+    nameFromType: availabilityType => {
+      switch (availabilityType) {
+        case z.user.AvailabilityType.AVAILABLE: {
+          return z.l10n.text(z.string.userAvailabilityAvailable);
+        }
+
+        case z.user.AvailabilityType.AWAY: {
+          return z.l10n.text(z.string.userAvailabilityAway);
+        }
+
+        case z.user.AvailabilityType.BUSY: {
+          return z.l10n.text(z.string.userAvailabilityBusy);
+        }
+
+        case z.user.AvailabilityType.NONE: {
+          return z.l10n.text(z.string.userAvailabilityNone);
+        }
+
+        default: {
+          throw new z.error.UserError(z.error.UserError.TYPE.INVALID_PARAMETER);
+        }
+      }
+    },
+    protoFromType: availabilityType => {
+      const typeValue = valueFromType(availabilityType).toUpperCase();
+      return z.proto.Availability.Type[typeValue];
+    },
     valueFromType,
   };
 })();
