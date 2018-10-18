@@ -85,7 +85,7 @@
     "babel-eslint": "10.0.1",
     "babel-loader": "8.0.4",
     "concurrently": "4.0.1",
-    "cssnano": "4.1.4",
+    "cssnano": "4.1.5",
     "enzyme": "3.7.0",
     "enzyme-adapter-react-16": "1.6.0",
     "enzyme-to-json": "3.3.4",
