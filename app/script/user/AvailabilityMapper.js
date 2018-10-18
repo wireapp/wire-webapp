@@ -30,15 +30,22 @@ z.user.AvailabilityMapper = (() => {
     NONE: 'none',
   };
 
-  const valueFromType = availabilityType => {
-    const availabilityTypeValues = {
-      [z.user.AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
-      [z.user.AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
-      [z.user.AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
-      [z.user.AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
-    };
+  const TYPE_VALUES = {
+    [z.user.AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
+    [z.user.AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
+    [z.user.AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
+    [z.user.AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
+  };
 
-    const value = availabilityTypeValues[availabilityType];
+  const TYPE_STRING_IDS = {
+    [z.user.AvailabilityType.AVAILABLE]: z.string.userAvailabilityAvailable,
+    [z.user.AvailabilityType.AWAY]: z.string.userAvailabilityAway,
+    [z.user.AvailabilityType.BUSY]: z.string.userAvailabilityBusy,
+    [z.user.AvailabilityType.NONE]: z.string.userAvailabilityNone,
+  };
+
+  const valueFromType = availabilityType => {
+    const value = TYPE_VALUES[availabilityType];
     if (value) {
       return value;
     }
@@ -47,14 +54,7 @@ z.user.AvailabilityMapper = (() => {
 
   return {
     nameFromType: availabilityType => {
-      const availabilityTypeStringIds = {
-        [z.user.AvailabilityType.AVAILABLE]: z.string.userAvailabilityAvailable,
-        [z.user.AvailabilityType.AWAY]: z.string.userAvailabilityAway,
-        [z.user.AvailabilityType.BUSY]: z.string.userAvailabilityBusy,
-        [z.user.AvailabilityType.NONE]: z.string.userAvailabilityNone,
-      };
-
-      const stringId = availabilityTypeStringIds[availabilityType];
+      const stringId = TYPE_STRING_IDS[availabilityType];
       if (stringId) {
         return z.l10n.text(stringId);
       }
