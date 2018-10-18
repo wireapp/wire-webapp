@@ -47,7 +47,7 @@ z.auth.AuthService = class AuthService {
   getCookies() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
+      url: AuthService.CONFIG.URL_COOKIES,
     });
   }
 
@@ -61,39 +61,39 @@ z.auth.AuthService = class AuthService {
    */
   postAccess(retryAttempt = 1) {
     return new Promise((resolve, reject) => {
-      const config = {
+      const ajaxConfig = {
         crossDomain: true,
         type: 'POST',
-        url: this.client.create_url(AuthService.CONFIG.URL_ACCESS),
+        url: this.client.createUrl(AuthService.CONFIG.URL_ACCESS),
         xhrFields: {
           withCredentials: true,
         },
       };
 
       if (this.client.access_token) {
-        config.headers = {
+        ajaxConfig.headers = {
           Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`,
         };
       }
 
-      config.success = data => {
+      ajaxConfig.success = data => {
         this.client.clear_queue_unblock();
         this.saveAccessTokenInClient(data.token_type, data.access_token);
         resolve(data);
       };
 
-      config.error = (jqXHR, textStatus, errorThrown) => {
-        const isRequestForbidden = jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
+      ajaxConfig.error = (jqXHR, textStatus, errorThrown) => {
+        const isRequestForbidden = jqXHR.status === z.error.BackendClientError.STATUS_CODE.FORBIDDEN;
         if (isRequestForbidden) {
           this.logger.warn(`Request for access token forbidden (Attempt '${retryAttempt}'): ${errorThrown}`, jqXHR);
-          return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
+          return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
 
         const exceededRetries = retryAttempt > AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT;
         if (exceededRetries) {
           this.saveAccessTokenInClient();
           this.logger.warn(`Exceeded limit of attempts to refresh access token': ${errorThrown}`, jqXHR);
-          return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
+          return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED));
         }
 
         retryAttempt++;
@@ -103,7 +103,7 @@ z.auth.AuthService = class AuthService {
             .then(resolve)
             .catch(reject);
 
-        const isConnectivityProblem = jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
+        const isConnectivityProblem = jqXHR.status === z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
         if (isConnectivityProblem) {
           this.logger.warn('Delaying request for access token due to suspected connectivity issue');
           this.client.clear_queue_unblock();
@@ -124,7 +124,7 @@ z.auth.AuthService = class AuthService {
         }, AuthService.CONFIG.POST_ACCESS_RETRY_TIMEOUT);
       };
 
-      $.ajax(config);
+      $.ajax(ajaxConfig);
     });
   }
 
@@ -144,7 +144,7 @@ z.auth.AuthService = class AuthService {
         password: password,
       },
       type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_COOKIES}/remove`),
+      url: `${AuthService.CONFIG.URL_COOKIES}/remove`,
     });
   }
 
@@ -174,7 +174,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${persistParam}`,
+        url: this.client.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
         xhrFields: {
           withCredentials: true,
         },
@@ -197,7 +197,7 @@ z.auth.AuthService = class AuthService {
     return this.client.send_json({
       data: requestCode,
       type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_LOGIN}/send`),
+      url: `${AuthService.CONFIG.URL_LOGIN}/send`,
     });
   }
 
@@ -209,7 +209,7 @@ z.auth.AuthService = class AuthService {
   postLogout() {
     return this.client.send_request({
       type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_ACCESS}/logout`),
+      url: `${AuthService.CONFIG.URL_ACCESS}/logout`,
       withCredentials: true,
     });
   }

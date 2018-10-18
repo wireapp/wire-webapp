@@ -41,15 +41,16 @@ z.user.UserRepository = class UserRepository {
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
+   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
-  constructor(user_service, asset_service, search_service, client_repository) {
+  constructor(user_service, asset_service, search_service, client_repository, serverTimeRepository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
     this.connection_mapper = new z.user.UserConnectionMapper();
-    this.user_mapper = new z.user.UserMapper();
+    this.user_mapper = new z.user.UserMapper(serverTimeRepository);
     this.should_set_username = false;
 
     this.self = ko.observable();
@@ -453,7 +454,7 @@ z.user.UserRepository = class UserRepository {
   _update_connection_status(user_et, status, show_conversation = false) {
     if (!user_et) {
       this.logger.error('Cannot update connection without a user');
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
+      return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
     }
 
     if (user_et.connection().status() === status) {
@@ -649,7 +650,7 @@ z.user.UserRepository = class UserRepository {
         .get_users(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.map_users_from_object(response) : []))
         .catch(error => {
-          const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             return [];
           }
@@ -681,17 +682,18 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Find a local user.
-   * @param {string} user_id - User ID
+   * @param {string} userId - User ID
    * @returns {Promise<z.entity.User>} Resolves with the matching user entity
    */
-  findUserById(user_id) {
-    for (const user_et of this.users()) {
-      if (user_et.id === user_id) {
-        return Promise.resolve(user_et);
-      }
+  findUserById(userId) {
+    if (!userId) {
+      return Promise.reject(new z.error.UserError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
-    return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
+    const matchingUserEntity = this.users().find(userEntity => userEntity.id === userId);
+    return matchingUserEntity
+      ? Promise.resolve(matchingUserEntity)
+      : Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
   }
 
   /**
@@ -720,14 +722,14 @@ z.user.UserRepository = class UserRepository {
   get_user_by_id(user_id) {
     return this.findUserById(user_id)
       .catch(error => {
-        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
           return this.fetchUserById(user_id);
         }
         throw error;
       })
       .catch(error => {
-        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
           this.logger.error(`Failed to get user '${user_id}': ${error.message}`, error);
         }
@@ -740,7 +742,7 @@ z.user.UserRepository = class UserRepository {
       .get_username(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
-        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
         }
       });
@@ -759,7 +761,7 @@ z.user.UserRepository = class UserRepository {
 
     const _find_user = user_id => {
       return this.findUserById(user_id).catch(error => {
-        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+        if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
         return user_id;
@@ -800,7 +802,7 @@ z.user.UserRepository = class UserRepository {
    */
   save_user(user_et, is_me = false) {
     return this.findUserById(user_et.id).catch(error => {
-      if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+      if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
         throw error;
       }
 
@@ -823,7 +825,7 @@ z.user.UserRepository = class UserRepository {
       return this.findUserById(user_et.id)
         .then(() => undefined)
         .catch(error => {
-          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
           return user_et;
@@ -846,7 +848,7 @@ z.user.UserRepository = class UserRepository {
   updateUserById(userId) {
     const getLocalUser = () =>
       this.findUserById(userId).catch(error => {
-        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
           return new z.entity.User();
         }
@@ -906,7 +908,7 @@ z.user.UserRepository = class UserRepository {
         .then(() => this.user_update({user: {id: this.self().id, name: name}}));
     }
 
-    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -934,7 +936,7 @@ z.user.UserRepository = class UserRepository {
         this.self().username(valid_suggestions[0]);
       })
       .catch(error => {
-        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
 
@@ -958,17 +960,17 @@ z.user.UserRepository = class UserRepository {
         .catch(({code: error_code}) => {
           if (
             [
-              z.service.BackendClientError.STATUS_CODE.CONFLICT,
-              z.service.BackendClientError.STATUS_CODE.BAD_REQUEST,
+              z.error.BackendClientError.STATUS_CODE.CONFLICT,
+              z.error.BackendClientError.STATUS_CODE.BAD_REQUEST,
             ].includes(error_code)
           ) {
-            throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+            throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
           }
-          throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+          throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
         });
     }
 
-    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -989,19 +991,19 @@ z.user.UserRepository = class UserRepository {
     return this.user_service
       .check_username(username)
       .catch(({code: error_code}) => {
-        if (error_code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
         }
-        if (error_code === z.service.BackendClientError.STATUS_CODE.BAD_REQUEST) {
-          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+        if (error_code === z.error.BackendClientError.STATUS_CODE.BAD_REQUEST) {
+          throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
         }
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
       })
       .then(verified_username => {
         if (verified_username) {
           return verified_username;
         }
-        throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+        throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
       });
   }
 

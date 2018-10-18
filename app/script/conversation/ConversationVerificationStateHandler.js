@@ -23,10 +23,10 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationVerificationStateHandler = class ConversationVerificationStateHandler {
-  constructor(conversationRepository, eventRepository) {
+  constructor(conversationRepository, eventRepository, serverTimeRepository) {
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
-    this.timeOffset = this.conversationRepository.timeOffset;
+    this.serverTimeRepository = serverTimeRepository;
     this.logger = new z.util.Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
 
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
@@ -131,7 +131,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   _checkChangeToVerified(conversationEntity) {
     if (this._willChangeToVerified(conversationEntity)) {
-      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, this.timeOffset);
+      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
@@ -163,7 +164,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
         throw new Error('Conversation degraded without affected users');
       }
 
-      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, this.timeOffset);
+      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
       this.eventRepository.injectEvent(event);
 
       return true;

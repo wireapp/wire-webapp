@@ -176,7 +176,9 @@ ko.bindingHandlers.heightSync = {
       const sourceHeight = element.scrollHeight;
       const targetHeight = parseInt(targetElement.style.height, 10);
       if (sourceHeight !== targetHeight) {
+        targetElement.style.overflowY = 'hidden';
         targetElement.style.height = `${element.scrollHeight}px`;
+        z.util.afterRender(() => (targetElement.style.overflowY = ''));
         if (typeof resizeCallback === 'function') {
           resizeCallback(sourceHeight, targetHeight);
         }
@@ -395,6 +397,20 @@ ko.bindingHandlers.antiscroll = {
           trigger_subscription.dispose();
         }
       });
+    }
+  },
+};
+
+ko.bindingHandlers.simplebar = {
+  init(element, valueAccessor) {
+    const {trigger = valueAccessor(), onInit} = valueAccessor();
+    const simpleBar = new window.SimpleBar(element, {autoHide: false});
+    if (ko.isObservable(trigger)) {
+      const triggerSubscription = trigger.subscribe(() => simpleBar.recalculate());
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => triggerSubscription.dispose());
+    }
+    if (onInit) {
+      onInit(simpleBar);
     }
   },
 };

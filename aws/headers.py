@@ -32,7 +32,6 @@ CSP = {
     'https://*.unsplash.com',
     'https://*.wire.com',
     'https://*.zinfra.io',
-    'https://api.mixpanel.com',
     'https://api.raygun.io',
     'https://apis.google.com',
     'https://wire.com',
@@ -60,7 +59,6 @@ CSP = {
     'https://*.wire.com',
     'https://*.zinfra.io',
     'https://1-ps.googleusercontent.com',
-    'https://api.mixpanel.com',
     'https://csi.gstatic.com',
   ],
   'media-src': [
@@ -80,7 +78,6 @@ CSP = {
     "'unsafe-inline'",
     'https://*.wire.com',
     'https://*.zinfra.io',
-    'https://api.mixpanel.com',
     'https://api.raygun.io',
     'https://apis.google.com',
   ],

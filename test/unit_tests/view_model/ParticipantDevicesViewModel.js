@@ -31,6 +31,7 @@ describe('z.viewModel.panel.ParticipantDevicesViewModel', () => {
   describe('detailMessage', () => {
     it('returns message parts that can safely be rendered by a template engine', () => {
       const fingerprintExplanation = viewModel.detailMessage();
+
       expect(fingerprintExplanation.length).toBe(3);
     });
   });

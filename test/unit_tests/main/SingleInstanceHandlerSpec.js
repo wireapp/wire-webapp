@@ -101,12 +101,14 @@ describe('z.main.SingleInstanceHandler', () => {
     it('returns false if the cookie is not set', () => {
       spyOn(Cookies, 'get').and.returnValue(undefined);
       const hasOtherInstance = singleInstanceHandler.hasOtherRunningInstance();
+
       expect(hasOtherInstance).toBe(false);
     });
 
     it('throws an error if the current instance has be registered', () => {
       spyOn(Cookies, 'get').and.returnValue('instance-id');
       const hasOtherInstance = singleInstanceHandler.hasOtherRunningInstance();
+
       expect(hasOtherInstance).toBe(true);
     });
   });

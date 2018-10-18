@@ -71,7 +71,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       this.user_service,
       this.asset_service,
       undefined,
-      this.client_repository
+      this.client_repository,
+      new z.time.ServerTimeRepository()
     );
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
@@ -241,7 +242,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._init_url_hash();
       })
       .catch(error => {
-        if (!(error instanceof z.auth.AuthError)) {
+        if (!(error instanceof z.error.AuthError)) {
           throw error;
         }
       });
@@ -297,7 +298,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     const cookies_disabled = () => {
       if (current_hash !== z.auth.AuthView.MODE.BLOCKED_COOKIES) {
         this._set_hash(z.auth.AuthView.MODE.BLOCKED_COOKIES);
-        throw new z.auth.AuthError(z.auth.AuthError.TYPE.COOKIES_DISABLED);
+        throw new z.error.AuthError(z.error.AuthError.TYPE.COOKIES_DISABLED);
       }
     };
 
@@ -362,7 +363,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         }
 
-        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+        return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
       }
     }
 
@@ -394,7 +395,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         })
         .catch(error => {
-          const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+          const isMultipleTabs = error.type === z.error.AuthError.TYPE.MULTIPLE_TABS;
           if (!isMultipleTabs) {
             throw error;
           }
@@ -435,25 +436,25 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           this.pending_server_request(false);
           if (navigator.onLine) {
             switch (error.label) {
-              case z.service.BackendClientError.LABEL.BAD_REQUEST:
+              case z.error.BackendClientError.LABEL.BAD_REQUEST:
                 this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
                 break;
-              case z.service.BackendClientError.LABEL.INVALID_PHONE:
+              case z.error.BackendClientError.LABEL.INVALID_PHONE:
                 this._add_error(z.string.authErrorPhoneNumberUnknown, z.auth.AuthView.TYPE.PHONE);
                 break;
-              case z.service.BackendClientError.LABEL.PASSWORD_EXISTS:
+              case z.error.BackendClientError.LABEL.PASSWORD_EXISTS:
                 this._set_hash(z.auth.AuthView.MODE.VERIFY_PASSWORD);
                 break;
-              case z.service.BackendClientError.LABEL.PENDING_LOGIN:
+              case z.error.BackendClientError.LABEL.PENDING_LOGIN:
                 _on_code_request_success(error);
                 break;
-              case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
+              case z.error.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
                 this._add_error(z.string.authErrorPhoneNumberBudget, z.auth.AuthView.TYPE.PHONE);
                 break;
-              case z.service.BackendClientError.LABEL.SUSPENDED:
+              case z.error.BackendClientError.LABEL.SUSPENDED:
                 this._add_error(z.string.authErrorSuspended);
                 break;
-              case z.service.BackendClientError.LABEL.UNAUTHORIZED:
+              case z.error.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.authErrorPhoneNumberForbidden, z.auth.AuthView.TYPE.PHONE);
                 break;
               default:
@@ -480,7 +481,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         .change_own_password(this.password())
         .catch(error => {
           this.logger.warn(`Could not change user password: ${error.message}`, error);
-          if (error.code !== z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
+          if (error.code !== z.error.BackendClientError.STATUS_CODE.FORBIDDEN) {
             throw error;
           }
         })
@@ -496,13 +497,13 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           this.pending_server_request(false);
           if (error) {
             switch (error.label) {
-              case z.service.BackendClientError.LABEL.BLACKLISTED_EMAIL:
+              case z.error.BackendClientError.LABEL.BLACKLISTED_EMAIL:
                 this._add_error(z.string.authErrorEmailForbidden, z.auth.AuthView.TYPE.EMAIL);
                 break;
-              case z.service.BackendClientError.LABEL.KEY_EXISTS:
+              case z.error.BackendClientError.LABEL.KEY_EXISTS:
                 this._add_error(z.string.authErrorEmailExists, z.auth.AuthView.TYPE.EMAIL);
                 break;
-              case z.service.BackendClientError.LABEL.INVALID_EMAIL:
+              case z.error.BackendClientError.LABEL.INVALID_EMAIL:
                 this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
                 break;
               default:
@@ -553,7 +554,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           $('#wire-verify-password').focus();
           if (navigator.onLine) {
             if (error.label) {
-              if (error.label === z.service.BackendClientError.LABEL.PENDING_ACTIVATION) {
+              if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
                 this._add_error(z.string.authErrorPending);
               } else {
                 this._add_error(z.string.authErrorSignIn, z.auth.AuthView.TYPE.PASSWORD);
@@ -1483,12 +1484,12 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
-        const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
+        const user_missing_email = error.type === z.error.UserError.TYPE.USER_MISSING_EMAIL;
         if (user_missing_email) {
           throw error;
         }
 
-        const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        const client_not_validated = error.type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
         if (client_not_validated) {
           const client_et = this.client_repository.currentClient();
           this.client_repository.currentClient(undefined);
@@ -1510,7 +1511,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._register_client(auto_login);
       })
       .catch(error => {
-        if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+        if (error.type !== z.error.UserError.TYPE.USER_MISSING_EMAIL) {
           this.logger.error(`Login failed: ${error.message}`, error);
           this._add_error(z.string.authErrorMisc);
           this._has_errors();
@@ -1537,7 +1538,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         const isIncompletePhoneUser = hasPhoneNumber && !hasEmailAddress;
         if (isIncompletePhoneUser) {
           this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
-          throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
+          throw new z.error.UserError(z.error.UserError.TYPE.USER_MISSING_EMAIL);
         }
 
         return this.storageService.init(this.self_user().id);
@@ -1577,7 +1578,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         return this.event_repository.setStreamState(clientObservable().id, true);
       })
       .catch(error => {
-        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
           return this.logger.warn(`Cannot set starting point on notification stream: ${error.message}`, error);
         }
@@ -1605,7 +1606,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         });
       })
       .catch(error => {
-        const isTooManyClients = error.type === z.client.ClientError.TYPE.TOO_MANY_CLIENTS;
+        const isTooManyClients = error.type === z.error.ClientError.TYPE.TOO_MANY_CLIENTS;
         if (isTooManyClients) {
           this.logger.warn('User has already registered the maximum number of clients', error);
           return (window.location.hash = z.auth.AuthView.MODE.LIMIT);

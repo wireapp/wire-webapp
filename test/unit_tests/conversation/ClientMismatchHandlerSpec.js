@@ -28,20 +28,14 @@ describe('ClientMismatchHandler', () => {
 
   beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
-  beforeEach(done => {
-    testFactory
-      .exposeConversationActors()
-      .then(conversationRepository => {
-        conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
-        return conversationRepository.save_conversation(conversationEntity);
-      })
-      .then(done)
-      .catch(done.fail);
+  beforeEach(() => {
+    return testFactory.exposeConversationActors().then(conversationRepository => {
+      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      return conversationRepository.save_conversation(conversationEntity);
+    });
   });
 
-  afterEach(() => {
-    TestFactory.conversation_repository.conversations.removeAll();
-  });
+  afterEach(() => TestFactory.conversation_repository.conversations.removeAll());
 
   describe('onClientMismatch', () => {
     let clientMismatch = undefined;
@@ -152,6 +146,7 @@ describe('ClientMismatchHandler', () => {
 
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db).then(() => {
         const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+        eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
         return TestFactory.conversation_repository.clientMismatchHandler
           .onClientMismatch(eventInfoEntity, clientMismatch, payload)
           .then(updatedPayload => {

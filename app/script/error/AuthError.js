@@ -20,29 +20,28 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.team = z.team || {};
+window.z.error = z.error || {};
 
-z.team.TeamError = class TeamError extends Error {
-  constructor(type) {
-    super();
+z.error.AuthError = class AuthError extends z.error.BaseError {
+  constructor(type, message) {
+    super('AuthError', type, message);
+  }
 
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || TeamError.TYPE.UNKNOWN;
-
-    switch (this.type) {
-      case TeamError.TYPE.NO_PERMISSIONS:
-        this.message = 'No permissions provided';
-        break;
-      default:
-        this.message = 'Unknown TeamError';
-    }
+  static get MESSAGE() {
+    return {
+      COOKIES_DISABLED: 'Cookies are disabled',
+      INDEXED_DB_UNSUPPORTED: 'IndexedDB is not supported',
+      MULTIPLE_TABS: 'Cannot open in multiple tabs simultaneously',
+      PRIVATE_MODE: 'Unsupported Private Mode',
+    };
   }
 
   static get TYPE() {
     return {
-      NO_PERMISSIONS: 'TeamError.TYPE.NO_PERMISSIONS',
-      UNKNOWN: 'TeamError.TYPE.UNKNOWN',
+      COOKIES_DISABLED: 'COOKIES_DISABLED',
+      INDEXED_DB_UNSUPPORTED: 'INDEXED_DB_UNSUPPORTED',
+      MULTIPLE_TABS: 'MULTIPLE_TABS',
+      PRIVATE_MODE: 'PRIVATE_MODE',
     };
   }
 };

@@ -205,7 +205,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
             const conversationEntity = this.joinedCall().conversationEntity;
 
             const attributes = {
-              conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
+              conversation_type: z.tracking.helpers.getConversationType(conversationEntity),
               kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
               num_screens: screenSources.length,
             };

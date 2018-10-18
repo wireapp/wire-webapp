@@ -105,7 +105,7 @@ z.conversation.ConversationCellState = (() => {
             }
 
             default:
-              throw new z.conversation.ConversationError();
+              throw new z.error.ConversationError();
           }
 
           return z.l10n.text(stringId, activityCount);

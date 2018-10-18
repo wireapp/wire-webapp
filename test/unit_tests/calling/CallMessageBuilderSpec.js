@@ -43,6 +43,7 @@ describe('z.calling.CallMessageBuilder', () => {
 
       tests.forEach(({props, expected}) => {
         const propSyncMessage = callMessageBuilder.createPropSync(props);
+
         expect(propSyncMessage.properties).toEqual(expected);
       });
     });
@@ -52,6 +53,7 @@ describe('z.calling.CallMessageBuilder', () => {
       const extraPayload = {extra: 'hey'};
 
       const propSyncMessage = callMessageBuilder.createPropSync(state, extraPayload);
+
       expect(propSyncMessage).toEqual(jasmine.objectContaining(extraPayload));
     });
 
@@ -59,10 +61,12 @@ describe('z.calling.CallMessageBuilder', () => {
       const noVideoState = {audioSend: () => true, screenSend: () => false, videoSend: () => false};
 
       const propSyncMessageWithVideo = callMessageBuilder.createPropSync(noVideoState, {}, true);
+
       expect(propSyncMessageWithVideo.properties.videosend).toEqual('true');
 
       const videoState = {audioSend: () => true, screenSend: () => false, videoSend: () => true};
       const propSyncMessageWithoutVideo = callMessageBuilder.createPropSync(videoState, {}, false);
+
       expect(propSyncMessageWithoutVideo.properties.videosend).toEqual('false');
     });
   });

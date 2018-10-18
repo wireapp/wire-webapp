@@ -629,7 +629,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository
       .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+        if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
           throw error;
         }
       });

@@ -88,6 +88,7 @@ describe('MediaEmbeds', () => {
         expect(
           'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(re_soundcloud)
         ).not.toBeNull();
+
         expect('https://soundcloud.com/groups/playlist-digital-sintonia'.match(re_soundcloud)).not.toBeNull();
       });
 
@@ -117,12 +118,14 @@ describe('MediaEmbeds', () => {
     describe('no rich media content', () => {
       it('renders a normal link', () => {
         const message = '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('renders a normal link with text', () => {
         const message =
           'Check this <a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
     });
@@ -181,6 +184,7 @@ describe('MediaEmbeds', () => {
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
@@ -189,6 +193,7 @@ describe('MediaEmbeds', () => {
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
@@ -251,6 +256,7 @@ describe('MediaEmbeds', () => {
           '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
         const iframe =
           '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
@@ -296,11 +302,13 @@ describe('MediaEmbeds', () => {
 
       it('renders profiles without embeds (https://soundcloud.com/dp-conference)', () => {
         const message = build_message_with_anchor('https://soundcloud.com/dp-conference');
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('renders profiles without embeds even if profiles have a trailing slash (https://soundcloud.com/dp-conference/)', () => {
         const message = build_message_with_anchor('https://soundcloud.com/dp-conference/');
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
@@ -334,6 +342,7 @@ describe('MediaEmbeds', () => {
       return it('doesn’t render links which cannot be rendered (https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended)', () => {
         const link = 'https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended';
         const message = `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
     });
@@ -404,6 +413,7 @@ describe('MediaEmbeds', () => {
 
       it('doesn’t render user https://vimeo.com/user38597062', () => {
         const message = build_message_with_anchor('https://vimeo.com/user38597062');
+
         expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 

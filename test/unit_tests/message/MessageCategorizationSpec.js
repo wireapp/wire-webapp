@@ -31,6 +31,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"0004ebd7-1ba9-4747-b880-e63504595cc7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:31:01.003Z","status":2,"data":{"content":"test","nonce":"0004ebd7-1ba9-4747-b880-e63504595cc7","previews":[]},"type":"conversation.message-add","ephemeral_expires":"1483968961027","ephemeral_started":"1483968661027"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.TEXT);
     });
 
@@ -38,6 +39,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"c499f282-2d79-4188-9808-8b63444194f8","id":"9ba0f061-0159-492b-8e6f-ba31d37ad962","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:07:47.096Z","status":2,"data":{"content":"aqgxjp","nonce":"9ba0f061-0159-492b-8e6f-ba31d37ad962"},"type":"conversation.message-add","ephemeral_expires":true,"ephemeral_started":"1483967267134"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.TEXT);
     });
 
@@ -45,6 +47,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b6498d81-92e8-4da7-afd2-054239595da7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:11:15.632Z","status":2,"data":{"content":"test","nonce":"b6498d81-92e8-4da7-afd2-054239595da7","previews":[]},"type":"conversation.message-add"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.TEXT);
     });
 
@@ -52,6 +55,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2276","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2017-01-09T13:11:15.051Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2276","previews":["CjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgQABpWCjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgSHFdpcmUgwrcgTW9kZXJuIGNvbW11bmljYXRpb24="]},"type":"conversation.message-add"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category & z.message.MessageCategory.TEXT).toBe(z.message.MessageCategory.TEXT);
       expect(category & z.message.MessageCategory.LINK).toBe(z.message.MessageCategory.LINK);
     });
@@ -60,6 +64,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b2a9bf4f-f912-4c0c-9f8b-aea290fe53e3","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:53:27.965Z","status":2,"data":{"content":"test","nonce":"b2a9bf4f-f912-4c0c-9f8b-aea290fe53e3","previews":[]},"type":"conversation.message-add","reactions":{"9b47476f-974d-481c-af64-13f82ed98a5f":"❤️"},"version":2}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category & z.message.MessageCategory.TEXT).toBe(z.message.MessageCategory.TEXT);
       expect(category & z.message.MessageCategory.LIKED).toBe(z.message.MessageCategory.LIKED);
     });
@@ -68,6 +73,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfb","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:37:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.IMAGE);
     });
 
@@ -75,6 +81,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"1846af80-7755-4b61-885d-4e37ce77e5ff","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:41:50.170Z","status":2,"data":{"content_length":9953127,"content_type":"image/gif","id":"8cc946e4-e450-47c0-87a8-584d5c18b79b","info":{"tag":"medium","width":450,"height":450,"nonce":"8cc946e4-e450-47c0-87a8-584d5c18b79b"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category & z.message.MessageCategory.IMAGE).toBe(z.message.MessageCategory.IMAGE);
       expect(category & z.message.MessageCategory.GIF).toBe(z.message.MessageCategory.GIF);
     });
@@ -83,6 +90,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"95377495-d203-4071-a02a-5221b75644fa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:46:14.855Z","status":2,"data":{"content_length":199580,"content_type":"image/jpeg","info":{"name":"6642.jpg","nonce":"95377495-d203-4071-a02a-5221b75644fa"},"id":"aed78bfd-7c98-475b-badd-2c11fd150a63","otr_key":{},"sha256":{},"status":"uploaded"},"type":"conversation.asset-add"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.FILE);
     });
 
@@ -90,6 +98,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"6cb452b4-6ae3-496d-90a8-8d7af6d756c8","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:51:00.960Z","status":2,"data":{"nonce":"6cb452b4-6ae3-496d-90a8-8d7af6d756c8"},"type":"conversation.knock"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.KNOCK);
     });
 
@@ -97,6 +106,7 @@ describe('z.message.MessageCategorization', () => {
       const event =
         '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"ae551ad3-2ca5-4d3a-8eec-ef9985996c29","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:54:00.960","data":{"location":{"longitude":13,"latitude":52,"name":"Alexanderplatz","zoom":20},"nonce":"ae551ad3-2ca5-4d3a-8eec-ef9985996c29"},"type":"conversation.location"}';
       const category = z.message.MessageCategorization.categoryFromEvent(JSON.parse(event));
+
       expect(category).toBe(z.message.MessageCategory.LOCATION);
     });
   });

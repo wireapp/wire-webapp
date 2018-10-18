@@ -23,7 +23,7 @@
 
 describe('PromiseQueue', () => {
   describe('push', () => {
-    it('should process promises', done => {
+    it('should process promises', () => {
       let counter = 0;
       const result = [];
 
@@ -35,13 +35,9 @@ describe('PromiseQueue', () => {
       const queue = new z.util.PromiseQueue();
       queue.push(promiseFn);
       queue.push(promiseFn);
-      queue
-        .push(promiseFn)
-        .then(() => {
-          expect(result).toEqual([0, 1, 2]);
-          done();
-        })
-        .catch(done.fail);
+      return queue.push(promiseFn).then(() => {
+        expect(result).toEqual([0, 1, 2]);
+      });
     });
 
     it('should process promises that are added during execution', done => {
@@ -76,20 +72,17 @@ describe('PromiseQueue', () => {
       }, 25);
     });
 
-    it('should process promises even when one of them rejects', done => {
+    it('should process promises even when one of them rejects', () => {
       const resolvingPromise = () => Promise.resolve();
 
       const rejectingPromise = () => Promise.reject(new Error('Unit test error'));
 
       const queue = new z.util.PromiseQueue();
       queue.push(rejectingPromise);
-      queue
-        .push(resolvingPromise)
-        .then(done)
-        .catch(done.fail);
+      return queue.push(resolvingPromise);
     });
 
-    it('should process promises even when one of them times out (with retries)', done => {
+    it('should process promises even when one of them times out (with retries)', () => {
       let counter = 0;
 
       const resolvingPromise = () => Promise.resolve(counter++);
@@ -104,10 +97,7 @@ describe('PromiseQueue', () => {
 
       const queue = new z.util.PromiseQueue({timeout: 100});
       queue.push(timeout_promise);
-      queue
-        .push(resolvingPromise)
-        .then(done)
-        .catch(done.fail);
+      return queue.push(resolvingPromise);
     });
   });
 });

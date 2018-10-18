@@ -27,15 +27,18 @@ describe('Shortcut', () => {
       beforeEach(() => {
         z.util.Environment.electron = false;
       });
+
       it('can get shortcut for mac', () => {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(mac_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.webapp.macos);
       });
 
       it('can get shortcut for pc', () => {
         z.util.Environment.os.mac = false;
         const pc_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(pc_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.webapp.pc);
       });
     });
@@ -44,15 +47,18 @@ describe('Shortcut', () => {
       beforeEach(() => {
         z.util.Environment.electron = true;
       });
+
       it('can get shortcut for electron mac', () => {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(mac_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.electron.macos);
       });
 
       it('can get shortcut for electron pc', () => {
         z.util.Environment.os.mac = false;
         const pc_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(pc_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.electron.pc);
       });
     });
@@ -63,15 +69,18 @@ describe('Shortcut', () => {
       beforeEach(() => {
         z.util.Environment.electron = false;
       });
+
       it('can create a beautified tooltip for webapp mac', () => {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(mac_shortcut).toBe('⌘⇧K');
       });
 
       it('can create a beautified tooltip for webapp pc', () => {
         z.util.Environment.os.mac = false;
         const pc_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(pc_shortcut).toBe('Ctrl + Shift + K');
       });
     });
@@ -84,12 +93,14 @@ describe('Shortcut', () => {
       it('can create a beautified tooltip for webapp mac', () => {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(mac_shortcut).toBe('⌘⇧K');
       });
 
       it('can create a beautified tooltip for webapp pc', () => {
         z.util.Environment.os.mac = false;
         const pc_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+
         expect(pc_shortcut).toBe('Ctrl + Shift + K');
       });
     });
@@ -98,6 +109,7 @@ describe('Shortcut', () => {
   describe('getBeautifiedShortcutMac', () => {
     it('can create a beautified shortcut', () => {
       const mac_shortcut = z.ui.Shortcut.getBeautifiedShortcutMac('command + q');
+
       expect(mac_shortcut).toBe('⌘Q');
     });
   });
@@ -105,6 +117,7 @@ describe('Shortcut', () => {
   describe('get_beautified_shortcut_pc', () => {
     it('can create a beautified shortcut', () => {
       const pc_shortcut = z.ui.Shortcut.getBeautifiedShortcutWin('alt + F4');
+
       expect(pc_shortcut).toBe('Alt + F4');
     });
   });

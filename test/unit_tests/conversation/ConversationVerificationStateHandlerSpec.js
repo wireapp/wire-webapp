@@ -37,54 +37,50 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
   let client_a = undefined;
   let client_b = undefined;
 
-  beforeEach(done => {
-    test_factory
-      .exposeConversationActors()
-      .then(_conversation_repository => {
-        spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(undefined);
-        conversation_repository = _conversation_repository;
-        state_handler = conversation_repository.verification_state_handler;
+  beforeEach(() => {
+    return test_factory.exposeConversationActors().then(_conversation_repository => {
+      spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(undefined);
+      conversation_repository = _conversation_repository;
+      state_handler = conversation_repository.verification_state_handler;
 
-        conversation_ab = new z.entity.Conversation(z.util.createRandomUuid());
-        conversation_b = new z.entity.Conversation(z.util.createRandomUuid());
-        conversation_c = new z.entity.Conversation(z.util.createRandomUuid());
+      conversation_ab = new z.entity.Conversation(z.util.createRandomUuid());
+      conversation_b = new z.entity.Conversation(z.util.createRandomUuid());
+      conversation_c = new z.entity.Conversation(z.util.createRandomUuid());
 
-        selfUserEntity = conversation_repository.selfUser();
-        selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
+      selfUserEntity = conversation_repository.selfUser();
+      selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-        user_a = new z.entity.User(z.util.createRandomUuid());
-        user_b = new z.entity.User(z.util.createRandomUuid());
+      user_a = new z.entity.User(z.util.createRandomUuid());
+      user_b = new z.entity.User(z.util.createRandomUuid());
 
-        client_a = new z.client.ClientEntity();
-        client_a.meta.isVerified(true);
-        user_a.devices.push(client_a);
+      client_a = new z.client.ClientEntity();
+      client_a.meta.isVerified(true);
+      user_a.devices.push(client_a);
 
-        client_b = new z.client.ClientEntity();
-        client_b.meta.isVerified(true);
-        user_b.devices.push(client_b);
+      client_b = new z.client.ClientEntity();
+      client_b.meta.isVerified(true);
+      user_b.devices.push(client_b);
 
-        conversation_ab.selfUser(selfUserEntity);
-        conversation_ab.participating_user_ids.push(user_a.id, user_b.id);
-        conversation_ab.participating_user_ets.push(user_a, user_b);
-        conversation_ab.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+      conversation_ab.selfUser(selfUserEntity);
+      conversation_ab.participating_user_ids.push(user_a.id, user_b.id);
+      conversation_ab.participating_user_ets.push(user_a, user_b);
+      conversation_ab.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
 
-        conversation_b.selfUser(selfUserEntity);
-        conversation_b.participating_user_ids.push(user_b.id);
-        conversation_b.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
-        conversation_b.participating_user_ets.push(user_b);
+      conversation_b.selfUser(selfUserEntity);
+      conversation_b.participating_user_ids.push(user_b.id);
+      conversation_b.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+      conversation_b.participating_user_ets.push(user_b);
 
-        conversation_c.selfUser(selfUserEntity);
-        conversation_c.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+      conversation_c.selfUser(selfUserEntity);
+      conversation_c.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
 
-        conversation_repository.conversations.removeAll();
-        return Promise.all([
-          conversation_repository.save_conversation(conversation_ab),
-          conversation_repository.save_conversation(conversation_b),
-          conversation_repository.save_conversation(conversation_c),
-        ]);
-      })
-      .then(done)
-      .catch(done.fail);
+      conversation_repository.conversations.removeAll();
+      return Promise.all([
+        conversation_repository.save_conversation(conversation_ab),
+        conversation_repository.save_conversation(conversation_b),
+        conversation_repository.save_conversation(conversation_c),
+      ]);
+    });
   });
 
   describe('onClientAdd', () => {
@@ -244,6 +240,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       client_a.meta.isVerified(false);
 
       state_handler.onClientVerificationChanged(user_a.id, client_a.id);
+
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_ab.is_verified()).toBeFalsy();

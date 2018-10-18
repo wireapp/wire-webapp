@@ -57,15 +57,7 @@ describe('z.team.TeamRepository', () => {
   let server = undefined;
   let team_repository = undefined;
 
-  beforeAll(done => {
-    test_factory
-      .exposeTeamActors()
-      .then(repository => {
-        team_repository = repository;
-        done();
-      })
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeTeamActors().then(repository => (team_repository = repository)));
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
@@ -84,22 +76,16 @@ describe('z.team.TeamRepository', () => {
     ]);
   });
 
-  afterEach(() => {
-    server.restore();
-  });
+  afterEach(() => server.restore());
 
   describe('getTeam()', () => {
-    it('returns the binding team entity', done => {
-      team_repository
-        .getTeam()
-        .then(team_et => {
-          const [team_data] = teams_data.teams;
+    it('returns the binding team entity', () => {
+      return team_repository.getTeam().then(team_et => {
+        const [team_data] = teams_data.teams;
 
-          expect(team_et.creator).toEqual(team_data.creator);
-          expect(team_et.id).toEqual(team_data.id);
-          done();
-        })
-        .catch(done.fail);
+        expect(team_et.creator).toEqual(team_data.creator);
+        expect(team_et.id).toEqual(team_data.id);
+      });
     });
   });
 

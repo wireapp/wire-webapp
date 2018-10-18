@@ -24,16 +24,9 @@
 describe('z.storage.StorageRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeStorageActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeStorageActors());
 
-  beforeEach(() => {
-    TestFactory.storage_repository.clearStores();
-  });
+  beforeEach(() => TestFactory.storage_repository.clearStores());
 
   describe('save', () => {
     it('does not save "null" values', done => {
@@ -41,7 +34,7 @@ describe('z.storage.StorageRepository', () => {
         .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toEqual(z.storage.StorageError.TYPE.NO_DATA);
+          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
           done();
         });
     });

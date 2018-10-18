@@ -5,7 +5,7 @@
     "jasmine": true,
     "node": true
   },
-  "extends": ["plugin:no-unsanitized/DOM", "plugin:react/recommended", "prettier"],
+  "extends": ["plugin:jasmine/recommended", "plugin:no-unsanitized/DOM", "plugin:react/recommended", "prettier"],
   "globals": {
     "$": true,
     "_": true,
@@ -31,7 +31,6 @@
     "LRUCache": true,
     "marked": true,
     "moment": true,
-    "mixpanel": true,
     "OpenGraphMocks": true,
     "pako": true,
     "payload": true,
@@ -50,7 +49,7 @@
     "z": true,
     "zeta": true
   },
-  "plugins": ["jsdoc", "no-unsanitized", "prettier", "react"],
+  "plugins": ["jasmine", "jsdoc", "no-unsanitized", "prettier", "react"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
@@ -62,6 +61,10 @@
   "rules": {
     "curly": 2,
     "dot-notation": 2,
+    "jasmine/prefer-toHaveBeenCalledWith": 0,
+    "jasmine/no-expect-in-setup-teardown": 0,
+    "jasmine/no-spec-dupes": 0,
+    "jasmine/no-suite-dupes": 0,
     "jsdoc/require-hyphen-before-param-description": 2,
     "no-console": [
       2,

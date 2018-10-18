@@ -36,12 +36,7 @@ const messages = [
 describe('z.backup.BackupRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeBackupActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeBackupActors());
 
   beforeEach(() => jasmine.clock().install());
 
@@ -101,18 +96,23 @@ describe('z.backup.BackupRepository', () => {
 
       return archivePromise.then(zip => {
         const fileNames = Object.keys(zip.files);
+
         expect(fileNames).toContain('export.json');
         filesToCheck.map(filename => expect(fileNames).toContain(filename));
 
         const validateConversationsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
           .async('string')
           .then(conversationsStr => JSON.parse(conversationsStr))
-          .then(conversations => expect(conversations).toEqual([conversation]));
+          .then(conversations => {
+            expect(conversations).toEqual([conversation]);
+          });
 
         const validateEventsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.EVENTS]
           .async('string')
           .then(eventsStr => JSON.parse(eventsStr))
-          .then(events => expect(events).toEqual(messages));
+          .then(events => {
+            expect(events).toEqual(messages);
+          });
 
         return Promise.all([validateConversationsPromise, validateEventsPromise]);
       });
@@ -161,7 +161,9 @@ describe('z.backup.BackupRepository', () => {
       const promise = backupRepository
         .generateHistory(noop)
         .then(() => fail('export show fail with a CancelError'))
-        .catch(error => expect(error instanceof z.backup.CancelError).toBe(true));
+        .catch(error => {
+          expect(error instanceof z.backup.CancelError).toBe(true);
+        });
 
       backupRepository.cancelAction();
 
@@ -205,12 +207,12 @@ describe('z.backup.BackupRepository', () => {
         return backupRepository
           .importHistory(archive, noop, noop)
           .then(() => fail('import should fail'))
-          .catch(error =>
+          .catch(error => {
             expect(error instanceof testDescription.expectedError).toBe(
               true,
               `${error} not instanceof of ${testDescription.expectedError}`
-            )
-          );
+            );
+          });
       });
 
       return Promise.all(promises);

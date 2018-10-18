@@ -23,10 +23,11 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
-  constructor(conversationRepository, cryptographyRepository, eventRepository, userRepository) {
+  constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeRepository, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.eventRepository = eventRepository;
+    this.serverTimeRepository = serverTimeRepository;
     this.userRepository = userRepository;
 
     this.logger = new z.util.Logger('z.conversation.ClientMismatchHandler', z.config.LOGGER.OPTIONS);
@@ -152,7 +153,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
     const conversationPromise = conversationId
       ? this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
-          const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+          const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
           if (!isConversationNotFound) {
             throw error;
           }
@@ -169,8 +170,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         if (noRemainingClients) {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
-            const timeOffset = this.conversationRepository.timeOffset;
-            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
+            const timestamp = this.serverTimeRepository.toServerTimestamp();
+            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
             this.eventRepository.injectEvent(event);
           }

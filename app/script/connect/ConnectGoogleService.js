@@ -96,7 +96,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       }
 
       this.logger.warn('Google Auth Client for JavaScript not loaded');
-      const error = new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_CLIENT);
+      const error = new z.error.ConnectError(z.error.ConnectError.TYPE.GOOGLE_CLIENT);
       Raygun.send(error);
       return reject(error);
     });

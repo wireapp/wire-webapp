@@ -33,7 +33,7 @@ z.team.TeamRole = (() => {
 
   const _checkRole = permissions => {
     if (!permissions) {
-      throw new z.team.TeamError(z.team.TeamError.TYPE.NO_PERMISSIONS);
+      throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
     }
 
     if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.OWNER)) {

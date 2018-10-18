@@ -91,6 +91,7 @@ z.main.App = class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
+    repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -103,7 +104,8 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.search,
-      repositories.client
+      repositories.client,
+      repositories.serverTime
     );
     repositories.event = new z.event.EventRepository(
       this.service.event,
@@ -111,6 +113,7 @@ z.main.App = class App {
       this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
+      repositories.serverTime,
       repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
@@ -123,6 +126,7 @@ z.main.App = class App {
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
+    repositories.eventTracker = new z.tracking.EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new z.conversation.ConversationRepository(
       this.service.conversation,
@@ -132,6 +136,7 @@ z.main.App = class App {
       repositories.event,
       repositories.giphy,
       repositories.links,
+      repositories.serverTime,
       repositories.team,
       repositories.user
     );
@@ -157,11 +162,7 @@ z.main.App = class App {
       repositories.conversation,
       repositories.event,
       repositories.media,
-      repositories.user
-    );
-    repositories.eventTracker = new z.tracking.EventTrackingRepository(
-      repositories.conversation,
-      repositories.team,
+      repositories.serverTime,
       repositories.user
     );
     repositories.integration = new z.integration.IntegrationRepository(
@@ -397,9 +398,9 @@ z.main.App = class App {
     this.logger.info(logMessage, {error});
 
     const {message, type} = error;
-    const isAuthError = error instanceof z.auth.AuthError;
+    const isAuthError = error instanceof z.error.AuthError;
     if (isAuthError) {
-      const isTypeMultipleTabs = type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+      const isTypeMultipleTabs = type === z.error.AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs
         ? z.auth.SIGN_OUT_REASON.MULTIPLE_TABS
         : z.auth.SIGN_OUT_REASON.INDEXED_DB;
@@ -411,8 +412,8 @@ z.main.App = class App {
     );
     if (isReload) {
       const isSessionExpired = [
-        z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
-        z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
+        z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
+        z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
       ];
 
       if (isSessionExpired.includes(type)) {
@@ -421,8 +422,8 @@ z.main.App = class App {
         return this._redirectToLogin(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
-      const isAccessTokenError = error instanceof z.auth.AccessTokenError;
-      const isInvalidClient = type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+      const isAccessTokenError = error instanceof z.error.AccessTokenError;
+      const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isAccessTokenError || isInvalidClient) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
@@ -435,24 +436,23 @@ z.main.App = class App {
 
     if (navigator.onLine) {
       switch (type) {
-        case z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
-        case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
-        case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
+        case z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
+        case z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED:
+        case z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
           return this._redirectToLogin(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
 
         default: {
           this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
-          const is_storage_error = error instanceof z.storage.StorageError;
-          if (is_storage_error) {
+
+          const isAccessTokenError = error instanceof z.error.AccessTokenError;
+          if (isAccessTokenError) {
+            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
+          } else {
             Raygun.send(error);
           }
 
-          const isAccessTokenError = error instanceof z.auth.AccessTokenError;
-          if (isAccessTokenError) {
-            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
-          }
           return this.logout(z.auth.SIGN_OUT_REASON.APP_INIT);
         }
       }
@@ -566,7 +566,7 @@ z.main.App = class App {
       this._registerSingleInstanceCleaning();
       return Promise.resolve();
     }
-    return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
   }
 
   _registerSingleInstanceCleaning(singleInstanceCheckIntervalId) {

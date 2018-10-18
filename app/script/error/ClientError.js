@@ -20,17 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.client = z.client || {};
+window.z.error = z.error || {};
 
-z.client.ClientError = class ClientError extends Error {
-  constructor(type) {
-    super();
-
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.type = type || ClientError.TYPE.UNKNOWN;
-
-    this.message = ClientError.MESSAGE[this.type] || ClientError.MESSAGE.UNKNOWN;
+z.error.ClientError = class ClientError extends z.error.BaseError {
+  constructor(type, message) {
+    super('ClientError', type, message);
   }
 
   static get MESSAGE() {
@@ -43,7 +37,6 @@ z.client.ClientError = class ClientError extends Error {
       REQUEST_FAILURE: 'Client related backend request failed',
       REQUEST_FORBIDDEN: 'Client related backend request forbidden',
       TOO_MANY_CLIENTS: 'User has reached the maximum of allowed clients',
-      UNKNOWN: 'Unknown ClientError',
     };
   }
 
@@ -57,7 +50,6 @@ z.client.ClientError = class ClientError extends Error {
       REQUEST_FAILURE: 'REQUEST_FAILURE',
       REQUEST_FORBIDDEN: 'REQUEST_FORBIDDEN',
       TOO_MANY_CLIENTS: 'TOO_MANY_CLIENTS',
-      UNKNOWN: 'UNKNOWN',
     };
   }
 };
