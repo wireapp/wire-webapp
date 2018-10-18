@@ -28,15 +28,9 @@ declare global {
         BACKEND_REST: string;
         BACKEND_WS: string;
         ENVIRONMENT: string;
-        URL: {
-          ACCOUNT_BASE: string;
-          MOBILE_BASE: string;
-          WEBSITE_BASE: string;
-        };
+        URL: string;
         VERSION: string;
-        FEATURE: {
-          CHECK_CONSENT: boolean;
-        };
+        FEATURE: string;
       };
     };
   }
@@ -47,13 +41,13 @@ export const BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-
 export const BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
 export const ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
 export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com/';
-export const URL = window.wire.env.URL || {
+export const URL = JSON.parse(window.wire.env.URL) || {
   ACCOUNT_BASE: 'https://account.wire.com/',
   MOBILE_BASE: '/',
   WEBSITE_BASE: 'https://wire.com/',
 };
 export const VERSION = window.wire.env.VERSION || '0.0.0';
-export const FEATURE = window.wire.env.FEATURE || {
+export const FEATURE = JSON.parse(window.wire.env.FEATURE) || {
   CHECK_CONSENT: true,
 };
 export const APP_INSTANCE_ID = UUID();
