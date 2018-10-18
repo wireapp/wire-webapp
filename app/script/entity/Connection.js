@@ -28,17 +28,17 @@ z.entity.Connection = class Connection {
     this.from = null;
     this.last_update = null;
     this.message = null;
-    this.status = ko.observable(z.user.ConnectionStatus.UNKNOWN);
+    this.status = ko.observable(z.connection.ConnectionStatus.UNKNOWN);
     this.to = null;
 
-    this.is_blocked = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.BLOCKED);
-    this.is_canceled = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.CANCELLED);
-    this.is_connected = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.ACCEPTED);
-    this.is_ignored = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.IGNORED);
-    this.is_incoming_request = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.PENDING);
-    this.is_outgoing_request = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.SENT);
+    this.is_blocked = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.BLOCKED);
+    this.is_canceled = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.CANCELLED);
+    this.is_connected = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.ACCEPTED);
+    this.is_ignored = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.IGNORED);
+    this.is_incoming_request = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.PENDING);
+    this.is_outgoing_request = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.SENT);
     this.is_unknown = ko.pureComputed(() =>
-      [z.user.ConnectionStatus.CANCELLED, z.user.ConnectionStatus.UNKNOWN].includes(this.status())
+      [z.connection.ConnectionStatus.CANCELLED, z.connection.ConnectionStatus.UNKNOWN].includes(this.status())
     );
 
     this.is_request = ko.pureComputed(() => this.is_incoming_request() || this.is_outgoing_request());
