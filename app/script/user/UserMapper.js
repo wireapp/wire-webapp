@@ -34,39 +34,40 @@ z.user.UserMapper = class UserMapper {
   }
 
   /**
-   * Converts JSON user into user entity.
-   * @param {Object} data - User data
+   * Converts JSON self user into user entity.
+   * @param {Object} userData - User data
    * @returns {z.entity.User} Mapped user entity
    */
-  map_user_from_object(data) {
-    return this.updateUserFromObject(new z.entity.User(), data);
+  mapSelfUserFromJson(userData) {
+    const userEntity = this.updateUserFromObject(new z.entity.User(), userData);
+    userEntity.is_me = true;
+
+    if (userData.locale) {
+      userEntity.locale = userData.locale;
+    }
+
+    return userEntity;
   }
 
   /**
-   * Converts JSON self user into user entity.
-   * @param {Object} data - User data
+   * Converts JSON user into user entity.
+   * @param {Object} userData - User data
    * @returns {z.entity.User} Mapped user entity
    */
-  map_self_user_from_object(data) {
-    const user_et = this.updateUserFromObject(new z.entity.User(), data);
-    user_et.is_me = true;
-
-    if (data.locale) {
-      user_et.locale = data.locale;
-    }
-
-    return user_et;
+  mapUserFromJson(userData) {
+    return this.updateUserFromObject(new z.entity.User(), userData);
   }
 
   /**
    * Convert multiple JSON users into user entities.
    * @note Return an empty array in any case to prevent crashes.
-   * @param {Object} data - User data
+   *
+   * @param {Array<Object>} usersData - Users data
    * @returns {Array<z.entity.User>} Mapped user entities
    */
-  map_users_from_object(data) {
-    if (data) {
-      return data.filter(user_et => user_et).map(user_et => this.map_user_from_object(user_et));
+  mapUsersFromJson(usersData) {
+    if (usersData && usersData.length) {
+      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
     this.logger.warn('We got no user data from the backend');
     return [];

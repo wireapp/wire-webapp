@@ -43,7 +43,7 @@ describe('z.notification.NotificationRepository', () => {
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
-      user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
+      user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
       [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
       const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
@@ -463,7 +463,7 @@ describe('z.notification.NotificationRepository', () => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
       message_et.memberMessageType = z.message.SystemMessageType.NORMAL;
-      other_user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.many[1]);
+      other_user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.many[1]);
     });
 
     describe('if people are added', () => {
@@ -527,7 +527,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with multiple users being removed from the conversation', () => {
-        const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(payload.users.get.many);
+        const user_ets = TestFactory.user_repository.user_mapper.mapUsersFromJson(payload.users.get.many);
         message_et.userEntities(user_ets);
 
         return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
@@ -585,7 +585,7 @@ describe('z.notification.NotificationRepository', () => {
     const expected_body = z.string.notificationPing;
 
     beforeAll(() => {
-      user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
+      user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
     });
 
     beforeEach(() => {

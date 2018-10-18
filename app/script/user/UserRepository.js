@@ -343,7 +343,16 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
    */
   fetchUserById(userId) {
-    return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
+    return this.user_service
+      .getUser(userId)
+      .then(response => (response ? this.user_mapper.mapUserFromJson(response) : undefined))
+      .catch(error => {
+        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isNotFound) {
+          return undefined;
+        }
+        throw error;
+      });
   }
 
   /**
@@ -360,8 +369,8 @@ z.user.UserRepository = class UserRepository {
 
     const _getUsers = chunkOfUserIds => {
       return this.user_service
-        .get_users(chunkOfUserIds)
-        .then(response => (response ? this.user_mapper.map_users_from_object(response) : []))
+        .getUsers(chunkOfUserIds)
+        .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
         .catch(error => {
           const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
@@ -417,7 +426,7 @@ z.user.UserRepository = class UserRepository {
     return this.selfService
       .getSelf()
       .then(userData => this._upgradePictureAsset(userData))
-      .then(response => this.user_mapper.map_self_user_from_object(response))
+      .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
         const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
         return Promise.all(promises).then(() => userEntity);
@@ -477,7 +486,7 @@ z.user.UserRepository = class UserRepository {
 
   get_user_id_by_handle(handle) {
     return this.user_service
-      .get_username(handle.toLowerCase())
+      .getUsersHandles(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
         if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
@@ -715,7 +724,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<string>} A list with usernames that are not taken.
    */
   verify_usernames(usernames) {
-    return this.user_service.check_usernames(usernames);
+    return this.user_service.headUsersHandles(usernames);
   }
 
   /**
@@ -725,7 +734,7 @@ z.user.UserRepository = class UserRepository {
    */
   verify_username(username) {
     return this.user_service
-      .check_username(username)
+      .postUsersHandles(username)
       .catch(({code: error_code}) => {
         if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;

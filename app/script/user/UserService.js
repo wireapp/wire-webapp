@@ -76,16 +76,18 @@ z.user.UserService = class UserService {
 
   /**
    * Initiate a password reset.
+   *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/beginPasswordReset
+   *
    * @param {string} email - Email address
-   * @param {string} phone_number - E.164 formatted phone number
+   * @param {string} phoneNumber - E.164 formatted phone number
    * @returns {Promise} Promise that resolves when password reset process has been triggered
    */
-  post_password_reset(email, phone_number) {
+  postPasswordReset(email, phoneNumber) {
     return this.backendClient.sendJson({
       data: {
         email: email,
-        phone: phone_number,
+        phone: phoneNumber,
       },
       type: 'POST',
       url: UserService.URL.PASSWORD_RESET,
@@ -94,20 +96,22 @@ z.user.UserService = class UserService {
 
   /**
    * Complete a password reset.
+   *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/completePasswordReset
+   *
    * @param {string} code - Password reset code
-   * @param {string} new_password - New password to be set
+   * @param {string} newPassword - New password to be set
    * @param {string} email - Email address
-   * @param {string} phone_number - E.164 formatted phone number
+   * @param {string} phoneNumber - E.164 formatted phone number
    * @returns {Promise} Promise that resolves when password reset process has been triggered
    */
-  post_password_reset_complete(code, new_password, email, phone_number) {
+  postPasswordResetComplete(code, newPassword, email, phoneNumber) {
     return this.backendClient.sendJson({
       data: {
         code: code,
         email: email,
-        password: new_password,
-        phone: phone_number,
+        password: newPassword,
+        phone: phoneNumber,
       },
       type: 'POST',
       url: `${UserService.URL.PASSWORD_RESET}/complete`,
@@ -116,18 +120,20 @@ z.user.UserService = class UserService {
 
   /**
    * Check if a username exists.
+   *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
+   *
    * @param {string} username - Username
    * @returns {Promise} Resolves with backend response.
    */
-  check_username(username) {
+  headUsersHandles(username) {
     return this.backendClient.sendRequest({
       type: 'HEAD',
       url: `${UserService.URL.USERS}/handles/${username}`,
     });
   }
 
-  get_username(username) {
+  getUsersHandles(username) {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${UserService.URL.USERS}/handles/${username}`,
@@ -135,14 +141,16 @@ z.user.UserService = class UserService {
   }
 
   /**
-   * Get a set of users for the given usernames
+   * Get a set of users for the given usernames.
+   *
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
+   *
    * @param {array} usernames - List of usernames
    * @param {number} amount - amount of usernames to return
    * @returns {Promise} Resolves with backend response.
    */
-  check_usernames(usernames, amount = 1) {
+  postUsersHandles(usernames, amount = 1) {
     return this.backendClient.sendJson({
       data: {
         handles: usernames,
@@ -154,32 +162,36 @@ z.user.UserService = class UserService {
   }
 
   /**
-   * Get a set of users.
-   * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
-   * @param {Array<string>} users - ID of users to be fetched
+   * Get a user by ID.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
+   *
+   * @param {string} user_id - User ID
    * @returns {Promise} Resolves with backend response.
    */
-  get_users(users) {
+  getUser(user_id) {
     return this.backendClient.sendRequest({
-      data: {
-        ids: users.join(','),
-      },
       type: 'GET',
-      url: UserService.URL.USERS,
+      url: `${UserService.URL.USERS}/${user_id}`,
     });
   }
 
   /**
-   * Get a user by ID.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
-   * @param {string} user_id - User ID
+   * Get a set of users.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
+   * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
+   *
+   * @param {Array<string>} userIds - ID of users to be fetched
    * @returns {Promise} Resolves with backend response.
    */
-  get_user_by_id(user_id) {
+  getUsers(userIds) {
     return this.backendClient.sendRequest({
+      data: {
+        ids: userIds.join(','),
+      },
       type: 'GET',
-      url: `${UserService.URL.USERS}/${user_id}`,
+      url: UserService.URL.USERS,
     });
   }
 };
