@@ -89,7 +89,6 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
               <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
               <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
               <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
-              <Route path={`${ROUTE.INVITE}/:invitationCode?`} component={CreatePersonalAccount} />
               <Route path={ROUTE.VERIFY} component={Verify} />
               <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
@@ -110,10 +109,12 @@ export default connect(
   },
   (dispatch: ThunkDispatch): DispatchProps => {
     return {
-      safelyRemoveCookie: (name: string, value: string) =>
-        dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
-      startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
-        dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
+      safelyRemoveCookie: (name: string, value: string) => {
+        return dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value));
+      },
+      startPolling: (name?: string, interval?: number, asJSON?: boolean) => {
+        return dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON));
+      },
       stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
     };
   }

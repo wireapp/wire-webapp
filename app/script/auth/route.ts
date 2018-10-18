@@ -51,9 +51,7 @@ const ROUTE = {
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
   LOGIN: '/login',
-  PERSONAL_INVITE: '/personalinvite',
   SSO: '/sso',
   VERIFY: '/verify',
 };

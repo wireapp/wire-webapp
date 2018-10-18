@@ -43,7 +43,6 @@ interface ConnectedProps {
   authError: Error;
   isFetching: boolean;
   isPersonalFlow: boolean;
-  isPersonalInvitationFlow: boolean;
 }
 
 interface DispatchProps {
@@ -129,8 +128,6 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
     });
 
     this.setState({validInputs, validationErrors: errors});
-    const isPersonalInvitation =
-      this.props.isPersonalInvitationFlow && this.state.registrationData.email === this.props.account.email;
     return Promise.resolve()
       .then(() => {
         if (errors.length > 0) {
@@ -139,12 +136,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
       })
       .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
       .then(() => this.props.pushAccountRegistrationData({...this.state.registrationData}))
-      .then(() => {
-        if (!isPersonalInvitation) {
-          return this.props.doSendActivationCode(this.state.registrationData.email);
-        }
-        return undefined;
-      })
+      .then(() => this.props.doSendActivationCode(this.state.registrationData.email))
       .then(() => this.props.onSubmit(event))
       .catch(error => {
         if (error.label) {
@@ -310,14 +302,14 @@ export default injectIntl(
         authError: AuthSelector.getError(state),
         isFetching: AuthSelector.isFetching(state),
         isPersonalFlow: AuthSelector.isPersonalFlow(state),
-        isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
       };
     },
     (dispatch: ThunkDispatch): DispatchProps => {
       return {
         doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-        pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
-          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
+        pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => {
+          return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
+        },
       };
     }
   )(AccountForm)

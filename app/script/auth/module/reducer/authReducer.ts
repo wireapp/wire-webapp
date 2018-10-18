@@ -154,17 +154,11 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
     case AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};
     }
-    case AUTH_ACTION.ENTER_PERSONAL_INVITATION_FLOW: {
-      return {...state, currentFlow: REGISTER_FLOW.PERSONAL_INVITATION};
-    }
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS: {
       return {
         ...state,
         fetching: false,
       };
-    }
-    case AUTH_ACTION.GET_INVITATION_FROM_CODE_SUCCESS: {
-      return {...state, account: {...state.account, email: action.payload.email, name: action.payload.name}};
     }
     default: {
       return state;

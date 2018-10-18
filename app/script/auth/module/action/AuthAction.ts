@@ -368,21 +368,6 @@ export class AuthAction {
     };
   };
 
-  getInvitationFromCode = (invitationCode: string): ThunkAction => {
-    return (dispatch, getState, {apiClient}) => {
-      dispatch(AuthActionCreator.startGetInvitationFromCode());
-      return apiClient.invitation.api
-        .getInvitationInfo(invitationCode)
-        .then(invitation => {
-          dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation));
-        })
-        .catch(error => {
-          dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
-          throw error;
-        });
-    };
-  };
-
   enterPersonalCreationFlow = (): ThunkAction => {
     return async dispatch => {
       dispatch(AuthActionCreator.enterPersonalCreationFlow());
@@ -398,12 +383,6 @@ export class AuthAction {
   enterGenericInviteCreationFlow = (): ThunkAction => {
     return async dispatch => {
       dispatch(AuthActionCreator.enterGenericInviteCreationFlow());
-    };
-  };
-
-  enterPersonalInvitationCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterPersonalInvitationCreationFlow());
     };
   };
 
