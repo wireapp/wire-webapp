@@ -273,8 +273,8 @@ z.service.BackendClient = class BackendClient {
     const {cache, contentType, data, headers, processData, timeout, type, url, withCredentials} = config;
     const ajaxConfig = {cache, contentType, data, headers, processData, timeout, type};
 
-    if (this.access_token) {
-      const authorizationHeader = `${this.access_token_type} ${this.access_token}`;
+    if (this.accessToken) {
+      const authorizationHeader = `${this.accessTokenType} ${this.accessToken}`;
       ajaxConfig.headers = Object.assign({}, headers, {Authorization: authorizationHeader});
     }
 
