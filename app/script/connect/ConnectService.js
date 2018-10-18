@@ -25,10 +25,10 @@ window.z.connect = z.connect || {};
 z.connect.ConnectService = class ConnectService {
   /**
    * Construct an new ConnectService.
-   * @param {z.client.ClientEntity} clientEntity - Local client
+   * @param {BackendClient} backendClient - Client for the API calls
    */
-  constructor(clientEntity) {
-    this.client = clientEntity;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
   }
 
@@ -40,10 +40,10 @@ z.connect.ConnectService = class ConnectService {
    * @returns {Promise} Resolves with the matched contacts from the user's phone book
    */
   postOnboarding(phoneBook) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: phoneBook,
       type: 'POST',
-      url: this.client.create_url('/onboarding/v3'),
+      url: '/onboarding/v3',
     });
   }
 };

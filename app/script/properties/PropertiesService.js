@@ -31,10 +31,10 @@ z.properties.PropertiesService = class PropertiesService {
 
   /**
    * Construct a new Properties Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.properties.PropertiesService', z.config.LOGGER.OPTIONS);
   }
 
@@ -44,9 +44,9 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves when all properties for user have been cleared
    */
   deleteProperties() {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
-      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
+      url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
   }
 
@@ -57,9 +57,9 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves when the requested property for user has been cleared
    */
   deletePropertiesByKey(key) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
-      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
+      url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 
@@ -69,9 +69,9 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves with an array of the property keys stored for the user
    */
   getProperties() {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
+      url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
   }
 
@@ -83,9 +83,9 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves with the property set for the given key
    */
   getPropertiesByKey(key) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
+      url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 
@@ -98,10 +98,10 @@ z.properties.PropertiesService = class PropertiesService {
    * @returns {Promise} Resolves when the property has been stored
    */
   putPropertiesByKey(key, properties) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: properties,
       type: 'PUT',
-      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
+      url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 };

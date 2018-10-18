@@ -682,17 +682,18 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Find a local user.
-   * @param {string} user_id - User ID
+   * @param {string} userId - User ID
    * @returns {Promise<z.entity.User>} Resolves with the matching user entity
    */
-  findUserById(user_id) {
-    for (const user_et of this.users()) {
-      if (user_et.id === user_id) {
-        return Promise.resolve(user_et);
-      }
+  findUserById(userId) {
+    if (!userId) {
+      return Promise.reject(new z.error.UserError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
-    return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
+    const matchingUserEntity = this.users().find(userEntity => userEntity.id === userId);
+    return matchingUserEntity
+      ? Promise.resolve(matchingUserEntity)
+      : Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
   }
 
   /**

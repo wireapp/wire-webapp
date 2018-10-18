@@ -36,8 +36,8 @@ z.main.Auth = class Auth {
   constructor(settings) {
     this.settings = settings;
     this.audio = new z.audio.AudioRepository();
-    this.client = new z.service.BackendClient(this.settings);
-    this.service = new z.auth.AuthService(this.client);
+    this.backendClient = new z.service.BackendClient(this.settings);
+    this.service = new z.auth.AuthService(this.backendClient);
     this.repository = new z.auth.AuthRepository(this.service);
     return this;
   }

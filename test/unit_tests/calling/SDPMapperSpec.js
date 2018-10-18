@@ -42,6 +42,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
   describe('rewriteSdp', () => {
     it('fails if no SDP given', () => {
       const expectedError = new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
+
       expect(() => sdpMapper.rewriteSdp(undefined)).toThrow(expectedError);
     });
 
@@ -56,11 +57,13 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
       };
 
       const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
       expect(localSdp.sdp).not.toContain('UDP/TLS/');
       expect(localSdp.sdp).toContain('RTP/SAVP');
       checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
 
       const {sdp: remoteSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, flowEntity);
+
       expect(remoteSdp.sdp).toContain('UDP/TLS/');
       checkUntouchedLines(rtcSdp.sdp, remoteSdp.sdp);
     });
@@ -85,6 +88,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
       };
 
       const {sdp: browserSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
       expect(browserSdp.sdp).toContain('a=tool:webapp 4.4.4 (firefox 12)');
       expect(browserSdp.sdp).toContain('t=0 0');
       checkUntouchedLines(rtcSdp.sdp, browserSdp.sdp);
@@ -95,6 +99,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
         version: '12',
       };
       const {sdp: electronSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
       expect(electronSdp.sdp).toContain('a=tool:electron 5.5.5 4.4.4 (chrome 12)');
       expect(electronSdp.sdp).toContain('t=0 0');
       checkUntouchedLines(rtcSdp.sdp, electronSdp.sdp);
@@ -122,6 +127,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       };
 
       const {sdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
       expect(sdp.sdp.match(/a=candidate/g).length).toEqual(8);
       checkUntouchedLines(rtcSdp.sdp, sdp.sdp);
     });
@@ -140,12 +146,14 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
 
       z.util.Environment.browser.firefox = true;
       const {sdp: firefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
       expect(firefoxSdp.sdp).toContain('m=application 9');
       expect(firefoxSdp.sdp).toContain('m=video 9');
       checkUntouchedLines(rtcSdp.sdp, firefoxSdp.sdp);
 
       z.util.Environment.browser.firefox = false;
       const {sdp: noFirefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
       expect(noFirefoxSdp.sdp).toContain('m=application 0');
       expect(noFirefoxSdp.sdp).toContain('m=video 0');
       checkUntouchedLines(rtcSdp.sdp, noFirefoxSdp.sdp);
@@ -168,6 +176,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
 
       [groupFlowEntity, restartedICEFlowEntity].forEach(flowEntity => {
         const {sdp: groupSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
         expect(groupSdp.sdp).toContain('b=AS:');
         expect(groupSdp.sdp).toContain('a=ptime:');
         checkUntouchedLines(rtcSdp.sdp, groupSdp.sdp);

@@ -28,12 +28,7 @@ window.wire.auth.audio = wire.auth.audio || {};
 describe('z.media.MediaStreamHandler', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeMediaActors()
-      .then(done)
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeMediaActors());
 
   describe('addRemoteMediaStream', () => {
     it('throws an error if stream type is not recognized', () => {
@@ -113,28 +108,20 @@ describe('z.media.MediaStreamHandler', () => {
       spyOn(mediaStreamHandler, '_toggleAudioSend').and.returnValue(Promise.resolve());
     });
 
-    it('toggles the audio state if MediaStream is available', done => {
+    it('toggles the audio state if MediaStream is available', () => {
       mediaStreamHandler.localMediaStream(true);
 
-      mediaStreamHandler
-        .toggleAudioSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleAudioSend().then(() => {
+        expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled();
+      });
     });
 
-    it('toggles the audio state if MediaStream is unavailable', done => {
+    it('toggles the audio state if MediaStream is unavailable', () => {
       mediaStreamHandler.localMediaStream(undefined);
 
-      mediaStreamHandler
-        .toggleAudioSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleAudioSend().then(() => {
+        expect(mediaStreamHandler._toggleAudioSend).toHaveBeenCalled();
+      });
     });
   });
 
@@ -147,46 +134,34 @@ describe('z.media.MediaStreamHandler', () => {
       spyOn(mediaStreamHandler, 'replaceInputSource').and.returnValue(Promise.resolve());
     });
 
-    it('toggles the video stream if available and in video mode', done => {
+    it('toggles the video stream if available and in video mode', () => {
       mediaStreamHandler.localMediaStream(true);
       mediaStreamHandler.localMediaType(z.media.MediaType.VIDEO);
 
-      mediaStreamHandler
-        .toggleVideoSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleVideoSend).toHaveBeenCalled();
-          expect(mediaStreamHandler.replaceInputSource).not.toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleVideoSend().then(() => {
+        expect(mediaStreamHandler._toggleVideoSend).toHaveBeenCalled();
+        expect(mediaStreamHandler.replaceInputSource).not.toHaveBeenCalled();
+      });
     });
 
-    it('turns on the video stream if it does not exist', done => {
+    it('turns on the video stream if it does not exist', () => {
       mediaStreamHandler.localMediaStream(undefined);
       mediaStreamHandler.localMediaType(z.media.MediaType.VIDEO);
 
-      TestFactory.media_repository.streamHandler
-        .toggleVideoSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleVideoSend).not.toHaveBeenCalled();
-          expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.media_repository.streamHandler.toggleVideoSend().then(() => {
+        expect(mediaStreamHandler._toggleVideoSend).not.toHaveBeenCalled();
+        expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
+      });
     });
 
-    it('turns on the video stream if not in video mode', done => {
+    it('turns on the video stream if not in video mode', () => {
       mediaStreamHandler.localMediaStream(true);
       mediaStreamHandler.localMediaType(z.media.MediaType.SCREEN);
 
-      mediaStreamHandler
-        .toggleVideoSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleVideoSend).not.toHaveBeenCalled();
-          expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleVideoSend().then(() => {
+        expect(mediaStreamHandler._toggleVideoSend).not.toHaveBeenCalled();
+        expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
+      });
     });
   });
 
@@ -199,46 +174,34 @@ describe('z.media.MediaStreamHandler', () => {
       spyOn(mediaStreamHandler, 'replaceInputSource').and.returnValue(Promise.resolve());
     });
 
-    it('toggles screen sharing if available and in screen sharing mode', done => {
+    it('toggles screen sharing if available and in screen sharing mode', () => {
       mediaStreamHandler.localMediaStream(true);
       mediaStreamHandler.localMediaType(z.media.MediaType.SCREEN);
 
-      mediaStreamHandler
-        .toggleScreenSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleScreenSend).toHaveBeenCalled();
-          expect(mediaStreamHandler.replaceInputSource).not.toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleScreenSend().then(() => {
+        expect(mediaStreamHandler._toggleScreenSend).toHaveBeenCalled();
+        expect(mediaStreamHandler.replaceInputSource).not.toHaveBeenCalled();
+      });
     });
 
-    it('turns on the screen sharing stream if it does not exist', done => {
+    it('turns on the screen sharing stream if it does not exist', () => {
       mediaStreamHandler.localMediaStream(undefined);
       mediaStreamHandler.localMediaType(z.media.MediaType.SCREEN);
 
-      mediaStreamHandler
-        .toggleScreenSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleScreenSend).not.toHaveBeenCalled();
-          expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleScreenSend().then(() => {
+        expect(mediaStreamHandler._toggleScreenSend).not.toHaveBeenCalled();
+        expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
+      });
     });
 
-    it('turns on the video stream if not in screen sharing mode', done => {
+    it('turns on the video stream if not in screen sharing mode', () => {
       mediaStreamHandler.localMediaStream(true);
       mediaStreamHandler.localMediaType(z.media.MediaType.VIDEO);
 
-      mediaStreamHandler
-        .toggleScreenSend()
-        .then(() => {
-          expect(mediaStreamHandler._toggleScreenSend).not.toHaveBeenCalled();
-          expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
-          done();
-        })
-        .catch(done.fail);
+      return mediaStreamHandler.toggleScreenSend().then(() => {
+        expect(mediaStreamHandler._toggleScreenSend).not.toHaveBeenCalled();
+        expect(mediaStreamHandler.replaceInputSource).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
+      });
     });
   });
 });

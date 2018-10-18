@@ -42,16 +42,19 @@ describe('ko.bindingHandlers', () => {
 
     it('can execute callback when enter is pressed', () => {
       $(element).trigger($.Event('keypress', {key: 'Enter'}));
+
       expect(handler.on_enter).toHaveBeenCalled();
     });
 
     it('can not execute callback when another key is pressed', () => {
       $(element).trigger($.Event('keypress', {key: 'Esc'}));
+
       expect(handler.on_enter).not.toHaveBeenCalled();
     });
 
     it('can not execute callback when another event is triggered', () => {
       $(element).trigger($.Event('keyup', {key: 'Enter'}));
+
       expect(handler.on_enter).not.toHaveBeenCalled();
     });
   });
@@ -73,6 +76,7 @@ describe('ko.bindingHandlers', () => {
       observable.subscribe_once(handler.callback);
       observable(true);
       observable(false);
+
       expect(handler.callback).toHaveBeenCalled();
       expect(handler.callback.calls.count()).toEqual(1);
       expect(handler.callback).toHaveBeenCalledWith(true);
@@ -88,12 +92,16 @@ describe('ko.bindingHandlers', () => {
 
     it('trims spaces', () => {
       observable(' foo');
+
       expect(observable()).toBe('foo');
       observable('foo ');
+
       expect(observable()).toBe('foo');
       observable(' foo ');
+
       expect(observable()).toBe('foo');
       observable(' foo bar ');
+
       expect(observable()).toBe('foo bar');
     });
   });

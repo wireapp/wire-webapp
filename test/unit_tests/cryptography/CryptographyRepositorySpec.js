@@ -51,7 +51,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       });
     });
 
-    it('encrypts a generic message', done => {
+    it('encrypts a generic message', () => {
       spyOn(TestFactory.cryptography_service, 'getUsersPreKeys').and.callFake(recipients =>
         Promise.resolve().then(() => {
           const prekey_map = {};
@@ -83,17 +83,13 @@ describe('z.cryptography.CryptographyRepository', () => {
       recipients[john_doe.id] = [john_doe.clients.phone_id, john_doe.clients.desktop_id];
       recipients[jane_roe.id] = [jane_roe.clients.phone_id];
 
-      TestFactory.cryptography_repository
-        .encryptGenericMessage(recipients, generic_message)
-        .then(payload => {
-          expect(payload.recipients).toBeTruthy();
-          expect(Object.keys(payload.recipients).length).toBe(2);
-          expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
-          expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
-          expect(_.isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBeTruthy();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.cryptography_repository.encryptGenericMessage(recipients, generic_message).then(payload => {
+        expect(payload.recipients).toBeTruthy();
+        expect(Object.keys(payload.recipients).length).toBe(2);
+        expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
+        expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
+        expect(_.isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBeTruthy();
+      });
     });
   });
 
@@ -106,6 +102,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       const database = TestFactory.storage_service.db;
       const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
       const alice = TestFactory.cryptography_repository.cryptobox.identity;
+
       expect(alice).toBeDefined();
 
       const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
@@ -137,6 +134,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+
       expect(decrypted.data.content).toBe(plainText);
 
       try {
@@ -148,7 +146,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       done();
     });
 
-    it('detects a session reset request', done => {
+    it('detects a session reset request', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: 'f1d2d451-0fcb-4313-b0ba-313b971ab758',
@@ -159,16 +157,12 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.cryptography_repository
-        .handleEncryptedEvent(event)
-        .then(mapped_event => {
-          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
+      });
     });
 
-    it('only accepts reasonable sized payloads (text key)', done => {
+    it('only accepts reasonable sized payloads (text key)', () => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
@@ -181,16 +175,12 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.cryptography_repository
-        .handleEncryptedEvent(event)
-        .then(mapped_event => {
-          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+      });
     });
 
-    it('only accepts reasonable sized payloads (data key)', done => {
+    it('only accepts reasonable sized payloads (data key)', () => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
@@ -203,13 +193,9 @@ describe('z.cryptography.CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.cryptography_repository
-        .handleEncryptedEvent(event)
-        .then(mapped_event => {
-          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+      });
     });
   });
 });

@@ -32,6 +32,7 @@ describe('z.entity.File', () => {
     it('should be true if status is uploading and uploaded on this client', () => {
       file.uploaded_on_this_client(true);
       file.status(z.assets.AssetTransferState.UPLOADING);
+
       expect(file.pending_upload()).toBeTruthy();
     });
   });
@@ -39,15 +40,19 @@ describe('z.entity.File', () => {
   describe('is_video', () => {
     it('should treat mp4 as video file', () => {
       file.file_type = 'video/mp4';
+
       expect(file.is_video()).toBeTruthy();
     });
 
     it('should not treat images as video file', () => {
       file.file_type = 'image/jpg';
+
       expect(file.is_video()).toBeFalsy();
       file.file_type = 'image/png';
+
       expect(file.is_video()).toBeFalsy();
       file.file_type = 'image/gif';
+
       expect(file.is_video()).toBeFalsy();
     });
   });

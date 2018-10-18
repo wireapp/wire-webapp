@@ -31,10 +31,10 @@ z.extension.GiphyService = class GiphyService {
 
   /**
    * Construct a new Giphy Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
   }
 
   /**
@@ -45,9 +45,9 @@ z.extension.GiphyService = class GiphyService {
   getById(ids) {
     ids = [].concat(ids);
 
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`),
+      url: `${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`,
     });
   }
 
@@ -57,12 +57,12 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with random gifs for given tag
    */
   getRandom(tag) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       data: {
         tag: tag,
       },
       type: 'GET',
-      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random`),
+      url: `${GiphyService.CONFIG.ENDPOINT_BASE}/random`,
     });
   }
 
@@ -77,7 +77,7 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with matches
    */
   getSearch(options) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       data: Object.assign(
         {
           limit: 25,
@@ -87,7 +87,7 @@ z.extension.GiphyService = class GiphyService {
         options
       ),
       type: 'GET',
-      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/search`),
+      url: `${GiphyService.CONFIG.ENDPOINT_BASE}/search`,
     });
   }
 };

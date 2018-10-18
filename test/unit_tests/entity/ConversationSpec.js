@@ -41,24 +41,28 @@ describe('Conversation', () => {
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeTruthy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
@@ -69,24 +73,28 @@ describe('Conversation', () => {
       conversation_et.team_id = z.util.createRandomUuid();
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeTruthy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
@@ -94,6 +102,7 @@ describe('Conversation', () => {
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
@@ -101,6 +110,7 @@ describe('Conversation', () => {
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
       expect(conversation_et.is_request()).toBeFalsy();
@@ -121,6 +131,7 @@ describe('Conversation', () => {
 
     it('should not add message with an exisiting id', () => {
       conversation_et.add_message(initial_message_et);
+
       expect(conversation_et.messages().length).toBe(1);
     });
 
@@ -129,6 +140,7 @@ describe('Conversation', () => {
       const newMessageEntity = new z.entity.Message(z.util.createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
       conversation_et.add_message(newMessageEntity, true);
+
       expect(conversation_et.messages().length).toBe(initialLength);
       expect(conversation_et.messages()[0]).toBe(newMessageEntity);
     });
@@ -141,6 +153,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.messages().length).toBe(2);
       const last_message_et = conversation_et.getLastMessage();
+
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(second_timestamp);
     });
@@ -154,6 +167,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.messages().length).toBe(2);
       const last_message_et = conversation_et.getFirstMessage();
+
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(older_timestamp);
     });
@@ -271,30 +285,35 @@ describe('Conversation', () => {
       sentMessageEntity.user(selfUserEntity);
       sentMessageEntity.status(z.message.StatusType.SENT);
       conversation_et.add_message(sentMessageEntity);
+
       expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
 
       const deliveredMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
       deliveredMessageEntity.user(selfUserEntity);
       deliveredMessageEntity.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(deliveredMessageEntity);
+
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextSentMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
       nextSentMessageEntity.user(selfUserEntity);
       nextSentMessageEntity.status(z.message.StatusType.SENT);
       conversation_et.add_message(nextSentMessageEntity);
+
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextDeliveredMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
       nextDeliveredMessageEntity.user(selfUserEntity);
       nextDeliveredMessageEntity.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(nextDeliveredMessageEntity);
+
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
       const remoteMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
       remoteMessageEntity.user(remoteUserEntity);
       remoteMessageEntity.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(remoteMessageEntity);
+
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
     });
   });
@@ -318,6 +337,7 @@ describe('Conversation', () => {
       message_et.id = z.util.createRandomUuid();
       message_et.user(new z.entity.User());
       conversation_et.add_message(message_et);
+
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
     });
 
@@ -326,6 +346,7 @@ describe('Conversation', () => {
       message_et.id = z.util.createRandomUuid();
       message_et.user(new z.entity.User());
       conversation_et.add_message(message_et);
+
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
     });
 
@@ -335,6 +356,7 @@ describe('Conversation', () => {
       message_et.id = z.util.createRandomUuid();
       message_et.user(new z.entity.User());
       conversation_et.add_message(message_et);
+
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
     });
 
@@ -344,6 +366,7 @@ describe('Conversation', () => {
       message_et.id = z.util.createRandomUuid();
       message_et.user(self_user_et);
       conversation_et.add_message(message_et);
+
       expect(conversation_et.get_last_editable_message()).toBeDefined();
     });
 
@@ -421,17 +444,21 @@ describe('Conversation', () => {
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
+
       expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
     });
 
     it('displays a fallback if no user name has been set', () => {
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.display_name()).toBe('…');
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
+
       expect(conversation_et.display_name()).toBe('…');
     });
 
@@ -445,11 +472,13 @@ describe('Conversation', () => {
       const expected_display_name = `${conversation_et
         .participating_user_ets()[0]
         .first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
+
       expect(conversation_et.display_name()).toBe(expected_display_name);
     });
 
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.display_name()).toBe(z.string.conversationsEmptyConversation);
     });
 
@@ -464,10 +493,12 @@ describe('Conversation', () => {
 
     it('displays the conversation name for a self conversation', () => {
       conversation_et.type(z.conversation.ConversationType.SELF);
+
       expect(conversation_et.display_name()).toBe('…');
 
       const conversation_name = 'My favorite music band';
       conversation_et.name(conversation_name);
+
       expect(conversation_et.display_name()).toBe('…');
     });
   });
@@ -574,9 +605,11 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.hasGuest()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.hasGuest()).toBe(false);
 
       // Is true for group conversations containing a guest
@@ -585,17 +618,21 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(secondUserEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.hasGuest()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
       selfUserEntity.inTeam(false);
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.hasGuest()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.hasGuest()).toBe(false);
     });
   });
@@ -608,9 +645,11 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.hasService()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.hasService()).toBe(false);
 
       const secondUserEntity = new z.entity.User(z.util.createRandomUuid());
@@ -618,9 +657,11 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(secondUserEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+
       expect(conversation_et.hasService()).toBe(true);
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
+
       expect(conversation_et.hasService()).toBe(true);
     });
   });
@@ -705,6 +746,7 @@ describe('Conversation', () => {
     it('should remove message by id', () => {
       expect(conversation_et.messages().length).toBe(1);
       conversation_et.remove_message_by_id(message_id);
+
       expect(conversation_et.messages().length).toBe(0);
     });
 
@@ -713,11 +755,14 @@ describe('Conversation', () => {
 
       expect(conversation_et.messages().length).toBe(1);
       conversation_et.add_message(duplicated_message_et);
+
       expect(conversation_et.messages().length).toBe(1);
       conversation_et.messages_unordered.push(duplicated_message_et);
+
       expect(conversation_et.messages().length).toBe(2);
 
       conversation_et.remove_message_by_id(message_id);
+
       expect(conversation_et.messages().length).toBe(0);
     });
   });
@@ -740,24 +785,28 @@ describe('Conversation', () => {
     it('should remove all messages', () => {
       expect(conversation_et.messages().length).toBe(2);
       conversation_et.remove_messages();
+
       expect(conversation_et.messages().length).toBe(0);
     });
 
     it('should remove all messages for invalid input timestamp', () => {
       expect(conversation_et.messages().length).toBe(2);
       conversation_et.remove_messages('foo');
+
       expect(conversation_et.messages().length).toBe(0);
     });
 
     it('should remove expected messages for timestamp greater than message', () => {
       expect(conversation_et.messages().length).toBe(2);
       conversation_et.remove_messages(first_timestamp + 1);
+
       expect(conversation_et.messages().length).toBe(1);
     });
 
     it('should remove expected messages for timestamp equal to message', () => {
       expect(conversation_et.messages().length).toBe(2);
       conversation_et.remove_messages(first_timestamp);
+
       expect(conversation_et.messages().length).toBe(1);
     });
   });
@@ -765,10 +814,12 @@ describe('Conversation', () => {
   describe('setTimestamp', () => {
     it('turns strings into numbers', () => {
       const lrt = conversation_et.last_read_timestamp();
+
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
       conversation_et.setTimestamp(new_lrt_string, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
+
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     });
 
@@ -776,6 +827,7 @@ describe('Conversation', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
       conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
+
       expect(conversation_et.last_read_timestamp()).toBe(currentTimestamp);
     });
 
@@ -783,6 +835,7 @@ describe('Conversation', () => {
       const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
       conversation_et.setTimestamp(newTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ, true);
+
       expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
     });
   });
@@ -832,106 +885,111 @@ describe('Conversation', () => {
 
     it('returns false if conversation is not archived', () => {
       conversationEntity.archivedState(false);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(contentMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(pingMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(selfMentionMessage);
+
       expect(conversationEntity.shouldUnarchive()).toBe(false);
     });
 
     it('returns false if conversation is in no notification state', () => {
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(contentMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(pingMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(selfMentionMessage);
+
       expect(conversationEntity.shouldUnarchive()).toBe(false);
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(contentMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(pingMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(selfMentionMessage);
+
       expect(conversationEntity.shouldUnarchive()).toBe(true);
     });
 
     it('returns expected value if conversation is in everything notifications state', () => {
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(mutedTimestampMessage);
+
       expect(conversationEntity.shouldUnarchive()).toBe(false);
-
       conversationEntity.messages_unordered.push(contentMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(true);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
       conversationEntity.messages_unordered.removeAll();
 
       const memberLeaveMessage = new z.entity.MemberMessage();
       memberLeaveMessage.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
       memberLeaveMessage.timestamp(timestamp + 100);
       conversationEntity.messages_unordered.push(memberLeaveMessage);
+
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
       const callMessage = new z.entity.CallMessage();
       callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
       callMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(callMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(true);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(true);
       conversationEntity.messages_unordered.removeAll();
       conversationEntity.messages_unordered.push(memberLeaveMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       const memberJoinMessage = new z.entity.MemberMessage();
       memberJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
       memberJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(memberJoinMessage);
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
 
+      expect(conversationEntity.shouldUnarchive()).toBe(false);
       const selfJoinMessage = new z.entity.MemberMessage();
       selfJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
       selfJoinMessage.userIds.push(selfUserEntity.id);
       selfJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(selfJoinMessage);
+
       expect(conversationEntity.shouldUnarchive()).toBe(true);
     });
   });
@@ -986,49 +1044,49 @@ describe('Conversation', () => {
       const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.selfUser(selfUserEntity);
       conversationEntity.mutedState(undefined);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState('true');
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(true);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       conversationEntity.mutedState(false);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
+
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       selfUserEntity.inTeam(true);
       conversationEntity.mutedState(undefined);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState('true');
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(true);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
       conversationEntity.mutedState(false);
+
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
+
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
 
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
+
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
     });
   });

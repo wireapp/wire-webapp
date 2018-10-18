@@ -32,12 +32,12 @@ z.conversation.ConversationService = class ConversationService {
 
   /**
    * Construct a new Conversation Service.
-   * @param {BackendClient} client - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {EventService} eventService - Service that handles events
    * @param {StorageService} storageService - Service for all storage interactions
    */
-  constructor(client, eventService, storageService) {
-    this.client = client;
+  constructor(backendClient, eventService, storageService) {
+    this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
@@ -60,10 +60,10 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the conversation was created
    */
   postConversations(payload) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
+      url: ConversationService.CONFIG.URL_CONVERSATIONS,
     });
   }
 
@@ -81,13 +81,13 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the conversation information
    */
   getConversations(limit = 100, conversation_id) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       data: {
         size: limit,
         start: conversation_id,
       },
       type: 'GET',
-      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
+      url: ConversationService.CONFIG.URL_CONVERSATIONS,
     });
   }
 
@@ -121,9 +121,9 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   get_conversation_by_id(conversation_id) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
     });
   }
 
@@ -137,10 +137,10 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   updateConversationName(conversationId, name) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {name},
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`,
     });
   }
 
@@ -154,10 +154,10 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   updateConversationMessageTimer(conversationId, messageTimer) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {message_timer: messageTimer},
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`,
     });
   }
   /**
@@ -170,10 +170,10 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   update_member_properties(conversation_id, payload) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/self`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/self`,
     });
   }
 
@@ -189,9 +189,9 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   deleteConversationCode(conversationId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
   }
 
@@ -203,9 +203,9 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   getConversationCode(conversationId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
   }
 
@@ -217,9 +217,9 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postConversationCode(conversationId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
     });
   }
 
@@ -232,13 +232,13 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postConversationJoin(key, code) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {
         code: code,
         key: key,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/join`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/join`,
     });
   }
 
@@ -253,13 +253,13 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   putConversationAccess(conversationId, accessModes, accessRole) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {
         access: accessModes,
         access_role: accessRole,
       },
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/access`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/access`,
     });
   }
 
@@ -275,9 +275,9 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   deleteBots(conversationId, userId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`,
     });
   }
 
@@ -291,11 +291,9 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   deleteMembers(conversationId, userId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'DELETE',
-      url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`
-      ),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
     });
   }
 
@@ -308,13 +306,13 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postBots(conversationId, providerId, serviceId) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {
         provider: providerId,
         service: serviceId,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots`,
     });
   }
 
@@ -341,7 +339,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Promise that resolves when the message was sent
    */
   post_encrypted_message(conversation_id, payload, precondition_option) {
-    let url = this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`);
+    let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
 
     if (_.isArray(precondition_option)) {
       url = `${url}?report_missing=${precondition_option.join(',')}`;
@@ -349,7 +347,7 @@ z.conversation.ConversationService = class ConversationService {
       url = `${url}?ignore_missing=true`;
     }
 
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
       url: url,
@@ -366,12 +364,12 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the server response
    */
   postMembers(conversationId, userIds) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {
         users: userIds,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members`),
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members`,
     });
   }
 

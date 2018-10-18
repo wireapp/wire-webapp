@@ -58,6 +58,7 @@ describe('z.util.KeyboardUtil.KEY', () => {
       expect(
         z.util.KeyboardUtil.isKey({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.KEY_V)
       ).toBeTruthy();
+
       expect(z.util.KeyboardUtil.isKey({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
       expect(z.util.KeyboardUtil.isKey({key: z.util.KeyboardUtil.KEY.KEY_V}, '')).toBeFalsy();
       expect(
@@ -71,24 +72,28 @@ describe('z.util.KeyboardUtil.KEY', () => {
       expect(
         z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V])
       ).toBeTruthy();
+
       expect(
         z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [
           z.util.KeyboardUtil.KEY.KEY_V,
           z.util.KeyboardUtil.KEY.ARROW_RIGHT,
         ])
       ).toBeTruthy();
+
       expect(
         z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [
           z.util.KeyboardUtil.KEY.ARROW_RIGHT,
           z.util.KeyboardUtil.KEY.KEY_V,
         ])
       ).toBeTruthy();
+
       expect(z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
       expect(z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [])).toBeFalsy();
       expect(z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [''])).toBeFalsy();
       expect(
         z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_LEFT])
       ).toBeFalsy();
+
       expect(
         z.util.KeyboardUtil.isOneOfKeys({key: z.util.KeyboardUtil.KEY.KEY_V}, [
           z.util.KeyboardUtil.KEY.ARROW_LEFT,

@@ -32,10 +32,10 @@ z.broadcast.BroadcastService = class BroadcastService {
 
   /**
    * Construct a new Broadcast Service.
-   * @param {BackendClient} client - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.broadcast.BroadcastService', z.config.LOGGER.OPTIONS);
   }
 
@@ -51,14 +51,14 @@ z.broadcast.BroadcastService = class BroadcastService {
    * @returns {Promise} Promise that resolve when the message was sent
    */
   postBroadcastMessage(payload, preconditionOption) {
-    let url = this.client.create_url(`${BroadcastService.CONFIG.URL_BROADCAST}/otr/messages`);
+    let url = `${BroadcastService.CONFIG.URL_BROADCAST}/otr/messages`;
     if (_.isArray(preconditionOption)) {
       url = `${url}?report_missing=${preconditionOption.join(',')}`;
     } else if (preconditionOption) {
       url = `${url}?ignore_missing=true`;
     }
 
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
       url: url,

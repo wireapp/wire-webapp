@@ -24,26 +24,13 @@
 describe('z.audio.AudioRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeAudioActors()
-      .then(() => {
-        TestFactory.audio_repository.init(true);
-        done();
-      })
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeAudioActors().then(() => TestFactory.audio_repository.init(true)));
 
   describe('_checkSoundSetting', () => {
-    beforeAll(() => {
-      TestFactory.audio_repository.audioPreference(z.audio.AudioPreference.SOME);
-    });
+    beforeAll(() => TestFactory.audio_repository.audioPreference(z.audio.AudioPreference.SOME));
 
-    it('plays a sound that should be played', done => {
-      TestFactory.audio_repository
-        ._checkSoundSetting(z.audio.AudioType.NETWORK_INTERRUPTION)
-        .then(done)
-        .catch(done.fail);
+    it('plays a sound that should be played', () => {
+      return TestFactory.audio_repository._checkSoundSetting(z.audio.AudioType.NETWORK_INTERRUPTION);
     });
 
     it('ignores a sound that should not be played', done => {
@@ -59,14 +46,10 @@ describe('z.audio.AudioRepository', () => {
   });
 
   describe('_getSoundById', () => {
-    it('finds an available sound', done => {
-      TestFactory.audio_repository
-        ._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION)
-        .then(audio_element => {
-          expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
-          done();
-        })
-        .catch(done.fail);
+    it('finds an available sound', () => {
+      return TestFactory.audio_repository._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION).then(audio_element => {
+        expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
+      });
     });
 
     it('handles a missing sound', done => {

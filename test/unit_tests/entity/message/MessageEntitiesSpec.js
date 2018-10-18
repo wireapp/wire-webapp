@@ -28,18 +28,21 @@ describe('Message Entities', () => {
     it('message with text asset should not be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.Text());
+
       expect(message_et.is_downloadable()).toBeFalsy();
     });
 
     it('message with image asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
+
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
     it('message with file asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.File());
+
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
@@ -47,6 +50,7 @@ describe('Message Entities', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
       message_et.ephemeral_expires(12312123);
+
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
@@ -54,6 +58,7 @@ describe('Message Entities', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
       message_et.ephemeral_expires(true);
+
       expect(message_et.is_downloadable()).toBeFalsy();
     });
   });
@@ -103,6 +108,7 @@ describe('Message Entities', () => {
       it('isObfuscated returns false if it is ephemeral and still sending', () => {
         message_et.status(z.message.StatusType.SENDING);
         message_et.ephemeral_expires(12312123);
+
         expect(message_et.isObfuscated()).toBeFalsy();
       });
     });

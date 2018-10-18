@@ -25,12 +25,7 @@ describe('z.lifecycle.LifecycleService', () => {
   let mock_response = undefined;
   const test_factory = new window.TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeLifecycleActors()
-      .then(done)
-      .catch(done.fail);
-
+  beforeAll(() => {
     mock_response = (body, status_code = 200, status_text) => {
       const response = new window.Response(JSON.stringify(body), {
         headers: {
@@ -42,6 +37,8 @@ describe('z.lifecycle.LifecycleService', () => {
 
       return Promise.resolve(response);
     };
+
+    return test_factory.exposeLifecycleActors();
   });
 
   beforeEach(() => {
@@ -53,17 +50,13 @@ describe('z.lifecycle.LifecycleService', () => {
   });
 
   describe('getVersion', () => {
-    it('fetches the webapp release version', done => {
+    it('fetches the webapp release version', () => {
       const response_body = {version: '2017-03-14-15-05-prod'};
       window.fetch.returns(mock_response(response_body, 200));
 
-      TestFactory.lifecycle_service
-        .getVersion()
-        .then(version => {
-          expect(version).toBe(response_body.version);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.lifecycle_service.getVersion().then(version => {
+        expect(version).toBe(response_body.version);
+      });
     });
   });
 });

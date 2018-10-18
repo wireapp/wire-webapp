@@ -33,11 +33,11 @@ z.client.ClientService = class ClientService {
 
   /**
    * Construct a new client service.
-   * @param {z.client.ClientEntity} clientEntity - Local client entity
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {z.storage.StorageService} storageService - Service for all storage interactions
    */
-  constructor(clientEntity, storageService) {
-    this.client = clientEntity;
+  constructor(backendClient, storageService) {
+    this.backendClient = backendClient;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.client.ClientService', z.config.LOGGER.OPTIONS);
 
@@ -57,12 +57,12 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves once the deletion of the client is complete
    */
   deleteClient(clientId, password) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {
         password,
       },
       type: 'DELETE',
-      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${clientId}`),
+      url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
   }
 
@@ -72,10 +72,10 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} - Resolves once the deletion of the temporary client is complete
    */
   deleteTemporaryClient(clientId) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: {},
       type: 'DELETE',
-      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${clientId}`),
+      url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
   }
 
@@ -87,9 +87,9 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the requested client
    */
   getClientById(clientId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${clientId}`),
+      url: `${ClientService.URL_CLIENTS}/${clientId}`,
     });
   }
 
@@ -99,9 +99,9 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the clients of the self user
    */
   getClients() {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(ClientService.URL_CLIENTS),
+      url: ClientService.URL_CLIENTS,
     });
   }
 
@@ -113,9 +113,9 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the clients of a user
    */
   getClientsByUserId(userId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`),
+      url: `${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`,
     });
   }
 
@@ -125,10 +125,10 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with the registered client information
    */
   postClients(payload) {
-    return this.client.send_json({
+    return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(ClientService.URL_CLIENTS),
+      url: ClientService.URL_CLIENTS,
     });
   }
 

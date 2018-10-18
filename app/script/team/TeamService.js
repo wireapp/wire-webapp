@@ -32,53 +32,53 @@ z.team.TeamService = class TeamService {
   /**
    * Construct a new Team Service.
    * @class z.user.TeamService
-   * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {z.service.BackendClient} backendClient - Client for the API calls
    */
-  constructor(client) {
-    this.client = client;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = new z.util.Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
   }
 
   getTeamById(teamId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}`),
+      url: `${TeamService.URL.TEAMS}/${teamId}`,
     });
   }
 
   getTeamMember(teamId, userId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/members/${userId}`),
+      url: `${TeamService.URL.TEAMS}/${teamId}/members/${userId}`,
     });
   }
 
   getTeamMembers(teamId) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/members`),
+      url: `${TeamService.URL.TEAMS}/${teamId}/members`,
     });
   }
 
   getTeams(limit = 100, teamIds) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       data: {
         size: limit,
         start: teamIds,
       },
       type: 'GET',
-      url: this.client.create_url(TeamService.URL.TEAMS),
+      url: TeamService.URL.TEAMS,
     });
   }
 
   getWhitelistedServices(teamId, size = 100, prefix) {
-    return this.client.send_request({
+    return this.backendClient.sendRequest({
       data: {
         prefix,
         size,
       },
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/services/whitelisted`),
+      url: `${TeamService.URL.TEAMS}/${teamId}/services/whitelisted`,
     });
   }
 };

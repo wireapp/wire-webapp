@@ -36,22 +36,19 @@ describe('z.conversation.EventBuilder', () => {
     event_mapper = new z.conversation.EventMapper();
   });
 
-  it('buildAllVerified', done => {
+  it('buildAllVerified', () => {
     const event = z.conversation.EventBuilder.buildAllVerified(conversation_et, 0);
-    event_mapper
-      .mapJsonEvent(event, conversation_et)
-      .then(messageEntity => {
-        expect(messageEntity).toBeDefined();
-        expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
-        expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.VERIFIED);
-        expect(messageEntity.from).toBe(conversation_et.selfUser().id);
-        expect(messageEntity.conversation_id).toBe(conversation_et.id);
-        done();
-      })
-      .catch(done.fail);
+
+    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+      expect(messageEntity).toBeDefined();
+      expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
+      expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.VERIFIED);
+      expect(messageEntity.from).toBe(conversation_et.selfUser().id);
+      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+    });
   });
 
-  it('buildDegraded', done => {
+  it('buildDegraded', () => {
     const user_ids = [z.util.createRandomUuid()];
     const event = z.conversation.EventBuilder.buildDegraded(
       conversation_et,
@@ -59,47 +56,38 @@ describe('z.conversation.EventBuilder', () => {
       z.message.VerificationMessageType.NEW_DEVICE,
       0
     );
-    event_mapper
-      .mapJsonEvent(event, conversation_et)
-      .then(messageEntity => {
-        expect(messageEntity).toBeDefined();
-        expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
-        expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.NEW_DEVICE);
-        expect(messageEntity.from).toBe(conversation_et.selfUser().id);
-        expect(messageEntity.conversation_id).toBe(conversation_et.id);
-        expect(messageEntity.userIds()).toEqual(user_ids);
-        done();
-      })
-      .catch(done.fail);
+
+    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+      expect(messageEntity).toBeDefined();
+      expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
+      expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.NEW_DEVICE);
+      expect(messageEntity.from).toBe(conversation_et.selfUser().id);
+      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+      expect(messageEntity.userIds()).toEqual(user_ids);
+    });
   });
 
-  it('buildMissed', done => {
+  it('buildMissed', () => {
     const event = z.conversation.EventBuilder.buildMissed(conversation_et, 0);
-    event_mapper
-      .mapJsonEvent(event, conversation_et)
-      .then(messageEntity => {
-        expect(messageEntity).toBeDefined();
-        expect(messageEntity.super_type).toBe(z.message.SuperType.MISSED);
-        expect(messageEntity.from).toBe(conversation_et.selfUser().id);
-        expect(messageEntity.conversation_id).toBe(conversation_et.id);
-        done();
-      })
-      .catch(done.fail);
+
+    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+      expect(messageEntity).toBeDefined();
+      expect(messageEntity.super_type).toBe(z.message.SuperType.MISSED);
+      expect(messageEntity.from).toBe(conversation_et.selfUser().id);
+      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+    });
   });
 
-  it('buildGroupCreation', done => {
+  it('buildGroupCreation', () => {
     conversation_et.participating_user_ids(['one', 'two', 'three']);
     conversation_et.creator = 'one';
     const event = z.conversation.EventBuilder.buildGroupCreation(conversation_et);
-    event_mapper
-      .mapJsonEvent(event, conversation_et)
-      .then(messageEntity => {
-        expect(messageEntity).toBeDefined();
-        expect(messageEntity.type).toBe(z.event.Client.CONVERSATION.GROUP_CREATION);
-        expect(messageEntity.conversation_id).toBe(conversation_et.id);
-        expect(conversation_et.participating_user_ids().length).toBe(3);
-        done();
-      })
-      .catch(done.fail);
+
+    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+      expect(messageEntity).toBeDefined();
+      expect(messageEntity.type).toBe(z.event.Client.CONVERSATION.GROUP_CREATION);
+      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+      expect(conversation_et.participating_user_ids().length).toBe(3);
+    });
   });
 });
