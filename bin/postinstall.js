@@ -2,6 +2,10 @@ const logger = require('logdown')('postinstall');
 logger.state.isEnabled = true;
 
 if (process.env.NODE_ENV === 'production') {
+  /**
+   * Running "npm install" with NODE_ENV set to production will skip downloading development dependencies, that's why
+   * we cannot execute grunt in such a scenario. Read more: https://docs.npmjs.com/cli/install
+   */
   logger.log('Skipping "grunt init" because it is not needed in a production environment.');
   process.exit(0);
 }
