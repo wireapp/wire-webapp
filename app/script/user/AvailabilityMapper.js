@@ -23,53 +23,42 @@ window.z = window.z || {};
 window.z.user = z.user || {};
 
 z.user.AvailabilityMapper = (() => {
+  const AVAILABILITY_VALUES = {
+    AVAILABLE: 'available',
+    AWAY: 'away',
+    BUSY: 'busy',
+    NONE: 'none',
+  };
+
   const valueFromType = availabilityType => {
-    switch (availabilityType) {
-      case z.user.AvailabilityType.AVAILABLE: {
-        return 'available';
-      }
+    const availabilityTypeValues = {
+      [z.user.AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
+      [z.user.AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
+      [z.user.AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
+      [z.user.AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
+    };
 
-      case z.user.AvailabilityType.AWAY: {
-        return 'away';
-      }
-
-      case z.user.AvailabilityType.BUSY: {
-        return 'busy';
-      }
-
-      case z.user.AvailabilityType.NONE: {
-        return 'none';
-      }
-
-      default: {
-        throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
-      }
+    const value = availabilityTypeValues[availabilityType];
+    if (value) {
+      return value;
     }
+    throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
   };
 
   return {
     nameFromType: availabilityType => {
-      switch (availabilityType) {
-        case z.user.AvailabilityType.AVAILABLE: {
-          return z.l10n.text(z.string.userAvailabilityAvailable);
-        }
+      const availabilityTypeStringIds = {
+        [z.user.AvailabilityType.AVAILABLE]: z.string.userAvailabilityAvailable,
+        [z.user.AvailabilityType.AWAY]: z.string.userAvailabilityAway,
+        [z.user.AvailabilityType.BUSY]: z.string.userAvailabilityBusy,
+        [z.user.AvailabilityType.NONE]: z.string.userAvailabilityNone,
+      };
 
-        case z.user.AvailabilityType.AWAY: {
-          return z.l10n.text(z.string.userAvailabilityAway);
-        }
-
-        case z.user.AvailabilityType.BUSY: {
-          return z.l10n.text(z.string.userAvailabilityBusy);
-        }
-
-        case z.user.AvailabilityType.NONE: {
-          return z.l10n.text(z.string.userAvailabilityNone);
-        }
-
-        default: {
-          throw new z.error.UserError(z.error.UserError.TYPE.INVALID_PARAMETER);
-        }
+      const stringId = availabilityTypeStringIds[availabilityType];
+      if (stringId) {
+        return z.l10n.text(stringId);
       }
+      throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
     },
     protoFromType: availabilityType => {
       const typeValue = valueFromType(availabilityType).toUpperCase();
