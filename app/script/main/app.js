@@ -105,7 +105,7 @@ z.main.App = class App {
     repositories.user = new z.user.UserRepository(
       this.service.user,
       this.service.asset,
-      this.service.search,
+      this.service.connection,
       repositories.client,
       repositories.serverTime
     );
@@ -203,6 +203,7 @@ z.main.App = class App {
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
       connectGoogle: new z.connect.ConnectGoogleService(),
+      connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,

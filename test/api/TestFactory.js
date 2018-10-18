@@ -280,14 +280,14 @@ window.TestFactory.prototype.exposeUserActors = function() {
 
       TestFactory.asset_service = new z.assets.AssetService(this.backendClient);
 
-      TestFactory.search_service = new z.search.SearchService(this.backendClient);
+      TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
 
       TestFactory.user_service = new z.user.UserService(this.backendClient);
 
       TestFactory.user_repository = new z.user.UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
-        TestFactory.search_service,
+        TestFactory.connection_service,
         TestFactory.client_repository,
         TestFactory.serverTimeRepository
       );

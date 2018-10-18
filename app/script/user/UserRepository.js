@@ -39,13 +39,14 @@ z.user.UserRepository = class UserRepository {
    * @class z.user.UserRepository
    * @param {z.user.UserService} user_service - Backend REST API user service implementation
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
-   * @param {z.search.SearchService} search_service - Backend REST API search service implementation
+   * @param {z.connection.ConnectionService} connectionService - Backend REST API connection service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
-  constructor(user_service, asset_service, search_service, client_repository, serverTimeRepository) {
+  constructor(user_service, asset_service, connectionService, client_repository, serverTimeRepository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
+    this.connectionService = connectionService;
     this.client_repository = client_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
@@ -287,8 +288,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection request was successfully created
    */
   createConnection(userEntity, showConversation = false) {
-    return this.user_service
-      .create_connection(userEntity.id, userEntity.name())
+    return this.connectionService
+      .postConnections(userEntity.id, userEntity.name())
       .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, showConversation))
       .catch(error => {
         this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
@@ -330,8 +331,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
   get_connections(limit = 500, user_id, connection_ets = []) {
-    return this.user_service
-      .get_own_connections(limit, user_id)
+    return this.connectionService
+      .getConnections(limit, user_id)
       .then(({connections, has_more}) => {
         if (connections.length) {
           const new_connection_ets = this.connectionMapper.mapConnectionsFromJson(connections);
@@ -462,8 +463,8 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve();
     }
 
-    return this.user_service
-      .update_connection_status(user_et.id, status)
+    return this.connectionService
+      .putConnections(user_et.id, status)
       .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
       .catch(error => {
         this.logger.error(
