@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@2.1.3...@wireapp/api-client@3.0.0) (2018-10-19)
+
+
+### Features
+
+* **api-client:** Remove invitation API ([#1239](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1239)) ([b1df2d3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b1df2d3))
+
+
+### BREAKING CHANGES
+
+* **api-client:** Removal of invitations API
+
+
+
+
+
 ## [2.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@2.1.2...@wireapp/api-client@2.1.3) (2018-10-17)
 
 **Note:** Version bump only for package @wireapp/api-client
