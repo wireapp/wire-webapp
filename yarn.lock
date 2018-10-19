@@ -1470,20 +1470,20 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@4.3.5":
-  version "4.3.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.5.tgz#62fbf87b35a2453e03c4aa289bc1e4c3ed248a10"
-  integrity sha512-RNMdByzEuss1rtrBvka1rwJkGS0oVHsJxXAx9hNEmUhR8koZRwErEw3+l/MNwU4HtLuEcHt5vJ8M2grIY4B65g==
+"@wireapp/react-ui-kit@4.3.6":
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-4.3.6.tgz#95f101a106f1141ae9ace64dccef3db3497226c5"
+  integrity sha512-+kUKtde/Flvt4CweEqxWelJt9nlLe4TEPNFXiNPJhx4fQKninjj2HZLlgWm0j0nZbHHO8mirEgO/nXlP/vjXcg==
   dependencies:
     "@types/color" "3.0.0"
-    bazinga64 "5.3.16"
+    bazinga64 "5.3.17"
     color "3.1.0"
     react "16.5.2"
     react-dom "16.5.2"
     react-transition-group "2.5.0"
     recompose "0.30.0"
     styled-components "3.4.10"
-    styled-normalize "8.0.1"
+    styled-normalize "8.0.2"
     styled-transition-group "1.0.0"
 
 "@wireapp/store-engine@1.0.3":
@@ -2147,11 +2147,6 @@ batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
   integrity sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY=
-
-bazinga64@5.3.16:
-  version "5.3.16"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.16.tgz#d4718b0cfd798cb80ac0175a90c2214adbb6e7d1"
-  integrity sha512-oB/g7ZdmzBQPwTTF+DO4afRoRHh2qxd7EE7MrNewwBpsrsWtX83OuVqN9dMOkOSFATIBYRC5aW+K0vYyEUq9og==
 
 bazinga64@5.3.17:
   version "5.3.17"
@@ -11753,10 +11748,10 @@ styled-components@3.4.10:
     stylis-rule-sheet "^0.0.10"
     supports-color "^3.2.3"
 
-styled-normalize@8.0.1:
-  version "8.0.1"
-  resolved "https://registry.yarnpkg.com/styled-normalize/-/styled-normalize-8.0.1.tgz#f1c390de61075cdcc45ae38a1c8c381c5667a0af"
-  integrity sha512-0V1ox4GajVrXND/Fl+92bZhDAxTtexdZWQGXAwimg7FwTh6k5RRUo57qsjkTaY7Z3ZqjjAxvd0qq4YxlIzjIyg==
+styled-normalize@8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/styled-normalize/-/styled-normalize-8.0.2.tgz#c983c38ed2b0281d9f207255c02a7b2c1012228e"
+  integrity sha512-6mDEqjZYDlCRfS7wGiOpBC4whY8cihijINOBbftbHVVIaV+KqxDzLh+7fC0glVGwp4nAv4sYU4zrX9azlOyJwA==
 
 styled-transition-group@1.0.0:
   version "1.0.0"
