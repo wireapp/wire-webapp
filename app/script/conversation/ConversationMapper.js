@@ -384,11 +384,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
   }
 
   mapAccessCode(conversationEntity, accessCode) {
-    const {uri} = accessCode;
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
 
-    if (uri && isTeamConversation) {
-      conversationEntity.accessCode(uri);
+    if (accessCode.uri && isTeamConversation) {
+      conversationEntity.accessCode(accessCode.uri);
     }
   }
 
