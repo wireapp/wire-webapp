@@ -149,7 +149,7 @@ class CodeInput extends React.PureComponent<CodeInputProps & React.HTMLAttribute
           onTouchStart={this.forceSelectionPreventDefault}
           onKeyDown={event => this.handleKeyDown(fieldIndex, event)}
           onKeyUp={this.forceSelection}
-          innerRef={node => (this.inputs[fieldIndex] = node)}
+          ref={node => (this.inputs[fieldIndex] = node)}
           type="text"
           value={values[fieldIndex]}
         />

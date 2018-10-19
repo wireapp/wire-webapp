@@ -17,14 +17,16 @@
  *
  */
 
+import * as React from 'react';
 import styled from 'styled-components';
+import GlobalStyle from '../globalStyles';
 import {COLOR} from '../Identity';
 
 export interface StyledAppProps {
   backgroundColor?: string;
 }
 
-const StyledApp = styled.div<StyledAppProps & React.HTMLAttributes<HTMLDivElement>>`
+const StyledAppContainer = styled.div<StyledAppProps & React.HTMLAttributes<HTMLDivElement>>`
   background-color: ${props => props.backgroundColor};
   color: ${COLOR.TEXT};
   display: flex;
@@ -40,8 +42,15 @@ const StyledApp = styled.div<StyledAppProps & React.HTMLAttributes<HTMLDivElemen
   }
 `;
 
-StyledApp.defaultProps = {
+StyledAppContainer.defaultProps = {
   backgroundColor: COLOR.GRAY_LIGHTEN_88,
 };
+
+const StyledApp = ({children, ...props}) => (
+  <StyledAppContainer {...props}>
+    <GlobalStyle />
+    {children}
+  </StyledAppContainer>
+);
 
 export {StyledApp};
