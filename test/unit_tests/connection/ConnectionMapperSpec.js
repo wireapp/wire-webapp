@@ -17,18 +17,18 @@
  *
  */
 
-// grunt test_init && grunt test_run:user/UserConnectionMapper
+// grunt test_init && grunt test_run:connection/ConnectionMapper
 
 'use strict';
 
-describe('z.user.UserConnectionMapper', () => {
-  let mapper = undefined;
+describe('z.connection.ConnectionMapper', () => {
+  let connectionMapper = undefined;
 
   beforeAll(() => {
-    mapper = new z.user.UserConnectionMapper();
+    connectionMapper = new z.connection.ConnectionMapper();
   });
 
-  describe('map_user_connection_from_json', () => {
+  describe('mapConnectionFromJson', () => {
     it('escapes all properties of an object', () => {
       const payload = {
         conversation: '4a559f61-8466-45a7-b366-9e1662f02370',
@@ -39,7 +39,7 @@ describe('z.user.UserConnectionMapper', () => {
         to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
       };
 
-      const connection_et = mapper.map_user_connection_from_json(payload);
+      const connection_et = connectionMapper.mapConnectionFromJson(payload);
 
       expect(connection_et.conversation_id).toBe(payload.conversation);
       expect(connection_et.from).toBe(payload.from);

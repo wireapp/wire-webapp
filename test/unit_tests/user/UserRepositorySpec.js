@@ -118,10 +118,10 @@ describe('z.user.UserRepository', () => {
 
         return TestFactory.user_repository.get_connections().then(() => {
           expect(TestFactory.user_repository.connections().length).toBe(2);
-          expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
-          expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
-            '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
-          );
+          const [firstConnectionEntity, secondConnectionEntity] = TestFactory.user_repository.connections();
+
+          expect(firstConnectionEntity.status()).toEqual(z.connection.ConnectionStatus.ACCEPTED);
+          expect(secondConnectionEntity.conversation_id).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
         });
       });
     });

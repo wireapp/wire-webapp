@@ -235,16 +235,12 @@ window.TestFactory.prototype.exposeEventActors = function() {
       this.logger.info('✓ exposedCryptographyActors');
 
       TestFactory.web_socket_service = new z.event.WebSocketService(this.backendClient, TestFactory.storage_service);
-
       TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
-
       TestFactory.event_service_no_compound = new z.event.EventServiceNoCompound(TestFactory.storage_service);
-
       TestFactory.notification_service = new z.event.NotificationService(
         this.backendClient,
         TestFactory.storage_service
       );
-
       TestFactory.conversation_service = new z.conversation.ConversationService(
         this.backendClient,
         TestFactory.event_service,
@@ -279,15 +275,15 @@ window.TestFactory.prototype.exposeUserActors = function() {
       this.logger.info('✓ exposedClientActors');
 
       TestFactory.asset_service = new z.assets.AssetService(this.backendClient);
-
-      TestFactory.search_service = new z.search.SearchService(this.backendClient);
-
+      TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
+      TestFactory.self_service = new z.self.SelfService(this.backendClient);
       TestFactory.user_service = new z.user.UserService(this.backendClient);
 
       TestFactory.user_repository = new z.user.UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
-        TestFactory.search_service,
+        TestFactory.connection_service,
+        TestFactory.self_service,
         TestFactory.client_repository,
         TestFactory.serverTimeRepository
       );
@@ -309,7 +305,6 @@ window.TestFactory.prototype.exposeConnectActors = function() {
       this.logger.info('✓ exposedUserActors');
 
       TestFactory.connectService = new z.connect.ConnectService(this.backendClient);
-
       TestFactory.connectGoogleService = new z.connect.ConnectGoogleService();
 
       TestFactory.connect_repository = new z.connect.ConnectRepository(

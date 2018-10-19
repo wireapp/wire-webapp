@@ -39,17 +39,20 @@ z.user.UserRepository = class UserRepository {
    * @class z.user.UserRepository
    * @param {z.user.UserService} user_service - Backend REST API user service implementation
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
-   * @param {z.search.SearchService} search_service - Backend REST API search service implementation
+   * @param {z.connection.ConnectionService} connectionService - Backend REST API connection service implementation
+   * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
-  constructor(user_service, asset_service, search_service, client_repository, serverTimeRepository) {
+  constructor(user_service, asset_service, connectionService, selfService, client_repository, serverTimeRepository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
+    this.connectionService = connectionService;
+    this.selfService = selfService;
     this.client_repository = client_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
-    this.connection_mapper = new z.user.UserConnectionMapper();
+    this.connectionMapper = new z.connection.ConnectionMapper();
     this.user_mapper = new z.user.UserMapper(serverTimeRepository);
     this.should_set_username = false;
 
@@ -173,13 +176,13 @@ z.user.UserRepository = class UserRepository {
 
     if (connection_et) {
       previous_status = connection_et.status();
-      this.connection_mapper.update_user_connection_from_json(connection_et, event_json);
+      this.connectionMapper.updateConnectionFromJson(connection_et, event_json);
     } else {
-      connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
+      connection_et = this.connectionMapper.mapConnectionFromJson(event_json);
     }
 
     this.update_user_connections([connection_et]).then(() => {
-      const shouldUpdateUser = previous_status === z.user.ConnectionStatus.SENT && connection_et.is_connected();
+      const shouldUpdateUser = previous_status === z.connection.ConnectionStatus.SENT && connection_et.is_connected();
       if (shouldUpdateUser) {
         this.updateUserById(connection_et.to);
       }
@@ -244,7 +247,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection request was accepted
    */
   acceptConnectionRequest(userEntity, showConversation = false) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.ACCEPTED, showConversation);
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -256,7 +259,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the user was blocked
    */
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.BLOCKED).then(() => {
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -272,7 +275,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancelConnectionRequest(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.CANCELLED).then(() => {
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -287,8 +290,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection request was successfully created
    */
   createConnection(userEntity, showConversation = false) {
-    return this.user_service
-      .create_connection(userEntity.id, userEntity.name())
+    return this.connectionService
+      .postConnections(userEntity.id, userEntity.name())
       .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, showConversation))
       .catch(error => {
         this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
@@ -330,11 +333,11 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
   get_connections(limit = 500, user_id, connection_ets = []) {
-    return this.user_service
-      .get_own_connections(limit, user_id)
+    return this.connectionService
+      .getConnections(limit, user_id)
       .then(({connections, has_more}) => {
         if (connections.length) {
-          const new_connection_ets = this.connection_mapper.map_user_connections_from_json(connections);
+          const new_connection_ets = this.connectionMapper.mapConnectionsFromJson(connections);
           connection_ets = connection_ets.concat(new_connection_ets);
         }
 
@@ -361,7 +364,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when an incoming connection request was ignored
    */
   ignoreConnectionRequest(userEntity) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.IGNORED);
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.IGNORED);
   }
 
   /**
@@ -371,7 +374,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when a user was unblocked
    */
   unblockUser(userEntity, showConversation = true) {
-    return this._update_connection_status(userEntity, z.user.ConnectionStatus.ACCEPTED, showConversation);
+    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -462,8 +465,8 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve();
     }
 
-    return this.user_service
-      .update_connection_status(user_et.id, status)
+    return this.connectionService
+      .putConnections(user_et.id, status)
       .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
       .catch(error => {
         this.logger.error(
@@ -485,12 +488,12 @@ z.user.UserRepository = class UserRepository {
    * Send the user connection notification.
    * @param {z.entity.Connection} connectionEntity - Connection entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.user.ConnectionStatus} previousStatus - Previous connection status
+   * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
    */
   _send_user_connection_notification(connectionEntity, source, previousStatus) {
     // We accepted the connection request or unblocked the user
-    const expectedPreviousStatus = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING];
+    const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.is_connected() && wasExpectedPreviousStatus;
     const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
@@ -502,13 +505,13 @@ z.user.UserRepository = class UserRepository {
         messageEntity.user(userEntity);
 
         switch (connectionEntity.status()) {
-          case z.user.ConnectionStatus.PENDING: {
+          case z.connection.ConnectionStatus.PENDING: {
             messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
             break;
           }
 
-          case z.user.ConnectionStatus.ACCEPTED: {
-            const statusWasSent = previousStatus === z.user.ConnectionStatus.SENT;
+          case z.connection.ConnectionStatus.ACCEPTED: {
+            const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
             messageEntity.memberMessageType = statusWasSent
               ? z.message.SystemMessageType.CONNECTION_ACCEPTED
               : z.message.SystemMessageType.CONNECTION_CONNECTED;
@@ -614,14 +617,10 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when account deletion process has been initiated
    */
   delete_me() {
-    return this.user_service
-      .delete_self()
-      .then(() => {
-        this.logger.info('Account deletion initiated');
-      })
-      .catch(error => {
-        this.logger.error(`Unable to delete self: ${error}`);
-      });
+    return this.selfService
+      .deleteSelf()
+      .then(() => this.logger.info('Account deletion initiated'))
+      .catch(error => this.logger.error(`Unable to delete self: ${error}`));
   }
 
   /**
@@ -701,8 +700,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that will resolve with the self user entity
    */
   getSelf() {
-    return this.user_service
-      .get_own_user()
+    return this.selfService
+      .getSelf()
       .then(response => this.user_mapper.map_self_user_from_object(response))
       .then(userEntity => {
         const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
@@ -891,8 +890,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when accent color was changed
    */
   change_accent_color(accent_id) {
-    return this.user_service
-      .update_own_user_profile({accent_id})
+    return this.selfService
+      .putSelf({accent_id})
       .then(() => this.user_update({user: {accent_id: accent_id, id: this.self().id}}));
   }
 
@@ -903,9 +902,7 @@ z.user.UserRepository = class UserRepository {
    */
   change_name(name) {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      return this.user_service
-        .update_own_user_profile({name})
-        .then(() => this.user_update({user: {id: this.self().id, name: name}}));
+      return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name: name}}));
     }
 
     return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
@@ -951,8 +948,8 @@ z.user.UserRepository = class UserRepository {
    */
   change_username(username) {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
-      return this.user_service
-        .change_own_username(username)
+      return this.selfService
+        .putSelfHandle(username)
         .then(() => {
           this.should_set_username = false;
           return this.user_update({user: {handle: username, id: this.self().id}});
@@ -1020,8 +1017,8 @@ z.user.UserRepository = class UserRepository {
           {key: previewImageKey, size: 'preview', type: 'image'},
           {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
-        return this.user_service
-          .update_own_user_profile({assets})
+        return this.selfService
+          .putSelf({assets})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
@@ -1053,8 +1050,8 @@ z.user.UserRepository = class UserRepository {
       this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
       return Promise.resolve();
     }
-    return this.user_service
-      .getConsent()
+    return this.selfService
+      .getSelfConsent()
       .then(consents => {
         for (const {type: consentType, value: consentValue} of consents) {
           const isMarketingConsent = consentType === z.user.ConsentType.MARKETING;
@@ -1076,7 +1073,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   setConsent(consentType, consentValue) {
-    return this.user_service.putConsent(consentType, consentValue, `Webapp ${z.util.Environment.version(false)}`);
+    return this.selfService.putSelfConsent(consentType, consentValue, `Webapp ${z.util.Environment.version(false)}`);
   }
 
   changeMarketingConsent(consentGiven) {

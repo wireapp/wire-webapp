@@ -43,30 +43,30 @@ describe('Conversation', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeTruthy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeTruthy();
+      expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeTruthy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeTruthy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeTruthy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeTruthy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeFalsy();
     });
 
     it('should return the expected value for team conversations', () => {
@@ -75,46 +75,46 @@ describe('Conversation', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeTruthy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeTruthy();
+      expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeTruthy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeTruthy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.type(z.conversation.ConversationType.SELF);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeTruthy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeTruthy();
 
       conversation_et.type(z.conversation.ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeTruthy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeFalsy();
-      expect(conversation_et.is_one2one()).toBeTruthy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeTruthy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeTruthy();
-      expect(conversation_et.is_one2one()).toBeFalsy();
-      expect(conversation_et.is_request()).toBeFalsy();
-      expect(conversation_et.is_self()).toBeFalsy();
+      expect(conversation_et.is1to1()).toBeFalsy();
+      expect(conversation_et.isRequest()).toBeFalsy();
+      expect(conversation_et.isSelf()).toBeFalsy();
     });
   });
 
@@ -1025,8 +1025,8 @@ describe('Conversation', () => {
       const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const user_connection_mapper = new z.user.UserConnectionMapper();
-      const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
+      const connectionMapper = new z.connection.ConnectionMapper();
+      const connection_et = connectionMapper.mapConnectionFromJson(payload_connection);
 
       const conversation_mapper = new z.conversation.ConversationMapper();
       const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);

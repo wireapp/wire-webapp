@@ -384,7 +384,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       .get_most_active_conversations()
       .then(conversationEntities => {
         return conversationEntities
-          .filter(conversationEntity => conversationEntity.is_one2one())
+          .filter(conversationEntity => conversationEntity.is1to1())
           .slice(0, 6)
           .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
       })

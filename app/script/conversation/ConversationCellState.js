@@ -333,16 +333,16 @@ z.conversation.ConversationCellState = (() => {
       return hasUsername ? `@${userEntity.username()}` : '';
     },
     icon: conversationEntity => {
-      if (conversationEntity.is_request()) {
+      if (conversationEntity.isRequest()) {
         return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
       }
     },
     match: conversationEntity => {
       const lastMessageEntity = conversationEntity.getLastMessage();
       const isMemberJoin = lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.isMemberJoin();
-      const isEmpty1to1Conversation = conversationEntity.is_one2one() && isMemberJoin;
+      const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
 
-      return conversationEntity.is_request() || isEmpty1to1Conversation;
+      return conversationEntity.isRequest() || isEmpty1to1Conversation;
     },
   };
 

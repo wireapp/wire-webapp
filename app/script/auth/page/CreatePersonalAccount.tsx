@@ -43,12 +43,9 @@ interface ConnectedProps {
   account: RegistrationDataState;
   currentFlow: string;
   isPersonalFlow: boolean;
-  isPersonalInvitationFlow: boolean;
 }
 
 interface DispatchProps {
-  getInvitationFromCode: (invitationCode: string) => Promise<void>;
-  enterPersonalInvitationCreationFlow: () => Promise<void>;
   enterPersonalCreationFlow: () => Promise<void>;
   enterGenericInviteCreationFlow: () => Promise<void>;
   doRegisterPersonal: (registrationData: RegisterData) => Promise<void>;
@@ -61,21 +58,6 @@ class CreatePersonalAccount extends React.PureComponent<
   State
 > {
   componentDidMount() {
-    const {params, url} = this.props.match;
-
-    const isInvite = url.startsWith(ROUTE.INVITE);
-    if (isInvite) {
-      const hasInvitationCode = !!params.invitationCode;
-      if (hasInvitationCode) {
-        return this.props
-          .getInvitationFromCode(params.invitationCode)
-          .then(() => this.props.enterPersonalInvitationCreationFlow())
-          .catch(() => this.props.enterPersonalCreationFlow());
-      }
-
-      return this.props.enterGenericInviteCreationFlow();
-    }
-
     return this.props.enterPersonalCreationFlow();
   }
 
@@ -87,11 +69,7 @@ class CreatePersonalAccount extends React.PureComponent<
   };
 
   handleSubmit = () => {
-    if (this.props.isPersonalInvitationFlow) {
-      this.createAccount();
-    } else {
-      this.props.history.push(ROUTE.VERIFY);
-    }
+    this.props.history.push(ROUTE.VERIFY);
   };
 
   render() {
@@ -146,17 +124,13 @@ export default withRouter(
         account: AuthSelector.getAccount(state),
         currentFlow: AuthSelector.getCurrentFlow(state),
         isPersonalFlow: AuthSelector.isPersonalFlow(state),
-        isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
       }),
       (dispatch: ThunkDispatch): DispatchProps => ({
-        doRegisterPersonal: (registrationData: RegisterData) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
+        doRegisterPersonal: (registrationData: RegisterData) => {
+          return dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData));
+        },
         enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
         enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
-        enterPersonalInvitationCreationFlow: () =>
-          dispatch(ROOT_ACTIONS.authAction.enterPersonalInvitationCreationFlow()),
-        getInvitationFromCode: (invitationCode: string) =>
-          dispatch(ROOT_ACTIONS.authAction.getInvitationFromCode(invitationCode)),
       })
     )(CreatePersonalAccount)
   )

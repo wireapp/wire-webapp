@@ -67,6 +67,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.client_service = new z.client.ClientService(backendClient, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
+    this.selfService = new z.self.SelfService(backendClient);
     this.user_service = new z.user.UserService(backendClient);
     this.user_repository = new z.user.UserRepository(
       this.user_service,
@@ -478,15 +479,15 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     if (!this.pending_server_request() && canVerifyAccount) {
       this.pending_server_request(true);
 
-      this.user_service
-        .change_own_password(this.password())
+      this.selfService
+        .putSelfPassword(this.password())
         .catch(error => {
           this.logger.warn(`Could not change user password: ${error.message}`, error);
           if (error.code !== z.error.BackendClientError.STATUS_CODE.FORBIDDEN) {
             throw error;
           }
         })
-        .then(() => this.user_service.change_own_email(this.username()))
+        .then(() => this.selfService.putSelfEmail(this.username()))
         .then(() => {
           this.pending_server_request(false);
           this._wait_for_update();
@@ -695,8 +696,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       if (!this.pending_server_request()) {
         this.pending_server_request(true);
 
-        this.user_service
-          .change_own_email(this.username())
+        this.selfService
+          .putSelfEmail(this.username())
           .then(response => this._on_resend_success(response))
           .catch(() => {
             this.pending_server_request(false);
