@@ -399,7 +399,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   showUserDetails(userEntity) {
     userEntity = ko.unwrap(userEntity);
     const conversationEntity = this.conversation_repository.active_conversation();
-    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+    const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (isSingleModeConversation && !userEntity.is_me) {
       return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
@@ -538,7 +538,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   getInViewportCallback(messageEntity) {
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
-      if (this.conversation().is_one2one() && isCreationMessage) {
+      if (this.conversation().is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
       return null;

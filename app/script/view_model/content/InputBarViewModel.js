@@ -171,7 +171,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {
       if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
-        const isOne2OneConversation = this.conversationEntity().is_one2one();
+        const isOne2OneConversation = this.conversationEntity().is1to1();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
         return this.selfUser().inTeam() && isOne2OneConversation && !availabilityIsNone;

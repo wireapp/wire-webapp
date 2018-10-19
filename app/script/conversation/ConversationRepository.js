@@ -130,7 +130,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           z.connection.ConnectionStatus.PENDING,
         ];
 
-        if (conversation_et.is_self() || states_to_filter.includes(conversation_et.connection().status())) {
+        if (conversation_et.isSelf() || states_to_filter.includes(conversation_et.connection().status())) {
           return false;
         }
 
@@ -447,7 +447,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const firstMessage = conversationEntity.getFirstMessage();
         const checkCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
         if (checkCreationMessage) {
-          const groupCreationMessageIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
+          const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
           const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
           const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
@@ -832,7 +832,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (inCurrentTeam) {
       const matchingConversationEntity = this.conversations().find(conversationEntity => {
-        if (!conversationEntity.is_one2one()) {
+        if (!conversationEntity.is1to1()) {
           // Disregard conversations that are not 1:1
           return false;
         }
@@ -1782,7 +1782,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   sendConfirmationStatus(conversationEntity, messageEntity) {
-    const otherUserIn1To1 = !messageEntity.user().is_me && conversationEntity.is_one2one();
+    const otherUserIn1To1 = !messageEntity.user().is_me && conversationEntity.is1to1();
     const {CONFIRMATION_THRESHOLD} = ConversationRepository.CONFIG;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
@@ -2663,11 +2663,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Can assets be uploaded
    */
   _can_upload_assets_to_conversation(conversation_et) {
-    if (!conversation_et || conversation_et.is_request() || conversation_et.removed_from_conversation()) {
+    if (!conversation_et || conversation_et.isRequest() || conversation_et.removed_from_conversation()) {
       return false;
     }
 
-    if (conversation_et.is_one2one() && !conversation_et.connection().is_connected) {
+    if (conversation_et.is1to1() && !conversation_et.connection().is_connected) {
       return false;
     }
 

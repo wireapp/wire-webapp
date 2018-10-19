@@ -399,7 +399,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
   mapAccessState(conversationEntity, accessModes, accessRole) {
     if (conversationEntity.team_id) {
-      if (conversationEntity.is_one2one()) {
+      if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.ONE2ONE);
       }
 
@@ -424,7 +424,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         : conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.LEGACY);
     }
 
-    if (conversationEntity.is_self()) {
+    if (conversationEntity.isSelf()) {
       return conversationEntity.accessState(z.conversation.ACCESS_STATE.SELF);
     }
 

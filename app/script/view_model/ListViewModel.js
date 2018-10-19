@@ -344,7 +344,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    if (conversationEntity.is_request()) {
+    if (conversationEntity.isRequest()) {
       entries.push({
         click: () => this.clickToCancelRequest(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverCancel),
