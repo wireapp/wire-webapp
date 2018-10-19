@@ -34,7 +34,6 @@ class AuthAPI {
       ACCESS: '/access',
       COOKIES: '/cookies',
       INITIATE_LOGIN: 'initiate-login',
-      INVITATIONS: '/invitations',
       LOGIN: '/login',
       LOGOUT: 'logout',
       REGISTER: '/register',
