@@ -839,9 +839,10 @@
   version "0.0.0"
   resolved "https://codeload.github.com/nfrasser/linkify-shim/tar.gz/a6caa8d338d07551c842f4f6f71a1015948542bb"
 
-"@bower_components/long@dcodeIO/Long.js#3.2.0":
-  version "3.2.0"
-  resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
+"@bower_components/long@dcodeIO/Long.js#4.0.0":
+  version "4.0.0"
+  uid "941c5c62471168b5d18153755c2a7b38d2560e58"
+  resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/941c5c62471168b5d18153755c2a7b38d2560e58"
 
 "@bower_components/moment@moment/moment#2.22.2":
   version "2.22.2"
