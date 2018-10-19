@@ -209,7 +209,7 @@
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "deploy:selfhosting": "yarn build:server && yarn deploy-travis-prod && eb deploy testing-bare",
+    "deploy:selfhosting": "yarn build:server && yarn deploy-travis-prod && eb deploy wire-self-hosting",
     "dist": "grunt prepare_dist",
     "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
     "fix:assets": "yarn prettier --write && yarn stylelint",

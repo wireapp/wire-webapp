@@ -110,7 +110,7 @@ export interface ServerConfig {
     };
     FEATURE: {
       CHECK_CONSENT: boolean;
-      DEBUG_UTIL: boolean;
+      ENABLE_DEBUG: boolean;
     };
     VERSION?: string;
   };
@@ -140,7 +140,7 @@ const config: ServerConfig = {
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
-      DEBUG_UTIL: process.env.FEATURE_DEBUG_UTIL == 'true' ? true : false,
+      ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
     },
     RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {

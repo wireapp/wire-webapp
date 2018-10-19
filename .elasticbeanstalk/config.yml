@@ -1,8 +1,8 @@
 deploy:
   artifact: aws/s3/ebs.zip
 global:
-  application_name: Selfhosting
+  application_name: PWA
   default_platform: Node.js
-  default_region: eu-central-1
+  default_region: eu-west-1
   sc: git
   workspace_type: Application
