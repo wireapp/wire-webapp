@@ -159,8 +159,9 @@ class Server {
 
   public initLatestBrowserRequired() {
     this.app.use((req, res, next) => {
+      const fileExtensionRegx = /\.[^/]+$/;
       const ignoredPath =
-        /\.[^/]+$/.test(req.path) ||
+        fileExtensionRegx.test(req.path) ||
         req.path.startsWith('/test') ||
         req.path.startsWith('/demo') ||
         req.path.startsWith('/_health') ||
