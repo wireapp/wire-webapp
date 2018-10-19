@@ -173,7 +173,7 @@ z.search.SearchRepository = class SearchRepository {
       .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => {
         return userEntities.filter(userEntity => {
-          return !userEntity.is_me && !userEntity.is_connected() && !userEntity.isTeamMember();
+          return !userEntity.is_me && !userEntity.isConnected() && !userEntity.isTeamMember();
         });
       })
       .then(userEntities => {

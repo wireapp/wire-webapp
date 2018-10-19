@@ -245,7 +245,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnOther(userEntity, event) {
-    if (userEntity.is_outgoing_request && userEntity.is_outgoing_request()) {
+    if (userEntity.isOutgoingRequest()) {
       return this.clickOnContact(userEntity);
     }
 
@@ -389,7 +389,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
           .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
       })
       .then(userIds => this.userRepository.get_users_by_id(userIds))
-      .then(userEntities => userEntities.filter(userEntity => !userEntity.is_blocked()));
+      .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
 
   //##############################################################################

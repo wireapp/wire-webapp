@@ -49,10 +49,10 @@ describe('ConversationRepository', () => {
     const conversation = new z.entity.Conversation(z.util.createRandomUuid());
     conversation.type(conversation_type);
 
-    const connection_et = new z.entity.Connection();
-    connection_et.conversation_id = conversation.id;
-    connection_et.status(connection_status);
-    conversation.connection(connection_et);
+    const connectionEntity = new z.connection.ConnectionEntity();
+    connectionEntity.conversationId = conversation.id;
+    connectionEntity.status(connection_status);
+    conversation.connection(connectionEntity);
 
     return conversation;
   };
@@ -398,11 +398,11 @@ describe('ConversationRepository', () => {
   });
 
   describe('map_connection', () => {
-    let connection_et = undefined;
+    let connectionEntity = undefined;
 
     beforeEach(() => {
-      connection_et = new z.entity.Connection();
-      connection_et.conversation_id = conversation_et.id;
+      connectionEntity = new z.connection.ConnectionEntity();
+      connectionEntity.conversationId = conversation_et.id;
 
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
@@ -416,29 +416,29 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a connection to an existing conversation', () => {
-      return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
+      return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
         expect(TestFactory.conversation_repository.fetch_conversation_by_id).not.toHaveBeenCalled();
         expect(TestFactory.conversation_service.get_conversation_by_id).not.toHaveBeenCalled();
-        expect(_conversation.connection()).toBe(connection_et);
+        expect(_conversation.connection()).toBe(connectionEntity);
       });
     });
 
     it('should map a connection to a new conversation', () => {
-      connection_et.status(z.connection.ConnectionStatus.ACCEPTED);
+      connectionEntity.status(z.connection.ConnectionStatus.ACCEPTED);
       TestFactory.conversation_repository.conversations.removeAll();
 
-      return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
+      return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
         expect(TestFactory.conversation_repository.fetch_conversation_by_id).toHaveBeenCalled();
         expect(TestFactory.conversation_service.get_conversation_by_id).toHaveBeenCalled();
-        expect(_conversation.connection()).toBe(connection_et);
+        expect(_conversation.connection()).toBe(connectionEntity);
       });
     });
 
     it('should map a cancelled connection to an existing conversation and filter it', () => {
-      connection_et.status(z.connection.ConnectionStatus.CANCELLED);
+      connectionEntity.status(z.connection.ConnectionStatus.CANCELLED);
 
-      return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
-        expect(_conversation.connection()).toBe(connection_et);
+      return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
+        expect(_conversation.connection()).toBe(connectionEntity);
         expect(_find_conversation(_conversation, TestFactory.conversation_repository.conversations)).not.toBeNull();
         expect(
           _find_conversation(_conversation, TestFactory.conversation_repository.filtered_conversations)
@@ -720,8 +720,8 @@ describe('ConversationRepository', () => {
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
         // conversation has a corresponding pending connection
-        const connectionEntity = new z.entity.Connection();
-        connectionEntity.conversation_id = conversation_et.id;
+        const connectionEntity = new z.connection.ConnectionEntity();
+        connectionEntity.conversationId = conversation_et.id;
         connectionEntity.status(z.connection.ConnectionStatus.PENDING);
         TestFactory.user_repository.connections.push(connectionEntity);
 
@@ -1001,7 +1001,7 @@ describe('ConversationRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.selfUser({id: 'felix'});
+        conversation.selfUser(new z.entity.User(z.util.createRandomUuid()));
         const messageText = 'hello there';
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });

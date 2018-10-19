@@ -33,18 +33,18 @@ z.connection.ConnectionMapper = class ConnectionMapper {
 
     /**
      * Converts JSON connection into connection entity.
-     * @param {JSON} connectionData - Connection data
-     * @returns {z.entity.Connection} Mapped connection entity
+     * @param {Object} connectionData - Connection data
+     * @returns {z.connection.ConnectionEntity} Mapped connection entity
      */
     this.mapConnectionFromJson = connectionData => {
-      const connectionEntitiy = new z.entity.Connection();
+      const connectionEntitiy = new z.connection.ConnectionEntity();
       return this.updateConnectionFromJson(connectionEntitiy, connectionData);
     };
 
     /**
      * Convert multiple JSON connections into connection entities.
-     * @param {Object} connectionsData - Connection data
-     * @returns {Array<z.entity.Connection>} Mapped connection entities
+     * @param {Array<Object>} connectionsData - Connection data
+     * @returns {Array<z.connection.ConnectionEntity>} Mapped connection entities
      */
     this.mapConnectionsFromJson = connectionsData => {
       return connectionsData
@@ -54,18 +54,18 @@ z.connection.ConnectionMapper = class ConnectionMapper {
 
     /**
      * Maps JSON connection into a blank connection entity or updates an existing one.
-     * @param {z.entity.Connection} connectionEntity - Connection entity that the info shall be mapped to
+     * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity that the info shall be mapped to
      * @param {JSON} connectionData - Connection data
-     * @returns {z.entity.Connection} Mapped connection entity
+     * @returns {z.connection.ConnectionEntity} Mapped connection entity
      */
     this.updateConnectionFromJson = (connectionEntity, connectionData) => {
       const {conversation, from, last_update, message, status, to} = connectionData;
 
       connectionEntity.status(status);
-      connectionEntity.conversation_id = conversation;
+      connectionEntity.conversationId = conversation;
       connectionEntity.to = to;
       connectionEntity.from = from;
-      connectionEntity.last_update = last_update;
+      connectionEntity.lastUpdate = last_update;
       connectionEntity.message = message;
       return connectionEntity;
     };

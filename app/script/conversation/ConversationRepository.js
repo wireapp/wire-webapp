@@ -858,7 +858,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         : this.createGroupConversation([userEntity]);
     }
 
-    const conversationId = userEntity.connection().conversation_id;
+    const conversationId = userEntity.connection().conversationId;
     return this.get_conversation_by_id(conversationId)
       .then(conversationEntity => {
         conversationEntity.connection(userEntity.connection());
@@ -933,30 +933,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
-   * @param {Connection} connection_et - Connections
+   * @param {z.connection.ConnectionEntity} connectionEntity - Connections
    * @param {boolean} [show_conversation=false] - Open the new conversation
    * @returns {Promise} Resolves when connection was mapped return value
    */
-  map_connection(connection_et, show_conversation = false) {
-    const {conversation_id} = connection_et;
-
-    return this.find_conversation_by_id(conversation_id)
+  map_connection(connectionEntity, show_conversation = false) {
+    return this.find_conversation_by_id(connectionEntity.conversationId)
       .catch(error => {
         const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
         if (!isConversationNotFound) {
           throw error;
         }
 
-        if (connection_et.is_connected() || connection_et.is_outgoing_request()) {
-          return this.fetch_conversation_by_id(conversation_id);
+        if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
+          return this.fetch_conversation_by_id(connectionEntity.conversationId);
         }
 
         throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .then(conversation_et => {
-        conversation_et.connection(connection_et);
+        conversation_et.connection(connectionEntity);
 
-        if (connection_et.is_connected()) {
+        if (connectionEntity.isConnected()) {
           conversation_et.type(z.conversation.ConversationType.ONE2ONE);
         }
 
@@ -980,12 +978,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param {Array<Connection>} connection_ets - Connections entities
+   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connections entities
    * @returns {undefined} No return value
    */
-  map_connections(connection_ets) {
-    this.logger.info(`Mapping '${connection_ets.length}' user connection(s) to conversations`, connection_ets);
-    connection_ets.map(connection_et => this.map_connection(connection_et));
+  map_connections(connectionEntities) {
+    this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
+    connectionEntities.map(connectionEntity => this.map_connection(connectionEntity));
   }
 
   /**
@@ -2667,7 +2665,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return false;
     }
 
-    if (conversation_et.is1to1() && !conversation_et.connection().is_connected) {
+    if (conversation_et.is1to1() && !conversation_et.connection().isConnected()) {
       return false;
     }
 
@@ -2987,7 +2985,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
         const userEntity = messageEntity.otherUser();
-        const isOutgoingRequest = userEntity && userEntity.is_outgoing_request();
+        const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
         if (isOutgoingRequest) {
           messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
         }
@@ -3130,7 +3128,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.user_repository.get_connection_by_conversation_id(conversationEntity.id);
-    const isPendingConnection = connectionEntity && connectionEntity.status() === z.connection.ConnectionStatus.PENDING;
+    const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
     if (isPendingConnection) {
       return Promise.resolve();
     }
