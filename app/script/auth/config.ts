@@ -59,7 +59,7 @@ export const URL = window.wire.env.URL || {
 export const VERSION = window.wire.env.VERSION || '0.0.0';
 export const FEATURE = window.wire.env.FEATURE || {
   CHECK_CONSENT: true,
-  DEBUG: false,
+  ENABLE_DEBUG: false,
   ENABLE_SSO: false,
 };
 export const APP_INSTANCE_ID = UUID();
