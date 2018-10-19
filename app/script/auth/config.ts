@@ -28,9 +28,18 @@ declare global {
         BACKEND_REST: string;
         BACKEND_WS: string;
         ENVIRONMENT: string;
-        URL: string;
+        URL: {
+          ACCOUNT_BASE: string;
+          MOBILE_BASE: string;
+          TEAMS_BASE: string;
+          WEBSITE_BASE: string;
+        };
         VERSION: string;
-        FEATURE: string;
+        FEATURE: {
+          CHECK_CONSENT: boolean;
+          ENABLE_DEBUG: boolean;
+          ENABLE_SSO: boolean;
+        };
       };
     };
   }
@@ -41,13 +50,16 @@ export const BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-
 export const BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
 export const ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
 export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com/';
-export const URL = JSON.parse(window.wire.env.URL) || {
+export const URL = window.wire.env.URL || {
   ACCOUNT_BASE: 'https://account.wire.com/',
   MOBILE_BASE: '/',
+  TEAMS_BASE: 'https://teams.wire.com/',
   WEBSITE_BASE: 'https://wire.com/',
 };
 export const VERSION = window.wire.env.VERSION || '0.0.0';
-export const FEATURE = JSON.parse(window.wire.env.FEATURE) || {
+export const FEATURE = window.wire.env.FEATURE || {
   CHECK_CONSENT: true,
+  DEBUG: false,
+  ENABLE_SSO: false,
 };
 export const APP_INSTANCE_ID = UUID();

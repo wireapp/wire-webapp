@@ -30,8 +30,8 @@ const ConfigRoute = (config: ServerConfig) =>
         BACKEND_WS: '${config.CLIENT.BACKEND_WS}',
         ENVIRONMENT: '${config.CLIENT.ENVIRONMENT}',
         VERSION: '${config.CLIENT.VERSION}',
-        URL: '${JSON.stringify(config.CLIENT.URL)}',
-        FEATURE: '${JSON.stringify(config.CLIENT.FEATURE)}',
+        URL: JSON.parse('${JSON.stringify(config.CLIENT.URL || {})}'),
+        FEATURE: JSON.parse('${JSON.stringify(config.CLIENT.FEATURE || {})}'),
       };
     `);
   });

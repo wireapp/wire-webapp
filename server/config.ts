@@ -112,6 +112,7 @@ export interface ServerConfig {
     FEATURE: {
       CHECK_CONSENT: boolean;
       ENABLE_DEBUG: boolean;
+      ENABLE_SSO: boolean;
     };
     VERSION?: string;
   };
@@ -142,6 +143,7 @@ const config: ServerConfig = {
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
+      ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
     },
     RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {

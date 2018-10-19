@@ -225,7 +225,7 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return JSON.parse(window.wire.env.FEATURE || {}).ENABLE_DEBUG ? {debug: new z.util.DebugUtil(this.repository)} : {};
+    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new z.util.DebugUtil(this.repository)} : {};
   }
 
   /**

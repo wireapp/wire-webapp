@@ -50,7 +50,6 @@ import {Link as RRLink} from 'react-router-dom';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import * as config from '../config';
-import * as Environment from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -407,7 +406,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {Environment.isInternalEnvironment() && !isDesktopApp() && !hideSSOLogin ? (
+                {config.FEATURE.ENABLE_SSO && !isDesktopApp() && !hideSSOLogin ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
