@@ -165,6 +165,7 @@ class Server {
         req.path.startsWith('/version') ||
         req.path.startsWith('/_health') ||
         req.path.startsWith('/join') ||
+        req.path.startsWith('/auth') ||
         req.path.startsWith('/unsupported');
 
       if (ignoredPath || this.config.SERVER.DEVELOPMENT) {
