@@ -164,6 +164,7 @@ class Server {
         req.path.startsWith('/test') ||
         req.path.startsWith('/version') ||
         req.path.startsWith('/_health') ||
+        req.path.startsWith('/join') ||
         req.path.startsWith('/unsupported');
 
       if (ignoredPath || this.config.SERVER.DEVELOPMENT) {
