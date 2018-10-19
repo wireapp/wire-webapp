@@ -653,7 +653,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversationId, type} = callMessageEntity;
 
     return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-      if (conversationEntity.is_one2one()) {
+      if (conversationEntity.is1to1()) {
         const groupMessageTypes = [
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,

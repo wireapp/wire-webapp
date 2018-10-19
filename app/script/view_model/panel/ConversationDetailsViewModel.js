@@ -82,7 +82,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isSingleUserMode = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().is_one2one() || this.activeConversation().is_request()
+        ? this.activeConversation().is1to1() || this.activeConversation().isRequest()
         : false;
     });
 
@@ -123,11 +123,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.showActionCreateGroup = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_one2one() && !this.isServiceMode();
+      return this.activeConversation() && this.activeConversation().is1to1() && !this.isServiceMode();
     });
 
     this.showActionCancelRequest = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_request();
+      return this.activeConversation() && this.activeConversation().isRequest();
     });
 
     this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());

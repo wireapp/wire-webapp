@@ -80,12 +80,12 @@ z.entity.Conversation = class Conversation {
       const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
-    this.is_one2one = ko.pureComputed(() => {
+    this.is1to1 = ko.pureComputed(() => {
       const is1to1Conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
-    this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
+    this.isRequest = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
+    this.isSelf = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
@@ -165,9 +165,9 @@ z.entity.Conversation = class Conversation {
       return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
-    this.isClearable = ko.pureComputed(() => !this.is_request() && !this.is_cleared());
+    this.isClearable = ko.pureComputed(() => !this.isRequest() && !this.is_cleared());
     this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.removed_from_conversation());
-    this.isMutable = ko.pureComputed(() => !this.is_request() && !this.removed_from_conversation());
+    this.isMutable = ko.pureComputed(() => !this.isRequest() && !this.removed_from_conversation());
 
     // Messages
     this.localMessageTimer = ko.observable(null);
@@ -258,7 +258,7 @@ z.entity.Conversation = class Conversation {
      * - "..." if the user entities have not yet been attached yet
      */
     this.display_name = ko.pureComputed(() => {
-      if (this.is_request() || this.is_one2one()) {
+      if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity && userEntity.name();
         return userName ? userName : '…';
@@ -707,7 +707,7 @@ z.entity.Conversation = class Conversation {
   }
 
   supportsVideoCall(isCreatingUser = false) {
-    if (this.is_one2one()) {
+    if (this.is1to1()) {
       return true;
     }
 
