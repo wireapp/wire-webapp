@@ -118,7 +118,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
-        return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
+        return this.firstParticipant().isConnected() || this.firstParticipant().isRequest();
       }
     });
 

@@ -406,7 +406,7 @@ z.event.EventRepository = class EventRepository {
 
     const isTypeUserConnection = eventType === z.event.Backend.USER.CONNECTION;
     if (isTypeUserConnection) {
-      return connection.last_update;
+      return connection.lastUpdate;
     }
 
     if (defaultValue) {

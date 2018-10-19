@@ -360,7 +360,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     if (!conversationEntity.isGroup()) {
       const userEntity = conversationEntity.firstUserEntity();
-      const canBlock = userEntity && (userEntity.is_connected() || userEntity.is_request());
+      const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
 
       if (canBlock) {
         entries.push({

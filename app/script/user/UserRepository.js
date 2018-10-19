@@ -62,14 +62,14 @@ z.user.UserRepository = class UserRepository {
 
     this.connect_requests = ko
       .pureComputed(() => {
-        return this.users().filter(user_et => user_et.is_incoming_request());
+        return this.users().filter(user_et => user_et.isIncomingRequest());
       })
       .extend({rateLimit: 50});
 
     this.connected_users = ko
       .pureComputed(() => {
         return this.users()
-          .filter(user_et => user_et.is_connected())
+          .filter(user_et => user_et.isConnected())
           .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND});
@@ -171,23 +171,23 @@ z.user.UserRepository = class UserRepository {
     }
     event_json = event_json.connection || event_json;
 
-    let connection_et = this.get_connection_by_user_id(event_json.to);
-    let previous_status = null;
+    let connectionEntity = this.get_connection_by_user_id(event_json.to);
+    let previousStatus = null;
 
-    if (connection_et) {
-      previous_status = connection_et.status();
-      this.connectionMapper.updateConnectionFromJson(connection_et, event_json);
+    if (connectionEntity) {
+      previousStatus = connectionEntity.status();
+      this.connectionMapper.updateConnectionFromJson(connectionEntity, event_json);
     } else {
-      connection_et = this.connectionMapper.mapConnectionFromJson(event_json);
+      connectionEntity = this.connectionMapper.mapConnectionFromJson(event_json);
     }
 
-    this.update_user_connections([connection_et]).then(() => {
-      const shouldUpdateUser = previous_status === z.connection.ConnectionStatus.SENT && connection_et.is_connected();
+    this.update_user_connections([connectionEntity]).then(() => {
+      const shouldUpdateUser = previousStatus === z.connection.ConnectionStatus.SENT && connectionEntity.isConnected();
       if (shouldUpdateUser) {
-        this.updateUserById(connection_et.to);
+        this.updateUserById(connectionEntity.to);
       }
-      this._send_user_connection_notification(connection_et, source, previous_status);
-      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
+      this._send_user_connection_notification(connectionEntity, source, previousStatus);
+      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connectionEntity, show_conversation);
     });
   }
 
@@ -300,28 +300,20 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Get a connection for a user ID.
-   * @param {string} user_id - User ID
-   * @returns {z.entity.Connection} User connection entity
+   * @param {string} userId - User ID
+   * @returns {z.connection.ConnectionEntity} User connection entity
    */
-  get_connection_by_user_id(user_id) {
-    for (const connection_et of this.connections()) {
-      if (connection_et.to === user_id) {
-        return connection_et;
-      }
-    }
+  get_connection_by_user_id(userId) {
+    return this.connections().find(connectionEntity => connectionEntity.to === userId);
   }
 
   /**
    * Get a connection for a conversation ID.
-   * @param {string} conversation_id - Conversation ID
-   * @returns {z.entity.Connection} User connection entity
+   * @param {string} conversationId - Conversation ID
+   * @returns {z.connection.ConnectionEntity} User connection entity
    */
-  get_connection_by_conversation_id(conversation_id) {
-    for (const connection_et of this.connections()) {
-      if (connection_et.conversation_id === conversation_id) {
-        return connection_et;
-      }
-    }
+  get_connection_by_conversation_id(conversationId) {
+    return this.connections().find(connectionEntity => connectionEntity.conversationId === conversationId);
   }
 
   /**
@@ -329,25 +321,25 @@ z.user.UserRepository = class UserRepository {
    * @note Initially called by Wire for Web's app start to retrieve user entities and their connections.
    * @param {number} [limit=500] - Query limit for user connections
    * @param {string} [user_id] - User ID of the latest connection
-   * @param {Array<z.entity.Connection>} [connection_ets=[]] - Unordered array of user connections
+   * @param {Array<z.connection.ConnectionEntity>} [connectionEntities=[]] - Unordered array of user connections
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
-  get_connections(limit = 500, user_id, connection_ets = []) {
+  get_connections(limit = 500, user_id, connectionEntities = []) {
     return this.connectionService
       .getConnections(limit, user_id)
-      .then(({connections, has_more}) => {
-        if (connections.length) {
-          const new_connection_ets = this.connectionMapper.mapConnectionsFromJson(connections);
-          connection_ets = connection_ets.concat(new_connection_ets);
+      .then(({connections: connectionData, has_more: hasMore}) => {
+        if (connectionData.length) {
+          const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
+          connectionEntities = connectionEntities.concat(newConnectionEntities);
         }
 
-        if (has_more) {
-          const last_connection_et = connection_ets[connection_ets.length - 1];
-          return this.get_connections(limit, last_connection_et.to, connection_ets);
+        if (hasMore) {
+          const lastConnectionEntity = connectionEntities[connectionEntities.length - 1];
+          return this.get_connections(limit, lastConnectionEntity.to, connectionEntities);
         }
 
-        if (connection_ets.length) {
-          return this.update_user_connections(connection_ets, true).then(() => this.connections());
+        if (connectionEntities.length) {
+          return this.update_user_connections(connectionEntities, true).then(() => this.connections());
         }
 
         return this.connections();
@@ -379,15 +371,15 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Update the user connections and get the matching users.
-   * @param {Array<z.entity.Connection>} connection_ets - Connection entities
+   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connection entities
    * @param {boolean} assign_clients - Retrieve locally known clients from database
-   * @returns {Promise<Array<z.entity.Connection>>} Promise that resolves when all user connections have been updated
+   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all user connections have been updated
    */
-  update_user_connections(connection_ets, assign_clients = false) {
+  update_user_connections(connectionEntities, assign_clients = false) {
     return Promise.resolve()
       .then(() => {
-        z.util.koArrayPushAll(this.connections, connection_ets);
-        const user_ids = connection_ets.map(connection_et => connection_et.to);
+        z.util.koArrayPushAll(this.connections, connectionEntities);
+        const user_ids = connectionEntities.map(connectionEntity => connectionEntity.to);
 
         if (user_ids.length === 0) {
           return;
@@ -402,9 +394,7 @@ z.user.UserRepository = class UserRepository {
           }
         });
       })
-      .then(() => {
-        return connection_ets;
-      });
+      .then(() => connectionEntities);
   }
 
   /**
@@ -435,15 +425,15 @@ z.user.UserRepository = class UserRepository {
   /**
    * Assign connections to the users.
    * @param {z.entity.User} user_et - User to which a connection will be assigned to.
-   * @returns {z.entity.Connection} Connection entity which has been found for the given user entity.
+   * @returns {z.connection.ConnectionEntity} Connection entity which has been found for the given user entity.
    * @private
    */
   _assign_connection(user_et) {
-    const connection_et = this.get_connection_by_user_id(user_et.id);
-    if (connection_et) {
-      user_et.connection(connection_et);
+    const connectionEntity = this.get_connection_by_user_id(user_et.id);
+    if (connectionEntity) {
+      user_et.connection(connectionEntity);
     }
-    return connection_et;
+    return connectionEntity;
   }
 
   /**
@@ -486,7 +476,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Send the user connection notification.
-   * @param {z.entity.Connection} connectionEntity - Connection entity
+   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
@@ -495,7 +485,7 @@ z.user.UserRepository = class UserRepository {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
-    const selfUserAccepted = connectionEntity.is_connected() && wasExpectedPreviousStatus;
+    const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
     const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;

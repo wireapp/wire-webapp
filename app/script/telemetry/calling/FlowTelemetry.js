@@ -188,7 +188,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       this.logger.force_log(`-- Remote user: ${participant_et.user.name()} (${participant_et.user.id})`);
     }
 
-    this.logger.force_log(`-- User is connected: ${participant_et.is_connected()}`);
+    this.logger.force_log(`-- User is connected: ${participant_et.isConnected()}`);
     this.logger.force_log(`-- Flow is answer: ${this.is_answer}`);
 
     if (this.peer_connection) {

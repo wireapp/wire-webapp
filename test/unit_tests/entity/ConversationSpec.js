@@ -1026,11 +1026,11 @@ describe('Conversation', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const connectionMapper = new z.connection.ConnectionMapper();
-      const connection_et = connectionMapper.mapConnectionFromJson(payload_connection);
+      const connectionEntity = connectionMapper.mapConnectionFromJson(payload_connection);
 
       const conversation_mapper = new z.conversation.ConversationMapper();
       const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);
-      new_conversation.connection(connection_et);
+      new_conversation.connection(connectionEntity);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
       expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);

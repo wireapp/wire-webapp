@@ -115,13 +115,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
           return 'selected';
         case this.participant().isTeamMember():
           return '';
-        case this.participant().is_blocked():
+        case this.participant().isBlocked():
           return 'blocked';
-        case this.participant().is_request():
+        case this.participant().isRequest():
           return 'pending';
-        case this.participant().is_ignored():
+        case this.participant().isIgnored():
           return 'ignored';
-        case this.participant().is_canceled() || this.participant().is_unknown():
+        case this.participant().isCanceled() || this.participant().isUnknown():
           return 'unknown';
         default:
           return '';

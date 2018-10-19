@@ -203,7 +203,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('shows the number of connection requests when viewing the inbox', done => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
 
-      const pending_connection = new z.entity.Connection();
+      const pending_connection = new z.connection.ConnectionEntity();
       pending_connection.status(z.connection.ConnectionStatus.PENDING);
 
       const user_et = new z.entity.User(z.util.createRandomUuid());
