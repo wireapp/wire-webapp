@@ -17,7 +17,7 @@
  *
  */
 
-import styled, {keyframes} from 'styled-components';
+import styled, {css, keyframes} from 'styled-components';
 import {COLOR} from '../Identity';
 
 interface PillProps {
@@ -77,10 +77,11 @@ const Pill = styled.span.attrs<PillProps & React.HTMLAttributes<HTMLSpanElement>
 
   ${({active}) =>
     active &&
-    `
-        cursor: default;
-        background-color: #eee;
-        animation: ${pillAnimation} 300ms ease-out;`};
+    css`
+      cursor: default;
+      background-color: #eee;
+      animation: ${pillAnimation} 300ms ease-out;
+    `};
 `;
 
 Pill.defaultProps = {

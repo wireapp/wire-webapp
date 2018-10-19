@@ -17,10 +17,6 @@
  *
  */
 
-import setGlobalStyles from './globalStyles';
-
-setGlobalStyles();
-
 export * from './Form';
 export * from './Icon';
 export * from './Identity';

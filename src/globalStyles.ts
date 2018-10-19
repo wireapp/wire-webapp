@@ -17,22 +17,13 @@
  *
  */
 
-import {injectGlobal} from 'styled-components';
+import {createGlobalStyle} from 'styled-components';
 import styledNormalize from 'styled-normalize';
 
-let areGlobalStylesSet = false;
-
-export default function applyGlobalStyles() {
-  if (!areGlobalStylesSet) {
-    /* tslint:disable:no-unused-expression */
-    injectGlobal`
+export default createGlobalStyle`
       ${styledNormalize}
 
       p {
         margin-top: 0;
       }
     `;
-    /* tslint:enable:no-unused-expression */
-    areGlobalStylesSet = true;
-  }
-}
