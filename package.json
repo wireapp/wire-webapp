@@ -6,7 +6,7 @@
     "@bower_components/amplify": "wireapp/amplify#v1.1.7",
     "@bower_components/antiscroll-2": "wireapp/antiscroll-2#v1.3.1",
     "@bower_components/bazinga64": "wireapp/bazinga64#v5.0.3",
-    "@bower_components/bytebuffer": "dcodeIO/ByteBuffer.js#3.5.5",
+    "@bower_components/bytebuffer": "dcodeIO/ByteBuffer.js#5.0.1",
     "@bower_components/cryptojs": "brix/crypto-js#3.1.9-1",
     "@bower_components/dexie": "dfahlander/Dexie.js#v2.0.4",
     "@bower_components/generic-message-proto": "wireapp/generic-message-proto#v1.21.6",

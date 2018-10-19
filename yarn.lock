@@ -784,12 +784,12 @@
   version "5.0.3"
   resolved "https://codeload.github.com/wireapp/bazinga64/tar.gz/dda8ab93bc0c985a1fd3d8990e7b3a21b26565f2"
 
-"@bower_components/bytebuffer@dcodeIO/ByteBuffer.js#3.5.5":
-  version "3.5.5"
-  resolved "https://codeload.github.com/dcodeIO/ByteBuffer.js/tar.gz/83b98043f13f6073b9e073f0eb39849dab5ae257"
+"@bower_components/bytebuffer@dcodeIO/ByteBuffer.js#5.0.1":
+  version "5.0.1"
+  uid f3f310b6786e5d44686d385a2cc60c6720a1069b
+  resolved "https://codeload.github.com/dcodeIO/ByteBuffer.js/tar.gz/f3f310b6786e5d44686d385a2cc60c6720a1069b"
   dependencies:
-    bufferview "~1"
-    long "~2 >=2.2.3"
+    long "~3"
 
 "@bower_components/cryptojs@brix/crypto-js#3.1.9-1":
   version "3.1.9"
@@ -2476,11 +2476,6 @@ buffer@^5.0.3:
   dependencies:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
-
-bufferview@~1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/bufferview/-/bufferview-1.0.1.tgz#7afd74a45f937fa422a1d338c08bbfdc76cd725d"
-  integrity sha1-ev10pF+Tf6QiodM4wIu/3HbNcl0=
 
 builtin-modules@^1.0.0, builtin-modules@^1.1.1:
   version "1.1.1"
@@ -7528,11 +7523,6 @@ long@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
   integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
-
-"long@~2 >=2.2.3":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/long/-/long-2.4.0.tgz#9fa180bb1d9500cdc29c4156766a1995e1f4524f"
-  integrity sha1-n6GAux2VAM3CnEFWdmoZleH0Uk8=
 
 long@~3:
   version "3.2.0"
