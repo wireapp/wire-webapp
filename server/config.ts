@@ -105,8 +105,9 @@ export interface ServerConfig {
     ENVIRONMENT: string;
     URL: {
       ACCOUNT_BASE: string;
-      WEBSITE_BASE: string;
       MOBILE_BASE: string;
+      TEAMS_BASE: string;
+      WEBSITE_BASE: string;
     };
     FEATURE: {
       CHECK_CONSENT: boolean;
@@ -146,6 +147,7 @@ const config: ServerConfig = {
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
+      TEAMS_BASE: process.env.URL_TEAMS_BASE,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
     VERSION: undefined,
