@@ -162,10 +162,12 @@ class Server {
       const ignoredPath =
         /\.[^/]+$/.test(req.path) ||
         req.path.startsWith('/test') ||
-        req.path.startsWith('/version') ||
+        req.path.startsWith('/demo') ||
         req.path.startsWith('/_health') ||
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
+        req.path.startsWith('/google') ||
+        req.path.startsWith('/apple-app-site-association') ||
         req.path.startsWith('/unsupported');
 
       if (ignoredPath || this.config.SERVER.DEVELOPMENT) {
