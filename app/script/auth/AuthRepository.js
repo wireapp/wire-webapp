@@ -187,7 +187,7 @@ z.auth.AuthRepository = class AuthRepository {
   /**
    * Store the access token using Amplify.
    *
-   * @param {Object|string} accessTokenResponse - Access token data structure
+   * @param {Object} accessTokenResponse - Access token data structure
    * @param {string} accessTokenResponse.access_token - Access token
    * @param {string} accessTokenResponse.expires_in - Expiration of access token in seconds
    * @param {string} accessTokenResponse.token_type - Type of access token
@@ -214,7 +214,7 @@ z.auth.AuthRepository = class AuthRepository {
    * Logs the update of the access token.
    *
    * @private
-   * @param {Object|string} accessTokenResponse - Access token data structure
+   * @param {Object} accessTokenResponse - Access token data structure
    * @param {number} expirationTimestamp - Timestamp when access token expires
    * @returns {undefined}
    */
