@@ -25,13 +25,13 @@ window.z.auth = z.auth || {};
 z.auth.AuthService = class AuthService {
   static get CONFIG() {
     return {
-      POST_ACCESS_RETRY_LIMIT: 10,
-      POST_ACCESS_RETRY_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+      POST_ACCESS_RETRY: {
+        LIMIT: 10,
+        TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+      },
       URL_ACCESS: '/access',
-      URL_ACTIVATE: '/activate',
       URL_COOKIES: '/cookies',
       URL_LOGIN: '/login',
-      URL_REGISTER: '/register',
     };
   }
 
@@ -42,6 +42,7 @@ z.auth.AuthService = class AuthService {
 
   /**
    * Get all cookies for a user.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCookies
    * @returns {Promise} Promise that resolves with an array of cookies.
    */
   getCookies() {
@@ -61,7 +62,7 @@ z.auth.AuthService = class AuthService {
    *  user: 4363e274-69c9-... - User ID
    *
    * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//newAccessToken
    * @param {number} retryAttempt - Retry attempts when a request fails
    * @returns {Promise} Promise which resolves with access token data (token_type, etc.).
    */
@@ -97,7 +98,7 @@ z.auth.AuthService = class AuthService {
           return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
 
-        const exceededRetries = retryAttempt > AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT;
+        const exceededRetries = retryAttempt > AuthService.CONFIG.POST_ACCESS_RETRY.LIMIT;
         if (exceededRetries) {
           this.saveAccessTokenInClient();
           this.logger.warn(`Exceeded limit of attempts to refresh access token': ${errorThrown}`, jqXHR);
@@ -130,7 +131,7 @@ z.auth.AuthService = class AuthService {
         return window.setTimeout(() => {
           this.logger.info(`Trying to request a new access token (Attempt '${retryAttempt}')`);
           return _retry();
-        }, AuthService.CONFIG.POST_ACCESS_RETRY_TIMEOUT);
+        }, AuthService.CONFIG.POST_ACCESS_RETRY.TIMEOUT);
       };
 
       $.ajax(ajaxConfig);
@@ -138,11 +139,13 @@ z.auth.AuthService = class AuthService {
   }
 
   /**
-   * Delete all cookies on the backend.
+   * Delete cookies on backend.
    *
-   * @param {string} email - The user's e-mail address
-   * @param {string} password - The user's password
-   * @param {string[]} labels - A list of cookie labels to remove from the system (optional)
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//rmCookies
+   *
+   * @param {string} email - Email address of user
+   * @param {string} password - Password of user
+   * @param {string[]} [labels] - A list of cookie labels to remove from the system (optional)
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
   postCookiesRemove(email, password, labels) {
@@ -160,8 +163,7 @@ z.auth.AuthService = class AuthService {
   /**
    * Login in order to obtain an access-token and cookie.
    *
-   * @note Don't use our client wrapper here. On cookie requests we need to use plain jQuery AJAX.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/login
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//login
    *
    * @param {Object} login - Containing sign in information
    * @param {string} login.email - The email address for a password login
@@ -172,24 +174,15 @@ z.auth.AuthService = class AuthService {
    * @returns {Promise} Promise that resolves with access token
    */
   postLogin(login, persist) {
-    const persistParam = window.encodeURIComponent(persist.toString());
-    return new Promise((resolve, reject) => {
-      $.ajax({
-        contentType: 'application/json; charset=utf-8',
-        crossDomain: true,
-        data: pako.gzip(JSON.stringify(login)),
-        headers: {
-          'Content-Encoding': 'gzip',
-        },
-        processData: false,
-        type: 'POST',
-        url: this.backendClient.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
-        xhrFields: {
-          withCredentials: true,
-        },
-      })
-        .done(resolve)
-        .fail((jqXHR, textStatus, errorThrown) => reject(jqXHR.responseJSON || errorThrown));
+    return this.backendClient.sendJson({
+      crossDomain: true,
+      data: {
+        persist: window.encodeURIComponent(persist.toString()),
+      },
+      skipRetry: true,
+      type: 'POST',
+      url: AuthService.CONFIG.URL_LOGIN,
+      withCredentials: true,
     });
   }
 
@@ -197,7 +190,7 @@ z.auth.AuthService = class AuthService {
    * A login code can be used only once and times out after 10 minutes.
    *
    * @note Only one login code may be pending at a time.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendLoginCode
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//sendLoginCode
    *
    * @param {Object} requestCode - Containing the phone number in E.164 format and whether a code should be forced
    * @returns {Promise} Promise that resolves on successful login code request
