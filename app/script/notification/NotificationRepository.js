@@ -747,10 +747,10 @@ z.notification.NotificationRepository = class NotificationRepository {
    * Sending the notification.
    *
    * @param {Object} notificationContent - Content of notification
-   * @option notificationContent [String] title
-   * @option notificationContent [Object] options
-   * @option notificationContent [Function] trigger
-   * @option notificationContent [Integer] timeout
+   * @param {string} notificationContent.title - Title of notification
+   * @param {Object} notificationContent.options - Notification options
+   * @param {Function} notificationContent.trigger - Function to be called on notificiation click
+   * @param {Integer} notificationContent.timeout - Timeout after which notification is closed
    * @returns {undefined} No return value
    */
   _showNotification(notificationContent) {
