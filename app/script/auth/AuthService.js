@@ -52,7 +52,13 @@ z.auth.AuthService = class AuthService {
   }
 
   /**
-   * Get access-token if a valid cookie is provided.
+   * Get access token if a valid cookie is provided.
+   *
+   * @example Access token data we expect:
+   *  access_token: Lt-IRHxkY9JLA5UuBR3Exxj5lCUf... - Token
+   *  expires_in: 900 - Expiration in seconds
+   *  token_type: Bearer - Token type
+   *  user: 4363e274-69c9-... - User ID
    *
    * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
@@ -71,16 +77,17 @@ z.auth.AuthService = class AuthService {
       };
 
       if (this.backendClient.accessToken) {
+        const {accessToken, accessTokenType} = this.backendClient;
         ajaxConfig.headers = {
-          Authorization: `Bearer ${window.decodeURIComponent(this.backendClient.accessToken)}`,
+          Authorization: `${accessTokenType} ${window.decodeURIComponent(accessToken)}`,
         };
       }
 
-      ajaxConfig.success = accessTokenData => {
-        const {access_token: accessToken, token_type: accessTokenType} = accessTokenData;
+      ajaxConfig.success = accessTokenResponse => {
+        const {access_token: accessToken, token_type: accessTokenType} = accessTokenResponse;
         this.backendClient.clearQueueUnblockTimeout();
         this.saveAccessTokenInClient(accessTokenType, accessToken);
-        resolve(accessTokenData);
+        resolve(accessTokenResponse);
       };
 
       ajaxConfig.error = (jqXHR, textStatus, errorThrown) => {
@@ -157,10 +164,10 @@ z.auth.AuthService = class AuthService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/login
    *
    * @param {Object} login - Containing sign in information
-   * @option {string} login - email The email address for a password login
-   * @option {string} login - phone The phone number for a password or SMS login
-   * @option {string} login - password The password for a password login
-   * @option {string} login - code The login code for an SMS login
+   * @param {string} login.email - The email address for a password login
+   * @param {string} login.phone - The phone number for a password or SMS login
+   * @param {string} login.password - The password for a password login
+   * @param {string} login.code - The login code for an SMS login
    * @param {boolean} persist - Request a persistent cookie instead of a session cookie
    * @returns {Promise} Promise that resolves with access token
    */
@@ -219,12 +226,12 @@ z.auth.AuthService = class AuthService {
   /**
    * Save the access token date in the client.
    *
-   * @param {string} type - Access token type
-   * @param {string} value - Access token
+   * @param {string} tokenType - Access token type
+   * @param {string} token - Access token
    * @returns {undefined}
    */
-  saveAccessTokenInClient(type = '', value = '') {
-    this.backendClient.accessTokenType = type;
-    this.backendClient.accessToken = value;
+  saveAccessTokenInClient(tokenType = '', token = '') {
+    this.backendClient.accessTokenType = tokenType;
+    this.backendClient.accessToken = token;
   }
 };

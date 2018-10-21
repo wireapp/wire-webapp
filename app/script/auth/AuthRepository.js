@@ -83,11 +83,11 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return this.authService.postLogin(login, persist).then(accessTokenData => {
-      this.saveAccessToken(accessTokenData);
+    return this.authService.postLogin(login, persist).then(accessTokenResponse => {
+      this.saveAccessToken(accessTokenResponse);
       z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, persist);
       z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-      return accessTokenData;
+      return accessTokenResponse;
     });
   }
 
@@ -187,49 +187,40 @@ z.auth.AuthRepository = class AuthRepository {
   /**
    * Store the access token using Amplify.
    *
-   * @example Access Token data we expect:
-   *  access_token: Lt-IRHxkY9JLA5UuBR3Exxj5lCUf...
-   *  access_token_expiration: 1424951321067 => Thu, 26 Feb 2015 11:48:41 GMT
-   *  access_token_type: Bearer
-   *  access_token_ttl: 900000 => 900s/15min
-   *
-   * @param {Object|string} accessTokenData - Access Token
-   * @option {string} accessTokenData - access_token
-   * @option {string} accessTokenData - expires_in
-   * @option {string} accessTokenData - type
+   * @param {Object|string} accessTokenResponse - Access token data structure
+   * @param {string} accessTokenResponse.access_token - Access token
+   * @param {string} accessTokenResponse.expires_in - Expiration of access token in seconds
+   * @param {string} accessTokenResponse.token_type - Type of access token
    * @returns {Object} Access token data
    */
-  saveAccessToken(accessTokenData) {
-    const {access_token: accessToken, expires_in: expiresIn, type: accessTokenType} = accessTokenData;
-    const expiresInMillis = accessTokenData.expires_in * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+  saveAccessToken(accessTokenResponse) {
+    const {access_token: accessToken, expires_in: expiresIn, token_type: accessTokenType} = accessTokenResponse;
+    const expiresInMillis = expiresIn * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
     z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
     z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
     z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenData.token_type, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
 
     this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 
-    this._logAccessTokenUpdate(accessTokenData, expirationTimestamp);
+    this._logAccessTokenUpdate(accessTokenResponse, expirationTimestamp);
     this._scheduleTokenRefresh(expirationTimestamp);
-    return accessTokenData;
+    return accessTokenResponse;
   }
 
   /**
    * Logs the update of the access token.
    *
    * @private
-   * @param {Object|string} accessTokenData - Access Token
-   * @option {string} accessTokenData - access_token
-   * @option {string} accessTokenData - expires_in
-   * @option {string} accessTokenData - type
+   * @param {Object|string} accessTokenResponse - Access token data structure
    * @param {number} expirationTimestamp - Timestamp when access token expires
    * @returns {undefined}
    */
-  _logAccessTokenUpdate(accessTokenData, expirationTimestamp) {
+  _logAccessTokenUpdate(accessTokenResponse, expirationTimestamp) {
     const expirationDate = z.util.TimeUtil.formatTimestamp(expirationTimestamp, false);
-    this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenData);
+    this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenResponse);
   }
 
   /**
