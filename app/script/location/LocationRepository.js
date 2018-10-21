@@ -27,11 +27,26 @@ z.location.LocationRepository = class LocationRepository {
     this.locationService = locationService;
   }
 
-  getMapsUrl(latitude, longitude, name, zoom) {
-    return this.locationService.getMapsUrl(latitude, longitude, name, zoom);
-  }
-
   getLocation(latitude, longitude) {
     return this.locationService.getLocation(latitude, longitude);
+  }
+
+  /**
+   * Return link to Google Maps.
+   *
+   * @param {number} latitude - Latitude of location
+   * @param {number} longitude - Longitude of location
+   * @param {string} name - Name of location
+   * @param {string} zoom - Map zoom level
+   * @returns {string} URL to location in Google Maps
+   */
+  getMapsUrl(latitude, longitude, name, zoom) {
+    const baseUrl = 'https://google.com/maps/';
+
+    const nameParam = name ? `place/${name}/` : '';
+    const locationParam = `@${latitude},${longitude}`;
+    const zoomParam = zoom ? `,${zoom}z` : '';
+
+    return `${baseUrl}${nameParam}${locationParam}${zoomParam}`;
   }
 };
