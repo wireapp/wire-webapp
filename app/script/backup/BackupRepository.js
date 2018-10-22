@@ -39,14 +39,16 @@ z.backup.BackupRepository = class BackupRepository {
    * @class z.backup.BackupRepository
    * @param {z.backup.BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
+   * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
-   * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
+   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
    */
-  constructor(backupService, clientRepository, conversationRepository, userRepository) {
+  constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
     this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
+    this.connectionRepository = connectionRepository;
     this.conversationRepository = conversationRepository;
     this.userRepository = userRepository;
 
@@ -214,7 +216,7 @@ z.backup.BackupRepository = class BackupRepository {
       .then(importedEntities => this._importHistoryEvents(eventEntities, progressCallback).then(() => importedEntities))
       .then(importedEntities => {
         this.conversationRepository.updateConversations(importedEntities);
-        this.conversationRepository.map_connections(this.userRepository.connections());
+        this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
       });
   }
 

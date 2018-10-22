@@ -96,7 +96,7 @@ z.entity.Conversation = class Conversation {
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.connection.ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
-      const connectedUserId = connectionEntity.to;
+      const connectedUserId = connectionEntity && connectionEntity.userId;
       if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
         this.participating_user_ids.push(connectedUserId);
       }

@@ -723,7 +723,7 @@ describe('ConversationRepository', () => {
         const connectionEntity = new z.connection.ConnectionEntity();
         connectionEntity.conversationId = conversation_et.id;
         connectionEntity.status(z.connection.ConnectionStatus.PENDING);
-        TestFactory.user_repository.connections.push(connectionEntity);
+        TestFactory.connection_repository.connectionEntities.push(connectionEntity);
 
         return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
           expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
