@@ -20,12 +20,6 @@
 'use strict';
 
 module.exports = {
-  aws: {
-    command: 'python aws/application.py',
-    options: {
-      stdout: true,
-    },
-  },
   aws_deploy: {
     command:
       'aws elasticbeanstalk create-application-version --application-name Webapp --version-label <%= grunt.config("aws.deploy.options.version") %> --source-bundle S3Bucket="wire-webapp",S3Key="<%= grunt.config("aws.deploy.options.version") %>.zip" --auto-create-application',

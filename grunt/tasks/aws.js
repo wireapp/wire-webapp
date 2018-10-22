@@ -54,5 +54,4 @@ module.exports = grunt => {
     'shell:aws_pack',
     'compress:aws',
   ]);
-  grunt.registerTask('aws_run', ['init', 'prepare_prod', 'aws_prepare', 'open:aws', 'shell:aws']);
 };

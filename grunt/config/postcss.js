@@ -32,10 +32,4 @@ module.exports = {
     },
     src: '<%= dir.deploy %>/**/*.css',
   },
-  distribution: {
-    options: {
-      processors,
-    },
-    src: '<%= dir.dist %>/**/*.css',
-  },
 };
