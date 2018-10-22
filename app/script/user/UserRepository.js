@@ -438,18 +438,18 @@ z.user.UserRepository = class UserRepository {
   _upgradePictureAsset(userData) {
     const hasPicture = userData.picture.length;
     const hasAsset = userData.assets.length;
-    if (!hasPicture) {
-      return userData;
-    }
 
-    if (!hasAsset) {
-      // if there are no assets, just upload the old picture to the new api
-      const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
-      medium.load().then(imageBlob => this.change_picture(imageBlob));
-    } else {
-      // if an asset is already there, just delete it on the user's profile
-      this.selfService.putSelf({picture: undefined});
+    if (hasPicture) {
+      if (!hasAsset) {
+        // if there are no assets, just upload the old picture to the new api
+        const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
+        medium.load().then(imageBlob => this.change_picture(imageBlob));
+      } else {
+        // if an asset is already there, just delete it on the user's profile
+        this.selfService.putSelf({picture: undefined});
+      }
     }
+    return userData;
   }
 
   /**
