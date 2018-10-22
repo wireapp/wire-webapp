@@ -26,12 +26,12 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends z.viewModel.panel.BasePanelViewModel {
   constructor(params) {
     super(params);
-
     this.clickOnNotificationSetting = this.clickOnNotificationSetting.bind(this);
 
-    this.conversationRepository = this.repositories.conversation;
+    const {conversation} = params.repositories;
+    this.conversationRepository = conversation;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.panel.NotificationsViewModel', z.config.LOGGER.OPTIONS);
 
     this.settings = Object.values(z.conversation.NotificationSetting.STATE).map(status => ({
       text: z.conversation.NotificationSetting.getText(status),
