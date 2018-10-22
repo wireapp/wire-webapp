@@ -111,6 +111,51 @@ module.exports = grunt => {
     }
   });
 
+  grunt.registerTask('build_dev', () => {
+    grunt.task.run(
+      'clean:temp',
+      'clean:deploy',
+      'clean:deploy_app',
+      'clean:deploy_script',
+      'clean:aws',
+      'clean:aws_app',
+      'clean:aws_s3',
+      'set_version:staging',
+      'npmBower',
+      'copy:frontend',
+      'scripts',
+      'less:deploy',
+      'postcss:deploy',
+      'copy:deploy',
+      'copy:deploy_audio',
+      'copy:deploy_favicon',
+      'includereplace:deploy_index',
+      'includereplace:deploy_auth',
+      'includereplace:deploy_login',
+      'includereplace:deploy_demo',
+      'concat:dev',
+      'copy:aws'
+    );
+  });
+
+  grunt.registerTask('build_dev_script', () => {
+    grunt.task.run('scripts', 'copy:deploy', 'concat:dev', 'copy:aws');
+  });
+
+  grunt.registerTask('build_dev_style', () => {
+    grunt.task.run('less:deploy', 'postcss:deploy', 'copy:deploy', 'copy:aws');
+  });
+
+  grunt.registerTask('build_dev_markup', () => {
+    grunt.task.run(
+      'includereplace:deploy_index',
+      'includereplace:deploy_auth',
+      'includereplace:deploy_login',
+      'includereplace:deploy_demo',
+      'copy:aws'
+    );
+  });
+
   // Test Related
   grunt.registerTask('test', () =>
     grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])

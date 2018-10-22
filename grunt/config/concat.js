@@ -25,4 +25,12 @@ module.exports = {
       'deploy/min/wire-vendor.min.js': ['deploy/min/wire-vendor.min.js'].concat('<%= scripts_minified.vendor %>'),
     },
   },
+  dev: {
+    files: {
+      'deploy/min/wire-app.min.js': ['<%= scripts.app %>'].concat('<%= scripts_minified.app %>'),
+      'deploy/min/wire-component.min.js': ['<%= scripts.component %>'].concat('<%= scripts_minified.component %>'),
+      'deploy/min/wire-login.min.js': ['<%= scripts.login %>'].concat('<%= scripts_minified.login %>'),
+      'deploy/min/wire-vendor.min.js': ['<%= scripts.vendor %>'].concat('<%= scripts_minified.vendor %>'),
+    },
+  },
 };

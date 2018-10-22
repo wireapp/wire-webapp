@@ -22,19 +22,31 @@
 // https://github.com/gruntjs/grunt-contrib-watch
 
 module.exports = {
-  js: {
-    files: '<%= dir.app_ %>/**/*.js',
-    tasks: ['newer:copy:dist_js'],
-  },
-  less: {
-    files: '<%= dir.app_ %>/**/*.less',
-    tasks: ['less:dist', 'postcss'],
+  markup: {
+    files: ['<%= dir.app_ %>/**/*.htm*'],
+    options: {
+      debounceDelay: 250,
+      spawn: false,
+    },
+    tasks: ['build_dev_markup'],
   },
   options: {
     livereload: 32123,
   },
-  templates: {
-    files: '<%= dir.app_ %>/**/*.htm*',
-    tasks: ['prepare_template'],
+  script: {
+    files: ['<%= dir.app_ %>/**/*.js'],
+    options: {
+      debounceDelay: 250,
+      spawn: false,
+    },
+    tasks: ['build_dev_script'],
+  },
+  style: {
+    files: ['<%= dir.app_ %>/**/*.less'],
+    options: {
+      debounceDelay: 250,
+      spawn: false,
+    },
+    tasks: ['build_dev_style'],
   },
 };
