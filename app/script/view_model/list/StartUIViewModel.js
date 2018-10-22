@@ -244,13 +244,14 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
-  clickOnOther(userEntity, event) {
-    if (userEntity.isOutgoingRequest()) {
-      return this.clickOnContact(userEntity);
+  clickOnOther(participantEntity, event) {
+    const isUser = participantEntity instanceof z.entity.User;
+    if (isUser && participantEntity.isOutgoingRequest()) {
+      return this.clickOnContact(participantEntity);
     }
 
     const createBubble = elementId => {
-      this.userProfile(userEntity);
+      this.userProfile(participantEntity);
       this.userBubbleLastId = elementId;
       this.userBubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element.attr('id')}`,
