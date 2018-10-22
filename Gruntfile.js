@@ -121,7 +121,6 @@ module.exports = grunt => {
       'clean:aws_app',
       'clean:aws_s3',
       'set_version:staging',
-      'npmBower',
       'copy:frontend',
       'scripts',
       'less:deploy',
