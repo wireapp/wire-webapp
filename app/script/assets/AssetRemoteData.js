@@ -121,6 +121,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     this.loadPromise = this._loadBuffer()
       .then(({buffer, mimeType}) => {
         type = mimeType;
+        this.loadPromise = undefined;
         const isEncryptedAsset = this.otrKey && this.sha256;
         return isEncryptedAsset
           ? z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer)
@@ -128,6 +129,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       })
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
       .catch(error => {
+        this.loadPromise = undefined;
         const errorMessage = (error && error.message) || '';
         const isAssetNotFound = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
         const isServerError = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
@@ -136,8 +138,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
         if (!isExpectedError) {
           throw error;
         }
-      })
-      .finally(() => (this.loadPromise = undefined));
+      });
 
     return this.loadPromise;
   }
