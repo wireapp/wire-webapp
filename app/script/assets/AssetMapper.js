@@ -23,31 +23,57 @@ window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetMapper = {
-  mapProfileAssets: (entity, assets) => {
-    return assets.filter(asset => asset.type === 'image').map(asset => {
+  /**
+   * Creates asset entities out of raw asset data.
+   *
+   * @param {string} userId - the id of the user that will hold the asset
+   * @param {Array<Object>} assets - the assets to map
+   * @returns {MappedAssets} Object containing the mapped assets
+   */
+  mapProfileAssets: (userId, assets) => {
+    return assets.filter(asset => asset.type === 'image').reduce((mappedAssets, asset) => {
       const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
 
       switch (asset.size) {
         case 'preview':
-          entity.previewPictureResource(assetRemoteData);
+          return Object.assign({}, mappedAssets, {preview: assetRemoteData});
           break;
         case 'complete':
-          entity.mediumPictureResource(assetRemoteData);
-          break;
-        default:
+          return Object.assign({}, mappedAssets, {medium: assetRemoteData});
           break;
       }
-    });
+    }, {});
   },
-  mapProfileAssetsV1: (entity, pictures) => {
+
+  /**
+   * Creates asset entities out of raw asset data.
+   *
+   * @param {string} userId - the id of the user that will hold the asset
+   * @param {Array<Object>} pictures - the pictures to map
+   * @returns {MappedAssets} Object containing the mapped assets
+   */
+  mapProfileAssetsV1: (userId, pictures) => {
     const [previewPicture, mediumPicture] = pictures;
+    const previewAsset = previewPicture ? z.assets.AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
+    const mediumAsset = mediumPicture ? z.assets.AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;
 
-    if (previewPicture) {
-      entity.previewPictureResource(z.assets.AssetRemoteData.v1(entity.id, previewPicture.id, true));
+    return {medium: mediumAsset, preview: previewAsset};
+  },
+
+  /**
+   * Updates the user entity's assets.
+   *
+   * @param {z.entity.User} userEntity - the user entity to update
+   * @param {MappedAssets} mappedAssets - the assets to add to the user entity
+   * @returns {void}
+   */
+  updateUserEntityAssets(userEntity, mappedAssets = {}) {
+    const {preview, medium} = mappedAssets;
+    if (preview) {
+      userEntity.previewPictureResource(preview);
     }
-
-    if (mediumPicture) {
-      entity.mediumPictureResource(z.assets.AssetRemoteData.v1(entity.id, mediumPicture.id, true));
+    if (medium) {
+      userEntity.mediumPictureResource(medium);
     }
   },
 };

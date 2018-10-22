@@ -116,11 +116,13 @@ z.user.UserMapper = class UserMapper {
 
     const hasAsset = assets && assets.length;
     const hasPicture = picture && picture.length;
+    let mappedAssets;
     if (hasAsset) {
-      z.assets.AssetMapper.mapProfileAssets(userEntity, userData.assets);
+      mappedAssets = z.assets.AssetMapper.mapProfileAssets(userEntity.id, userData.assets);
     } else if (hasPicture) {
-      z.assets.AssetMapper.mapProfileAssetsV1(userEntity, userData.picture);
+      mappedAssets = z.assets.AssetMapper.mapProfileAssetsV1(userEntity.id, userData.picture);
     }
+    z.assets.AssetMapper.updateUserEntityAssets(userEntity, mappedAssets);
 
     if (email) {
       userEntity.email(email);
