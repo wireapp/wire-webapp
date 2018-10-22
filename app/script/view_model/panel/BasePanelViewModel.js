@@ -32,8 +32,7 @@ z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
 
     this.isVisible = isVisible;
 
-    const conversationRepository = repositories.conversation;
-    this.activeConversation = conversationRepository.active_conversation;
+    this.activeConversation = repositories.conversation.active_conversation;
   }
 
   initView() {}
