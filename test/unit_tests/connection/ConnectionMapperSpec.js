@@ -39,14 +39,14 @@ describe('z.connection.ConnectionMapper', () => {
         to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
       };
 
-      const connection_et = connectionMapper.mapConnectionFromJson(payload);
+      const connectionEntity = connectionMapper.mapConnectionFromJson(payload);
 
-      expect(connection_et.conversation_id).toBe(payload.conversation);
-      expect(connection_et.from).toBe(payload.from);
-      expect(connection_et.last_update).toBe(payload.last_update);
-      expect(connection_et.message).toBe(payload.message);
-      expect(connection_et.status()).toBe(payload.status);
-      expect(connection_et.to).toBe(payload.to);
+      expect(connectionEntity.conversationId).toBe(payload.conversation);
+      expect(connectionEntity.from).toBe(payload.from);
+      expect(connectionEntity.lastUpdate).toBe(payload.last_update);
+      expect(connectionEntity.message).toBe(payload.message);
+      expect(connectionEntity.status()).toBe(payload.status);
+      expect(connectionEntity.to).toBe(payload.to);
     });
   });
 });

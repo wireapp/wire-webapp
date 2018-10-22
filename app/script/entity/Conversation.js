@@ -94,10 +94,11 @@ z.entity.Conversation = class Conversation {
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new z.entity.Connection());
-    this.connection.subscribe(connection_et => {
-      if (!this.participating_user_ids().includes(connection_et.to)) {
-        return this.participating_user_ids([connection_et.to]);
+    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection.subscribe(connectionEntity => {
+      const connectedUserId = connectionEntity.to;
+      if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
+        this.participating_user_ids.push(connectedUserId);
       }
     });
 

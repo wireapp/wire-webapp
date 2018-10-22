@@ -42,13 +42,13 @@ describe('z.user.UserRepository', () => {
       let user_et = undefined;
 
       beforeEach(() => {
-        const connection_et = new z.entity.Connection(z.util.createRandomUuid());
-        connection_et.to = entities.user.jane_roe.id;
+        const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
+        connectionEntity.to = entities.user.jane_roe.id;
 
         user_et = new z.entity.User(entities.user.john_doe.id);
-        user_et.connection(connection_et);
+        user_et.connection(connectionEntity);
 
-        TestFactory.user_repository.connections.push(connection_et);
+        TestFactory.user_repository.connections.push(connectionEntity);
         spyOn(TestFactory.user_repository, '_update_connection_status').and.returnValue(Promise.resolve());
       });
 
@@ -70,16 +70,16 @@ describe('z.user.UserRepository', () => {
     });
 
     describe('get_connection_by_conversation_id', () => {
-      let connection_et_a = null;
-      let connection_et_b = null;
+      let firstConnectionEntity = null;
+      let secondConnectionEntity = null;
 
       beforeEach(() => {
-        connection_et_a = new z.entity.Connection();
-        connection_et_a.conversation_id = '874d2afe-821d-4f8c-9d3d-3b0fea948e43';
-        TestFactory.user_repository.connections.push(connection_et_a);
-        connection_et_b = new z.entity.Connection();
-        connection_et_a.conversation_id = 'a8566a3b-0f24-448e-a0dc-85992c140fb5';
-        TestFactory.user_repository.connections.push(connection_et_b);
+        firstConnectionEntity = new z.connection.ConnectionEntity();
+        firstConnectionEntity.conversationId = '874d2afe-821d-4f8c-9d3d-3b0fea948e43';
+        TestFactory.user_repository.connections.push(firstConnectionEntity);
+        secondConnectionEntity = new z.connection.ConnectionEntity();
+        secondConnectionEntity.conversationId = 'a8566a3b-0f24-448e-a0dc-85992c140fb5';
+        TestFactory.user_repository.connections.push(secondConnectionEntity);
       });
 
       afterEach(() => {
@@ -87,15 +87,14 @@ describe('z.user.UserRepository', () => {
       });
 
       it('should return the expected connection for the given conversation id', () => {
-        let connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
-          connection_et_a.conversation_id
+        const connectionEntity = TestFactory.user_repository.get_connection_by_conversation_id(
+          firstConnectionEntity.conversationId
         );
 
-        expect(connection_et).toBe(connection_et_a);
+        expect(connectionEntity).toBe(firstConnectionEntity);
+        const otherConnectionEntity = TestFactory.user_repository.get_connection_by_conversation_id('');
 
-        connection_et = TestFactory.user_repository.get_connection_by_conversation_id('');
-
-        expect(connection_et).not.toBeDefined();
+        expect(otherConnectionEntity).not.toBeDefined();
       });
     });
 
@@ -121,7 +120,7 @@ describe('z.user.UserRepository', () => {
           const [firstConnectionEntity, secondConnectionEntity] = TestFactory.user_repository.connections();
 
           expect(firstConnectionEntity.status()).toEqual(z.connection.ConnectionStatus.ACCEPTED);
-          expect(secondConnectionEntity.conversation_id).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
+          expect(secondConnectionEntity.conversationId).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
         });
       });
     });

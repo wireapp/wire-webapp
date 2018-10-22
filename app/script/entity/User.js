@@ -150,15 +150,15 @@ z.entity.User = class User {
     this.previewPictureResource = ko.observable();
     this.mediumPictureResource = ko.observable();
 
-    this.connection = ko.observable(new z.entity.Connection());
+    this.connection = ko.observable(new z.connection.ConnectionEntity());
 
-    this.is_blocked = ko.pureComputed(() => this.connection().is_blocked());
-    this.is_canceled = ko.pureComputed(() => this.connection().is_canceled());
-    this.is_connected = ko.pureComputed(() => this.connection().is_connected());
-    this.is_ignored = ko.pureComputed(() => this.connection().is_ignored());
-    this.is_incoming_request = ko.pureComputed(() => this.connection().is_incoming_request());
-    this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
-    this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
+    this.isBlocked = ko.pureComputed(() => this.connection().isBlocked());
+    this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());
+    this.isConnected = ko.pureComputed(() => this.connection().isConnected());
+    this.isIgnored = ko.pureComputed(() => this.connection().isIgnored());
+    this.isIncomingRequest = ko.pureComputed(() => this.connection().isIncomingRequest());
+    this.isOutgoingRequest = ko.pureComputed(() => this.connection().isOutgoingRequest());
+    this.isUnknown = ko.pureComputed(() => this.connection().isUnknown());
 
     this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
@@ -171,7 +171,7 @@ z.entity.User = class User {
     this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.teamRole());
     this.teamId = undefined;
 
-    this.is_request = ko.pureComputed(() => this.connection().is_request());
+    this.isRequest = ko.pureComputed(() => this.connection().isRequest());
 
     this.devices = ko.observableArray(); // does not include current client/device
     this.is_verified = ko.pureComputed(() => {
