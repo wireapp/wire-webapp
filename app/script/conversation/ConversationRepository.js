@@ -49,18 +49,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {ConversationService} conversation_service - Backend REST API conversation service implementation
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {ClientRepository} client_repository - Repository for client interactions
+   * @param {ConnectionRepository} connectionRepository - Repository for all connnection interactions
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
    * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
-   * @param {UserRepository} user_repository - Repository for all user and connection interactions
+   * @param {UserRepository} user_repository - Repository for all user interactions
    */
   constructor(
     conversation_service,
     asset_service,
     client_repository,
+    connectionRepository,
     cryptography_repository,
     eventRepository,
     giphy_repository,
@@ -74,6 +76,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
+    this.connectionRepository = connectionRepository;
     this.cryptography_repository = cryptography_repository;
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
@@ -3127,7 +3130,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
-    const connectionEntity = this.user_repository.get_connection_by_conversation_id(conversationEntity.id);
+    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
     if (isPendingConnection) {
       return Promise.resolve();

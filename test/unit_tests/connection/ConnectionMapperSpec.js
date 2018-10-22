@@ -46,7 +46,7 @@ describe('z.connection.ConnectionMapper', () => {
       expect(connectionEntity.lastUpdate).toBe(payload.last_update);
       expect(connectionEntity.message).toBe(payload.message);
       expect(connectionEntity.status()).toBe(payload.status);
-      expect(connectionEntity.to).toBe(payload.to);
+      expect(connectionEntity.userId).toBe(payload.to);
     });
   });
 });

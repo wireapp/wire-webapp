@@ -29,7 +29,7 @@ z.connection.ConnectionEntity = class ConnectionEntity {
     this.lastUpdate = null;
     this.message = null;
     this.status = ko.observable(z.connection.ConnectionStatus.UNKNOWN);
-    this.to = null;
+    this.userId = null;
 
     this.isBlocked = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.BLOCKED);
     this.isCanceled = ko.pureComputed(() => this.status() === z.connection.ConnectionStatus.CANCELLED);
