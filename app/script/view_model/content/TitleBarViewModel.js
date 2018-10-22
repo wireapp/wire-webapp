@@ -34,7 +34,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.multitasking = contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
-    this.isActivatedAccount = mainViewModel.isActivatedAccount;
     this.panelViewModel = mainViewModel.panel;
 
     this.panelIsVisible = this.panelViewModel.isVisible;
@@ -46,7 +45,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.selfStreamState = this.callingRepository.selfStreamState;
-    this.isActivatedAccount = mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && this.joinedCall();

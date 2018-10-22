@@ -28,13 +28,16 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
   constructor(params) {
     super(params);
 
-    this.userRepository = this.repositories.user;
+    const {mainViewModel, repositories} = params;
+
+    this.userRepository = repositories.user;
+    this.actionsViewModel = mainViewModel.actions;
 
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
 
-    this.selectedParticipant = ko.observable(undefined);
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.selectedParticipant = ko.observable(undefined);
 
     this.selectedIsConnected = ko.pureComputed(() => {
       return this.selectedParticipant().isConnected() || this.selectedParticipant().isTeamMember();

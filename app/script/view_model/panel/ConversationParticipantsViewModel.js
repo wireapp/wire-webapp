@@ -27,9 +27,10 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
   .BasePanelViewModel {
   constructor(params) {
     super(params);
-
-    this.searchRepository = params.repositories.search;
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
+
+    const {repositories} = params;
+    this.searchRepository = repositories.search;
 
     this.participants = ko.pureComputed(() => {
       if (this.activeConversation()) {
