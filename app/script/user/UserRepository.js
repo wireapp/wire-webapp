@@ -416,6 +416,7 @@ z.user.UserRepository = class UserRepository {
   getSelf() {
     return this.selfService
       .getSelf()
+      .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.user_mapper.map_self_user_from_object(response))
       .then(userEntity => {
         const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
@@ -425,6 +426,30 @@ z.user.UserRepository = class UserRepository {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;
       });
+  }
+
+  /**
+   * Detects if the user has a profile picture that uses the outdated picture API.
+   * Will migrate the picture to the newer assets API if so.
+   *
+   * @param {Object} userData - user data from the backend
+   * @returns {void}
+   */
+  _upgradePictureAsset(userData) {
+    const hasPicture = userData.picture.length;
+    const hasAsset = userData.assets.length;
+    if (!hasPicture) {
+      return userData;
+    }
+
+    if (!hasAsset) {
+      // if there are no assets, just upload the old picture to the new api
+      const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
+      medium.load().then(imageBlob => this.change_picture(imageBlob));
+    } else {
+      // if an asset is already there, just delete it on the user's profile
+      this.selfService.putSelf({picture: undefined});
+    }
   }
 
   /**
@@ -732,7 +757,7 @@ z.user.UserRepository = class UserRepository {
           {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
         return this.selfService
-          .putSelf({assets})
+          .putSelf({assets, picture: undefined})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
