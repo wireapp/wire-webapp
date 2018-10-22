@@ -5,7 +5,6 @@
 .grunt
 .Icon
 .vscode
-*.pyc
 /_SpecRunner.html
 /.idea/**/*.xml
 /app/ext
@@ -23,7 +22,6 @@
 /bower_components
 /debug.log
 /deploy
-/dist
 /doc
 /docs/auth-coverage
 /docs/coverage

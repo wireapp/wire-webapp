@@ -52,27 +52,6 @@ module.exports = grunt => {
     grunt.log.ok(`Version set to ${version}`);
   });
 
-  grunt.registerTask('prepare_dist', [
-    'clean:dist',
-    'less:dist',
-    'postcss:distribution',
-    'copy:dist',
-    'copy:dist_audio',
-    'copy:dist_favicon',
-    'includereplace:dist_index',
-    'includereplace:dist_auth',
-    'includereplace:dist_login',
-    'includereplace:dist_demo',
-    'clean:dist_app',
-  ]);
-
-  grunt.registerTask('prepare_template', [
-    'includereplace:dist_index',
-    'includereplace:dist_auth',
-    'includereplace:dist_login',
-    'includereplace:dist_demo',
-  ]);
-
   grunt.registerTask('prepare_staging', [
     'clean:deploy',
     'less:deploy',
