@@ -445,7 +445,7 @@ z.user.UserRepository = class UserRepository {
         const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
         medium.load().then(imageBlob => this.change_picture(imageBlob));
       } else {
-        // if an asset is already there, just delete it on the user's profile
+        // if an asset is already there, remove the pointer to the old picture
         this.selfService.putSelf({picture: undefined});
       }
     }

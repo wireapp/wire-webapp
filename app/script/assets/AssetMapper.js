@@ -34,14 +34,16 @@ z.assets.AssetMapper = {
     return assets.filter(asset => asset.type === 'image').reduce((mappedAssets, asset) => {
       const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
 
-      switch (asset.size) {
-        case 'preview':
-          return Object.assign({}, mappedAssets, {preview: assetRemoteData});
-          break;
-        case 'complete':
-          return Object.assign({}, mappedAssets, {medium: assetRemoteData});
-          break;
+      const sizeMap = {
+        complete: 'medium',
+        preview: 'preview',
+      };
+
+      if (!sizeMap[asset.size]) {
+        return mappedAssets;
       }
+
+      return Object.assign({}, mappedAssets, {[sizeMap[asset.size]]: assetRemoteData});
     }, {});
   },
 
