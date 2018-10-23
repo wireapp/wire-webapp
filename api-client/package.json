@@ -20,7 +20,7 @@
   "devDependencies": {
     "@babel/core": "7.1.2",
     "@babel/preset-react": "7.0.0",
-    "@wireapp/react-ui-kit": "4.3.9",
+    "@wireapp/react-ui-kit": "4.3.10",
     "babel-loader": "8.0.4",
     "browser-sync": "2.26.3",
     "concurrently": "4.0.1",
@@ -67,5 +67,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/APIClient.d.ts",
-  "version": "3.0.3"
+  "version": "3.0.4"
 }
