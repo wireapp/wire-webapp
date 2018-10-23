@@ -127,9 +127,11 @@ after_deploy:
 
 after_failure:
   - |
-    if [ "${TRAVIS_BRANCH}" == "dev" ] || [ "${TRAVIS_BRANCH}" == "prod" ] || [ "${TRAVIS_BRANCH}" == "staging" ]; then
-      LAST_COMMITTER_NAME="$(git --no-pager show -s --format='%an' HEAD)"
-      TRAVIS_BUILD_URL="https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
-      yarn global add @wireapp/changelog-bot@1.0.35
-      wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "b2cc7120-4154-4be4-b0c0-45a8c361c4d1" -m "${LAST_COMMITTER_NAME} broke the \"${TRAVIS_BRANCH}\" branch on \"${TRAVIS_REPO_SLUG}\" (Build #${TRAVIS_BUILD_NUMBER}). 🌵 → ${TRAVIS_BUILD_URL}"
+    if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+      if [[ "${TRAVIS_BRANCH}" =~ ^(dev|prod|staging)$ ]]; then
+        LAST_COMMITTER_NAME="$(git --no-pager show -s --format='%an' HEAD)"
+        TRAVIS_BUILD_URL="https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
+        yarn global add @wireapp/changelog-bot@1.0.35
+        wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "b2cc7120-4154-4be4-b0c0-45a8c361c4d1" -m "${LAST_COMMITTER_NAME} broke the \"${TRAVIS_BRANCH}\" branch on \"${TRAVIS_REPO_SLUG}\" (Build #${TRAVIS_BUILD_NUMBER}). 🌵 → ${TRAVIS_BUILD_URL}"
+      fi
     fi
