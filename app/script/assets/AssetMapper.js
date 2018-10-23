@@ -31,19 +31,17 @@ z.assets.AssetMapper = {
    * @returns {MappedAssets} Object containing the mapped assets
    */
   mapProfileAssets: (userId, assets) => {
+    const sizeMap = {
+      complete: 'medium',
+      preview: 'preview',
+    };
+
     return assets.filter(asset => asset.type === 'image').reduce((mappedAssets, asset) => {
       const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
 
-      const sizeMap = {
-        complete: 'medium',
-        preview: 'preview',
-      };
-
-      if (!sizeMap[asset.size]) {
-        return mappedAssets;
-      }
-
-      return Object.assign({}, mappedAssets, {[sizeMap[asset.size]]: assetRemoteData});
+      return !sizeMap[asset.size]
+        ? mappedAssets
+        : Object.assign({}, mappedAssets, {[sizeMap[asset.size]]: assetRemoteData});
     }, {});
   },
 
