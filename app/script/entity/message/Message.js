@@ -243,6 +243,15 @@ z.entity.Message = class Message {
   }
 
   /**
+   * Check if message can be copied.
+   * @returns {boolean} True, if message can be copied.
+   */
+
+  isCopyable() {
+    return this.has_asset_text();
+  }
+
+  /**
    * Check if message can be edited.
    * @returns {boolean} True, if message can be edited.
    */
@@ -271,6 +280,14 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if message type supports reactions.
    */
   is_reactable() {
+    return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
+  }
+
+  /**
+   * Check if message can be replied to.
+   * @returns {boolean} True, if message type supports replies.
+   */
+  isRepliable() {
     return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
   }
 
