@@ -81,14 +81,16 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       throw new z.error.ConnectionError(z.error.BaseError.TYPE.MISSING_PARAMETER);
     }
 
-    let connectionEntity = this.getConnectionByUserId(eventJson.to);
+    const connectionData = eventJson.connection;
+
+    let connectionEntity = this.getConnectionByUserId(connectionData.to);
     let previousStatus = null;
 
     if (connectionEntity) {
       previousStatus = connectionEntity.status();
-      this.connectionMapper.updateConnectionFromJson(connectionEntity, eventJson);
+      this.connectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
     } else {
-      connectionEntity = this.connectionMapper.mapConnectionFromJson(eventJson);
+      connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
     }
 
     this.updateConnection(connectionEntity).then(() => {
