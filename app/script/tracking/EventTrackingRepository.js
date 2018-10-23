@@ -205,16 +205,15 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _isDomainAllowedForTracking() {
-    if (!z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING)) {
-      return !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
-        if (z.util.StringUtil.includes(window.location.hostname, domain)) {
-          this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
-          return true;
-        }
-      });
-    }
-
-    return true;
+    const trackingParameter = z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING);
+    return typeof trackingParameter === 'boolean'
+      ? trackingParameter
+      : !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
+          if (z.util.StringUtil.includes(window.location.hostname, domain)) {
+            this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
+            return true;
+          }
+        });
   }
 
   //##############################################################################
