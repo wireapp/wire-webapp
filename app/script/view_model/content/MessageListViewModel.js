@@ -168,6 +168,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.capture_scrolling_event = false;
     this.conversation_last_read_timestamp(false);
     this.conversation_reached_bottom = false;
+    this.messagesContainer = undefined;
   }
 
   /**
