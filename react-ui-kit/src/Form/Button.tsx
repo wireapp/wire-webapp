@@ -74,4 +74,8 @@ const ButtonLink = styled(Button.withComponent(Link))`
   display: inline-block !important;
 `;
 
+ButtonLink.defaultProps = {
+  ...Button.defaultProps,
+};
+
 export {Button, ButtonLink};
