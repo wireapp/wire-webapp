@@ -582,7 +582,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
 
-    if (message_et.has_asset_text()) {
+    if (message_et.isRepliable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, message_et),
+        label: z.l10n.text(z.string.conversationContextMenuReply),
+      });
+    }
+
+    if (message_et.isCopyable()) {
       entries.push({
         click: () => message_et.copy(),
         label: z.l10n.text(z.string.conversationContextMenuCopy),

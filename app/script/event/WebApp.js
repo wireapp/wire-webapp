@@ -114,6 +114,7 @@ z.event.WebApp = {
       ADDED: 'wire.webapp.conversation.message.added',
       EDIT: 'wire.webapp.conversation.message.edit',
       REMOVED: 'wire.webapp.conversation.message.removed',
+      REPLY: 'wire.webapp.conversation.message.reply',
     },
     MISSED_EVENTS: 'wire.webapp.conversation.missed_events',
     PEOPLE: {
