@@ -24,7 +24,7 @@
 module.exports = function(config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: 'dist',
+    basePath: 'deploy',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -49,7 +49,7 @@ module.exports = function(config) {
     // pre-process matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../dist/script/**/*.js': ['coverage'],
+      '../deploy/script/**/*.js': ['coverage'],
     },
 
     // test results reporter to use

@@ -93,7 +93,6 @@ module.exports = grunt => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('default', ['prepare_dist', 'host']);
   grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack', 'scripts']);
 
   // Deploy to different environments
@@ -158,7 +157,7 @@ module.exports = grunt => {
 
   // Test Related
   grunt.registerTask('test', () =>
-    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])
+    grunt.task.run(['clean:docs_coverage', 'scripts', 'build_dev', 'test_prepare', 'karma:test'])
   );
 
   grunt.registerTask('npmWebpack', function() {
@@ -195,8 +194,6 @@ module.exports = grunt => {
 
     grunt.config('karma.options.files', files);
   });
-
-  grunt.registerTask('test_init', ['prepare_dist']);
 
   grunt.registerTask('test_run', testName => {
     grunt.config('karma.options.reporters', ['spec']);
