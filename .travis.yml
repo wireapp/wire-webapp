@@ -127,7 +127,7 @@ after_deploy:
 
 after_failure:
   - |
-    if [ "${TRAVIS_BRANCH}" == "dev" ] || [ "${TRAVIS_BRANCH}" == "prod" ] || [ "${TRAVIS_BRANCH}" == "staging" ]; then
+    if [ "${TRAVIS_BRANCH}" == "dev" && "${TRAVIS_PULL_REQUEST}" == "false" ] || [ "${TRAVIS_BRANCH}" == "prod" && "${TRAVIS_PULL_REQUEST}" == "false" ] || [ "${TRAVIS_BRANCH}" == "staging" && "${TRAVIS_PULL_REQUEST}" == "false" ]; then
       LAST_COMMITTER_NAME="$(git --no-pager show -s --format='%an' HEAD)"
       TRAVIS_BUILD_URL="https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
       yarn global add @wireapp/changelog-bot@1.0.35
