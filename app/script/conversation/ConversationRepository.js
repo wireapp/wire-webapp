@@ -1905,9 +1905,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of message
    * @returns {Promise} Resolves after sending the message
    */
-  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities) {
+  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.message_id;
 
@@ -1915,7 +1916,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .getLinkPreviewFromString(textMessage)
       .then(linkPreview => {
         if (linkPreview) {
-          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, [linkPreview]);
+          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, quoteEntity, [linkPreview]);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
@@ -2073,11 +2074,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
-  sendText(conversationEntity, textMessage, mentionEntities) {
+  sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
+    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities, quoteEntity);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
     if (conversationEntity.messageTimer()) {
@@ -2093,13 +2095,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */
-  sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities) {
-    return this.sendText(conversationEntity, textMessage, mentionEntities)
+  sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
+    return this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity)
       .then(genericMessage => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
         }
       })
       .catch(error => {
@@ -2110,7 +2113,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  _createTextProto(messageId, textMessage, mentionEntities, linkPreviews) {
+  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews) {
     const protoText = new z.proto.Text(textMessage);
 
     if (mentionEntities && mentionEntities.length) {
@@ -2133,10 +2136,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, protoMentions);
     }
 
-    if (linkPreviews && linkPreviews.length) {
-      const logMessage = `Adding link preview to message '${messageId}'`;
-      this.logger.debug(logMessage, linkPreviews);
+    if (quoteEntity) {
+      const protoQuote = quoteEntity.toProto();
+      this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
+      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.QUOTE, protoQuote);
+    }
 
+    if (linkPreviews && linkPreviews.length) {
+      this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
       protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS, linkPreviews);
     }
 
