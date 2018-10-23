@@ -30,14 +30,14 @@ interface LoadingComponentProps {
 
 function LoadingComponent({
   className,
-  progress = null,
+  progress = undefined,
   size,
 }: LoadingComponentProps & React.HTMLAttributes<SVGElement>) {
   const additionalProps: {
     strokeDashoffset?: string;
   } = {};
 
-  if (progress !== null) {
+  if (progress) {
     additionalProps.strokeDashoffset = `${pathLength - pathLength * progress}`;
   }
   return (
@@ -75,7 +75,7 @@ interface LoadingProps {
 
 const Loading = styled<LoadingProps & React.HTMLAttributes<SVGElement>>(LoadingComponent)`
   ${props =>
-    props.progress === null &&
+    !props.progress &&
     css`
       circle:nth-of-type(2) {
         transform-origin: 50% 50%;
@@ -87,7 +87,7 @@ const Loading = styled<LoadingProps & React.HTMLAttributes<SVGElement>>(LoadingC
 `;
 
 Loading.defaultProps = {
-  progress: null,
+  progress: undefined,
   size: 43,
 };
 
