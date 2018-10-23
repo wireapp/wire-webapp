@@ -64,13 +64,19 @@ class DemoInputs extends React.PureComponent {
         <Columns>
           <Column>Button</Column>
           <Column>
-            <ButtonLink backgroundColor={COLOR.GREEN}>ButtonLink</ButtonLink>
+            <Button backgroundColor={COLOR.BLUE}>Button</Button>
           </Column>
         </Columns>
         <Columns>
           <Column>Disabled Button</Column>
           <Column>
             <Button disabled>Default Button</Button>
+          </Column>
+        </Columns>
+        <Columns>
+          <Column>ButtonLink</Column>
+          <Column>
+            <ButtonLink backgroundColor={COLOR.GREEN}>ButtonLink</ButtonLink>
           </Column>
         </Columns>
 
