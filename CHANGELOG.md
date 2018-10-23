@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.1.7...@wireapp/core@7.2.0) (2018-10-23)
+
+
+### Features
+
+* **core:** Add quote to text messages (WEBFOUND-53) ([#1241](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1241)) ([40b88b5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/40b88b5))
+
+
+
+
+
 ## [7.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.1.6...@wireapp/core@7.1.7) (2018-10-19)
 
 **Note:** Version bump only for package @wireapp/core
