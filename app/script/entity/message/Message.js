@@ -287,7 +287,7 @@ z.entity.Message = class Message {
    * Check if message can be replied to.
    * @returns {boolean} True, if message type supports replies.
    */
-  isRepliable() {
+  isReplyable() {
     return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
   }
 

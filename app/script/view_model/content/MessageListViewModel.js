@@ -582,7 +582,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
 
-    if (message_et.isRepliable() && !this.conversation().removed_from_conversation()) {
+    if (message_et.isReplyable() && !this.conversation().removed_from_conversation()) {
       entries.push({
         click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, message_et),
         label: z.l10n.text(z.string.conversationContextMenuReply),
