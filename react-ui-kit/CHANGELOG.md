@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.8...@wireapp/react-ui-kit@4.3.9) (2018-10-23)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Pass default Button props to ButtonLink ([#1247](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1247)) ([872c714](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/872c714))
+
+
+
+
+
 ## [4.3.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.7...@wireapp/react-ui-kit@4.3.8) (2018-10-23)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
