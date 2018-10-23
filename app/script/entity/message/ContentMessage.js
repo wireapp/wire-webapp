@@ -39,6 +39,8 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
         .join(', ');
     });
 
+    this.quote = ko.observable();
+
     this.display_edited_timestamp = () => {
       return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
     };
