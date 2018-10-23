@@ -26,6 +26,7 @@ describe('z.entity.User', () => {
     it('can generate first name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Doe');
+
       expect(user_et.first_name()).toBe('John');
     });
   });
@@ -34,18 +35,21 @@ describe('z.entity.User', () => {
     it('can generate last name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Doe');
+
       expect(user_et.last_name()).toBe('Doe');
     });
 
     it('can generate last name', () => {
       const user_et = new z.entity.User();
       user_et.name('John D. Doe');
+
       expect(user_et.last_name()).toBe('Doe');
     });
 
     it('can ignore last name if user has only one name', () => {
       const user_et = new z.entity.User();
       user_et.name('John');
+
       expect(user_et.last_name()).toBeUndefined();
     });
   });
@@ -54,30 +58,35 @@ describe('z.entity.User', () => {
     it('returns correct initials for user with first name and last name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Doe');
+
       expect(user_et.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with just a first name', () => {
       const user_et = new z.entity.User();
       user_et.name('John');
+
       expect(user_et.initials()).toBe('JO');
     });
 
     it('returns correct initials for user with middle name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Peter Doe');
+
       expect(user_et.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with one character as name', () => {
       const user_et = new z.entity.User();
       user_et.name('J');
+
       expect(user_et.initials()).toBe('J');
     });
 
     it('returns correct initials for user with an emoji as name', () => {
       const user_et = new z.entity.User();
       user_et.name('🐒');
+
       expect(user_et.initials()).toBe('🐒');
     });
   });
@@ -101,58 +110,58 @@ describe('z.entity.User', () => {
   describe('accent_theme', () =>
     it('can change the accent theme', () => {
       const user_et = new z.entity.User();
-
       user_et.accent_id(z.config.ACCENT_ID.BLUE);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.BLUE);
-
       user_et.accent_id(z.config.ACCENT_ID.GREEN);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.GREEN);
-
       user_et.accent_id(z.config.ACCENT_ID.ORANGE);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.ORANGE);
-
       user_et.accent_id(z.config.ACCENT_ID.PINK);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.PINK);
-
       user_et.accent_id(z.config.ACCENT_ID.PURPLE);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.PURPLE);
-
       user_et.accent_id(z.config.ACCENT_ID.RED);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.RED);
-
       user_et.accent_id(z.config.ACCENT_ID.YELLOW);
-      expect(user_et.accent_theme()).toBe(z.entity.User.THEME.YELLOW);
 
+      expect(user_et.accent_theme()).toBe(z.entity.User.THEME.YELLOW);
       user_et.accent_id(undefined);
+
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.BLUE);
     }));
 
   describe('accent_color', () =>
     it('can change the accent color', () => {
       const user_et = new z.entity.User();
-
       user_et.accent_id(z.config.ACCENT_ID.BLUE);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.BLUE);
-
       user_et.accent_id(z.config.ACCENT_ID.GREEN);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.GREEN);
-
       user_et.accent_id(z.config.ACCENT_ID.ORANGE);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.ORANGE);
-
       user_et.accent_id(z.config.ACCENT_ID.PINK);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.PINK);
-
       user_et.accent_id(z.config.ACCENT_ID.PURPLE);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.PURPLE);
-
       user_et.accent_id(z.config.ACCENT_ID.RED);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.RED);
-
       user_et.accent_id(z.config.ACCENT_ID.YELLOW);
-      expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.YELLOW);
 
+      expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.YELLOW);
       user_et.accent_id(undefined);
+
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.BLUE);
     }));
 });

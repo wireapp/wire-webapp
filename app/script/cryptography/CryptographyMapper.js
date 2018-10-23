@@ -43,8 +43,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    */
   mapGenericMessage(genericMessage, event) {
     if (!genericMessage) {
-      const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
-      return Promise.reject(error);
+      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
     }
 
     return Promise.resolve()
@@ -134,7 +133,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       default: {
         const logMessage = `Skipped event '${genericMessage.message_id}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
-        throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+        throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
       }
     }
 
@@ -236,7 +235,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
               return z.user.AvailabilityType.BUSY;
             default:
               const message = 'Unhandled availability type';
-              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+              throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
       },
@@ -274,7 +273,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
               return z.message.StatusType.SEEN;
             default:
               const message = 'Unhandled confirmation type';
-              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+              throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
       },
@@ -332,7 +331,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       .then(externalMessageBuffer => z.proto.GenericMessage.decode(externalMessageBuffer))
       .catch(error => {
         this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
-        throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
+        throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.BROKEN_EXTERNAL);
       });
   }
 
@@ -352,9 +351,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       return this._mapImageMedium(image, eventId);
     }
 
-    const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW);
-    this.logger.info(`Skipped event '${eventId}': ${error.message}`);
-    throw error;
+    this.logger.info(`Skipped event '${eventId}': ${z.error.CryptographyError.MESSAGE.IGNORED_PREVIEW}`);
+    throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.IGNORED_PREVIEW);
   }
 
   _mapImageMedium(image, eventId) {

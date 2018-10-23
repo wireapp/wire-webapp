@@ -126,7 +126,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     return mediaType
       ? Promise.resolve(mediaType)
-      : Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE));
+      : Promise.reject(new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE));
   }
 
   /**
@@ -175,8 +175,8 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
 
         const expectedErrors = [
-          z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE,
-          z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
+          z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE,
+          z.error.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
         ];
 
         const isExpectedError = expectedErrors.includes(error.type);

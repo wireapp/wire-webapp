@@ -40,11 +40,13 @@ describe('z.util.PeerConnectionUtil', () => {
   describe('isValidIceCandidatesGathering', () => {
     it('returns false if no ice candidate gathered', () => {
       const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering({}, []);
+
       expect(result).toBe(false);
     });
 
     it('returns true if there are some not-relay candidates with empty iceServers config', () => {
       const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering({iceServers: []}, hostIceCandidates);
+
       expect(result).toBe(true);
     });
 
@@ -54,6 +56,7 @@ describe('z.util.PeerConnectionUtil', () => {
           {iceServers: new Array(numberOfServers)},
           relayIceCandidates.slice(0, numberOfServers)
         );
+
         expect(result).toBe(true);
       });
     });
@@ -64,6 +67,7 @@ describe('z.util.PeerConnectionUtil', () => {
           {iceServers: new Array(numberOfServers)},
           hostIceCandidates
         );
+
         expect(result).toBe(false);
       });
     });
@@ -74,6 +78,7 @@ describe('z.util.PeerConnectionUtil', () => {
           {iceServers: new Array(1)},
           relayIceCandidates.slice(0, numberOfCandidates)
         );
+
         expect(result).toBe(true);
       });
     });
@@ -82,6 +87,7 @@ describe('z.util.PeerConnectionUtil', () => {
   describe('getIceCandidatesTypes', () => {
     it('detects types of candidates', () => {
       const candidates = hostIceCandidates.concat(relayIceCandidates);
+
       expect(z.util.PeerConnectionUtil.getIceCandidatesTypes(candidates)).toEqual({
         host: hostIceCandidates.length,
         relay: relayIceCandidates.length,

@@ -100,16 +100,16 @@ describe('z.search.SearchRepository', () => {
     tests.forEach(({expected, term, testCase}) => {
       it(`${testCase} term: ${term}`, () => {
         const suggestions = TestFactory.search_repository.searchUserInSet(term, users);
+
         expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
       });
     });
 
     it('does not replace numbers with emojis', () => {
       const felix10 = generateUser('simple10', 'Felix10');
-
       const unsortedUsers = [felix10];
-
       const suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+
       expect(suggestions.map(serializeUser)).toEqual([]);
     });
 
@@ -122,10 +122,11 @@ describe('z.search.SearchRepository', () => {
 
       let suggestions = TestFactory.search_repository.searchUserInSet('felix', unsortedUsers);
       let expected = [simplyFelix, smilyFelix, atFelix];
-      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
 
+      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
       suggestions = TestFactory.search_repository.searchUserInSet('😋', unsortedUsers);
       expected = [smilyFelix];
+
       expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
     });
 
@@ -141,6 +142,7 @@ describe('z.search.SearchRepository', () => {
       const expectedUsers = [first, second, third, fourth, fifth, sixth];
 
       const suggestions = TestFactory.search_repository.searchUserInSet('_', unsortedUsers);
+
       expect(suggestions.map(serializeUser)).toEqual(expectedUsers.map(serializeUser));
     });
   });

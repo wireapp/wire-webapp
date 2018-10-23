@@ -59,38 +59,31 @@ describe('ConversationRepository', () => {
 
   beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
 
-  beforeEach(done => {
+  beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
     sinon.spy(jQuery, 'ajax');
 
-    test_factory
-      .exposeConversationActors()
-      .then(conversation_repository => {
-        amplify.publish(
-          z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-        );
-        ({storageService: storage_service} = conversation_repository.conversation_service);
+    return test_factory.exposeConversationActors().then(conversation_repository => {
+      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      ({storageService: storage_service} = conversation_repository.conversation_service);
 
-        spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
-        conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
-        conversation_et.id = payload.conversations.knock.post.conversation;
+      spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
+      conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
+      conversation_et.id = payload.conversations.knock.post.conversation;
 
-        const ping_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/knock`;
-        server.respondWith('POST', ping_url, [
-          201,
-          {'Content-Type': 'application/json'},
-          JSON.stringify(payload.conversations.knock.post),
-        ]);
+      const ping_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/knock`;
+      server.respondWith('POST', ping_url, [
+        201,
+        {'Content-Type': 'application/json'},
+        JSON.stringify(payload.conversations.knock.post),
+      ]);
 
-        const mark_as_read_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/self`;
-        server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
+      const mark_as_read_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/self`;
+      server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
 
-        return conversation_repository.save_conversation(conversation_et);
-      })
-      .then(done)
-      .catch(done.fail);
+      return conversation_repository.save_conversation(conversation_et);
+    });
   });
 
   afterEach(() => {
@@ -103,28 +96,25 @@ describe('ConversationRepository', () => {
   describe('asset upload', () => {
     let message_et = null;
 
-    beforeEach(done => {
+    beforeEach(() => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      TestFactory.conversation_repository
-        .save_conversation(conversation_et)
-        .then(() => {
-          const file_et = new z.entity.File();
-          file_et.status(z.assets.AssetTransferState.UPLOADING);
-          message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
-          message_et.assets.push(file_et);
-          conversation_et.add_message(message_et);
 
-          spyOn(TestFactory.event_service, 'updateEventAsUploadSucceeded');
-          spyOn(TestFactory.event_service, 'updateEventAsUploadFailed');
-          spyOn(TestFactory.event_service, 'deleteEvent');
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
+        const file_et = new z.entity.File();
+        file_et.status(z.assets.AssetTransferState.UPLOADING);
+        message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
+        message_et.assets.push(file_et);
+        conversation_et.add_message(message_et);
+
+        spyOn(TestFactory.event_service, 'updateEventAsUploadSucceeded');
+        spyOn(TestFactory.event_service, 'updateEventAsUploadFailed');
+        spyOn(TestFactory.event_service, 'deleteEvent');
+      });
     });
 
     afterEach(() => conversation_et.remove_messages());
 
-    it('should update original asset when asset upload is complete', done => {
+    it('should update original asset when asset upload is complete', () => {
       // mocked event response
       const event = {
         conversation: conversation_et.id,
@@ -139,18 +129,15 @@ describe('ConversationRepository', () => {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       };
 
-      TestFactory.conversation_repository
-        ._on_asset_upload_complete(conversation_et, event)
-        .then(() => {
-          expect(TestFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
+      return TestFactory.conversation_repository._on_asset_upload_complete(conversation_et, event).then(() => {
+        expect(TestFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
-          const [firstAsset] = message_et.assets();
-          expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
-          expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-          expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
-          done();
-        })
-        .catch(done.fail);
+        const [firstAsset] = message_et.assets();
+
+        expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
+        expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
+        expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
+      });
     });
   });
 
@@ -171,8 +158,8 @@ describe('ConversationRepository', () => {
         .deleteMessageForEveryone(conversation_et, message_to_delete_et)
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-          expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
+          expect(error).toEqual(jasmine.any(z.error.ConversationError));
+          expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
           done();
         });
     });
@@ -188,6 +175,7 @@ describe('ConversationRepository', () => {
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversation_et)
       );
+
       expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
 
       return TestFactory.conversation_repository
@@ -199,81 +187,69 @@ describe('ConversationRepository', () => {
   });
 
   describe('filtered_conversations', () => {
-    it('should not contain the self conversation', done => {
+    it('should not contain the self conversation', () => {
       const self_conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
 
-      TestFactory.conversation_repository
-        .save_conversation(self_conversation_et)
-        .then(() => {
-          expect(
-            _find_conversation(self_conversation_et, TestFactory.conversation_repository.conversations)
-          ).not.toBeNull();
-          expect(
-            _find_conversation(self_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-          ).toBeNull();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.save_conversation(self_conversation_et).then(() => {
+        expect(
+          _find_conversation(self_conversation_et, TestFactory.conversation_repository.conversations)
+        ).not.toBeNull();
+
+        expect(
+          _find_conversation(self_conversation_et, TestFactory.conversation_repository.filtered_conversations)
+        ).toBeNull();
+      });
     });
 
-    it('should not contain a blocked conversations', done => {
+    it('should not contain a blocked conversations', () => {
       const blocked_conversation_et = _generate_conversation(
         z.conversation.ConversationType.ONE2ONE,
         z.user.ConnectionStatus.BLOCKED
       );
 
-      TestFactory.conversation_repository
-        .save_conversation(blocked_conversation_et)
-        .then(() => {
-          expect(
-            _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.conversations)
-          ).not.toBeNull();
-          expect(
-            _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-          ).toBeNull();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.save_conversation(blocked_conversation_et).then(() => {
+        expect(
+          _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.conversations)
+        ).not.toBeNull();
+
+        expect(
+          _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.filtered_conversations)
+        ).toBeNull();
+      });
     });
 
-    it('should not contain the conversation for a cancelled connection request', done => {
+    it('should not contain the conversation for a cancelled connection request', () => {
       const cancelled_conversation_et = _generate_conversation(
         z.conversation.ConversationType.ONE2ONE,
         z.user.ConnectionStatus.CANCELLED
       );
 
-      TestFactory.conversation_repository
-        .save_conversation(cancelled_conversation_et)
-        .then(() => {
-          expect(
-            _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.conversations)
-          ).not.toBeNull();
-          expect(
-            _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-          ).toBeNull();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.save_conversation(cancelled_conversation_et).then(() => {
+        expect(
+          _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.conversations)
+        ).not.toBeNull();
+
+        expect(
+          _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.filtered_conversations)
+        ).toBeNull();
+      });
     });
 
-    it('should not contain the conversation for a pending connection request', done => {
+    it('should not contain the conversation for a pending connection request', () => {
       const pending_conversation_et = _generate_conversation(
         z.conversation.ConversationType.ONE2ONE,
         z.user.ConnectionStatus.PENDING
       );
 
-      TestFactory.conversation_repository
-        .save_conversation(pending_conversation_et)
-        .then(() => {
-          expect(
-            _find_conversation(pending_conversation_et, TestFactory.conversation_repository.conversations)
-          ).not.toBeNull();
-          expect(
-            _find_conversation(pending_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-          ).toBeNull();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.save_conversation(pending_conversation_et).then(() => {
+        expect(
+          _find_conversation(pending_conversation_et, TestFactory.conversation_repository.conversations)
+        ).not.toBeNull();
+
+        expect(
+          _find_conversation(pending_conversation_et, TestFactory.conversation_repository.filtered_conversations)
+        ).toBeNull();
+      });
     });
   });
 
@@ -304,7 +280,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('getGroupsByName', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       const group_a = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_a.name('Web Dudes');
 
@@ -327,40 +303,45 @@ describe('ConversationRepository', () => {
       group_removed.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
       group_removed.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
-      Promise.all([
+      return Promise.all([
         TestFactory.conversation_repository.save_conversation(group_a),
         TestFactory.conversation_repository.save_conversation(group_b),
         TestFactory.conversation_repository.save_conversation(group_c),
         TestFactory.conversation_repository.save_conversation(group_cleared),
-      ])
-        .then(done)
-        .catch(done.fail);
+      ]);
     });
 
     it('should return expected matches', () => {
       let result = TestFactory.conversation_repository.getGroupsByName('Web Dudes');
+
       expect(result.length).toBe(1);
 
       result = TestFactory.conversation_repository.getGroupsByName('Dudes');
+
       expect(result.length).toBe(1);
 
       result = TestFactory.conversation_repository.getGroupsByName('e');
+
       expect(result.length).toBe(3);
 
       result = TestFactory.conversation_repository.getGroupsByName('Rene');
+
       expect(result.length).toBe(1);
 
       result = TestFactory.conversation_repository.getGroupsByName('John');
+
       expect(result.length).toBe(1);
     });
 
     it('should return a cleared group with the user still being member of it', () => {
       const result = TestFactory.conversation_repository.getGroupsByName('Cleared');
+
       expect(result.length).toBe(1);
     });
 
     it('should not return a cleared group that the user left', () => {
       const result = TestFactory.conversation_repository.getGroupsByName('Removed');
+
       expect(result.length).toBe(0);
     });
   });
@@ -369,27 +350,31 @@ describe('ConversationRepository', () => {
     it('should return number of pending uploads if there are pending uploads', () => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
     });
 
     it('should return 0 if there are no pending uploads', () => {
       conversation_et.add_message(new z.entity.Message(z.util.createRandomUuid()));
+
       expect(conversation_et.get_number_of_pending_uploads()).toBe(0);
     });
   });
 
   describe('getPrecedingMessages', () => {
-    it('gets messages which are not broken by design', done => {
+    it('gets messages which are not broken by design', () => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
 
       conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
@@ -402,15 +387,13 @@ describe('ConversationRepository', () => {
 
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
-      storage_service
+      return storage_service
         .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
         .catch(() => storage_service.save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);
-          done();
-        })
-        .catch(done.fail);
+        });
     });
   });
 
@@ -432,47 +415,35 @@ describe('ConversationRepository', () => {
       );
     });
 
-    it('should map a connection to an existing conversation', done => {
-      TestFactory.conversation_repository
-        .map_connection(connection_et)
-        .then(_conversation => {
-          expect(TestFactory.conversation_repository.fetch_conversation_by_id).not.toHaveBeenCalled();
-          expect(TestFactory.conversation_service.get_conversation_by_id).not.toHaveBeenCalled();
-          expect(_conversation.connection()).toBe(connection_et);
-          done();
-        })
-        .catch(done.fail);
+    it('should map a connection to an existing conversation', () => {
+      return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
+        expect(TestFactory.conversation_repository.fetch_conversation_by_id).not.toHaveBeenCalled();
+        expect(TestFactory.conversation_service.get_conversation_by_id).not.toHaveBeenCalled();
+        expect(_conversation.connection()).toBe(connection_et);
+      });
     });
 
-    it('should map a connection to a new conversation', done => {
+    it('should map a connection to a new conversation', () => {
       connection_et.status(z.user.ConnectionStatus.ACCEPTED);
       TestFactory.conversation_repository.conversations.removeAll();
 
-      TestFactory.conversation_repository
-        .map_connection(connection_et)
-        .then(_conversation => {
-          expect(TestFactory.conversation_repository.fetch_conversation_by_id).toHaveBeenCalled();
-          expect(TestFactory.conversation_service.get_conversation_by_id).toHaveBeenCalled();
-          expect(_conversation.connection()).toBe(connection_et);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
+        expect(TestFactory.conversation_repository.fetch_conversation_by_id).toHaveBeenCalled();
+        expect(TestFactory.conversation_service.get_conversation_by_id).toHaveBeenCalled();
+        expect(_conversation.connection()).toBe(connection_et);
+      });
     });
 
-    it('should map a cancelled connection to an existing conversation and filter it', done => {
+    it('should map a cancelled connection to an existing conversation and filter it', () => {
       connection_et.status(z.user.ConnectionStatus.CANCELLED);
 
-      TestFactory.conversation_repository
-        .map_connection(connection_et)
-        .then(_conversation => {
-          expect(_conversation.connection()).toBe(connection_et);
-          expect(_find_conversation(_conversation, TestFactory.conversation_repository.conversations)).not.toBeNull();
-          expect(
-            _find_conversation(_conversation, TestFactory.conversation_repository.filtered_conversations)
-          ).toBeNull();
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.map_connection(connection_et).then(_conversation => {
+        expect(_conversation.connection()).toBe(connection_et);
+        expect(_find_conversation(_conversation, TestFactory.conversation_repository.conversations)).not.toBeNull();
+        expect(
+          _find_conversation(_conversation, TestFactory.conversation_repository.filtered_conversations)
+        ).toBeNull();
+      });
     });
   });
 
@@ -608,17 +579,19 @@ describe('ConversationRepository', () => {
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
             return TestFactory.conversation_repository._handleConversationEvent(upload_cancel);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(0);
           });
       });
 
-      it('removes a file upload from the messages list of the receiver when the upload gets canceled', done => {
+      it('removes a file upload from the messages list of the receiver when the upload gets canceled', () => {
         const conversation_id = z.util.createRandomUuid();
         const message_id = z.util.createRandomUuid();
         const sending_user_id = z.util.createRandomUuid();
@@ -628,7 +601,7 @@ describe('ConversationRepository', () => {
         // prettier-ignore
         const upload_cancel = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
 
-        TestFactory.conversation_repository
+        return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
@@ -638,19 +611,19 @@ describe('ConversationRepository', () => {
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
             return TestFactory.conversation_repository._handleConversationEvent(upload_cancel);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(0);
-            done();
-          })
-          .catch(done.fail);
+          });
       });
 
-      it("shows a failed message on the sender's side if the upload fails", done => {
+      it("shows a failed message on the sender's side if the upload fails", () => {
         const conversation_id = z.util.createRandomUuid();
         const message_id = z.util.createRandomUuid();
         const sending_user_id = TestFactory.user_repository.self().id;
@@ -660,7 +633,7 @@ describe('ConversationRepository', () => {
         // prettier-ignore
         const upload_failed = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T16:14:08.165Z","data":{"reason":1,"status":"upload-failed"},"type":"conversation.asset-add"};
 
-        TestFactory.conversation_repository
+        return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
@@ -670,16 +643,16 @@ describe('ConversationRepository', () => {
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
             return TestFactory.conversation_repository._handleConversationEvent(upload_failed);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
+
             expect(number_of_messages).toBe(1);
-            done();
-          })
-          .catch(done.fail);
+          });
       });
     });
 
@@ -697,46 +670,39 @@ describe('ConversationRepository', () => {
         createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
       });
 
-      it('should process create event for a new conversation created locally', done => {
-        TestFactory.conversation_repository
-          ._handleConversationEvent(createEvent)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(createEvent.data, 1);
-            done();
-          })
-          .catch(done.fail);
+      it('should process create event for a new conversation created locally', () => {
+        return TestFactory.conversation_repository._handleConversationEvent(createEvent).then(() => {
+          expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
+          expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(createEvent.data, 1);
+        });
       });
 
-      it('should process create event for a new conversation created remotely', done => {
+      it('should process create event for a new conversation created remotely', () => {
         const time = new Date();
         createEvent.time = time.toISOString();
 
-        TestFactory.conversation_repository
-          ._handleConversationEvent(createEvent)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
-              createEvent.data,
-              time.getTime()
-            );
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._handleConversationEvent(createEvent).then(() => {
+          expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
+          expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
+            createEvent.data,
+            time.getTime()
+          );
+        });
       });
     });
 
     describe('"conversation.member-join"', () => {
-      let member_join_event = null;
+      let memberJoinEvent = null;
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onMemberJoin').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
+        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([]));
 
-        member_join_event = {
+        memberJoinEvent = {
           conversation: conversation_et.id,
           data: {
-            user_ids: [],
+            user_ids: ['9028624e-bfef-490a-ba61-01683f5ccc83'],
           },
           from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
           id: '3.800122000a5dcd58',
@@ -745,53 +711,40 @@ describe('ConversationRepository', () => {
         };
       });
 
-      it('should process member-join event when joining a group conversation', done => {
-        TestFactory.conversation_repository
-          ._handleConversationEvent(member_join_event)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+      it('should process member-join event when joining a group conversation', () => {
+        return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
+          expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
+          expect(TestFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
+        });
       });
 
-      it('should ignore member-join event when joining a 1to1 conversation', done => {
+      it('should ignore member-join event when joining a 1to1 conversation', () => {
         // conversation has a corresponding pending connection
-        const connection_et_a = new z.entity.Connection();
-        connection_et_a.conversation_id = conversation_et.id;
-        connection_et_a.status(z.user.ConnectionStatus.PENDING);
-        TestFactory.user_repository.connections.push(connection_et_a);
+        const connectionEntity = new z.entity.Connection();
+        connectionEntity.conversation_id = conversation_et.id;
+        connectionEntity.status(z.user.ConnectionStatus.PENDING);
+        TestFactory.user_repository.connections.push(connectionEntity);
 
-        TestFactory.conversation_repository
-          ._handleConversationEvent(member_join_event)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.updateParticipatingUserEntities).not.toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
+          expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
+          expect(TestFactory.conversation_repository.updateParticipatingUserEntities).not.toHaveBeenCalled();
+        });
       });
     });
 
     describe('"conversation.message-delete"', () => {
       let message_et = undefined;
 
-      beforeEach(done => {
+      beforeEach(() => {
         conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-        TestFactory.conversation_repository
-          .save_conversation(conversation_et)
-          .then(() => {
-            message_et = new z.entity.Message(z.util.createRandomUuid());
-            message_et.from = TestFactory.user_repository.self().id;
-            conversation_et.add_message(message_et);
+        return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
+          message_et = new z.entity.Message(z.util.createRandomUuid());
+          message_et.from = TestFactory.user_repository.self().id;
+          conversation_et.add_message(message_et);
 
-            spyOn(TestFactory.conversation_repository, '_addDeleteMessage');
-            spyOn(TestFactory.conversation_repository, '_onMessageDeleted').and.callThrough();
-
-            done();
-          })
-          .catch(done.fail);
+          spyOn(TestFactory.conversation_repository, '_addDeleteMessage');
+          spyOn(TestFactory.conversation_repository, '_onMessageDeleted').and.callThrough();
+        });
       });
 
       afterEach(() => conversation_et.remove_messages());
@@ -813,8 +766,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(message_delete_event)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-            expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(z.error.ConversationError));
+            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
@@ -822,7 +775,7 @@ describe('ConversationRepository', () => {
           });
       });
 
-      it('should delete message if user is self', done => {
+      it('should delete message if user is self', () => {
         const message_delete_event = {
           conversation: conversation_et.id,
           data: {
@@ -835,18 +788,14 @@ describe('ConversationRepository', () => {
         };
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
-        TestFactory.conversation_repository
-          ._handleConversationEvent(message_delete_event)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
-            expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
+          expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+          expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
+          expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
+        });
       });
 
-      it('should delete message and add delete message if user is not self', done => {
+      it('should delete message and add delete message if user is not self', () => {
         const other_user_id = z.util.createRandomUuid();
         message_et.from = other_user_id;
 
@@ -862,18 +811,14 @@ describe('ConversationRepository', () => {
         };
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
-        TestFactory.conversation_repository
-          ._handleConversationEvent(message_delete_event)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
-            expect(TestFactory.conversation_repository._addDeleteMessage).toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
+          expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+          expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
+          expect(TestFactory.conversation_repository._addDeleteMessage).toHaveBeenCalled();
+        });
       });
 
-      it('should delete message and skip adding delete message for ephemeral messages', done => {
+      it('should delete message and skip adding delete message for ephemeral messages', () => {
         const other_user_id = z.util.createRandomUuid();
         message_et.from = other_user_id;
         message_et.ephemeral_expires(true);
@@ -890,35 +835,27 @@ describe('ConversationRepository', () => {
         };
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
-        TestFactory.conversation_repository
-          ._handleConversationEvent(message_delete_event)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
-            expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
+          expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+          expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
+          expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
+        });
       });
     });
 
     describe('"conversation.message-hidden"', () => {
       let messageId = null;
 
-      beforeEach(done => {
+      beforeEach(() => {
         conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
 
-        TestFactory.conversation_repository
-          .save_conversation(conversation_et)
-          .then(() => {
-            const messageToHideEt = new z.entity.Message(z.util.createRandomUuid());
-            conversation_et.add_message(messageToHideEt);
+        return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
+          const messageToHideEt = new z.entity.Message(z.util.createRandomUuid());
+          conversation_et.add_message(messageToHideEt);
 
-            messageId = messageToHideEt.id;
-            spyOn(TestFactory.conversation_repository, '_onMessageHidden').and.callThrough();
-            done();
-          })
-          .catch(done.fail);
+          messageId = messageToHideEt.id;
+          spyOn(TestFactory.conversation_repository, '_onMessageHidden').and.callThrough();
+        });
       });
 
       it('should not hide message if sender is not self user', done => {
@@ -940,15 +877,15 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-            expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(z.error.ConversationError));
+            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
             done();
           });
       });
 
-      it('should hide message if sender is self user', done => {
+      it('should hide message if sender is self user', () => {
         const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
@@ -963,17 +900,13 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
 
-        TestFactory.conversation_repository
-          ._handleConversationEvent(messageHiddenEvent)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._handleConversationEvent(messageHiddenEvent).then(() => {
+          expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+          expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
+        });
       });
 
-      it('should not hide message if not send via self conversation', done => {
+      it('should not hide message if not send via self conversation', () => {
         const messageHiddenEvent = {
           conversation: z.util.createRandomUuid(),
           data: {
@@ -988,14 +921,10 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
 
-        TestFactory.conversation_repository
-          ._onMessageHidden(messageHiddenEvent)
-          .then(() => {
-            expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
-            done();
-          })
-          .catch(done.fail);
+        return TestFactory.conversation_repository._onMessageHidden(messageHiddenEvent).then(() => {
+          expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+          expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
+        });
       });
     });
   });
@@ -1017,7 +946,9 @@ describe('ConversationRepository', () => {
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeTruthy());
+        .then(shouldSendAsExternal => {
+          expect(shouldSendAsExternal).toBeTruthy();
+        });
     });
 
     it('should return false for small payload', () => {
@@ -1033,7 +964,9 @@ describe('ConversationRepository', () => {
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
-        .then(shouldSendAsExternal => expect(shouldSendAsExternal).toBeFalsy());
+        .then(shouldSendAsExternal => {
+          expect(shouldSendAsExternal).toBeFalsy();
+        });
     });
   });
 
@@ -1058,6 +991,7 @@ describe('ConversationRepository', () => {
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
         (conversationId, genericMessage, payload, preconditionOption) => {
           const {content, ephemeral} = genericMessage;
+
           expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
           expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
           expect(ephemeral.expire_after_millis.toString()).toBe(expectedValues.shift());
@@ -1086,7 +1020,7 @@ describe('ConversationRepository', () => {
     let john;
     let lara = undefined;
 
-    beforeEach(done => {
+    beforeEach(() => {
       anne = new z.entity.User();
       anne.name('Anne');
 
@@ -1130,42 +1064,32 @@ describe('ConversationRepository', () => {
       mixed_group.participating_user_ets.push(john);
       mixed_group.participating_user_ets.push(lara);
 
-      Promise.all([
+      return Promise.all([
         TestFactory.conversation_repository.save_conversation(dudes),
         TestFactory.conversation_repository.save_conversation(gals),
         TestFactory.conversation_repository.save_conversation(mixed_group),
-      ])
-        .then(done)
-        .catch(done.fail);
+      ]);
     });
 
-    it('should know all users participating in a conversation (including the self user)', done => {
+    it('should know all users participating in a conversation (including the self user)', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
-      TestFactory.conversation_repository
-        .get_all_users_in_conversation(dudes.id)
-        .then(user_ets => {
-          expect(user_ets.length).toBe(3);
-          expect(user_ets[0] instanceof z.entity.User).toBeTruthy();
-          expect(TestFactory.conversation_repository.conversations().length).toBe(4);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.get_all_users_in_conversation(dudes.id).then(user_ets => {
+        expect(user_ets.length).toBe(3);
+        expect(user_ets[0] instanceof z.entity.User).toBeTruthy();
+        expect(TestFactory.conversation_repository.conversations().length).toBe(4);
+      });
     });
 
-    it('should generate a user-client-map including users with clients', done => {
+    it('should generate a user-client-map including users with clients', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
       const user_ets = dudes.participating_user_ets();
 
-      TestFactory.conversation_repository
-        .create_recipients(dudes.id)
-        .then(recipients => {
-          expect(Object.keys(recipients).length).toBe(2);
-          expect(recipients[bob.id].length).toBe(2);
-          expect(recipients[john.id].length).toBe(1);
-          expect(user_ets.length).toBe(2);
-          done();
-        })
-        .catch(done.fail);
+      return TestFactory.conversation_repository.create_recipients(dudes.id).then(recipients => {
+        expect(Object.keys(recipients).length).toBe(2);
+        expect(recipients[bob.id].length).toBe(2);
+        expect(recipients[john.id].length).toBe(1);
+        expect(user_ets.length).toBe(2);
+      });
     });
   });
 

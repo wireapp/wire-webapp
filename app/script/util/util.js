@@ -25,9 +25,9 @@ window.z.util = z.util || {};
 z.util.checkIndexedDb = () => {
   if (!z.util.Environment.browser.supports.indexedDb) {
     const errorType = z.util.Environment.browser.edge
-      ? z.auth.AuthError.TYPE.PRIVATE_MODE
-      : z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
-    return Promise.reject(new z.auth.AuthError(errorType));
+      ? z.error.AuthError.TYPE.PRIVATE_MODE
+      : z.error.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
+    return Promise.reject(new z.error.AuthError(errorType));
   }
 
   if (z.util.Environment.browser.firefox) {
@@ -38,11 +38,11 @@ z.util.checkIndexedDb = () => {
       dbOpenRequest.onerror = event => {
         if (dbOpenRequest.error) {
           event.preventDefault();
-          return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+          return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
         }
       };
     } catch (error) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+      return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
     }
 
     return new Promise((resolve, reject) => {
@@ -55,7 +55,7 @@ z.util.checkIndexedDb = () => {
 
         if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
-          return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+          return reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
         }
 
         const tooManyAttempts = currentAttempt >= maxRetry;

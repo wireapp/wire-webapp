@@ -233,7 +233,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
               }
 
               default: {
-                throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+                throw new z.error.MediaError(z.error.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
               }
             }
           });
@@ -245,7 +245,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;
         }
-        throw new z.media.MediaError(z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND);
+        throw new z.error.MediaError(z.error.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND);
       });
   }
 

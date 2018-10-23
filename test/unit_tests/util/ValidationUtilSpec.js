@@ -28,6 +28,7 @@ describe('z.util.ValidationUtil', () => {
       const conversationId = z.util.createRandomUuid();
 
       const actual = z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+
       expect(actual).toBe(true);
     });
 
@@ -49,6 +50,7 @@ describe('z.util.ValidationUtil', () => {
       const assetKey = `3-1-${z.util.createRandomUuid()}`;
 
       const actual = z.util.ValidationUtil.asset.v3(assetKey);
+
       expect(actual).toBe(true);
     });
 
@@ -57,6 +59,7 @@ describe('z.util.ValidationUtil', () => {
       const assetToken = 'aV0TGxF3ugpawm3wAYPmew==';
 
       const actual = z.util.ValidationUtil.asset.v3(assetKey, assetToken);
+
       expect(actual).toBe(true);
     });
 
@@ -105,12 +108,14 @@ describe('z.util.ValidationUtil', () => {
     it('detects a correct Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh';
       const actual = z.util.ValidationUtil.isBase64(encoded);
+
       expect(actual).toBe(true);
     });
 
     it('detects an incorrect Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh==';
       const actual = z.util.ValidationUtil.isBase64(encoded);
+
       expect(actual).toBe(false);
     });
   });
@@ -119,12 +124,14 @@ describe('z.util.ValidationUtil', () => {
     it('detects a correct Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==';
       const actual = z.util.ValidationUtil.isBearerToken(token);
+
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1';
       const actual = z.util.ValidationUtil.isBearerToken(token);
+
       expect(actual).toBe(false);
     });
   });
@@ -133,21 +140,30 @@ describe('z.util.ValidationUtil', () => {
     it('detects a correct UUID', () => {
       const uuid = UUID.genV4().hexString;
       const actual = z.util.ValidationUtil.isUUID(uuid);
+
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect UUID', () => {
       const uuid = 'i-c-o-r-r-e-c-t';
       const actual = z.util.ValidationUtil.isUUID(uuid);
+
       expect(actual).toBe(false);
     });
   });
 
   describe('"isValidApiPath"', () => {
     it('detects a valid API path', () => {
-      const path = '/search/contacts';
-      const actual = z.util.ValidationUtil.isValidApiPath(path);
-      expect(actual).toBe(true);
+      const urlPaths = [
+        '/search/contacts',
+        '/search/contacts/',
+        '/search/contacts/?ignore_missing=true',
+        '/search/contacts/?ignore_missing=true&foo=bar',
+      ];
+
+      urlPaths.forEach(urlPath => {
+        expect(z.util.ValidationUtil.isValidApiPath(urlPath)).toBe(true);
+      });
     });
 
     it('detects a invalid API path', done => {
@@ -192,6 +208,7 @@ describe('z.util.ValidationUtil', () => {
         expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
+
     it('detects a valid status with "statues" in the url', () => {
       const urls = ['https://twitter.com/pwnsdx/statuses/899574902050758656'];
       for (const url of urls) {

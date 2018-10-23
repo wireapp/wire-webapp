@@ -27,6 +27,7 @@ describe('UserHandleGenerator', () => {
       const handle = 'superman';
       const number_of_variations = 10;
       const variations = z.user.UserHandleGenerator.generate_handle_variations(handle, number_of_variations);
+
       expect(variations.length).toBe(number_of_variations);
       variations.forEach(variation => expect(variation).not.toBe(handle));
     });
@@ -48,9 +49,11 @@ describe('UserHandleGenerator', () => {
       expect(z.user.UserHandleGenerator.normalize_name('    Maria LaRochelle Von Schwerigstein ')).toBe(
         'marialarochellevonsch'
       );
+
       expect(z.user.UserHandleGenerator.normalize_name(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe(
         'marialarochellevonsch'
       );
+
       expect(z.user.UserHandleGenerator.normalize_name('🐙☀️')).toBe('');
       expect(z.user.UserHandleGenerator.normalize_name('name@mail.com')).toBe('namemailcom');
     });
@@ -89,9 +92,9 @@ describe('UserHandleGenerator', () => {
       const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
       const allowed_symbols = ['_'];
 
-      latin_alphabet
-        .concat(numbers, allowed_symbols)
-        .forEach(character => expect(z.user.UserHandleGenerator.validate_character(character)).toBeTruthy());
+      latin_alphabet.concat(numbers, allowed_symbols).forEach(character => {
+        expect(z.user.UserHandleGenerator.validate_character(character)).toBeTruthy();
+      });
     });
 
     it('returns false if character is not a string', () => {
@@ -114,6 +117,7 @@ describe('UserHandleGenerator', () => {
       const handle = 'foo';
       const additional_numbers = 5;
       const string_with_digits = z.user.UserHandleGenerator.append_random_digits('foo', additional_numbers);
+
       expect(string_with_digits.length).toBe(handle.length + additional_numbers);
       expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe(additional_numbers);
     });
@@ -123,6 +127,7 @@ describe('UserHandleGenerator', () => {
     it('appends random digits to the end of the string', () => {
       const username = 'memphis';
       const suggestions = z.user.UserHandleGenerator.create_suggestions(username);
+
       expect(suggestions.length).toBe(12);
       expect(suggestions.shift()).toBe(username);
       suggestions.forEach(suggestion => expect(suggestion).not.toBe(username));

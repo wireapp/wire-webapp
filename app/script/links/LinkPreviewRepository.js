@@ -52,7 +52,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
 
         if (linkData) {
           return this.getLinkPreview(linkData.url, linkData.offset).catch(error => {
-            const isLinkPreviewError = error instanceof z.links.LinkPreviewError;
+            const isLinkPreviewError = error instanceof z.error.LinkPreviewError;
             if (!isLinkPreviewError) {
               throw error;
             }
@@ -77,27 +77,27 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     return Promise.resolve()
       .then(() => {
         if (z.links.LinkPreviewBlackList.isBlacklisted(url)) {
-          throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.BLACKLISTED);
+          throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
         }
 
         if (window.openGraph) {
           return this._fetchOpenGraphData(url);
         }
 
-        throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
+        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.NOT_SUPPORTED);
       })
       .then(fetchedData => {
         if (fetchedData) {
           openGraphData = fetchedData;
           return z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(openGraphData, url, offset);
         }
-        throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
       })
       .then(linkPreview => {
         if (linkPreview) {
           return this._fetchPreviewImage(linkPreview, openGraphData.image);
         }
-        throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
+        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
       });
   }
 

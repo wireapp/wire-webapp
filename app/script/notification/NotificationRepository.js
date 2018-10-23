@@ -412,7 +412,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         if (optionsBody) {
           return this._shouldObfuscateNotificationSender(messageEntity);
         }
-        throw new z.notification.NotificationError(z.notification.NotificationError.TYPE.HIDE_NOTIFICATION);
+        throw new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION);
       })
       .then(shouldObfuscateSender => {
         return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
@@ -638,7 +638,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         });
       })
       .catch(error => {
-        const hideNotification = error.type === z.notification.NotificationError.TYPE.HIDE_NOTIFICATION;
+        const hideNotification = error.type === z.error.NotificationError.TYPE.HIDE_NOTIFICATION;
         if (!hideNotification) {
           throw error;
         }
@@ -739,7 +739,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
 
     return hideNotification
-      ? Promise.reject(new z.notification.NotificationError(z.notification.NotificationError.TYPE.HIDE_NOTIFICATION))
+      ? Promise.reject(new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION))
       : Promise.resolve();
   }
 

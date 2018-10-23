@@ -79,7 +79,8 @@ z.util.ValidationUtil = {
   isUUID: string => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string),
 
   isValidApiPath: path => {
-    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(path)) {
+    const [urlPath] = path.split('?');
+    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(urlPath)) {
       throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${path}`);
     }
     return true;

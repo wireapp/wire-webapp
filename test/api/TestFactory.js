@@ -63,6 +63,14 @@ window.TestFactory.prototype.exposeAudioActors = function() {
   });
 };
 
+window.TestFactory.prototype.exposeServerActors = function() {
+  this.logger.info('- exposeServerActors');
+  return Promise.resolve().then(() => {
+    TestFactory.serverTimeRepository = new z.time.ServerTimeRepository();
+    return TestFactory.serverTimeRepository;
+  });
+};
+
 /**
  *
  * @returns {Promise<z.auth.AuthRepository>} The authentication repository.
@@ -155,6 +163,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
 
       if (mockCryptobox) {
+        // eslint-disable-next-line jasmine/no-unsafe-spy
         spyOn(TestFactory.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
       }
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
@@ -245,6 +254,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
+        TestFactory.serverTimeRepository,
         TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
@@ -261,6 +271,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
   this.logger.info('- exposeUserActors');
   return Promise.resolve()
     .then(() => this.exposeClientActors())
+    .then(() => this.exposeServerActors())
     .then(() => {
       this.logger.info('✓ exposedClientActors');
 
@@ -274,7 +285,8 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.search_service,
-        TestFactory.client_repository
+        TestFactory.client_repository,
+        TestFactory.serverTimeRepository
       );
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
@@ -371,6 +383,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.event_repository,
         undefined,
         undefined,
+        TestFactory.serverTimeRepository,
         TestFactory.team_repository,
         TestFactory.user_repository
       );
@@ -464,12 +477,11 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
 window.TestFactory.prototype.exposeTrackingActors = function() {
   this.logger.info('- exposeTrackingActors');
   return Promise.resolve()
-    .then(() => this.exposeConversationActors())
+    .then(() => this.exposeTeamActors())
     .then(() => {
-      this.logger.info('✓ exposedConversationActors');
+      this.logger.info('✓ exposesTeamActors');
 
       TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(
-        TestFactory.conversation_repository,
         TestFactory.team_repository,
         TestFactory.user_repository
       );

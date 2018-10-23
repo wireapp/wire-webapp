@@ -27,6 +27,7 @@ describe('z.util.ArrayUtil', () => {
 
     it('returns one chunk with all items when the size is bigger than the array', () => {
       const actual = z.util.ArrayUtil.chunk(array, 10);
+
       expect(actual.length).toBe(1);
       expect(actual[0].length).toBe(10);
       expect(actual[0][0]).toBe(1);
@@ -35,6 +36,7 @@ describe('z.util.ArrayUtil', () => {
 
     it('returns the correct chunks', () => {
       const actual = z.util.ArrayUtil.chunk(array, 3);
+
       expect(actual.length).toBe(4);
       expect(actual[0].length).toBe(3);
       expect(actual[1].length).toBe(3);
@@ -44,6 +46,7 @@ describe('z.util.ArrayUtil', () => {
 
     it('does not effect the original array', () => {
       const actual = z.util.ArrayUtil.chunk(array, 3);
+
       expect(actual.length).toBe(4);
       expect(actual[0].length).toBe(3);
       expect(actual[1].length).toBe(3);
@@ -81,6 +84,7 @@ describe('z.util.ArrayUtil', () => {
 
     it('keeps the first and the last value', () => {
       const interpolated_array = z.util.ArrayUtil.interpolate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 5);
+
       expect(interpolated_array[0]).toEqual(0);
       expect(interpolated_array[interpolated_array.length - 1]).toEqual(9);
     });
@@ -116,6 +120,7 @@ describe('z.util.ArrayUtil', () => {
 
     it('iterates through the array index', () => {
       const array = [1, 2, 3, 4, 5];
+
       expect(z.util.ArrayUtil.iterateIndex(array, 0)).toBe(1);
       expect(z.util.ArrayUtil.iterateIndex(array, 1)).toBe(2);
       expect(z.util.ArrayUtil.iterateIndex(array, 2)).toBe(3);

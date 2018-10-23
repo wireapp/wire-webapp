@@ -37,16 +37,19 @@ describe('z.util.TimeUtil', () => {
         text: '1 second',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS * 2)).toEqual({
         symbol: 's',
         text: '2 seconds',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS * 2 + 300)).toEqual({
         symbol: 's',
         text: '2 seconds',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(5000)).toEqual({symbol: 's', text: '5 seconds', value: 5});
       expect(z.util.TimeUtil.formatDuration(15000)).toEqual({symbol: 's', text: '15 seconds', value: 15});
     });
@@ -58,31 +61,37 @@ describe('z.util.TimeUtil', () => {
         text: '1 minute',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS * 5)).toEqual({
         symbol: 'm',
         text: '5 minutes',
         value: 5,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
         text: '1 minute',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS + 29 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
         text: '1 minute',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS + 30 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
         text: '2 minutes',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS * 2 + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
         text: '2 minutes',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(60000)).toEqual({symbol: 'm', text: '1 minute', value: 1});
       expect(z.util.TimeUtil.formatDuration(900000)).toEqual({symbol: 'm', text: '15 minutes', value: 15});
     });
@@ -94,31 +103,37 @@ describe('z.util.TimeUtil', () => {
         text: '1 hour',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'h',
         text: '1 hour',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
         text: '1 hour',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 29 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
         text: '1 hour',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 30 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
         text: '2 hours',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS * 2 + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'h',
         text: '2 hours',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS * 2 + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
         text: '2 hours',
@@ -134,36 +149,43 @@ describe('z.util.TimeUtil', () => {
         text: '1 day',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '1 day',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '1 day',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 11 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '1 day',
         value: 1,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 12 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '2 days',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '2 days',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '2 days',
         value: 2,
       });
+
       expect(z.util.TimeUtil.formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
         text: '2 days',
@@ -178,6 +200,7 @@ describe('z.util.TimeUtil', () => {
         text: '26 weeks',
         value: 26,
       });
+
       expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 27)).toEqual({
         symbol: 'w',
         text: '27 weeks',
@@ -196,21 +219,25 @@ describe('z.util.TimeUtil', () => {
 
     it('renders hours and minutes correctly', () => {
       caption = z.util.TimeUtil.formatDurationCaption(ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
+
       expect(caption).toEqual('01:01 remaining');
     });
 
     it('renders days and hours:minutes', () => {
       caption = z.util.TimeUtil.formatDurationCaption(ONE_DAY_IN_MILLIS + ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
+
       expect(caption).toEqual('1 day and 01:01 remaining');
     });
 
     it('renders just the days if hours are 0', () => {
       caption = z.util.TimeUtil.formatDurationCaption(2 * ONE_DAY_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
+
       expect(caption).toEqual('2 days remaining');
     });
 
     it('renders weeks and days', () => {
       caption = z.util.TimeUtil.formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
+
       expect(caption).toEqual('3 weeks and 1 day remaining');
     });
   });

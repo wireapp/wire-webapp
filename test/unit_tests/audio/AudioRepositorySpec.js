@@ -24,26 +24,13 @@
 describe('z.audio.AudioRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(done => {
-    test_factory
-      .exposeAudioActors()
-      .then(() => {
-        TestFactory.audio_repository.init(true);
-        done();
-      })
-      .catch(done.fail);
-  });
+  beforeAll(() => test_factory.exposeAudioActors().then(() => TestFactory.audio_repository.init(true)));
 
   describe('_checkSoundSetting', () => {
-    beforeAll(() => {
-      TestFactory.audio_repository.audioPreference(z.audio.AudioPreference.SOME);
-    });
+    beforeAll(() => TestFactory.audio_repository.audioPreference(z.audio.AudioPreference.SOME));
 
-    it('plays a sound that should be played', done => {
-      TestFactory.audio_repository
-        ._checkSoundSetting(z.audio.AudioType.NETWORK_INTERRUPTION)
-        .then(done)
-        .catch(done.fail);
+    it('plays a sound that should be played', () => {
+      return TestFactory.audio_repository._checkSoundSetting(z.audio.AudioType.NETWORK_INTERRUPTION);
     });
 
     it('ignores a sound that should not be played', done => {
@@ -51,22 +38,18 @@ describe('z.audio.AudioRepository', () => {
         ._checkSoundSetting(z.audio.AudioType.ALERT)
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.audio.AudioError));
-          expect(error.type).toBe(z.audio.AudioError.TYPE.IGNORED_SOUND);
+          expect(error).toEqual(jasmine.any(z.error.AudioError));
+          expect(error.type).toBe(z.error.AudioError.TYPE.IGNORED_SOUND);
           done();
         });
     });
   });
 
   describe('_getSoundById', () => {
-    it('finds an available sound', done => {
-      TestFactory.audio_repository
-        ._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION)
-        .then(audio_element => {
-          expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
-          done();
-        })
-        .catch(done.fail);
+    it('finds an available sound', () => {
+      return TestFactory.audio_repository._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION).then(audio_element => {
+        expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
+      });
     });
 
     it('handles a missing sound', done => {
@@ -74,8 +57,8 @@ describe('z.audio.AudioRepository', () => {
         ._getSoundById('foo')
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.audio.AudioError));
-          expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
+          expect(error).toEqual(jasmine.any(z.error.AudioError));
+          expect(error.type).toBe(z.error.AudioError.TYPE.NOT_FOUND);
           done();
         });
     });
@@ -126,8 +109,8 @@ describe('z.audio.AudioRepository', () => {
         )
         .then(() => fail('should throw an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.audio.AudioError));
-          expect(error.type).toBe(z.audio.AudioError.TYPE.ALREADY_PLAYING);
+          expect(error).toEqual(jasmine.any(z.error.AudioError));
+          expect(error.type).toBe(z.error.AudioError.TYPE.ALREADY_PLAYING);
         });
     });
 
@@ -135,15 +118,15 @@ describe('z.audio.AudioRepository', () => {
       return TestFactory.audio_repository
         ._play(undefined, TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL])
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.audio.AudioError));
-          expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
+          expect(error).toEqual(jasmine.any(z.error.AudioError));
+          expect(error.type).toBe(z.error.AudioError.TYPE.NOT_FOUND);
         });
     });
 
     it('handles a missing audio element', () => {
       return TestFactory.audio_repository._play(z.audio.AudioType.OUTGOING_CALL, undefined).catch(error => {
-        expect(error).toEqual(jasmine.any(z.audio.AudioError));
-        expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
+        expect(error).toEqual(jasmine.any(z.error.AudioError));
+        expect(error.type).toBe(z.error.AudioError.TYPE.NOT_FOUND);
       });
     });
   });
