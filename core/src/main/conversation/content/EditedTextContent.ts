@@ -17,9 +17,16 @@
  *
  */
 
-import {TextContent} from '../content/';
+import {QuoteContent, TextContent} from '../content/';
 
 interface EditedTextContent extends TextContent {
+  /**
+   * While this field exists in the Protobuf spec, it should be
+   * ignored on the receiver side in an edited message.
+   *
+   * See https://github.com/wireapp/generic-message-proto/blob/v1.22.1/proto/messages.proto#L54
+   */
+  quote?: QuoteContent;
   originalMessageId: string;
 }
 

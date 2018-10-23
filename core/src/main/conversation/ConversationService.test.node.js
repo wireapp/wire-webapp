@@ -326,5 +326,41 @@ describe('ConversationService', () => {
 
       expect(textMessage.content.mentions).toBeUndefined();
     });
+
+    it('adds a quote correctly', () => {
+      account.apiClient.context = {
+        userId: new UUID(4).format(),
+      };
+
+      const quoteId = new UUID(4).format();
+      const textSHA256 = new UUID(4).format();
+
+      const text = 'I totally agree.';
+
+      const quote = {
+        id: quoteId,
+        sha256: textSHA256,
+      };
+
+      const replyMessage = account.service.conversation
+        .createText(text)
+        .withQuote(quote)
+        .build();
+
+      expect(replyMessage.content.text).toEqual(text);
+      expect(replyMessage.content.quote).toEqual(jasmine.objectContaining({id: quoteId, sha256: textSHA256}));
+      expect(replyMessage.content.quote).toEqual(jasmine.objectContaining(quote));
+    });
+
+    it('does not add a quote', () => {
+      account.apiClient.context = {
+        userId: new UUID(4).format(),
+      };
+
+      const text = 'Hello, world!';
+      const textMessage = account.service.conversation.createText(text).build();
+
+      expect(textMessage.content.quote).toBeUndefined();
+    });
   });
 });
