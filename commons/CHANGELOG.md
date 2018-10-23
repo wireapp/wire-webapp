@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.7.3...@wireapp/commons@0.8.0) (2018-10-23)
+
+
+### Features
+
+* **commons:** Add website supported languages ([#1246](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1246)) ([cc83b09](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/cc83b09))
+
+
+
+
+
 ## [0.7.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.7.2...@wireapp/commons@0.7.3) (2018-10-19)
 
 **Note:** Version bump only for package @wireapp/commons
