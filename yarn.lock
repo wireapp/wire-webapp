@@ -9357,10 +9357,10 @@ postcss-image-set-polyfill@^0.3.5:
     postcss "^6.0.1"
     postcss-media-query-parser "^0.2.3"
 
-postcss-import@12.0.0:
-  version "12.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-12.0.0.tgz#149f96a4ef0b27525c419784be8517ebd17e92c5"
-  integrity sha512-3KqKRZcaZAvxbY8DVLdd81tG5uKzbUQuiWIvy0o0fzEC42bKacqPYFWbfCQyw6L4LWUaqPz/idvIdbhpgQ32eQ==
+postcss-import@12.0.1:
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-12.0.1.tgz#cf8c7ab0b5ccab5649024536e565f841928b7153"
+  integrity sha512-3Gti33dmCjyKBgimqGxL3vcV8w9+bsHwO5UrBawp796+jdardbcFl4RP5w/76BwNL7aGzpKstIfF9I+kdE8pTw==
   dependencies:
     postcss "^7.0.1"
     postcss-value-parser "^3.2.3"
@@ -9797,16 +9797,7 @@ postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, 
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.2.tgz#7b5a109de356804e27f95a960bef0e4d5bc9bb18"
-  integrity sha512-fmaUY5370keLUTx+CnwRxtGiuFTcNBLQBqr1oE3WZ/euIYmGAo0OAgOhVJ3ByDnVmOR3PK+0V9VebzfjRIUcqw==
-  dependencies:
-    chalk "^2.4.1"
-    source-map "^0.6.1"
-    supports-color "^5.4.0"
-
-postcss@^7.0.5:
+postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2, postcss@^7.0.5:
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.5.tgz#70e6443e36a6d520b0fd4e7593fcca3635ee9f55"
   integrity sha512-HBNpviAUFCKvEh7NZhw1e8MBPivRszIiUnhrJ+sBFVSYSqubrzwX3KG51mYgcRHX8j/cAgZJedONZcm5jTBdgQ==
