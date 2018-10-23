@@ -34,3 +34,5 @@ export const WEBAPP_SUPPORTED_BROWSERS = {
   [BROWSER.ELECTRON]: {major: 1, minor: 6},
   [BROWSER.OPERA]: {major: 43, minor: 0},
 };
+
+export const WEBSITE_SUPPORTED_LANGUAGES = ['de', 'en'];
