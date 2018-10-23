@@ -446,7 +446,7 @@ z.user.UserRepository = class UserRepository {
         medium.load().then(imageBlob => this.change_picture(imageBlob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
-        this.selfService.putSelf({picture: undefined});
+        this.selfService.putSelf({picture: []});
       }
     }
     return userData;
@@ -757,7 +757,7 @@ z.user.UserRepository = class UserRepository {
           {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
         return this.selfService
-          .putSelf({assets, picture: undefined})
+          .putSelf({assets, picture: []})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
