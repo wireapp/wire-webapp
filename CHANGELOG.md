@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.9...@wireapp/react-ui-kit@4.3.10) (2018-10-23)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Set initial loading progress to undefined ([#1248](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1248)) ([1a91240](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/1a91240))
+
+
+
+
+
 ## [4.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.8...@wireapp/react-ui-kit@4.3.9) (2018-10-23)
 
 
