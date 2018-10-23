@@ -202,14 +202,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
     if (isDisabledEvent) {
       this.logger.info(`Skipped sending disabled event of type '${eventName}'`);
-      return Promise.resolve();
+    } else {
+      const logAttributes = attributes ? `with attributes: ${JSON.stringify(attributes)}` : 'without attributes';
+      this.logger.info(`Tracking event '${eventName}' ${logAttributes}`);
+
+      // Send event if provider API available
     }
-
-    const logAttributes = attributes ? `with attributes: ${JSON.stringify(attributes)}` : 'without attributes';
-    this.logger.info(`Tracking event '${eventName}' ${logAttributes}`);
-
-    // Send event if provider API available
-    return Promise.resolve();
   }
 
   _unsubscribeFromAnalyticsEvents() {
