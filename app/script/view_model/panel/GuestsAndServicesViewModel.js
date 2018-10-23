@@ -39,8 +39,11 @@ z.viewModel.panel.GuestsAndServicesViewModel = class GuestsAndServicesViewModel 
     this.requestAccessCode = this.requestAccessCode.bind(this);
     this.revokeAccessCode = this.revokeAccessCode.bind(this);
 
-    this.conversationRepository = this.repositories.conversation;
-    this.stateHandler = this.conversationRepository.stateHandler;
+    const {repositories} = params;
+    const conversationRepository = repositories.conversation;
+    this.stateHandler = conversationRepository.stateHandler;
+
+    this.logger = new z.util.Logger('z.viewModel.panel.GuestsAndServicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);

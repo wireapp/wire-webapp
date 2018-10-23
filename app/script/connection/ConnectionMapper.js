@@ -59,11 +59,11 @@ z.connection.ConnectionMapper = class ConnectionMapper {
      * @returns {z.connection.ConnectionEntity} Mapped connection entity
      */
     this.updateConnectionFromJson = (connectionEntity, connectionData) => {
-      const {conversation, from, last_update, message, status, to} = connectionData;
+      const {conversation, from, last_update, message, status, to: remoteUserId} = connectionData;
 
       connectionEntity.status(status);
       connectionEntity.conversationId = conversation;
-      connectionEntity.to = to;
+      connectionEntity.userId = remoteUserId;
       connectionEntity.from = from;
       connectionEntity.lastUpdate = last_update;
       connectionEntity.message = message;

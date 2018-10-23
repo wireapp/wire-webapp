@@ -105,11 +105,11 @@ z.main.App = class App {
     repositories.user = new z.user.UserRepository(
       this.service.user,
       this.service.asset,
-      this.service.connection,
       this.service.self,
       repositories.client,
       repositories.serverTime
     );
+    repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
     repositories.event = new z.event.EventRepository(
       this.service.event,
       this.service.notification,
@@ -135,6 +135,7 @@ z.main.App = class App {
       this.service.conversation,
       this.service.asset,
       repositories.client,
+      repositories.connection,
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
@@ -149,6 +150,7 @@ z.main.App = class App {
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
       repositories.client,
+      repositories.connection,
       repositories.conversation,
       repositories.user
     );
@@ -292,7 +294,9 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
-        return Promise.all([this.repository.conversation.getConversations(), this.repository.user.get_connections()]);
+
+        const promises = [this.repository.conversation.getConversations(), this.repository.connection.getConnections()];
+        return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {
         this.view.loading.updateProgress(25, z.string.initReceivedUserData);
@@ -309,7 +313,7 @@ z.main.App = class App {
           50
         );
 
-        this.repository.conversation.map_connections(this.repository.user.connections());
+        this.repository.conversation.map_connections(this.repository.connection.connectionEntities());
         this._subscribeToUnloadEvents();
 
         return this.repository.team.getTeam();

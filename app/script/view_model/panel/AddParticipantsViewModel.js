@@ -35,11 +35,12 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
   constructor(params) {
     super(params);
 
-    this.conversationRepository = this.repositories.conversation;
-    this.integrationRepository = this.repositories.integration;
-    this.searchRepository = params.repositories.search;
-    this.teamRepository = this.repositories.team;
-    this.userRepository = this.repositories.user;
+    const {conversation, integration, search, team, user} = params.repositories;
+    this.conversationRepository = conversation;
+    this.integrationRepository = integration;
+    this.searchRepository = search;
+    this.teamRepository = team;
+    this.userRepository = user;
 
     this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
 

@@ -37,15 +37,22 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
-    this.conversationRepository = this.repositories.conversation;
-    this.integrationRepository = this.repositories.integration;
-    this.searchRepository = params.repositories.search;
-    this.teamRepository = this.repositories.team;
+    const {mainViewModel, repositories} = params;
+
+    const {conversation, integration, search, team, user} = repositories;
+    this.conversationRepository = conversation;
+    this.integrationRepository = integration;
+    this.searchRepository = search;
+    this.teamRepository = team;
+    this.userRepository = user;
+
+    this.actionsViewModel = mainViewModel.actions;
 
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
+
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
 
     this.serviceParticipants = ko.observableArray();
@@ -185,11 +192,13 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
-      const conversation = this.activeConversation();
-      const hasMessageTimeSet = conversation && conversation.messageTimer() && conversation.hasGlobalMessageTimer();
-      return hasMessageTimeSet
-        ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
-        : z.l10n.text(z.string.ephemeralUnitsNone);
+      if (this.activeConversation()) {
+        const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
+        if (hasTimer) {
+          return z.util.TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
+        }
+      }
+      return z.l10n.text(z.string.ephemeralUnitsNone);
     });
 
     const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);

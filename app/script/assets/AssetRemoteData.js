@@ -127,7 +127,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
           ? z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer)
           : buffer;
       })
-      .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
+      .then(plaintext => new Blob([new Uint8Array(plaintext)], {type}))
       .catch(error => {
         this.loadPromise = undefined;
         const errorMessage = (error && error.message) || '';

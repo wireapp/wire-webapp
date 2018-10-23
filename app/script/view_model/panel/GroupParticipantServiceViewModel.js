@@ -28,9 +28,10 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   constructor(params) {
     super(params);
 
-    this.conversationRepository = this.repositories.conversation;
-    this.integrationRepository = this.repositories.integration;
-    this.userRepository = this.repositories.user;
+    const {mainViewModel, repositories} = params;
+
+    this.integrationRepository = repositories.integration;
+    this.actionsViewModel = mainViewModel.actions;
 
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
 

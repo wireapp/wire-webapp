@@ -55,7 +55,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
 
     this.newClients = ko.observableArray([]);

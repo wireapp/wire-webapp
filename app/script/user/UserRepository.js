@@ -39,26 +39,22 @@ z.user.UserRepository = class UserRepository {
    * @class z.user.UserRepository
    * @param {z.user.UserService} user_service - Backend REST API user service implementation
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
-   * @param {z.connection.ConnectionService} connectionService - Backend REST API connection service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
-  constructor(user_service, asset_service, connectionService, selfService, client_repository, serverTimeRepository) {
+  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
-    this.connectionService = connectionService;
     this.selfService = selfService;
     this.client_repository = client_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
-    this.connectionMapper = new z.connection.ConnectionMapper();
     this.user_mapper = new z.user.UserMapper(serverTimeRepository);
     this.should_set_username = false;
 
     this.self = ko.observable();
     this.users = ko.observableArray([]);
-    this.connections = ko.observableArray([]);
 
     this.connect_requests = ko
       .pureComputed(() => {
@@ -114,9 +110,6 @@ z.user.UserRepository = class UserRepository {
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case z.event.Backend.USER.CONNECTION:
-        this.user_connection(event_json, source);
-        break;
       case z.event.Backend.USER.DELETE:
         this.user_delete(event_json);
         break;
@@ -156,39 +149,6 @@ z.user.UserRepository = class UserRepository {
    */
   saveUserInDb(userEntity) {
     return this.user_service.saveUserInDb(userEntity);
-  }
-
-  /**
-   * Convert a JSON event into an entity and get the matching conversation.
-   * @param {Object} event_json - JSON data of 'user.connection' event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {boolean} [show_conversation] - Should the new conversation be opened?
-   * @returns {undefined} No return value
-   */
-  user_connection(event_json, source, show_conversation) {
-    if (!event_json) {
-      return;
-    }
-    event_json = event_json.connection || event_json;
-
-    let connectionEntity = this.get_connection_by_user_id(event_json.to);
-    let previousStatus = null;
-
-    if (connectionEntity) {
-      previousStatus = connectionEntity.status();
-      this.connectionMapper.updateConnectionFromJson(connectionEntity, event_json);
-    } else {
-      connectionEntity = this.connectionMapper.mapConnectionFromJson(event_json);
-    }
-
-    this.update_user_connections([connectionEntity]).then(() => {
-      const shouldUpdateUser = previousStatus === z.connection.ConnectionStatus.SENT && connectionEntity.isConnected();
-      if (shouldUpdateUser) {
-        this.updateUserById(connectionEntity.to);
-      }
-      this._send_user_connection_notification(connectionEntity, source, previousStatus);
-      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connectionEntity, show_conversation);
-    });
   }
 
   /**
@@ -241,160 +201,19 @@ z.user.UserRepository = class UserRepository {
   }
 
   /**
-   * Accept a connection request.
-   * @param {z.entity.User} userEntity - User to update connection with
-   * @param {boolean} [showConversation=false] - Show new conversation on success
-   * @returns {Promise} Promise that resolves when the connection request was accepted
-   */
-  acceptConnectionRequest(userEntity, showConversation = false) {
-    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
-  }
-
-  /**
-   * Block a user.
-   *
-   * @param {z.entity.User} userEntity - User to block
-   * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
-   * @returns {Promise} Promise that resolves when the user was blocked
-   */
-  blockUser(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.BLOCKED).then(() => {
-      if (hideConversation) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
-      }
-    });
-  }
-
-  /**
-   * Cancel a connection request.
-   *
-   * @param {z.entity.User} userEntity - User to cancel the sent connection request
-   * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
-   * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
-   */
-  cancelConnectionRequest(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.CANCELLED).then(() => {
-      if (hideConversation) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
-      }
-    });
-  }
-
-  /**
-   * Create a connection request.
-   *
-   * @param {z.entity.User} userEntity - User to connect to
-   * @param {boolean} [showConversation=false] - Should we open the new conversation
-   * @returns {Promise} Promise that resolves when the connection request was successfully created
-   */
-  createConnection(userEntity, showConversation = false) {
-    return this.connectionService
-      .postConnections(userEntity.id, userEntity.name())
-      .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, showConversation))
-      .catch(error => {
-        this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-      });
-  }
-
-  /**
-   * Get a connection for a user ID.
-   * @param {string} userId - User ID
-   * @returns {z.connection.ConnectionEntity} User connection entity
-   */
-  get_connection_by_user_id(userId) {
-    return this.connections().find(connectionEntity => connectionEntity.to === userId);
-  }
-
-  /**
-   * Get a connection for a conversation ID.
-   * @param {string} conversationId - Conversation ID
-   * @returns {z.connection.ConnectionEntity} User connection entity
-   */
-  get_connection_by_conversation_id(conversationId) {
-    return this.connections().find(connectionEntity => connectionEntity.conversationId === conversationId);
-  }
-
-  /**
-   * Create a new conversation.
-   * @note Initially called by Wire for Web's app start to retrieve user entities and their connections.
-   * @param {number} [limit=500] - Query limit for user connections
-   * @param {string} [user_id] - User ID of the latest connection
-   * @param {Array<z.connection.ConnectionEntity>} [connectionEntities=[]] - Unordered array of user connections
-   * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
-   */
-  get_connections(limit = 500, user_id, connectionEntities = []) {
-    return this.connectionService
-      .getConnections(limit, user_id)
-      .then(({connections: connectionData, has_more: hasMore}) => {
-        if (connectionData.length) {
-          const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
-          connectionEntities = connectionEntities.concat(newConnectionEntities);
-        }
-
-        if (hasMore) {
-          const lastConnectionEntity = connectionEntities[connectionEntities.length - 1];
-          return this.get_connections(limit, lastConnectionEntity.to, connectionEntities);
-        }
-
-        if (connectionEntities.length) {
-          return this.update_user_connections(connectionEntities, true).then(() => this.connections());
-        }
-
-        return this.connections();
-      })
-      .catch(error => {
-        this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
-        throw error;
-      });
-  }
-
-  /**
-   * Ignore connection request.
-   * @param {z.entity.User} userEntity - User to ignore the connection request
-   * @returns {Promise} Promise that resolves when an incoming connection request was ignored
-   */
-  ignoreConnectionRequest(userEntity) {
-    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.IGNORED);
-  }
-
-  /**
-   * Unblock a user.
-   * @param {z.entity.User} userEntity - User to unblock
-   * @param {boolean} [showConversation=false] - Show new conversation on success
-   * @returns {Promise} Promise that resolves when a user was unblocked
-   */
-  unblockUser(userEntity, showConversation = true) {
-    return this._update_connection_status(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
-  }
-
-  /**
-   * Update the user connections and get the matching users.
+   * Update users matching the given connections.
    * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connection entities
-   * @param {boolean} assign_clients - Retrieve locally known clients from database
-   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all user connections have been updated
+   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all connections have been updated
    */
-  update_user_connections(connectionEntities, assign_clients = false) {
-    return Promise.resolve()
-      .then(() => {
-        z.util.koArrayPushAll(this.connections, connectionEntities);
-        const user_ids = connectionEntities.map(connectionEntity => connectionEntity.to);
-
-        if (user_ids.length === 0) {
-          return;
-        }
-
-        return this.get_users_by_id(user_ids).then(user_ets => {
-          for (const user_et of user_ets) {
-            this._assign_connection(user_et);
-          }
-          if (assign_clients) {
-            return this._assignAllClients();
-          }
-        });
-      })
-      .then(() => connectionEntities);
+  updateUsersFromConnections(connectionEntities) {
+    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
+    return this.get_users_by_id(userIds).then(userEntities => {
+      userEntities.forEach(userEntity => {
+        const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+        userEntity.connection(connectionEntity);
+      });
+      return this._assignAllClients();
+    });
   }
 
   /**
@@ -420,101 +239,6 @@ z.user.UserRepository = class UserRepository {
         return userEntities;
       });
     });
-  }
-
-  /**
-   * Assign connections to the users.
-   * @param {z.entity.User} user_et - User to which a connection will be assigned to.
-   * @returns {z.connection.ConnectionEntity} Connection entity which has been found for the given user entity.
-   * @private
-   */
-  _assign_connection(user_et) {
-    const connectionEntity = this.get_connection_by_user_id(user_et.id);
-    if (connectionEntity) {
-      user_et.connection(connectionEntity);
-    }
-    return connectionEntity;
-  }
-
-  /**
-   * Update the status of a connection.
-   * @private
-   * @param {z.entity.User} user_et - User to update connection with
-   * @param {string} status - Connection status
-   * @param {boolean} [show_conversation=false] - Show conversation on success
-   * @returns {Promise} Promise that resolves when the connection status was updated
-   */
-  _update_connection_status(user_et, status, show_conversation = false) {
-    if (!user_et) {
-      this.logger.error('Cannot update connection without a user');
-      return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
-    }
-
-    if (user_et.connection().status() === status) {
-      this.logger.info(`Requested connection status change to '${status}' for user '${user_et.id}' is current status`);
-      return Promise.resolve();
-    }
-
-    return this.connectionService
-      .putConnections(user_et.id, status)
-      .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
-      .catch(error => {
-        this.logger.error(
-          `Connection status change to '${status}' for user '${user_et.id}' failed: ${error.message}`,
-          error
-        );
-
-        const custom_data = {
-          current_status: user_et.connection().status(),
-          failed_action: status,
-          server_error: error,
-        };
-
-        Raygun.send(new Error('Connection status change failed'), custom_data);
-      });
-  }
-
-  /**
-   * Send the user connection notification.
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
-   * @returns {undefined} No return value
-   */
-  _send_user_connection_notification(connectionEntity, source, previousStatus) {
-    // We accepted the connection request or unblocked the user
-    const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
-    const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
-    const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
-    const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-
-    const showNotification = isWebSocketEvent && !selfUserAccepted;
-    if (showNotification) {
-      this.get_user_by_id(connectionEntity.to).then(userEntity => {
-        const messageEntity = new z.entity.MemberMessage();
-        messageEntity.user(userEntity);
-
-        switch (connectionEntity.status()) {
-          case z.connection.ConnectionStatus.PENDING: {
-            messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
-            break;
-          }
-
-          case z.connection.ConnectionStatus.ACCEPTED: {
-            const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
-            messageEntity.memberMessageType = statusWasSent
-              ? z.message.SystemMessageType.CONNECTION_ACCEPTED
-              : z.message.SystemMessageType.CONNECTION_CONNECTED;
-            break;
-          }
-
-          default:
-            break;
-        }
-
-        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
-      });
-    }
   }
 
   /**
@@ -692,6 +416,7 @@ z.user.UserRepository = class UserRepository {
   getSelf() {
     return this.selfService
       .getSelf()
+      .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.user_mapper.map_self_user_from_object(response))
       .then(userEntity => {
         const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
@@ -701,6 +426,30 @@ z.user.UserRepository = class UserRepository {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;
       });
+  }
+
+  /**
+   * Detects if the user has a profile picture that uses the outdated picture API.
+   * Will migrate the picture to the newer assets API if so.
+   *
+   * @param {Object} userData - user data from the backend
+   * @returns {void}
+   */
+  _upgradePictureAsset(userData) {
+    const hasPicture = userData.picture.length;
+    const hasAsset = userData.assets.length;
+
+    if (hasPicture) {
+      if (!hasAsset) {
+        // if there are no assets, just upload the old picture to the new api
+        const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
+        medium.load().then(imageBlob => this.change_picture(imageBlob));
+      } else {
+        // if an asset is already there, remove the pointer to the old picture
+        this.selfService.putSelf({picture: []});
+      }
+    }
+    return userData;
   }
 
   /**
@@ -1008,7 +757,7 @@ z.user.UserRepository = class UserRepository {
           {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
         return this.selfService
-          .putSelf({assets})
+          .putSelf({assets, picture: []})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {

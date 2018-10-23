@@ -120,18 +120,14 @@ window.TestFactory.prototype.exposeBackupActors = function() {
     .then(() => this.exposeStorageActors())
     .then(() => this.exposeConversationActors())
     .then(() => {
-      this.logger.info('✓ exposedStorageActors');
+      this.logger.info('✓ exposedUserActors');
 
       TestFactory.backup_service = new z.backup.BackupService(TestFactory.storage_service, status);
-
-      return this.exposeUserActors();
-    })
-    .then(() => {
-      this.logger.info('✓ exposedUserActors');
 
       TestFactory.backup_repository = new z.backup.BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
+        TestFactory.connection_repository,
         TestFactory.conversation_repository,
         TestFactory.user_repository
       );
@@ -282,7 +278,6 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.user_repository = new z.user.UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
-        TestFactory.connection_service,
         TestFactory.self_service,
         TestFactory.client_repository,
         TestFactory.serverTimeRepository
@@ -290,6 +285,28 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
       return TestFactory.user_repository;
+    });
+};
+
+/**
+ *
+ * @returns {Promise<z.connection.ConnectionRepository>} The connection repository.
+ */
+window.TestFactory.prototype.exposeConnectionActors = function() {
+  this.logger.info('- exposeConnectionActors');
+  return Promise.resolve()
+    .then(() => this.exposeUserActors())
+    .then(() => {
+      this.logger.info('✓ exposedConnectionActors');
+
+      TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
+
+      TestFactory.connection_repository = new z.connection.ConnectionRepository(
+        TestFactory.connection_service,
+        TestFactory.user_repository
+      );
+
+      return TestFactory.connect_repository;
     });
 };
 
@@ -362,6 +379,7 @@ window.TestFactory.prototype.exposeTeamActors = function() {
 window.TestFactory.prototype.exposeConversationActors = function() {
   this.logger.info('- exposeConversationActors');
   return Promise.resolve()
+    .then(() => this.exposeConnectionActors())
     .then(() => this.exposeTeamActors())
     .then(() => this.exposeEventActors())
     .then(() => {
@@ -377,6 +395,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.conversation_service,
         TestFactory.asset_service,
         TestFactory.client_repository,
+        TestFactory.connection_repository,
         TestFactory.cryptography_repository,
         TestFactory.event_repository,
         undefined,

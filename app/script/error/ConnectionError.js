@@ -20,32 +20,18 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+window.z.error = z.error || {};
 
-z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
-  constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot, repositories}) {
-    this.onClose = onClose;
-    this.onGoBack = onGoBack;
-    this.onGoToRoot = onGoToRoot;
-    this.navigateTo = navigateTo;
-
-    this.isVisible = isVisible;
-
-    this.activeConversation = repositories.conversation.active_conversation;
+z.error.ConnectionError = class ConnectionError extends z.error.BaseError {
+  constructor(type, message) {
+    super('ConnectionError', type, message);
   }
 
-  initView() {}
-
-  getElementId() {
-    return 'conversation-details';
+  static get MESSAGE() {
+    return {};
   }
 
-  getEntityId() {
-    return this.activeConversation() ? this.activeConversation().id : false;
-  }
-
-  shouldSkipTransition() {
-    return false;
+  static get TYPE() {
+    return {};
   }
 };
