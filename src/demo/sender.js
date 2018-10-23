@@ -8,6 +8,7 @@ process.on('unhandledRejection', error =>
   console.error(`Uncaught rejection "${error.constructor.name}": ${error.message}`, error)
 );
 
+const crypto = require('crypto');
 const program = require('commander');
 const logdown = require('logdown');
 const fs = require('fs');
@@ -155,15 +156,42 @@ const {FileEngine} = require('@wireapp/store-engine');
     await account.service.conversation.send(CONVERSATION_ID, payload);
   }
 
+  async function sendQuote() {
+    const text = 'Hello';
+
+    const textPayload = account.service.conversation.createText(text).build();
+
+    const {id: messageId} = await account.service.conversation.send(CONVERSATION_ID, textPayload);
+
+    const sha256String = crypto
+      .createHash('sha256')
+      .update(text)
+      .digest('hex');
+    const quotedMessageSha256 = new Uint8Array(Buffer.from(sha256String));
+
+    const quoteText = 'Hello again';
+
+    const quotePayload = account.service.conversation
+      .createText(quoteText)
+      .withQuote({
+        quotedMessageId: messageId,
+        quotedMessageSha256,
+      })
+      .build();
+
+    await account.service.conversation.send(CONVERSATION_ID, quotePayload);
+  }
+
   const methods = [
     sendAndDeleteMessage,
     sendAndEdit,
     sendEphemeralText,
     sendFile,
     sendImage,
-    sendPing,
-    sendText,
     sendMentions,
+    sendPing,
+    sendQuote,
+    sendText,
   ];
 
   const timeoutInMillis = 2000;

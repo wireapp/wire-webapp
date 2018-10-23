@@ -58,6 +58,7 @@ const messageIdCache = {};
       content.mentions && content.mentions.length
         ? `mentioning "${content.mentions.map(mention => mention.userId).join(',')}"`
         : '',
+      content.quote ? `quoting "${content.quote.quotedMessageId}"` : '',
       messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : '',
       content
     );
@@ -126,7 +127,7 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {
-      content: {linkPreviews, mentions, text},
+      content: {linkPreviews, mentions, quote, text},
       id: messageId,
     } = data;
     let textPayload;
@@ -147,12 +148,14 @@ const messageIdCache = {};
         .createText(text, cachedMessageId)
         .withLinkPreviews(newLinkPreviews)
         .withMentions(mentions)
+        .withQuote(quote)
         .build();
     } else {
       await handleIncomingMessage(data);
       textPayload = account.service.conversation
         .createText(text)
         .withMentions(mentions)
+        .withQuote(quote)
         .build();
     }
 
@@ -315,7 +318,7 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.MESSAGE_EDIT, async data => {
     const {
-      content: {linkPreviews, mentions, originalMessageId, text},
+      content: {linkPreviews, mentions, originalMessageId, quote, text},
       id: messageId,
     } = data;
     let editedPayload;
@@ -342,12 +345,14 @@ const messageIdCache = {};
         .createEditedText(text, cachedOriginalMessageId, cachedMessageId)
         .withLinkPreviews(newLinkPreviews)
         .withMentions(mentions)
+        .withQuote(quote)
         .build();
     } else {
       await handleIncomingMessage(data);
       editedPayload = account.service.conversation
         .createEditedText(text, cachedOriginalMessageId)
-        .withMentions()
+        .withMentions(mentions)
+        .withQuote(quote)
         .build();
     }
 

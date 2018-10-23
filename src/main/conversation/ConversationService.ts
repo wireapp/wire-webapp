@@ -59,6 +59,7 @@ import {
   MessageDelete,
   MessageEdit,
   MessageHide,
+  Quote,
   Reaction,
   Text,
   Tweet,
@@ -219,7 +220,7 @@ class ConversationService {
     payloadBundle: PayloadBundleOutgoingUnsent,
     userIds?: string[]
   ): Promise<PayloadBundleOutgoing> {
-    const {originalMessageId, text, linkPreviews, mentions} = payloadBundle.content as EditedTextContent;
+    const {originalMessageId, text, linkPreviews, mentions, quote} = payloadBundle.content as EditedTextContent;
 
     const textMessage = Text.create({content: text});
 
@@ -229,6 +230,13 @@ class ConversationService {
 
     if (mentions && mentions.length) {
       textMessage.mentions = mentions.map(mention => Mention.create(mention));
+    }
+
+    if (quote) {
+      textMessage.quote = Quote.create({
+        quotedMessageId: quote.quotedMessageId,
+        quotedMessageSha256: quote.quotedMessageSha256,
+      });
     }
 
     const editedMessage = MessageEdit.create({
@@ -684,7 +692,7 @@ class ConversationService {
       state: PayloadBundleState.OUTGOING_SENT,
     };
 
-    const {text, linkPreviews, mentions} = payloadBundle.content as TextContent;
+    const {text, linkPreviews, mentions, quote} = payloadBundle.content as TextContent;
 
     const textMessage = Text.create({
       content: text,
@@ -696,6 +704,13 @@ class ConversationService {
 
     if (mentions && mentions.length) {
       textMessage.mentions = mentions.map(mention => Mention.create(mention));
+    }
+
+    if (quote) {
+      textMessage.quote = Quote.create({
+        quotedMessageId: quote.quotedMessageId,
+        quotedMessageSha256: quote.quotedMessageSha256,
+      });
     }
 
     let genericMessage = GenericMessage.create({

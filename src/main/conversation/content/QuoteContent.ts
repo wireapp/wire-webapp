@@ -17,13 +17,9 @@
  *
  */
 
-import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content/';
-
-interface TextContent {
-  linkPreviews?: LinkPreviewUploadedContent[];
-  mentions?: MentionContent[];
-  quote?: QuoteContent;
-  text: string;
+interface QuoteContent {
+  quotedMessageId: string;
+  quotedMessageSha256: Uint8Array;
 }
 
-export {TextContent};
+export {QuoteContent};
