@@ -884,9 +884,10 @@
   version "2.0.4"
   resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/70b22f3b85368762129639928075ea0c4865a199"
 
-"@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.21.6":
-  version "1.21.6"
-  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/78abfcec1f97b047ef4bc3f3138c21575e48b5c1"
+"@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.22.1":
+  version "1.22.1"
+  uid eaf8625985f235915ae4db7925576d8e2dd4bb08
+  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/eaf8625985f235915ae4db7925576d8e2dd4bb08"
   dependencies:
     protobufjs "6.8.8"
 
