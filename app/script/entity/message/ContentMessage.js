@@ -120,6 +120,10 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     return this.quote() && this.quote().isQuoteFromUser(userId);
   }
 
+  isResponseToUser(userId) {
+    return this.isUserMentioned(userId) || this.isReplyToUser(userId);
+  }
+
   /**
    * Check whether the message was edited.
    * @returns {boolean} True, if message has been edited.
