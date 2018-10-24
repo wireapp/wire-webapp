@@ -30,8 +30,8 @@ z.message.QuoteEntity = class QuoteEntity {
     this.userId = userId;
   }
 
-  targetsUser(selfId) {
-    return this.userId === selfId;
+  isQuoteFromUser(userId) {
+    return this.userId === userId;
   }
 
   toJSON() {
