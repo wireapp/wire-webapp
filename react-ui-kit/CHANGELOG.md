@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.10...@wireapp/react-ui-kit@4.3.11) (2018-10-24)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Add types for styled-components ([#1253](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1253)) ([a990fba](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/a990fba))
+
+
+
+
+
 ## [4.3.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.9...@wireapp/react-ui-kit@4.3.10) (2018-10-23)
 
 
