@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/color": "3.0.0",
+    "@types/styled-components": "4.0.2",
     "bazinga64": "5.3.18",
     "color": "3.1.0",
     "react": "16.6.0",
@@ -18,7 +19,6 @@
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
     "@types/recompose": "0.27.0",
-    "@types/styled-components": "4.0.2",
     "babel-loader": "8.0.4",
     "react-helmet": "5.2.0",
     "react-hot-loader": "4.3.11",
