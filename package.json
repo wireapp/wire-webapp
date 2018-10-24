@@ -81,7 +81,7 @@
     "@types/speakingurl": "13.0.2",
     "@types/uuid": "3.4.4",
     "@types/webpack-env": "1.13.6",
-    "autoprefixer": "9.2.1",
+    "autoprefixer": "9.3.0",
     "babel-eslint": "10.0.1",
     "babel-loader": "8.0.4",
     "concurrently": "4.0.1",
