@@ -558,8 +558,7 @@ z.string.guestOptionsTitle = 'Guests and services';
 
 // Panel: Notifications
 z.string.notificationSettingsTitle = 'Notifications';
-z.string.notificationSettingsDisclaimer =
-  'You can be notified about everything (including audio and video calls) or only when someone mentions you or replies to one of your messages.';
+z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when someone mentions you or replies to one of your messages.';
 z.string.notificationSettingsEverything = 'Everything';
 z.string.notificationSettingsMentionsAndReplies = 'Mentions and replies';
 z.string.notificationSettingsNothing = 'Nothing';
