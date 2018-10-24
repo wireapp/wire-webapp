@@ -35,4 +35,5 @@ export const WEBAPP_SUPPORTED_BROWSERS = {
   [BROWSER.OPERA]: {major: 43, minor: 0},
 };
 
-export const WEBSITE_SUPPORTED_LANGUAGES = ['de', 'en'];
+export const WEBSITE_DEFAULT_LANGUAGE = 'en';
+export const WEBSITE_SUPPORTED_LANGUAGES = [WEBSITE_DEFAULT_LANGUAGE, 'de'];
