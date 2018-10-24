@@ -513,16 +513,18 @@ z.entity.Conversation = class Conversation {
 
     const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
 
+    const {allEvents, allMessages, selfMentions, selfReplies} = this.unreadState();
     if (this.showNotificationsMentionsAndReplies()) {
-      return this.unreadState().selfMentions.some(isNewerMessage);
+      const mentionsAndReplies = selfMentions.concat(selfReplies);
+      return mentionsAndReplies.some(isNewerMessage);
     }
 
-    const hasNewMessage = this.unreadState().allMessages.some(isNewerMessage);
+    const hasNewMessage = allMessages.some(isNewerMessage);
     if (hasNewMessage) {
       return true;
     }
 
-    return this.unreadState().allEvents.some(messageEntity => {
+    return allEvents.some(messageEntity => {
       if (!isNewerMessage(messageEntity)) {
         return false;
       }
