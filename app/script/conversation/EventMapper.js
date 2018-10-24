@@ -387,6 +387,8 @@ z.conversation.EventMapper = class EventMapper {
       messageEntity.quote(new z.message.QuoteEntity(messageId, hash));
     }
 
+    messageEntity.hash = z.message.MessageHashing.getTextMessageHash(messageEntity);
+
     return messageEntity;
   }
 

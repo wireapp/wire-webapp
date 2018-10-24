@@ -45,6 +45,15 @@ z.util.StringUtil = {
     return window.getSlug(string, options);
   },
 
+  convertBufferToHex: buffer => {
+    const hexBase = 16;
+    const padIndex = 2;
+
+    return Array.from(new Uint8Array(buffer))
+      .map(byte => byte.toString(hexBase).padStart(padIndex, '0'))
+      .join('');
+  },
+
   cutLastChars: (string, length) => string.substring(0, string.length - length),
 
   format: (...args) => {
