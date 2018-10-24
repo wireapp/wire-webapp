@@ -375,15 +375,15 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {ContentMessage} Content message entity
    */
   _mapEventMessageAdd(event) {
-    const {data: eventData, edited_time: editedTime, quote: encodedQuote} = event;
+    const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new z.entity.ContentMessage();
 
     messageEntity.assets.push(this._mapAssetText(eventData));
     messageEntity.replacing_message_id = eventData.replacing_message_id;
     messageEntity.edited_timestamp = new Date(editedTime || eventData.edited_time).getTime();
 
-    if (encodedQuote) {
-      const {quoted_message_id: messageId, quoted_message_sha256: hash} = z.proto.Quote.decode64(encodedQuote);
+    if (eventData.quote) {
+      const {quoted_message_id: messageId, quoted_message_sha256: hash} = z.proto.Quote.decode64(eventData.quote);
       messageEntity.quote(new z.message.QuoteEntity(messageId, hash));
     }
 
