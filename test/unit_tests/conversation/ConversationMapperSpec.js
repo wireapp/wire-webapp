@@ -450,58 +450,52 @@ describe('Conversation Mapper', () => {
   });
 
   describe('getMutedState', () => {
+    let expectedState;
     const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
 
     it('returns states if only a muted state is given', () => {
-      const expectedTrueState = conversation_mapper.getMutedState(true);
+      expectedState = conversation_mapper.getMutedState(true);
 
-      expect(expectedTrueState).toBe(true);
+      expect(expectedState).toBe(true);
+      expectedState = conversation_mapper.getMutedState(false);
 
-      const expectedFalseState = conversation_mapper.getMutedState(false);
-
-      expect(expectedFalseState).toBe(false);
+      expect(expectedState).toBe(false);
     });
 
     it('returns states if congruent states are given', () => {
-      const expectNothingState = conversation_mapper.getMutedState(true, NOTIFICATION_STATE.NOTHING);
+      expectedState = conversation_mapper.getMutedState(true, NOTIFICATION_STATE.NOTHING);
 
-      expect(expectNothingState).toBe(NOTIFICATION_STATE.NOTHING);
+      expect(expectedState).toBe(NOTIFICATION_STATE.NOTHING);
+      expectedState = conversation_mapper.getMutedState(true, NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
-      const expectOnlyMentionsState = conversation_mapper.getMutedState(true, NOTIFICATION_STATE.ONLY_MENTIONS);
+      expect(expectedState).toBe(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
+      expectedState = conversation_mapper.getMutedState(false, NOTIFICATION_STATE.EVERYTHING);
 
-      expect(expectOnlyMentionsState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
-
-      const expectEverythingState = conversation_mapper.getMutedState(false, NOTIFICATION_STATE.EVERYTHING);
-
-      expect(expectEverythingState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expect(expectedState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
 
     it('returns states if conflicting states are given', () => {
-      const expectNothingState = conversation_mapper.getMutedState(false, NOTIFICATION_STATE.NOTHING);
+      expectedState = conversation_mapper.getMutedState(false, NOTIFICATION_STATE.NOTHING);
 
-      expect(expectNothingState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expect(expectedState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expectedState = conversation_mapper.getMutedState(false, NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
-      const expectOnlyMentionsState = conversation_mapper.getMutedState(false, NOTIFICATION_STATE.ONLY_MENTIONS);
+      expect(expectedState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expectedState = conversation_mapper.getMutedState(true, NOTIFICATION_STATE.EVERYTHING);
 
-      expect(expectOnlyMentionsState).toBe(NOTIFICATION_STATE.EVERYTHING);
-
-      const expectEverythingState = conversation_mapper.getMutedState(true, NOTIFICATION_STATE.EVERYTHING);
-
-      expect(expectEverythingState).toBe(NOTIFICATION_STATE.ONLY_MENTIONS);
+      expect(expectedState).toBe(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
     });
 
     it('returns states if invalid states are given', () => {
-      const expectUndefinedState = conversation_mapper.getMutedState();
+      expectedState = conversation_mapper.getMutedState();
 
-      expect(expectUndefinedState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expect(expectedState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expectedState = conversation_mapper.getMutedState('true');
 
-      const expectedUndefinedState = conversation_mapper.getMutedState('true');
+      expect(expectedState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expectedState = conversation_mapper.getMutedState(0b10);
 
-      expect(expectedUndefinedState).toBe(NOTIFICATION_STATE.EVERYTHING);
-
-      const expectInvalidState = conversation_mapper.getMutedState(0b10);
-
-      expect(expectInvalidState).toBe(NOTIFICATION_STATE.EVERYTHING);
+      expect(expectedState).toBe(NOTIFICATION_STATE.EVERYTHING);
     });
   });
 });

@@ -116,26 +116,27 @@ z.entity.Conversation = class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
+      const NOTIIFCATION_STATE = z.conversation.NotificationSetting.STATE;
       if (!this.selfUser()) {
-        return z.conversation.NotificationSetting.STATE.NOTHING;
+        return NOTIIFCATION_STATE.NOTHING;
       }
 
-      const knownNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
+      const knownNotificationStates = Object.values(NOTIIFCATION_STATE);
       if (knownNotificationStates.includes(this.mutedState())) {
-        const isStateOnlyMentions = this.mutedState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
-        const isInvalidState = isStateOnlyMentions && !this.selfUser().inTeam();
+        const isStateMentionsAndReplies = this.mutedState() === NOTIIFCATION_STATE.MENTIONS_AND_REPLIES;
+        const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
 
-        return isInvalidState ? z.conversation.NotificationSetting.STATE.NOTHING : this.mutedState();
+        return isInvalidState ? NOTIIFCATION_STATE.NOTHING : this.mutedState();
       }
 
       if (typeof this.mutedState() === 'boolean') {
         const migratedMutedState = this.selfUser().inTeam()
-          ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
-          : z.conversation.NotificationSetting.STATE.NOTHING;
-        return this.mutedState() ? migratedMutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
+          ? NOTIIFCATION_STATE.MENTIONS_AND_REPLIES
+          : NOTIIFCATION_STATE.NOTHING;
+        return this.mutedState() ? migratedMutedState : NOTIIFCATION_STATE.EVERYTHING;
       }
 
-      return z.conversation.NotificationSetting.STATE.EVERYTHING;
+      return NOTIIFCATION_STATE.EVERYTHING;
     });
 
     this.is_archived = this.archivedState;
@@ -157,8 +158,8 @@ z.entity.Conversation = class Conversation {
     this.showNotificationsNothing = ko.pureComputed(() => {
       return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
     });
-    this.showNotificationsOnlyMentions = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+    this.showNotificationsMentionsAndReplies = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -512,7 +513,7 @@ z.entity.Conversation = class Conversation {
 
     const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
 
-    if (this.showNotificationsOnlyMentions()) {
+    if (this.showNotificationsMentionsAndReplies()) {
       return this.unreadState().selfMentions.some(isNewerMessage);
     }
 

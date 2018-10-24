@@ -62,7 +62,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
               return false;
             }
 
-            return conversationEntity.showNotificationsOnlyMentions()
+            return conversationEntity.showNotificationsMentionsAndReplies()
               ? unreadSelfMentions.length
               : unreadMessages.length > 0 || conversationEntity.hasJoinableCall();
           }).length;

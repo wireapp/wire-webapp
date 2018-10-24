@@ -243,11 +243,11 @@ z.conversation.ConversationCellState = (() => {
 
   const _getStateMuted = {
     description: conversationEntity => {
-      return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsOnlyMentions());
+      return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsMentionsAndReplies());
     },
     icon: conversationEntity => {
       const hasSelfMentions = conversationEntity.unreadState().selfMentions.length;
-      const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsOnlyMentions();
+      const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsMentionsAndReplies();
 
       return showMentionsIcon
         ? z.conversation.ConversationStatusIcon.UNREAD_MENTION
