@@ -205,6 +205,7 @@ z.entity.Conversation = class Conversation {
         otherMessages: [],
         pings: [],
         selfMentions: [],
+        selfReplies: [],
       };
 
       for (let index = this.messages().length - 1; index >= 0; index--) {
@@ -219,6 +220,7 @@ z.entity.Conversation = class Conversation {
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
           const isSelfMention = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
+          const isSelfReply = isMessage && this.selfUser() && messageEntity.isReplyToUser(this.selfUser().id);
 
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity);
@@ -226,6 +228,8 @@ z.entity.Conversation = class Conversation {
 
           if (isSelfMention) {
             unreadState.selfMentions.push(messageEntity);
+          } else if (isSelfReply) {
+            unreadState.selfReplies.push(messageEntity);
           } else if (isMissedCall) {
             unreadState.calls.push(messageEntity);
           } else if (isPing) {
