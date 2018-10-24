@@ -654,7 +654,7 @@ describe('z.notification.NotificationRepository', () => {
 
     it('returns the correct value for self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset(true));
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -662,7 +662,7 @@ describe('z.notification.NotificationRepository', () => {
 
     it('returns the correct value for non-self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);

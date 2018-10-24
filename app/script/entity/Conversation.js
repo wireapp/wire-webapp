@@ -122,15 +122,15 @@ z.entity.Conversation = class Conversation {
 
       const knownNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
       if (knownNotificationStates.includes(this.mutedState())) {
-        const isStateOnlyMentions = this.mutedState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
-        const isInvalidState = isStateOnlyMentions && !this.selfUser().inTeam();
+        const isExpectedState = this.mutedState() === z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES;
+        const isInvalidState = isExpectedState && !this.selfUser().inTeam();
 
         return isInvalidState ? z.conversation.NotificationSetting.STATE.NOTHING : this.mutedState();
       }
 
       if (typeof this.mutedState() === 'boolean') {
         const migratedMutedState = this.selfUser().inTeam()
-          ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
+          ? z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES
           : z.conversation.NotificationSetting.STATE.NOTHING;
         return this.mutedState() ? migratedMutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
       }
@@ -157,8 +157,8 @@ z.entity.Conversation = class Conversation {
     this.showNotificationsNothing = ko.pureComputed(() => {
       return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
     });
-    this.showNotificationsOnlyMentions = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+    this.showNotificationsMentionsAndReplies = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -512,7 +512,7 @@ z.entity.Conversation = class Conversation {
 
     const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
 
-    if (this.showNotificationsOnlyMentions()) {
+    if (this.showNotificationsMentionsAndReplies()) {
       return this.unreadState().selfMentions.some(isNewerMessage);
     }
 

@@ -560,7 +560,7 @@ z.string.guestOptionsTitle = 'Guests and services';
 z.string.notificationSettingsTitle = 'Notifications';
 z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when you are mentioned.';
 z.string.notificationSettingsEverything = 'Everything';
-z.string.notificationSettingsOnlyMentions = 'Only mentions';
+z.string.notificationSettingsMentionsAndReplies = 'Mentions and replies';
 z.string.notificationSettingsNothing = 'Nothing';
 
 // Panel: Timed messages
