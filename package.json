@@ -18,7 +18,7 @@
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
     "@types/recompose": "0.27.0",
-    "@types/styled-components": "4.0.1",
+    "@types/styled-components": "4.0.2",
     "babel-loader": "8.0.4",
     "react-helmet": "5.2.0",
     "react-hot-loader": "4.3.11",
