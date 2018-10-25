@@ -26,11 +26,12 @@ window.z.message = z.message || {};
 
 z.message.MessageHashing = {
   /**
-   * @param {ArrayBuffer} buffer - The bytes to hash
-   * @returns {Promise<ArrayBuffer>} Promise with ArrayBuffer of hashed string bytes
+   * @param {number[]} array - The bytes to hash
+   * @returns {Promise<Uint8Array>} Promise with hashed string bytes
    */
-  _createSha256Hash: buffer => {
-    return window.crypto.subtle.digest('SHA-256', buffer);
+  _createSha256Hash: array => {
+    const buffer = new Uint8Array(array).buffer;
+    return window.crypto.subtle.digest('SHA-256', buffer).then(hash => new Uint8Array(hash));
   },
 
   /**
@@ -82,11 +83,9 @@ z.message.MessageHashing = {
 
     const locationArray = z.message.MessageHashing._getAssetIdArray(fileAsset);
     const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
-    const concatenatedArray = new Uint8Array(locationArray.concat(timestampArray));
+    const concatenatedArray = locationArray.concat(timestampArray);
 
-    return z.message.MessageHashing._createSha256Hash(concatenatedArray.buffer).then(buffer => {
-      return new Uint8Array(buffer);
-    });
+    return z.message.MessageHashing._createSha256Hash(concatenatedArray);
   },
 
   /**
@@ -98,11 +97,9 @@ z.message.MessageHashing = {
 
     const locationArray = z.message.MessageHashing._getLocationArray(locationAsset);
     const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
-    const concatenatedArray = new Uint8Array(locationArray.concat(timestampArray));
+    const concatenatedArray = locationArray.concat(timestampArray);
 
-    return z.message.MessageHashing._createSha256Hash(concatenatedArray.buffer).then(buffer => {
-      return new Uint8Array(buffer);
-    });
+    return z.message.MessageHashing._createSha256Hash(concatenatedArray);
   },
 
   /**
@@ -111,12 +108,11 @@ z.message.MessageHashing = {
    */
   getTextMessageHash: messageEntity => {
     const textAsset = messageEntity.get_first_asset();
+
     const textArray = z.message.MessageHashing._getTextArray(textAsset);
     const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
-    const concatenatedArray = new Uint8Array(textArray.concat(timestampArray));
+    const concatenatedArray = textArray.concat(timestampArray);
 
-    return z.message.MessageHashing._createSha256Hash(concatenatedArray.buffer).then(buffer => {
-      return new Uint8Array(buffer);
-    });
+    return z.message.MessageHashing._createSha256Hash(concatenatedArray);
   },
 };
