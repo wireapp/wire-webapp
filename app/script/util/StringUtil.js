@@ -97,8 +97,8 @@ z.util.StringUtil = {
     const bytes = [];
     const hexBase = 16;
 
-    for (let c = 0; c < hexString.length; c += 2) {
-      const parsedInt = parseInt(hexString.substr(c, 2), hexBase);
+    for (let charIndex = 0; charIndex < hexString.length; charIndex += 2) {
+      const parsedInt = parseInt(hexString.substr(charIndex, 2), hexBase);
       bytes.push(parsedInt);
     }
 
