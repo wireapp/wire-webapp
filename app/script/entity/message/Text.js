@@ -36,6 +36,9 @@ z.entity.Text = class Text extends z.entity.Asset {
     // Array of z.message.MentionEntity instances
     this.mentions = ko.observableArray();
 
+    // Quote object
+    this.quote = ko.observable();
+
     // Array of z.entity.LinkPreview instances
     this.previews = ko.observableArray();
 
