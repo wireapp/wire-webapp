@@ -91,7 +91,7 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} event - Event data
    * @param {Conversation} conversationEntity - Conversation entity the event belong to
    * @param {boolean} createDummyImage - Create a dummy image
-   * @returns {Promise<Message>} Mapped message entity
+   * @returns {Message} Mapped message entity
    */
   _mapJsonEvent(event, conversationEntity, createDummyImage) {
     let messageEntity;
@@ -314,8 +314,6 @@ z.conversation.EventMapper = class EventMapper {
 
     messageEntity.assets.push(assetEntity);
 
-    z.message.MessageHashing.getLocationMessageHash(messageEntity);
-
     return messageEntity;
   }
 
@@ -388,8 +386,6 @@ z.conversation.EventMapper = class EventMapper {
       const {quoted_message_id: messageId, quoted_message_sha256: hash} = z.proto.Quote.decode64(eventData.quote);
       messageEntity.quote(new z.message.QuoteEntity(messageId, hash));
     }
-
-    z.message.MessageHashing.getTextMessageHash(messageEntity);
 
     return messageEntity;
   }
