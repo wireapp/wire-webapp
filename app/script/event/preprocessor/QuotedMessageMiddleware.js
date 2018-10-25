@@ -29,14 +29,34 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
    * This class is reponsible for parsing incomming text messages that contains quoted messages.
    * It will handle validating the quote and adding metadatas to the event.
    *
-   * @param {z.event.EventRepository} eventRepository - Repository that handles events
+   * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {TODOMessageHasher} messageHasher - Handles hashing messages
    */
-  constructor(eventRepository) {
-    this.eventRepository = eventRepository;
+  constructor(eventService, messageHasher) {
+    this.eventService = eventService;
+    this.messageHasher = messageHasher;
     this.logger = new z.util.Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   processEvent(event) {
-    return Promise.resolve(event);
+    const rawQuote = event.data && event.data.quote;
+    if (!rawQuote) {
+      return Promise.resolve(event);
+    }
+    const quote = z.proto.Quote.decode64(rawQuote);
+    this.logger.info('Found quoted message', quote);
+
+    return this.eventService.loadEvent(event.conversation, quote.quoted_message_id).then(quotedMessage => {
+      if (!quotedMessage) {
+        return Promise.resolve(event);
+      }
+      const hash = this.messageHasher.hash(quotedMessage);
+      if (hash !== quote.quoted_message_sha256) {
+        return Promise.resolve(event);
+      }
+
+      // TODO parse quote and generate metadatas
+      return Promise.resolve({...event, quote: {userId: 'felix'}});
+    });
   }
 };
