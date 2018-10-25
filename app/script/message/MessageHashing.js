@@ -29,9 +29,10 @@ z.message.MessageHashing = {
    * @param {number[]} array - The bytes to hash
    * @returns {Promise<Uint8Array>} Promise with hashed string bytes
    */
-  _createSha256Hash: array => {
+  _createSha256Hash: async array => {
     const buffer = new Uint8Array(array).buffer;
-    return window.crypto.subtle.digest('SHA-256', buffer).then(hash => new Uint8Array(hash));
+    const hash = await window.crypto.subtle.digest('SHA-256', buffer);
+    return new Uint8Array(hash);
   },
 
   /**
