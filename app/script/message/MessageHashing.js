@@ -77,7 +77,7 @@ z.message.MessageHashing = {
 
   /**
    * @param {LocationMessage} messageEntity - The message to hash
-   * @returns {Promise<ArrayBuffer>} Promise with hashed location message as ArrayBuffer
+   * @returns {Promise<Uint8Array>} Promise with hashed location message
    */
   getAssetMessageHash: messageEntity => {
     const fileAsset = messageEntity.get_first_asset();
@@ -91,7 +91,7 @@ z.message.MessageHashing = {
 
   /**
    * @param {LocationMessage} messageEntity - The message to hash
-   * @returns {Promise<ArrayBuffer>} Promise with hashed location message as ArrayBuffer
+   * @returns {Promise<Uint8Array>} Promise with hashed location message
    */
   getLocationMessageHash: messageEntity => {
     const locationAsset = messageEntity.get_first_asset();
@@ -105,7 +105,7 @@ z.message.MessageHashing = {
 
   /**
    * @param {ContentMessage} messageEntity - The message to hash
-   * @returns {Promise<ArrayBuffer>} Promise with hashed text message as ArrayBuffer
+   * @returns {Promise<Uint8Array>} Promise with hashed text message
    */
   getTextMessageHash: messageEntity => {
     const textAsset = messageEntity.get_first_asset();
