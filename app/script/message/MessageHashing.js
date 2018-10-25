@@ -20,6 +20,7 @@
 'use strict';
 
 const Long = window.dcodeIO.Long;
+const crypto = window.crypto;
 
 window.z = window.z || {};
 window.z.message = z.message || {};
@@ -31,7 +32,7 @@ z.message.MessageHashing = {
    */
   _createSha256Hash: async array => {
     const buffer = new Uint8Array(array).buffer;
-    const hash = await window.crypto.subtle.digest('SHA-256', buffer);
+    const hash = await crypto.subtle.digest('SHA-256', buffer);
     return new Uint8Array(hash);
   },
 
@@ -63,17 +64,13 @@ z.message.MessageHashing = {
    * @param {textEntity} textEntity - The text entity to convert
    * @returns {number[]} Array of string bytes
    */
-  _getTextArray: textEntity => {
-    return z.util.StringUtil.utf8ToUtf16BE(textEntity.text);
-  },
+  _getTextArray: textEntity => z.util.StringUtil.utf8ToUtf16BE(textEntity.text),
 
   /**
    * @param {number} timestamp - The timestamp to convert
    * @returns {number[]} the timestamp as long endian bytes
    */
-  _getTimestampArray: timestamp => {
-    return Long.fromInt(timestamp).toBytesBE();
-  },
+  _getTimestampArray: timestamp => Long.fromInt(timestamp).toBytesBE(),
 
   /**
    * @param {LocationMessage} messageEntity - The message to hash
