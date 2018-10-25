@@ -23,6 +23,19 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.StringUtil = {
+  /**
+   * @param {ArrayLike} bytes - bytes to convert
+   * @returns {string} bytes as hex string
+   */
+  bytesToHex: bytes => {
+    bytes = Array.from(bytes);
+
+    const hexBase = 16;
+    const padIndex = 2;
+
+    return bytes.map(byte => byte.toString(hexBase).padStart(padIndex, '0')).join('');
+  },
+
   capitalizeFirstChar: (string = '') => `${string.charAt(0).toUpperCase()}${string.substring(1)}`,
 
   /**
@@ -43,15 +56,6 @@ z.util.StringUtil = {
   computeTransliteration: (string, excludedChars = {}) => {
     const options = {custom: excludedChars, uric: true};
     return window.getSlug(string, options);
-  },
-
-  convertBufferToHex: buffer => {
-    const hexBase = 16;
-    const padIndex = 2;
-
-    return Array.from(new Uint8Array(buffer))
-      .map(byte => byte.toString(hexBase).padStart(padIndex, '0'))
-      .join('');
   },
 
   cutLastChars: (string, length) => string.substring(0, string.length - length),
@@ -83,6 +87,22 @@ z.util.StringUtil = {
 
     // Returns random alphanumeric character [A-Z, a-z, 0-9]
     return charIndex <= 9 ? charIndex : String.fromCharCode(charIndex);
+  },
+
+  /**
+   * @param {string} hexString - string to convert
+   * @returns {number[]} bytes as array
+   */
+  hexToBytes: hexString => {
+    const bytes = [];
+    const hexBase = 16;
+
+    for (let c = 0; c < hexString.length; c += 2) {
+      const parsedInt = parseInt(hexString.substr(c, 2), hexBase);
+      bytes.push(parsedInt);
+    }
+
+    return bytes;
   },
 
   includes: (string = '', query = '') => string.toLowerCase().includes(query.toLowerCase()),
@@ -176,5 +196,25 @@ z.util.StringUtil = {
       string = `${string.substr(0, truncateIndex)}…`;
     }
     return string;
+  },
+
+  /**
+   * @param {string} str - The string to convert
+   * @returns {number[]} Converted string as byte array
+   */
+  utf8ToUtf16BE: str => {
+    const BOMChar = '\uFEFF';
+
+    str = `${BOMChar}${str}`;
+
+    const bytes = [];
+
+    for (let i = 0; i < str.length; ++i) {
+      const charCode = str.charCodeAt(i);
+      bytes.push((charCode & 0xff00) >> 8);
+      bytes.push(charCode & 0xff);
+    }
+
+    return bytes;
   },
 };

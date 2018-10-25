@@ -23,13 +23,13 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.Location = class Location extends z.entity.Asset {
-  constructor() {
-    super();
+  constructor(id, latitude = 0, longitude = 0) {
+    super(id);
 
-    this.latitude = '';
-    this.longitude = '';
+    this.latitude = latitude;
+    this.longitude = longitude;
     this.name = '';
     this.type = z.assets.AssetType.LOCATION;
-    this.zoom = '';
+    this.zoom = 0;
   }
 };

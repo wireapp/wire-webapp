@@ -249,4 +249,28 @@ describe('z.util.StringUtil', () => {
       expect(text.charAt(69)).toBe('…');
     });
   });
+
+  describe('bytesToHex', () => {
+    it('converts string values to hex', () => {
+      const stringValue = 'wire';
+      const expectedResult = '77697265';
+
+      const array = stringValue.split('').map(char => char.charCodeAt(0));
+      const resultValue = z.util.StringUtil.bytesToHex(array);
+
+      expect(resultValue).toBe(expectedResult);
+    });
+  });
+
+  describe('hexToBytes', () => {
+    it('converts string values to hex', () => {
+      const hexValue = '77697265';
+      const expectedResult = 'wire';
+
+      const resultArray = z.util.StringUtil.hexToBytes(hexValue);
+      const resultValue = resultArray.map(byte => String.fromCharCode(byte)).join('');
+
+      expect(resultValue).toBe(expectedResult);
+    });
+  });
 });

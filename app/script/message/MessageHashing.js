@@ -19,89 +19,104 @@
 
 'use strict';
 
+const Long = window.dcodeIO.Long;
+
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-z.message.MessageHashing = (() => {
-  const _createSha256Hash = buffer => {
-    return window.crypto.subtle.subtle.digest('SHA-256', buffer);
-  };
+z.message.MessageHashing = {
+  /**
+   * @param {ArrayBuffer} buffer - The bytes to hash
+   * @returns {Promise<ArrayBuffer>} Promise with ArrayBuffer of hashed string bytes
+   */
+  _createSha256Hash: buffer => {
+    return window.crypto.subtle.digest('SHA-256', buffer);
+  },
 
-  const _convertToUtf16BE = str => {
-    const BOMChar = '\uFEFF';
+  /**
+   * @param {Asset} asset - The file or image asset
+   * @returns {number[]} Array of assetId bytes
+   */
+  _getAssetIdArray: asset => {
+    const assetId = asset.original_resource().identifier;
+    const withoutDashes = assetId.replace(/-/g, '');
+    return z.util.StringUtil.hexToBytes(withoutDashes);
+  },
 
-    str = `${BOMChar}${str}`;
-
-    const arr = new TextEncoder().encode(str);
-
-    for (let index = 0; index < arr.length; index += 2) {
-      const tempValue = arr[index];
-      arr[index] = arr[index + 1];
-      arr[index + 1] = tempValue;
-    }
-
-    return arr;
-  };
-
-  const _getAssetBuffer = content => {
-    if (content.uploaded) {
-      const assetId = content.uploaded.assetId;
-      const withoutDashes = assetId.replace(/-/g, '');
-      return Buffer.from(withoutDashes, 'hex');
-    }
-    return Buffer.from([]);
-  };
-
-  const _getTimestampBuffer = timestamp => {
-    const timestampBytes = Long.fromInt(timestamp).toBytesBE();
-    return Buffer.from(timestampBytes);
-  };
-
-  const _getLocationBuffer = content => {
-    const latitudeApproximate = Math.round(content.latitude * 1000);
-    const longitudeApproximate = Math.round(content.longitude * 1000);
+  /**
+   * @param {Asset} asset - The location asset
+   * @returns {number[]} Array of longitude bytes
+   */
+  _getLocationArray: asset => {
+    const latitudeApproximate = Math.round(asset.latitude * 1000);
+    const longitudeApproximate = Math.round(asset.longitude * 1000);
 
     const latitudeLong = Long.fromInt(latitudeApproximate).toBytesBE();
     const longitudeLong = Long.fromInt(longitudeApproximate).toBytesBE();
 
-    const latitudeBuffer = Buffer.from(latitudeLong);
-    const longitudeBuffer = Buffer.from(longitudeLong);
+    return latitudeLong.concat(longitudeLong);
+  },
 
-    return Buffer.concat([latitudeBuffer, longitudeBuffer]);
-  };
+  /**
+   * @param {textEntity} textEntity - The text entity to convert
+   * @returns {number[]} Array of string bytes
+   */
+  _getTextArray: textEntity => {
+    return z.util.StringUtil.utf8ToUtf16BE(textEntity.text);
+  },
 
-  const _getTextBuffer = asset => {
-    return _convertToUtf16BE(asset.text);
-  };
+  /**
+   * @param {number} timestamp - The timestamp to convert
+   * @returns {number[]} the timestamp as long endian bytes
+   */
+  _getTimestampArray: timestamp => {
+    return Long.fromInt(timestamp).toBytesBE();
+  },
 
-  const _getBuffer = content => {
-    let buffer;
+  /**
+   * @param {LocationMessage} messageEntity - The message to hash
+   * @returns {Promise<ArrayBuffer>} Promise with hashed location message as ArrayBuffer
+   */
+  getAssetMessageHash: messageEntity => {
+    const fileAsset = messageEntity.get_first_asset();
 
-    if (ContentType.isLocationContent(content)) {
-      buffer = this.getLocationBuffer(content);
-    } else if (ContentType.isTextContent(content)) {
-      buffer = this.getTextBuffer(content);
-    } else if (ContentType.isAssetContent(content)) {
-      buffer = this.getAssetBuffer(content);
-    } else {
-      throw new Error(`Unknown message type (message id "${this.message.id}").`);
-    }
+    const locationArray = z.message.MessageHashing._getAssetIdArray(fileAsset);
+    const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
+    const concatenatedArray = new Uint8Array(locationArray.concat(timestampArray));
 
-    const timestampBuffer = this.getTimestampBuffer(this.message.timestamp);
-    return Buffer.concat([buffer, timestampBuffer]);
-  };
-  return {
-    getTextMessageHash: messageEntity => {
-      const textAsset = messageEntity.get_first_asset();
-      const buffer = _getTextBuffer(textAsset);
-      console.log(buffer);
-      return buffer;
-      /*    if (messageContent) {
-      const buffer = this.getBuffer(messageContent);
-      return this.createSha256Hash(buffer);
-    } else {
-      throw new Error(`Message with ID "${this.message.id}" has no content.`);
-    }*/
-    },
-  };
-})();
+    return z.message.MessageHashing._createSha256Hash(concatenatedArray.buffer).then(buffer => {
+      return new Uint8Array(buffer);
+    });
+  },
+
+  /**
+   * @param {LocationMessage} messageEntity - The message to hash
+   * @returns {Promise<ArrayBuffer>} Promise with hashed location message as ArrayBuffer
+   */
+  getLocationMessageHash: messageEntity => {
+    const locationAsset = messageEntity.get_first_asset();
+
+    const locationArray = z.message.MessageHashing._getLocationArray(locationAsset);
+    const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
+    const concatenatedArray = new Uint8Array(locationArray.concat(timestampArray));
+
+    return z.message.MessageHashing._createSha256Hash(concatenatedArray.buffer).then(buffer => {
+      return new Uint8Array(buffer);
+    });
+  },
+
+  /**
+   * @param {ContentMessage} messageEntity - The message to hash
+   * @returns {Promise<ArrayBuffer>} Promise with hashed text message as ArrayBuffer
+   */
+  getTextMessageHash: messageEntity => {
+    const textAsset = messageEntity.get_first_asset();
+    const textArray = z.message.MessageHashing._getTextArray(textAsset);
+    const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
+    const concatenatedArray = new Uint8Array(textArray.concat(timestampArray));
+
+    return z.message.MessageHashing._createSha256Hash(concatenatedArray.buffer).then(buffer => {
+      return new Uint8Array(buffer);
+    });
+  },
+};
