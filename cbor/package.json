@@ -5,7 +5,7 @@
     "coveralls": "3.0.2",
     "cross-env": "5.2.0",
     "istanbul": "1.1.0-alpha.1",
-    "jasmine": "3.2.0",
+    "jasmine": "3.3.0",
     "rimraf": "2.6.2",
     "webpack": "4.23.1",
     "webpack-cli": "3.1.2"
