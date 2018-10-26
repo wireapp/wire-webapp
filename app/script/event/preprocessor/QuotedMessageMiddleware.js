@@ -48,10 +48,12 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
 
     return this.eventService.loadEvent(event.conversation, quote.quoted_message_id).then(quotedMessage => {
       if (!quotedMessage) {
+        this.logger.warn('Quoted message not found');
         return Promise.resolve(event);
       }
       const hash = this.messageHasher.hash(quotedMessage);
       if (hash !== quote.quoted_message_sha256) {
+        this.logger.warn('Quoted message hash does not match');
         return Promise.resolve(event);
       }
 
