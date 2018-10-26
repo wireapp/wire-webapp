@@ -26,11 +26,11 @@ window.z.event.preprocessor = z.event.preprocessor || {};
 z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   /**
    * Construct a new QuotedMessageMiddleware.
-   * This class is reponsible for parsing incomming text messages that contains quoted messages.
-   * It will handle validating the quote and adding metadatas to the event.
+   * This class is reponsible for parsing incoming text messages that contains quoted messages.
+   * It will handle validating the quote and adding metadata to the event.
    *
    * @param {z.event.EventService} eventService - Repository that handles events
-   * @param {TODOMessageHasher} messageHasher - Handles hashing messages
+   * @param {z.message.MessageHasher} messageHasher - Handles hashing messages
    */
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
@@ -38,6 +38,13 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
     this.logger = new z.util.Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
   }
 
+  /**
+   * Handles validation of the event if it contains a quote.
+   * If the event does contain a quote, will also decorate the event with some metadata regarding the quoted message
+   *
+   * @param {Object} event - event in the DB format
+   * @returns {Object} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
+   */
   processEvent(event) {
     const rawQuote = event.data && event.data.quote;
     if (!rawQuote) {
@@ -58,7 +65,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         return Promise.resolve(event);
       }
 
-      // TODO parse quote and generate metadatas
+      // TODO parse quote and generate metadata
       const decoratedData = Object.assign({}, event.data, {
         message_id: quote.quoted_message_id,
         user_id: quotedMessage.from,
