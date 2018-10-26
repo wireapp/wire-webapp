@@ -221,7 +221,7 @@ z.entity.Conversation = class Conversation {
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
           const isSelfMention = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
-          const isReplyToSelf = isMessage && this.selfUser() && messageEntity.isReplyToUser(this.selfUser().id);
+          const isReplyToSelf = isMessage && this.selfUser() && messageEntity.isUserQuoted(this.selfUser().id);
 
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity);

@@ -217,7 +217,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
           if (assetEntity.isUserMentioned(this.selfUser().id)) {
             notificationText = z.l10n.text(z.string.notificationMention, assetEntity.text);
-          } else if (messageEntity.isReplyToUser(this.selfUser().id)) {
+          } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
             notificationText = z.l10n.text(z.string.notificationReply, assetEntity.text);
           } else {
             notificationText = assetEntity.text;
@@ -349,7 +349,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         return z.l10n.text(z.string.notificationObfuscatedMention);
       }
 
-      const isReplyToSelf = messageEntity.isReplyToUser(this.selfUser().id);
+      const isReplyToSelf = messageEntity.isUserQuoted(this.selfUser().id);
 
       if (isReplyToSelf) {
         return z.l10n.text(z.string.notificationObfuscatedReply);
@@ -851,7 +851,8 @@ z.notification.NotificationRepository = class NotificationRepository {
       return isEventToNotify;
     }
 
-    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isResponseToUser(userId);
+    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(userId);
+
     return isEventToNotify && isSelfMentionOrReply;
   }
 };
