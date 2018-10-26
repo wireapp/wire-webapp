@@ -613,6 +613,8 @@ z.event.EventRepository = class EventRepository {
     return mapEvent
       .then(mappedEvent => {
         return this.eventProcessMiddlewares.reduce((eventPromise, middleware) => {
+          // use reduce to resolve promises sequentially
+          // see https://hackernoon.com/functional-javascript-resolving-promises-sequentially-7aac18c4431e
           return eventPromise.then(middleware);
         }, Promise.resolve(mappedEvent));
       })
