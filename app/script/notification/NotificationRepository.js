@@ -349,9 +349,9 @@ z.notification.NotificationRepository = class NotificationRepository {
         return z.l10n.text(z.string.notificationObfuscatedMention);
       }
 
-      const isReplyToSelf = messageEntity.isUserQuoted(this.selfUser().id);
+      const isSelfQuoted = messageEntity.isUserQuoted(this.selfUser().id);
 
-      if (isReplyToSelf) {
+      if (isSelfQuoted) {
         return z.l10n.text(z.string.notificationObfuscatedReply);
       }
     }

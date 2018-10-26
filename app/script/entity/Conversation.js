@@ -220,16 +220,16 @@ z.entity.Conversation = class Conversation {
           const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
-          const isSelfMention = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
-          const isReplyToSelf = isMessage && this.selfUser() && messageEntity.isUserQuoted(this.selfUser().id);
+          const isSelfMentioned = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
+          const isSelfQuoted = isMessage && this.selfUser() && messageEntity.isUserQuoted(this.selfUser().id);
 
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity);
           }
 
-          if (isSelfMention) {
+          if (isSelfMentioned) {
             unreadState.selfMentions.push(messageEntity);
-          } else if (isReplyToSelf) {
+          } else if (isSelfQuoted) {
             unreadState.selfReplies.push(messageEntity);
           } else if (isMissedCall) {
             unreadState.calls.push(messageEntity);
