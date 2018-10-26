@@ -613,7 +613,6 @@ describe('z.notification.NotificationRepository', () => {
     let messageEntity;
 
     const userId = z.util.createRandomUuid();
-    const quoteHash = z.util.createRandomUuid();
     const shouldNotifyInConversation = z.notification.NotificationRepository.shouldNotifyInConversation;
 
     function generateTextAsset(selfMentioned = false) {
@@ -673,7 +672,7 @@ describe('z.notification.NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity(z.util.createRandomUuid(), quoteHash, userId);
+      const quoteEntity = new z.message.QuoteEntity(z.util.createRandomUuid(), userId);
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
@@ -685,7 +684,7 @@ describe('z.notification.NotificationRepository', () => {
     it('returns the correct value for non-self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity(z.util.createRandomUuid(), quoteHash, z.util.createRandomUuid());
+      const quoteEntity = new z.message.QuoteEntity(z.util.createRandomUuid(), z.util.createRandomUuid());
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
