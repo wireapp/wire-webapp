@@ -23,14 +23,6 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.QuoteEntity = class QuoteEntity {
-  static get ERROR() {
-    return {
-      INVALID_HASH: 'Invalid quote: Invalid SHA256 hash',
-      INVALID_HASH_LENGTH: 'Invalid quote: Invalid SHA256 hash length',
-      NO_HASH: 'Invalid quote: No SHA256 hash',
-    };
-  }
-
   constructor(messageId, hash, userId) {
     this.messageId = messageId;
     this.hash = hash;
@@ -52,23 +44,5 @@ z.message.QuoteEntity = class QuoteEntity {
   toProto(messageEntity) {
     const messageHash = ''; //create hash from message entity
     return new z.proto.Quote(this.messageId, messageHash);
-  }
-
-  validate(textEntity, assetType) {
-    if (!this.hash) {
-      throw new Error(QuoteEntity.ERROR.NO_HASH);
-    }
-
-    switch (assetType) {
-      case z.assets.AssetType.TEXT: {
-        const messageHash = z.message.MessageHashing.getTextMessageHash(textEntity);
-        if (messageHash.length !== this.hash.length) {
-          throw new Error(QuoteEntity.ERROR.INVALID_HASH_LENGTH);
-        }
-        if (messageHash !== this.hash) {
-          throw new Error(QuoteEntity.ERROR.INVALID_HASH);
-        }
-      }
-    }
   }
 };

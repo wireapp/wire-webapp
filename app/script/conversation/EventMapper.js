@@ -681,28 +681,6 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Map quote from proto messages.
-   *
-   * @private
-   * @param {Object} quote - Quote as base64 encoded proto message
-   * @param {z.assets.AssetType} assetType - Type of message
-   * @returns {z.message.QuoteEntity|undefined} Mapped quote
-   */
-  _mapAssetQuote(quote, assetType) {
-    const protoQuote = z.proto.Quote.decode64(quote);
-    const quoteEntity = new z.message.QuoteEntity(protoQuote);
-
-    if (quoteEntity) {
-      try {
-        quoteEntity.validate(assetType);
-        return quoteEntity;
-      } catch (error) {
-        this.logger.warn(`Removed invalid quote when mapping message: ${error.message}`, quoteEntity);
-      }
-    }
-  }
-
-  /**
    * Maps JSON data of text asset into asset entity.
    *
    * @private
@@ -710,7 +688,7 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {Text} Text asset entity
    */
   _mapAssetText(eventData) {
-    const {id, content, mentions, message, quote, previews} = eventData;
+    const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
     const assetEntity = new z.entity.Text(id, messageText);
 
@@ -719,9 +697,6 @@ z.conversation.EventMapper = class EventMapper {
     }
     if (previews && previews.length) {
       assetEntity.previews(this._mapAssetLinkPreviews(previews));
-    }
-    if (quote) {
-      assetEntity.quote(this._mapAssetQuote(quote, assetEntity));
     }
 
     return assetEntity;

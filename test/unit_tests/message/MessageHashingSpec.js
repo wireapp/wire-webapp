@@ -156,7 +156,9 @@ describe('z.message.MessageHashing', () => {
       const longitude = 13.4;
       const timestamp = 1540213769;
 
-      const locationEntity = new z.entity.Location(z.util.createRandomUuid(), latitude, longitude);
+      const locationEntity = new z.entity.Location();
+      locationEntity.latitude = latitude;
+      locationEntity.longitude = longitude;
 
       const locationArray = z.message.MessageHashing._getLocationArray(locationEntity);
       const timestampArray = z.message.MessageHashing._getTimestampArray(timestamp);
@@ -183,7 +185,9 @@ describe('z.message.MessageHashing', () => {
       const longitude = -0.117277;
       const timestamp = 1540213769;
 
-      const locationEntity = new z.entity.Location(z.util.createRandomUuid(), latitude, longitude);
+      const locationEntity = new z.entity.Location();
+      locationEntity.latitude = latitude;
+      locationEntity.longitude = longitude;
 
       const locationArray = z.message.MessageHashing._getLocationArray(locationEntity);
       const timestampArray = z.message.MessageHashing._getTimestampArray(timestamp);
