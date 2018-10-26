@@ -37,12 +37,23 @@ z.message.MessageHasher = (() => {
   };
 
   /**
-   * @param {z.entity.File} asset - The file or image asset
+   * @param {z.entity.File} asset - The file asset
    * @returns {number[]} Array of assetId bytes
    * @private
    */
-  const getAssetIdBytes = asset => {
+  const getFileAssetBytes = asset => {
     const assetId = asset.original_resource().identifier;
+    const withoutDashes = assetId.replace(/-/g, '');
+    return z.util.StringUtil.hexToBytes(withoutDashes);
+  };
+
+  /**
+   * @param {z.entity.MediumImage} asset - The image asset
+   * @returns {number[]} Array of assetId bytes
+   * @private
+   */
+  const getImageAssetBytes = asset => {
+    const assetId = asset.resource().identifier;
     const withoutDashes = assetId.replace(/-/g, '');
     return z.util.StringUtil.hexToBytes(withoutDashes);
   };
@@ -71,13 +82,26 @@ z.message.MessageHasher = (() => {
 
   return {
     /**
-     * @param {LocationMessage} messageEntity - The message to hash
+     * @param {ContentMessage} messageEntity - The message to hash
      * @returns {Promise<Uint8Array>} Promise with hashed location message
      */
-    getAssetMessageHash: messageEntity => {
+    getFileMessageHash: messageEntity => {
       const fileAsset = messageEntity.get_first_asset();
 
-      const locationBytes = getAssetIdBytes(fileAsset);
+      const locationBytes = getFileAssetBytes(fileAsset);
+      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
+      const concatenatedBytes = locationBytes.concat(timestampBytes);
+
+      return createSha256Hash(concatenatedBytes);
+    },
+    /**
+     * @param {ContentMessage} messageEntity - The message to hash
+     * @returns {Promise<Uint8Array>} Promise with hashed location message
+     */
+    getImageMessageHash: messageEntity => {
+      const fileAsset = messageEntity.get_first_asset();
+
+      const locationBytes = getImageAssetBytes(fileAsset);
       const timestampBytes = getTimestampBytes(messageEntity.timestamp());
       const concatenatedBytes = locationBytes.concat(timestampBytes);
 
@@ -85,7 +109,7 @@ z.message.MessageHasher = (() => {
     },
 
     /**
-     * @param {LocationMessage} messageEntity - The message to hash
+     * @param {ContentMessage} messageEntity - The message to hash
      * @returns {Promise<Uint8Array>} Promise with hashed location message
      */
     getLocationMessageHash: messageEntity => {
