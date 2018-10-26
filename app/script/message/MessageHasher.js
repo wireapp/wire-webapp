@@ -25,31 +25,31 @@ const crypto = window.crypto;
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-z.message.MessageHashing = {
+z.message.MessageHasher = (() => {
   /**
    * @param {number[]} array - The bytes to hash
    * @returns {Promise<Uint8Array>} Promise with hashed string bytes
    */
-  _createSha256Hash: array => {
+  const _createSha256Hash = array => {
     const buffer = new Uint8Array(array).buffer;
     return crypto.subtle.digest('SHA-256', buffer).then(hash => new Uint8Array(hash));
-  },
+  };
 
   /**
    * @param {Asset} asset - The file or image asset
    * @returns {number[]} Array of assetId bytes
    */
-  _getAssetIdArray: asset => {
+  const _getAssetIdArray = asset => {
     const assetId = asset.original_resource().identifier;
     const withoutDashes = assetId.replace(/-/g, '');
     return z.util.StringUtil.hexToBytes(withoutDashes);
-  },
+  };
 
   /**
    * @param {Asset} asset - The location asset
    * @returns {number[]} Array of longitude bytes
    */
-  _getLocationArray: asset => {
+  const _getLocationArray = asset => {
     const latitudeApproximate = Math.round(asset.latitude * 1000);
     const longitudeApproximate = Math.round(asset.longitude * 1000);
 
@@ -57,59 +57,61 @@ z.message.MessageHashing = {
     const longitudeLong = Long.fromInt(longitudeApproximate).toBytesBE();
 
     return latitudeLong.concat(longitudeLong);
-  },
+  };
 
   /**
    * @param {textEntity} textEntity - The text entity to convert
    * @returns {number[]} Array of string bytes
    */
-  _getTextArray: textEntity => z.util.StringUtil.utf8ToUtf16BE(textEntity.text),
+  const _getTextArray = textEntity => z.util.StringUtil.utf8ToUtf16BE(textEntity.text);
 
   /**
    * @param {number} timestamp - The timestamp to convert
    * @returns {number[]} the timestamp as long endian bytes
    */
-  _getTimestampArray: timestamp => Long.fromInt(timestamp).toBytesBE(),
+  const _getTimestampArray = timestamp => Long.fromInt(timestamp).toBytesBE();
 
-  /**
-   * @param {LocationMessage} messageEntity - The message to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed location message
-   */
-  getAssetMessageHash: messageEntity => {
-    const fileAsset = messageEntity.get_first_asset();
+  return {
+    /**
+     * @param {LocationMessage} messageEntity - The message to hash
+     * @returns {Promise<Uint8Array>} Promise with hashed location message
+     */
+    getAssetMessageHash: messageEntity => {
+      const fileAsset = messageEntity.get_first_asset();
 
-    const locationArray = z.message.MessageHashing._getAssetIdArray(fileAsset);
-    const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
-    const concatenatedArray = locationArray.concat(timestampArray);
+      const locationArray = _getAssetIdArray(fileAsset);
+      const timestampArray = _getTimestampArray(messageEntity.timestamp());
+      const concatenatedArray = locationArray.concat(timestampArray);
 
-    return z.message.MessageHashing._createSha256Hash(concatenatedArray);
-  },
+      return _createSha256Hash(concatenatedArray);
+    },
 
-  /**
-   * @param {LocationMessage} messageEntity - The message to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed location message
-   */
-  getLocationMessageHash: messageEntity => {
-    const locationAsset = messageEntity.get_first_asset();
+    /**
+     * @param {LocationMessage} messageEntity - The message to hash
+     * @returns {Promise<Uint8Array>} Promise with hashed location message
+     */
+    getLocationMessageHash: messageEntity => {
+      const locationAsset = messageEntity.get_first_asset();
 
-    const locationArray = z.message.MessageHashing._getLocationArray(locationAsset);
-    const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
-    const concatenatedArray = locationArray.concat(timestampArray);
+      const locationArray = _getLocationArray(locationAsset);
+      const timestampArray = _getTimestampArray(messageEntity.timestamp());
+      const concatenatedArray = locationArray.concat(timestampArray);
 
-    return z.message.MessageHashing._createSha256Hash(concatenatedArray);
-  },
+      return _createSha256Hash(concatenatedArray);
+    },
 
-  /**
-   * @param {ContentMessage} messageEntity - The message to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed text message
-   */
-  getTextMessageHash: messageEntity => {
-    const textAsset = messageEntity.get_first_asset();
+    /**
+     * @param {ContentMessage} messageEntity - The message to hash
+     * @returns {Promise<Uint8Array>} Promise with hashed text message
+     */
+    getTextMessageHash: messageEntity => {
+      const textAsset = messageEntity.get_first_asset();
 
-    const textArray = z.message.MessageHashing._getTextArray(textAsset);
-    const timestampArray = z.message.MessageHashing._getTimestampArray(messageEntity.timestamp());
-    const concatenatedArray = textArray.concat(timestampArray);
+      const textArray = _getTextArray(textAsset);
+      const timestampArray = _getTimestampArray(messageEntity.timestamp());
+      const concatenatedArray = textArray.concat(timestampArray);
 
-    return z.message.MessageHashing._createSha256Hash(concatenatedArray);
-  },
-};
+      return _createSha256Hash(concatenatedArray);
+    },
+  };
+})();
