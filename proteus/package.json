@@ -3,7 +3,7 @@
     "@types/chai": "4.1.6",
     "@types/ed2curve": "0.2.2",
     "@types/node": "10.12.0",
-    "@wireapp/cbor": "3.0.95",
+    "@wireapp/cbor": "3.0.96",
     "ed2curve": "0.2.1",
     "libsodium-wrappers-sumo": "0.7.3"
   },
@@ -36,5 +36,5 @@
     "test:node": "jasmine"
   },
   "types": "dist/index.d.ts",
-  "version": "8.0.5"
+  "version": "8.0.6"
 }
