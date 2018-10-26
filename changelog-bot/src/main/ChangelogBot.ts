@@ -35,6 +35,10 @@ const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
 logger.state.isEnabled = true;
 
 class ChangelogBot {
+  public static SETUP = {
+    EXCLUDED_COMMIT_TYPES: ['build', 'chore', 'docs', 'refactor', 'test'],
+  };
+
   constructor(private readonly loginData: LoginDataBackend, private readonly messageData: ChangelogData) {}
 
   get message(): string {
@@ -81,10 +85,16 @@ class ChangelogBot {
     const omittedMessage = '... (content omitted)';
 
     const changelog = await Changelog.generate({
-      exclude: ['build', 'chore', 'docs', 'refactor', 'test'],
+      exclude: ChangelogBot.SETUP.EXCLUDED_COMMIT_TYPES,
       repoUrl: `https://github.com/${repoSlug}`,
       tag: previousGitTag,
     });
+
+    if (!changelog.match(listItems)) {
+      const excludedTypes = ChangelogBot.SETUP.EXCLUDED_COMMIT_TYPES.join(', ');
+      const errorMessage = `Could not generate a meaningful changelog from the commit types given (excluded ${excludedTypes}).`;
+      throw new Error(errorMessage);
+    }
 
     let styledChangelog = changelog
       .replace(headlines, '**$1**')
