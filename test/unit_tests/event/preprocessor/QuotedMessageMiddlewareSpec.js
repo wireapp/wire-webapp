@@ -82,5 +82,9 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => expect(parsedEvent).toEqual(event));
     });
+
+    it('decorates event with the quote metadata if validation is successful', () => {
+      // FIXME add this scenario when proper hashing function is used for validation
+    });
   });
 });
