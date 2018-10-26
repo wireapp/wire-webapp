@@ -23,10 +23,8 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.QuoteEntity = class QuoteEntity {
-  constructor(messageId, hash, userId) {
+  constructor(messageId, userId) {
     this.messageId = messageId;
-    this.hash = hash;
-
     this.userId = userId;
   }
 

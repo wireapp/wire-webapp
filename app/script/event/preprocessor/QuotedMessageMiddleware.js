@@ -52,13 +52,21 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         return Promise.resolve(event);
       }
       const hash = this.messageHasher.hash(quotedMessage);
-      if (hash !== quote.quoted_message_sha256) {
+      // FIXME actually check the hash
+      if (false && hash !== quote.quoted_message_sha256) {
         this.logger.warn('Quoted message hash does not match');
         return Promise.resolve(event);
       }
 
       // TODO parse quote and generate metadatas
-      return Promise.resolve({...event, quote: {userId: 'felix'}});
+      const decoratedQuote = {
+        message_id: quote.quoted_message_id,
+        user_id: quotedMessage.from,
+      };
+      return Promise.resolve({
+        ...event,
+        data: {...event.data, quote: decoratedQuote},
+      });
     });
   }
 };
