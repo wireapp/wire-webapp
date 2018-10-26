@@ -214,6 +214,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       for (const assetEntity of messageEntity.assets()) {
         if (assetEntity.is_text()) {
           let notificationText;
+
           if (assetEntity.isUserMentioned(this.selfUser().id)) {
             notificationText = z.l10n.text(z.string.notificationMention, assetEntity.text);
           } else if (messageEntity.isReplyToUser(this.selfUser().id)) {
