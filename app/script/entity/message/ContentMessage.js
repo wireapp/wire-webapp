@@ -110,14 +110,30 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     }
   }
 
+  /**
+   * @param {string} userId - The user id to check
+   * @returns {boolean} True if the message mentions the user.
+   */
   isUserMentioned(userId) {
     return this.has_asset_text()
       ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isUserMentioned(userId))
       : false;
   }
 
-  isReplyToUser(userId) {
-    return this.quote() && this.quote().isQuoteFromUser(userId);
+  /**
+   * @param {string} userId - The user id to check
+   * @returns {boolean} True if the message quotes the user.
+   */
+  isUserQuoted(userId) {
+    return this.quote() ? this.quote().isQuoteFromUser(userId) : false;
+  }
+
+  /**
+   * @param {string} userId - The user id to check
+   * @returns {boolean} True if the user was mentioned or quoted.
+   */
+  isUserTargeted(userId) {
+    return this.isUserMentioned(userId) || this.isUserQuoted(userId);
   }
 
   /**
