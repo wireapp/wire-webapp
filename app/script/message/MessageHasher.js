@@ -83,7 +83,7 @@ z.message.MessageHasher = (() => {
   return {
     /**
      * @param {ContentMessage} messageEntity - The message to hash
-     * @returns {Promise<Uint8Array>} Promise with hashed location message
+     * @returns {Promise<Uint8Array>} Promise with hashed file message
      */
     getFileMessageHash: messageEntity => {
       const fileAsset = messageEntity.get_first_asset();
@@ -94,9 +94,10 @@ z.message.MessageHasher = (() => {
 
       return createSha256Hash(concatenatedBytes);
     },
+
     /**
      * @param {ContentMessage} messageEntity - The message to hash
-     * @returns {Promise<Uint8Array>} Promise with hashed location message
+     * @returns {Promise<Uint8Array>} Promise with hashed image message
      */
     getImageMessageHash: messageEntity => {
       const fileAsset = messageEntity.get_first_asset();

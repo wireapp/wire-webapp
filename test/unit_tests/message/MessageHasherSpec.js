@@ -35,8 +35,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(textEntity);
 
-      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -54,8 +54,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(textEntity);
 
-      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -73,8 +73,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(textEntity);
 
-      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -92,8 +92,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(textEntity);
 
-      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getTextMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -116,8 +116,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(locationEntity);
 
-      return z.message.MessageHasher.getLocationMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getLocationMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -138,8 +138,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(locationEntity);
 
-      return z.message.MessageHasher.getLocationMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getLocationMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -160,8 +160,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(fileAsset);
 
-      return z.message.MessageHasher.getFileMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getFileMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -180,8 +180,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(fileAsset);
 
-      return z.message.MessageHasher.getFileMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getFileMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -202,8 +202,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(imageAsset);
 
-      return z.message.MessageHasher.getImageMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getImageMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
@@ -222,8 +222,8 @@ describe('z.message.MessageHasher', () => {
       messageEntity.timestamp(timestamp);
       messageEntity.add_asset(imageAsset);
 
-      return z.message.MessageHasher.getImageMessageHash(messageEntity).then(hashArray => {
-        const hashValue = z.util.StringUtil.bytesToHex(hashArray);
+      return z.message.MessageHasher.getImageMessageHash(messageEntity).then(hashBytes => {
+        const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
 
         expect(hashValue).toBe(expectedHashValue);
       });
