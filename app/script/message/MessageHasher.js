@@ -27,19 +27,21 @@ window.z.message = z.message || {};
 
 z.message.MessageHasher = (() => {
   /**
-   * @param {number[]} array - The bytes to hash
+   * @param {number[]} bytes - The array of bytes to hash
    * @returns {Promise<Uint8Array>} Promise with hashed string bytes
+   * @private
    */
-  const _createSha256Hash = array => {
-    const buffer = new Uint8Array(array).buffer;
+  const createSha256Hash = bytes => {
+    const buffer = new Uint8Array(bytes).buffer;
     return crypto.subtle.digest('SHA-256', buffer).then(hash => new Uint8Array(hash));
   };
 
   /**
-   * @param {Asset} asset - The file or image asset
+   * @param {z.entity.File} asset - The file or image asset
    * @returns {number[]} Array of assetId bytes
+   * @private
    */
-  const _getAssetIdArray = asset => {
+  const getAssetIdBytes = asset => {
     const assetId = asset.original_resource().identifier;
     const withoutDashes = assetId.replace(/-/g, '');
     return z.util.StringUtil.hexToBytes(withoutDashes);
@@ -48,8 +50,9 @@ z.message.MessageHasher = (() => {
   /**
    * @param {Asset} asset - The location asset
    * @returns {number[]} Array of longitude bytes
+   * @private
    */
-  const _getLocationArray = asset => {
+  const getLocationBytes = asset => {
     const latitudeApproximate = Math.round(asset.latitude * 1000);
     const longitudeApproximate = Math.round(asset.longitude * 1000);
 
@@ -60,16 +63,11 @@ z.message.MessageHasher = (() => {
   };
 
   /**
-   * @param {textEntity} textEntity - The text entity to convert
-   * @returns {number[]} Array of string bytes
-   */
-  const _getTextArray = textEntity => z.util.StringUtil.utf8ToUtf16BE(textEntity.text);
-
-  /**
    * @param {number} timestamp - The timestamp to convert
    * @returns {number[]} the timestamp as long endian bytes
+   * @private
    */
-  const _getTimestampArray = timestamp => Long.fromInt(timestamp).toBytesBE();
+  const getTimestampBytes = timestamp => Long.fromInt(timestamp).toBytesBE();
 
   return {
     /**
@@ -79,11 +77,11 @@ z.message.MessageHasher = (() => {
     getAssetMessageHash: messageEntity => {
       const fileAsset = messageEntity.get_first_asset();
 
-      const locationArray = _getAssetIdArray(fileAsset);
-      const timestampArray = _getTimestampArray(messageEntity.timestamp());
-      const concatenatedArray = locationArray.concat(timestampArray);
+      const locationBytes = getAssetIdBytes(fileAsset);
+      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
+      const concatenatedBytes = locationBytes.concat(timestampBytes);
 
-      return _createSha256Hash(concatenatedArray);
+      return createSha256Hash(concatenatedBytes);
     },
 
     /**
@@ -93,11 +91,11 @@ z.message.MessageHasher = (() => {
     getLocationMessageHash: messageEntity => {
       const locationAsset = messageEntity.get_first_asset();
 
-      const locationArray = _getLocationArray(locationAsset);
-      const timestampArray = _getTimestampArray(messageEntity.timestamp());
-      const concatenatedArray = locationArray.concat(timestampArray);
+      const locationBytes = getLocationBytes(locationAsset);
+      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
+      const concatenatedBytes = locationBytes.concat(timestampBytes);
 
-      return _createSha256Hash(concatenatedArray);
+      return createSha256Hash(concatenatedBytes);
     },
 
     /**
@@ -107,11 +105,11 @@ z.message.MessageHasher = (() => {
     getTextMessageHash: messageEntity => {
       const textAsset = messageEntity.get_first_asset();
 
-      const textArray = _getTextArray(textAsset);
-      const timestampArray = _getTimestampArray(messageEntity.timestamp());
-      const concatenatedArray = textArray.concat(timestampArray);
+      const textBytes = z.util.StringUtil.utf8ToUtf16BE(textAsset.text);
+      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
+      const concatenatedBytes = textBytes.concat(timestampBytes);
 
-      return _createSha256Hash(concatenatedArray);
+      return createSha256Hash(concatenatedBytes);
     },
   };
 })();
