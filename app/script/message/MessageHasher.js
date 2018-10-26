@@ -88,9 +88,9 @@ z.message.MessageHasher = (() => {
     getFileMessageHash: messageEntity => {
       const fileAsset = messageEntity.get_first_asset();
 
-      const locationBytes = getFileAssetBytes(fileAsset);
+      const fileAssetBytes = getFileAssetBytes(fileAsset);
       const timestampBytes = getTimestampBytes(messageEntity.timestamp());
-      const concatenatedBytes = locationBytes.concat(timestampBytes);
+      const concatenatedBytes = fileAssetBytes.concat(timestampBytes);
 
       return createSha256Hash(concatenatedBytes);
     },
@@ -102,9 +102,9 @@ z.message.MessageHasher = (() => {
     getImageMessageHash: messageEntity => {
       const fileAsset = messageEntity.get_first_asset();
 
-      const locationBytes = getImageAssetBytes(fileAsset);
+      const imageAssetBytes = getImageAssetBytes(fileAsset);
       const timestampBytes = getTimestampBytes(messageEntity.timestamp());
-      const concatenatedBytes = locationBytes.concat(timestampBytes);
+      const concatenatedBytes = imageAssetBytes.concat(timestampBytes);
 
       return createSha256Hash(concatenatedBytes);
     },
