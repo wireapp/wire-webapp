@@ -27,6 +27,7 @@
     "libsodium": true,
     "linkify": true,
     "linkifyHtml": true,
+    "Long": true,
     "lorem_ipsum": true,
     "LRUCache": true,
     "marked": true,
