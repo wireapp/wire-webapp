@@ -613,7 +613,7 @@ z.event.EventRepository = class EventRepository {
     return mapEvent
       .then(mappedEvent => {
         return this.eventProcessMiddlewares.reduce((eventPromise, middleware) => {
-          return eventPromise.then(processedEvent => middleware(processedEvent));
+          return eventPromise.then(middleware);
         }, Promise.resolve(mappedEvent));
       })
       .then(mappedEvent => {
