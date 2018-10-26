@@ -33,7 +33,12 @@ z.util.StringUtil = {
     const hexBase = 16;
     const padIndex = 2;
 
-    return bytes.map(byte => byte.toString(hexBase).padStart(padIndex, '0')).join('');
+    return bytes
+      .map(byte => {
+        const stringByte = byte.toString(hexBase);
+        return z.util.StringUtil.padStart(stringByte, padIndex, '0');
+      })
+      .join('');
   },
 
   capitalizeFirstChar: (string = '') => `${string.charAt(0).toUpperCase()}${string.substring(1)}`,
@@ -120,6 +125,19 @@ z.util.StringUtil = {
     }
 
     return obfuscated;
+  },
+
+  /**
+   * @param {string} str - string to pad
+   * @param {number} length - maximum length to pad
+   * @param {string} [padCharacter] - character to pad with (default is space)
+   * @returns {string} The padded string
+   */
+  padStart(str, length, padCharacter = ' ') {
+    if (str.length >= length) {
+      return str;
+    }
+    return padCharacter.repeat(length - str.length) + str;
   },
 
   removeLineBreaks: (string = '') => string.replace(/(\r\n|\n|\r)/gm, ''),
