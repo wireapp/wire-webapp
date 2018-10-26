@@ -117,7 +117,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
   }
 
   isReplyToUser(userId) {
-    return this.quote() && this.quote().isQuoteFromUser(userId);
+    return this.quote() ? this.quote().isQuoteFromUser(userId) : false;
   }
 
   isResponseToUser(userId) {

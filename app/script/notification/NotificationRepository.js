@@ -237,6 +237,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     if (messageEntity.has_asset()) {
       const assetEntity = messageEntity.get_first_asset();
+
       if (assetEntity.is_audio()) {
         return z.l10n.text(z.string.notificationSharedAudio);
       }
@@ -342,11 +343,13 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createBodyObfuscated(messageEntity) {
     if (messageEntity.is_content()) {
       const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().id);
+
       if (isSelfMentioned) {
         return z.l10n.text(z.string.notificationObfuscatedMention);
       }
 
       const isReplyToSelf = messageEntity.isReplyToUser(this.selfUser().id);
+
       if (isReplyToSelf) {
         return z.l10n.text(z.string.notificationObfuscatedReply);
       }
