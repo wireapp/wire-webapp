@@ -148,9 +148,9 @@ describe('z.message.MessageHasher', () => {
 
   describe('getFileMessageHash', () => {
     it('correctly creates an asset hash.', () => {
-      const expectedHashValue = '585764d2b2741454628e908c57bad9d482a1ea048dc3f11ba82a5e613653e65b';
+      const expectedHashValue = 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de';
 
-      const assetId = '38d4f5b9-61a3-4228-8706-37e75043dbaa';
+      const assetId = '3-2-1-38d4f5b9';
       const timestamp = 1540213769;
 
       const fileAsset = new z.entity.File(assetId);
@@ -168,9 +168,9 @@ describe('z.message.MessageHasher', () => {
     });
 
     it('correctly creates another file asset hash.', () => {
-      const expectedHashValue = '46f392cb88a8e4f69d1c755f2c6c4e8b8ca0cf2db11b3de6499404548ef29905';
+      const expectedHashValue = '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6';
 
-      const assetId = '82a62735-35f2-4d4a-8190-284327979ca7';
+      const assetId = '3-3-3-82a62735';
       const timestamp = 1540213965;
 
       const fileAsset = new z.entity.File(assetId);
@@ -190,9 +190,9 @@ describe('z.message.MessageHasher', () => {
 
   describe('getImageMessageHash', () => {
     it('correctly creates an image asset hash', () => {
-      const expectedHashValue = '585764d2b2741454628e908c57bad9d482a1ea048dc3f11ba82a5e613653e65b';
+      const expectedHashValue = 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de';
 
-      const assetId = '38d4f5b9-61a3-4228-8706-37e75043dbaa';
+      const assetId = '3-2-1-38d4f5b9';
       const timestamp = 1540213769;
 
       const imageAsset = new z.entity.MediumImage(assetId);
@@ -210,9 +210,9 @@ describe('z.message.MessageHasher', () => {
     });
 
     it('correctly creates another image asset hash', () => {
-      const expectedHashValue = '46f392cb88a8e4f69d1c755f2c6c4e8b8ca0cf2db11b3de6499404548ef29905';
+      const expectedHashValue = '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6';
 
-      const assetId = '82a62735-35f2-4d4a-8190-284327979ca7';
+      const assetId = '3-3-3-82a62735';
       const timestamp = 1540213965;
 
       const imageAsset = new z.entity.MediumImage(assetId);

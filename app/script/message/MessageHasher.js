@@ -43,8 +43,7 @@ z.message.MessageHasher = (() => {
    */
   const getFileAssetBytes = asset => {
     const assetId = asset.original_resource().identifier;
-    const withoutDashes = assetId.replace(/-/g, '');
-    return z.util.StringUtil.hexToBytes(withoutDashes);
+    return z.util.StringUtil.utf8ToUtf16BE(assetId);
   };
 
   /**
@@ -54,8 +53,7 @@ z.message.MessageHasher = (() => {
    */
   const getImageAssetBytes = asset => {
     const assetId = asset.resource().identifier;
-    const withoutDashes = assetId.replace(/-/g, '');
-    return z.util.StringUtil.hexToBytes(withoutDashes);
+    return z.util.StringUtil.utf8ToUtf16BE(assetId);
   };
 
   /**
