@@ -40,7 +40,7 @@ z.conversation.ConversationCellState = (() => {
       selfReplies: unreadSelfReplies,
     } = conversationEntity.unreadState();
 
-    // sorted in order of priority
+    // Sorted in order of alert type priority
     const activities = {
       [ACTIVITY_TYPE.MENTION]: unreadSelfMentions.length,
       [ACTIVITY_TYPE.REPLY]: unreadSelfReplies.length,
@@ -49,24 +49,34 @@ z.conversation.ConversationCellState = (() => {
       [ACTIVITY_TYPE.MESSAGE]: unreadOtherMessages.length,
     };
 
-    if (prioritizeMentionAndReply) {
-      if (activities[ACTIVITY_TYPE.MENTION].length === 1 || activities[ACTIVITY_TYPE.REPLY].length === 1) {
-        const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+    const hasSingleAlert = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0) === 1;
+    if (prioritizeMentionAndReply && hasSingleAlert) {
+      const hasSingleMention = activities[ACTIVITY_TYPE.MENTION].length === 1;
+      const hasSingleReply = activities[ACTIVITY_TYPE.REPLY].length === 1;
 
-        if (numberOfAlerts === 1) {
-          const [messageEntity] = unreadSelfMentions;
+      if (hasSingleMention || hasSingleReply) {
+        const [mentionMessageEntity] = unreadSelfMentions;
+        const [replyMessageEntity] = unreadSelfReplies;
+        const messageEntity = mentionMessageEntity || replyMessageEntity;
 
-          if (messageEntity.is_ephemeral()) {
-            const stringId = conversationEntity.isGroup()
+        if (messageEntity.is_ephemeral()) {
+          let stringId;
+          if (hasSingleMention) {
+            stringId = conversationEntity.isGroup()
               ? z.string.conversationsSecondaryLineEphemeralMentionGroup
               : z.string.conversationsSecondaryLineEphemeralMention;
-            return z.l10n.text(stringId);
+          } else {
+            stringId = conversationEntity.isGroup()
+              ? z.string.conversationsSecondaryLineEphemeralReplyGroup
+              : z.string.conversationsSecondaryLineEphemeralReply;
           }
 
-          return conversationEntity.isGroup()
-            ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
-            : messageEntity.get_first_asset().text;
+          return z.l10n.text(stringId);
         }
+
+        return conversationEntity.isGroup()
+          ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
+          : messageEntity.get_first_asset().text;
       }
     }
 
