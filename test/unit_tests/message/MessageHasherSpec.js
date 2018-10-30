@@ -24,197 +24,130 @@
 describe('z.message.MessageHasher', () => {
   describe('hashEvent', () => {
     describe('text events', () => {
-      it('correctly creates a markdown text hash', () => {
-        const event = {
-          data: {
-            content: 'This has **markdown**',
+      it('correctly hashes text events', () => {
+        const tests = [
+          {
+            event: createTextEvent('This has **markdown**', 1540213965),
+            expectedHashValue: 'f25a925d55116800e66872d2a82d8292adf1d4177195703f976bc884d32b5c94',
           },
-          time: new Date(1540213965),
-          type: z.event.Client.CONVERSATION.MESSAGE_ADD,
-        };
-        const expectedHashValue = 'f25a925d55116800e66872d2a82d8292adf1d4177195703f976bc884d32b5c94';
-
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
-      });
-
-      it('correctly creates an arabic text hash', () => {
-        const event = {
-          data: {
-            content: 'بغداد',
+          {
+            event: createTextEvent('بغداد', 1540213965),
+            expectedHashValue: '5830012f6f14c031bf21aded5b07af6e2d02d01074f137d106d4645e4dc539ca',
           },
-          time: new Date(1540213965),
-          type: z.event.Client.CONVERSATION.MESSAGE_ADD,
-        };
-        const expectedHashValue = '5830012f6f14c031bf21aded5b07af6e2d02d01074f137d106d4645e4dc539ca';
-
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
-      });
-
-      it('correctly creates an emoji text hash', () => {
-        const event = {
-          data: {
-            content: 'Hello 👩‍💻👨‍👩‍👧!',
+          {
+            event: createTextEvent('Hello 👩‍💻👨‍👩‍👧!', 1540213769),
+            expectedHashValue: '4f8ee55a8b71a7eb7447301d1bd0c8429971583b15a91594b45dee16f208afd5',
           },
-          time: new Date(1540213769),
-          type: z.event.Client.CONVERSATION.MESSAGE_ADD,
-        };
-        const expectedHashValue = '4f8ee55a8b71a7eb7447301d1bd0c8429971583b15a91594b45dee16f208afd5';
-
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
-      });
-
-      it('correctly creates a link text hash', () => {
-        const event = {
-          data: {
-            content: 'https://www.youtube.com/watch?v=DLzxrzFCyOs',
+          {
+            event: createTextEvent('https://www.youtube.com/watch?v=DLzxrzFCyOs', 1540213769),
+            expectedHashValue: 'ef39934807203191c404ebb3acba0d33ec9dce669f9acec49710d520c365b657',
           },
-          time: new Date(1540213769),
-          type: z.event.Client.CONVERSATION.MESSAGE_ADD,
-        };
-        const expectedHashValue = 'ef39934807203191c404ebb3acba0d33ec9dce669f9acec49710d520c365b657';
+        ];
 
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+        const testPromises = tests.map(({event, expectedHashValue}) => {
+          return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
+            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
 
-          expect(hashValue).toBe(expectedHashValue);
+            expect(hashValue).toBe(expectedHashValue);
+          });
         });
+
+        return Promise.all(testPromises);
       });
     });
 
     describe('location events', () => {
-      it('correctly creates a location hash', () => {
-        const event = {
-          conversation: '614c75c7-359a-41aa-b60c-08c3762bd5d2',
-          data: {
-            location: {
-              latitude: 52.5166667,
-              longitude: 13.4,
-              name: 'Rosenthaler Str. 40-41, 10178 Berlin, Germany',
-            },
+      it('correctly hashes location events', () => {
+        const tests = [
+          {
+            event: createLocationEvent(52.5166667, 13.4, 1540213769),
+            expectedHashValue: '56a5fa30081bc16688574fdfbbe96c2eee004d1fb37dc714eec6efb340192816',
           },
-          time: new Date(1540213769),
-          type: 'conversation.location',
-        };
-        const expectedHashValue = '56a5fa30081bc16688574fdfbbe96c2eee004d1fb37dc714eec6efb340192816';
 
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
-      });
-
-      it('correctly creates another location hash with a negative value', () => {
-        const event = {
-          conversation: '614c75c7-359a-41aa-b60c-08c3762bd5d2',
-          data: {
-            location: {
-              latitude: 51.509143,
-              longitude: -0.117277,
-              name: 'Rosenthaler Str. 40-41, 10178 Berlin, Germany',
-            },
+          {
+            event: createLocationEvent(51.509143, -0.117277, 1540213769),
+            expectedHashValue: '803b2698104f58772dbd715ec6ee5853d835df98a4736742b2a676b2217c9499',
           },
-          time: new Date(1540213769),
-          type: 'conversation.location',
-        };
-        const expectedHashValue = '803b2698104f58772dbd715ec6ee5853d835df98a4736742b2a676b2217c9499';
+        ];
 
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+        const testPromises = tests.map(({event, expectedHashValue}) => {
+          return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
+            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
 
-          expect(hashValue).toBe(expectedHashValue);
+            expect(hashValue).toBe(expectedHashValue);
+          });
         });
+
+        return Promise.all(testPromises);
       });
     });
 
     describe('assets events', () => {
-      it('correctly creates an asset hash.', () => {
-        const event = {
-          conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
-          data: {
-            key: '3-2-1-38d4f5b9',
+      it('correctly hashes asset events', () => {
+        const tests = [
+          {
+            event: createAssetEvent('3-2-1-38d4f5b9', 1540213769),
+            expectedHashValue: 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de',
           },
-          time: new Date(1540213769),
-          type: 'conversation.asset-add',
-        };
-        const expectedHashValue = 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de';
 
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
-      });
-
-      it('correctly creates another file asset hash.', () => {
-        const event = {
-          conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
-          data: {
-            key: '3-3-3-82a62735',
+          {
+            event: createAssetEvent('3-3-3-82a62735', 1540213965),
+            expectedHashValue: '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6',
           },
-          time: new Date(1540213965),
-          type: 'conversation.asset-add',
-        };
-        const expectedHashValue = '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6';
 
-        return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+          {
+            event: createAssetEvent('3-2-1-38d4f5b9', 1540213769),
+            expectedHashValue: 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de',
+          },
 
-          expect(hashValue).toBe(expectedHashValue);
+          {
+            event: createAssetEvent('3-3-3-82a62735', 1540213965),
+            expectedHashValue: '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6',
+          },
+        ];
+
+        const testPromises = tests.map(({event, expectedHashValue}) => {
+          return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
+            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+
+            expect(hashValue).toBe(expectedHashValue);
+          });
         });
-      });
 
-      xit('correctly creates an image asset hash', () => {
-        const expectedHashValue = 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de';
-
-        const assetId = '3-2-1-38d4f5b9';
-        const timestamp = 1540213769;
-
-        const imageAsset = new z.entity.MediumImage(assetId);
-        imageAsset.resource({identifier: assetId});
-
-        const messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
-        messageEntity.timestamp(timestamp);
-        messageEntity.add_asset(imageAsset);
-
-        return z.message.MessageHasher.getImageMessageHash(messageEntity).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
-      });
-
-      xit('correctly creates another image asset hash', () => {
-        const expectedHashValue = '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6';
-
-        const assetId = '3-3-3-82a62735';
-        const timestamp = 1540213965;
-
-        const imageAsset = new z.entity.MediumImage(assetId);
-        imageAsset.resource({identifier: assetId});
-
-        const messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
-        messageEntity.timestamp(timestamp);
-        messageEntity.add_asset(imageAsset);
-
-        return z.message.MessageHasher.getImageMessageHash(messageEntity).then(hashBytes => {
-          const hashValue = z.util.StringUtil.bytesToHex(hashBytes);
-
-          expect(hashValue).toBe(expectedHashValue);
-        });
+        return Promise.all(testPromises);
       });
     });
   });
+
+  function createAssetEvent(key, timestamp) {
+    return {
+      data: {
+        key,
+      },
+      time: new Date(timestamp),
+      type: z.event.Client.CONVERSATION.ASSET_ADD,
+    };
+  }
+  function createTextEvent(text, timestamp) {
+    return {
+      data: {
+        content: text,
+      },
+      time: new Date(timestamp),
+      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+    };
+  }
+
+  function createLocationEvent(latitude, longitude, timestamp) {
+    return {
+      data: {
+        location: {
+          latitude,
+          longitude,
+        },
+      },
+      time: new Date(timestamp),
+      type: z.event.Client.CONVERSATION.LOCATION,
+    };
+  }
 });
