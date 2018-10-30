@@ -106,10 +106,10 @@ z.message.MessageHasher = (() => {
       if (hash.byteLength !== generatedHash.byteLength) {
         return false;
       }
-      const dv1 = new Uint8Array(generatedHash);
-      const dv2 = new Uint8Array(hash);
+      const generatedHashBytes = new Uint8Array(generatedHash);
+      const hashBytes = new Uint8Array(hash);
       for (let i = 0; i !== generatedHash.byteLength; i++) {
-        if (dv1[i] !== dv2[i]) {
+        if (generatedHashBytes[i] !== hashBytes[i]) {
           return false;
         }
       }
