@@ -41,10 +41,7 @@ z.message.MessageHasher = (() => {
    * @returns {number[]} Array of assetId bytes
    * @private
    */
-  const getAssetBytes = event => {
-    const assetId = event.data.key;
-    return z.util.StringUtil.utf8ToUtf16BE(assetId);
-  };
+  const getAssetBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.key);
 
   /**
    * @param {Event} event - The event
@@ -69,11 +66,15 @@ z.message.MessageHasher = (() => {
    */
   const getTimestampBytes = event => Long.fromInt(new Date(event.time).getTime()).toBytesBE();
 
-  const getTextBytes = event => {
-    return z.util.StringUtil.utf8ToUtf16BE(event.data.content);
-  };
+  const getTextBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.content);
 
-  function hashEvent(event) {
+  /**
+   * Creates a hash of the given event.
+   *
+   * @param {Event} event - the event to hash
+   * @returns {ArrayBuffer} hashBuffer - buffer containing the bytes of the hash
+   */
+  const hashEvent = event => {
     const EventTypes = z.event.Client.CONVERSATION;
     let specificBytes;
     switch (event.type) {
@@ -94,24 +95,33 @@ z.message.MessageHasher = (() => {
     const allBytes = specificBytes.concat(timeBytes);
 
     return createSha256Hash(allBytes);
-  }
+  };
+
+  /**
+   * Validates that the quoteHash correspond to the given event.
+   *
+   * @param {Event} event - The event to match against the hash
+   * @param {ArrayBuffer} hash - The hash
+   * @returns {boolean} isValid - true if the event hash is equal to the given hash
+   */
+  const validateHash = (event, hash) => {
+    return hashEvent(event).then(generatedHash => {
+      if (hash.byteLength !== generatedHash.byteLength) {
+        return false;
+      }
+      const dv1 = new Uint8Array(generatedHash);
+      const dv2 = new Uint8Array(hash);
+      for (let i = 0; i !== generatedHash.byteLength; i++) {
+        if (dv1[i] !== dv2[i]) {
+          return false;
+        }
+      }
+      return true;
+    });
+  };
 
   return {
     hashEvent,
-    validateHash(quotedEvent, quoteHash) {
-      return hashEvent(quotedEvent).then(eventHash => {
-        if (quoteHash.byteLength !== eventHash.byteLength) {
-          return false;
-        }
-        const dv1 = new Uint8Array(eventHash);
-        const dv2 = new Uint8Array(quoteHash);
-        for (let i = 0; i !== eventHash.byteLength; i++) {
-          if (dv1[i] !== dv2[i]) {
-            return false;
-          }
-        }
-        return true;
-      });
-    },
+    validateHash,
   };
 })();
