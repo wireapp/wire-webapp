@@ -60,6 +60,7 @@ describe('z.conversation.ConversationCellState', () => {
       otherMessages: [],
       pings: [],
       selfMentions: [],
+      selfReplies: [],
     };
 
     const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
