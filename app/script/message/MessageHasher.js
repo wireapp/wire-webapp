@@ -28,42 +28,30 @@ window.z.message = z.message || {};
 z.message.MessageHasher = (() => {
   /**
    * @param {number[]} bytes - The array of bytes to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed string bytes
+   * @returns {Promise<ArrayBuffer>} Promise with hashed string bytes
    * @private
    */
   const createSha256Hash = bytes => {
     const buffer = new Uint8Array(bytes).buffer;
-    return crypto.subtle.digest('SHA-256', buffer).then(hash => new Uint8Array(hash));
+    return crypto.subtle.digest('SHA-256', buffer);
   };
 
   /**
-   * @param {z.entity.File} asset - The file asset
+   * @param {Event} event - The event
    * @returns {number[]} Array of assetId bytes
    * @private
    */
-  const getFileAssetBytes = asset => {
-    const assetId = asset.original_resource().identifier;
-    return z.util.StringUtil.utf8ToUtf16BE(assetId);
-  };
+  const getAssetBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.key);
 
   /**
-   * @param {z.entity.MediumImage} asset - The image asset
-   * @returns {number[]} Array of assetId bytes
-   * @private
-   */
-  const getImageAssetBytes = asset => {
-    const assetId = asset.resource().identifier;
-    return z.util.StringUtil.utf8ToUtf16BE(assetId);
-  };
-
-  /**
-   * @param {Asset} asset - The location asset
+   * @param {Event} event - The event
    * @returns {number[]} Array of longitude bytes
    * @private
    */
-  const getLocationBytes = asset => {
-    const latitudeApproximate = Math.round(asset.latitude * 1000);
-    const longitudeApproximate = Math.round(asset.longitude * 1000);
+  const getLocationBytes = event => {
+    const {longitude, latitude} = event.data.location;
+    const latitudeApproximate = Math.round(latitude * 1000);
+    const longitudeApproximate = Math.round(longitude * 1000);
 
     const latitudeLong = Long.fromInt(latitudeApproximate).toBytesBE();
     const longitudeLong = Long.fromInt(longitudeApproximate).toBytesBE();
@@ -72,67 +60,65 @@ z.message.MessageHasher = (() => {
   };
 
   /**
-   * @param {number} timestamp - The timestamp to convert
+   * @param {Event} event - The event
    * @returns {number[]} the timestamp as long endian bytes
    * @private
    */
-  const getTimestampBytes = timestamp => Long.fromInt(timestamp).toBytesBE();
+  const getTimestampBytes = event => Long.fromInt(new Date(event.time).getTime()).toBytesBE();
+
+  const getTextBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.content);
+
+  /**
+   * Creates a hash of the given event.
+   *
+   * @param {Event} event - the event to hash
+   * @returns {ArrayBuffer} hashBuffer - buffer containing the bytes of the hash
+   */
+  const hashEvent = event => {
+    const EventTypes = z.event.Client.CONVERSATION;
+    const specificBytesGenerators = {
+      [EventTypes.MESSAGE_ADD]: getTextBytes,
+      [EventTypes.LOCATION]: getLocationBytes,
+      [EventTypes.ASSET_ADD]: getAssetBytes,
+    };
+
+    const generator = specificBytesGenerators[event.type];
+    if (!generator) {
+      throw new Error(`Cannot generate hash for event of type "${event.type}"`);
+    }
+
+    const specificBytes = generator(event);
+    const timeBytes = getTimestampBytes(event);
+    const allBytes = specificBytes.concat(timeBytes);
+
+    return createSha256Hash(allBytes);
+  };
+
+  /**
+   * Validates that the quoteHash correspond to the given event.
+   *
+   * @param {Event} event - The event to match against the hash
+   * @param {ArrayBuffer} hash - The hash
+   * @returns {boolean} isValid - true if the event hash is equal to the given hash
+   */
+  const validateHash = (event, hash) => {
+    return hashEvent(event).then(generatedHash => {
+      if (hash.byteLength !== generatedHash.byteLength) {
+        return false;
+      }
+      const generatedHashBytes = new Uint8Array(generatedHash);
+      const hashBytes = new Uint8Array(hash);
+      for (let i = 0; i !== generatedHash.byteLength; i++) {
+        if (generatedHashBytes[i] !== hashBytes[i]) {
+          return false;
+        }
+      }
+      return true;
+    });
+  };
 
   return {
-    /**
-     * @param {ContentMessage} messageEntity - The message to hash
-     * @returns {Promise<Uint8Array>} Promise with hashed file message
-     */
-    getFileMessageHash: messageEntity => {
-      const fileAsset = messageEntity.get_first_asset();
-
-      const fileAssetBytes = getFileAssetBytes(fileAsset);
-      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
-      const concatenatedBytes = fileAssetBytes.concat(timestampBytes);
-
-      return createSha256Hash(concatenatedBytes);
-    },
-
-    /**
-     * @param {ContentMessage} messageEntity - The message to hash
-     * @returns {Promise<Uint8Array>} Promise with hashed image message
-     */
-    getImageMessageHash: messageEntity => {
-      const fileAsset = messageEntity.get_first_asset();
-
-      const imageAssetBytes = getImageAssetBytes(fileAsset);
-      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
-      const concatenatedBytes = imageAssetBytes.concat(timestampBytes);
-
-      return createSha256Hash(concatenatedBytes);
-    },
-
-    /**
-     * @param {ContentMessage} messageEntity - The message to hash
-     * @returns {Promise<Uint8Array>} Promise with hashed location message
-     */
-    getLocationMessageHash: messageEntity => {
-      const locationAsset = messageEntity.get_first_asset();
-
-      const locationBytes = getLocationBytes(locationAsset);
-      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
-      const concatenatedBytes = locationBytes.concat(timestampBytes);
-
-      return createSha256Hash(concatenatedBytes);
-    },
-
-    /**
-     * @param {ContentMessage} messageEntity - The message to hash
-     * @returns {Promise<Uint8Array>} Promise with hashed text message
-     */
-    getTextMessageHash: messageEntity => {
-      const textAsset = messageEntity.get_first_asset();
-
-      const textBytes = z.util.StringUtil.utf8ToUtf16BE(textAsset.text);
-      const timestampBytes = getTimestampBytes(messageEntity.timestamp());
-      const concatenatedBytes = textBytes.concat(timestampBytes);
-
-      return createSha256Hash(concatenatedBytes);
-    },
+    hashEvent,
+    validateHash,
   };
 })();
