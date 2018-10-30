@@ -63,66 +63,34 @@ z.message.MessageHasher = (() => {
   };
 
   /**
-   * @param {number} timestamp - The timestamp to convert
+   * @param {Event} event - The event
    * @returns {number[]} the timestamp as long endian bytes
    * @private
    */
-  const getTimestampBytes = timestamp => Long.fromInt(timestamp).toBytesBE();
+  const getTimestampBytes = event => Long.fromInt(new Date(event.time).getTime()).toBytesBE();
 
-  /**
-   * @param {ContentMessage} event - The message to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed image message
-   */
-  function hashAssetEvent(event) {
-    const imageAssetBytes = getAssetBytes(event);
-    const timestampBytes = getTimestampBytes(new Date(event.time).getTime());
-    const concatenatedBytes = imageAssetBytes.concat(timestampBytes);
-
-    return createSha256Hash(concatenatedBytes);
-  }
-
-  /**
-   * @param {Event} event - The message to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed location message
-   */
-  function hashLocationEvent(event) {
-    const locationBytes = getLocationBytes(event);
-    const timestampBytes = getTimestampBytes(new Date(event.time).getTime());
-    const concatenatedBytes = locationBytes.concat(timestampBytes);
-
-    return createSha256Hash(concatenatedBytes);
-  }
-
-  /**
-   * @param {ContentMessage} event - The message to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed text message
-   */
-  function hashTextEvent(event) {
-    const textBytes = z.util.StringUtil.utf8ToUtf16BE(event.data.content);
-    const timestampBytes = getTimestampBytes(new Date(event.time).getTime());
-    const concatenatedBytes = textBytes.concat(timestampBytes);
-
-    return createSha256Hash(concatenatedBytes);
-  }
+  const getTextBytes = event => {
+    return z.util.StringUtil.utf8ToUtf16BE(event.data.content);
+  };
 
   function hashEvent(event) {
     const EventTypes = z.event.Client.CONVERSATION;
-    let hashFunction;
+    let specificBytes;
     switch (event.type) {
       case EventTypes.MESSAGE_ADD:
-        hashFunction = hashTextEvent;
+        specificBytes = getTextBytes(event);
         break;
       case EventTypes.LOCATION:
-        hashFunction = hashLocationEvent;
+        specificBytes = getLocationBytes(event);
         break;
       case EventTypes.ASSET_ADD:
-        hashFunction = hashAssetEvent;
+        specificBytes = getAssetBytes(event);
         break;
       default:
         throw new Error('TODO');
     }
 
-    return hashFunction(event);
+    return createSha256Hash(specificBytes.concat(getTimestampBytes(event)));
   }
 
   return {
