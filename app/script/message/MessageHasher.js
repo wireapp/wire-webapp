@@ -28,7 +28,7 @@ window.z.message = z.message || {};
 z.message.MessageHasher = (() => {
   /**
    * @param {number[]} bytes - The array of bytes to hash
-   * @returns {Promise<Uint8Array>} Promise with hashed string bytes
+   * @returns {Promise<ArrayBuffer>} Promise with hashed string bytes
    * @private
    */
   const createSha256Hash = bytes => {
