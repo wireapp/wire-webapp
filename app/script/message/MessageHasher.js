@@ -90,7 +90,10 @@ z.message.MessageHasher = (() => {
         throw new Error('TODO');
     }
 
-    return createSha256Hash(specificBytes.concat(getTimestampBytes(event)));
+    const timeBytes = getTimestampBytes(event);
+    const allBytes = specificBytes.concat(timeBytes);
+
+    return createSha256Hash(allBytes);
   }
 
   return {
