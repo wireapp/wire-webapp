@@ -426,11 +426,6 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves with the remaining user devices
    */
   deleteClient(clientId, password) {
-    if (!password) {
-      this.logger.error(`Could not delete client '${clientId}' because password is missing`);
-      return Promise.reject(new z.error.ClientError(z.error.ClientError.TYPE.REQUEST_FORBIDDEN));
-    }
-
     return this.clientService
       .deleteClient(clientId, password)
       .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
