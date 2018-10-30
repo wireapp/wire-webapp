@@ -456,10 +456,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
-    } else if (this.replyMessageEntity()) {
-      this.sendMessageReply(messageText, this.replyMessageEntity());
     } else {
-      this.sendMessage(messageText);
+      this.sendMessage(messageText, this.replyMessageEntity());
     }
 
     this._resetDraftState();
@@ -644,10 +642,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this._resetDraftState();
   }
 
-  sendMessage(messageText) {
+  sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
+      this.cancelMessageReply();
       const mentionEntities = this.currentMentions.slice();
-      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
+      const quoteEntity = replyMessageEntity && new z.message.QuoteEntity(replyMessageEntity.id, '');
+
+      this.conversationRepository.sendTextWithLinkPreview(
+        this.conversationEntity(),
+        messageText,
+        mentionEntities,
+        quoteEntity
+      );
     }
   }
 
@@ -666,10 +672,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           throw error;
         }
       });
-  }
-
-  sendMessageReply(messageText, messageEntity) {
-    //TODO: send message reply
   }
 
   sendPastedFile() {
