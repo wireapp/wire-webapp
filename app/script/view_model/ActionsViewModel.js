@@ -97,6 +97,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       // SSO users can remove their clients without the need of entering a password
       return this.clientRepository.deleteClient(clientEntity.id);
     }
+
     return new Promise((resolve, reject) => {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
         action: password => {
