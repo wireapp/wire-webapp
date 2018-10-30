@@ -28,9 +28,10 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
       .then(() => testFactory.exposeEventActors())
       .then(() => {
-        quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(TestFactory.event_service, {
-          hash: message => '',
-        });
+        quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
+          TestFactory.event_service,
+          z.message.MessageHasher
+        );
       });
   });
 
@@ -41,7 +42,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'salut',
           quote: undefined,
         },
-        type: z.event.Client.MESSAGE_ADD,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(decoratedEvent => {
@@ -58,14 +59,20 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'salut',
           quote: new z.proto.Quote({quoted_message_id: '', quoted_message_sha256: ''}).encode64(),
         },
-        type: z.event.Client.MESSAGE_ADD,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => expect(parsedEvent).toEqual(event));
     });
 
     it('does not decorate event is hashes do not match', () => {
-      const quotedMessage = new z.entity.Text();
+      const quotedMessage = {
+        data: {
+          content: 'pas salut',
+        },
+        time: 100,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      };
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
 
       const event = {
@@ -77,14 +84,42 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
             quoted_message_sha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
           }).encode64(),
         },
-        type: z.event.Client.MESSAGE_ADD,
+        time: 100,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => expect(parsedEvent).toEqual(event));
     });
 
     it('decorates event with the quote metadata if validation is successful', () => {
-      // FIXME add this scenario when proper hashing function is used for validation
+      const quotedMessage = {
+        data: {
+          content: 'salut',
+        },
+        from: 'user-id',
+        time: 100,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      };
+      spyOn(z.message.MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
+      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
+
+      const event = {
+        conversation: 'conversation-uuid',
+        data: {
+          content: 'salut',
+          quote: new z.proto.Quote({
+            quoted_message_id: 'message-uuid',
+            quoted_message_sha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
+          }).encode64(),
+        },
+        time: 100,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      };
+
+      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+        expect(parsedEvent.data.message_id).toEqual('message-uuid');
+        expect(parsedEvent.data.user_id).toEqual('user-id');
+      });
     });
   });
 });
