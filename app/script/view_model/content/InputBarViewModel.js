@@ -68,7 +68,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 
     this.editMessageEntity = ko.observable();
+    this.replyMessageEntity = ko.observable();
+
+    this.replyAsset = ko.pureComputed(() => {
+      return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
+    });
+
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
+    this.isReplying = ko.pureComputed(() => !!this.replyMessageEntity());
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -228,6 +235,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, this.replyMessage.bind(this));
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversationHasFocus(false));
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => {
@@ -245,6 +253,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus(true);
     this.pastedFile(null);
     this.cancelMessageEditing();
+    this.cancelMessageReply();
     if (conversationEntity) {
       const previousSessionData = this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
@@ -327,9 +336,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
     }
-
     this.editMessageEntity(undefined);
     this._resetDraftState();
+  }
+
+  cancelMessageReply(resetDraft = true) {
+    if (this.replyMessageEntity()) {
+      this.replyMessageEntity().isReplying(false);
+    }
+    this.replyMessageEntity(undefined);
+    if (resetDraft) {
+      this._resetDraftState();
+    }
   }
 
   clickToCancelPastedFile() {
@@ -351,6 +369,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   editMessage(messageEntity) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
+      this.cancelMessageReply();
       this.cancelMessageEditing();
       messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
@@ -362,6 +381,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .slice();
       this.currentMentions(newMentions);
       this._moveCursorToEnd();
+    }
+  }
+
+  replyMessage(messageEntity) {
+    if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
+      this.cancelMessageReply();
+      this.cancelMessageEditing();
+      messageEntity.isReplying(true);
+      this.replyMessageEntity(messageEntity);
     }
   }
 
@@ -392,6 +420,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   onWindowClick(event) {
     if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
       this.cancelMessageEditing();
+      this.cancelMessageReply();
     }
   }
 
@@ -428,7 +457,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
     } else {
-      this.sendMessage(messageText);
+      this.sendMessage(messageText, this.replyMessageEntity());
     }
 
     this._resetDraftState();
@@ -455,6 +484,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             this.pastedFile(null);
           } else if (this.isEditing()) {
             this.cancelMessageEditing();
+          } else if (this.isReplying()) {
+            this.cancelMessageReply(false);
           }
           break;
         }
@@ -611,10 +642,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this._resetDraftState();
   }
 
-  sendMessage(messageText) {
+  sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
+      this.cancelMessageReply();
       const mentionEntities = this.currentMentions.slice();
-      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
+      const quoteEntity = replyMessageEntity && new z.message.QuoteEntity(replyMessageEntity.id, '');
+
+      this.conversationRepository.sendTextWithLinkPreview(
+        this.conversationEntity(),
+        messageText,
+        mentionEntities,
+        quoteEntity
+      );
     }
   }
 

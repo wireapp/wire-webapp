@@ -237,3 +237,62 @@
     }
   }
 }
+
+.input-bar__reply {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  display: flex;
+  width: 100%;
+  padding: 12px 16px 0 28px;
+  background-color: #fff;
+
+  close-icon {
+    margin-top: 4px;
+  }
+
+  &__body {
+    display: flex;
+    overflow: hidden;
+    max-width: 640px;
+    margin-left: 28px;
+    font-weight: 400;
+  }
+
+  &__vert-bar {
+    width: 4px;
+    height: 100%;
+    margin-right: 12px;
+    background-color: #cfcfcf;
+    border-radius: 2px;
+  }
+
+  &__text {
+    overflow: hidden;
+  }
+
+  &__sender-name {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+
+    edit-icon {
+      margin-left: 8px;
+
+      svg {
+        width: 8px;
+        height: 8px;
+        fill: fade(@graphite-dark, 40%);
+      }
+    }
+  }
+
+  &__message-text {
+    max-width: @conversation-message-max-width;
+    margin-top: 4px;
+    font-size: 14px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

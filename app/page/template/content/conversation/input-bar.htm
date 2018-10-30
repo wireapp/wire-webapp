@@ -4,6 +4,26 @@
      data-bind="with: $root.inputBar,
                 css: {'conversation-input-bar-editing': $root.inputBar.isEditing()}">
 
+  <!-- ko if: isReplying() -->
+    <div class="input-bar__reply">
+      <close-icon data-bind="click: cancelMessageReply"></close-icon>
+      <div class="input-bar__reply__body">
+        <div class="input-bar__reply__vert-bar"></div>
+        <div class="input-bar__reply__text">
+          <div class="input-bar__reply__sender-name">
+            <span data-bind="text: replyMessageEntity().unsafeSenderName()"></span>
+            <!-- ko if: replyMessageEntity().was_edited() -->
+              <edit-icon></edit-icon>
+            <!-- /ko -->
+          </div>
+          <!-- ko if: replyAsset() && replyAsset().is_text()-->
+            <div class="input-bar__reply__message-text" data-bind="html: z.util.renderMessage(replyAsset().text)"></div>
+          <!-- /ko -->
+        </div>
+      </div>
+    </div>
+  <!-- /ko -->
+
   <!-- ko if: conversationEntity() && !conversationEntity().connection().isOutgoingRequest() -->
     <div class="controls-left">
       <!-- ko if: input().length -->
