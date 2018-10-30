@@ -70,9 +70,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
-    this.replyAsset = ko.pureComputed(
-      () => this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0]
-    );
+    this.replyAsset = ko.pureComputed(() => {
+      return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
+    });
 
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
     this.isReplying = ko.pureComputed(() => !!this.replyMessageEntity());
