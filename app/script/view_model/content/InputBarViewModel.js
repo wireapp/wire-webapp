@@ -644,7 +644,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
-      this.cancelMessageReply();
       const mentionEntities = this.currentMentions.slice();
       const quoteEntity = replyMessageEntity && new z.message.QuoteEntity(replyMessageEntity.id, '');
 
@@ -654,6 +653,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         mentionEntities,
         quoteEntity
       );
+
+      this.cancelMessageReply();
     }
   }
 
