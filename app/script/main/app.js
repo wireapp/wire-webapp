@@ -145,14 +145,10 @@ z.main.App = class App {
       repositories.user
     );
 
-    const fakeHasherThatNoOneShouldUseNeverEver = {
-      hash: message => 'super-secure-hash',
-    };
-
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
     const quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
       this.service.event,
-      fakeHasherThatNoOneShouldUseNeverEver
+      z.message.MessageHasher
     );
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),

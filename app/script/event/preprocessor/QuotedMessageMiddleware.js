@@ -58,19 +58,21 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         this.logger.warn('Quoted message not found');
         return Promise.resolve(event);
       }
-      const hash = this.messageHasher.hash(quotedMessage);
-      // FIXME actually check the hash
-      if (hash !== quote.quoted_message_sha256) {
-        this.logger.warn('Quoted message hash does not match');
-        return Promise.resolve(event);
-      }
 
-      // TODO parse quote and generate metadata
-      const decoratedData = Object.assign({}, event.data, {
-        message_id: quote.quoted_message_id,
-        user_id: quotedMessage.from,
-      });
-      return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
+      return this.messageHasher
+        .validateHash(quotedMessage, quote.quoted_message_sha256.toArrayBuffer())
+        .then(isValid => {
+          if (!isValid) {
+            this.logger.warn('Quoted message hash does not match');
+            return Promise.resolve(event);
+          }
+
+          const decoratedData = Object.assign({}, event.data, {
+            message_id: quote.quoted_message_id,
+            user_id: quotedMessage.from,
+          });
+          return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
+        });
     });
   }
 };
