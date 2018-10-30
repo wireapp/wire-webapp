@@ -64,7 +64,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         .validateHash(quotedMessage, quote.quoted_message_sha256.toArrayBuffer())
         .then(isValid => {
           if (!isValid) {
-            this.logger.warn('Quoted message hash does not match');
+            this.logger.warn(`Quoted message hash for message ID "${quote.quoted_message_id}" does not match`);
             // TODO add error metadata (to discuss with UI team)
             return Promise.resolve(event);
           }
