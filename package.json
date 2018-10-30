@@ -23,7 +23,7 @@
     "@bower_components/pako": "nodeca/pako#1.0.6",
     "@bower_components/phone-format": "albeebe/phoneformat.js#1.0.6",
     "@bower_components/platform.js": "bestiejs/platform.js#1.3.5",
-    "@bower_components/poster-image": "herrmannplatz/poster-image#1.1.1",
+    "@bower_components/poster-image": "herrmannplatz/poster-image#v1.1.1",
     "@bower_components/protobuf": "gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "@bower_components/raygun4js": "MindscapeHQ/raygun4js#v2.13.0",
     "@bower_components/speakingurl": "pid/speakingurl#v14.0.1",
