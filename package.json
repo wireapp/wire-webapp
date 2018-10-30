@@ -141,7 +141,7 @@
     "redux-mock-store": "1.5.3",
     "request": "2.88.0",
     "sinon": "7.1.0",
-    "stylelint": "9.6.0",
+    "stylelint": "9.7.0",
     "stylelint-config-idiomatic-order": "5.0.0",
     "stylelint-config-prettier": "4.0.0",
     "tslint": "5.11.0",
