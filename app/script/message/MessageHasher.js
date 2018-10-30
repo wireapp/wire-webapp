@@ -98,14 +98,14 @@ z.message.MessageHasher = (() => {
 
   return {
     hashEvent,
-    validateHash(event, hashBuffer) {
-      return hashEvent(event).then(eventHashBuffer => {
-        if (hashBuffer.byteLength !== eventHashBuffer.byteLength) {
+    validateHash(quotedEvent, quoteHash) {
+      return hashEvent(quotedEvent).then(eventHash => {
+        if (quoteHash.byteLength !== eventHash.byteLength) {
           return false;
         }
-        const dv1 = new Uint8Array(eventHashBuffer);
-        const dv2 = new Uint8Array(hashBuffer);
-        for (let i = 0; i !== eventHashBuffer.byteLength; i++) {
+        const dv1 = new Uint8Array(eventHash);
+        const dv2 = new Uint8Array(quoteHash);
+        for (let i = 0; i !== eventHash.byteLength; i++) {
           if (dv1[i] !== dv2[i]) {
             return false;
           }
