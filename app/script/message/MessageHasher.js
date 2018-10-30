@@ -76,21 +76,18 @@ z.message.MessageHasher = (() => {
    */
   const hashEvent = event => {
     const EventTypes = z.event.Client.CONVERSATION;
-    let specificBytes;
-    switch (event.type) {
-      case EventTypes.MESSAGE_ADD:
-        specificBytes = getTextBytes(event);
-        break;
-      case EventTypes.LOCATION:
-        specificBytes = getLocationBytes(event);
-        break;
-      case EventTypes.ASSET_ADD:
-        specificBytes = getAssetBytes(event);
-        break;
-      default:
-        throw new Error('TODO');
+    const specificBytesGenerators = {
+      [EventTypes.MESSAGE_ADD]: getTextBytes,
+      [EventTypes.LOCATION]: getLocationBytes,
+      [EventTypes.ASSET_ADD]: getAssetBytes,
+    };
+
+    const generator = specificBytesGenerators[event.type];
+    if (!generator) {
+      throw new Error(`Cannot generate hash for event of type "${event.type}"`);
     }
 
+    const specificBytes = generator(event);
     const timeBytes = getTimestampBytes(event);
     const allBytes = specificBytes.concat(timeBytes);
 

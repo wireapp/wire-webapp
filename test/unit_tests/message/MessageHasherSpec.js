@@ -23,6 +23,16 @@
 
 describe('z.message.MessageHasher', () => {
   describe('hashEvent', () => {
+    describe('unhandled event type', () => {
+      it('throws if the event type is not handled', () => {
+        const event = {
+          type: z.event.Client.CONVERSATION.KNOCK,
+        };
+
+        expect(() => z.message.MessageHasher.hashEvent(event)).toThrow();
+      });
+    });
+
     describe('text events', () => {
       it('correctly hashes text events', () => {
         const tests = [
