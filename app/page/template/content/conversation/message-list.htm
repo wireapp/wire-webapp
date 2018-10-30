@@ -9,7 +9,7 @@
                       attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
            data-uie-name="item-message">
         <div data-bind="template: {name: 'timestamp'}"></div>
-        <div data-bind="template: {name: message.super_type}"></div>
+        <div data-bind="template: {name: message.super_type}, css: {'message-isreplying': message.isReplying()}"></div>
       </div>
      </div>
    </div>

@@ -73,6 +73,7 @@ z.entity.Message = class Message {
     this.conversation_id = '';
     this.from = '';
     this.isEditing = ko.observable(false);
+    this.isReplying = ko.observable(false);
     this.primary_key = undefined;
     this.status = ko.observable(z.message.StatusType.UNSPECIFIED);
     this.type = '';
