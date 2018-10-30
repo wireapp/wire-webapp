@@ -92,8 +92,13 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   deleteClient(clientEntity) {
+    // @todo Add failure case ux WEBAPP-3570
+    if (this.userRepository.self().isSingleSignOn) {
+      // SSO users can remove their clients without the need of entering a password
+      return this.clientRepository.deleteClient(clientEntity.id);
+    }
+
     return new Promise((resolve, reject) => {
-      // @todo Add failure case ux WEBAPP-3570
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
         action: password => {
           this.clientRepository
