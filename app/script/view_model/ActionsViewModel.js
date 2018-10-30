@@ -118,27 +118,6 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         warning: false,
       });
     });
-    return new Promise((resolve, reject) => {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
-        action: password => {
-          this.clientRepository
-            .deleteClient(clientEntity.id, password)
-            .then(resolve)
-            .catch(error => {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-              reject(error);
-            });
-        },
-        preventClose: true,
-        text: {
-          action: z.l10n.text(z.string.modalAccountRemoveDeviceAction),
-          input: z.l10n.text(z.string.modalAccountRemoveDevicePlaceholder),
-          message: z.l10n.text(z.string.modalAccountRemoveDeviceMessage),
-          title: z.l10n.text(z.string.modalAccountRemoveDeviceHeadline, clientEntity.model),
-        },
-        warning: false,
-      });
-    });
   }
 
   deleteMessage(conversationEntity, messageEntity) {
