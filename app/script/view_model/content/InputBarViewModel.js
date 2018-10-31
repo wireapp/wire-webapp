@@ -663,13 +663,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions.slice();
-      let generateQuotePromise = Promise.resolve();
-      if (replyMessageEntity) {
-        generateQuotePromise = this.eventRepository
-          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
-          .then(event => this.messageHasher.hashEvent(event))
-          .then(messageHash => new z.message.QuoteEntity(replyMessageEntity.id, replyMessageEntity.from, messageHash));
-      }
+      const generateQuotePromise = !replyMessageEntity
+        ? Promise.resolve()
+        : this.eventRepository
+            .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+            .then(event => this.messageHasher.hashEvent(event))
+            .then(messageHash => {
+              return new z.message.QuoteEntity(replyMessageEntity.id, replyMessageEntity.from, messageHash);
+            });
 
       generateQuotePromise.then(quoteEntity => {
         this.conversationRepository.sendTextWithLinkPreview(
