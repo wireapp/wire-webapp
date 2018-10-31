@@ -94,35 +94,6 @@ z.message.MessageHasher = (() => {
     return createSha256Hash(allBytes);
   };
 
-  const extractHashData = message => {
-    const EventTypes = z.event.Client.CONVERSATION;
-    const commonData = {
-      time: message.timestamp(),
-      type: message.type,
-    };
-    let extraData = {};
-    switch (message.type) {
-      case EventTypes.MESSAGE_ADD:
-        extraData = {
-          data: {
-            content: message.get_first_asset().text,
-          },
-        };
-        break;
-
-      case EventTypes.LOCATION:
-        extraData = {
-          data: {
-            location: {
-              latitude: message.get_first_asset().latitude,
-              longitude: message.get_first_asset().longitude,
-            },
-          },
-        };
-    }
-    return Object.assign({}, commonData, extraData);
-  };
-
   /**
    * Validates that the quoteHash correspond to the given event.
    *
@@ -148,10 +119,6 @@ z.message.MessageHasher = (() => {
 
   return {
     hashEvent,
-    hashMessage: _.compose(
-      hashEvent,
-      extractHashData
-    ),
     validateHash,
   };
 })();

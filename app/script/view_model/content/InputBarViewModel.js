@@ -59,6 +59,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.emojiInput = contentViewModel.emojiInput;
 
+    this.eventRepository = repositories.event;
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
@@ -664,8 +665,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const mentionEntities = this.currentMentions.slice();
       let generateQuotePromise = Promise.resolve();
       if (replyMessageEntity) {
-        generateQuotePromise = this.messageHasher
-          .hashMessage(replyMessageEntity)
+        generateQuotePromise = this.eventRepository
+          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+          .then(event => this.messageHasher.hashEvent(event))
           .then(messageHash => new z.message.QuoteEntity(replyMessageEntity.id, replyMessageEntity.from, messageHash));
       }
 
