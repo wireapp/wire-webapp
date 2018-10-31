@@ -130,7 +130,9 @@
             <div class="preferences-link text-theme" data-bind="click: clickOpenCreateTeam, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
           <!-- /ko -->
 
-          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
+          <!-- ko ifnot: selfUser().isSingleSignOn -->
+            <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
+          <!-- /ko -->
 
           <!-- ko ifnot: isTeam() -->
             <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
