@@ -383,6 +383,7 @@ z.string.conversationSendPastedFile = 'Pasted image at {{date}}';
 z.string.conversationSomeone = 'Someone';
 z.string.conversationTweetAuthor = ' on Twitter';
 z.string.conversationServicesWarning = 'Services have access to the content of this conversation';
+z.string.conversationReplyAudioMessage = 'Audio message';
 
 // Group creation
 z.string.groupCreationPreferencesAction = 'Next';

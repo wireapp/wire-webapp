@@ -20,7 +20,7 @@
         <!-- /ko -->
         <!-- ko if: messageEntity().isReplyable() && !conversationEntity().removed_from_conversation() -->
           <span class="detail-view-action-button" data-bind="click: clickOnReply" data-uie-name="do-reply-fullscreen-picture">
-            <span class="icon-liked"></span>
+            <reply-icon></reply-icon>
             <span data-bind="l10n_text: z.string.conversationContextMenuReply"></span>
           </span>
         <!-- /ko -->
