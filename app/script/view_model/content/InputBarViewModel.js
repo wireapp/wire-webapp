@@ -76,6 +76,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
     this.isReplying = ko.pureComputed(() => !!this.replyMessageEntity());
+    this.replyMessageId = ko.pureComputed(() => (this.replyMessageEntity() ? this.replyMessageEntity().id : undefined));
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -107,7 +108,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .pureComputed(() => {
         const text = this.input();
         const mentions = this.currentMentions();
-        return {mentions, text};
+        const reply = this.replyMessageEntity();
+        return {mentions, reply, text};
       })
       .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
 
@@ -225,14 +227,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
     this.draftMessage.subscribe(message => {
       if (this.conversationEntity()) {
-        this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
+        this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
       }
     });
 
-    this._init_subscriptions();
+    this._initSubscriptions();
   }
 
-  _init_subscriptions() {
+  _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, this.replyMessage.bind(this));
@@ -258,14 +260,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const previousSessionData = this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
       this.currentMentions(previousSessionData.mentions);
+
+      if (previousSessionData.replyEntityPromise) {
+        previousSessionData.replyEntityPromise.then(replyEntity => {
+          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, replyEntity);
+        });
+      }
     }
   }
 
-  _saveDraftState(conversationEntity, text, mentions) {
+  _saveDraftState(conversationEntity, text, mentions, reply) {
     if (!this.isEditing()) {
       // we only save state for newly written messages
+      reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      z.util.StorageUtil.setValue(storageKey, {mentions, text});
+      z.util.StorageUtil.setValue(storageKey, {mentions, reply, text});
     }
   }
 
@@ -278,16 +287,22 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const storageValue = z.util.StorageUtil.getValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
-      return {mentions: [], text: ''};
+      return {mentions: [], reply: {}, text: ''};
     }
 
     if (typeof storageValue === 'string') {
-      return {mentions: [], text: storageValue};
+      return {mentions: [], reply: {}, text: storageValue};
     }
 
     storageValue.mentions = storageValue.mentions.map(mention => {
       return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
     });
+
+    const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
+
+    if (replyMessageId) {
+      storageValue.replyEntityPromise = this._getMessageInConversation(conversationEntity, replyMessageId);
+    }
 
     return storageValue;
   }
@@ -300,6 +315,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+  }
+
+  _getMessageInConversation(conversationEntity, messageId) {
+    return this.conversationRepository.get_message_in_conversation_by_id(conversationEntity, messageId);
   }
 
   addMention(userEntity, inputElement) {
@@ -341,9 +360,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageReply(resetDraft = true) {
-    if (this.replyMessageEntity()) {
-      this.replyMessageEntity().isReplying(false);
-    }
     this.replyMessageEntity(undefined);
     if (resetDraft) {
       this._resetDraftState();
@@ -388,7 +404,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
-      messageEntity.isReplying(true);
       this.replyMessageEntity(messageEntity);
     }
   }
