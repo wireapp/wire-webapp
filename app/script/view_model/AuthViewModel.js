@@ -200,6 +200,15 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.posted_mode = ko.observable(undefined);
     this.posted_mode_verify = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY);
 
+    // dirty fix: The AssetRemoteData class consumes the global `wire.app` object.
+    // so we need to publish a fake `wire.app` object only with what the class consumes (namely the assetService)
+    // more engineering will be required to get rid of that global dependency
+    window.wire.app = {
+      service: {
+        asset: new z.assets.AssetService(backendClient),
+      },
+    };
+
     // Debugging
     if (z.util.Environment.frontend.isLocalhost()) {
       const live_reload = document.createElement('script');
