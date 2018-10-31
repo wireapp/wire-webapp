@@ -106,6 +106,8 @@ z.event.EventRepository = class EventRepository {
     this.notificationsQueue = ko.observableArray([]);
     this.notificationsBlocked = false;
 
+    this.loadEvent = this.eventService.loadEvent.bind(this.eventService);
+
     this.notificationsQueue.subscribe(notifications => {
       if (notifications.length) {
         if (this.notificationsBlocked) {

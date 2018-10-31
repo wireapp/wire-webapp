@@ -38,7 +38,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories, messageHasher) {
     this.addedToView = this.addedToView.bind(this);
     this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
@@ -49,6 +49,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
 
+    this.messageHasher = messageHasher;
+
     this.shadowInput = null;
     this.textarea = null;
 
@@ -57,6 +59,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.emojiInput = contentViewModel.emojiInput;
 
+    this.eventRepository = repositories.event;
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
@@ -660,16 +663,24 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions.slice();
-      const quoteEntity = replyMessageEntity && new z.message.QuoteEntity(replyMessageEntity.id, '');
+      const generateQuotePromise = !replyMessageEntity
+        ? Promise.resolve()
+        : this.eventRepository
+            .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+            .then(this.messageHasher.hashEvent)
+            .then(messageHash => {
+              return new z.message.QuoteEntity(replyMessageEntity.id, replyMessageEntity.from, messageHash);
+            });
 
-      this.conversationRepository.sendTextWithLinkPreview(
-        this.conversationEntity(),
-        messageText,
-        mentionEntities,
-        quoteEntity
-      );
-
-      this.cancelMessageReply();
+      generateQuotePromise.then(quoteEntity => {
+        this.conversationRepository.sendTextWithLinkPreview(
+          this.conversationEntity(),
+          messageText,
+          mentionEntities,
+          quoteEntity
+        );
+        this.cancelMessageReply();
+      });
     }
   }
 
