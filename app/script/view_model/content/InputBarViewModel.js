@@ -667,7 +667,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         ? Promise.resolve()
         : this.eventRepository
             .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
-            .then(event => this.messageHasher.hashEvent(event))
+            .then(this.messageHasher.hashEvent)
             .then(messageHash => {
               return new z.message.QuoteEntity(replyMessageEntity.id, replyMessageEntity.from, messageHash);
             });
