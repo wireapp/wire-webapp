@@ -72,7 +72,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.user_repository = new z.user.UserRepository(
       this.user_service,
       this.asset_service,
-      undefined,
+      new z.self.SelfService(backendClient),
       this.client_repository,
       new z.time.ServerTimeRepository()
     );
