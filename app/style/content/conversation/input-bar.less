@@ -294,5 +294,44 @@
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &__image img {
+      max-height: 40px;
+      border-radius: 2px;
+    }
+  }
+
+  &__icon {
+    margin-right: 8px;
+    svg {
+      max-width: 12px;
+      max-height: 12px;
+      fill: currentColor;
+    }
+
+    & + span {
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+  }
+
+  &__video {
+    position: relative;
+    display: inline-block;
+
+    camera-icon {
+      position: absolute;
+      top: 14px;
+      left: 0;
+      width: 100%;
+      line-height: 0;
+      text-align: center;
+
+      svg {
+        max-width: 12px;
+        max-height: 12px;
+        fill: #fff;
+      }
+    }
   }
 }

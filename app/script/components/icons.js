@@ -51,6 +51,14 @@ ko.components.register('attachment-icon', {
   `,
 });
 
+ko.components.register('audio-icon', {
+  template: `
+  <svg width="12" height="16" viewBox="0 0 12 16">
+    <path d="M10.5 12l1.4 1.4a8 8 0 0 1-11.9 0L1.4 12a6 6 0 0 0 9.1 0zM6 12a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4 4 4 0 0 1 4 4v4a4 4 0 0 1-4 4z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('block-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -211,6 +219,14 @@ ko.components.register('leave-icon', {
   `,
 });
 
+ko.components.register('location-icon', {
+  template: `
+  <svg width="12" height="16" viewBox="0 0 12 16">
+    <path d="M12 6c0 6-6 10-6 10S0 12 0 6a6 6 0 1 1 12 0zM6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('markdown-icon', {
   template: `
   <svg width="15" height="14" viewBox="0 0 15 14">
@@ -319,6 +335,14 @@ ko.components.register('profile-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('reply-icon', {
+  template: `
+  <svg width="16" height="15" viewBox="0 0 16 15">
+    <path d="M3.3 4h7.1C13.5 4 16 6.6 16 9.6c0 3-2.5 5.4-5.6 5.4H7a1 1 0 0 1 0-2h3.4c2 0 3.6-1.4 3.6-3.4S12.5 6 10.4 6h-7l2.4 2.4a1 1 0 0 1 0 1.3 1 1 0 0 1-1.4 0l-4.1-4a1 1 0 0 1-.2-.3 1 1 0 0 1 .2-1l4-4.1a1 1 0 0 1 1.5 0 1 1 0 0 1 0 1.3L3.3 4z"></path>
   </svg>
   `,
 });
