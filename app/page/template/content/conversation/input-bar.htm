@@ -16,37 +16,44 @@
               <edit-icon data-uie-name="message-edited-reply-box"></edit-icon>
             <!-- /ko -->
           </div>
-          <!-- ko if: replyAsset() && replyAsset().is_text()-->
-            <div class="input-bar__reply__message-text" data-bind="html: z.util.renderMessage(replyAsset().text)" data-uie-name="media-text-reply-box"></div>
-          <!-- /ko -->
-          <!-- ko if: replyAsset() && replyAsset().is_image()-->
-            <div class="input-bar__reply__message-text input-bar__reply__message-text__image" data-bind="background_image: replyAsset().resource" data-uie-name="media-picture-reply-box">
-              <img/>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: replyAsset() && replyAsset().is_video() -->
-            <div class="input-bar__reply__message-text input-bar__reply__message-text__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource" data-uie-name="media-video-reply-box">
-              <img/>
-              <camera-icon></camera-icon>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: replyAsset() && replyAsset().is_audio()-->
-            <div class="input-bar__reply__message-text" data-uie-name="media-audio-reply-box">
-              <audio-icon class="input-bar__reply__icon"></audio-icon>
-              <span data-bind="l10n_text: z.string.conversationReplyAudioMessage"></span>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: replyAsset() && replyAsset().is_file()-->
-            <div class="input-bar__reply__message-text" data-uie-name="media-file-reply-box">
-              <file-icon class="input-bar__reply__icon"></file-icon>
-              <span data-bind="text: replyAsset().file_name"></span>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: replyAsset() && replyAsset().is_location()-->
-            <div class="input-bar__reply__message-text" data-uie-name="media-location-reply-box">
-              <location-icon class="input-bar__reply__icon"></location-icon>
-              <span data-bind="text: replyAsset().name"></span>
-            </div>
+          <!-- ko if: replyAsset() -->
+            <!-- ko if: replyAsset().is_text()-->
+              <div class="input-bar__reply__message-text" data-bind="html: z.util.renderMessage(replyAsset().text)" data-uie-name="media-text-reply-box"></div>
+            <!-- /ko -->
+
+            <!-- ko if: replyAsset().is_image()-->
+              <div class="input-bar__reply__message-text input-bar__reply__message-text__image" data-bind="background_image: replyAsset().resource" data-uie-name="media-picture-reply-box">
+                <img/>
+              </div>
+            <!-- /ko -->
+
+            <!-- ko if: replyAsset().is_video() -->
+              <div class="input-bar__reply__message-text input-bar__reply__message-text__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource" data-uie-name="media-video-reply-box">
+                <img/>
+                <camera-icon></camera-icon>
+              </div>
+            <!-- /ko -->
+
+            <!-- ko if: replyAsset().is_audio()-->
+              <div class="input-bar__reply__message-text" data-uie-name="media-audio-reply-box">
+                <audio-icon class="input-bar__reply__icon"></audio-icon>
+                <span data-bind="l10n_text: z.string.conversationReplyAudioMessage"></span>
+              </div>
+            <!-- /ko -->
+
+            <!-- ko if: replyAsset().is_file()-->
+              <div class="input-bar__reply__message-text" data-uie-name="media-file-reply-box">
+                <file-icon class="input-bar__reply__icon"></file-icon>
+                <span data-bind="text: replyAsset().file_name"></span>
+              </div>
+            <!-- /ko -->
+
+            <!-- ko if: replyAsset().is_location()-->
+              <div class="input-bar__reply__message-text" data-uie-name="media-location-reply-box">
+                <location-icon class="input-bar__reply__icon"></location-icon>
+                <span data-bind="text: replyAsset().name"></span>
+              </div>
+            <!-- /ko -->
           <!-- /ko -->
         </div>
       </div>
