@@ -94,6 +94,22 @@ z.message.MessageHasher = (() => {
     return createSha256Hash(allBytes);
   };
 
+  const extractHashData = message => {
+    const commonData = {
+      time: message.timestamp(),
+      type: message.type,
+    };
+    switch (message.type) {
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return Object.assign({}, commonData, {
+          data: {
+            content: message.get_first_asset().text,
+          },
+        });
+    }
+    return {};
+  };
+
   /**
    * Validates that the quoteHash correspond to the given event.
    *
@@ -119,6 +135,10 @@ z.message.MessageHasher = (() => {
 
   return {
     hashEvent,
+    hashMessage: _.compose(
+      hashEvent,
+      extractHashData
+    ),
     validateHash,
   };
 })();

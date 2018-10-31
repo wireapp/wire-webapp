@@ -23,8 +23,9 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.QuoteEntity = class QuoteEntity {
-  constructor(messageId, userId) {
+  constructor(messageId, userId, hash) {
     this.messageId = messageId;
+    this.hash = hash;
     this.userId = userId;
   }
 
@@ -39,8 +40,7 @@ z.message.QuoteEntity = class QuoteEntity {
     };
   }
 
-  toProto(messageEntity) {
-    const messageHash = ''; //create hash from message entity
-    return new z.proto.Quote(this.messageId, messageHash);
+  toProto() {
+    return new z.proto.Quote(this.messageId, new Uint8Array(this.hash));
   }
 };
