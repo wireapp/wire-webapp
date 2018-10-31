@@ -73,8 +73,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
   };
 
   formatId = (id = '?', outputLength = 16) => {
-    const zerosNeeded = Math.max(0, outputLength - id.toString().length);
-    const paddedId = `${'0'.repeat(zerosNeeded)}${id}`;
+    const paddedId = id.padStart(outputLength, '0');
     return paddedId.toUpperCase().replace(/(..)/g, '$1 ');
   };
 
