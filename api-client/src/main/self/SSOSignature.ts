@@ -17,23 +17,9 @@
  *
  */
 
-import {Picture, SSOSignature} from '../self/';
-import {UserAsset} from '../user/';
-
-interface Self {
-  accent_id?: number;
-  assets: UserAsset[];
-  deleted?: boolean;
-  email?: string;
-  expires_at?: string;
-  handle?: string;
-  id: string;
-  locale: string;
-  name: string;
-  phone?: string;
-  picture?: Picture[];
-  sso_id?: SSOSignature;
-  team?: string;
+interface SSOSignature {
+  subject: string;
+  tenant: string;
 }
 
-export {Self};
+export {SSOSignature};
