@@ -95,19 +95,32 @@ z.message.MessageHasher = (() => {
   };
 
   const extractHashData = message => {
+    const EventTypes = z.event.Client.CONVERSATION;
     const commonData = {
       time: message.timestamp(),
       type: message.type,
     };
+    let extraData = {};
     switch (message.type) {
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        return Object.assign({}, commonData, {
+      case EventTypes.MESSAGE_ADD:
+        extraData = {
           data: {
             content: message.get_first_asset().text,
           },
-        });
+        };
+        break;
+
+      case EventTypes.LOCATION:
+        extraData = {
+          data: {
+            location: {
+              latitude: message.get_first_asset().latitude,
+              longitude: message.get_first_asset().longitude,
+            },
+          },
+        };
     }
-    return {};
+    return Object.assign({}, commonData, extraData);
   };
 
   /**
