@@ -25,3 +25,4 @@ export * from './Picture';
 export * from './SearchableStatus';
 export * from './Self';
 export * from './SelfAPI';
+export * from './SSOSignature';
