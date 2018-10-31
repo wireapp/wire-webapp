@@ -30,7 +30,7 @@ EXPOSE 5000
 WORKDIR /src/aws
 
 # For runtime, it needs a few extra packages
-RUN pip install -r requirements.txt
+RUN pip install -r /src/aws/requirements.txt
 
 ENV HOSTHTTPS staging-nginz-https.zinfra.io
 ENV HOSTSSL staging-nginz-ssl.zinfra.io
