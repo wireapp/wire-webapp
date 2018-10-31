@@ -72,7 +72,10 @@ class ClientItem extends React.Component<CombinedProps, State> {
     validationError: null,
   };
 
-  formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
+  formatId = (id = '?', outputLength = 16) => {
+    const paddedId = id.padStart(outputLength, '0');
+    return paddedId.toUpperCase().replace(/(..)/g, '$1 ');
+  };
 
   constructor(props: CombinedProps) {
     super(props);
