@@ -39,15 +39,16 @@ class Bot {
 
   private readonly config: Required<BotConfig>;
   private readonly handlers: Map<string, MessageHandler>;
-  private readonly logger: logdown.Logger = logdown('@wireapp/bot-api/Bot', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
 
   constructor(private readonly credentials: BotCredentials, config?: BotConfig) {
     this.config = {...defaultConfig, ...config};
     this.credentials = credentials;
     this.handlers = new Map();
+    this.logger = logdown('@wireapp/bot-api/Bot', {
+      logger: console,
+      markdown: false,
+    });
   }
 
   public addHandler(handler: MessageHandler): void {

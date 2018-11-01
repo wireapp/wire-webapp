@@ -48,10 +48,7 @@ export type DecryptionResult =
     };
 
 class CryptographyService {
-  private readonly logger = logdown('@wireapp/core/cryptography/CryptographyService', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
 
   public cryptobox: Cryptobox;
   private readonly database: CryptographyDatabaseRepository;
@@ -59,6 +56,10 @@ class CryptographyService {
   constructor(readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
+    this.logger = logdown('@wireapp/core/cryptography/CryptographyService', {
+      logger: console,
+      markdown: false,
+    });
   }
 
   public static constructSessionId(userId: string, clientId: string): string {

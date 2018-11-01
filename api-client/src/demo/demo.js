@@ -27,8 +27,9 @@ import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
+import logdown from 'logdown';
 
-const logger = require('logdown')('@wireapp/api-client/demo/demo.js');
+const logger = logdown('@wireapp/api-client/demo/demo.js');
 logger.state.isEnabled = true;
 
 const BACKEND_ENV = APIClient.BACKEND.STAGING;

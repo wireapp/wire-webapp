@@ -28,10 +28,7 @@ import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 class HttpClient extends EventEmitter {
-  private readonly logger = logdown('@wireapp/api-client/http/HttpClient', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
 
@@ -47,6 +44,11 @@ class HttpClient extends EventEmitter {
     super();
 
     this.connectionState = ConnectionState.UNDEFINED;
+
+    this.logger = logdown('@wireapp/api-client/http/HttpClient', {
+      logger: console,
+      markdown: false,
+    });
 
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,

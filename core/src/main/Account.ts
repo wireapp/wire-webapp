@@ -71,10 +71,7 @@ import * as logdown from 'logdown';
 import {UserService} from './user/';
 
 class Account extends EventEmitter {
-  private readonly logger = logdown('@wireapp/core/Account', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
 
   private readonly apiClient: APIClient;
   public service?: {
@@ -94,6 +91,10 @@ class Account extends EventEmitter {
   constructor(apiClient: APIClient = new APIClient()) {
     super();
     this.apiClient = apiClient;
+    this.logger = logdown('@wireapp/core/Account', {
+      logger: console,
+      markdown: false,
+    });
   }
 
   public async init(): Promise<void> {

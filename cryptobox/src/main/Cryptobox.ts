@@ -41,10 +41,7 @@ class Cryptobox extends EventEmitter {
   };
 
   private cachedSessions: LRUCache<CryptoboxSession>;
-  private readonly logger = logdown('@wireapp/cryptobox/Cryptobox', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
   private readonly minimumAmountOfPreKeys: number;
   private queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
   private readonly store: CryptoboxCRUDStore;
@@ -63,6 +60,11 @@ class Cryptobox extends EventEmitter {
     if (minimumAmountOfPreKeys > ProteusKeys.PreKey.MAX_PREKEY_ID) {
       minimumAmountOfPreKeys = ProteusKeys.PreKey.MAX_PREKEY_ID;
     }
+
+    this.logger = logdown('@wireapp/cryptobox/Cryptobox', {
+      logger: console,
+      markdown: false,
+    });
 
     this.cachedSessions = new LRUCache(DEFAULT_CAPACITY);
     this.minimumAmountOfPreKeys = minimumAmountOfPreKeys;

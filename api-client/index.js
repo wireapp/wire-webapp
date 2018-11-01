@@ -17,6 +17,8 @@
  *
  */
 
+const logdown = require('logdown');
+
 // Try with: node demo.js -c "conversation-id" -e "mail@wire.com" -p "secret"
 const argv = require('optimist')
   .alias('c', 'conversation')
@@ -24,7 +26,7 @@ const argv = require('optimist')
   .alias('h', 'handle')
   .alias('p', 'password').argv;
 
-const logger = require('logdown')('@wireapp/api-client/index.js');
+const logger = logdown('@wireapp/api-client/index.js');
 logger.state.isEnabled = true;
 
 const {APIClient} = require('@wireapp/api-client');

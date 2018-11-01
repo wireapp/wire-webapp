@@ -1,8 +1,10 @@
 const cryptobox = require('../../');
 const {MemoryEngine} = require('@wireapp/store-engine');
-const Logdown = require('logdown');
+const logdown = require('logdown');
 
-const logger = new Logdown('Demo', {alignOutput: true});
+const logger = logdown('@wireapp/cryptobox/Demo', {
+  alignOutput: true,
+});
 logger.state.isEnabled = true;
 logger.log(`Testing Cryptobox v${cryptobox.Cryptobox.VERSION}`);
 
