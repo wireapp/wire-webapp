@@ -355,9 +355,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageEditing() {
-    if (this.editMessageEntity()) {
-      this.editMessageEntity().isEditing(false);
-    }
     this.editMessageEntity(undefined);
     this._resetDraftState();
   }
@@ -390,7 +387,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
-      messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
 
       this.input(messageEntity.get_first_asset().text);
