@@ -2466,6 +2466,11 @@ better-assert@~1.0.0:
   dependencies:
     callsite "1.0.0"
 
+big-integer@^1.6.31:
+  version "1.6.36"
+  resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.36.tgz#78631076265d4ae3555c04f85e7d9d2f3a071a36"
+  integrity sha512-t70bfa7HYEA1D9idDbmuv7YbsbVkQ+Hp+8KFSul4aE5e/i1bjCNIRYJZlA8Q8p0r9T8cF/RVvwUgRA//FydEyg==
+
 big.js@^3.1.3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
@@ -5730,6 +5735,11 @@ gaze@^1.0.0, gaze@^1.1.0:
   dependencies:
     globule "^1.0.0"
 
+geolite2@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/geolite2/-/geolite2-1.3.0.tgz#47094a5e1278d592fd1b41693d223d83c9dfe4c1"
+  integrity sha512-/m+vdLjYEZ3ScekuGNDdO/HaJi32vZ/hKh20HgEoeV5z1DzlT18FF39Mfin1wTlF4EtYyNgcUg5kaBaMCfwAhQ==
+
 get-caller-file@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.2.tgz#f702e63127e7e231c160a80c1554acb70d5047e5"
@@ -8354,6 +8364,14 @@ maxmin@^1.1.0:
     figures "^1.0.1"
     gzip-size "^1.0.0"
     pretty-bytes "^1.0.0"
+
+maxmind@2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.7.0.tgz#b6695cf2b98da825b418a228c4307ac2d790714d"
+  integrity sha512-blmBnRbEkYBGz+7kxNQzuYUwyMyJ5PYGhrMYe6RXmMSBxZXe2665INgNP5/8WuYdWnDJ1Z8osC/LVKdsbT2fnQ==
+  dependencies:
+    big-integer "^1.6.31"
+    tiny-lru "^1.6.1"
 
 md5.js@^1.3.4:
   version "1.3.4"
@@ -13026,6 +13044,11 @@ tiny-lr@^1.1.1:
     livereload-js "^2.3.0"
     object-assign "^4.1.0"
     qs "^6.4.0"
+
+tiny-lru@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-1.6.1.tgz#addb5c043311d1f07cd3a81d706ae739b8efebb1"
+  integrity sha512-m8oyPnHjnQlbDk8+MCw33qRMp6+BxPxoayN9C743VToeyQ5zZV6F6vkklrYVEI0z9MQ3+jmc+22tKmvPg4gmoA==
 
 tmp@0.0.33, tmp@0.0.x, tmp@^0.0.33:
   version "0.0.33"

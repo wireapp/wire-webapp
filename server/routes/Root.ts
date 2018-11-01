@@ -20,8 +20,18 @@
 import {Router} from 'express';
 import {ServerConfig} from '../config';
 
+const geolite2 = require('geolite2');
+const maxmind = require('maxmind');
+
 const Root = (config: ServerConfig) => [
-  Router().get('/', (req, res) => res.render('index')),
+  Router().get('/', (req, res) => {
+    const lookup = maxmind.openSync(geolite2.paths.country);
+    const result = lookup.get(req.ip);
+    if (result) {
+      req.app.locals.country = result.country.iso_code;
+    }
+    return res.render('index');
+  }),
   Router().get('/auth', (req, res) => res.render('auth/index')),
   Router().get('/login', (req, res) => res.render('login/index')),
   Router().get('/demo', (req, res) => res.render('demo/index')),
