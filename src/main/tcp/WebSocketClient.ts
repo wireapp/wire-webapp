@@ -29,10 +29,7 @@ const ReconnectingWebsocket = require('reconnecting-websocket');
 class WebSocketClient extends EventEmitter {
   private clientId: string | undefined;
 
-  private readonly logger = logdown('@wireapp/api-client/tcp/WebSocketClient', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
 
   private socket: WebSocket | undefined;
 
@@ -59,6 +56,11 @@ class WebSocketClient extends EventEmitter {
 
   constructor(private readonly baseURL: string, public client: HttpClient) {
     super();
+
+    this.logger = logdown('@wireapp/api-client/tcp/WebSocketClient', {
+      logger: console,
+      markdown: false,
+    });
   }
 
   private buildWebSocketURL(accessToken: string = this.client.accessTokenStore.accessToken!.access_token): string {

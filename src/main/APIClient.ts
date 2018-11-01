@@ -46,10 +46,7 @@ const defaultConfig: Config = {
 };
 
 class APIClient {
-  private readonly logger = logdown('@wireapp/api-client/Client', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
 
   private readonly STORE_NAME_PREFIX = 'wire';
   // APIs
@@ -83,6 +80,10 @@ class APIClient {
   constructor(config?: Config) {
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
+    this.logger = logdown('@wireapp/api-client/Client', {
+      logger: console,
+      markdown: false,
+    });
 
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
 
