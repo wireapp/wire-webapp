@@ -2664,15 +2664,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Can assets be uploaded
    */
   _can_upload_assets_to_conversation(conversation_et) {
-    if (!conversation_et || conversation_et.isRequest() || conversation_et.removed_from_conversation()) {
-      return false;
-    }
-
-    if (conversation_et.is1to1() && !conversation_et.connection().isConnected()) {
-      return false;
-    }
-
-    return true;
+    return !!conversation_et && !conversation_et.isRequest() && !conversation_et.removed_from_conversation();
   }
 
   /**
