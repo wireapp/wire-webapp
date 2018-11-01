@@ -61,7 +61,10 @@ export class ClientAction {
   doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
     return (dispatch, getState, {core, actions: {clientAction, notificationAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
+      let isFirstClient = false;
       return Promise.resolve()
+        .then(() => clientAction.doGetAllClients())
+        .then(clients => (isFirstClient = !clients || !clients.length))
         .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))
         .then(creationStatus =>
           Promise.resolve()
@@ -69,7 +72,7 @@ export class ClientAction {
             .then(() => creationStatus)
         )
         .then(creationStatus => {
-          const isNewSubsequentClient = password && creationStatus.isNewClient;
+          const isNewSubsequentClient = !isFirstClient && creationStatus.isNewClient;
           if (isNewSubsequentClient) {
             return dispatch(notificationAction.checkHistory()).then(() => {
               throw new BackendError({
