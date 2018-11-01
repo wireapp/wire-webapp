@@ -24,11 +24,20 @@ const geolite2 = require('geolite2');
 const maxmind = require('maxmind');
 
 function addGeoIP(req: Request) {
-  const lookup = maxmind.openSync(geolite2.paths.country);
-  const result = lookup.get(req.ip);
-  if (result) {
-    req.app.locals.country = result.country.iso_code;
+  let countryCode = '';
+
+  try {
+    const ip = req.header('X-Forwarded-For') || req.ip;
+    const lookup = maxmind.openSync(geolite2.paths.country);
+    const result = lookup.get(ip);
+    if (result) {
+      countryCode = result.country.iso_code;
+    }
+  } catch (error) {
+    // It's okay to go without a detected country.
   }
+
+  req.app.locals.country = countryCode;
 }
 
 const Root = (config: ServerConfig) => [
