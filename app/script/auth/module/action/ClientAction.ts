@@ -63,7 +63,7 @@ export class ClientAction {
       dispatch(ClientActionCreator.startInitializeClient());
       let isFirstClient = false;
       return Promise.resolve()
-        .then(() => clientAction.doGetAllClients())
+        .then(() => dispatch(clientAction.doGetAllClients()))
         .then(clients => (isFirstClient = !clients || !clients.length))
         .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))
         .then(creationStatus =>
