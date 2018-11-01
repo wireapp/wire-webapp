@@ -446,12 +446,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  onInputClick() {
-    if (!this.hasTextInput()) {
-      amplify.publish(z.event.WebApp.CONVERSATION.INPUT.CLICK);
-    }
-  }
-
   onInputEnter(data, event) {
     if (this.pastedFile()) {
       return this.sendPastedFile();
