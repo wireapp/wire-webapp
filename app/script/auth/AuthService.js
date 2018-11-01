@@ -174,15 +174,24 @@ z.auth.AuthService = class AuthService {
    * @returns {Promise} Promise that resolves with access token
    */
   postLogin(login, persist) {
-    return this.backendClient.sendJson({
-      crossDomain: true,
-      data: {
-        persist: window.encodeURIComponent(persist.toString()),
-      },
-      skipRetry: true,
-      type: 'POST',
-      url: AuthService.CONFIG.URL_LOGIN,
-      withCredentials: true,
+    const persistParam = window.encodeURIComponent(persist.toString());
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        contentType: 'application/json; charset=utf-8',
+        crossDomain: true,
+        data: pako.gzip(JSON.stringify(login)),
+        headers: {
+          'Content-Encoding': 'gzip',
+        },
+        processData: false,
+        type: 'POST',
+        url: this.backendClient.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
+        xhrFields: {
+          withCredentials: true,
+        },
+      })
+        .done(resolve)
+        .fail((jqXHR, textStatus, errorThrown) => reject(jqXHR.responseJSON || errorThrown));
     });
   }
 
