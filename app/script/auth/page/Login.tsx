@@ -406,7 +406,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {Environment.isInternalEnvironment() && !isDesktopApp() && !hideSSOLogin ? (
+                {!isDesktopApp() && !hideSSOLogin ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
