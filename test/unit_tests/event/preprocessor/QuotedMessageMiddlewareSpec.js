@@ -57,6 +57,10 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
         data: {
           content: 'salut',
+          error: {
+            message: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+            quotedMessageId: '',
+          },
           quote: new z.proto.Quote({quoted_message_id: '', quoted_message_sha256: ''}).encode64(),
         },
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -69,6 +73,10 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       const quotedMessage = {
         data: {
           content: 'pas salut',
+          error: {
+            message: z.message.QuoteEntity.ERROR.INVALID_HASH,
+            quotedMessageId: '',
+          },
         },
         time: 100,
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,

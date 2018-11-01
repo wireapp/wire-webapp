@@ -55,8 +55,11 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
 
     return this.eventService.loadEvent(event.conversation, quote.quoted_message_id).then(quotedMessage => {
       if (!quotedMessage) {
-        this.logger.warn('Quoted message not found');
-        // TODO add error metadata (to discuss with UI team)
+        this.logger.warn(`Quoted message with ID "${quote.quoted_message_id}" not found.`);
+        event.error = {
+          message: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+          quotedMessageId: quote.quoted_message_id,
+        };
         return Promise.resolve(event);
       }
 
@@ -64,8 +67,11 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         .validateHash(quotedMessage, quote.quoted_message_sha256.toArrayBuffer())
         .then(isValid => {
           if (!isValid) {
-            this.logger.warn(`Quoted message hash for message ID "${quote.quoted_message_id}" does not match`);
-            // TODO add error metadata (to discuss with UI team)
+            this.logger.warn(`Quoted message hash for message ID "${quote.quoted_message_id}" does not match.`);
+            event.error = {
+              message: z.message.QuoteEntity.ERROR.INVALID_HASH,
+              quotedMessageId: quote.quoted_message_id,
+            };
             return Promise.resolve(event);
           }
 

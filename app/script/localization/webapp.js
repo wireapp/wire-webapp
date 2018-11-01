@@ -354,6 +354,7 @@ z.string.conversationResetTimerYou = ' turned off the message timer';
 z.string.conversationResume = 'Start a conversation with {{users}}';
 z.string.conversationPing = ' pinged';
 z.string.conversationPingYou = ' pinged';
+z.string.conversationReplyInvalid = 'You cannot see this message.';
 z.string.conversationToday = 'today';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
