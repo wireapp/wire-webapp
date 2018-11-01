@@ -117,8 +117,8 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.message_id).toEqual('message-uuid');
-        expect(parsedEvent.data.user_id).toEqual('user-id');
+        expect(parsedEvent.data.quote.message_id).toEqual('message-uuid');
+        expect(parsedEvent.data.quote.user_id).toEqual('user-id');
       });
     });
   });
