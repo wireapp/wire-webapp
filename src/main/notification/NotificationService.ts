@@ -26,10 +26,7 @@ import NotificationBackendRepository from './NotificationBackendRepository';
 import NotificationDatabaseRepository from './NotificationDatabaseRepository';
 
 export default class NotificationService {
-  private readonly logger = logdown('@wireapp/core/notification/NotificationService', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger: logdown.Logger;
 
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
@@ -37,6 +34,10 @@ export default class NotificationService {
   constructor(private readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(this.storeEngine);
+    this.logger = logdown('@wireapp/core/notification/NotificationService', {
+      logger: console,
+      markdown: false,
+    });
   }
 
   public initializeNotificationStream(clientId: string): Promise<string> {
