@@ -137,10 +137,15 @@ z.conversation.ConversationCellState = (() => {
         calls: unreadCalls,
         pings: unreadPings,
         selfMentions: unreadSelfMentions,
+        selfReplies: unreadSelfReplies,
       } = conversationEntity.unreadState();
 
       if (unreadSelfMentions.length) {
         return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+      }
+
+      if (unreadSelfReplies.length) {
+        return z.conversation.ConversationStatusIcon.UNREAD_REPLY;
       }
 
       if (unreadCalls.length) {
