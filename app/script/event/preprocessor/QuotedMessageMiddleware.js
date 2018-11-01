@@ -70,8 +70,10 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
           }
 
           const decoratedData = Object.assign({}, event.data, {
-            message_id: quote.quoted_message_id,
-            user_id: quotedMessage.from,
+            quote: {
+              message_id: quote.quoted_message_id,
+              user_id: quotedMessage.from,
+            },
           });
           return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
         });
