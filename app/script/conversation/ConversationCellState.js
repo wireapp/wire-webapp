@@ -119,6 +119,13 @@ z.conversation.ConversationCellState = (() => {
               break;
             }
 
+            case ACTIVITY_TYPE.REPLY: {
+              stringId = activityCountIsOne
+                ? z.string.conversationsSecondaryLineSummaryReply
+                : z.string.conversationsSecondaryLineSummaryReplies;
+              break;
+            }
+
             default:
               throw new z.error.ConversationError();
           }

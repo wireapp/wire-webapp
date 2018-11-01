@@ -466,7 +466,9 @@ z.string.conversationsSecondaryLineSummaryMentions = '{{number}} mentions';
 z.string.conversationsSecondaryLineSummaryMissedCall = '{{number}} missed call';
 z.string.conversationsSecondaryLineSummaryMissedCalls = '{{number}} missed calls';
 z.string.conversationsSecondaryLineSummaryPing = '{{number}} ping';
-z.string.conversationsSecondaryLineSummaryPings = '{{number}} pings';
+z.string.conversationsSecondaryLineSummaryPings = '{{number}} pings'
+z.string.conversationsSecondaryLineSummaryReply = '{{number}} reply';
+z.string.conversationsSecondaryLineSummaryReplies = '{{number}} replies';
 z.string.conversationsSecondaryLineYouLeft = 'You left';
 z.string.conversationsSecondaryLineYouWereRemoved = 'You were removed';
 
