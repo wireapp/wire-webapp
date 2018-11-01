@@ -121,6 +121,7 @@ export interface ServerConfig {
     CACHE_DURATION_SECONDS: number;
     CSP: HelmetCSP;
     DEVELOPMENT?: boolean;
+    ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;
     PORT_HTTP: number;
     ROBOTS: {
@@ -159,6 +160,7 @@ const config: ServerConfig = {
     CACHE_DURATION_SECONDS: 300,
     CSP: mergedCSP(),
     DEVELOPMENT: nodeEnvironment === 'development',
+    ENFORCE_HTTPS: process.env.ENFORCE_HTTPS == 'false' ? false : true,
     ENVIRONMENT: nodeEnvironment,
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
