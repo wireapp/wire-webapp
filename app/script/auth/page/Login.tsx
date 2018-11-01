@@ -87,7 +87,6 @@ interface State {
   conversationCode: string;
   conversationKey: string;
   email: string;
-  hideSSOLogin: boolean;
   isValidLink: boolean;
   logoutReason: string;
   password: string;
@@ -110,7 +109,6 @@ class Login extends React.Component<CombinedProps, State> {
     conversationCode: null,
     conversationKey: null,
     email: '',
-    hideSSOLogin: false,
     isValidLink: true,
     logoutReason: null,
     password: '',
@@ -156,8 +154,6 @@ class Login extends React.Component<CombinedProps, State> {
           }));
         });
     }
-
-    this.setState((state, props) => ({hideSSOLogin: URLUtil.hasURLParameter(QUERY_KEY.HIDE_SSO)}));
   };
 
   componentDidMount = () => {
@@ -287,16 +283,7 @@ class Login extends React.Component<CombinedProps, State> {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {
-      logoutReason,
-      isValidLink,
-      hideSSOLogin,
-      email,
-      password,
-      persist,
-      validInputs,
-      validationErrors,
-    } = this.state;
+    const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     const backArrow = (
       <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -406,7 +393,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {!isDesktopApp() && !hideSSOLogin ? (
+                {!isDesktopApp() ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
