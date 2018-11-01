@@ -29,6 +29,7 @@ import BackendError from '../module/action/BackendError';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 import ClientItem from './ClientItem';
@@ -38,14 +39,15 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteCompon
 interface ConnectedProps {
   clientError: Error;
   isFetching: boolean;
+  isSSOUser: boolean;
   permanentClients: RegisteredClient[];
 }
 
 interface DispatchProps {
-  resetAuthError: () => Promise<void>;
-  doRemoveClient: (clientId: string, password: string) => Promise<void>;
-  getLocalStorage: (key: string) => Promise<string | boolean | number>;
   doInitializeClient: (clientType: ClientType, password?: string) => Promise<void>;
+  doRemoveClient: (clientId: string, password?: string) => Promise<void>;
+  getLocalStorage: (key: string) => Promise<string | boolean | number>;
+  resetAuthError: () => Promise<void>;
 }
 
 interface State {
@@ -72,7 +74,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
     this.props.resetAuthError();
   };
 
-  removeClient = (clientId: string, password: string) => {
+  removeClient = (clientId: string, password?: string) => {
     this.setState({showLoading: true, loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner.bind(this), 1000)});
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
@@ -100,7 +102,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
   isSelectedClient = (clientId: string) => clientId === this.state.currentlySelectedClient;
 
   render() {
-    const {isFetching, permanentClients} = this.props;
+    const {clientError, isFetching, permanentClients, isSSOUser} = this.props;
     const {showLoading} = this.state;
 
     return isFetching || showLoading ? (
@@ -115,12 +117,13 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
       >
         {permanentClients.map(client => (
           <ClientItem
-            key={client.id}
-            selected={this.isSelectedClient(client.id)}
             client={client}
-            clientError={this.isSelectedClient(client.id) && this.props.clientError}
+            clientError={this.isSelectedClient(client.id) && clientError}
+            key={client.id}
             onClick={() => this.setSelectedClient(client.id)}
-            onClientRemoval={(password: string) => this.removeClient(client.id, password)}
+            onClientRemoval={(password?: string) => this.removeClient(client.id, password)}
+            requirePassword={!isSSOUser}
+            selected={this.isSelectedClient(client.id)}
           />
         ))}
       </ContainerXS>
@@ -135,6 +138,7 @@ export default withRouter(
         return {
           clientError: ClientSelector.getError(state),
           isFetching: ClientSelector.isFetching(state),
+          isSSOUser: SelfSelector.isSSOUser(state),
           permanentClients: ClientSelector.getPermanentClients(state),
         };
       },
@@ -142,7 +146,7 @@ export default withRouter(
         return {
           doInitializeClient: (clientType: ClientType, password?: string) =>
             dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-          doRemoveClient: (clientId: string, password: string) =>
+          doRemoveClient: (clientId: string, password?: string) =>
             dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
           getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),

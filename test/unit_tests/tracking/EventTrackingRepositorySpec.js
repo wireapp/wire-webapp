@@ -26,17 +26,17 @@ describe('z.tracking.EventTrackingRepository', () => {
 
   beforeEach(() => {
     return test_factory.exposeTrackingActors().then(() => {
-      TestFactory.tracking_repository._isDomainAllowedForTracking = () => true;
+      TestFactory.tracking_repository._isDomainAllowedForAnalytics = () => true;
     });
   });
 
   describe('Initialization', () => {
-    it('enables error reporting, user tracking and subscribes to tracking events', () => {
+    it('enables error reporting, user analytics and subscribes to analytics events', () => {
       expect(TestFactory.tracking_repository.providerAPI).toBeUndefined();
       TestFactory.tracking_repository.providerAPI = true;
       spyOn(TestFactory.tracking_repository, '_enableErrorReporting').and.callThrough();
-      spyOn(TestFactory.tracking_repository, '_initTracking').and.callThrough();
-      spyOn(TestFactory.tracking_repository, '_subscribeToTrackingEvents').and.callThrough();
+      spyOn(TestFactory.tracking_repository, '_enableAnalytics').and.callThrough();
+      spyOn(TestFactory.tracking_repository, '_subscribeToAnalyticsEvents').and.callThrough();
 
       const properties = new z.properties.PropertiesEntity();
       const privacyPreference = properties.settings.privacy.improve_wire;
@@ -46,8 +46,8 @@ describe('z.tracking.EventTrackingRepository', () => {
       return TestFactory.tracking_repository.init(true).then(() => {
         expect(TestFactory.tracking_repository.providerAPI).toBeDefined();
         expect(TestFactory.tracking_repository._enableErrorReporting).toHaveBeenCalled();
-        expect(TestFactory.tracking_repository._initTracking).toHaveBeenCalled();
-        expect(TestFactory.tracking_repository._subscribeToTrackingEvents).toHaveBeenCalled();
+        expect(TestFactory.tracking_repository._enableAnalytics).toHaveBeenCalled();
+        expect(TestFactory.tracking_repository._subscribeToAnalyticsEvents).toHaveBeenCalled();
       });
     });
 
