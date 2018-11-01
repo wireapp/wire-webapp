@@ -124,6 +124,7 @@
     align-items: center;
     margin: 0 16px;
     cursor: pointer;
+    font-weight: @font-weight-regular;
     user-select: none;
 
     &.custom {
@@ -180,14 +181,14 @@
     }
 
     &__status {
-      color: fade(@graphite-dark, 40%);
       font-size: 12px;
       justify-self: flex-end;
+      opacity: 0.56;
     }
 
     &__summary {
       flex-grow: 1;
-      line-height: 14pt;
+      line-height: 18px;
     }
 
     disclose-icon {
