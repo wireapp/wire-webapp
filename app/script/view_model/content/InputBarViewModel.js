@@ -73,6 +73,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
+    ko.pureComputed(() => !!this.replyMessageEntity())
+      .extend({notify: 'always', rateLimit: 100})
+      .subscribe(() => this.scrollMessageList());
+
     this.replyAsset = ko.pureComputed(() => {
       return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
     });
@@ -404,6 +408,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.replyMessageEntity(messageEntity);
+      this.textarea.focus();
     }
   }
 
@@ -639,7 +644,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
   }
 
-  scrollMessageList(newListHeight, previousListHeight) {
+  scrollMessageList(newListHeight = 0, previousListHeight = 0) {
     const antiscroll = $('.message-list').data('antiscroll');
     if (antiscroll) {
       antiscroll.rebuild();
