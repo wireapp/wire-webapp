@@ -18,7 +18,7 @@
  */
 
 import {ClientActionCreator} from './creator/';
-import ROOT_ACTIONS from '.';
+import ROOT_ACTIONS from './';
 import {mockStore} from '../../util/TestUtil';
 import BackendError from './BackendError';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
@@ -29,7 +29,7 @@ function printActions(actions) {
 
 describe('ClientAction', () => {
   describe('Permanent device', () => {
-    it(`doesn't create NewClientError when it is the first`, () => {
+    it('doesn`t create NewClientError when it is the first', () => {
       const creationStatus = {isNewClient: true};
       const mockedActions = {
         clientAction: {
@@ -62,7 +62,7 @@ describe('ClientAction', () => {
       });
     });
 
-    it(`does create NewClientError when it is the second`, () => {
+    it('does create NewClientError when it is the second', () => {
       const creationStatus = {isNewClient: true};
       const mockedActions = {
         clientAction: {
@@ -102,7 +102,7 @@ describe('ClientAction', () => {
   });
 
   describe('Temporary device', () => {
-    it(`does create NewClientError when it is the first`, () => {
+    it('does create NewClientError when it is the first', () => {
       const creationStatus = {isNewClient: true};
       const mockedActions = {
         clientAction: {
@@ -140,7 +140,7 @@ describe('ClientAction', () => {
       });
     });
 
-    it(`does create NewClientError when it is the second`, () => {
+    it('does create NewClientError when it is the second', () => {
       const creationStatus = {isNewClient: true};
       const mockedActions = {
         clientAction: {
