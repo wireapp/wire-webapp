@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.QuoteEntity = class QuoteEntity {
+  static get ERROR() {
+    return {
+      INVALID_HASH: 'INVALID_HASH',
+      MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
+    };
+  }
+
   constructor(messageId, userId, hash) {
     this.messageId = messageId;
     this.hash = hash;
