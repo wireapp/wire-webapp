@@ -203,7 +203,7 @@
     "start": "concurrently \"yarn start:dev\" \"grunt\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
-    "test": "yarn test:types && yarn lint && grunt check && grunt test",
+    "test": "yarn test:types && yarn lint && grunt check && yarn test:auth && grunt test",
     "test:types": "yarn tsc --noEmit",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "translate": "yarn translate:upload && yarn translate:download",

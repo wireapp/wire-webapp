@@ -55,7 +55,7 @@ describe('when entering account data', () => {
   const passwordInput = () => wrapper.find('[data-uie-name="enter-password"]').first();
   const doNextButton = () => wrapper.find('[data-uie-name="do-next"]').first();
   const doTermsCheckbox = () => wrapper.find('[data-uie-name="do-terms"]').first();
-  const validationErrorMessage = () => wrapper.find('[data-uie-name="error-message"]').at(2);
+  const validationErrorMessage = () => wrapper.find('[data-uie-name="error-message"]').last();
 
   const createAccountState = account => {
     return {
