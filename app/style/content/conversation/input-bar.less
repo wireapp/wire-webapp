@@ -23,7 +23,12 @@
   width: 100%;
   min-height: @conversation-input-min-height;
   box-sizing: content-box;
+  flex-direction: column;
   background-color: #fff;
+
+  &__input {
+    display: flex;
+  }
 }
 
 .conversation-input-bar-editing {
@@ -205,11 +210,11 @@
     cursor: pointer;
 
     &:first-child {
-      border-radius: 4px 4px 0 0; // to match parent's border-radius
+      border-radius: 4px 4px 0 0; // to match parent border-radius
     }
 
     &:last-child {
-      border-radius: 0 0 4px 4px; // to match parent's border-radius
+      border-radius: 0 0 4px 4px; // to match parent border-radius
     }
 
     &.selected {
@@ -239,9 +244,6 @@
 }
 
 .input-bar__reply {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
   display: flex;
   width: 100%;
   padding: 12px 16px 0 30px;
