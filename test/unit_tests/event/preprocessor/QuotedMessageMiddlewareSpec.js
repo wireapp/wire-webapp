@@ -50,37 +50,44 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       });
     });
 
-    it('does not decorate event if quoted message is not found', () => {
+    it('adds an error if quoted message is not found', () => {
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
+
+      const expectedError = {
+        type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+      };
 
       const event = {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
         data: {
           content: 'salut',
-          error: {
-            message: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-            quotedMessageId: '',
-          },
-          quote: new z.proto.Quote({quoted_message_id: '', quoted_message_sha256: ''}).encode64(),
+          quote: new z.proto.Quote({
+            quoted_message_id: 'invalid-message-uuid',
+            quoted_message_sha256: '',
+          }).encode64(),
         },
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => expect(parsedEvent).toEqual(event));
+      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+        expect(parsedEvent.data.quote.quoted_message_id).toEqual('invalid-message-uuid');
+        expect(parsedEvent.data.quote.error).toEqual(expectedError);
+      });
     });
 
-    it('does not decorate event is hashes do not match', () => {
+    it('adds an error if hashes do not match', () => {
+      const expectedError = {
+        type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+      };
+
       const quotedMessage = {
         data: {
           content: 'pas salut',
-          error: {
-            message: z.message.QuoteEntity.ERROR.INVALID_HASH,
-            quotedMessageId: '',
-          },
         },
         time: 100,
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
+
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
 
       const event = {
@@ -96,7 +103,10 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => expect(parsedEvent).toEqual(event));
+      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+        expect(parsedEvent.data.quote.message_id).toEqual('message-uuid');
+        expect(parsedEvent.data.quote.error).toEqual(expectedError);
+      });
     });
 
     it('decorates event with the quote metadata if validation is successful', () => {
