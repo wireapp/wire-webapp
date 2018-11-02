@@ -70,7 +70,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.quote.quoted_message_id).toEqual('invalid-message-uuid');
+        expect(parsedEvent.data.quote.quoted_message_id).toBeUndefined();
         expect(parsedEvent.data.quote.error).toEqual(expectedError);
       });
     });
@@ -104,7 +104,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.quote.message_id).toEqual('message-uuid');
+        expect(parsedEvent.data.quote.message_id).toBeUndefined();
         expect(parsedEvent.data.quote.error).toEqual(expectedError);
       });
     });

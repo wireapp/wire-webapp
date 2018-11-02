@@ -58,11 +58,11 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
     return this.eventService.loadEvent(event.conversation, quote.quoted_message_id).then(quotedMessage => {
       if (!quotedMessage) {
         this.logger.warn(`Quoted message with ID "${quote.quoted_message_id}" not found.`);
-        const quoteData = Object.assign({}, quote, {
+        const quoteData = {
           error: {
             type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
           },
-        });
+        };
 
         const decoratedData = Object.assign({}, event.data, {quote: quoteData});
         return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
@@ -71,15 +71,19 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
       return this.messageHasher
         .validateHash(quotedMessage, quote.quoted_message_sha256.toArrayBuffer())
         .then(isValid => {
-          const quoteData = {
-            message_id: quote.quoted_message_id,
-            user_id: quotedMessage.from,
-          };
+          let quoteData;
 
           if (!isValid) {
             this.logger.warn(`Quoted message hash for message ID "${quote.quoted_message_id}" does not match.`);
-            quoteData.error = {
-              type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+            quoteData = {
+              error: {
+                type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+              },
+            };
+          } else {
+            quoteData = {
+              message_id: quote.quoted_message_id,
+              user_id: quotedMessage.from,
             };
           }
 
