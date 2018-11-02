@@ -32,9 +32,10 @@ describe('Root', () => {
         languageState: {
           language: 'en',
         },
+        runtimeState: {},
       };
 
-      store = mockStore(state, {});
+      store = mockStore(state, {actions: {cookieAction: {}}});
       wrapper = mountWithStore(<Root />, store);
     });
 
