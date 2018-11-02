@@ -266,7 +266,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
-          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, replyEntity);
+          if (replyEntity && replyEntity.isReplyable() && replyEntity !== this.replyMessageEntity()) {
+            this.replyMessageEntity(replyEntity);
+          }
         });
       }
     }
