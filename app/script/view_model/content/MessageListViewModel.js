@@ -259,7 +259,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           const unread_message = $('.message-timestamp-unread');
 
           if (this.marked_message()) {
-            this._focus_message(this.marked_message());
+            this._focus_message(this.marked_message().id);
           } else if (unread_message.length) {
             const unread_message_position = unread_message
               .parent()
@@ -380,11 +380,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * Scroll to given message in the list.
    *
    * @note Ideally message is centered horizontally
-   * @param {z.entity.Message} message_et - Target message
+   * @param {string} messageId - Target message's id
    * @returns {undefined} No return value
    */
-  _focus_message(message_et) {
-    const message_element = $(`.message[data-uie-uid="${message_et.id}"]`);
+  _focus_message(messageId) {
+    const message_element = $(`.message[data-uie-uid="${messageId}"]`);
 
     if (message_element.length) {
       const message_list_element = this._getMessagesContainer();
