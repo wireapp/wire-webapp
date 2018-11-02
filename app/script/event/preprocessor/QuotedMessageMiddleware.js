@@ -46,41 +46,50 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
    * @returns {Object} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
   processEvent(event) {
-    const rawQuote = event.data && event.data.quote;
+    const rawQuote = !!event.data && !!event.data.quote;
+
     if (!rawQuote) {
       return Promise.resolve(event);
     }
+
     const quote = z.proto.Quote.decode64(rawQuote);
     this.logger.info('Found quoted message', quote);
 
     return this.eventService.loadEvent(event.conversation, quote.quoted_message_id).then(quotedMessage => {
       if (!quotedMessage) {
         this.logger.warn(`Quoted message with ID "${quote.quoted_message_id}" not found.`);
-        event.error = {
-          message: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-          quotedMessageId: quote.quoted_message_id,
+        const quoteData = {
+          error: {
+            quotedMessageId: quote.quoted_message_id,
+            type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+          },
         };
-        return Promise.resolve(event);
+
+        const decoratedData = Object.assign({}, event.data, {quote: quoteData});
+        return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
       }
 
       return this.messageHasher
         .validateHash(quotedMessage, quote.quoted_message_sha256.toArrayBuffer())
         .then(isValid => {
+          let quoteData;
+
           if (!isValid) {
             this.logger.warn(`Quoted message hash for message ID "${quote.quoted_message_id}" does not match.`);
-            event.error = {
-              message: z.message.QuoteEntity.ERROR.INVALID_HASH,
-              quotedMessageId: quote.quoted_message_id,
+            quoteData = {
+              error: {
+                quotedMessageId: quote.quoted_message_id,
+                type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+              },
             };
-            return Promise.resolve(event);
-          }
-
-          const decoratedData = Object.assign({}, event.data, {
-            quote: {
+          } else {
+            quoteData = {
               message_id: quote.quoted_message_id,
               user_id: quotedMessage.from,
-            },
-          });
+            };
+          }
+
+          const decoratedData = Object.assign({}, event.data, {quote: quoteData});
           return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
         });
     });
