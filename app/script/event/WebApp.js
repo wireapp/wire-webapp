@@ -106,9 +106,6 @@ z.event.WebApp = {
     IMAGE: {
       SEND: 'wire.webapp.conversation.image.send',
     },
-    INPUT: {
-      CLICK: 'wire.webapp.conversation.input.click',
-    },
     MAP_CONNECTION: 'wire.webapp.conversation.map_connection',
     MESSAGE: {
       ADDED: 'wire.webapp.conversation.message.added',
