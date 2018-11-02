@@ -331,7 +331,7 @@ z.conversation.EventMapper = class EventMapper {
 
     const messageEntity = new z.entity.MemberMessage();
 
-    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+    const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
     messageEntity.visible(!isSingleModeConversation);
 
     if (conversationEntity.isGroup()) {

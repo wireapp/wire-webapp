@@ -38,7 +38,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
-    this.isActivatedAccount = mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
 
     this.optionAudio = ko.observable();

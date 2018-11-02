@@ -546,20 +546,20 @@ describe('z.notification.NotificationRepository', () => {
   });
 
   describe('shows a well-formed request notification', () => {
-    let connection_et = undefined;
+    let connectionEntity = undefined;
     const expected_title = '…';
 
     beforeEach(() => {
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
 
-      const user_connection_mapper = new z.user.UserConnectionMapper();
-      connection_et = user_connection_mapper.map_user_connection_from_json(entities.connection);
+      const connectionMapper = new z.connection.ConnectionMapper();
+      connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
     });
 
     it('if a connection request is incoming', () => {
-      connection_et.status = 'pending';
+      connectionEntity.status = 'pending';
       message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;

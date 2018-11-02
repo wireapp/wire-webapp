@@ -137,7 +137,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    */
   get1To1ConversationWithService(serviceEntity) {
     const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
-      if (!conversationEntity.is_one2one()) {
+      if (!conversationEntity.is1to1()) {
         // Disregard conversations that are not 1:1
         return false;
       }

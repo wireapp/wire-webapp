@@ -37,13 +37,13 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     super(params);
     this.clickOnDevice = this.clickOnDevice.bind(this);
 
-    this.clientRepository = this.repositories.client;
-    this.cryptographyRepository = this.repositories.cryptography;
-    this.conversationRepository = this.repositories.conversation;
+    const {client, conversation, cryptography} = params.repositories;
+    this.clientRepository = client;
+    this.conversationRepository = conversation;
+    this.cryptographyRepository = cryptography;
 
     this.logger = new z.util.Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
 
-    this.conversationEntity = this.conversationRepository.active_conversation;
     this.selfClient = this.clientRepository.currentClient;
 
     this.deviceMode = ko.observable(ParticipantDevicesViewModel.MODE.REQUESTING);
@@ -156,7 +156,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
 
     this.isResettingSession(true);
     this.conversationRepository
-      .reset_session(this.userEntity().id, this.selectedClient().id, this.conversationEntity().id)
+      .reset_session(this.userEntity().id, this.selectedClient().id, this.activeConversation().id)
       .then(() => _resetProgress())
       .catch(() => _resetProgress());
   }

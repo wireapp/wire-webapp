@@ -107,11 +107,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_REQUEST: {
           if (this.otherUser()) {
-            if (this.otherUser().is_blocked()) {
+            if (this.otherUser().isBlocked()) {
               return z.l10n.safeHtml(z.string.conversationConnectionBlocked);
             }
 
-            if (this.otherUser().is_outgoing_request()) {
+            if (this.otherUser().isOutgoingRequest()) {
               return '';
             }
           }

@@ -45,7 +45,7 @@ window.TestFactory = function(logger_level) {
   });
   initialLoggerOptions.level = logger_level;
 
-  this.client = new z.service.BackendClient(this.settings.connection);
+  this.backendClient = new z.service.BackendClient(this.settings.connection);
   this.logger = new z.util.Logger('TestFactory', z.config.LOGGER.OPTIONS);
 
   return this;
@@ -78,7 +78,7 @@ window.TestFactory.prototype.exposeServerActors = function() {
 window.TestFactory.prototype.exposeAuthActors = function() {
   this.logger.info('- exposeAuthActors');
   return Promise.resolve().then(() => {
-    TestFactory.authService = new z.auth.AuthService(this.client);
+    TestFactory.authService = new z.auth.AuthService(this.backendClient);
 
     TestFactory.auth_repository = new z.auth.AuthRepository(TestFactory.authService);
     return TestFactory.auth_repository;
@@ -120,18 +120,14 @@ window.TestFactory.prototype.exposeBackupActors = function() {
     .then(() => this.exposeStorageActors())
     .then(() => this.exposeConversationActors())
     .then(() => {
-      this.logger.info('✓ exposedStorageActors');
+      this.logger.info('✓ exposedUserActors');
 
       TestFactory.backup_service = new z.backup.BackupService(TestFactory.storage_service, status);
-
-      return this.exposeUserActors();
-    })
-    .then(() => {
-      this.logger.info('✓ exposedUserActors');
 
       TestFactory.backup_repository = new z.backup.BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
+        TestFactory.connection_repository,
         TestFactory.conversation_repository,
         TestFactory.user_repository
       );
@@ -154,7 +150,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
 
       const currentClient = new z.client.ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
-      TestFactory.cryptography_service = new z.cryptography.CryptographyService(this.client);
+      TestFactory.cryptography_service = new z.cryptography.CryptographyService(this.backendClient);
 
       TestFactory.cryptography_repository = new z.cryptography.CryptographyRepository(
         TestFactory.cryptography_service,
@@ -196,7 +192,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
 
-      TestFactory.client_service = new z.client.ClientService(this.client, TestFactory.storage_service);
+      TestFactory.client_service = new z.client.ClientService(this.backendClient, TestFactory.storage_service);
 
       TestFactory.client_repository = new z.client.ClientRepository(
         TestFactory.client_service,
@@ -234,16 +230,15 @@ window.TestFactory.prototype.exposeEventActors = function() {
     .then(() => {
       this.logger.info('✓ exposedCryptographyActors');
 
-      TestFactory.web_socket_service = new z.event.WebSocketService(this.client, TestFactory.storage_service);
-
+      TestFactory.web_socket_service = new z.event.WebSocketService(this.backendClient, TestFactory.storage_service);
       TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
-
       TestFactory.event_service_no_compound = new z.event.EventServiceNoCompound(TestFactory.storage_service);
-
-      TestFactory.notification_service = new z.event.NotificationService(this.client, TestFactory.storage_service);
-
+      TestFactory.notification_service = new z.event.NotificationService(
+        this.backendClient,
+        TestFactory.storage_service
+      );
       TestFactory.conversation_service = new z.conversation.ConversationService(
-        this.client,
+        this.backendClient,
         TestFactory.event_service,
         TestFactory.storage_service
       );
@@ -275,22 +270,43 @@ window.TestFactory.prototype.exposeUserActors = function() {
     .then(() => {
       this.logger.info('✓ exposedClientActors');
 
-      TestFactory.asset_service = new z.assets.AssetService(this.client);
-
-      TestFactory.search_service = new z.search.SearchService(this.client);
-
-      TestFactory.user_service = new z.user.UserService(this.client);
+      TestFactory.asset_service = new z.assets.AssetService(this.backendClient);
+      TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
+      TestFactory.self_service = new z.self.SelfService(this.backendClient);
+      TestFactory.user_service = new z.user.UserService(this.backendClient);
 
       TestFactory.user_repository = new z.user.UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
-        TestFactory.search_service,
+        TestFactory.self_service,
         TestFactory.client_repository,
         TestFactory.serverTimeRepository
       );
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
       return TestFactory.user_repository;
+    });
+};
+
+/**
+ *
+ * @returns {Promise<z.connection.ConnectionRepository>} The connection repository.
+ */
+window.TestFactory.prototype.exposeConnectionActors = function() {
+  this.logger.info('- exposeConnectionActors');
+  return Promise.resolve()
+    .then(() => this.exposeUserActors())
+    .then(() => {
+      this.logger.info('✓ exposedConnectionActors');
+
+      TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
+
+      TestFactory.connection_repository = new z.connection.ConnectionRepository(
+        TestFactory.connection_service,
+        TestFactory.user_repository
+      );
+
+      return TestFactory.connect_repository;
     });
 };
 
@@ -305,9 +321,8 @@ window.TestFactory.prototype.exposeConnectActors = function() {
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
-      TestFactory.connectService = new z.connect.ConnectService(this.client);
-
-      TestFactory.connectGoogleService = new z.connect.ConnectGoogleService(this.client);
+      TestFactory.connectService = new z.connect.ConnectService(this.backendClient);
+      TestFactory.connectGoogleService = new z.connect.ConnectGoogleService();
 
       TestFactory.connect_repository = new z.connect.ConnectRepository(
         TestFactory.connectService,
@@ -330,7 +345,7 @@ window.TestFactory.prototype.exposeSearchActors = function() {
     .then(() => {
       this.logger.info('✓ exposedTeamActors');
 
-      TestFactory.search_service = new z.search.SearchService(this.client);
+      TestFactory.search_service = new z.search.SearchService(this.backendClient);
 
       TestFactory.search_repository = new z.search.SearchRepository(
         TestFactory.search_service,
@@ -348,7 +363,7 @@ window.TestFactory.prototype.exposeTeamActors = function() {
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
-      TestFactory.teamService = new z.team.TeamService(this.client);
+      TestFactory.teamService = new z.team.TeamService(this.backendClient);
       return TestFactory.teamService;
     })
     .then(() => {
@@ -364,13 +379,14 @@ window.TestFactory.prototype.exposeTeamActors = function() {
 window.TestFactory.prototype.exposeConversationActors = function() {
   this.logger.info('- exposeConversationActors');
   return Promise.resolve()
+    .then(() => this.exposeConnectionActors())
     .then(() => this.exposeTeamActors())
     .then(() => this.exposeEventActors())
     .then(() => {
       this.logger.info('✓ exposedTeamActors');
 
       TestFactory.conversation_service = new z.conversation.ConversationService(
-        this.client,
+        this.backendClient,
         TestFactory.event_service,
         TestFactory.storage_service
       );
@@ -379,6 +395,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.conversation_service,
         TestFactory.asset_service,
         TestFactory.client_repository,
+        TestFactory.connection_repository,
         TestFactory.cryptography_repository,
         TestFactory.event_repository,
         undefined,
@@ -424,7 +441,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
     .then(() => {
       this.logger.info('✓ exposedConversationActors');
 
-      TestFactory.calling_service = new z.calling.CallingService(this.client);
+      TestFactory.calling_service = new z.calling.CallingService(this.backendClient);
 
       TestFactory.calling_repository = new z.calling.CallingRepository(
         TestFactory.calling_service,

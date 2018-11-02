@@ -42,7 +42,7 @@ z.components.UserProfile = class UserProfile {
 
     this.clickOnPending = () => {
       if (this.hasUser()) {
-        const isPendingRequest = this.userEntity().is_ignored() || this.userEntity().is_incoming_request();
+        const isPendingRequest = this.userEntity().isIgnored() || this.userEntity().isIncomingRequest();
         if (isPendingRequest && typeof params.pending === 'function') {
           return params.pending(this.userEntity());
         }
@@ -89,15 +89,15 @@ z.components.UserProfile = class UserProfile {
       if (this.hasUser()) {
         const userEntity = this.userEntity();
 
-        if (userEntity.is_blocked()) {
+        if (userEntity.isBlocked()) {
           return 'user-profile-footer-unblock';
         }
 
-        if (userEntity.is_ignored() || userEntity.is_incoming_request()) {
+        if (userEntity.isIgnored() || userEntity.isIncomingRequest()) {
           return 'user-profile-footer-ignore-accept';
         }
 
-        if (userEntity.is_unknown()) {
+        if (userEntity.isUnknown()) {
           return 'user-profile-footer-add';
         }
       }

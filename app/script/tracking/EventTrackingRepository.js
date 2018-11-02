@@ -76,44 +76,93 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    */
   init(privacyPreference) {
     this.privacyPreference = privacyPreference;
-    this.logger.info(`Initialize tracking and error reporting: ${this.privacyPreference}`);
+    this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
 
-    return Promise.resolve()
-      .then(() => {
-        if (this._isDomainAllowedForTracking() && this.privacyPreference) {
-          this._enableErrorReporting();
-          return this._initTracking();
-        }
-        return undefined;
-      })
-      .then(providerInstance => this._initAnalytics(providerInstance))
-      .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference));
+    const privacyPromise = this.privacyPreference ? this._enableServices(false) : Promise.resolve();
+    return privacyPromise.then(() => {
+      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
+    });
   }
 
   updatePrivacyPreference(privacyPreference) {
-    if (privacyPreference !== this.privacyPreference) {
+    const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
+    if (hasPreferenceChanged) {
       this.privacyPreference = privacyPreference;
 
-      if (privacyPreference) {
-        this._enableErrorReporting();
-        if (this._isDomainAllowedForTracking()) {
-          this._reEnableTracking();
-        }
-      } else {
-        this._disableErrorReporting();
-        this._disableTracking();
+      return this.privacyPreference ? this._enableServices(true) : this._disableServices();
+    }
+  }
+
+  _enableServices(isOptIn = false) {
+    this._enableErrorReporting();
+    return this._isDomainAllowedForAnalytics()
+      ? this._enableAnalytics().then(() => {
+          if (isOptIn) {
+            this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING);
+          }
+        })
+      : Promise.resolve();
+  }
+
+  _disableServices() {
+    this._disableErrorReporting();
+    this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
+    this._disableAnalytics();
+  }
+
+  //##############################################################################
+  // Analytics
+  //##############################################################################
+
+  _disableAnalytics() {
+    this.logger.debug('Analytics was disabled due to user preferences');
+    this.isUserAnalyticsActivated = false;
+
+    this._unsubscribeFromAnalyticsEvents();
+
+    if (this.providerAPI) {
+      // Disable provider API
+      this.providerAPI = undefined;
+    }
+  }
+
+  _enableAnalytics() {
+    this.isUserAnalyticsActivated = true;
+
+    // Check if provider API is available and reuse if possible
+    const providerPromise = this.providerAPI ? Promise.resolve(this.providerAPI) : this._initAnalytics();
+    return providerPromise.then(providerInstance => {
+      if (providerInstance) {
+        this._setSuperProperties();
+        this._subscribeToAnalyticsEvents();
       }
+    });
+  }
+
+  _initAnalytics() {
+    // Initialize provider API
+    return Promise.resolve(this.providerAPI);
+  }
+
+  _isDomainAllowedForAnalytics() {
+    const trackingParameter = z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING);
+    return typeof trackingParameter === 'boolean'
+      ? trackingParameter
+      : !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
+          if (z.util.StringUtil.includes(window.location.hostname, domain)) {
+            this.logger.debug(`Analytics is disabled for domain '${window.location.hostname}'`);
+            return true;
+          }
+        });
+  }
+
+  _resetSuperProperties() {
+    if (this.providerAPI) {
+      // Reset super properties on provider API and forget distinct ids
     }
   }
 
-  _initAnalytics(analyticsProvider) {
-    if (analyticsProvider) {
-      this._setSuperProperties();
-      this._subscribeToTrackingEvents();
-    }
-  }
-
-  _subscribeToTrackingEvents() {
+  _subscribeToAnalyticsEvents() {
     amplify.subscribe(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
       if (this.isUserAnalyticsActivated) {
         this._setSuperProperty(...args);
@@ -127,21 +176,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     });
 
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
-  }
-
-  /**
-   * Calling the reset method will clear the Distinct Id and all super properties.
-   * @returns {undefined}
-   */
-  _resetSuperProperties() {
-    if (this.providerAPI) {
-      // reset super properties on provider
-    }
-  }
-
-  _unsubscribeFromTrackingEvents() {
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
   }
 
   _setSuperProperties() {
@@ -160,65 +194,29 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _setSuperProperty(superPropertyName, value) {
+    // Set property on provider API
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
   }
 
   _trackEvent(eventName, attributes) {
-    const logMessage = attributes
-      ? `Tracking event '${eventName}' with attributes: ${JSON.stringify(attributes)}`
-      : `Tracking event '${eventName}' without attributes`;
-    this.logger.info(logMessage);
-
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
-    if (!isDisabledEvent) {
-      // send event to provider
+    if (isDisabledEvent) {
+      this.logger.info(`Skipped sending disabled event of type '${eventName}'`);
+    } else {
+      const logAttributes = attributes ? `with attributes: ${JSON.stringify(attributes)}` : 'without attributes';
+      this.logger.info(`Tracking event '${eventName}' ${logAttributes}`);
+
+      // Send event if provider API available
     }
   }
 
-  _disableTracking() {
-    this.logger.debug('Tracking was disabled due to user preferences');
-    this.isUserAnalyticsActivated = false;
-
-    this._unsubscribeFromTrackingEvents();
-
-    if (this.providerAPI) {
-      this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
-      // disable provider
-      this.providerAPI = undefined;
-    }
-  }
-
-  _reEnableTracking() {
-    this.isUserAnalyticsActivated = true;
-
-    // check if provider API is available and reuse if possible
-    const providerPromise = this.providerAPI ? Promise.resolve(this.providerAPI) : this._initTracking();
-    return providerPromise
-      .then(providerInstance => this._initAnalytics(providerInstance))
-      .then(() => this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
-  }
-
-  _initTracking() {
-    this.isUserAnalyticsActivated = true;
-    // initialize provider API
-    return Promise.resolve(this.providerAPI);
-  }
-
-  _isDomainAllowedForTracking() {
-    if (!z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING)) {
-      return !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
-        if (z.util.StringUtil.includes(window.location.hostname, domain)) {
-          this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
-          return true;
-        }
-      });
-    }
-
-    return true;
+  _unsubscribeFromAnalyticsEvents() {
+    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
+    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
   }
 
   //##############################################################################
-  // Raygun
+  // Error reporting
   //##############################################################################
 
   /**

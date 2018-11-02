@@ -38,10 +38,12 @@
 <script src="/script/error/CallError.js"></script>
 <script src="/script/error/ClientError.js"></script>
 <script src="/script/error/ConnectError.js"></script>
+<script src="/script/error/ConnectionError.js"></script>
 <script src="/script/error/ConversationError.js"></script>
 <script src="/script/error/CryptographyError.js"></script>
 <script src="/script/error/EventError.js"></script>
 <script src="/script/error/LinkPreviewError.js"></script>
+<script src="/script/error/LocationError.js"></script>
 <script src="/script/error/MediaError.js"></script>
 <script src="/script/error/NotificationError.js"></script>
 <script src="/script/error/PermissionError.js"></script>
@@ -158,6 +160,12 @@
 <script src="/script/connect/ConnectRepository.js"></script>
 <script src="/script/connect/ConnectSource.js"></script>
 <script src="/script/connect/PhoneBook.js"></script>
+<!-- Connection -->
+<script src="/script/connection/ConnectionEntity.js"></script>
+<script src="/script/connection/ConnectionMapper.js"></script>
+<script src="/script/connection/ConnectionRepository.js"></script>
+<script src="/script/connection/ConnectionService.js"></script>
+<script src="/script/connection/ConnectionStatus.js"></script>
 <!-- Client -->
 <script src="/script/client/ClientEntity.js"></script>
 <script src="/script/client/ClientMapper.js"></script>
@@ -264,6 +272,8 @@
 <script src="/script/search/FullTextSearch.js"></script>
 <script src="/script/search/SearchService.js"></script>
 <script src="/script/search/SearchRepository.js"></script>
+<!-- Self -->
+<script src="/script/self/SelfService.js"></script>
 <!-- Server -->
 <script src="/script/time/ServerTimeRepository.js"></script>
 <!-- Team -->
@@ -290,12 +300,10 @@
 <!-- User -->
 <script src="/script/user/AvailabilityMapper.js"></script>
 <script src="/script/user/AvailabilityType.js"></script>
-<script src="/script/user/ConnectionStatus.js"></script>
 <script src="/script/user/ConsentType.js"></script>
 <script src="/script/user/ConsentValue.js"></script>
 <script src="/script/user/UserService.js"></script>
 <script src="/script/user/UserMapper.js"></script>
-<script src="/script/user/UserConnectionMapper.js"></script>
 <script src="/script/user/UserRepository.js"></script>
 <script src="/script/user/UserHandleGenerator.js"></script>
 <!-- View Models -->
@@ -427,7 +435,6 @@
 <script src="/script/entity/message/DecryptErrorMessage.js"></script>
 <script src="/script/entity/message/VerificationMessage.js"></script>
 <script src="/script/entity/User.js"></script>
-<script src="/script/entity/Connection.js"></script>
 <script src="/script/entity/Conversation.js"></script>
 <!-- View -->
 <script src="/script/ui/AvailabilityContextMenu.js"></script>

@@ -30,7 +30,7 @@ z.tracking.helpers = {
    */
   getConversationType(conversationEntity) {
     if (conversationEntity instanceof z.entity.Conversation) {
-      return conversationEntity.is_one2one()
+      return conversationEntity.is1to1()
         ? z.tracking.attribute.ConversationType.ONE_TO_ONE
         : z.tracking.attribute.ConversationType.GROUP;
     }

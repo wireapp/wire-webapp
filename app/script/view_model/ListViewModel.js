@@ -50,16 +50,15 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.onContextMenu = this.onContextMenu.bind(this);
 
     this.elementId = 'left-column';
-    this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
-    this.actionsViewModel = this.mainViewModel.actions;
-    this.contentViewModel = this.mainViewModel.content;
+    this.actionsViewModel = mainViewModel.actions;
+    this.contentViewModel = mainViewModel.content;
     this.panelViewModel = mainViewModel.panel;
 
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
@@ -344,7 +343,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    if (conversationEntity.is_request()) {
+    if (conversationEntity.isRequest()) {
       entries.push({
         click: () => this.clickToCancelRequest(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverCancel),
@@ -360,7 +359,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     if (!conversationEntity.isGroup()) {
       const userEntity = conversationEntity.firstUserEntity();
-      const canBlock = userEntity && (userEntity.is_connected() || userEntity.is_request());
+      const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
 
       if (canBlock) {
         entries.push({

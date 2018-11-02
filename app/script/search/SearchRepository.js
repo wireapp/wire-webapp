@@ -52,7 +52,7 @@ z.search.SearchRepository = class SearchRepository {
   /**
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} searchService - Backend REST API search service implementation
-   * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
+   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
    */
   constructor(searchService, userRepository) {
     this.searchService = searchService;
@@ -173,7 +173,7 @@ z.search.SearchRepository = class SearchRepository {
       .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => {
         return userEntities.filter(userEntity => {
-          return !userEntity.is_me && !userEntity.is_connected() && !userEntity.isTeamMember();
+          return !userEntity.is_me && !userEntity.isConnected() && !userEntity.isTeamMember();
         });
       })
       .then(userEntities => {

@@ -38,7 +38,7 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
 
     this.contentViewModel = this.mainViewModel.content;
     this.contentState = this.contentViewModel.state;
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.selectedAbout = ko.pureComputed(() => {
       return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT;
@@ -67,7 +67,7 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
       z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT,
     ];
 
-    if (!preventingContentViewStates.includes(this.contentViewModel.state())) {
+    if (!preventingContentViewStates.includes(this.contentState())) {
       if (!this.isActivatedAccount()) {
         return this.listViewModel.showTemporaryGuest();
       }
