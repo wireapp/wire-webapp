@@ -667,15 +667,13 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Get a message by it's unique ID.
-   * @param {string} id - ID of message to be retrieved
+   * Only lookup in the loaded message list which is a limited view of all the messages in DB.
+   *
+   * @param {string} messageId - ID of message to be retrieved
    * @returns {z.entity.Message|undefined} Message with ID or undefined
    */
-  get_message_by_id(id) {
-    for (const message_et of this.messages()) {
-      if (message_et.id === id) {
-        return message_et;
-      }
-    }
+  getMessage(messageId) {
+    return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
 
   /**

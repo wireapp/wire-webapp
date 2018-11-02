@@ -259,7 +259,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           const unread_message = $('.message-timestamp-unread');
 
           if (this.marked_message()) {
-            this._focus_message(this.marked_message().id);
+            this._focusMessage(this.marked_message().id);
           } else if (unread_message.length) {
             const unread_message_position = unread_message
               .parent()
@@ -383,7 +383,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @param {string} messageId - Target message's id
    * @returns {undefined} No return value
    */
-  _focus_message(messageId) {
+  _focusMessage(messageId) {
     const message_element = $(`.message[data-uie-uid="${messageId}"]`);
 
     if (message_element.length) {
