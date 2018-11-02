@@ -44,6 +44,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
     this.showUserDetails = this.showUserDetails.bind(this);
+    this._handleWindowResize = this._handleWindowResize.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
@@ -137,8 +138,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
       );
     });
-
-    amplify.subscribe(z.event.WebApp.CONVERSATION.INPUT.CLICK, this.on_conversation_input_click.bind(this));
   }
 
   /**
@@ -169,6 +168,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.conversation_last_read_timestamp(false);
     this.conversation_reached_bottom = false;
     this.messagesContainer = undefined;
+    window.removeEventListener('resize', this._handleWindowResize);
+  }
+
+  _handleWindowResize() {
+    if (this.should_scroll_to_bottom) {
+      this._getMessagesContainer().scrollToBottom();
+    }
   }
 
   /**
@@ -270,6 +276,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
         $('.conversation').css({opacity: 1});
         this.capture_scrolling_event = true;
+        window.addEventListener('resize', this._handleWindowResize);
 
         // Subscribe for incoming messages
         this.messages_subscription = conversation_et.messages_visible.subscribe(
@@ -387,17 +394,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   scroll_height(change_in_height) {
     this._getMessagesContainer().scrollBy(change_in_height);
-  }
-
-  on_conversation_input_click() {
-    if (this.conversation_reached_bottom) {
-      return this._getMessagesContainer().scrollToBottom();
-    }
-
-    this.conversation().remove_messages();
-    this.conversation_repository
-      .getPrecedingMessages(this.conversation())
-      .then(() => this._getMessagesContainer().scrollToBottom());
   }
 
   /**
