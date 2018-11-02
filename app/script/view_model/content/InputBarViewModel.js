@@ -259,6 +259,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.pastedFile(null);
     this.cancelMessageEditing();
     this.cancelMessageReply();
+
     if (conversationEntity) {
       const previousSessionData = this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
@@ -266,7 +267,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
-          if (replyEntity && replyEntity.isReplyable() && replyEntity !== this.replyMessageEntity()) {
+          if (replyEntity && replyEntity.isReplyable()) {
             this.replyMessageEntity(replyEntity);
           }
         });
