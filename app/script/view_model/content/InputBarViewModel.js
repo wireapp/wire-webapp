@@ -73,6 +73,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
+    ko.pureComputed(() => !!this.replyMessageEntity())
+      .extend({notify: 'always', rateLimit: 100})
+      .subscribe(() => this.scrollMessageList());
+
     this.replyAsset = ko.pureComputed(() => {
       return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
     });
@@ -259,6 +263,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.pastedFile(null);
     this.cancelMessageEditing();
     this.cancelMessageReply();
+
     if (conversationEntity) {
       const previousSessionData = this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
@@ -266,7 +271,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
-          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, replyEntity);
+          if (replyEntity && replyEntity.isReplyable()) {
+            this.replyMessageEntity(replyEntity);
+          }
         });
       }
     }
@@ -404,6 +411,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.replyMessageEntity(messageEntity);
+      this.textarea.focus();
     }
   }
 
@@ -435,12 +443,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
       this.cancelMessageEditing();
       this.cancelMessageReply();
-    }
-  }
-
-  onInputClick() {
-    if (!this.hasTextInput()) {
-      amplify.publish(z.event.WebApp.CONVERSATION.INPUT.CLICK);
     }
   }
 
@@ -639,7 +641,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
   }
 
-  scrollMessageList(newListHeight, previousListHeight) {
+  scrollMessageList(newListHeight = 0, previousListHeight = 0) {
     const antiscroll = $('.message-list').data('antiscroll');
     if (antiscroll) {
       antiscroll.rebuild();

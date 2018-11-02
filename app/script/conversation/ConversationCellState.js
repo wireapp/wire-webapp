@@ -50,6 +50,7 @@ z.conversation.ConversationCellState = (() => {
     };
 
     const hasSingleAlert = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0) === 1;
+
     if (prioritizeMentionAndReply && hasSingleAlert) {
       const hasSingleMention = activities[ACTIVITY_TYPE.MENTION].length === 1;
       const hasSingleReply = activities[ACTIVITY_TYPE.REPLY].length === 1;
@@ -168,8 +169,14 @@ z.conversation.ConversationCellState = (() => {
         calls: unreadCalls,
         pings: unreadPings,
         selfMentions: unreadSelfMentions,
+        selfReplies: unreadSelfReplies,
       } = conversationEntity.unreadState();
-      return unreadCalls.length || unreadPings.length || unreadSelfMentions.length;
+      return (
+        unreadCalls.length > 0 ||
+        unreadPings.length > 0 ||
+        unreadSelfMentions.length > 0 ||
+        unreadSelfReplies.length > 0
+      );
     },
   };
 
@@ -180,9 +187,9 @@ z.conversation.ConversationCellState = (() => {
     },
     icon: () => z.conversation.ConversationStatusIcon.NONE,
     match: conversationEntity => {
-      if (conversationEntity.call()) {
-        return conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined();
-      }
+      return conversationEntity.call()
+        ? conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined()
+        : false;
     },
   };
 
@@ -273,7 +280,7 @@ z.conversation.ConversationCellState = (() => {
       return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsMentionsAndReplies());
     },
     icon: conversationEntity => {
-      const hasSelfMentions = conversationEntity.unreadState().selfMentions.length;
+      const hasSelfMentions = conversationEntity.unreadState().selfMentions.length > 0;
       const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsMentionsAndReplies();
 
       return showMentionsIcon
