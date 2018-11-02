@@ -50,7 +50,11 @@ describe('when entering a team name', () => {
     languageState: {
       language: 'en',
     },
-    runtimeState: {},
+    runtimeState: {
+      hasCookieSupport: true,
+      hasIndexedDbSupport: true,
+      isSupportedBrowser: true,
+    },
   };
 
   const teamNameInput = () => wrapper.find('[data-uie-name="enter-team-name"]').first();

@@ -32,7 +32,11 @@ describe('Root', () => {
         languageState: {
           language: 'en',
         },
-        runtimeState: {},
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
       };
 
       store = mockStore(state, {actions: {cookieAction: {}}});
