@@ -289,6 +289,7 @@ class Login extends React.Component<CombinedProps, State> {
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
       </Link>
     );
+    const isSSOCapable = !isDesktopApp() || (isDesktopApp() && typeof window.wSSOCapable !== 'undefined');
     return (
       <Page>
         <IsMobile>
@@ -393,7 +394,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {!isDesktopApp() ? (
+                {isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
