@@ -17,13 +17,39 @@
  *
  */
 
-import {Router} from 'express';
+import {Request, Router} from 'express';
 import {ServerConfig} from '../config';
+
+const geolite2 = require('geolite2');
+const maxmind = require('maxmind');
+
+function addGeoIP(req: Request) {
+  let countryCode = '';
+
+  try {
+    const ip = req.header('X-Forwarded-For') || req.ip;
+    const lookup = maxmind.openSync(geolite2.paths.country);
+    const result = lookup.get(ip);
+    if (result) {
+      countryCode = result.country.iso_code;
+    }
+  } catch (error) {
+    // It's okay to go without a detected country.
+  }
+
+  req.app.locals.country = countryCode;
+}
 
 const Root = (config: ServerConfig) => [
   Router().get('/', (req, res) => res.render('index')),
-  Router().get('/auth', (req, res) => res.render('auth/index')),
-  Router().get('/login', (req, res) => res.render('login/index')),
+  Router().get('/auth', (req, res) => {
+    addGeoIP(req);
+    return res.render('auth/index');
+  }),
+  Router().get('/login', (req, res) => {
+    addGeoIP(req);
+    return res.render('login/index');
+  }),
   Router().get('/demo', (req, res) => res.render('demo/index')),
 ];
 

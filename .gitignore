@@ -5,6 +5,7 @@
 .grunt
 .Icon
 .vscode
+*.rej
 /_SpecRunner.html
 /.idea/**/*.xml
 /app/ext

@@ -174,7 +174,7 @@ ko.bindingHandlers.heightSync = {
 
     const resizeTarget = () => {
       const sourceHeight = element.scrollHeight;
-      const targetHeight = parseInt(targetElement.style.height, 10);
+      const targetHeight = targetElement.offsetHeight;
       if (sourceHeight !== targetHeight) {
         targetElement.style.overflowY = 'hidden';
         targetElement.style.height = `${element.scrollHeight}px`;

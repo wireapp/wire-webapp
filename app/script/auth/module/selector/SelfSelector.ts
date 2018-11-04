@@ -29,18 +29,20 @@ const unsetSelf: Self = {
   id: undefined,
   locale: undefined,
   name: undefined,
+  sso_id: undefined,
   team: undefined,
 };
 
-export const getSelf = (state: RootState) => state.selfState.self || unsetSelf;
-export const getSelfName = (state: RootState) => getSelf(state).name;
-export const getSelfHandle = (state: RootState) => getSelf(state).handle;
-export const hasSelfHandle = (state: RootState) => !!getSelf(state).handle;
-export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;
-export const getSelfTeamId = (state: RootState) => getSelf(state).team;
-export const getSelfError = (state: RootState) => state.selfState.error;
-export const isFetching = (state: RootState) => state.selfState.fetching;
 export const getConsents = (state: RootState) => state.selfState.consents || {};
+export const getSelf = (state: RootState) => state.selfState.self || unsetSelf;
+export const getSelfError = (state: RootState) => state.selfState.error;
+export const getSelfHandle = (state: RootState) => getSelf(state).handle;
+export const getSelfName = (state: RootState) => getSelf(state).name;
+export const getSelfTeamId = (state: RootState) => getSelf(state).team;
+export const hasSelfHandle = (state: RootState) => !!getSelf(state).handle;
+export const isFetching = (state: RootState) => state.selfState.fetching;
+export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id;
+export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;
 const getConsent = (state: RootState, consentType: number) => getConsents(state)[consentType];
 export const hasUnsetConsent = (state: RootState, consentType: number) =>
   !config.FEATURE.CHECK_CONSENT ? false : getConsent(state, consentType) === undefined;

@@ -40,7 +40,9 @@
                 </div>
               </div>
               <div class="preferences-devices-card-action">
-                <div class="icon-trash" data-bind="click: $parent.clickOnRemoveDevice" data-uie-name="do-device-remove"></div>
+                <div class="preferences-devices-card-action__delete" data-bind="click: $parent.clickOnRemoveDevice, css: {'svg-red': $parent.isSSO()}" data-uie-name="do-device-remove">
+                  <delete-icon></delete-icon>
+                </div>
                 <div class="icon-forward" data-uie-name="go-device-details"></div>
               </div>
             </div>
