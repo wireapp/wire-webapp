@@ -64,6 +64,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
     });
 
+    amplify.subscribe(z.event.WebApp.INPUT.RESIZE, this._handleInputResize.bind(this));
+
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
 
@@ -167,6 +169,17 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   _handleWindowResize() {
     if (this.should_scroll_to_bottom) {
       this._getMessagesContainer().scrollToBottom();
+    }
+  }
+
+  _handleInputResize(inputSizeDiff) {
+    const antiscroll = $('.message-list').data('antiscroll');
+    if (antiscroll) {
+      antiscroll.rebuild();
+    }
+
+    if (inputSizeDiff !== 0) {
+      this._getMessagesContainer().scrollBy(inputSizeDiff);
     }
   }
 

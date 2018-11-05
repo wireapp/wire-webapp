@@ -132,6 +132,9 @@ z.event.WebApp = {
       SHOW: 'wire.webapp.extionsions.giphy.show',
     },
   },
+  INPUT: {
+    RESIZE: 'wire.webapp.input.resize',
+  },
   LEFT: {
     FADE_IN: 'wire.webapp.left.fade_in',
     HIDE: 'wire.webapp.left.hide',

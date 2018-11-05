@@ -78,7 +78,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .subscribeChanged((newValue, previousValue) => {
         // scroll the message list whenever the user starts or cancels replying to a message
         if (newValue !== previousValue) {
-          this.scrollMessageList();
+          this.triggerInputChangeEvent();
         }
       });
 
@@ -646,17 +646,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
   }
 
-  scrollMessageList(newListHeight = 0, previousListHeight = 0) {
-    const antiscroll = $('.message-list').data('antiscroll');
-    if (antiscroll) {
-      antiscroll.rebuild();
-    }
-
-    if ($('.messages-wrap').isScrolledBottom()) {
-      return $('.messages-wrap').scrollToBottom();
-    }
-
-    $('.messages-wrap').scrollBy(newListHeight - previousListHeight);
+  triggerInputChangeEvent(newInputHeight = 0, previousInputHeight = 0) {
+    amplify.publish(z.event.WebApp.INPUT.RESIZE, newInputHeight - previousInputHeight);
   }
 
   sendGiphy() {
