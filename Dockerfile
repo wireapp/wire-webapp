@@ -12,7 +12,6 @@ ENV PATH=$PATH:/src/node_modules/.bin
 WORKDIR /src
 RUN yarn && yarn build:server && yarn deploy-travis-prod
 
-ENV NODEPORT 8080
 EXPOSE 8080
 
-ENTRYPOINT ["dumb-init", "--", "/bin/bash", "/src/run.sh"]
+ENTRYPOINT ["dumb-init", "--", "node", "/src/aws/index.js"]
