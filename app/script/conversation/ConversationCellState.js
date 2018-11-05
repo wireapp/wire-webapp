@@ -52,8 +52,8 @@ z.conversation.ConversationCellState = (() => {
     const hasSingleAlert = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0) === 1;
 
     if (prioritizeMentionAndReply && hasSingleAlert) {
-      const hasSingleMention = activities[ACTIVITY_TYPE.MENTION].length === 1;
-      const hasSingleReply = activities[ACTIVITY_TYPE.REPLY].length === 1;
+      const hasSingleMention = activities[ACTIVITY_TYPE.MENTION] === 1;
+      const hasSingleReply = activities[ACTIVITY_TYPE.REPLY] === 1;
 
       if (hasSingleMention || hasSingleReply) {
         const [mentionMessageEntity] = unreadSelfMentions;
