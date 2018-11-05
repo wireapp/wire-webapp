@@ -402,10 +402,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     });
   }
 
-  scroll_height(change_in_height) {
-    this._getMessagesContainer().scrollBy(change_in_height);
-  }
-
   /**
    * Triggered when user clicks on an avatar in the message list.
    * @param {z.entity.User} userEntity - User entity of the selected user

@@ -235,10 +235,4 @@ z.event.WebApp = {
     MODAL: 'wire.webapp.warning.modal',
     SHOW: 'wire.webapp.warning.show',
   },
-  WINDOW: {
-    RESIZE: {
-      HEIGHT: 'wire.webapp.window.resize.height',
-      WIDTH: 'wire.webapp.window.resize.width',
-    },
-  },
 };

@@ -132,7 +132,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
-    amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.messageList.scroll_height.bind(this.messageList));
   }
 
   /**
