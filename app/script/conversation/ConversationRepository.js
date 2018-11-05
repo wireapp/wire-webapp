@@ -405,7 +405,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the message
    */
   get_message_in_conversation_by_id(conversationEntity, messageId) {
-    const messageEntity = conversationEntity.get_message_by_id(messageId);
+    const messageEntity = conversationEntity.getMessage(messageId);
     if (messageEntity) {
       return Promise.resolve(messageEntity);
     }
