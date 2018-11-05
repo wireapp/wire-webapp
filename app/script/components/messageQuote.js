@@ -29,9 +29,9 @@ z.components.MessageQuote = class MessageQuote {
 
     const activeConversation = conversationRepository.active_conversation;
     this.locationRepository = locationRepository;
-    this.message = ko.observable();
+    this.quotedMessage = ko.observable();
     conversationRepository.get_message_in_conversation_by_id(activeConversation(), quote().messageId).then(message => {
-      this.message(message);
+      this.quotedMessage(message);
     });
 
     this.canShowMore = ko.observable(false);
@@ -52,14 +52,14 @@ z.components.MessageQuote = class MessageQuote {
 
 ko.components.register('message-quote', {
   template: `
-  <!-- ko if: message() -->
+  <!-- ko if: quotedMessage() -->
     <div class="message-quote" data-bind="template: {afterRender: updateCanShowMore}">
-      <!-- ko if: message().error -->
+      <!-- ko if: quotedMessage().error -->
         <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError"></div>
       <!-- /ko -->
-      <!-- ko ifnot: message().error -->
-        <div class="message-quote__sender" data-bind="text: message().headerSenderName()"></div>
-        <!-- ko foreach: {data: message().assets, as: 'asset'} -->
+      <!-- ko ifnot: quotedMessage().error -->
+        <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()"></div>
+        <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
               <div class="message-quote__image" data-bind="background_image: asset.resource">
                 <img data-bind="attr: {src: asset.dummy_url}"/>
@@ -77,15 +77,15 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_video() -->
-            <video-asset class="message-quote__video" params="message: $parent.message, isQuote: true"></video-asset>
+            <video-asset class="message-quote__video" params="message: $parent.quotedMessage, isQuote: true"></video-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.is_audio() -->
-            <audio-asset class="message-quote__audio" params="message: $parent.message"></audio-asset>
+            <audio-asset class="message-quote__audio" params="message: $parent.quotedMessage"></audio-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.is_file() -->
-            <file-asset class="message-quote__file" params="message: $parent.message"></file-asset>
+            <file-asset class="message-quote__file" params="message: $parent.quotedMessage"></file-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.is_location() -->
