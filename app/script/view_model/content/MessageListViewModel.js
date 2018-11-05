@@ -390,13 +390,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     loadMessagePromise.then(() => {
       z.util.afterRender(() => {
-        const message_element = $(`.message[data-uie-uid="${messageId}"]`);
+        const messagesContainer = this._getMessagesContainer();
+        const messageElement = messagesContainer.find(`.message[data-uie-uid="${messageId}"]`);
 
-        if (message_element.length) {
-          message_element.removeClass('message-marked');
-          const message_list_element = this._getMessagesContainer();
-          message_list_element.scrollBy(message_element.offset().top - message_list_element.height() / 2);
-          message_element.addClass('message-marked');
+        if (messageElement.length) {
+          messageElement.removeClass('message-marked');
+          messagesContainer.scrollBy(messageElement.offset().top - messagesContainer.height() / 2);
+          messageElement.addClass('message-marked');
         }
       });
     });
