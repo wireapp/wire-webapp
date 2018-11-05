@@ -35,7 +35,7 @@
     "karma-spec-reporter": "0.0.32",
     "nock": "10.0.2",
     "optimist": "0.6.1",
-    "react-hot-loader": "4.3.11",
+    "react-hot-loader": "4.3.12",
     "rimraf": "2.6.2",
     "sinon": "7.1.1",
     "sinon-har-server": "0.3.0",
