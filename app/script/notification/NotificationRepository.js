@@ -218,10 +218,7 @@ z.notification.NotificationRepository = class NotificationRepository {
           if (assetEntity.isUserMentioned(this.selfUser().id)) {
             notificationText = z.l10n.text(z.string.notificationMention, assetEntity.text);
           } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
-            notificationText = z.l10n.text(z.string.notificationReply, {
-              text: assetEntity.text,
-              user: messageEntity.user().first_name(),
-            });
+            notificationText = z.l10n.text(z.string.notificationReply, assetEntity.text);
           } else {
             notificationText = assetEntity.text;
           }
