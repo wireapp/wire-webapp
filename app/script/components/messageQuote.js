@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.MessageQuote = class MessageQuote {
-  constructor({conversation, quote, conversationRepository, locationRepository}) {
+  constructor({conversation, conversationRepository, locationRepository, quote}) {
     this.updateCanShowMore = this.updateCanShowMore.bind(this);
     this.toggleShowMore = this.toggleShowMore.bind(this);
 
