@@ -178,7 +178,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       antiscroll.rebuild();
     }
 
-    if (inputSizeDiff !== 0) {
+    if (inputSizeDiff) {
       this._getMessagesContainer().scrollBy(inputSizeDiff);
     }
   }
