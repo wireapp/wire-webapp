@@ -14,4 +14,4 @@ RUN yarn && yarn build:server && yarn deploy-travis-prod
 
 EXPOSE 8080
 
-ENTRYPOINT ["dumb-init", "--", "node", "/src/aws/index.js"]
+ENTRYPOINT ["dumb-init", "--", "/bin/bash", "/src/run.sh"]
