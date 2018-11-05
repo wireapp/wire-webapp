@@ -51,7 +51,7 @@ z.conversation.ConversationCellState = (() => {
 
     const alertCount = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
     const hasSingleAlert = alertCount === 1;
-    const hasOnlyReplies = alertCount - activities[ACTIVITY_TYPE.REPLY] === 0 && activities[ACTIVITY_TYPE.REPLY] > 0;
+    const hasOnlyReplies = activities[ACTIVITY_TYPE.REPLY] > 0 && alertCount === activities[ACTIVITY_TYPE.REPLY];
 
     if (prioritizeMentionAndReply && (hasSingleAlert || hasOnlyReplies)) {
       const hasSingleMention = activities[ACTIVITY_TYPE.MENTION] === 1;
