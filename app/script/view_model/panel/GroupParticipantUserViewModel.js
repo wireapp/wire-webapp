@@ -28,16 +28,19 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
   constructor(params) {
     super(params);
 
-    this.userRepository = this.repositories.user;
+    const {mainViewModel, repositories} = params;
+
+    this.userRepository = repositories.user;
+    this.actionsViewModel = mainViewModel.actions;
 
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
 
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+
     this.selectedParticipant = ko.observable(undefined);
 
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
-
     this.selectedIsConnected = ko.pureComputed(() => {
-      return this.selectedParticipant().is_connected() || this.selectedParticipant().isTeamMember();
+      return this.selectedParticipant().isConnected() || this.selectedParticipant().isTeamMember();
     });
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.isVisible()) {
@@ -50,11 +53,11 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
       return this.isVisible() ? this.activeConversation().isActiveParticipant() : false;
     });
 
-    this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().is_incoming_request());
-    this.showActionsOutgoingRequest = ko.pureComputed(() => this.selectedParticipant().is_outgoing_request());
+    this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().isIncomingRequest());
+    this.showActionsOutgoingRequest = ko.pureComputed(() => this.selectedParticipant().isOutgoingRequest());
 
     this.showActionBlock = ko.pureComputed(() => {
-      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_request();
+      return this.selectedParticipant().isConnected() || this.selectedParticipant().isRequest();
     });
     this.showActionDevices = ko.pureComputed(() => !this.selectedParticipant().is_me);
     this.showActionOpenConversation = ko.pureComputed(() => {
@@ -63,7 +66,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
     this.showActionSelfProfile = ko.pureComputed(() => this.selectedParticipant().is_me);
     this.showActionSendRequest = ko.pureComputed(() => {
-      const isNotConnectedUser = this.selectedParticipant().is_canceled() || this.selectedParticipant().is_unknown();
+      const isNotConnectedUser = this.selectedParticipant().isCanceled() || this.selectedParticipant().isUnknown();
       const canConnect = !this.selectedParticipant().isTeamMember() && !this.selectedParticipant().isTemporaryGuest();
       return isNotConnectedUser && canConnect;
     });
@@ -71,7 +74,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
       const isActiveParticipant = this.activeConversation() && !this.activeConversation().removed_from_conversation();
       return this.selectedParticipant().is_me && isActiveParticipant;
     });
-    this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
+    this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().isBlocked());
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedParticipant() && this.isVisible())

@@ -56,7 +56,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
           .filter(conversationEntity => {
             const {allMessages: unreadMessages, selfMentions: unreadSelfMentions} = conversationEntity.unreadState();
 
-            const isIgnored = conversationEntity.is_request() || conversationEntity.showNotificationsNothing();
+            const isIgnored = conversationEntity.isRequest() || conversationEntity.showNotificationsNothing();
 
             if (isIgnored) {
               return false;

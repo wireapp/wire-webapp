@@ -22,7 +22,6 @@ const QUERY_KEY = {
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
   ENVIRONMENT: 'env',
-  HIDE_SSO: 'hide_sso',
   IMMEDIATE_LOGIN: 'immediate_login',
   JOIN_EXPIRES: 'expires_in',
   LANGUAGE: 'hl',
@@ -51,9 +50,7 @@ const ROUTE = {
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
   LOGIN: '/login',
-  PERSONAL_INVITE: '/personalinvite',
   SSO: '/sso',
   VERIFY: '/verify',
 };

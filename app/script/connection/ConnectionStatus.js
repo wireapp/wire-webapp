@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.user = z.user || {};
+window.z.connection = z.connection || {};
 
-z.user.ConnectionStatus = {
+z.connection.ConnectionStatus = {
   ACCEPTED: 'accepted',
   BLOCKED: 'blocked',
   CANCELLED: 'cancelled',

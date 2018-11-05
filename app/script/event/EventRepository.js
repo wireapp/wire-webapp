@@ -60,7 +60,7 @@ z.event.EventRepository = class EventRepository {
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
-   * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
+   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
    */
   constructor(
     eventService,
@@ -406,7 +406,7 @@ z.event.EventRepository = class EventRepository {
 
     const isTypeUserConnection = eventType === z.event.Backend.USER.CONNECTION;
     if (isTypeUserConnection) {
-      return connection.last_update;
+      return connection.lastUpdate;
     }
 
     if (defaultValue) {

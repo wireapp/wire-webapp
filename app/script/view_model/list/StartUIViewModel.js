@@ -244,13 +244,14 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
-  clickOnOther(userEntity, event) {
-    if (userEntity.is_outgoing_request && userEntity.is_outgoing_request()) {
-      return this.clickOnContact(userEntity);
+  clickOnOther(participantEntity, event) {
+    const isUser = participantEntity instanceof z.entity.User;
+    if (isUser && participantEntity.isOutgoingRequest()) {
+      return this.clickOnContact(participantEntity);
     }
 
     const createBubble = elementId => {
-      this.userProfile(userEntity);
+      this.userProfile(participantEntity);
       this.userBubbleLastId = elementId;
       this.userBubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element.attr('id')}`,
@@ -384,12 +385,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       .get_most_active_conversations()
       .then(conversationEntities => {
         return conversationEntities
-          .filter(conversationEntity => conversationEntity.is_one2one())
+          .filter(conversationEntity => conversationEntity.is1to1())
           .slice(0, 6)
           .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
       })
       .then(userIds => this.userRepository.get_users_by_id(userIds))
-      .then(userEntities => userEntities.filter(userEntity => !userEntity.is_blocked()));
+      .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
 
   //##############################################################################

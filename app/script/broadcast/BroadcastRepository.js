@@ -31,7 +31,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
    * @param {ClientRepository} clientRepository - Repository for client interactions
    * @param {ConversationRepository} conversationRepository - Repository for conversation interactions
    * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {UserRepository} userRepository - Repository for all user and connection interactions
+   * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(broadcastService, clientRepository, conversationRepository, cryptographyRepository, userRepository) {
     this.broadcastService = broadcastService;

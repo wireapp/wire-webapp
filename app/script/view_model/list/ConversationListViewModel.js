@@ -35,14 +35,15 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.isSelectedConversation = this.isSelectedConversation.bind(this);
 
-    this.contentViewModel = mainViewModel.content;
-    this.listViewModel = listViewModel;
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
     this.permissionRepository = repositories.permission;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
+
+    this.contentViewModel = mainViewModel.content;
+    this.listViewModel = listViewModel;
 
     this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
     this.multitasking = this.contentViewModel.multitasking;
@@ -53,7 +54,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.selectedConversation = ko.observable();
 
     this.isTeam = this.teamRepository.isTeam;
-    this.isActivatedAccount = mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.selfUser = ko.pureComputed(() => this.userRepository.self && this.userRepository.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());

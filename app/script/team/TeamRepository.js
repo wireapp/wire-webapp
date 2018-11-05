@@ -28,7 +28,7 @@ z.team.TeamRepository = class TeamRepository {
    * @class z.team.TeamRepository
    *
    * @param {z.team.TeamService} teamService - Backend REST API team service implementation
-   * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
+   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
    */
   constructor(teamService, userRepository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);

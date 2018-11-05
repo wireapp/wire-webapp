@@ -37,15 +37,22 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
-    this.conversationRepository = this.repositories.conversation;
-    this.integrationRepository = this.repositories.integration;
-    this.searchRepository = params.repositories.search;
-    this.teamRepository = this.repositories.team;
+    const {mainViewModel, repositories} = params;
+
+    const {conversation, integration, search, team, user} = repositories;
+    this.conversationRepository = conversation;
+    this.integrationRepository = integration;
+    this.searchRepository = search;
+    this.teamRepository = team;
+    this.userRepository = user;
+
+    this.actionsViewModel = mainViewModel.actions;
 
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
+
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
 
     this.serviceParticipants = ko.observableArray();
@@ -82,7 +89,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isSingleUserMode = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().is_one2one() || this.activeConversation().is_request()
+        ? this.activeConversation().is1to1() || this.activeConversation().isRequest()
         : false;
     });
 
@@ -118,16 +125,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
-        return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
+        return this.firstParticipant().isConnected() || this.firstParticipant().isRequest();
       }
     });
 
     this.showActionCreateGroup = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_one2one() && !this.isServiceMode();
+      return this.activeConversation() && this.activeConversation().is1to1() && !this.isServiceMode();
     });
 
     this.showActionCancelRequest = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is_request();
+      return this.activeConversation() && this.activeConversation().isRequest();
     });
 
     this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
@@ -185,11 +192,13 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
-      const conversation = this.activeConversation();
-      const hasMessageTimeSet = conversation && conversation.messageTimer() && conversation.hasGlobalMessageTimer();
-      return hasMessageTimeSet
-        ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
-        : z.l10n.text(z.string.ephemeralUnitsNone);
+      if (this.activeConversation()) {
+        const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
+        if (hasTimer) {
+          return z.util.TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
+        }
+      }
+      return z.l10n.text(z.string.ephemeralUnitsNone);
     });
 
     const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);

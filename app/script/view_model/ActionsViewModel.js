@@ -25,6 +25,7 @@ window.z.viewModel = z.viewModel || {};
 z.viewModel.ActionsViewModel = class ActionsViewModel {
   constructor(mainViewModel, repositories) {
     this.clientRepository = repositories.client;
+    this.connectionRepository = repositories.connection;
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
@@ -33,7 +34,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   acceptConnectionRequest(userEntity, showConversation) {
     if (userEntity) {
-      return this.userRepository.acceptConnectionRequest(userEntity, showConversation);
+      return this.connectionRepository.acceptRequest(userEntity, showConversation);
     }
   }
 
@@ -46,7 +47,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   blockUser(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.userRepository.blockUser(userEntity, hideConversation, nextConversationEntity),
+        action: () => this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity),
         text: {
           action: z.l10n.text(z.string.modalUserBlockAction),
           message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
@@ -59,7 +60,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.userRepository.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity),
+        action: () => this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity),
         text: {
           action: z.l10n.text(z.string.modalConnectCancelAction),
           message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
@@ -91,8 +92,13 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   deleteClient(clientEntity) {
+    // @todo Add failure case ux WEBAPP-3570
+    if (this.userRepository.self().isSingleSignOn) {
+      // SSO users can remove their clients without the need of entering a password
+      return this.clientRepository.deleteClient(clientEntity.id);
+    }
+
     return new Promise((resolve, reject) => {
-      // @todo Add failure case ux WEBAPP-3570
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
         action: password => {
           this.clientRepository
@@ -153,7 +159,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   ignoreConnectionRequest(userEntity) {
     if (userEntity) {
-      return this.userRepository.ignoreConnectionRequest(userEntity);
+      return this.connectionRepository.ignoreRequest(userEntity);
     }
   }
 
@@ -230,7 +236,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   sendConnectionRequest(userEntity, showConversation) {
     if (userEntity) {
-      return this.userRepository.createConnection(userEntity, showConversation);
+      return this.connectionRepository.createConnection(userEntity, showConversation);
     }
   }
 
@@ -247,7 +253,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
-          this.userRepository
+          this.connectionRepository
             .unblockUser(userEntity, showConversation)
             .then(() => this.conversationRepository.get1To1Conversation(userEntity))
             .then(conversationEntity => {

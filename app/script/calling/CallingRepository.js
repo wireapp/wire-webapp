@@ -58,7 +58,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {EventRepository} eventRepository -  Repository that handles events
    * @param {MediaRepository} mediaRepository -  Repository for media interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
-   * @param {UserRepository} userRepository -  Repository for all user and connection interactions
+   * @param {UserRepository} userRepository -  Repository for all user interactions
    */
   constructor(
     callingService,
@@ -653,7 +653,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversationId, type} = callMessageEntity;
 
     return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-      if (conversationEntity.is_one2one()) {
+      if (conversationEntity.is1to1()) {
         const groupMessageTypes = [
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,

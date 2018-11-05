@@ -34,7 +34,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.multitasking = contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
-    this.isActivatedAccount = mainViewModel.isActivatedAccount;
     this.panelViewModel = mainViewModel.panel;
 
     this.panelIsVisible = this.panelViewModel.isVisible;
@@ -46,7 +45,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.selfStreamState = this.callingRepository.selfStreamState;
-    this.isActivatedAccount = mainViewModel.isActivatedAccount;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && this.joinedCall();
@@ -76,7 +75,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
         return false;
       }
 
-      const isSupportedConversation = this.conversationEntity().isGroup() || this.conversationEntity().is_one2one();
+      const isSupportedConversation = this.conversationEntity().isGroup() || this.conversationEntity().is1to1();
       const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
       const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
       return !this.hasCall() && isSupportedConversation && isActiveConversation;

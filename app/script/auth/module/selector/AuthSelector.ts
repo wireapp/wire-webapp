@@ -24,7 +24,6 @@ import {RegistrationDataState} from '../reducer/authReducer';
 export const REGISTER_FLOW = {
   GENERIC_INVITATION: 'REGISTER_FLOW_GENERIC_INVITATION',
   PERSONAL: 'REGISTER_FLOW_PERSONAL',
-  PERSONAL_INVITATION: 'REGISTER_FLOW_PERSONAL_INVITATION',
   TEAM: 'REGISTER_FLOW_TEAM',
 };
 
@@ -62,6 +61,4 @@ export const getAccountTeamName = (state: RootState) => getAccountTeam(state).na
 
 export const isGenericInvitationFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;
 export const isPersonalFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL;
-export const isPersonalInvitationFlow = (state: RootState) =>
-  getCurrentFlow(state) === REGISTER_FLOW.PERSONAL_INVITATION;
 export const isTeamFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.TEAM;

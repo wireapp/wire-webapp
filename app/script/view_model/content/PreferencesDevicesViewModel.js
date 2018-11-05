@@ -32,6 +32,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = mainViewModel.actions;
@@ -42,6 +43,8 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.activationDate = ko.observable([]);
     this.devices = ko.observableArray();
     this.localFingerprint = ko.observableArray([]);
+    this.selfUser = this.userRepository.self;
+    this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
 
     this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 

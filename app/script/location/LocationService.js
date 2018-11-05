@@ -72,7 +72,8 @@ z.location.LocationService = (() => {
     getLocation(latitude, longitude) {
       return new Promise((resolve, reject) => {
         if (latitude == null || longitude == null) {
-          reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
+          const errorMessage = 'You need to specify latitude and longitude in order to retrieve the location';
+          return reject(new z.error.LocationError(z.error.BaseError.MISSING_PARAMETER, errorMessage));
         }
 
         const requestConfig = {
@@ -80,36 +81,19 @@ z.location.LocationService = (() => {
             latlng: `${latitude},${longitude}`,
           },
           type: 'GET',
-          url: this.backendClient.create_url(GOOGLE_GEOCODE_PROXY_BASE_URL),
+          url: GOOGLE_GEOCODE_PROXY_BASE_URL,
         };
 
         return this.backendClient
-          .send_request(requestConfig)
+          .sendRequest(requestConfig)
           .then(response => {
             const isStatusOk = response.status === 'OK';
             return isStatusOk ? resolve(_parseResults(response.results)) : resolve();
           })
-          .catch((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
+          .catch((jqXHR, textStatus, errorThrown) => {
+            reject(new z.error.LocationError(z.error.LocationError.TYPE.REQUEST_FAILED, errorThrown));
+          });
       });
-    }
-
-    /**
-     * Return link to Google Maps
-     *
-     * @param {number} latitude - Latitude of location
-     * @param {number} longitude - Longitude of location
-     * @param {string} name - Name of location
-     * @param {string} zoom - Map zoom level
-     * @returns {string} URL to location in Google Maps
-     */
-    getMapsUrl(latitude, longitude, name, zoom) {
-      const baseUrl = 'https://google.com/maps/';
-
-      const nameParam = name ? `place/${name}/` : '';
-      const locationParam = `@${latitude},${longitude}`;
-      const zoomParam = zoom ? `,${zoom}z` : '';
-
-      return `${baseUrl}${nameParam}${locationParam}${zoomParam}`;
     }
   };
 })();

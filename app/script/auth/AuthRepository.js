@@ -48,7 +48,7 @@ z.auth.AuthRepository = class AuthRepository {
     this.authService = authService;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
 
-    this.queueState = this.authService.client.queue_state;
+    this.queueState = this.authService.backendClient.queueState;
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
   }
@@ -83,11 +83,11 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return this.authService.postLogin(login, persist).then(accessTokenData => {
-      this.saveAccessToken(accessTokenData);
+    return this.authService.postLogin(login, persist).then(accessTokenResponse => {
+      this.saveAccessToken(accessTokenResponse);
       z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, persist);
       z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-      return accessTokenData;
+      return accessTokenResponse;
     });
   }
 
@@ -121,12 +121,12 @@ z.auth.AuthRepository = class AuthRepository {
 
     if (!isRefreshingToken) {
       this.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
-      this.authService.client.schedule_queue_unblock();
+      this.authService.backendClient.scheduleQueueUnblock();
       this.logger.info(`Access token renewal started. Source: ${renewalTrigger}`);
 
       this.getAccessToken()
         .then(() => {
-          this.authService.client.execute_request_queue();
+          this.authService.backendClient.executeRequestQueue();
           amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
         })
         .catch(error => {
@@ -166,7 +166,7 @@ z.auth.AuthRepository = class AuthRepository {
       const accessTokenType = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (accessToken) {
-        this.logger.info('Cached access token found in Local Storage', {access_token: accessToken});
+        this.logger.info('Cached access token found in Local Storage', {accessToken});
         this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
         this._scheduleTokenRefresh(z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
@@ -187,64 +187,40 @@ z.auth.AuthRepository = class AuthRepository {
   /**
    * Store the access token using Amplify.
    *
-   * @example Access Token data we expect:
-   *  access_token: Lt-IRHxkY9JLA5UuBR3Exxj5lCUf...
-   *  access_token_expiration: 1424951321067 => Thu, 26 Feb 2015 11:48:41 GMT
-   *  access_token_type: Bearer
-   *  access_token_ttl: 900000 => 900s/15min
-   *
-   * @param {Object|string} accessTokenData - Access Token
-   * @option {string} accessTokenData - access_token
-   * @option {string} accessTokenData - expires_in
-   * @option {string} accessTokenData - type
+   * @param {Object} accessTokenResponse - Access token data structure
+   * @param {string} accessTokenResponse.access_token - Access token
+   * @param {string} accessTokenResponse.expires_in - Expiration of access token in seconds
+   * @param {string} accessTokenResponse.token_type - Type of access token
    * @returns {Object} Access token data
    */
-  saveAccessToken(accessTokenData) {
-    const expiresInMillis = accessTokenData.expires_in * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+  saveAccessToken(accessTokenResponse) {
+    const {access_token: accessToken, expires_in: expiresIn, token_type: accessTokenType} = accessTokenResponse;
+    const expiresInMillis = expiresIn * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
-      accessTokenData.access_token,
-      accessTokenData.expires_in
-    );
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
-      expirationTimestamp,
-      accessTokenData.expires_in
-    );
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL,
-      expiresInMillis,
-      accessTokenData.expires_in
-    );
-    z.util.StorageUtil.setValue(
-      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
-      accessTokenData.token_type,
-      accessTokenData.expires_in
-    );
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
 
-    this.authService.saveAccessTokenInClient(accessTokenData.token_type, accessTokenData.access_token);
+    this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 
-    this._logAccessTokenUpdate(accessTokenData, expirationTimestamp);
+    this._logAccessTokenUpdate(accessTokenResponse, expirationTimestamp);
     this._scheduleTokenRefresh(expirationTimestamp);
-    return accessTokenData;
+    return accessTokenResponse;
   }
 
   /**
    * Logs the update of the access token.
    *
    * @private
-   * @param {Object|string} accessTokenData - Access Token
-   * @option {string} accessTokenData - access_token
-   * @option {string} accessTokenData - expires_in
-   * @option {string} accessTokenData - type
+   * @param {Object} accessTokenResponse - Access token data structure
    * @param {number} expirationTimestamp - Timestamp when access token expires
    * @returns {undefined}
    */
-  _logAccessTokenUpdate(accessTokenData, expirationTimestamp) {
+  _logAccessTokenUpdate(accessTokenResponse, expirationTimestamp) {
     const expirationDate = z.util.TimeUtil.formatTimestamp(expirationTimestamp, false);
-    this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenData);
+    this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenResponse);
   }
 
   /**

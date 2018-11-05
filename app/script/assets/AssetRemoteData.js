@@ -36,6 +36,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     this.generateUrl = undefined;
     this.identifier = undefined;
 
+    this.loadPromise = undefined;
+
     this.logger = new z.util.Logger('z.assets.AssetRemoteData', z.config.LOGGER.OPTIONS);
   }
 
@@ -112,16 +114,22 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   load() {
     let type;
 
-    return this._loadBuffer()
+    if (this.loadPromise) {
+      return this.loadPromise;
+    }
+
+    this.loadPromise = this._loadBuffer()
       .then(({buffer, mimeType}) => {
         type = mimeType;
+        this.loadPromise = undefined;
         const isEncryptedAsset = this.otrKey && this.sha256;
         return isEncryptedAsset
           ? z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer)
           : buffer;
       })
-      .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
+      .then(plaintext => new Blob([new Uint8Array(plaintext)], {type}))
       .catch(error => {
+        this.loadPromise = undefined;
         const errorMessage = (error && error.message) || '';
         const isAssetNotFound = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
         const isServerError = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
@@ -131,6 +139,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
           throw error;
         }
       });
+
+    return this.loadPromise;
   }
 
   _loadBuffer() {

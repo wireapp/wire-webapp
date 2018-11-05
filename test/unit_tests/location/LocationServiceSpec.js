@@ -33,8 +33,8 @@ describe('z.location.LocationService', () => {
       const longitude = 13.4138;
 
       const backendClientMock = {
-        create_url: () => {},
-        send_request: () => Promise.resolve({results: locations, status: 'OK'}),
+        createUrl: () => {},
+        sendRequest: () => Promise.resolve({results: locations, status: 'OK'}),
       };
       const locationService = new z.location.LocationService(backendClientMock);
       return locationService.getLocation(latitude, longitude).then(location => {
@@ -50,8 +50,8 @@ describe('z.location.LocationService', () => {
       const longitude = 13.4138;
 
       const backendClientMock = {
-        create_url: () => {},
-        send_request: () => Promise.resolve({results: locations, status: 'OK'}),
+        createUrl: () => {},
+        sendRequest: () => Promise.resolve({results: locations, status: 'OK'}),
       };
 
       const locationService = new z.location.LocationService(backendClientMock);
@@ -59,17 +59,6 @@ describe('z.location.LocationService', () => {
         expect(location.countryCode).toBe('&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;');
         expect(location.place).toBe('Berlin');
       });
-    });
-  });
-
-  describe('getMapsUrl', () => {
-    it('should return the proper urls', () => {
-      const locationService = new z.location.LocationService({});
-
-      expect(locationService.getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
-      expect(locationService.getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
-      expect(locationService.getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
-      expect(locationService.getMapsUrl(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
     });
   });
 });
