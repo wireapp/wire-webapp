@@ -22,7 +22,11 @@ import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as path from 'path';
 import {fileIsReadable, readFile} from './util/FileUtil';
 
-dotenv.config();
+const nodeEnvironment = process.env.NODE_ENV || 'production';
+
+if (nodeEnvironment === 'development') {
+  dotenv.config();
+}
 
 const defaultCSP: HelmetCSP = {
   connectSrc: [
@@ -131,8 +135,6 @@ export interface ServerConfig {
     };
   };
 }
-
-const nodeEnvironment = process.env.NODE_ENV || 'production';
 
 const config: ServerConfig = {
   CLIENT: {
