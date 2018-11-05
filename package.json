@@ -225,7 +225,7 @@
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "yarn build:server && yarn grunt build_dev && concurrently \"yarn start:server:dev\" \"yarn grunt watch\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./aws/index.js",
-    "start:prod": "cross-env NODE_ENV=production pm2 start \"./aws/index.js\" --name \"Webapp\" && pm2 logs",
+    "start:prod": "pm2 start \"./aws/index.js\" --name \"Webapp\" && pm2 logs",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:types && yarn lint && grunt check && yarn test:auth && grunt test",
     "test:types": "yarn tsc --noEmit",
