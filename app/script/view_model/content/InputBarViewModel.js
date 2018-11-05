@@ -75,7 +75,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     ko.pureComputed(() => !!this.replyMessageEntity())
       .extend({notify: 'always', rateLimit: 100})
-      .subscribe(() => this.scrollMessageList());
+      .subscribeChanged((newValue, previousValue) => {
+        // scroll the message list whenever the user starts or cancels replying to a message
+        if (newValue !== previousValue) {
+          this.scrollMessageList();
+        }
+      });
 
     this.replyAsset = ko.pureComputed(() => {
       return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
