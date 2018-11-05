@@ -23,14 +23,13 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.MessageQuote = class MessageQuote {
-  constructor({quote, conversationRepository, locationRepository}) {
+  constructor({conversation, quote, conversationRepository, locationRepository}) {
     this.updateCanShowMore = this.updateCanShowMore.bind(this);
     this.toggleShowMore = this.toggleShowMore.bind(this);
 
-    const activeConversation = conversationRepository.active_conversation;
     this.locationRepository = locationRepository;
     this.quotedMessage = ko.observable();
-    conversationRepository.get_message_in_conversation_by_id(activeConversation(), quote().messageId).then(message => {
+    conversationRepository.get_message_in_conversation_by_id(conversation(), quote().messageId).then(message => {
       this.quotedMessage(message);
     });
 
