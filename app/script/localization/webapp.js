@@ -384,7 +384,6 @@ z.string.conversationSendPastedFile = 'Pasted image at {{date}}';
 z.string.conversationSomeone = 'Someone';
 z.string.conversationTweetAuthor = ' on Twitter';
 z.string.conversationServicesWarning = 'Services have access to the content of this conversation';
-z.string.conversationReplyAudioMessage = 'Audio message';
 
 // Group creation
 z.string.groupCreationPreferencesAction = 'Next';
@@ -883,3 +882,11 @@ z.string.ephemeralUnitsWeeks = 'weeks';
 z.string.ephemeralUnitsYear = 'year';
 z.string.ephemeralUnitsYears = 'years';
 z.string.ephemeralRemaining = 'remaining';
+
+// Replies 
+z.string.replyAudioMessage = 'Audio Message';
+z.string.replyQuoteError = 'You cannot see this message.';
+z.string.replyQuoteShowMore = 'Show more';
+z.string.replyQuoteShowLess = 'Show less';
+z.string.replyQuoteTimeStampDate = 'Original message from {{date}}';
+z.string.replyQuoteTimeStampTime = 'Original message from {{time}}'

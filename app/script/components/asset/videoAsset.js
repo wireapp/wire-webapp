@@ -36,6 +36,8 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
 
+    this.isQuote = params.isQuote;
+
     this.preview_subscription = undefined;
 
     this.video_element = $(component_info.element).find('video')[0];
@@ -119,7 +121,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 ko.components.register('video-asset', {
   template: `
     <!-- ko ifnot: message.isObfuscated() -->
-      <div class="video-asset-container" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}" data-uie-name="video-asset">
+      <div class="video-asset-container" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}, css: {'video-asset-container--quoted': isQuote}" data-uie-name="video-asset">
         <video playsinline
                data-bind="attr: {src: video_src},
                           css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
