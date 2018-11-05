@@ -49,19 +49,21 @@ z.conversation.ConversationCellState = (() => {
       [ACTIVITY_TYPE.MESSAGE]: unreadOtherMessages.length,
     };
 
-    const hasSingleAlert = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0) === 1;
+    const alertCount = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+    const hasSingleAlert = alertCount === 1;
+    const hasOnlyReplies = activities[ACTIVITY_TYPE.REPLY] > 0 && alertCount === activities[ACTIVITY_TYPE.REPLY];
 
-    if (prioritizeMentionAndReply && hasSingleAlert) {
+    if (prioritizeMentionAndReply && (hasSingleAlert || hasOnlyReplies)) {
       const hasSingleMention = activities[ACTIVITY_TYPE.MENTION] === 1;
-      const hasSingleReply = activities[ACTIVITY_TYPE.REPLY] === 1;
 
-      if (hasSingleMention || hasSingleReply) {
+      if (hasSingleMention || hasOnlyReplies) {
         const [mentionMessageEntity] = unreadSelfMentions;
         const [replyMessageEntity] = unreadSelfReplies;
         const messageEntity = mentionMessageEntity || replyMessageEntity;
 
         if (messageEntity.is_ephemeral()) {
           let stringId;
+
           if (hasSingleMention) {
             stringId = conversationEntity.isGroup()
               ? z.string.conversationsSecondaryLineEphemeralMentionGroup
@@ -171,12 +173,14 @@ z.conversation.ConversationCellState = (() => {
         selfMentions: unreadSelfMentions,
         selfReplies: unreadSelfReplies,
       } = conversationEntity.unreadState();
-      return (
+
+      const hasUnreadActivities =
         unreadCalls.length > 0 ||
         unreadPings.length > 0 ||
         unreadSelfMentions.length > 0 ||
-        unreadSelfReplies.length > 0
-      );
+        unreadSelfReplies.length > 0;
+
+      return hasUnreadActivities;
     },
   };
 
@@ -281,11 +285,19 @@ z.conversation.ConversationCellState = (() => {
     },
     icon: conversationEntity => {
       const hasSelfMentions = conversationEntity.unreadState().selfMentions.length > 0;
+      const hasSelfReplies = conversationEntity.unreadState().selfReplies.length > 0;
       const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsMentionsAndReplies();
+      const showRepliesIcon = hasSelfReplies && conversationEntity.showNotificationsMentionsAndReplies();
 
-      return showMentionsIcon
-        ? z.conversation.ConversationStatusIcon.UNREAD_MENTION
-        : z.conversation.ConversationStatusIcon.MUTED;
+      if (showMentionsIcon) {
+        return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+      }
+
+      if (showRepliesIcon) {
+        return z.conversation.ConversationStatusIcon.UNREAD_REPLY;
+      }
+
+      return z.conversation.ConversationStatusIcon.MUTED;
     },
     match: conversationEntity => !conversationEntity.showNotificationsEverything(),
   };
