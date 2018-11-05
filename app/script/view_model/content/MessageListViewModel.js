@@ -64,9 +64,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
     });
 
-    // Message that should be focused
-    this.marked_message = ko.observable(undefined);
-
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
 
@@ -188,7 +185,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     // Update new conversation
     this.conversation(conversationEntity);
-    this.marked_message(messageEntity);
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unreadState().allEvents.length) {
@@ -197,19 +193,19 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     // @todo Rethink conversation.is_loaded
     if (conversationEntity.is_loaded()) {
-      return this._render_conversation(conversationEntity);
+      return this._renderConversation(conversationEntity, messageEntity);
     }
 
     return this.conversation_repository
       .updateParticipatingUserEntities(conversationEntity, false, true)
       .then(_conversationEntity => {
-        return this.marked_message()
-          ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, this.marked_message())
+        return messageEntity
+          ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, messageEntity)
           : this.conversation_repository.getPrecedingMessages(_conversationEntity);
       })
       .then(() => {
         conversationEntity.is_loaded(true);
-        return this._render_conversation(conversationEntity);
+        return this._renderConversation(conversationEntity, messageEntity);
       });
   }
 
@@ -232,19 +228,20 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Sets the conversation and waits for further processing until knockout has rendered the messages.
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to set
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity to set
+   * @param {z.entity.Message} messageEntity - Message that should be in focus when the conversation loads
    * @returns {Promise} Resolves when conversation was rendered
    */
-  _render_conversation(conversation_et) {
+  _renderConversation(conversationEntity, messageEntity) {
     // Hide conversation until everything is processed
     $('.conversation').css({opacity: 0});
 
     const messages_container = this._getMessagesContainer();
     messages_container.on('mousewheel', this.on_mouse_wheel);
 
-    const is_current_conversation = conversation_et === this.conversation();
+    const is_current_conversation = conversationEntity === this.conversation();
     if (!is_current_conversation) {
-      this.logger.info(`Skipped re-loading current conversation '${conversation_et.display_name()}'`);
+      this.logger.info(`Skipped re-loading current conversation '${conversationEntity.display_name()}'`);
       return Promise.resolve();
     }
 
@@ -256,8 +253,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         if (messages_container.isScrollable()) {
           const unread_message = $('.message-timestamp-unread');
 
-          if (this.marked_message()) {
-            this._focusMessage(this.marked_message().id);
+          if (messageEntity) {
+            this._focusMessage(messageEntity.id);
           } else if (unread_message.length) {
             const unread_message_position = unread_message
               .parent()
@@ -269,7 +266,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
             messages_container.scrollToBottom();
           }
         } else {
-          this.conversation_repository.markAsRead(conversation_et);
+          this.conversation_repository.markAsRead(conversationEntity);
         }
 
         $('.conversation').css({opacity: 1});
@@ -277,7 +274,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         window.addEventListener('resize', this._handleWindowResize);
 
         // Subscribe for incoming messages
-        this.messages_subscription = conversation_et.messages_visible.subscribe(
+        this.messages_subscription = conversationEntity.messages_visible.subscribe(
           this._scrollAddedMessagesIntoView,
           null,
           'arrayChange'
@@ -392,12 +389,16 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           });
 
     loadMessagePromise.then(() => {
-      const message_element = $(`.message[data-uie-uid="${messageId}"]`);
+      z.util.afterRender(() => {
+        const message_element = $(`.message[data-uie-uid="${messageId}"]`);
 
-      if (message_element.length) {
-        const message_list_element = this._getMessagesContainer();
-        message_list_element.scrollBy(message_element.offset().top - message_list_element.height() / 2);
-      }
+        if (message_element.length) {
+          message_element.removeClass('message-marked');
+          const message_list_element = this._getMessagesContainer();
+          message_list_element.scrollBy(message_element.offset().top - message_list_element.height() / 2);
+          message_element.addClass('message-marked');
+        }
+      });
     });
   }
 
