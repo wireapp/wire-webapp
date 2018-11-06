@@ -28,13 +28,18 @@ z.components.MessageQuote = class MessageQuote {
     this.toggleShowMore = this.toggleShowMore.bind(this);
 
     this.locationRepository = locationRepository;
-    this.quotedMessage = ko.observable();
-    conversationRepository.get_message_in_conversation_by_id(conversation(), quote().messageId).then(message => {
-      this.quotedMessage(message);
-    });
 
     this.canShowMore = ko.observable(false);
     this.showFullText = ko.observable(false);
+
+    this.quotedMessage = ko.observable();
+    this.error = quote().error;
+
+    if (!this.error) {
+      conversationRepository.get_message_in_conversation_by_id(conversation(), quote().messageId).then(message => {
+        this.quotedMessage(message);
+      });
+    }
   }
 
   updateCanShowMore(elements) {
@@ -51,12 +56,12 @@ z.components.MessageQuote = class MessageQuote {
 
 ko.components.register('message-quote', {
   template: `
-  <!-- ko if: quotedMessage() -->
+  <!-- ko if: quotedMessage() || error -->
     <div class="message-quote" data-bind="template: {afterRender: updateCanShowMore}">
-      <!-- ko if: quotedMessage().error -->
+      <!-- ko if: error -->
         <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError"></div>
       <!-- /ko -->
-      <!-- ko ifnot: quotedMessage().error -->
+      <!-- ko ifnot: error -->
         <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()"></div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
