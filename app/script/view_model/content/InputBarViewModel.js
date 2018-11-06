@@ -73,12 +73,30 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
+    const handleRepliedMessageDeleted = messageId => {
+      if (this.replyMessageEntity().id === messageId) {
+        this.replyMessageEntity(undefined);
+      }
+    };
+
+    const handleRepliedMessageUpdated = (originalMessageId, messageEntity) => {
+      if (this.replyMessageEntity().id === originalMessageId) {
+        this.replyMessageEntity(messageEntity);
+      }
+    };
+
     ko.pureComputed(() => !!this.replyMessageEntity())
       .extend({notify: 'always', rateLimit: 100})
-      .subscribeChanged((newValue, previousValue) => {
-        // scroll the message list whenever the user starts or cancels replying to a message
-        if (newValue !== previousValue) {
+      .subscribeChanged((isReplyingToMessage, wasReplyingToMessage) => {
+        if (isReplyingToMessage !== wasReplyingToMessage) {
           this.triggerInputChangeEvent();
+          if (isReplyingToMessage) {
+            amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+            amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+          } else {
+            amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+            amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+          }
         }
       });
 

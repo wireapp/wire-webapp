@@ -385,7 +385,7 @@ z.entity.Conversation = class Conversation {
    * Adds a single message to the conversation.
    * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
    * @param {boolean} replaceDuplicate - If a duplicate (or a message that should be replaced) already exists, replace it with the new entity.
-   * @returns {undefined} No return value.
+   * @returns {z.entity.Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
    */
   add_message(messageEntity, replaceDuplicate = false) {
     if (messageEntity) {
@@ -399,7 +399,7 @@ z.entity.Conversation = class Conversation {
           this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
         }
         // The duplicated message has been treated (either replaced or ignored). Our job here is done.
-        return;
+        return entityToReplace;
       }
       this.messages_unordered.push(messageEntity);
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
