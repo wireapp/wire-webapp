@@ -19,6 +19,7 @@
 
 'use strict';
 
+// grunt test_init && grunt test_run:links/LinkPreviewRepository
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
@@ -87,9 +88,7 @@ describe('z.links.LinkPreviewRepository', () => {
     });
 
     it('catches errors that are raised by the openGraph lib when invalid URIs are parsed', done => {
-      window.openGraph = function() {
-        return Promise.reject(new Error('Invalid URI'));
-      };
+      window.openGraph = () => Promise.reject(new Error('Invalid URI'));
 
       const invalidUrl = 'http:////api/apikey';
       link_preview_repository
