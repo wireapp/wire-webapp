@@ -23,11 +23,12 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.MessageQuote = class MessageQuote {
-  constructor({conversation, conversationRepository, locationRepository, quote}) {
+  constructor({conversation, conversationRepository, locationRepository, quote, selfId}) {
     this.updateCanShowMore = this.updateCanShowMore.bind(this);
     this.toggleShowMore = this.toggleShowMore.bind(this);
 
     this.locationRepository = locationRepository;
+    this.selfId = selfId;
 
     this.canShowMore = ko.observable(false);
     this.showFullText = ko.observable(false);
@@ -80,7 +81,7 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_text() -->
-            <div class="message-quote__text" data-bind="html: asset.render(), css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
+            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parents[2].handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
                 <span data-bind="l10n_text: $parent.showFullText() ? z.string.replyQuoteShowLess : z.string.replyQuoteShowMore"></span>
