@@ -35,6 +35,15 @@ z.components.MessageQuote = class MessageQuote {
     this.quotedMessage = ko.observable();
     this.error = quote().error;
 
+    this.quotedMessageIsBeforeToday = ko.pureComputed(() => {
+      if (!this.quotedMessage()) {
+        return false;
+      }
+      const quoteDate = moment(this.quotedMessage().timestamp());
+      const today = moment().startOf('day');
+      return quoteDate.isBefore(today);
+    });
+
     if (!this.error) {
       conversationRepository.get_message_in_conversation_by_id(conversation(), quote().messageId).then(message => {
         this.quotedMessage(message);
@@ -96,6 +105,12 @@ ko.components.register('message-quote', {
             <location-asset params="asset: asset, locationRepository: $parent.locationRepository"></location-asset>
           <!-- /ko -->
         <!-- /ko -->
+        <div class="message-quote__timestamp" 
+          data-bind="l10n_text: {
+              id: quotedMessageIsBeforeToday() ? z.string.replyQuoteTimeStampDate : z.string.replyQuoteTimeStampTime, 
+              substitute: moment(quotedMessage().timestamp()).format(quotedMessageIsBeforeToday() ? 'DD.MM.YYYY' : 'HH:mm')
+            },
+            click: () => $parents[1]._focusMessage(quotedMessage().id)"></div>
       <!-- /ko -->
     </div>
   <!-- /ko -->
