@@ -73,9 +73,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
-    this.handleRepliedMessageDeleted = messageId => {
+    const handleRepliedMessageDeleted = messageId => {
       if (this.replyMessageEntity().id === messageId) {
         this.replyMessageEntity(undefined);
+      }
+    };
+
+    const handleRepliedMessageUpdated = (originalMessageId, messageEntity) => {
+      if (this.replyMessageEntity().id === originalMessageId) {
+        this.replyMessageEntity(messageEntity);
       }
     };
 
@@ -84,9 +90,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .subscribeChanged((isReplyingToMessage, wasReplyingToMessage) => {
         // scroll the message list whenever the user starts or cancels replying to a message
         if (isReplyingToMessage) {
-          amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.handleRepliedMessageDeleted);
+          amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+          amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
         } else {
-          amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.handleRepliedMessageDeleted);
+          amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+          amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
         }
         if (isReplyingToMessage !== wasReplyingToMessage) {
           this.triggerInputChangeEvent();
