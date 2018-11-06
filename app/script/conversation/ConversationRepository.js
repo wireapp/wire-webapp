@@ -3468,7 +3468,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
-          conversationEntity.add_message(messageEntity, true);
+          const replacedEntity = conversationEntity.add_message(messageEntity, true);
+          if (replacedEntity) {
+            amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
+          }
         }
         return {conversationEntity, messageEntity};
       });
