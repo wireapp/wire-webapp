@@ -112,6 +112,7 @@ z.event.WebApp = {
       EDIT: 'wire.webapp.conversation.message.edit',
       REMOVED: 'wire.webapp.conversation.message.removed',
       REPLY: 'wire.webapp.conversation.message.reply',
+      UPDATED: 'wire.webapp.conversation.message.updated',
     },
     MISSED_EVENTS: 'wire.webapp.conversation.missed_events',
     PEOPLE: {

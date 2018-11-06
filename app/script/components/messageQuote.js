@@ -58,23 +58,23 @@ z.components.MessageQuote = class MessageQuote {
 ko.components.register('message-quote', {
   template: `
   <!-- ko if: quotedMessage() || error -->
-    <div class="message-quote" data-bind="template: {afterRender: updateCanShowMore}">
+    <div class="message-quote" data-bind="template: {afterRender: updateCanShowMore}" data-uie-name="quote-item">
       <!-- ko if: error -->
-        <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError"></div>
+        <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError" data-uie-name="label-error-quote"></div>
       <!-- /ko -->
       <!-- ko ifnot: error -->
-        <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()"></div>
+        <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()" data-uie-name="label-name-quote"></div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
-              <div class="message-quote__image" data-bind="background_image: asset.resource">
+              <div class="message-quote__image" data-bind="background_image: asset.resource, click: (data, event) => $parents[2].show_detail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
                 <img data-bind="attr: {src: asset.dummy_url}"/>
               </div>
           <!-- /ko -->
 
           <!-- ko if: asset.is_text() -->
-            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parents[2].handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto"></div>
+            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parents[2].handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
-              <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore">
+              <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
                 <span data-bind="l10n_text: $parent.showFullText() ? z.string.replyQuoteShowLess : z.string.replyQuoteShowMore"></span>
                 <disclose-icon data-bind="css: {'upside-down': $parent.showFullText()}"></disclose-icon>
               </div>
@@ -82,19 +82,19 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_video() -->
-            <video-asset class="message-quote__video" params="message: $parent.quotedMessage, isQuote: true"></video-asset>
+            <video-asset class="message-quote__video" params="message: $parent.quotedMessage, isQuote: true" data-uie-name="media-video-quote"></video-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.is_audio() -->
-            <audio-asset class="message-quote__audio" params="message: $parent.quotedMessage"></audio-asset>
+            <audio-asset class="message-quote__audio" params="message: $parent.quotedMessage" data-uie-name="media-audio-quote"></audio-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.is_file() -->
-            <file-asset class="message-quote__file" params="message: $parent.quotedMessage"></file-asset>
+            <file-asset class="message-quote__file" params="message: $parent.quotedMessage" data-uie-name="media-file-quote"></file-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.is_location() -->
-            <location-asset params="asset: asset, locationRepository: $parent.locationRepository"></location-asset>
+            <location-asset params="asset: asset, locationRepository: $parent.locationRepository" data-uie-name="media-location-quote"></location-asset>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
