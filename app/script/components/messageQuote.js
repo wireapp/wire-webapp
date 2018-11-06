@@ -51,7 +51,8 @@ z.components.MessageQuote = class MessageQuote {
     this.showFullText = ko.observable(false);
 
     this.quotedMessage = ko.observable();
-    this.error = quote().error;
+    this.quotedMessageId = ko.observable();
+    this.error = ko.observable(quote().error);
 
     this.quotedMessageIsBeforeToday = ko.pureComputed(() => {
       if (!this.quotedMessage()) {
@@ -62,11 +63,37 @@ z.components.MessageQuote = class MessageQuote {
       return quoteDate.isBefore(today);
     });
 
-    if (!this.error) {
-      conversationRepository.get_message_in_conversation_by_id(conversation(), quote().messageId).then(message => {
-        this.quotedMessage(message);
-      });
+    if (!this.error()) {
+      conversationRepository
+        .get_message_in_conversation_by_id(conversation(), quote().messageId)
+        .then(message => {
+          this.quotedMessage(message);
+          this.quotedMessageId(message.id);
+        })
+        .catch(() => this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND));
     }
+
+    const handleQuoteDeleted = messageId => {
+      if (this.quotedMessageId() === messageId) {
+        this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+        this.quotedMessage(undefined);
+      }
+    };
+
+    const handleQuoteUpdated = (originalMessageId, messageEntity) => {
+      if (this.quotedMessageId() === originalMessageId) {
+        this.quotedMessage(messageEntity);
+        this.quotedMessageId(messageEntity.id);
+      }
+    };
+
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+
+    this.removedFromView = () => {
+      amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+      amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+    };
   }
 
   updateCanShowMore(elements) {
@@ -83,12 +110,12 @@ z.components.MessageQuote = class MessageQuote {
 
 ko.components.register('message-quote', {
   template: `
-  <!-- ko if: quotedMessage() || error -->
+  <!-- ko if: quotedMessage() || error() -->
     <div class="message-quote" data-bind="template: {afterRender: updateCanShowMore}" data-uie-name="quote-item">
-      <!-- ko if: error -->
+      <!-- ko if: error() -->
         <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError" data-uie-name="label-error-quote"></div>
       <!-- /ko -->
-      <!-- ko ifnot: error -->
+      <!-- ko ifnot: error() -->
         <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()" data-uie-name="label-name-quote"></div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
