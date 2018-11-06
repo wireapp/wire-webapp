@@ -73,11 +73,22 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
+    this.handleRepliedMessageDeleted = messageId => {
+      if (this.replyMessageEntity().id === messageId) {
+        this.replyMessageEntity(undefined);
+      }
+    };
+
     ko.pureComputed(() => !!this.replyMessageEntity())
       .extend({notify: 'always', rateLimit: 100})
-      .subscribeChanged((newValue, previousValue) => {
+      .subscribeChanged((isReplyingToMessage, wasReplyingToMessage) => {
         // scroll the message list whenever the user starts or cancels replying to a message
-        if (newValue !== previousValue) {
+        if (isReplyingToMessage) {
+          amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.handleRepliedMessageDeleted);
+        } else {
+          amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.handleRepliedMessageDeleted);
+        }
+        if (isReplyingToMessage !== wasReplyingToMessage) {
           this.triggerInputChangeEvent();
         }
       });
