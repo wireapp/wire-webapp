@@ -128,7 +128,9 @@ ko.components.register('message-quote', {
               id: quotedMessageIsBeforeToday() ? z.string.replyQuoteTimeStampDate : z.string.replyQuoteTimeStampTime, 
               substitute: moment(quotedMessage().timestamp()).format(quotedMessageIsBeforeToday() ? 'DD.MM.YYYY' : 'HH:mm')
             },
-            click: focusMessage"></div>
+            click: focusMessage" 
+          data-uie-name="label-timestamp-quote">
+        </div>
       <!-- /ko -->
     </div>
   <!-- /ko -->

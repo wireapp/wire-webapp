@@ -17,8 +17,8 @@
             <!-- /ko -->
           </div>
           <!-- ko if: replyAsset() -->
-            <!-- ko if: replyAsset().is_text()-->
-              <div class="input-bar__reply__message-text" data-bind="html: z.util.renderMessage(replyAsset().text)" data-uie-name="media-text-reply-box"></div>
+            <!-- ko if: replyAsset().is_text() -->
+              <div class="input-bar__reply__message-text" data-bind="html: z.util.renderMessage(replyAsset().text, null, replyAsset().mentions())" data-uie-name="media-text-reply-box"></div>
             <!-- /ko -->
 
             <!-- ko if: replyAsset().is_image()-->
