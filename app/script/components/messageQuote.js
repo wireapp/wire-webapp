@@ -23,9 +23,26 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.MessageQuote = class MessageQuote {
-  constructor({conversation, conversationRepository, locationRepository, quote, selfId}) {
+  constructor({
+    conversation,
+    conversationRepository,
+    focusMessage,
+    handleClickOnMessage,
+    locationRepository,
+    quote,
+    selfId,
+    showDetail,
+  }) {
     this.updateCanShowMore = this.updateCanShowMore.bind(this);
     this.toggleShowMore = this.toggleShowMore.bind(this);
+
+    this.showDetail = showDetail;
+    this.handleClickOnMessage = handleClickOnMessage;
+    this.focusMessage = () => {
+      if (this.quotedMessage()) {
+        focusMessage(this.quotedMessage().id);
+      }
+    };
 
     this.locationRepository = locationRepository;
     this.selfId = selfId;
@@ -75,13 +92,13 @@ ko.components.register('message-quote', {
         <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()" data-uie-name="label-name-quote"></div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
-              <div class="message-quote__image" data-bind="background_image: asset.resource, click: (data, event) => $parents[2].show_detail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
+              <div class="message-quote__image" data-bind="background_image: asset.resource, click: (data, event) => $parent.showDetail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
                 <img data-bind="attr: {src: asset.dummy_url}"/>
               </div>
           <!-- /ko -->
 
           <!-- ko if: asset.is_text() -->
-            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parents[2].handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
+            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parent.handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
                 <span data-bind="l10n_text: $parent.showFullText() ? z.string.replyQuoteShowLess : z.string.replyQuoteShowMore"></span>
@@ -111,7 +128,7 @@ ko.components.register('message-quote', {
               id: quotedMessageIsBeforeToday() ? z.string.replyQuoteTimeStampDate : z.string.replyQuoteTimeStampTime, 
               substitute: moment(quotedMessage().timestamp()).format(quotedMessageIsBeforeToday() ? 'DD.MM.YYYY' : 'HH:mm')
             },
-            click: () => $parents[1]._focusMessage(quotedMessage().id)"
+            click: focusMessage" 
           data-uie-name="label-timestamp-quote">
         </div>
       <!-- /ko -->
