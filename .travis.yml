@@ -60,7 +60,7 @@ deploy:
     region: eu-central-1
     app: Webapp
     env: wire-webapp-edge
-    bucket_name: wire-webapp
+    bucket_name: wire-webapp-builds
     on:
       repo: wireapp/wire-webapp
       branch: edge
@@ -76,7 +76,7 @@ deploy:
     region: eu-central-1
     app: Webapp
     env: wire-webapp-dev
-    bucket_name: wire-webapp
+    bucket_name: wire-webapp-builds
     on:
       repo: wireapp/wire-webapp
       branch: self-hosting
@@ -92,7 +92,7 @@ deploy:
     region: eu-central-1
     app: Webapp
     env: wire-webapp-staging
-    bucket_name: wire-webapp
+    bucket_name: wire-webapp-builds
     on:
       repo: wireapp/wire-webapp
       branch: staging
@@ -108,7 +108,7 @@ deploy:
     region: eu-central-1
     app: Webapp
     env: wire-webapp-prod-next
-    bucket_name: wire-webapp
+    bucket_name: wire-webapp-builds
     on:
       repo: wireapp/wire-webapp
       branch: prod
