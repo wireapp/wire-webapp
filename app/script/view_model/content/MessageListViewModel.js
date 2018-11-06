@@ -116,7 +116,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
       if (hitTop) {
         return this._loadPrecedingMessages();
-      } else if (hitBottom) {
+      }
+
+      if (hitBottom) {
         this._loadFollowingMessages().then(() => {
           this._mark_conversation_as_read_on_focus(this.conversation());
         });
