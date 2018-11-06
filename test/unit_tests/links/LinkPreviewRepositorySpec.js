@@ -19,6 +19,7 @@
 
 'use strict';
 
+// grunt test_init && grunt test_run:links/LinkPreviewRepository
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
@@ -27,16 +28,32 @@ describe('z.links.LinkPreviewRepository', () => {
     link_preview_repository = new z.links.LinkPreviewRepository(undefined, properties_repository);
   });
 
-  afterEach(() => {
-    window.openGraph = undefined;
-  });
+  afterEach(() => (window.openGraph = undefined));
+
+  function mockSucceedingOpenGraph() {
+    return (url, callback) => {
+      return Promise.resolve()
+        .then(meta => {
+          if (callback) {
+            callback(null, meta);
+          }
+
+          return meta;
+        })
+        .catch(error => {
+          if (callback) {
+            callback(error);
+          }
+
+          throw error;
+        });
+    };
+  }
 
   describe('getLinkPreview', () => {
-    beforeEach(() => {
-      spyOn(link_preview_repository, '_fetchOpenGraphData').and.returnValue(Promise.resolve());
-    });
+    it('rejects if openGraph lib is not available', done => {
+      window.openGraph = undefined;
 
-    it('should reject if open graph lib is not available', done => {
       link_preview_repository
         .getLinkPreview()
         .then(done.fail)
@@ -46,27 +63,39 @@ describe('z.links.LinkPreviewRepository', () => {
         });
     });
 
-    it('should fetch open graph data if openGraph lib is available', done => {
-      window.openGraph = {};
+    it('fetches open graph data if openGraph lib is available', done => {
+      window.openGraph = mockSucceedingOpenGraph();
 
       link_preview_repository
-        .getLinkPreview()
+        .getLinkPreview('https://app.wire.com/')
         .then(done.fail)
         .catch(error => {
-          expect(link_preview_repository._fetchOpenGraphData).toHaveBeenCalled();
           expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
         });
     });
 
-    it('should reject if link is blacklisted', done => {
-      window.openGraph = {};
+    it('rejects if a link is blacklisted', done => {
+      window.openGraph = mockSucceedingOpenGraph();
 
       link_preview_repository
         .getLinkPreview('youtube.com')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.error.LinkPreviewError.TYPE.BLACKLISTED);
+          done();
+        });
+    });
+
+    it('catches errors that are raised by the openGraph lib when invalid URIs are parsed', done => {
+      window.openGraph = () => Promise.reject(new Error('Invalid URI'));
+
+      const invalidUrl = 'http:////api/apikey';
+      link_preview_repository
+        .getLinkPreview(invalidUrl)
+        .then(done.fail)
+        .catch(error => {
+          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
           done();
         });
     });
