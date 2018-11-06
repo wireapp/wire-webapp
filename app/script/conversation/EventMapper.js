@@ -383,8 +383,8 @@ z.conversation.EventMapper = class EventMapper {
     messageEntity.edited_timestamp = new Date(editedTime || eventData.edited_time).getTime();
 
     if (eventData.quote) {
-      const {message_id: messageId, user_id: userId} = eventData.quote;
-      messageEntity.quote(new z.message.QuoteEntity(messageId, userId));
+      const {message_id: messageId, user_id: userId, error} = eventData.quote;
+      messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
     }
 
     return messageEntity;
