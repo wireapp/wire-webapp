@@ -82,41 +82,43 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.recalculate_timeout = undefined;
 
-    // Should we scroll to bottom when new message comes in
-    this.should_scroll_to_bottom = true;
-
-    // Check if the message container is to small and then pull new events
-    this.on_mouse_wheel = _.throttle(event => {
-      const is_not_scrollable = !$(event.currentTarget).isScrollable();
-      const is_scrolling_up = event.deltaY > 0;
-
-      if (is_not_scrollable && is_scrolling_up) {
-        return this._pull_messages();
+    this.onMouseWheel = _.throttle((data, event) => {
+      const element = $(event.currentTarget);
+      if (element.isScrollable()) {
+        // if the element is scrollable, the scroll event will take the relay
+        return true;
       }
-    }, 200);
+      const isScrollingUp = event.deltaY > 0;
+      const loadExtraMessagePromise = isScrollingUp ? this._loadPrecedingMessages() : this._loadFollowingMessages();
 
-    this.on_scroll = _.throttle((data, event) => {
-      if (this.capture_scrolling_event) {
-        const element = $(event.currentTarget);
-
-        // On some HDPI screen scrollTop returns a floating point number instead of an integer
-        // https://github.com/jquery/api.jquery.com/issues/608
-        const scroll_position = Math.ceil(element.scrollTop());
-        const scrollEnd = element.scrollEnd();
-
-        if (scroll_position === 0) {
-          this._pull_messages();
+      loadExtraMessagePromise.then(() => {
+        const antiscroll = $('.message-list').data('antiscroll');
+        if (antiscroll) {
+          antiscroll.rebuild();
         }
+      });
 
-        if (scroll_position >= scrollEnd) {
-          if (this._conversationHasExtraMessages(this.conversation())) {
-            this._push_messages();
-          }
+      return true;
+    }, 50);
 
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        }
+    this.onScroll = _.throttle((data, event) => {
+      if (!this.capture_scrolling_event) {
+        return;
+      }
+      const element = $(event.currentTarget);
 
-        this.should_scroll_to_bottom = scroll_position > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+      // On some HDPI screen scrollTop returns a floating point number instead of an integer
+      // https://github.com/jquery/api.jquery.com/issues/608
+      const scrollPosition = Math.ceil(element.scrollTop());
+      const scrollEnd = element.scrollEnd();
+      const hitTop = scrollPosition <= 0;
+      const hitBottom = scrollPosition >= scrollEnd;
+
+      if (hitTop) {
+        return this._loadPrecedingMessages();
+      } else if (hitBottom) {
+        this._loadFollowingMessages();
+        this._mark_conversation_as_read_on_focus(this.conversation());
       }
     }, 100);
 
@@ -168,8 +170,15 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     window.removeEventListener('resize', this._handleWindowResize);
   }
 
+  _shouldStickToBottom() {
+    const messagesContainer = this._getMessagesContainer();
+    const scrollPosition = Math.ceil(messagesContainer.scrollTop());
+    const scrollEnd = Math.ceil(messagesContainer.scrollEnd());
+    return scrollPosition > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+  }
+
   _handleWindowResize() {
-    if (this.should_scroll_to_bottom) {
+    if (this._shouldStickToBottom()) {
       this._getMessagesContainer().scrollToBottom();
     }
   }
@@ -249,10 +258,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   _renderConversation(conversationEntity, messageEntity) {
     // Hide conversation until everything is processed
-    $('.conversation').css({opacity: 0});
+    const conversationElement = $('.conversation');
+    conversationElement.css({opacity: 0});
 
     const messages_container = this._getMessagesContainer();
-    messages_container.on('mousewheel', this.on_mouse_wheel);
 
     const is_current_conversation = conversationEntity === this.conversation();
     if (!is_current_conversation) {
@@ -265,12 +274,15 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // Reset scroll position
         messages_container.scrollTop(0);
 
-        if (messages_container.isScrollable()) {
-          const unread_message = $('.message-timestamp-unread');
+        if (!this._conversationHasExtraMessages(this.conversation())) {
+          this._mark_conversation_as_read_on_focus(this.conversation());
+        }
 
-          if (messageEntity) {
-            this.focusMessage(messageEntity.id);
-          } else if (unread_message.length) {
+        if (messageEntity) {
+          this.focusMessage(messageEntity.id);
+        } else {
+          const unread_message = $('.message-timestamp-unread');
+          if (unread_message.length) {
             const unread_message_position = unread_message
               .parent()
               .parent()
@@ -280,11 +292,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           } else {
             messages_container.scrollToBottom();
           }
-        } else {
-          this.conversation_repository.markAsRead(conversationEntity);
         }
 
-        $('.conversation').css({opacity: 1});
+        conversationElement.css({opacity: 1});
         this.capture_scrolling_event = true;
         window.addEventListener('resize', this._handleWindowResize);
 
@@ -332,7 +342,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     // Scroll to the end of the list if we are under a certain threshold
-    if (this.should_scroll_to_bottom) {
+    if (this._shouldStickToBottom()) {
       window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
@@ -348,9 +358,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Fetch older messages beginning from the oldest message in view
-   * @returns {undefined} No return value
+   * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _pull_messages() {
+  _loadPrecedingMessages() {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
     const [messagesContainer] = this._getMessagesContainer().children();
 
@@ -358,7 +368,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       const initialListHeight = messagesContainer.scrollHeight;
 
       this.capture_scrolling_event = false;
-      this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
+      return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         if (messagesContainer) {
           const newListHeight = messagesContainer.scrollHeight;
           this._getMessagesContainer().scrollTop(newListHeight - initialListHeight);
@@ -366,21 +376,25 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
       });
     }
+    return Promise.resolve();
   }
 
   /**
    * Fetch newer messages beginning from the newest message in view
-   * @returns {undefined} No return value
+   * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _push_messages() {
+  _loadFollowingMessages() {
     const last_message = this.conversation().getLastMessage();
 
     if (last_message && this._conversationHasExtraMessages(this.conversation())) {
       this.capture_scrolling_event = false;
-      this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(message_ets => {
-        this.capture_scrolling_event = true;
-      });
+      return this.conversation_repository
+        .getSubsequentMessages(this.conversation(), last_message, false)
+        .then(message_ets => {
+          this.capture_scrolling_event = true;
+        });
     }
+    return Promise.resolve();
   }
 
   /**
