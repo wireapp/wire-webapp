@@ -1,8 +1,11 @@
+branch-defaults:
+  self-hosting:
+    environment: wire-webapp-dev
 deploy:
   artifact: aws/s3/ebs.zip
 global:
-  application_name: PWA
+  application_name: Webapp
   default_platform: Node.js
-  default_region: eu-west-1
+  default_region: eu-central-1
   sc: git
   workspace_type: Application
