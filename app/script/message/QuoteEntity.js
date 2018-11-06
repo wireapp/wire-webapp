@@ -30,10 +30,11 @@ z.message.QuoteEntity = class QuoteEntity {
     };
   }
 
-  constructor(messageId, userId, hash) {
+  constructor({error, hash, messageId, userId}) {
     this.messageId = messageId;
     this.hash = hash;
     this.userId = userId;
+    this.error = error;
   }
 
   isQuoteFromUser(userId) {
