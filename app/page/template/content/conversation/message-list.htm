@@ -1,5 +1,5 @@
  <div id="message-list" class="message-list" data-bind="with: $root.messageList, show_all_timestamps: true">
-   <div class="messages-wrap" data-bind="antiscroll, event: {scroll: on_scroll}">
+   <div class="messages-wrap" data-bind="antiscroll, event: {mousewheel: onMouseWheel, scroll: onScroll}">
      <div class="messages"
           data-bind="css: {'flex-center': verticallyCenterMessage},
                      foreach: {data: conversation().messages_visible, as: 'message'}">
