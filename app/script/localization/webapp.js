@@ -354,7 +354,6 @@ z.string.conversationResetTimerYou = ' turned off the message timer';
 z.string.conversationResume = 'Start a conversation with {{users}}';
 z.string.conversationPing = ' pinged';
 z.string.conversationPingYou = ' pinged';
-z.string.conversationReplyInvalid = 'You cannot see this message.';
 z.string.conversationToday = 'today';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
@@ -883,7 +882,7 @@ z.string.ephemeralUnitsYear = 'year';
 z.string.ephemeralUnitsYears = 'years';
 z.string.ephemeralRemaining = 'remaining';
 
-// Replies 
+// Replies
 z.string.replyAudioMessage = 'Audio Message';
 z.string.replyQuoteError = 'You cannot see this message.';
 z.string.replyQuoteShowMore = 'Show more';
