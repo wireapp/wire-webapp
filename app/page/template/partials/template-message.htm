@@ -85,7 +85,16 @@
     </div>
   <!-- /ko -->
   <!-- ko if: message.quote() -->
-    <message-quote params="conversation: $parent.conversation(), quote: message.quote(), selfId: $parent.selfUser().id, conversationRepository: $parent.conversation_repository, locationRepository: $parent.locationRepository"></message-quote>
+    <message-quote params="
+        conversation: $parent.conversation(), 
+        quote: message.quote(), 
+        selfId: $parent.selfUser().id, 
+        conversationRepository: $parent.conversation_repository, 
+        locationRepository: $parent.locationRepository,
+        showDetail: $parent.show_detail,
+        focusMessage: $parent._focusMessage,
+        handleClickOnMessage: $parent.handleClickOnMessage,
+      "></message-quote>
   <!-- /ko -->
 
   <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">

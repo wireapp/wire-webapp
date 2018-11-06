@@ -45,6 +45,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
     this.showUserDetails = this.showUserDetails.bind(this);
     this._handleWindowResize = this._handleWindowResize.bind(this);
+    this._focusMessage = this._focusMessage.bind(this);
+    this.show_detail = this.show_detail.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
