@@ -45,7 +45,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
     this.showUserDetails = this.showUserDetails.bind(this);
     this._handleWindowResize = this._handleWindowResize.bind(this);
-    this._focusMessage = this._focusMessage.bind(this);
+    this.focusMessage = this.focusMessage.bind(this);
     this.show_detail = this.show_detail.bind(this);
 
     this.mainViewModel = mainViewModel;
@@ -269,7 +269,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           const unread_message = $('.message-timestamp-unread');
 
           if (messageEntity) {
-            this._focusMessage(messageEntity.id);
+            this.focusMessage(messageEntity.id);
           } else if (unread_message.length) {
             const unread_message_position = unread_message
               .parent()
@@ -390,7 +390,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @param {string} messageId - Target message's id
    * @returns {undefined} No return value
    */
-  _focusMessage(messageId) {
+  focusMessage(messageId) {
     const messageIsLoaded = !!this.conversation().getMessage(messageId);
     const conversationEntity = this.conversation();
 
