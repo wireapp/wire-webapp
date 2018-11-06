@@ -60,7 +60,7 @@ ko.components.register('message-quote', {
         <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()"></div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
-              <div class="message-quote__image" data-bind="background_image: asset.resource">
+              <div class="message-quote__image" data-bind="background_image: asset.resource, click: (data, event) => $parents[1].show_detail($parent.quotedMessage, event),">
                 <img data-bind="attr: {src: asset.dummy_url}"/>
               </div>
           <!-- /ko -->
