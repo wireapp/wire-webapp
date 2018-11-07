@@ -62,24 +62,26 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   }
 
   _handleDeleteEvent(event) {
-    // TODO
-
-    return Promise.resolve(event);
+    const originalMessageId = event.data.message_id;
+    return this._findRepliesToMessage(event.conversation, originalMessageId).then(replies => {
+      this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
+      replies.forEach(reply => {
+        reply.data.quote = {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
+        this.eventService.replaceEvent(reply);
+      });
+      return event;
+    });
   }
 
   _handleEditEvent(event) {
     const originalMessageId = event.data.replacing_message_id;
-    return this.eventService.loadEvent(event.conversation, originalMessageId).then(originalEvent => {
-      return this.eventService
-        .loadEventsReplyingToMessage(event.conversation, originalMessageId, originalEvent.time)
-        .then(replies => {
-          this.logger.info(`Updating '${replies.length}' replies to message '${originalMessageId}'`);
-          replies.forEach(reply => {
-            reply.data.quote.message_id = event.id;
-            this.eventService.replaceEvent(reply);
-          });
-          return event;
-        });
+    return this._findRepliesToMessage(event.conversation, originalMessageId).then(replies => {
+      this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
+      replies.forEach(reply => {
+        reply.data.quote.message_id = event.id;
+        this.eventService.replaceEvent(reply);
+      });
+      return event;
     });
   }
 
@@ -128,6 +130,15 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
           const decoratedData = Object.assign({}, event.data, {quote: quoteData});
           return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
         });
+    });
+  }
+
+  _findRepliesToMessage(conversationId, messageId) {
+    return this.eventService.loadEvent(conversationId, messageId).then(originalEvent => {
+      if (!originalEvent) {
+        return [];
+      }
+      return this.eventService.loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time);
     });
   }
 };
