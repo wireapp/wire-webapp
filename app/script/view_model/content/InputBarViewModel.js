@@ -396,6 +396,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
+  handleCancelReply() {
+    if (!this.mentionSuggestions().length) {
+      this.cancelMessageReply(false);
+    }
+    this.textarea.focus();
+  }
+
   clickToCancelPastedFile() {
     this.pastedFile(null);
   }
