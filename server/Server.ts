@@ -176,26 +176,29 @@ class Server {
 
       const userAgent = req.header('User-Agent');
       const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
-      const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
 
-      const supportedBrowser = (() => {
-        const browserName = parsedUserAgent.browser.name.toLowerCase();
-        const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
-        const supportedBrowserVersion = supportedBrowserVersionObject && supportedBrowserVersionObject.major;
+      if (parsedUserAgent) {
+        const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
 
-        try {
-          const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
-          const browserVersion = parseInt(browserVersionString, 10);
-          return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
-        } catch (err) {
-          return false;
+        const supportedBrowser = (() => {
+          const browserName = parsedUserAgent.browser.name.toLowerCase();
+          const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
+          const supportedBrowserVersion = supportedBrowserVersionObject && supportedBrowserVersionObject.major;
+
+          try {
+            const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
+            const browserVersion = parseInt(browserVersionString, 10);
+            return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
+          } catch (err) {
+            return false;
+          }
+        })();
+        if (invalidBrowser || !supportedBrowser) {
+          return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
         }
-      })();
-
-      if (!parsedUserAgent || invalidBrowser || !supportedBrowser) {
+      } else {
         return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
       }
-
       return next();
     });
   }
