@@ -52,24 +52,7 @@ module.exports = grunt => {
     grunt.log.ok(`Version set to ${version}`);
   });
 
-  grunt.registerTask('prepare_staging', [
-    'clean:deploy',
-    'less:deploy',
-    'postcss:deploy',
-    'copy:deploy',
-    'copy:deploy_audio',
-    'copy:deploy_favicon',
-    'includereplace:deploy_index',
-    'includereplace:deploy_auth',
-    'includereplace:deploy_login',
-    'includereplace:deploy_demo',
-    'clean:deploy_app',
-    'uglify:deploy',
-    'concat:deploy',
-    'clean:deploy_script',
-  ]);
-
-  grunt.registerTask('prepare_prod', [
+  grunt.registerTask('prepare', [
     'clean:deploy',
     'less:deploy',
     'postcss:deploy',

@@ -25,14 +25,8 @@ module.exports = grunt => {
   grunt.registerTask('aws_deploy', () => {
     grunt.task.run('init');
 
-    const target = grunt.option('target' || grunt.config('gitinfo.local.branch.current.name'));
-
-    if (target === 'prod') {
-      grunt.task.run('prepare_prod');
-    } else if (target === 'staging') {
-      grunt.task.run('prepare_staging');
-    }
-
+    grunt.option('target' || grunt.config('gitinfo.local.branch.current.name'));
+    grunt.task.run('prepare');
     const version = grunt.option('version');
 
     grunt.config('aws.deploy.options.version', version);
