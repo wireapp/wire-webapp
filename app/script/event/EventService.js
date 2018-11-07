@@ -78,7 +78,7 @@ z.event.EventService = class EventService {
     return this.storageService.db[this.EVENT_STORE_NAME]
       .where(['conversation', 'time'])
       .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
-      .filter(event => (event.data || {}).quote && event.data.quote.message_id === quotedMessageId)
+      .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
       .toArray();
   }
 

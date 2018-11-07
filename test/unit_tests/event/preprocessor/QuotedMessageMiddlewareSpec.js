@@ -139,5 +139,101 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         expect(parsedEvent.data.quote.user_id).toEqual('user-id');
       });
     });
+
+    it('updates quotes in DB when a message is edited', () => {
+      const originalMessage = {
+        data: {
+          content: 'hello',
+        },
+      };
+      const replies = [
+        {
+          data: {
+            content: 'bonjour',
+            quote: {
+              message_id: 'original-id',
+            },
+          },
+        },
+        {
+          data: {
+            content: 'hey',
+            quote: {
+              message_id: 'original-id',
+            },
+          },
+        },
+      ];
+      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
+      spyOn(quotedMessageMiddleware.eventService, 'loadEventsReplyingToMessage').and.returnValue(
+        Promise.resolve(replies)
+      );
+      spyOn(quotedMessageMiddleware.eventService, 'replaceEvent').and.returnValue(Promise.resolve());
+
+      const event = {
+        conversation: 'conversation-uuid',
+        data: {
+          replacing_message_id: 'original-id',
+        },
+        id: 'new-id',
+        time: 100,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      };
+
+      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+        expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
+          jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})})
+        );
+      });
+    });
+
+    it('invalidates quotes in DB when a message is deleted', () => {
+      const originalMessage = {
+        data: {
+          content: 'hello',
+        },
+      };
+      const replies = [
+        {
+          data: {
+            content: 'bonjour',
+            quote: {
+              message_id: 'original-id',
+            },
+          },
+        },
+        {
+          data: {
+            content: 'hey',
+            quote: {
+              message_id: 'original-id',
+            },
+          },
+        },
+      ];
+      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
+      spyOn(quotedMessageMiddleware.eventService, 'loadEventsReplyingToMessage').and.returnValue(
+        Promise.resolve(replies)
+      );
+      spyOn(quotedMessageMiddleware.eventService, 'replaceEvent').and.returnValue(Promise.resolve());
+
+      const event = {
+        conversation: 'conversation-uuid',
+        data: {
+          replacing_message_id: 'original-id',
+        },
+        id: 'new-id',
+        time: 100,
+        type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+      };
+
+      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+        expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            data: jasmine.objectContaining({quote: {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
+          })
+        );
+      });
+    });
   });
 });
