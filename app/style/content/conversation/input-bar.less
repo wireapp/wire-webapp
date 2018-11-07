@@ -29,12 +29,12 @@
     z-index: 10;
     display: flex;
     background-color: #fff;
-  }
-}
 
-.conversation-input-bar-editing {
-  background-color: fade(@w-yellow, 16%);
-  transition: background-color @animation-timing-faster @ease-in-quad;
+    &--editing {
+      background-color: mix(@w-yellow, #fff, 16%);
+      transition: background-color @animation-timing-faster @ease-in-quad;
+    }
+  }
 }
 
 .conversation-input-bar-text,

@@ -74,13 +74,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.replyMessageEntity = ko.observable();
 
     const handleRepliedMessageDeleted = messageId => {
-      if (this.replyMessageEntity().id === messageId) {
+      if (this.replyMessageEntity() && this.replyMessageEntity().id === messageId) {
         this.replyMessageEntity(undefined);
       }
     };
 
     const handleRepliedMessageUpdated = (originalMessageId, messageEntity) => {
-      if (this.replyMessageEntity().id === originalMessageId) {
+      if (this.replyMessageEntity() && this.replyMessageEntity().id === originalMessageId) {
         this.replyMessageEntity(messageEntity);
       }
     };
@@ -341,7 +341,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
 
     if (replyMessageId) {
-      storageValue.replyEntityPromise = this._getMessageInConversation(conversationEntity, replyMessageId);
+      storageValue.replyEntityPromise = this.conversationRepository.get_message_in_conversation_by_id(
+        conversationEntity,
+        replyMessageId
+      );
     }
 
     return storageValue;
@@ -355,10 +358,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
     return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
-  }
-
-  _getMessageInConversation(conversationEntity, messageId) {
-    return this.conversationRepository.get_message_in_conversation_by_id(conversationEntity, messageId);
   }
 
   addMention(userEntity, inputElement) {
@@ -439,6 +438,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
+
+      if (messageEntity.quote) {
+        this.conversationRepository
+          .get_message_in_conversation_by_id(this.conversationEntity(), messageEntity.quote().messageId)
+          .then(quotedMessage => this.replyMessageEntity(quotedMessage));
+      }
+
       this._moveCursorToEnd();
     }
   }
@@ -508,7 +514,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     if (this.isEditing()) {
-      this.sendMessageEdit(messageText, this.editMessageEntity());
+      this.sendMessageEdit(messageText, this.editMessageEntity(), this.replyMessageEntity());
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
@@ -686,23 +692,26 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this._resetDraftState();
   }
 
+  _generateQuote(replyMessageEntity) {
+    return !replyMessageEntity
+      ? Promise.resolve()
+      : this.eventRepository
+          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+          .then(this.messageHasher.hashEvent)
+          .then(messageHash => {
+            return new z.message.QuoteEntity({
+              hash: messageHash,
+              messageId: replyMessageEntity.id,
+              userId: replyMessageEntity.from,
+            });
+          });
+  }
+
   sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions.slice();
-      const generateQuotePromise = !replyMessageEntity
-        ? Promise.resolve()
-        : this.eventRepository
-            .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
-            .then(this.messageHasher.hashEvent)
-            .then(messageHash => {
-              return new z.message.QuoteEntity({
-                hash: messageHash,
-                messageId: replyMessageEntity.id,
-                userId: replyMessageEntity.from,
-              });
-            });
 
-      generateQuotePromise.then(quoteEntity => {
+      this._generateQuote(replyMessageEntity).then(quoteEntity => {
         this.conversationRepository.sendTextWithLinkPreview(
           this.conversationEntity(),
           messageText,
@@ -714,7 +723,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  sendMessageEdit(messageText, messageEntity) {
+  sendMessageEdit(messageText, messageEntity, replyMessageEntity) {
     const mentionEntities = this.currentMentions.slice();
     this.cancelMessageEditing();
 
@@ -722,13 +731,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    this.conversationRepository
-      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
-      .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-          throw error;
-        }
-      });
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
+      this.conversationRepository
+        .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities, quoteEntity)
+        .catch(error => {
+          if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+            throw error;
+          }
+        });
+      this.cancelMessageReply();
+    });
   }
 
   sendPastedFile() {
