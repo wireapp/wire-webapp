@@ -208,7 +208,7 @@
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.prod.js --progress",
     "bundle:test": "webpack --config webpack.config.test.js --progress",
-    "deploy-travis": "yarn build:server && runt app_deploy_travis",
+    "deploy-travis": "yarn build:server && grunt app_deploy_travis",
     "dist": "yarn grunt build_dev",
     "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
     "fix:assets": "yarn prettier --write && yarn stylelint",
