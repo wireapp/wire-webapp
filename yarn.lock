@@ -10905,17 +10905,12 @@ scss-tokenizer@^0.2.3:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
 
-sdp-transform@2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.4.1.tgz#3d1aa89045ea4fb20f688dd1e64934224b5d791a"
-  integrity sha512-dCReSJ6NtCW6goKkKBEHcIknBS1pKejnMw+S3p3jl0PALPFrbjbreCyQ+CABtFxl2GXD2/05+C2q2gZP23dUWQ==
+sdp-transform@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.5.0.tgz#4829a6d79e854d1a022e4bbc6bbe43eccc3ef624"
+  integrity sha512-iktBwqgfhfsCu1szik/NRAUXmLbx7mFb3zRzQrrNJSdj9e6OvB0pAH6ZxdG8YwUCWwybZVhcI+45MN/FwVoAag==
 
-sdp@^2.6.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.7.0.tgz#02b64ea0c29d73179afa19794e466b123b1b29f3"
-  integrity sha512-H/r89sRrnrJULbMzHLhC/LwQiMHu4GeItj6X3p7a6ADngGDnJXFIu2baTO6sjPBxMG+vtmlkUj7qwMccNzgk1w==
-
-sdp@^2.9.0:
+sdp@^2.6.0, sdp@^2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.9.0.tgz#2eed2d9c0b26c81ff87593107895c68d6fb9a0a6"
   integrity sha512-XAVZQO4qsfzVTHorF49zCpkdxiGmPNjA8ps8RcJGtGP3QJ/A8I9/SVg/QnkAFDMXIyGbHZBBFwYBw6WdnhT96w==
