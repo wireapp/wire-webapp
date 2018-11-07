@@ -64,7 +64,11 @@ z.message.MessageHasher = (() => {
    * @returns {number[]} the timestamp as long endian bytes
    * @private
    */
-  const getTimestampBytes = event => Long.fromInt(new Date(event.time).getTime()).toBytesBE();
+  const getTimestampBytes = event => {
+    const unixTimestamp = new Date(event.time).getTime();
+    const timestampSeconds = Math.floor(unixTimestamp / 1e3);
+    return Long.fromInt(timestampSeconds).toBytesBE();
+  };
 
   const getTextBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.content);
 
