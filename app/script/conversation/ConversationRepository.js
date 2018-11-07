@@ -1973,9 +1973,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of message
    * @returns {Promise} Resolves after sending the message
    */
-  sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
+  sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities, quoteEntity) {
     const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -1985,14 +1986,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
+    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities, quoteEntity);
     const protoMessageEdit = new z.proto.MessageEdit(originalMessageEntity.id, protoText);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, protoMessageEdit);
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage, false)
       .then(() => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
         }
       })
       .catch(error => {

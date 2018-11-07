@@ -1,10 +1,7 @@
 <!--@formatter:off-->
-<div id="conversation-input-bar"
-     class="conversation-input-bar"
-     data-bind="with: $root.inputBar,
-                css: {'conversation-input-bar-editing': $root.inputBar.isEditing()}">
+<div id="conversation-input-bar" class="conversation-input-bar" data-bind="with: $root.inputBar">
 
-  <!-- ko if: isReplying() -->
+  <!-- ko if: isReplying() && !isEditing() -->
     <div class="input-bar__reply" data-uie-name="input-bar-reply-box">
       <close-icon data-bind="click: handleCancelReply" data-uie-name="do-close-reply-box"></close-icon>
       <div class="input-bar__reply__body">
@@ -60,7 +57,7 @@
     </div>
   <!-- /ko -->
 
-  <div class="conversation-input-bar__input" data-bind="template: {afterRender: triggerInputChangeEvent}">
+  <div class="conversation-input-bar__input" data-bind="template: {afterRender: triggerInputChangeEvent}, css: {'conversation-input-bar__input--editing': isEditing()}">
     <!-- ko if: conversationEntity() && !conversationEntity().connection().isOutgoingRequest() -->
       <div class="controls-left">
         <!-- ko if: input().length -->
