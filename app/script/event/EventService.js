@@ -74,6 +74,14 @@ z.event.EventService = class EventService {
       .sortBy('time');
   }
 
+  loadEventsReplyingToMessage(conversationId, quotedMessageId, quotedMessageTime) {
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where(['conversation', 'time'])
+      .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
+      .filter(event => event.data.quote && event.data.quote.message_id === quotedMessageId)
+      .toArray();
+  }
+
   /**
    * Load events starting from the fromDate going back in history until either limit or toDate is reached.
    *

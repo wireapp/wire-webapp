@@ -46,6 +46,44 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
    * @returns {Object} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
   processEvent(event) {
+    switch (event.type) {
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        if (event.data.replacing_message_id) {
+          return this._handleEditEvent(event);
+        }
+        return this._handleAddEvent(event);
+
+      case z.event.Client.CONVERSATION.MESSAGE_DELETE:
+        return this._handleDeleteEvent(event);
+
+      default:
+        return Promise.resolve(event);
+    }
+  }
+
+  _handleDeleteEvent(event) {
+    // TODO
+
+    return Promise.resolve(event);
+  }
+
+  _handleEditEvent(event) {
+    const originalMessageId = event.data.replacing_message_id;
+    return this.eventService.loadEvent(event.conversation, originalMessageId).then(originalEvent => {
+      return this.eventService
+        .loadEventsReplyingToMessage(event.conversation, originalMessageId, originalEvent.time)
+        .then(replies => {
+          this.logger.info(`Updating '${replies.length}' replies to message '${originalMessageId}'`);
+          replies.forEach(reply => {
+            reply.data.quote.message_id = event.id;
+            this.eventService.replaceEvent(reply);
+          });
+          return event;
+        });
+    });
+  }
+
+  _handleAddEvent(event) {
     const rawQuote = event.data && event.data.quote;
 
     if (!rawQuote) {
