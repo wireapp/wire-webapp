@@ -692,7 +692,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this._resetDraftState();
   }
 
-  _generateQuotePromise(replyMessageEntity) {
+  _generateQuote(replyMessageEntity) {
     return !replyMessageEntity
       ? Promise.resolve()
       : this.eventRepository
@@ -711,7 +711,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (messageText.length) {
       const mentionEntities = this.currentMentions.slice();
 
-      this._generateQuotePromise(replyMessageEntity).then(quoteEntity => {
+      this._generateQuote(replyMessageEntity).then(quoteEntity => {
         this.conversationRepository.sendTextWithLinkPreview(
           this.conversationEntity(),
           messageText,
@@ -731,7 +731,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    this._generateQuotePromise(replyMessageEntity).then(quoteEntity => {
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
       this.conversationRepository
         .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities, quoteEntity)
         .catch(error => {
