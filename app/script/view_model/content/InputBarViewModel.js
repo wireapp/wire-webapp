@@ -295,7 +295,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
           if (replyEntity && replyEntity.isReplyable()) {
-            this.replyMessageEntity(replyEntity);
+            if (!replyEntity.user().id) {
+              this.userRepository.get_user_by_id(replyEntity.from).then(userEntity => {
+                replyEntity.user(userEntity);
+                this.replyMessageEntity(replyEntity);
+              });
+            } else {
+              this.replyMessageEntity(replyEntity);
+            }
           }
         });
       }
