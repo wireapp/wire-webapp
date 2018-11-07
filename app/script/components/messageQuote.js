@@ -32,12 +32,15 @@ z.components.MessageQuote = class MessageQuote {
     quote,
     selfId,
     showDetail,
+    showUserDetails,
   }) {
     this.updateCanShowMore = this.updateCanShowMore.bind(this);
     this.toggleShowMore = this.toggleShowMore.bind(this);
 
     this.showDetail = showDetail;
     this.handleClickOnMessage = handleClickOnMessage;
+    this.showUserDetails = showUserDetails;
+
     this.focusMessage = () => {
       if (this.quotedMessage()) {
         focusMessage(this.quotedMessage().id);
@@ -116,7 +119,7 @@ ko.components.register('message-quote', {
         <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError" data-uie-name="label-error-quote"></div>
       <!-- /ko -->
       <!-- ko ifnot: error() -->
-        <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName()" data-uie-name="label-name-quote"></div>
+        <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName(), click: () => showUserDetails(quotedMessage().user)" data-uie-name="label-name-quote"></div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset'} -->
           <!-- ko if: asset.is_image() -->
               <div class="message-quote__image" data-bind="background_image: asset.resource, click: (data, event) => $parent.showDetail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
