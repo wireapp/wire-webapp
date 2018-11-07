@@ -6,7 +6,7 @@
 
   <!-- ko if: isReplying() -->
     <div class="input-bar__reply" data-uie-name="input-bar-reply-box">
-      <close-icon data-bind="click: cancelMessageReply" data-uie-name="do-close-reply-box"></close-icon>
+      <close-icon data-bind="click: handleCancelReply" data-uie-name="do-close-reply-box"></close-icon>
       <div class="input-bar__reply__body">
         <div class="input-bar__reply__vert-bar"></div>
         <div class="input-bar__reply__text">
