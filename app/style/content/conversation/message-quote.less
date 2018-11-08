@@ -4,7 +4,7 @@
   padding-left: 88px;
   margin-bottom: 10px;
   font-size: 14px;
-  line-height: 21px;
+  line-height: 1.5em;
 
   &::before {
     position: absolute;
@@ -29,14 +29,32 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: @font-weight-bold;
+
+    edit-icon {
+      margin-left: 4px;
+
+      svg {
+        width: 8px;
+        height: 8px;
+        fill: fade(@graphite-dark, 40%);
+      }
+    }
   }
 
   &__text {
+    height: 1.5em;
+    max-height: 1.5em;
+    line-height: 1.5em;
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
+    &--large {
+      font-size: 32px;
+    }
+
     &--full {
+      max-height: unset;
       white-space: normal;
     }
 

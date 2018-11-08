@@ -68,7 +68,7 @@ z.components.MessageQuote = class MessageQuote {
       return quoteDate.isBefore(today);
     });
 
-    if (!this.error()) {
+    if (!this.error() && quote().messageId) {
       conversationRepository
         .get_message_in_conversation_by_id(conversation(), quote().messageId)
         .then(message => {
@@ -104,7 +104,9 @@ z.components.MessageQuote = class MessageQuote {
   updateCanShowMore(elements) {
     const textQuote = elements.find(element => element.classList && element.classList.contains('message-quote__text'));
     if (textQuote) {
-      this.canShowMore(textQuote.scrollWidth > textQuote.clientWidth);
+      const isWider = textQuote.scrollWidth > textQuote.clientWidth;
+      const isHigher = textQuote.scrollHeight > textQuote.clientHeight;
+      this.canShowMore(isWider || isHigher);
     }
   }
 
@@ -121,7 +123,12 @@ ko.components.register('message-quote', {
         <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError" data-uie-name="label-error-quote"></div>
       <!-- /ko -->
       <!-- ko ifnot: error() -->
-        <div class="message-quote__sender" data-bind="text: quotedMessage().headerSenderName(), click: () => showUserDetails(quotedMessage().user)" data-uie-name="label-name-quote"></div>
+        <div class="message-quote__sender">
+          <span data-bind="text: quotedMessage().headerSenderName(), click: () => showUserDetails(quotedMessage().user)" data-uie-name="label-name-quote"></span>
+          <!-- ko if: quotedMessage().was_edited() -->
+            <edit-icon data-uie-name="message-edited-quote"></edit-icon>
+          <!-- /ko -->
+        </div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset', afterRender: updateCanShowMore} -->
           <!-- ko if: asset.is_image() -->
               <div class="message-quote__image" data-bind="background_image: asset.resource, click: (data, event) => $parent.showDetail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
@@ -130,7 +137,11 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_text() -->
-            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parent.handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
+            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), 
+                                                        event: {click: $parent.handleClickOnMessage}, 
+                                                        css: {'message-quote__text--full': $parent.showFullText(), 
+                                                              'message-quote__text--large': z.util.EmojiUtil.includesOnlyEmojies(asset.text)}" 
+              dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
                 <span data-bind="l10n_text: $parent.showFullText() ? z.string.replyQuoteShowLess : z.string.replyQuoteShowMore"></span>
