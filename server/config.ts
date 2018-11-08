@@ -20,6 +20,7 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import * as logdown from 'logdown';
 import * as path from 'path';
 import {ServerConfig} from './ServerConfig';
 
@@ -70,11 +71,16 @@ const defaultCSP: HelmetCSP = {
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
   workerSrc: [],
 };
+const logger = logdown('config', {
+  logger: console,
+  markdown: false,
+});
 
 function readFile(path: string, fallback?: string): string {
   try {
     return fs.readFileSync(path, {encoding: 'utf8', flag: 'r'});
   } catch (error) {
+    logger.warn(`Cannot access "${path}": ${error.message}`);
     return fallback;
   }
 }
