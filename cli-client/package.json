@@ -3,7 +3,7 @@
     "wire-cli": "dist/commonjs/index.js"
   },
   "dependencies": {
-    "@types/dotenv": "4.0.3",
+    "@types/dotenv": "6.1.0",
     "@wireapp/core": "7.2.10",
     "commander": "2.19.0",
     "dotenv": "6.1.0",
