@@ -200,7 +200,7 @@
       "git add"
     ],
     "*.{ts,tsx}": [
-      "tslint --config tslint.json --fix",
+      "tslint --config tslint.json --project tsconfig.json --fix",
       "git add"
     ]
   },

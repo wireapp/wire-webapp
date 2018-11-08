@@ -21,6 +21,7 @@ export interface ServerConfig {
     };
     VERSION: string;
   };
+  COMMIT: string;
   SERVER: {
     APP_BASE: string;
     CACHE_DURATION_SECONDS: number;
