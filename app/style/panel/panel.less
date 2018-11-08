@@ -124,6 +124,7 @@
     align-items: center;
     margin: 0 16px;
     cursor: pointer;
+    font-weight: @font-weight-regular;
     user-select: none;
 
     &.custom {
@@ -171,23 +172,23 @@
       }
     }
 
-    &__text,
-    &__status {
-      font-size: 14px;
-      font-weight: 400;
-    }
-
     &__text {
       overflow: hidden;
       flex: 1;
+      font-size: 14px;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     &__status {
-      margin-left: 8px;
-      color: fade(@graphite-dark, 40%);
+      font-size: 12px;
       justify-self: flex-end;
+      opacity: 0.56;
+    }
+
+    &__summary {
+      flex-grow: 1;
+      line-height: 16px;
     }
 
     disclose-icon {

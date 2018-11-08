@@ -84,6 +84,19 @@
       </div>
     </div>
   <!-- /ko -->
+  <!-- ko if: message.quote() -->
+    <message-quote params="
+        conversation: $parent.conversation(), 
+        quote: message.quote(), 
+        selfId: $parent.selfUser().id, 
+        conversationRepository: $parent.conversation_repository, 
+        locationRepository: $parent.locationRepository,
+        showDetail: $parent.show_detail,
+        focusMessage: $parent.focusMessage,
+        handleClickOnMessage: $parent.handleClickOnMessage,
+        showUserDetails: $parent.showUserDetails,
+      "></message-quote>
+  <!-- /ko -->
 
   <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
     <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->

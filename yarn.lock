@@ -891,9 +891,9 @@
   version "2.0.4"
   resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/70b22f3b85368762129639928075ea0c4865a199"
 
-"@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.21.6":
-  version "1.21.6"
-  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/78abfcec1f97b047ef4bc3f3138c21575e48b5c1"
+"@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.22.1":
+  version "1.22.1"
+  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/eaf8625985f235915ae4db7925576d8e2dd4bb08"
   dependencies:
     protobufjs "6.8.8"
 
@@ -7480,7 +7480,7 @@ lolex@^3.0.0:
   resolved "https://registry.yarnpkg.com/lolex/-/lolex-3.0.0.tgz#f04ee1a8aa13f60f1abd7b0e8f4213ec72ec193e"
   integrity sha512-hcnW80h3j2lbUfFdMArd5UPA/vxZJ+G8vobd+wg3nVEQA0EigStbYcrG030FJxL6xiDDPEkoMatV9xIh5OecQQ==
 
-long@^4.0.0:
+long@4.0.0, long@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
   integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==

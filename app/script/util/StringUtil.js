@@ -23,6 +23,24 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.StringUtil = {
+  /**
+   * @param {ArrayLike} bytes - bytes to convert
+   * @returns {string} bytes as hex string
+   */
+  bytesToHex: bytes => {
+    bytes = Array.from(bytes);
+
+    const hexBase = 16;
+    const padIndex = 2;
+
+    return bytes
+      .map(byte => {
+        const stringByte = byte.toString(hexBase);
+        return z.util.StringUtil.padStart(stringByte, padIndex, '0');
+      })
+      .join('');
+  },
+
   capitalizeFirstChar: (string = '') => `${string.charAt(0).toUpperCase()}${string.substring(1)}`,
 
   /**
@@ -76,6 +94,22 @@ z.util.StringUtil = {
     return charIndex <= 9 ? charIndex : String.fromCharCode(charIndex);
   },
 
+  /**
+   * @param {string} hexString - string to convert
+   * @returns {number[]} bytes as array
+   */
+  hexToBytes: hexString => {
+    const bytes = [];
+    const hexBase = 16;
+
+    for (let charIndex = 0; charIndex < hexString.length; charIndex += 2) {
+      const parsedInt = parseInt(hexString.substr(charIndex, 2), hexBase);
+      bytes.push(parsedInt);
+    }
+
+    return bytes;
+  },
+
   includes: (string = '', query = '') => string.toLowerCase().includes(query.toLowerCase()),
 
   obfuscate: text => {
@@ -91,6 +125,19 @@ z.util.StringUtil = {
     }
 
     return obfuscated;
+  },
+
+  /**
+   * @param {string} str - string to pad
+   * @param {number} length - maximum length to pad
+   * @param {string} [padCharacter] - character to pad with (default is space)
+   * @returns {string} The padded string
+   */
+  padStart(str, length, padCharacter = ' ') {
+    if (str.length >= length) {
+      return str;
+    }
+    return padCharacter.repeat(length - str.length) + str;
   },
 
   removeLineBreaks: (string = '') => string.replace(/(\r\n|\n|\r)/gm, ''),
@@ -167,5 +214,25 @@ z.util.StringUtil = {
       string = `${string.substr(0, truncateIndex)}…`;
     }
     return string;
+  },
+
+  /**
+   * @param {string} str - The string to convert
+   * @returns {number[]} Converted string as byte array
+   */
+  utf8ToUtf16BE: str => {
+    const BOMChar = '\uFEFF';
+
+    str = `${BOMChar}${str}`;
+
+    const bytes = [];
+
+    for (let i = 0; i < str.length; ++i) {
+      const charCode = str.charCodeAt(i);
+      bytes.push((charCode & 0xff00) >> 8);
+      bytes.push(charCode & 0xff);
+    }
+
+    return bytes;
   },
 };

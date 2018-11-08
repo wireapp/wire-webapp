@@ -213,9 +213,15 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (messageEntity.has_asset_text()) {
       for (const assetEntity of messageEntity.assets()) {
         if (assetEntity.is_text()) {
-          const notificationText = assetEntity.isUserMentioned(this.selfUser().id)
-            ? `${z.l10n.text(z.string.notificationMention)} ${assetEntity.text}`
-            : assetEntity.text;
+          let notificationText;
+
+          if (assetEntity.isUserMentioned(this.selfUser().id)) {
+            notificationText = z.l10n.text(z.string.notificationMention, assetEntity.text);
+          } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
+            notificationText = z.l10n.text(z.string.notificationReply, assetEntity.text);
+          } else {
+            notificationText = assetEntity.text;
+          }
 
           return z.util.StringUtil.truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
         }
@@ -232,6 +238,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     if (messageEntity.has_asset()) {
       const assetEntity = messageEntity.get_first_asset();
+
       if (assetEntity.is_audio()) {
         return z.l10n.text(z.string.notificationSharedAudio);
       }
@@ -335,9 +342,21 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyObfuscated(messageEntity) {
-    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
-    const stringId = isSelfMentioned ? z.string.notificationObfuscatedMention : z.string.notificationObfuscated;
-    return z.l10n.text(stringId);
+    if (messageEntity.is_content()) {
+      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().id);
+
+      if (isSelfMentioned) {
+        return z.l10n.text(z.string.notificationObfuscatedMention);
+      }
+
+      const isSelfQuoted = messageEntity.isUserQuoted(this.selfUser().id);
+
+      if (isSelfQuoted) {
+        return z.l10n.text(z.string.notificationObfuscatedReply);
+      }
+    }
+
+    return z.l10n.text(z.string.notificationObfuscated);
   }
 
   /**
@@ -832,7 +851,8 @@ z.notification.NotificationRepository = class NotificationRepository {
       return isEventToNotify;
     }
 
-    const isSelfMentioned = messageEntity.is_content() && messageEntity.isUserMentioned(userId);
-    return isEventToNotify && isSelfMentioned;
+    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(userId);
+
+    return isEventToNotify && isSelfMentionOrReply;
   }
 };

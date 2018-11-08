@@ -20,17 +20,35 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+window.z.message = z.message || {};
 
-z.conversation.ConversationStatusIcon = {
-  ACTIVE_CALL: 'active-call',
-  MISSED_CALL: 'missed-call',
-  MUTED: 'muted',
-  NONE: 'none',
-  PENDING_CONNECTION: 'pending',
-  TYPING: 'typing',
-  UNREAD_MENTION: 'mention',
-  UNREAD_MESSAGES: 'messages',
-  UNREAD_PING: 'ping',
-  UNREAD_REPLY: 'reply',
+z.message.QuoteEntity = class QuoteEntity {
+  static get ERROR() {
+    return {
+      INVALID_HASH: 'INVALID_HASH',
+      MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
+    };
+  }
+
+  constructor({error, hash, messageId, userId}) {
+    this.messageId = messageId;
+    this.hash = hash;
+    this.userId = userId;
+    this.error = error;
+  }
+
+  isQuoteFromUser(userId) {
+    return this.userId === userId;
+  }
+
+  toJSON() {
+    return {
+      messageId: this.messageId,
+      userId: this.userId,
+    };
+  }
+
+  toProto() {
+    return new z.proto.Quote(this.messageId, new Uint8Array(this.hash));
+  }
 };
