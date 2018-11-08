@@ -24,6 +24,10 @@ import * as path from 'path';
 import {ServerConfig} from './ServerConfig';
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
+const ROBOTS_DIR = path.join(__dirname, 'robots');
+const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
+const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
+const VERSION_FILE = path.join(__dirname, 'version');
 
 if (nodeEnvironment === 'development') {
   dotenv.config();
@@ -119,7 +123,7 @@ const config: ServerConfig = {
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
-    VERSION: undefined,
+    VERSION: fs.readFileSync(VERSION_FILE, {encoding: 'utf8', flag: 'r'}),
   },
   SERVER: {
     APP_BASE: process.env.APP_BASE,
@@ -130,20 +134,11 @@ const config: ServerConfig = {
     ENVIRONMENT: nodeEnvironment,
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
-      ALLOW: '',
+      ALLOW: fs.readFileSync(ROBOTS_ALLOW_FILE, {encoding: 'utf8', flag: 'r'}),
       ALLOWED_HOSTS: ['app.wire.com'],
-      DISALLOW: '',
+      DISALLOW: fs.readFileSync(ROBOTS_DISALLOW_FILE, {encoding: 'utf8', flag: 'r'}),
     },
   },
 };
-
-const robotsDir = path.join(__dirname, 'robots');
-const robotsAllowFile = path.join(robotsDir, 'robots.txt');
-const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
-const versionFile = path.join(__dirname, 'version');
-
-config.SERVER.ROBOTS.ALLOW = fs.readFileSync(robotsAllowFile, {encoding: 'utf8', flag: 'r'});
-config.SERVER.ROBOTS.DISALLOW = fs.readFileSync(robotsDisallowFile, {encoding: 'utf8', flag: 'r'});
-config.CLIENT.VERSION = fs.readFileSync(versionFile, {encoding: 'utf8', flag: 'r'});
 
 export default config;

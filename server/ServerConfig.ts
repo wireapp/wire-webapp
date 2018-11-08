@@ -19,7 +19,7 @@ export interface ServerConfig {
       ENABLE_DEBUG: boolean;
       ENABLE_SSO: boolean;
     };
-    VERSION?: string;
+    VERSION: string;
   };
   SERVER: {
     APP_BASE: string;
