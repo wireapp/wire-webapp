@@ -71,6 +71,14 @@ const defaultCSP: HelmetCSP = {
   workerSrc: [],
 };
 
+function readFile(path: string, fallback?: string): string {
+  try {
+    return fs.readFileSync(path, {encoding: 'utf8', flag: 'r'});
+  } catch (error) {
+    return fallback;
+  }
+}
+
 function parseCommaSeparatedList(list: string = ''): string[] {
   const cleanedList = list.replace(/\s/g, '');
   if (!cleanedList) {
@@ -123,7 +131,7 @@ const config: ServerConfig = {
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
-    VERSION: fs.readFileSync(VERSION_FILE, {encoding: 'utf8', flag: 'r'}),
+    VERSION: readFile(VERSION_FILE, '0.0.0'),
   },
   SERVER: {
     APP_BASE: process.env.APP_BASE,
@@ -134,9 +142,9 @@ const config: ServerConfig = {
     ENVIRONMENT: nodeEnvironment,
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
-      ALLOW: fs.readFileSync(ROBOTS_ALLOW_FILE, {encoding: 'utf8', flag: 'r'}),
+      ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
       ALLOWED_HOSTS: ['app.wire.com'],
-      DISALLOW: fs.readFileSync(ROBOTS_DISALLOW_FILE, {encoding: 'utf8', flag: 'r'}),
+      DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
   },
 };
