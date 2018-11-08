@@ -5,7 +5,7 @@
     "@types/node": "10.12.3",
     "bro-fs": "0.4.0",
     "dexie": "2.0.4",
-    "fs-extra": "7.0.0"
+    "fs-extra": "7.0.1"
   },
   "devDependencies": {
     "jasmine": "3.3.0",
