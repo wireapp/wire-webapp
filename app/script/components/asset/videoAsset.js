@@ -124,8 +124,7 @@ ko.components.register('video-asset', {
       <div class="video-asset-container" 
         data-bind="hide_controls: 2000, 
                    attr: {'data-uie-value': asset.file_name}, 
-                   css: {'video-asset-container--small': displaySmall()}, 
-                   click: () => displaySmall() && onPlayButtonClicked()" 
+                   css: {'video-asset-container--small': displaySmall()}" 
         data-uie-name="video-asset">
         <video playsinline
                data-bind="attr: {src: video_src},
@@ -146,18 +145,25 @@ ko.components.register('video-asset', {
               </div>
             </div>
           <!-- /ko -->
-          <!-- ko if: displaySmall() -->
-            <camera-icon></camera-icon>
-          <!-- /ko -->
-          <!-- ko ifnot: displaySmall() || (!asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING) -->
+
+          <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
             <div class="video-controls-center">
-              <media-button params="src: video_element,
-                                    large: true,
-                                    asset: asset,
-                                    play: onPlayButtonClicked,
-                                    pause: on_pause_button_clicked,
-                                    cancel: () => asset.cancel($parents[1])">
-              </media-button>
+              <!-- ko if: displaySmall() -->
+                <media-button params="src: video_element,
+                                      large: false,
+                                      asset: asset,
+                                      play: onPlayButtonClicked">
+                </media-button>
+              <!-- /ko -->           
+              <!-- ko ifnot: displaySmall() -->
+                <media-button params="src: video_element,
+                                      large: true,
+                                      asset: asset,
+                                      play: onPlayButtonClicked,
+                                      pause: on_pause_button_clicked,
+                                      cancel: () => asset.cancel($parents[1])">
+                </media-button>
+              <!-- /ko -->
             </div>
             <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
               <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
