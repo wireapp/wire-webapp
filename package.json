@@ -59,7 +59,7 @@
     "redux": "4.0.1",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.3.0",
-    "sdp-transform": "2.4.1",
+    "sdp-transform": "2.5.0",
     "simplebar": "3.0.0-beta.5",
     "speakingurl": "14.0.1",
     "uuid": "3.3.2"
