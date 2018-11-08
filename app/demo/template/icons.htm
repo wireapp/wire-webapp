@@ -1,34 +1,6 @@
-<div id="icons">
-    <add-participants-icon></add-participants-icon>
-    <archive-icon></archive-icon>
-    <arrow-left-icon></arrow-left-icon>
-    <block-icon></block-icon>
-    <camera-icon></camera-icon>
-    <check-icon></check-icon>
-    <chevron-icon></chevron-icon>
-    <close-icon></close-icon>
-    <copy-icon></copy-icon>
-    <delete-icon></delete-icon>
-    <devices-icon></devices-icon>
-    <disclose-icon></disclose-icon>
-    <edit-icon></edit-icon>
-    <fullscreen-icon></fullscreen-icon>
-    <group-icon></group-icon>
-    <guest-icon></guest-icon>
-    <hangup-icon></hangup-icon>
-    <link-icon></link-icon>
-    <leave-icon></leave-icon>
-    <message-icon></message-icon>
-    <micoff-icon></micoff-icon>
-    <minus-icon></minus-icon>
-    <mute-icon></mute-icon>
-    <people-icon></people-icon>
-    <pickup-icon></pickup-icon>
-    <plus-icon></plus-icon>
-    <profile-icon></profile-icon>
-    <screenshare-icon></screenshare-icon>
-    <settings-icon></settings-icon>
-    <timer-icon></timer-icon>
-    <undo-icon></undo-icon>
-    <verified-icon class="override-color"></verified-icon>
+<div id="icons" data-bind="foreach: {data: Object.keys(ko.components._allRegisteredComponents).filter(key => /-icon$/.test(key)), as: 'iconName'}">
+    <div class="iconpreview">
+        <div class="iconpreview__icon" data-bind="component: iconName, css: {'override-color': ['verified-icon'].includes(iconName)}"></div>
+        <div class="iconpreview__name" data-bind="text: iconName"></div>
+    </div>
 </div>

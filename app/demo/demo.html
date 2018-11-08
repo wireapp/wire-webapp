@@ -106,13 +106,18 @@
       .box-list-dark {
         background: #222;
       }
-
-      #icons * {
-        font-size: 0;
-        margin: 8px;
+      .iconpreview {
+        display: flex;
+        margin-top: 8px;
       }
-
-      #icons *:not(.override-color) svg path{
+      .iconpreview__icon{
+        flex-basis: 32px;
+      }
+      .iconpreview__icon svg{
+        max-width: 16px;
+        max-height: 16px;
+      }
+      .iconpreview__icon:not(.override-color) svg path{
         fill: currentColor;
       }
     </style>

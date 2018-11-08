@@ -66,7 +66,12 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new z.viewModel.content.EmojiInputViewModel(mainViewModel, this, repositories);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
-    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
+    this.inputBar = new z.viewModel.content.InputBarViewModel(
+      mainViewModel,
+      this,
+      repositories,
+      z.message.MessageHasher
+    );
     this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);
     this.messageList = new z.viewModel.content.MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
@@ -127,7 +132,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
-    amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.messageList.scroll_height.bind(this.messageList));
   }
 
   /**

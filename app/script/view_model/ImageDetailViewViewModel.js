@@ -161,24 +161,17 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.imageModal.hide();
   }
 
-  clickOnDelete() {
-    return this.actionsViewModel
-      .deleteMessage(this.conversationEntity(), this.messageEntity())
-      .then(() => this.imageModal.hide());
-  }
-
-  clickOnDeleteForEveryone() {
-    return this.actionsViewModel
-      .deleteMessageEveryone(this.conversationEntity(), this.messageEntity())
-      .then(() => this.imageModal.hide());
-  }
-
   clickOnDownload() {
     this.messageEntity().download();
   }
 
   clickOnLike() {
     this.conversationRepository.toggle_like(this.conversationEntity(), this.messageEntity());
+  }
+
+  clickOnReply() {
+    amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
+    this.imageModal.hide();
   }
 
   clickOnShowNext(imageDetailViewViewModel, event) {
