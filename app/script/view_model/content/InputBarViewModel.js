@@ -390,9 +390,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.PING, this.clickToPing);
   }
 
-  cancelMessageEditing() {
+  cancelMessageEditing(resetDraft = true) {
     this.editMessageEntity(undefined);
-    this._resetDraftState();
+    this.replyMessageEntity(undefined);
+    if (resetDraft) {
+      this._resetDraftState();
+    }
   }
 
   cancelMessageReply(resetDraft = true) {
@@ -451,8 +454,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   replyMessage(messageEntity) {
     if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
-      this.cancelMessageReply();
-      this.cancelMessageEditing();
+      this.cancelMessageReply(false);
+      this.cancelMessageEditing(!!this.editMessageEntity());
       this.replyMessageEntity(messageEntity);
       this.textarea.focus();
     }
