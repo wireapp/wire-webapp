@@ -29,8 +29,8 @@ ko.components.register('add-participants-icon', {
 
 ko.components.register('archive-icon', {
   template: `
-  <svg width="16" height="14" viewBox="0 0 16 14">
-    <path d="M0 10h6v2h4v-2h6v4H0v-4zm0-6h6v2h4V4h6v4H0V4zm16-4v2H0V0h16z"></path>
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M1 7h14v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7zm6 2a1 1 0 1 0 0 2h2a1 1 0 0 0 0-2H7zM2.5 0h11c.8 0 1.2 0 1.5.3.3.1.6.4.7.7.2.3.3.7.3 1.5V4c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V2.5C0 1.7 0 1.3.3 1 .4.7.7.4 1 .3c.3-.2.7-.3 1.5-.3z"></path>
   </svg>
   `,
 });
