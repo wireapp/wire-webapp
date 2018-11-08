@@ -132,7 +132,11 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_text() -->
-            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), event: {click: $parent.handleClickOnMessage}, css: {'message-quote__text--full': $parent.showFullText()}" dir="auto" data-uie-name="media-text-quote"></div>
+            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), 
+                                                        event: {click: $parent.handleClickOnMessage}, 
+                                                        css: {'message-quote__text--full': $parent.showFullText(), 
+                                                              'message-quote__text--large': z.util.EmojiUtil.includesOnlyEmojies(asset.text)}" 
+              dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
                 <span data-bind="l10n_text: $parent.showFullText() ? z.string.replyQuoteShowLess : z.string.replyQuoteShowMore"></span>
