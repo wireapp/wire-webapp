@@ -68,7 +68,7 @@ z.components.MessageQuote = class MessageQuote {
       return quoteDate.isBefore(today);
     });
 
-    if (!this.error()) {
+    if (!this.error() && quote().messageId) {
       conversationRepository
         .get_message_in_conversation_by_id(conversation(), quote().messageId)
         .then(message => {
