@@ -25,22 +25,22 @@ import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
-import {ServerConfig} from './config';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
+import {ServerConfig} from './ServerConfig';
 import * as BrowserUtil from './util/BrowserUtil';
 
 const STATUS_CODE_MOVED = 301;
 const STATUS_CODE_FOUND = 302;
 
 class Server {
-  private app: express.Express;
+  private readonly app: express.Express;
   private server?: http.Server;
 
-  constructor(private config: ServerConfig) {
+  constructor(private readonly config: ServerConfig) {
     if (this.config.SERVER.DEVELOPMENT) {
       console.log(this.config);
     }
