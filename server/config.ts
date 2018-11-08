@@ -18,11 +18,17 @@
  */
 
 import * as dotenv from 'dotenv';
+import * as fs from 'fs-extra';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import * as logdown from 'logdown';
 import * as path from 'path';
-import {fileIsReadable, readFile} from './util/FileUtil';
+import {ServerConfig} from './ServerConfig';
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
+const ROBOTS_DIR = path.join(__dirname, 'robots');
+const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
+const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
+const VERSION_FILE = path.join(__dirname, 'version');
 
 if (nodeEnvironment === 'development') {
   dotenv.config();
@@ -65,6 +71,19 @@ const defaultCSP: HelmetCSP = {
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
   workerSrc: [],
 };
+const logger = logdown('config', {
+  logger: console,
+  markdown: false,
+});
+
+function readFile(path: string, fallback?: string): string {
+  try {
+    return fs.readFileSync(path, {encoding: 'utf8', flag: 'r'});
+  } catch (error) {
+    logger.warn(`Cannot access "${path}": ${error.message}`);
+    return fallback;
+  }
+}
 
 function parseCommaSeparatedList(list: string = ''): string[] {
   const cleanedList = list.replace(/\s/g, '');
@@ -99,43 +118,6 @@ function mergedCSP(): HelmetCSP {
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
-export interface ServerConfig {
-  CLIENT: {
-    ANALYTICS_API_KEY: string;
-    RAYGUN_API_KEY: string;
-    APP_NAME: string;
-    BACKEND_REST: string;
-    BACKEND_WS: string;
-    ENVIRONMENT: string;
-    URL: {
-      ACCOUNT_BASE: string;
-      MOBILE_BASE: string;
-      TEAMS_BASE: string;
-      WEBSITE_BASE: string;
-    };
-    FEATURE: {
-      CHECK_CONSENT: boolean;
-      ENABLE_DEBUG: boolean;
-      ENABLE_SSO: boolean;
-    };
-    VERSION?: string;
-  };
-  SERVER: {
-    APP_BASE: string;
-    CACHE_DURATION_SECONDS: number;
-    CSP: HelmetCSP;
-    DEVELOPMENT?: boolean;
-    ENFORCE_HTTPS: boolean;
-    ENVIRONMENT: string;
-    PORT_HTTP: number;
-    ROBOTS: {
-      ALLOWED_HOSTS: string[];
-      ALLOW: string;
-      DISALLOW: string;
-    };
-  };
-}
-
 const config: ServerConfig = {
   CLIENT: {
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
@@ -155,7 +137,7 @@ const config: ServerConfig = {
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
-    VERSION: undefined,
+    VERSION: readFile(VERSION_FILE, '0.0.0'),
   },
   SERVER: {
     APP_BASE: process.env.APP_BASE,
@@ -166,34 +148,11 @@ const config: ServerConfig = {
     ENVIRONMENT: nodeEnvironment,
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
-      ALLOW: '',
+      ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
       ALLOWED_HOSTS: ['app.wire.com'],
-      DISALLOW: '',
+      DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
   },
 };
-
-const robotsDir = path.join(__dirname, 'robots');
-const robotsAllowFile = path.join(robotsDir, 'robots.txt');
-const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
-const versionFile = path.join(__dirname, 'version');
-
-if (fileIsReadable(robotsAllowFile, true)) {
-  try {
-    config.SERVER.ROBOTS.ALLOW = readFile(robotsAllowFile, true);
-  } catch (error) {}
-}
-
-if (fileIsReadable(robotsDisallowFile, true)) {
-  try {
-    config.SERVER.ROBOTS.DISALLOW = readFile(robotsDisallowFile, true);
-  } catch (error) {}
-}
-
-if (fileIsReadable(versionFile, true)) {
-  try {
-    config.CLIENT.VERSION = readFile(versionFile, true);
-  } catch (error) {}
-}
 
 export default config;
