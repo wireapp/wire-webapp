@@ -18,9 +18,10 @@
  */
 
 import * as dotenv from 'dotenv';
+import * as fs from 'fs-extra';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as path from 'path';
-import {fileIsReadable, readFile} from './util/FileUtil';
+import {ServerConfig} from './ServerConfig';
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
@@ -99,43 +100,6 @@ function mergedCSP(): HelmetCSP {
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
-export interface ServerConfig {
-  CLIENT: {
-    ANALYTICS_API_KEY: string;
-    RAYGUN_API_KEY: string;
-    APP_NAME: string;
-    BACKEND_REST: string;
-    BACKEND_WS: string;
-    ENVIRONMENT: string;
-    URL: {
-      ACCOUNT_BASE: string;
-      MOBILE_BASE: string;
-      TEAMS_BASE: string;
-      WEBSITE_BASE: string;
-    };
-    FEATURE: {
-      CHECK_CONSENT: boolean;
-      ENABLE_DEBUG: boolean;
-      ENABLE_SSO: boolean;
-    };
-    VERSION?: string;
-  };
-  SERVER: {
-    APP_BASE: string;
-    CACHE_DURATION_SECONDS: number;
-    CSP: HelmetCSP;
-    DEVELOPMENT?: boolean;
-    ENFORCE_HTTPS: boolean;
-    ENVIRONMENT: string;
-    PORT_HTTP: number;
-    ROBOTS: {
-      ALLOWED_HOSTS: string[];
-      ALLOW: string;
-      DISALLOW: string;
-    };
-  };
-}
-
 const config: ServerConfig = {
   CLIENT: {
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
@@ -178,22 +142,8 @@ const robotsAllowFile = path.join(robotsDir, 'robots.txt');
 const robotsDisallowFile = path.join(robotsDir, 'robots-disallow.txt');
 const versionFile = path.join(__dirname, 'version');
 
-if (fileIsReadable(robotsAllowFile, true)) {
-  try {
-    config.SERVER.ROBOTS.ALLOW = readFile(robotsAllowFile, true);
-  } catch (error) {}
-}
-
-if (fileIsReadable(robotsDisallowFile, true)) {
-  try {
-    config.SERVER.ROBOTS.DISALLOW = readFile(robotsDisallowFile, true);
-  } catch (error) {}
-}
-
-if (fileIsReadable(versionFile, true)) {
-  try {
-    config.CLIENT.VERSION = readFile(versionFile, true);
-  } catch (error) {}
-}
+config.SERVER.ROBOTS.ALLOW = fs.readFileSync(robotsAllowFile, {encoding: 'utf8', flag: 'r'});
+config.SERVER.ROBOTS.DISALLOW = fs.readFileSync(robotsDisallowFile, {encoding: 'utf8', flag: 'r'});
+config.CLIENT.VERSION = fs.readFileSync(versionFile, {encoding: 'utf8', flag: 'r'});
 
 export default config;
