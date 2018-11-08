@@ -83,8 +83,8 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         this.eventService.replaceEvent(reply);
       });
 
-      const decoratedData = Object.assign(event.data, {quote: originalEvent.data.quote});
-      return Object.assign(event, {data: decoratedData});
+      const decoratedData = Object.assign({}, event.data, {quote: originalEvent.data.quote});
+      return Object.assign({}, event, {data: decoratedData});
     });
   }
 
