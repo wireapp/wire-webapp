@@ -64,6 +64,12 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
+declare global {
+  interface Window {
+    wSSOCapable: boolean;
+  }
+}
+
 interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
 
 interface ConnectedProps {
@@ -87,7 +93,6 @@ interface State {
   conversationCode: string;
   conversationKey: string;
   email: string;
-  hideSSOLogin: boolean;
   isValidLink: boolean;
   logoutReason: string;
   password: string;
@@ -110,7 +115,6 @@ class Login extends React.Component<CombinedProps, State> {
     conversationCode: null,
     conversationKey: null,
     email: '',
-    hideSSOLogin: false,
     isValidLink: true,
     logoutReason: null,
     password: '',
@@ -156,8 +160,6 @@ class Login extends React.Component<CombinedProps, State> {
           }));
         });
     }
-
-    this.setState((state, props) => ({hideSSOLogin: URLUtil.hasURLParameter(QUERY_KEY.HIDE_SSO)}));
   };
 
   componentDidMount = () => {
@@ -287,21 +289,13 @@ class Login extends React.Component<CombinedProps, State> {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {
-      logoutReason,
-      isValidLink,
-      hideSSOLogin,
-      email,
-      password,
-      persist,
-      validInputs,
-      validationErrors,
-    } = this.state;
+    const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     const backArrow = (
       <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
       </Link>
     );
+    const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
       <Page>
         <IsMobile>
@@ -406,7 +400,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {Environment.isInternalEnvironment() && !isDesktopApp() && !hideSSOLogin ? (
+                {isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}

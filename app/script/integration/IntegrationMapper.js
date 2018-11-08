@@ -74,7 +74,8 @@ z.integration.IntegrationMapper = (() => {
       }
 
       if (assets && assets.length) {
-        z.assets.AssetMapper.mapProfileAssets(serviceEntity, assets);
+        const mappedAssets = z.assets.AssetMapper.mapProfileAssets(serviceEntity.id, assets);
+        z.assets.AssetMapper.updateUserEntityAssets(serviceEntity, mappedAssets);
       }
 
       if (description) {
