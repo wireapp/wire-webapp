@@ -43,11 +43,18 @@
   & a {
     text-decoration: none;
   }
+
   & * {
     .accent-selection-color;
   }
+
   &:last-child {
     margin-bottom: 24px;
+  }
+
+  .context-menu,
+  .time {
+    background-color: @app-bg;
   }
 
   &.hover .time,
@@ -55,7 +62,6 @@
   &.hover .context-menu,
   &:hover .context-menu,
   .show-timestamp.time {
-    background-color: @app-bg;
     opacity: 1;
     pointer-events: auto;
   }
@@ -107,14 +113,15 @@
 }
 
 .message-marked {
+  .context-menu,
+  .time {
+    background-color: transparent;
+  }
+
   .message-body {
     .accent-background-color(24%);
 
-    animation-delay: 1s;
-    animation-duration: @animation-timing-slower * 2;
-    animation-fill-mode: forwards;
-    animation-name: marked-animation;
-    animation-timing-function: @ease-out-quart;
+    animation: @animation-timing-slower * 2 @ease-out-quart 1s forwards marked-animation;
   }
 }
 
