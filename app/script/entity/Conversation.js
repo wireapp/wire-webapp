@@ -395,7 +395,9 @@ z.entity.Conversation = class Conversation {
       this.update_timestamps(messageEntity);
       if (entityToReplace) {
         if (replaceDuplicate) {
-          messageEntity.quote(entityToReplace.quote());
+          if (messageEntity.is_content()) {
+            messageEntity.quote(entityToReplace.quote());
+          }
           const duplicateIndex = this.messages_unordered.indexOf(entityToReplace);
           this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
         }
