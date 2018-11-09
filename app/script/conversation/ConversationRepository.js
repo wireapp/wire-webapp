@@ -495,7 +495,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {Message} messageEntity - Message entity
-   * @param {number} [padding=30] - Number of messages to load around the targetted message
+   * @param {number} [padding=30] - Number of messages to load around the targeted message
    * @returns {Promise} Resolves with the message
    */
   getMessagesWithOffset(conversationEntity, messageEntity, padding = 30) {
