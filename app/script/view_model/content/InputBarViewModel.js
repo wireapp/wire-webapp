@@ -442,7 +442,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .slice();
       this.currentMentions(newMentions);
 
-      if (messageEntity.quote) {
+      if (messageEntity.quote()) {
         this.conversationRepository
           .get_message_in_conversation_by_id(this.conversationEntity(), messageEntity.quote().messageId)
           .then(quotedMessage => this.replyMessageEntity(quotedMessage));
