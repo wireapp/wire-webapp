@@ -1748,7 +1748,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
 
-          return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+          return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
         });
       })
       .catch(error => {
