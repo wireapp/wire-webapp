@@ -280,9 +280,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         } else {
           const unread_message = $('.message-timestamp-unread');
           if (unread_message.length) {
-            const unread_message_position = unread_message.parents('.message').position();
+            const unreadMarkerPosition = unread_message.parents('.message').position();
 
-            messages_container.scrollBy(unread_message_position.top);
+            messages_container.scrollBy(unreadMarkerPosition.top);
           } else {
             messages_container.scrollToBottom();
           }
