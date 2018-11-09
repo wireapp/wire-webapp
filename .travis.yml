@@ -12,22 +12,10 @@ env:
     # WIRE_WEBAPP_BOT_PASSWORD
     - secure: "U9Fq+z04H9EbI55M6VDAVelLtETVSS9oNNCJo5llDSij0pjrNZpxj3MeKhRZQc8yiZ4hOC5nUbNPHpvIKBkw+xD/Pg32t6SVZl4ZSDPm3XZTFYpWj/U/NB+/l/ivK4bNmx62hLOL8Dhr5A67UlwwCr4tYVmLu7wcUNwgtkyAii1mqoAC0yT4qzDQBalGAk/Q+ZatmjAZM/5ZU8H3jags0+bubJlJKlU0YOmSzXFdFSQLFMQSwEeVEH7vMIkOmFIK6L6qveSDJDmNj2tvgn8ZLr6p7TvOLovGbfPiNKcrEyeADJQrG0J3IQ6dHYOCIN1SzibdJEWqluk6T/N0mNq27AKEzXsV8VHl6VAnswxAq1pljlGF5Nj0OUt5JAUzavbt7tw3TBwC96+55YJdvPZ9ESg2S4afj94nEUISLldNDVEQPBUt4qfkTznKMOeBNzVItO9IhSQK65wUQ07//nxHsV38GMMKMWhtujFrqhAdtC6TCBGVxdCYQziCKW3xsmt2nNosxIkxESF9Osw7A5YbjwoREu7nIZOA0TYrJxZRz0AlV1D1WfNv/7KP5J0LQCR90jdoAnTvkTP4+WfX7C8UkyowpxpBUKvbe9d65cYTCzN69eT/lEQBmQz06Y8Wh+ou5q4BeNQmfgwUK7tYr1/vY9DqNskpaLyJsXKPO+gkTm4="
 
-# https://docs.travis-ci.com/user/installing-dependencies/#Installing-Packages-with-the-APT-Addon
-addons:
-  apt:
-    packages:
-      - google-chrome-stable
-
 # http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 node_js:
   - "10"
-
-# http://docs.travis-ci.com/user/gui-and-headless-browsers/
-before_install:
-  - export CHROME_BIN=/usr/bin/google-chrome
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
 
 # https://docs.travis-ci.com/user/caching/
 cache:
