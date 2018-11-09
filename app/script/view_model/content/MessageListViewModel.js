@@ -26,7 +26,6 @@ window.z.viewModel.content = z.viewModel.content || {};
 /**
  * Message list rendering view model.
  *
- * @todo Get rid of the $('.conversation') opacity
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jquery selectors
  */
@@ -68,6 +67,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     amplify.subscribe(z.event.WebApp.INPUT.RESIZE, this._handleInputResize.bind(this));
 
+    this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
 
@@ -206,6 +206,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   changeConversation(conversationEntity, messageEntity) {
     // Clean up old conversation
+    this.conversationLoaded(false);
     if (this.conversation()) {
       this.release_conversation(this.conversation());
     }
@@ -218,21 +219,22 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
     }
 
-    // @todo Rethink conversation.is_loaded
-    if (conversationEntity.is_loaded()) {
-      return this._renderConversation(conversationEntity, messageEntity);
-    }
+    conversationEntity.is_loaded(false);
+    return this._loadConversation(conversationEntity, messageEntity)
+      .then(() => this._renderConversation(conversationEntity, messageEntity))
+      .then(() => {
+        conversationEntity.is_loaded(true);
+        this.conversationLoaded(true);
+      });
+  }
 
+  _loadConversation(conversationEntity, messageEntity) {
     return this.conversation_repository
       .updateParticipatingUserEntities(conversationEntity, false, true)
       .then(_conversationEntity => {
         return messageEntity
           ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, messageEntity)
           : this.conversation_repository.getPrecedingMessages(_conversationEntity);
-      })
-      .then(() => {
-        conversationEntity.is_loaded(true);
-        return this._renderConversation(conversationEntity, messageEntity);
       });
   }
 
@@ -260,10 +262,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {Promise} Resolves when conversation was rendered
    */
   _renderConversation(conversationEntity, messageEntity) {
-    // Hide conversation until everything is processed
-    const conversationElement = $('.conversation');
-    conversationElement.css({opacity: 0});
-
     const messages_container = this._getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
@@ -282,12 +280,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         } else {
           const unread_message = $('.message-timestamp-unread');
           if (unread_message.length) {
-            const unread_message_position = unread_message
-              .parent()
-              .parent()
-              .position();
+            const unreadMarkerPosition = unread_message.parents('.message').position();
 
-            messages_container.scrollBy(unread_message_position.top);
+            messages_container.scrollBy(unreadMarkerPosition.top);
           } else {
             messages_container.scrollToBottom();
           }
@@ -297,7 +292,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           this._mark_conversation_as_read_on_focus(this.conversation());
         }
 
-        conversationElement.css({opacity: 1});
         this.capture_scrolling_event = true;
         window.addEventListener('resize', this._handleWindowResize);
 
@@ -417,7 +411,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           .get_message_in_conversation_by_id(conversationEntity, messageId)
           .then(messageEntity => {
             conversationEntity.remove_messages();
-            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity, 30);
+            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
           });
 
     loadMessagePromise.then(() => {
