@@ -76,6 +76,10 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   _handleEditEvent(event) {
     const originalMessageId = event.data.replacing_message_id;
     return this._findRepliesToMessage(event.conversation, originalMessageId).then(({originalEvent, replies}) => {
+      if (!originalEvent) {
+        return event;
+      }
+
       this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
 
       replies.forEach(reply => {
@@ -139,7 +143,9 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   _findRepliesToMessage(conversationId, messageId) {
     return this.eventService.loadEvent(conversationId, messageId).then(originalEvent => {
       if (!originalEvent) {
-        return [];
+        return {
+          replies: [],
+        };
       }
       return this.eventService
         .loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time)
