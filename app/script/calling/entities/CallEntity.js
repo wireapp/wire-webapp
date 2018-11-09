@@ -539,7 +539,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _setVerifyGroupCheckTimeout() {
-    const {ACTIVITY_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
+    const ACTIVITY_TIMEOUT = CallEntity.CONFIG.GROUP_CHECK.ACTIVITY_TIMEOUT;
     const timeout = ACTIVITY_TIMEOUT * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
 
     this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeout);
@@ -597,7 +597,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   setRemoteVersion(callMessageEntity) {
-    const {sdp: rtcSdp} = callMessageEntity;
+    const rtcSdp = callMessageEntity.sdp;
 
     if (rtcSdp) {
       this.telemetry.set_remote_version(z.calling.SDPMapper.getToolVersion(rtcSdp));
