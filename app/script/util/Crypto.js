@@ -25,7 +25,7 @@ window.z.util = z.util || {};
 z.util.Crypto = {
   Hashing: {
     joaatHash: string => {
-      const {uint32} = window;
+      const uint32 = window.uint32;
       let hash = uint32.toUint32(0);
       const key = string.toLowerCase();
 

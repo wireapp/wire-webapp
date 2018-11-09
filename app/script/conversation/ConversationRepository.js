@@ -1784,7 +1784,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendConfirmationStatus(conversationEntity, messageEntity) {
     const otherUserIn1To1 = !messageEntity.user().is_me && conversationEntity.is1to1();
-    const {CONFIRMATION_THRESHOLD} = ConversationRepository.CONFIG;
+    const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
@@ -3747,7 +3747,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case 'calling': {
-        const {properties} = callMessageEntity;
+        const properties = callMessageEntity.properties;
         const isVideoCall = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
         actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;

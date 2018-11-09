@@ -51,7 +51,7 @@ z.calling.CallMessageMapper = {
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const {props: properties} = callMessage;
+        const properties = callMessage.props;
 
         content = {properties};
         break;

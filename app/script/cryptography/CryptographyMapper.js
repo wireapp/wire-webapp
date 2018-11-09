@@ -170,7 +170,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
 
     if (preview) {
-      const {remote} = preview;
+      const remote = preview.remote;
 
       data = Object.assign(data, {
         preview_key: remote.asset_id,
