@@ -277,10 +277,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // Reset scroll position
         messages_container.scrollTop(0);
 
-        if (!this._conversationHasExtraMessages(this.conversation())) {
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        }
-
         if (messageEntity) {
           this.focusMessage(messageEntity.id);
         } else {
@@ -295,6 +291,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           } else {
             messages_container.scrollToBottom();
           }
+        }
+
+        if (!messages_container.isScrollable() && !this._conversationHasExtraMessages(this.conversation())) {
+          this._mark_conversation_as_read_on_focus(this.conversation());
         }
 
         conversationElement.css({opacity: 1});
