@@ -86,10 +86,10 @@
   <!-- /ko -->
   <!-- ko if: message.quote() -->
     <message-quote params="
-        conversation: $parent.conversation(), 
-        quote: message.quote(), 
-        selfId: $parent.selfUser().id, 
-        conversationRepository: $parent.conversation_repository, 
+        conversation: $parent.conversation(),
+        quote: message.quote(),
+        selfId: $parent.selfUser().id,
+        conversationRepository: $parent.conversation_repository,
         locationRepository: $parent.locationRepository,
         showDetail: $parent.show_detail,
         focusMessage: $parent.focusMessage,
@@ -343,17 +343,5 @@
       <span class="icon-sysmsg-error text-red"></span>
     </div>
     <div class="message-header-label" data-bind="l10n_text: z.string.conversationMissedMessages"></div>
-  </div>
-</script>
-
-<script type="text/html" id="timestamp">
-  <div class="message-header message-timestamp" data-bind="css: $parent.get_timestamp_class($data)">
-    <div class="message-header-icon">
-      <span class="message-unread-dot dot-md bg-theme"></span>
-    </div>
-    <div class="message-header-label">
-      <time data-timestamp-type="normal" class="label-xs" data-bind="relative_timestamp: message.timestamp(), attr: {'data-timestamp': message.timestamp}"></time>
-      <time data-timestamp-type="day" class="label-bold-xs" data-bind="relative_timestamp: message.timestamp(), relative_timestamp_day: true, attr: {'data-timestamp': message.timestamp}"></time>
-    </div>
   </div>
 </script>
