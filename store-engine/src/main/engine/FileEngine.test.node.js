@@ -43,7 +43,8 @@ describe('FileEngine', () => {
     fs
       .remove(TEST_DIRECTORY)
       .then(done)
-      .catch(done.fail));
+      .catch(done.fail)
+  );
 
   describe('"enforcePathRestrictions"', () => {
     const enforcePathRestrictions = (...opts) => () => FileEngine.enforcePathRestrictions(...opts);

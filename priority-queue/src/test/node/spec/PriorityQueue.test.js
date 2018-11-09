@@ -76,10 +76,12 @@ describe('PriorityQueue', () => {
       }
 
       queue = new PriorityQueue();
-      queue.add(() => happyFn()).then(value => {
-        expect(value).toBe('happy');
-        done();
-      });
+      queue
+        .add(() => happyFn())
+        .then(value => {
+          expect(value).toBe('happy');
+          done();
+        });
     });
 
     it('works with thunked primitive values', done => {
@@ -105,10 +107,12 @@ describe('PriorityQueue', () => {
       }
 
       queue = new PriorityQueue();
-      queue.add(() => notHappyFn()).catch(error => {
-        expect(error.message).toBe('not so happy');
-        done();
-      });
+      queue
+        .add(() => notHappyFn())
+        .catch(error => {
+          expect(error.message).toBe('not so happy');
+          done();
+        });
     });
 
     it('supports adding a label', () => {

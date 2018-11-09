@@ -46,7 +46,8 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
     fs
       .remove(TEMP_DIRECTORY)
       .then(done)
-      .catch(done.fail));
+      .catch(done.fail)
+  );
 
   describe('"delete_all"', () => {
     it('deletes everything from the storage', async done => {
