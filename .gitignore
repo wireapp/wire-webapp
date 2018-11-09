@@ -19,6 +19,7 @@
 /aws/config.*
 /aws/index.*
 /aws/Server.*
+/aws/ServerConfig.*
 /aws/util
 /bower_components
 /debug.log
