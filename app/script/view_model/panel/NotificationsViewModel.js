@@ -28,7 +28,7 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
     super(params);
     this.clickOnNotificationSetting = this.clickOnNotificationSetting.bind(this);
 
-    const {conversation} = params.repositories;
+    const conversation = params.repositories.conversation;
     this.conversationRepository = conversation;
 
     this.logger = new z.util.Logger('z.viewModel.panel.NotificationsViewModel', z.config.LOGGER.OPTIONS);

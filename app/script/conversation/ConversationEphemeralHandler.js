@@ -35,7 +35,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   static validateTimer(messageTimer) {
-    const {TIMER_RANGE} = ConversationEphemeralHandler.CONFIG;
+    const TIMER_RANGE = ConversationEphemeralHandler.CONFIG.TIMER_RANGE;
     const isTimerReset = messageTimer === null;
 
     return isTimerReset ? messageTimer : z.util.NumberUtil.clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
@@ -70,7 +70,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
 
       const shouldSetInterval = messageEntities.length && !updateIntervalId;
       if (shouldSetInterval) {
-        const {INTERVAL_TIME} = ConversationEphemeralHandler.CONFIG;
+        const INTERVAL_TIME = ConversationEphemeralHandler.CONFIG.INTERVAL_TIME;
         updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);
         this.logger.info('Started ephemeral message check interval');
       }

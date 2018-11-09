@@ -65,7 +65,7 @@ describe('Conversation Mapper', () => {
     });
 
     it('maps a single conversation', () => {
-      const {conversation} = entities;
+      const conversation = entities.conversation;
       const initial_timestamp = Date.now();
       const [conversation_et] = conversation_mapper.mapConversations([conversation], initial_timestamp);
 
@@ -93,7 +93,7 @@ describe('Conversation Mapper', () => {
     });
 
     it('maps multiple conversations', () => {
-      const {conversations} = payload.conversations.get;
+      const conversations = payload.conversations.get.conversations;
       const conversation_ets = conversation_mapper.mapConversations(conversations);
 
       expect(conversation_ets.length).toBe(conversations.length);

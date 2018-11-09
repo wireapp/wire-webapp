@@ -39,7 +39,7 @@ z.viewModel.panel.GuestsAndServicesViewModel = class GuestsAndServicesViewModel 
     this.requestAccessCode = this.requestAccessCode.bind(this);
     this.revokeAccessCode = this.revokeAccessCode.bind(this);
 
-    const {repositories} = params;
+    const repositories = params.repositories;
     const conversationRepository = repositories.conversation;
     this.stateHandler = conversationRepository.stateHandler;
 

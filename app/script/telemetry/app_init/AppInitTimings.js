@@ -50,7 +50,7 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
   }
 
   get_app_load() {
-    const {CONFIG} = AppInitTimings;
+    const CONFIG = AppInitTimings.CONFIG;
     const appLoaded = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED];
     const appLoadedInSeconds = appLoaded / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
 

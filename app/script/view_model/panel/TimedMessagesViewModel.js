@@ -30,7 +30,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
     this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
     this.clickOnMessageTimeOff = this.clickOnMessageTime.bind(this, {value: null});
 
-    const {conversation} = params.repositories;
+    const conversation = params.repositories.conversation;
     this.conversationRepository = conversation;
 
     this.logger = new z.util.Logger('z.viewModel.panel.TimedMessagesViewModel', z.config.LOGGER.OPTIONS);
