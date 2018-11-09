@@ -495,24 +495,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {Message} messageEntity - Message entity
-   * @param {number} [padding=15] - Padding
+   * @param {number} [padding=30] - Number of messages to load around the targetted message
    * @returns {Promise} Resolves with the message
    */
-  getMessagesWithOffset(conversationEntity, messageEntity, padding = 15) {
+  getMessagesWithOffset(conversationEntity, messageEntity, padding = 30) {
     const messageDate = new Date(messageEntity.timestamp());
     const conversationId = conversationEntity.id;
 
     conversationEntity.is_pending(true);
 
-    const preceedingPromise = this.eventService.loadPrecedingEvents(conversationId, new Date(0), messageDate, padding);
-    const followingPromise = this.eventService.loadFollowingEvents(conversationEntity.id, messageDate, padding);
-    return Promise.all([preceedingPromise, followingPromise])
-      .then(([olderEvents, newerEvents]) => {
-        this._addEventsToConversation(olderEvents.concat(newerEvents), conversationEntity);
+    return this.eventService
+      .loadPrecedingEvents(conversationId, new Date(0), messageDate, Math.floor(padding / 2))
+      .then(precedingMessages => {
+        return this.eventService
+          .loadFollowingEvents(conversationEntity.id, messageDate, padding - precedingMessages.length)
+          .then(followingMessages => precedingMessages.concat(followingMessages));
       })
-      .then(mappedMessageEntnties => {
+      .then(messages => this._addEventsToConversation(messages, conversationEntity))
+      .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
-        return mappedMessageEntnties;
+        return mappedMessageEntities;
       });
   }
 
