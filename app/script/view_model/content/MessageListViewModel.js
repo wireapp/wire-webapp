@@ -80,8 +80,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     // Store message subscription id
     this.messages_subscription = undefined;
 
-    this.recalculate_timeout = undefined;
-
     this.onMouseWheel = _.throttle((data, event) => {
       const element = $(event.currentTarget);
       if (element.isScrollable()) {
