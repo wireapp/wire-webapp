@@ -199,8 +199,12 @@
       "stylelint --fix",
       "git add"
     ],
-    "*.{ts,tsx}": [
-      "tslint --config tslint.json --fix",
+    "app/script/**/*.{ts,tsx}": [
+      "tslint --config tslint.json --project tsconfig.json --fix",
+      "git add"
+    ],
+    "server/**/*.{ts,tsx}": [
+      "tslint --config tslint.json --project tsconfig.server.json",
       "git add"
     ]
   },
@@ -214,11 +218,12 @@
     "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
     "fix:assets": "yarn prettier --write && yarn stylelint",
     "fix:js": "yarn lint:js --fix",
-    "fix:ts": "yarn lint:ts --fix",
-    "lint": "yarn lint:assets && yarn lint:js && yarn lint:ts",
+    "fix:ts": "yarn lint:ts:auth --fix && yarn lint:ts:server --fix",
+    "lint": "yarn lint:assets && yarn lint:js && yarn lint:ts:auth",
     "lint:assets": "yarn prettier --list-different",
     "lint:js": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore --ext .js app/script/ test/ bin/ grunt/",
-    "lint:ts": "tslint --config tslint.json --project tsconfig.json \"app/script/**/*.{ts,tsx}\"",
+    "lint:ts:auth": "tslint --config tslint.json --project tsconfig.json \"app/script/**/*.{ts,tsx}\"",
+    "lint:ts:server": "tslint --config tslint.json --project tsconfig.server.json \"server/**/*.{ts,tsx}\"",
     "postinstall": "node ./bin/postinstall.js",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "yarn build:server && yarn grunt build_dev && concurrently \"yarn start:server:dev\" \"yarn grunt watch\"",

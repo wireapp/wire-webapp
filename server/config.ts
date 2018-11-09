@@ -25,6 +25,8 @@ import * as path from 'path';
 import {ServerConfig} from './ServerConfig';
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
+
+const COMMIT_FILE = path.join(__dirname, 'commit');
 const ROBOTS_DIR = path.join(__dirname, 'robots');
 const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
@@ -139,6 +141,7 @@ const config: ServerConfig = {
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),
   },
+  COMMIT: readFile(COMMIT_FILE, ''),
   SERVER: {
     APP_BASE: process.env.APP_BASE,
     CACHE_DURATION_SECONDS: 300,
