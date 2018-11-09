@@ -136,6 +136,7 @@ module.exports = {
           'dexie-batch/dist/dexie-batch.js',
           'dexie-batch/dist/dexie-batch.js.map',
           'jszip/dist/jszip.js',
+          'long/dist/long.js',
           'simplebar/dist/simplebar.min.js',
         ],
       },

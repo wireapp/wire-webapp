@@ -74,6 +74,14 @@ z.event.EventService = class EventService {
       .sortBy('time');
   }
 
+  loadEventsReplyingToMessage(conversationId, quotedMessageId, quotedMessageTime) {
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where(['conversation', 'time'])
+      .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
+      .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
+      .toArray();
+  }
+
   /**
    * Load events starting from the fromDate going back in history until either limit or toDate is reached.
    *
@@ -174,7 +182,7 @@ z.event.EventService = class EventService {
       if (!record) {
         return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
       }
-      const {data: assetData, time} = event;
+      const assetData = event.data;
 
       record.data.id = assetData.id;
       record.data.key = assetData.key;
@@ -183,7 +191,6 @@ z.event.EventService = class EventService {
       record.data.status = z.assets.AssetTransferState.UPLOADED;
       record.data.token = assetData.token;
       record.status = z.message.StatusType.SENT;
-      record.time = time;
 
       return this.replaceEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
     });

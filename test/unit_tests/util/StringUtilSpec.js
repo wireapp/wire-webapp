@@ -249,4 +249,49 @@ describe('z.util.StringUtil', () => {
       expect(text.charAt(69)).toBe('…');
     });
   });
+
+  describe('bytesToHex', () => {
+    it('converts string values to hex', () => {
+      const stringValue = 'wire';
+      const expectedResult = '77697265';
+
+      const array = stringValue.split('').map(char => char.charCodeAt(0));
+      const resultValue = z.util.StringUtil.bytesToHex(array);
+
+      expect(resultValue).toBe(expectedResult);
+    });
+  });
+
+  describe('hexToBytes', () => {
+    it('converts string values to hex', () => {
+      const hexValue = '77697265';
+      const expectedResult = 'wire';
+
+      const resultArray = z.util.StringUtil.hexToBytes(hexValue);
+      const resultValue = resultArray.map(byte => String.fromCharCode(byte)).join('');
+
+      expect(resultValue).toBe(expectedResult);
+    });
+  });
+
+  describe('padStart', () => {
+    it('pads a string', () => {
+      const unpaddedString = 'wire';
+      const paddedString = '   wire';
+
+      const result = z.util.StringUtil.padStart(unpaddedString, 7);
+
+      expect(result).toBe(paddedString);
+    });
+
+    it('masks a credit card number', () => {
+      const fullNumber = '2034399002125581';
+      const last4Digits = fullNumber.slice(-4);
+      const maskedNumber = '************5581';
+
+      const result = z.util.StringUtil.padStart(last4Digits, fullNumber.length, '*');
+
+      expect(result).toBe(maskedNumber);
+    });
+  });
 });

@@ -405,7 +405,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the message
    */
   get_message_in_conversation_by_id(conversationEntity, messageId) {
-    const messageEntity = conversationEntity.get_message_by_id(messageId);
+    const messageEntity = conversationEntity.getMessage(messageId);
     if (messageEntity) {
       return Promise.resolve(messageEntity);
     }
@@ -495,24 +495,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {Message} messageEntity - Message entity
-   * @param {number} [padding=15] - Padding
+   * @param {number} [padding=30] - Number of messages to load around the targeted message
    * @returns {Promise} Resolves with the message
    */
-  getMessagesWithOffset(conversationEntity, messageEntity, padding = 15) {
+  getMessagesWithOffset(conversationEntity, messageEntity, padding = 30) {
     const messageDate = new Date(messageEntity.timestamp());
     const conversationId = conversationEntity.id;
 
     conversationEntity.is_pending(true);
 
-    const preceedingPromise = this.eventService.loadPrecedingEvents(conversationId, new Date(0), messageDate, padding);
-    const followingPromise = this.eventService.loadFollowingEvents(conversationEntity.id, messageDate, padding);
-    return Promise.all([preceedingPromise, followingPromise])
-      .then(([olderEvents, newerEvents]) => {
-        this._addEventsToConversation(olderEvents.concat(newerEvents), conversationEntity);
+    return this.eventService
+      .loadPrecedingEvents(conversationId, new Date(0), messageDate, Math.floor(padding / 2))
+      .then(precedingMessages => {
+        return this.eventService
+          .loadFollowingEvents(conversationEntity.id, messageDate, padding - precedingMessages.length)
+          .then(followingMessages => precedingMessages.concat(followingMessages));
       })
-      .then(mappedMessageEntnties => {
+      .then(messages => this._addEventsToConversation(messages, conversationEntity))
+      .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
-        return mappedMessageEntnties;
+        return mappedMessageEntities;
       });
   }
 
@@ -1746,7 +1748,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
 
-          return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+          return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
         });
       })
       .catch(error => {
@@ -1784,7 +1786,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendConfirmationStatus(conversationEntity, messageEntity) {
     const otherUserIn1To1 = !messageEntity.user().is_me && conversationEntity.is1to1();
-    const {CONFIRMATION_THRESHOLD} = ConversationRepository.CONFIG;
+    const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
@@ -1905,9 +1907,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of message
    * @returns {Promise} Resolves after sending the message
    */
-  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities) {
+  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.message_id;
 
@@ -1915,7 +1918,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .getLinkPreviewFromString(textMessage)
       .then(linkPreview => {
         if (linkPreview) {
-          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, [linkPreview]);
+          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, quoteEntity, [linkPreview]);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
@@ -1972,9 +1975,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of message
    * @returns {Promise} Resolves after sending the message
    */
-  sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
+  sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities, quoteEntity) {
     const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -1984,14 +1988,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
+    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities, quoteEntity);
     const protoMessageEdit = new z.proto.MessageEdit(originalMessageEntity.id, protoText);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, protoMessageEdit);
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage, false)
       .then(() => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
         }
       })
       .catch(error => {
@@ -2073,11 +2077,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
-  sendText(conversationEntity, textMessage, mentionEntities) {
+  sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
+    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities, quoteEntity);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
     if (conversationEntity.messageTimer()) {
@@ -2093,13 +2098,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */
-  sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities) {
-    return this.sendText(conversationEntity, textMessage, mentionEntities)
+  sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
+    return this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity)
       .then(genericMessage => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
         }
       })
       .catch(error => {
@@ -2110,7 +2116,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  _createTextProto(messageId, textMessage, mentionEntities, linkPreviews) {
+  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews) {
     const protoText = new z.proto.Text(textMessage);
 
     if (mentionEntities && mentionEntities.length) {
@@ -2133,10 +2139,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, protoMentions);
     }
 
-    if (linkPreviews && linkPreviews.length) {
-      const logMessage = `Adding link preview to message '${messageId}'`;
-      this.logger.debug(logMessage, linkPreviews);
+    if (quoteEntity) {
+      const protoQuote = quoteEntity.toProto();
+      this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
+      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.QUOTE, protoQuote);
+    }
 
+    if (linkPreviews && linkPreviews.length) {
+      this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
       protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS, linkPreviews);
     }
 
@@ -3461,7 +3471,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
-          conversationEntity.add_message(messageEntity, true);
+          const replacedEntity = conversationEntity.add_message(messageEntity, true);
+          if (replacedEntity) {
+            amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
+          }
         }
         return {conversationEntity, messageEntity};
       });
@@ -3736,7 +3749,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case 'calling': {
-        const {properties} = callMessageEntity;
+        const properties = callMessageEntity.properties;
         const isVideoCall = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
         actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;

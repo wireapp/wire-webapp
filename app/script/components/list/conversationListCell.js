@@ -81,6 +81,9 @@ ko.components.register('conversation-list-cell', {
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MENTION -->
             <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention"><mention-icon class="svg-icon"></mention-icon></span>
           <!-- /ko -->
+          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_REPLY -->
+            <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-reply"><reply-icon class="svg-icon"></reply-icon></span>
+          <!-- /ko -->
           <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_PING -->
             <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-ping"><ping-icon class="svg-icon"></ping-icon></span>
           <!-- /ko -->

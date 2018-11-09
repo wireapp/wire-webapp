@@ -170,7 +170,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
 
     if (preview) {
-      const {remote} = preview;
+      const remote = preview.remote;
 
       data = Object.assign(data, {
         preview_key: remote.asset_id,
@@ -415,18 +415,19 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapText(text) {
-    const {link_preview: linkPreviews, mentions} = text;
+    const {link_preview: protoLinkPreviews, mentions: protoMentions, quote: protoQuote} = text;
 
-    if (mentions && mentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
-      this.logger.warn(`Message contains '${mentions.length}' mentions exceeding limit`, text);
-      mentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
+    if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+      this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
+      protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
     return {
       data: {
         content: `${text.content}`,
-        mentions: mentions.map(protoMention => protoMention.encode64()),
-        previews: linkPreviews.map(protoLinkPreview => protoLinkPreview.encode64()),
+        mentions: protoMentions.map(protoMention => protoMention.encode64()),
+        previews: protoLinkPreviews.map(protoLinkPreview => protoLinkPreview.encode64()),
+        quote: protoQuote && protoQuote.encode64(),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };

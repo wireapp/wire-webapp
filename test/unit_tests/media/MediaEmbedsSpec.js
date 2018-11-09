@@ -61,7 +61,7 @@ describe('MediaEmbeds', () => {
   };
 
   describe('regex', () => {
-    const {regex} = z.media.MediaEmbeds;
+    const regex = z.media.MediaEmbeds.regex;
 
     describe('Spotify', () => {
       const re_spotify = regex.spotify;

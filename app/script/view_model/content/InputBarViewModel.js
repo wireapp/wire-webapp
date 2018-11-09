@@ -38,7 +38,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories, messageHasher) {
     this.addedToView = this.addedToView.bind(this);
     this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
@@ -49,6 +49,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
 
+    this.messageHasher = messageHasher;
+
     this.shadowInput = null;
     this.textarea = null;
 
@@ -57,6 +59,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.emojiInput = contentViewModel.emojiInput;
 
+    this.eventRepository = repositories.event;
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
@@ -68,7 +71,42 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 
     this.editMessageEntity = ko.observable();
+    this.replyMessageEntity = ko.observable();
+
+    const handleRepliedMessageDeleted = messageId => {
+      if (this.replyMessageEntity() && this.replyMessageEntity().id === messageId) {
+        this.replyMessageEntity(undefined);
+      }
+    };
+
+    const handleRepliedMessageUpdated = (originalMessageId, messageEntity) => {
+      if (this.replyMessageEntity() && this.replyMessageEntity().id === originalMessageId) {
+        this.replyMessageEntity(messageEntity);
+      }
+    };
+
+    ko.pureComputed(() => !!this.replyMessageEntity())
+      .extend({notify: 'always', rateLimit: 100})
+      .subscribeChanged((isReplyingToMessage, wasReplyingToMessage) => {
+        if (isReplyingToMessage !== wasReplyingToMessage) {
+          this.triggerInputChangeEvent();
+          if (isReplyingToMessage) {
+            amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+            amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+          } else {
+            amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+            amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+          }
+        }
+      });
+
+    this.replyAsset = ko.pureComputed(() => {
+      return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
+    });
+
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
+    this.isReplying = ko.pureComputed(() => !!this.replyMessageEntity());
+    this.replyMessageId = ko.pureComputed(() => (this.replyMessageEntity() ? this.replyMessageEntity().id : undefined));
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -100,7 +138,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       .pureComputed(() => {
         const text = this.input();
         const mentions = this.currentMentions();
-        return {mentions, text};
+        const reply = this.replyMessageEntity();
+        return {mentions, reply, text};
       })
       .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 1}});
 
@@ -218,16 +257,17 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
     this.draftMessage.subscribe(message => {
       if (this.conversationEntity()) {
-        this._saveDraftState(this.conversationEntity(), message.text, message.mentions);
+        this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
       }
     });
 
-    this._init_subscriptions();
+    this._initSubscriptions();
   }
 
-  _init_subscriptions() {
+  _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, this.replyMessage.bind(this));
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversationHasFocus(false));
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => {
@@ -245,18 +285,36 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationHasFocus(true);
     this.pastedFile(null);
     this.cancelMessageEditing();
+    this.cancelMessageReply();
+
     if (conversationEntity) {
       const previousSessionData = this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
       this.currentMentions(previousSessionData.mentions);
+
+      if (previousSessionData.replyEntityPromise) {
+        previousSessionData.replyEntityPromise.then(replyEntity => {
+          if (replyEntity && replyEntity.isReplyable()) {
+            if (!replyEntity.user().id) {
+              this.userRepository.get_user_by_id(replyEntity.from).then(userEntity => {
+                replyEntity.user(userEntity);
+                this.replyMessageEntity(replyEntity);
+              });
+            } else {
+              this.replyMessageEntity(replyEntity);
+            }
+          }
+        });
+      }
     }
   }
 
-  _saveDraftState(conversationEntity, text, mentions) {
+  _saveDraftState(conversationEntity, text, mentions, reply) {
     if (!this.isEditing()) {
       // we only save state for newly written messages
+      reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      z.util.StorageUtil.setValue(storageKey, {mentions, text});
+      z.util.StorageUtil.setValue(storageKey, {mentions, reply, text});
     }
   }
 
@@ -269,16 +327,25 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const storageValue = z.util.StorageUtil.getValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
-      return {mentions: [], text: ''};
+      return {mentions: [], reply: {}, text: ''};
     }
 
     if (typeof storageValue === 'string') {
-      return {mentions: [], text: storageValue};
+      return {mentions: [], reply: {}, text: storageValue};
     }
 
     storageValue.mentions = storageValue.mentions.map(mention => {
       return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
     });
+
+    const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
+
+    if (replyMessageId) {
+      storageValue.replyEntityPromise = this.conversationRepository.get_message_in_conversation_by_id(
+        conversationEntity,
+        replyMessageId
+      );
+    }
 
     return storageValue;
   }
@@ -323,13 +390,26 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.PING, this.clickToPing);
   }
 
-  cancelMessageEditing() {
-    if (this.editMessageEntity()) {
-      this.editMessageEntity().isEditing(false);
-    }
-
+  cancelMessageEditing(resetDraft = true) {
     this.editMessageEntity(undefined);
-    this._resetDraftState();
+    this.replyMessageEntity(undefined);
+    if (resetDraft) {
+      this._resetDraftState();
+    }
+  }
+
+  cancelMessageReply(resetDraft = true) {
+    this.replyMessageEntity(undefined);
+    if (resetDraft) {
+      this._resetDraftState();
+    }
+  }
+
+  handleCancelReply() {
+    if (!this.mentionSuggestions().length) {
+      this.cancelMessageReply(false);
+    }
+    this.textarea.focus();
   }
 
   clickToCancelPastedFile() {
@@ -351,8 +431,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   editMessage(messageEntity) {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
+      this.cancelMessageReply();
       this.cancelMessageEditing();
-      messageEntity.isEditing(true);
       this.editMessageEntity(messageEntity);
 
       this.input(messageEntity.get_first_asset().text);
@@ -361,7 +441,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         .mentions()
         .slice();
       this.currentMentions(newMentions);
+
+      if (messageEntity.quote()) {
+        this.conversationRepository
+          .get_message_in_conversation_by_id(this.conversationEntity(), messageEntity.quote().messageId)
+          .then(quotedMessage => this.replyMessageEntity(quotedMessage));
+      }
+
       this._moveCursorToEnd();
+    }
+  }
+
+  replyMessage(messageEntity) {
+    if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
+      this.cancelMessageReply(false);
+      this.cancelMessageEditing(!!this.editMessageEntity());
+      this.replyMessageEntity(messageEntity);
+      this.textarea.focus();
     }
   }
 
@@ -392,12 +488,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   onWindowClick(event) {
     if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
       this.cancelMessageEditing();
-    }
-  }
-
-  onInputClick() {
-    if (!this.hasTextInput()) {
-      amplify.publish(z.event.WebApp.CONVERSATION.INPUT.CLICK);
+      this.cancelMessageReply();
     }
   }
 
@@ -426,9 +517,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     if (this.isEditing()) {
-      this.sendMessageEdit(messageText, this.editMessageEntity());
+      this.sendMessageEdit(messageText, this.editMessageEntity(), this.replyMessageEntity());
     } else {
-      this.sendMessage(messageText);
+      this.sendMessage(messageText, this.replyMessageEntity());
     }
 
     this._resetDraftState();
@@ -455,6 +546,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             this.pastedFile(null);
           } else if (this.isEditing()) {
             this.cancelMessageEditing();
+          } else if (this.isReplying()) {
+            this.cancelMessageReply(false);
           }
           break;
         }
@@ -594,31 +687,46 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
   }
 
-  scrollMessageList(newListHeight, previousListHeight) {
-    const antiscroll = $('.message-list').data('antiscroll');
-    if (antiscroll) {
-      antiscroll.rebuild();
-    }
-
-    if ($('.messages-wrap').isScrolledBottom()) {
-      return $('.messages-wrap').scrollToBottom();
-    }
-
-    $('.messages-wrap').scrollBy(newListHeight - previousListHeight);
+  triggerInputChangeEvent(newInputHeight = 0, previousInputHeight = 0) {
+    amplify.publish(z.event.WebApp.INPUT.RESIZE, newInputHeight - previousInputHeight);
   }
 
   sendGiphy() {
     this._resetDraftState();
   }
 
-  sendMessage(messageText) {
+  _generateQuote(replyMessageEntity) {
+    return !replyMessageEntity
+      ? Promise.resolve()
+      : this.eventRepository
+          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+          .then(this.messageHasher.hashEvent)
+          .then(messageHash => {
+            return new z.message.QuoteEntity({
+              hash: messageHash,
+              messageId: replyMessageEntity.id,
+              userId: replyMessageEntity.from,
+            });
+          });
+  }
+
+  sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions.slice();
-      this.conversationRepository.sendTextWithLinkPreview(this.conversationEntity(), messageText, mentionEntities);
+
+      this._generateQuote(replyMessageEntity).then(quoteEntity => {
+        this.conversationRepository.sendTextWithLinkPreview(
+          this.conversationEntity(),
+          messageText,
+          mentionEntities,
+          quoteEntity
+        );
+        this.cancelMessageReply();
+      });
     }
   }
 
-  sendMessageEdit(messageText, messageEntity) {
+  sendMessageEdit(messageText, messageEntity, replyMessageEntity) {
     const mentionEntities = this.currentMentions.slice();
     this.cancelMessageEditing();
 
@@ -626,13 +734,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    this.conversationRepository
-      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
-      .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-          throw error;
-        }
-      });
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
+      this.conversationRepository
+        .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities, quoteEntity)
+        .catch(error => {
+          if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+            throw error;
+          }
+        });
+      this.cancelMessageReply();
+    });
   }
 
   sendPastedFile() {

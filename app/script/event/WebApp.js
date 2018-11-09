@@ -106,14 +106,13 @@ z.event.WebApp = {
     IMAGE: {
       SEND: 'wire.webapp.conversation.image.send',
     },
-    INPUT: {
-      CLICK: 'wire.webapp.conversation.input.click',
-    },
     MAP_CONNECTION: 'wire.webapp.conversation.map_connection',
     MESSAGE: {
       ADDED: 'wire.webapp.conversation.message.added',
       EDIT: 'wire.webapp.conversation.message.edit',
       REMOVED: 'wire.webapp.conversation.message.removed',
+      REPLY: 'wire.webapp.conversation.message.reply',
+      UPDATED: 'wire.webapp.conversation.message.updated',
     },
     MISSED_EVENTS: 'wire.webapp.conversation.missed_events',
     PEOPLE: {
@@ -133,6 +132,9 @@ z.event.WebApp = {
       SEND: 'wire.webapp.extionsions.giphy.send',
       SHOW: 'wire.webapp.extionsions.giphy.show',
     },
+  },
+  INPUT: {
+    RESIZE: 'wire.webapp.input.resize',
   },
   LEFT: {
     FADE_IN: 'wire.webapp.left.fade_in',
@@ -236,11 +238,5 @@ z.event.WebApp = {
     DISMISS: 'wire.webapp.warning.dismiss',
     MODAL: 'wire.webapp.warning.modal',
     SHOW: 'wire.webapp.warning.show',
-  },
-  WINDOW: {
-    RESIZE: {
-      HEIGHT: 'wire.webapp.window.resize.height',
-      WIDTH: 'wire.webapp.window.resize.width',
-    },
   },
 };

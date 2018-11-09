@@ -664,7 +664,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {undefined} No return value
    */
   onUserEvent(eventJson, source) {
-    const {type} = eventJson;
+    const type = eventJson.type;
 
     const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;
     if (isClientAdd) {

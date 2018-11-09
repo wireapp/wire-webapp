@@ -26,7 +26,6 @@ window.z.viewModel.content = z.viewModel.content || {};
 /**
  * Message list rendering view model.
  *
- * @todo Get rid of the $('.conversation') opacity
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jquery selectors
  */
@@ -44,6 +43,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
     this.showUserDetails = this.showUserDetails.bind(this);
+    this._handleWindowResize = this._handleWindowResize.bind(this);
+    this.focusMessage = this.focusMessage.bind(this);
+    this.show_detail = this.show_detail.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
@@ -63,14 +65,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
     });
 
-    // Message that should be focused
-    this.marked_message = ko.observable(undefined);
+    amplify.subscribe(z.event.WebApp.INPUT.RESIZE, this._handleInputResize.bind(this));
 
+    this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
-
-    // @todo We should align this with hasAdditionalMessages
-    this.conversation_reached_bottom = false;
 
     // Store conversation to mark as read when browser gets focus
     this.mark_as_read_on_focus = undefined;
@@ -83,41 +82,46 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.recalculate_timeout = undefined;
 
-    // Should we scroll to bottom when new message comes in
-    this.should_scroll_to_bottom = true;
-
-    // Check if the message container is to small and then pull new events
-    this.on_mouse_wheel = _.throttle(event => {
-      const is_not_scrollable = !$(event.currentTarget).isScrollable();
-      const is_scrolling_up = event.deltaY > 0;
-
-      if (is_not_scrollable && is_scrolling_up) {
-        return this._pull_messages();
+    this.onMouseWheel = _.throttle((data, event) => {
+      const element = $(event.currentTarget);
+      if (element.isScrollable()) {
+        // if the element is scrollable, the scroll event will take the relay
+        return true;
       }
-    }, 200);
+      const isScrollingUp = event.deltaY > 0;
+      const loadExtraMessagePromise = isScrollingUp ? this._loadPrecedingMessages() : this._loadFollowingMessages();
 
-    this.on_scroll = _.throttle((data, event) => {
-      if (this.capture_scrolling_event) {
-        const element = $(event.currentTarget);
-
-        // On some HDPI screen scrollTop returns a floating point number instead of an integer
-        // https://github.com/jquery/api.jquery.com/issues/608
-        const scroll_position = Math.ceil(element.scrollTop());
-        const scrollEnd = element.scrollEnd();
-
-        if (scroll_position === 0) {
-          this._pull_messages();
+      loadExtraMessagePromise.then(() => {
+        const antiscroll = $('.message-list').data('antiscroll');
+        if (antiscroll) {
+          antiscroll.rebuild();
         }
+      });
 
-        if (scroll_position >= scrollEnd) {
-          if (!this.conversation_reached_bottom) {
-            this._push_messages();
-          }
+      return true;
+    }, 50);
 
+    this.onScroll = _.throttle((data, event) => {
+      if (!this.capture_scrolling_event) {
+        return;
+      }
+      const element = $(event.currentTarget);
+
+      // On some HDPI screen scrollTop returns a floating point number instead of an integer
+      // https://github.com/jquery/api.jquery.com/issues/608
+      const scrollPosition = Math.ceil(element.scrollTop());
+      const scrollEnd = element.scrollEnd();
+      const hitTop = scrollPosition <= 0;
+      const hitBottom = scrollPosition >= scrollEnd;
+
+      if (hitTop) {
+        return this._loadPrecedingMessages();
+      }
+
+      if (hitBottom) {
+        this._loadFollowingMessages().then(() => {
           this._mark_conversation_as_read_on_focus(this.conversation());
-        }
-
-        this.should_scroll_to_bottom = scroll_position > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+        });
       }
     }, 100);
 
@@ -137,8 +141,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
       );
     });
-
-    amplify.subscribe(z.event.WebApp.CONVERSATION.INPUT.CLICK, this.on_conversation_input_click.bind(this));
   }
 
   /**
@@ -167,8 +169,32 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
     this.capture_scrolling_event = false;
     this.conversation_last_read_timestamp(false);
-    this.conversation_reached_bottom = false;
     this.messagesContainer = undefined;
+    window.removeEventListener('resize', this._handleWindowResize);
+  }
+
+  _shouldStickToBottom() {
+    const messagesContainer = this._getMessagesContainer();
+    const scrollPosition = Math.ceil(messagesContainer.scrollTop());
+    const scrollEnd = Math.ceil(messagesContainer.scrollEnd());
+    return scrollPosition > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+  }
+
+  _handleWindowResize() {
+    if (this._shouldStickToBottom()) {
+      this._getMessagesContainer().scrollToBottom();
+    }
+  }
+
+  _handleInputResize(inputSizeDiff) {
+    const antiscroll = $('.message-list').data('antiscroll');
+    if (antiscroll) {
+      antiscroll.rebuild();
+    }
+
+    if (inputSizeDiff) {
+      this._getMessagesContainer().scrollBy(inputSizeDiff);
+    }
   }
 
   /**
@@ -180,43 +206,46 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   changeConversation(conversationEntity, messageEntity) {
     // Clean up old conversation
+    this.conversationLoaded(false);
     if (this.conversation()) {
       this.release_conversation(this.conversation());
     }
 
     // Update new conversation
     this.conversation(conversationEntity);
-    this.marked_message(messageEntity);
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unreadState().allEvents.length) {
       this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
     }
 
-    // @todo Rethink conversation.is_loaded
-    if (conversationEntity.is_loaded()) {
-      return this._render_conversation(conversationEntity);
-    }
+    conversationEntity.is_loaded(false);
+    return this._loadConversation(conversationEntity, messageEntity)
+      .then(() => this._renderConversation(conversationEntity, messageEntity))
+      .then(() => {
+        conversationEntity.is_loaded(true);
+        this.conversationLoaded(true);
+      });
+  }
 
+  _loadConversation(conversationEntity, messageEntity) {
     return this.conversation_repository
       .updateParticipatingUserEntities(conversationEntity, false, true)
       .then(_conversationEntity => {
-        return this.marked_message()
-          ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, this.marked_message())
+        return messageEntity
+          ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, messageEntity)
           : this.conversation_repository.getPrecedingMessages(_conversationEntity);
-      })
-      .then(() => {
-        const lastMessageEntity = this.conversation().getLastMessage();
-        if (lastMessageEntity) {
-          const isLastConversationEvent = lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp();
-          const hasReachedBottom = isLastConversationEvent || !lastMessageEntity.timestamp();
-          if (hasReachedBottom) {
-            this.conversation_reached_bottom = true;
-          }
-        }
-        conversationEntity.is_loaded(true);
-        return this._render_conversation(conversationEntity);
       });
+  }
+
+  _conversationHasExtraMessages(conversationEntity) {
+    const lastMessageEntity = conversationEntity.getLastMessage();
+    if (!lastMessageEntity) {
+      return false;
+    }
+
+    const isLastConversationEvent = lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp();
+    return !isLastConversationEvent && lastMessageEntity.timestamp();
   }
 
   _getMessagesContainer() {
@@ -228,19 +257,16 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Sets the conversation and waits for further processing until knockout has rendered the messages.
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to set
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity to set
+   * @param {z.entity.Message} messageEntity - Message that should be in focus when the conversation loads
    * @returns {Promise} Resolves when conversation was rendered
    */
-  _render_conversation(conversation_et) {
-    // Hide conversation until everything is processed
-    $('.conversation').css({opacity: 0});
-
+  _renderConversation(conversationEntity, messageEntity) {
     const messages_container = this._getMessagesContainer();
-    messages_container.on('mousewheel', this.on_mouse_wheel);
 
-    const is_current_conversation = conversation_et === this.conversation();
+    const is_current_conversation = conversationEntity === this.conversation();
     if (!is_current_conversation) {
-      this.logger.info(`Skipped re-loading current conversation '${conversation_et.display_name()}'`);
+      this.logger.info(`Skipped re-loading current conversation '${conversationEntity.display_name()}'`);
       return Promise.resolve();
     }
 
@@ -249,30 +275,28 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // Reset scroll position
         messages_container.scrollTop(0);
 
-        if (messages_container.isScrollable()) {
+        if (messageEntity) {
+          this.focusMessage(messageEntity.id);
+        } else {
           const unread_message = $('.message-timestamp-unread');
+          if (unread_message.length) {
+            const unreadMarkerPosition = unread_message.parents('.message').position();
 
-          if (this.marked_message()) {
-            this._focus_message(this.marked_message());
-          } else if (unread_message.length) {
-            const unread_message_position = unread_message
-              .parent()
-              .parent()
-              .position();
-
-            messages_container.scrollBy(unread_message_position.top);
+            messages_container.scrollBy(unreadMarkerPosition.top);
           } else {
             messages_container.scrollToBottom();
           }
-        } else {
-          this.conversation_repository.markAsRead(conversation_et);
         }
 
-        $('.conversation').css({opacity: 1});
+        if (!messages_container.isScrollable() && !this._conversationHasExtraMessages(this.conversation())) {
+          this._mark_conversation_as_read_on_focus(this.conversation());
+        }
+
         this.capture_scrolling_event = true;
+        window.addEventListener('resize', this._handleWindowResize);
 
         // Subscribe for incoming messages
-        this.messages_subscription = conversation_et.messages_visible.subscribe(
+        this.messages_subscription = conversationEntity.messages_visible.subscribe(
           this._scrollAddedMessagesIntoView,
           null,
           'arrayChange'
@@ -315,7 +339,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     // Scroll to the end of the list if we are under a certain threshold
-    if (this.should_scroll_to_bottom) {
+    if (this._shouldStickToBottom()) {
       window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
@@ -331,9 +355,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Fetch older messages beginning from the oldest message in view
-   * @returns {undefined} No return value
+   * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _pull_messages() {
+  _loadPrecedingMessages() {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
     const [messagesContainer] = this._getMessagesContainer().children();
 
@@ -341,7 +365,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       const initialListHeight = messagesContainer.scrollHeight;
 
       this.capture_scrolling_event = false;
-      this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
+      return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         if (messagesContainer) {
           const newListHeight = messagesContainer.scrollHeight;
           this._getMessagesContainer().scrollTop(newListHeight - initialListHeight);
@@ -349,55 +373,59 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
       });
     }
+    return Promise.resolve();
   }
 
   /**
    * Fetch newer messages beginning from the newest message in view
-   * @returns {undefined} No return value
+   * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _push_messages() {
+  _loadFollowingMessages() {
     const last_message = this.conversation().getLastMessage();
 
-    if (last_message && !this.conversation_reached_bottom) {
+    if (last_message && this._conversationHasExtraMessages(this.conversation())) {
       this.capture_scrolling_event = false;
-      this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(message_ets => {
-        if (!message_ets.length) {
-          this.conversation_reached_bottom = true;
-        }
-        this.capture_scrolling_event = true;
-      });
+      return this.conversation_repository
+        .getSubsequentMessages(this.conversation(), last_message, false)
+        .then(message_ets => {
+          this.capture_scrolling_event = true;
+        });
     }
+    return Promise.resolve();
   }
 
   /**
    * Scroll to given message in the list.
    *
    * @note Ideally message is centered horizontally
-   * @param {z.entity.Message} message_et - Target message
+   * @param {string} messageId - Target message's id
    * @returns {undefined} No return value
    */
-  _focus_message(message_et) {
-    const message_element = $(`.message[data-uie-uid="${message_et.id}"]`);
+  focusMessage(messageId) {
+    const messageIsLoaded = !!this.conversation().getMessage(messageId);
+    const conversationEntity = this.conversation();
 
-    if (message_element.length) {
-      const message_list_element = this._getMessagesContainer();
-      message_list_element.scrollBy(message_element.offset().top - message_list_element.height() / 2);
-    }
-  }
+    const loadMessagePromise = messageIsLoaded
+      ? Promise.resolve()
+      : this.conversation_repository
+          .get_message_in_conversation_by_id(conversationEntity, messageId)
+          .then(messageEntity => {
+            conversationEntity.remove_messages();
+            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
+          });
 
-  scroll_height(change_in_height) {
-    this._getMessagesContainer().scrollBy(change_in_height);
-  }
+    loadMessagePromise.then(() => {
+      z.util.afterRender(() => {
+        const messagesContainer = this._getMessagesContainer();
+        const messageElement = messagesContainer.find(`.message[data-uie-uid="${messageId}"]`);
 
-  on_conversation_input_click() {
-    if (this.conversation_reached_bottom) {
-      return this._getMessagesContainer().scrollToBottom();
-    }
-
-    this.conversation().remove_messages();
-    this.conversation_repository
-      .getPrecedingMessages(this.conversation())
-      .then(() => this._getMessagesContainer().scrollToBottom());
+        if (messageElement.length) {
+          messageElement.removeClass('message-marked');
+          messagesContainer.scrollBy(messageElement.offset().top - messagesContainer.height() / 2);
+          messageElement.addClass('message-marked');
+        }
+      });
+    });
   }
 
   /**
@@ -591,7 +619,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
 
-    if (message_et.has_asset_text()) {
+    if (message_et.isReplyable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, message_et),
+        label: z.l10n.text(z.string.conversationContextMenuReply),
+      });
+    }
+
+    if (message_et.isCopyable()) {
       entries.push({
         click: () => message_et.copy(),
         label: z.l10n.text(z.string.conversationContextMenuCopy),
