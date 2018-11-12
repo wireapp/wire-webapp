@@ -70,12 +70,15 @@ z.components.MessageQuote = class MessageQuote {
 
     if (!this.error() && quote().messageId) {
       conversationRepository
-        .get_message_in_conversation_by_id(conversation(), quote().messageId, true)
+        .get_message_in_conversation_by_id(conversation(), quote().messageId, true, true)
         .then(message => {
           this.quotedMessage(message);
           this.quotedMessageId(message.id);
         })
-        .catch(() => this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND));
+        .catch(error => {
+          console.error(error);
+          this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+        });
     }
 
     const handleQuoteDeleted = messageId => {
