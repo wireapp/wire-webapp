@@ -75,10 +75,7 @@ z.components.MessageQuote = class MessageQuote {
           this.quotedMessage(message);
           this.quotedMessageId(message.id);
         })
-        .catch(error => {
-          console.error(error);
-          this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
-        });
+        .catch(() => this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND));
     }
 
     const handleQuoteDeleted = messageId => {
