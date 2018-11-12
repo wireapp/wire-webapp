@@ -406,11 +406,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the message
    */
   get_message_in_conversation_by_id(conversationEntity, messageId, skipConversationMessages = false) {
-    if (!skipConversationMessages) {
-      const messageEntity = conversationEntity.getMessage(messageId);
-      if (messageEntity) {
-        return Promise.resolve(messageEntity);
-      }
+    const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
+    if (messageEntity) {
+      return Promise.resolve(messageEntity);
     }
 
     return this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
