@@ -8,8 +8,8 @@
     "@types/node": "10.12.5",
     "@types/spark-md5": "3.0.1",
     "@types/tough-cookie": "2.3.4",
-    "@wireapp/priority-queue": "0.2.38",
-    "@wireapp/store-engine": "1.0.13",
+    "@wireapp/priority-queue": "0.2.39",
+    "@wireapp/store-engine": "1.0.14",
     "axios": "0.18.0",
     "html5-websocket": "2.0.4",
     "logdown": "3.2.7",
@@ -67,5 +67,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/APIClient.d.ts",
-  "version": "3.1.5"
+  "version": "3.1.6"
 }
