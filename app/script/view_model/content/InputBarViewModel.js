@@ -286,6 +286,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.pastedFile(null);
     this.cancelMessageEditing();
     this.cancelMessageReply();
+    this.endMentionFlow();
 
     if (conversationEntity) {
       const previousSessionData = this._loadDraftState(conversationEntity);
