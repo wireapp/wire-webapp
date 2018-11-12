@@ -402,14 +402,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation message belongs to
    * @param {string} messageId - ID of message
+   * @param {boolean} skipConversationMessages - Don't use message entity from conversation
    * @returns {Promise} Resolves with the message
    */
-  get_message_in_conversation_by_id(conversationEntity, messageId) {
-    const messageEntity = conversationEntity.getMessage(messageId);
-    if (messageEntity) {
-      return Promise.resolve(messageEntity);
+  get_message_in_conversation_by_id(conversationEntity, messageId, skipConversationMessages = false) {
+    if (!skipConversationMessages) {
+      const messageEntity = conversationEntity.getMessage(messageId);
+      if (messageEntity) {
+        return Promise.resolve(messageEntity);
+      }
     }
-
     return this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
       if (event) {
         return this.event_mapper.mapJsonEvent(event, conversationEntity);
