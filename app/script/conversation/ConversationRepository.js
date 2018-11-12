@@ -412,6 +412,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return Promise.resolve(messageEntity);
       }
     }
+
     return this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
       if (event) {
         return this.event_mapper.mapJsonEvent(event, conversationEntity);
