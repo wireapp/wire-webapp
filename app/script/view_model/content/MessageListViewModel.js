@@ -78,7 +78,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.capture_scrolling_event = false;
 
     // Store message subscription id
-    this.messages_subscription = undefined;
+    this.messagesChangeSubscription = undefined;
+    this.messagesBeforeChangeSubscription = undefined;
 
     this.onMouseWheel = _.throttle((data, event) => {
       const element = $(event.currentTarget);
@@ -162,8 +163,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (conversation_et) {
       conversation_et.release();
     }
-    if (this.messages_subscription) {
-      this.messages_subscription.dispose();
+    if (this.messagesBeforeChangeSubscription) {
+      this.messagesBeforeChangeSubscription.dispose();
+    }
+    if (this.messagesChangeSubscription) {
+      this.messagesChangeSubscription.dispose();
     }
     this.capture_scrolling_event = false;
     this.conversation_last_read_timestamp(false);
@@ -293,9 +297,23 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         this.capture_scrolling_event = true;
         window.addEventListener('resize', this._handleWindowResize);
 
+        let shouldStickToBottomOnMessageAdd;
+
+        this.messagesBeforeChangeSubscription = conversationEntity.messages_visible.subscribe(
+          () => {
+            // we need to keep track of the scroll position before the message array has changed
+            shouldStickToBottomOnMessageAdd = this._shouldStickToBottom();
+          },
+          null,
+          'beforeChange'
+        );
+
         // Subscribe for incoming messages
-        this.messages_subscription = conversationEntity.messages_visible.subscribe(
-          this._scrollAddedMessagesIntoView,
+        this.messagesChangeSubscription = conversationEntity.messages_visible.subscribe(
+          changedMessages => {
+            this._scrollAddedMessagesIntoView(changedMessages, shouldStickToBottomOnMessageAdd);
+            shouldStickToBottomOnMessageAdd = undefined;
+          },
           null,
           'arrayChange'
         );
@@ -307,9 +325,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Checks how to scroll message list and if conversation should be marked as unread.
    * @param {Array} changedMessages - List of the messages that were added or removed from the list
+   * @param {boolean} shouldStickToBottom - should the list stick to the bottom
    * @returns {undefined} No return value
    */
-  _scrollAddedMessagesIntoView(changedMessages) {
+  _scrollAddedMessagesIntoView(changedMessages, shouldStickToBottom) {
     const messages_container = this._getMessagesContainer();
     const lastAddedItem = changedMessages
       .slice()
@@ -337,7 +356,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     // Scroll to the end of the list if we are under a certain threshold
-    if (this._shouldStickToBottom()) {
+    if (shouldStickToBottom) {
       window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
