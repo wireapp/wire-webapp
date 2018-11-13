@@ -313,6 +313,14 @@
     &__image img {
       max-height: 40px;
       border-radius: 2px;
+
+      &[src=''],
+      &[src='#'],
+      &:not([src]) {
+        width: 40px;
+        height: 40px;
+        background-color: @graphite;
+      }
     }
   }
 
