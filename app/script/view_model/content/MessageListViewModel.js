@@ -39,7 +39,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.get_timestamp_class = this.get_timestamp_class.bind(this);
     this.handleClickOnMessage = this.handleClickOnMessage.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
-    this.on_context_menu_click = this.on_context_menu_click.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
     this.showUserDetails = this.showUserDetails.bind(this);
@@ -488,14 +487,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .catch(() => reset_progress());
   }
 
-  getSystemMessageIconComponent(message) {
-    const iconComponents = {
-      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
-    };
-    return iconComponents[message.system_message_type];
-  }
-
   /**
    * Shows detail image view.
    *
@@ -608,67 +599,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       };
       return document.hasFocus() ? startTimer() : $(window).one('focus', startTimer);
     };
-  }
-
-  on_context_menu_click(message_et, event) {
-    const entries = [];
-
-    if (message_et.is_downloadable()) {
-      entries.push({
-        click: () => message_et.download(),
-        label: z.l10n.text(z.string.conversationContextMenuDownload),
-      });
-    }
-
-    if (message_et.is_reactable() && !this.conversation().removed_from_conversation()) {
-      const stringId = message_et.is_liked()
-        ? z.string.conversationContextMenuUnlike
-        : z.string.conversationContextMenuLike;
-
-      entries.push({
-        click: () => this.click_on_like(message_et, false),
-        label: z.l10n.text(stringId),
-      });
-    }
-
-    if (message_et.is_editable() && !this.conversation().removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et),
-        label: z.l10n.text(z.string.conversationContextMenuEdit),
-      });
-    }
-
-    if (message_et.isReplyable() && !this.conversation().removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, message_et),
-        label: z.l10n.text(z.string.conversationContextMenuReply),
-      });
-    }
-
-    if (message_et.isCopyable()) {
-      entries.push({
-        click: () => message_et.copy(),
-        label: z.l10n.text(z.string.conversationContextMenuCopy),
-      });
-    }
-
-    if (message_et.is_deletable()) {
-      entries.push({
-        click: () => this.actionsViewModel.deleteMessage(this.conversation(), message_et),
-        label: z.l10n.text(z.string.conversationContextMenuDelete),
-      });
-    }
-
-    const isSendingMessage = message_et.status() === z.message.StatusType.SENDING;
-    const canDelete = message_et.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
-    if (canDelete) {
-      entries.push({
-        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), message_et),
-        label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
-      });
-    }
-
-    z.ui.Context.from(event, entries, 'message-options-menu');
   }
 
   handleClickOnMessage(messageEntity, event) {
