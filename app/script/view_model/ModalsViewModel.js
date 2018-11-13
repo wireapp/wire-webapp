@@ -142,7 +142,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       this.logger.info(`Show modal of type '${type}'`);
     }
 
-    modal.autoclose = !preventClose;
+    modal.setAutoclose(!preventClose);
     modal.toggle();
   }
 

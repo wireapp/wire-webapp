@@ -125,7 +125,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     if (!this.modal) {
       this.modal = new z.ui.Modal('#group-creation-modal', this._afterHideModal.bind(this));
-      this.modal.autoclose = false;
+      this.modal.setAutoclose(false);
     }
 
     this.state(GroupCreationViewModel.STATE.PREFERENCES);

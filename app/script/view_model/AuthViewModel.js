@@ -825,7 +825,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     if (!this.device_modal) {
       const hideCallback = $(document).off('keydown.deviceModal');
       this.device_modal = new z.ui.Modal('#modal-limit', hideCallback);
-      this.device_modal.autoclose = false;
+      this.device_modal.setAutoclose(false);
     }
 
     if (this.device_modal.isHidden()) {

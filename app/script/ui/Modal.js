@@ -39,11 +39,9 @@ z.ui.Modal = class Modal {
     this.beforeHideCallback = beforeHideCallback;
 
     this.autoclose = true;
-    this.initExits();
-  }
 
-  initExits() {
     keyboardJS.bind('esc', this._hide);
+
     if (this.modal) {
       this.modal.addEventListener('click', this.handleClick);
     }
