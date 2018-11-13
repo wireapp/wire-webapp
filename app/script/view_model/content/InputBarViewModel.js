@@ -296,14 +296,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
           if (replyEntity && replyEntity.isReplyable()) {
-            if (!replyEntity.user().id) {
-              this.userRepository.get_user_by_id(replyEntity.from).then(userEntity => {
-                replyEntity.user(userEntity);
-                this.replyMessageEntity(replyEntity);
-              });
-            } else {
-              this.replyMessageEntity(replyEntity);
-            }
+            this.replyMessageEntity(replyEntity);
           }
         });
       }
@@ -344,7 +337,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (replyMessageId) {
       storageValue.replyEntityPromise = this.conversationRepository.get_message_in_conversation_by_id(
         conversationEntity,
-        replyMessageId
+        replyMessageId,
+        false,
+        true
       );
     }
 

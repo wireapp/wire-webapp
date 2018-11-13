@@ -403,20 +403,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation message belongs to
    * @param {string} messageId - ID of message
    * @param {boolean} skipConversationMessages - Don't use message entity from conversation
+   * @param {boolean} ensureUser - Make sure message entity has a valid user
    * @returns {Promise} Resolves with the message
    */
-  get_message_in_conversation_by_id(conversationEntity, messageId, skipConversationMessages = false) {
+  get_message_in_conversation_by_id(
+    conversationEntity,
+    messageId,
+    skipConversationMessages = false,
+    ensureUser = false
+  ) {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
-    if (messageEntity) {
-      return Promise.resolve(messageEntity);
-    }
+    const messagePromise = messageEntity
+      ? Promise.resolve(messageEntity)
+      : this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
+          if (event) {
+            return this.event_mapper.mapJsonEvent(event, conversationEntity);
+          }
+          throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        });
 
-    return this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
-      if (event) {
-        return this.event_mapper.mapJsonEvent(event, conversationEntity);
-      }
-      throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
-    });
+    if (ensureUser) {
+      return messagePromise.then(message => {
+        if (message.from && !message.user().id) {
+          return this.user_repository.get_user_by_id(message.from).then(userEntity => {
+            message.user(userEntity);
+            return message;
+          });
+        }
+        return message;
+      });
+    }
+    return messagePromise;
   }
 
   /**
