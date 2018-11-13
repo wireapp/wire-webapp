@@ -161,6 +161,7 @@ class Server {
       const fileExtensionRegx = /\.[^/]+$/;
       const ignoredPath =
         fileExtensionRegx.test(req.path) ||
+        req.path.startsWith('/commit') ||
         req.path.startsWith('/test') ||
         req.path.startsWith('/demo') ||
         req.path.startsWith('/_health') ||
