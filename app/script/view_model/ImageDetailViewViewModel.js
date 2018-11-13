@@ -89,7 +89,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
 
     if (!this.imageModal) {
-      this.imageModal = new zeta.webapp.module.Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
+      this.imageModal = new z.ui.Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
     }
 
     this.imageModal.show();

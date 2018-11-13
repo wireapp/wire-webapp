@@ -741,7 +741,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           break;
 
         case z.auth.AuthView.MODE.LIMIT:
-          if (!this.device_modal || this.device_modal.is_hidden()) {
+          if (!this.device_modal || this.device_modal.isHidden()) {
             this.clicked_on_manage_devices();
           }
           break;
@@ -824,11 +824,11 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   clicked_on_manage_devices() {
     if (!this.device_modal) {
       const hideCallback = $(document).off('keydown.deviceModal');
-      this.device_modal = new zeta.webapp.module.Modal('#modal-limit', hideCallback);
+      this.device_modal = new z.ui.Modal('#modal-limit', hideCallback);
       this.device_modal.autoclose = false;
     }
 
-    if (this.device_modal.is_hidden()) {
+    if (this.device_modal.isHidden()) {
       this.client_repository.getClientsForSelf();
       $(document).on('keydown.deviceModal', keyboard_event => {
         if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
