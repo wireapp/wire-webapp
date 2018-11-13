@@ -3491,6 +3491,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (conversationEntity && messageEntity) {
           const replacedEntity = conversationEntity.add_message(messageEntity, true);
           if (replacedEntity) {
+            const messages = conversationEntity.messages_unordered();
+
+            const updatedMessages = messages.map(message => {
+              const hasEditedQuote =
+                message.quote && message.quote() && message.quote().messageId === replacedEntity.id;
+              if (hasEditedQuote) {
+                const {error, userId} = message.quote();
+                const newQuote = new z.message.QuoteEntity({error, messageId: messageEntity.id, userId});
+                message.quote(newQuote);
+              }
+              return message;
+            });
+
+            conversationEntity.messages_unordered(updatedMessages);
             amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
           }
         }
