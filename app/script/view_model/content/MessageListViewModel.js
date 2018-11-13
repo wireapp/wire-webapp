@@ -196,6 +196,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (inputSizeDiff) {
       this._getMessagesContainer().scrollBy(inputSizeDiff);
+    } else if (this._shouldStickToBottom()) {
+      this._getMessagesContainer().scrollToBottom();
     }
   }
 
