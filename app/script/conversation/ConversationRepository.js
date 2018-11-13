@@ -1951,7 +1951,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           if (messageContentUnchanged) {
             this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-            return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+            return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
           }
 
           this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
