@@ -999,7 +999,6 @@
 
 "@bower_components/raygun4js@MindscapeHQ/raygun4js#v2.13.2":
   version "2.13.2"
-  uid "3a240172d66d70cc406437cee1c19fea0ae63c26"
   resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/3a240172d66d70cc406437cee1c19fea0ae63c26"
 
 "@bower_components/speakingurl@pid/speakingurl#v14.0.1":
@@ -1031,10 +1030,6 @@
 "@bower_components/webapp-module-logger@wireapp/webapp-module-logger#v1.1.2":
   version "1.1.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/2281c01352a515f88316962817badb4e9767e273"
-
-"@bower_components/webapp-module-modal@wireapp/webapp-module-modal#v1.0.2":
-  version "1.0.2"
-  resolved "https://codeload.github.com/wireapp/webapp-module-modal/tar.gz/9d7d42fb87cbc679989a842b55461df2600a6f44"
 
 "@bower_components/webapp-module-namespace@wireapp/webapp-module-namespace#1.0.2":
   version "1.0.2"

@@ -34,7 +34,6 @@
     "@bower_components/uuid": "LiosK/UUID.js#v4.0.3",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
-    "@bower_components/webapp-module-modal": "wireapp/webapp-module-modal#v1.0.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@bower_components/webrtc-adapter": "webrtcHacks/adapter#v6.4.4",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#v1.1.1",
@@ -347,10 +346,6 @@
     },
     "@bower_components/webapp-module-logger": {
       "js": "dist/js/Logger.js"
-    },
-    "@bower_components/webapp-module-modal": {
-      "js": "dist/script/*.js",
-      "less": "app/style/webapp-module-modal.less"
     },
     "@bower_components/webapp-module-namespace": {
       "js": "js/*.js"
