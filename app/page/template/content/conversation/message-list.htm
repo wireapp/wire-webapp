@@ -32,6 +32,7 @@
             onClickImage: $parent.show_detail,
             onClickMessage: $parent.handleClickOnMessage,
             onClickTimestamp: $parent.focusMessage,
+            onClickParticipants: $parent.showParticipants,
             onLike: $parent.click_on_like,
             actionsViewModel: $parent.actionsViewModel,
         " data-bind=css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>

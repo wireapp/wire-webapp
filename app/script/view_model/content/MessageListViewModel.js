@@ -32,7 +32,6 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
-    this.bindShowMore = this.bindShowMore.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
@@ -44,6 +43,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.showUserDetails = this.showUserDetails.bind(this);
     this._handleWindowResize = this._handleWindowResize.bind(this);
     this.focusMessage = this.focusMessage.bind(this);
+    this.showParticipants = this.showParticipants.bind(this);
     this.show_detail = this.show_detail.bind(this);
 
     this.mainViewModel = mainViewModel;
@@ -621,19 +621,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     return true;
   }
 
-  bindShowMore(elements, message) {
-    const label = elements.find(element => element.className === 'message-header-label');
-    if (!label) {
-      return;
-    }
-    const link = label.querySelector('.message-header-show-more');
-    if (link) {
-      link.addEventListener('click', () =>
-        this.mainViewModel.panel.togglePanel(
-          z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
-          message.highlightedUsers()
-        )
-      );
-    }
+  showParticipants(participants) {
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
   }
 };

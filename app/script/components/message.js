@@ -36,6 +36,7 @@ window.z.components = z.components || {};
       onClickImage,
       onClickMessage,
       onClickTimestamp,
+      onClickParticipants,
       onLike,
       conversationRepository,
       locationRepository,
@@ -54,6 +55,7 @@ window.z.components = z.components || {};
       this.onClickAvatar = onClickAvatar;
       this.onClickMessage = onClickMessage;
       this.onClickTimestamp = onClickTimestamp;
+      this.onClickParticipants = onClickParticipants;
       this.onLike = onLike;
 
       this.conversationRepository = conversationRepository;
@@ -62,6 +64,8 @@ window.z.components = z.components || {};
       this.actionsViewModel = actionsViewModel;
 
       this.showLikes = ko.observable(false);
+
+      this.bindShowMore = this.bindShowMore.bind(this);
     }
 
     getSystemMessageIconComponent(message) {
@@ -132,6 +136,17 @@ window.z.components = z.components || {};
       }
 
       z.ui.Context.from(event, entries, 'message-options-menu');
+    }
+
+    bindShowMore(elements, scope) {
+      const label = elements.find(element => element.className === 'message-header-label');
+      if (!label) {
+        return;
+      }
+      const link = label.querySelector('.message-header-show-more');
+      if (link) {
+        link.addEventListener('click', () => this.onClickParticipants(scope.message.highlightedUsers()));
+      }
     }
   }
 
@@ -439,7 +454,7 @@ window.z.components = z.components || {};
     <!-- /ko -->
 
     <!-- ko if: message.hasUsers() -->
-      <div class="message-header" data-bind="template: {afterRender: $parent.bindShowMore}">
+      <div class="message-header" data-bind="template: {afterRender: bindShowMore}">
         <div class="message-header-icon message-header-icon--svg text-graphite">
           <message-icon data-bind="visible: message.isGroupCreation()"></message-icon>
           <span class="icon-minus" data-bind="visible: message.isMemberRemoval()"></span>
