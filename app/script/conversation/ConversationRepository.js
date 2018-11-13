@@ -413,21 +413,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
     ensureUser = false
   ) {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
-    let messagePromise = null;
-    if (messageEntity) {
-      messagePromise = Promise.resolve(messageEntity);
-    }
-
-    messagePromise = this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
-      if (event) {
-        return this.event_mapper.mapJsonEvent(event, conversationEntity);
-      }
-      throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
-    });
+    const messagePromise = messageEntity
+      ? Promise.resolve(messageEntity)
+      : this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
+          if (event) {
+            return this.event_mapper.mapJsonEvent(event, conversationEntity);
+          }
+          throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        });
 
     if (ensureUser) {
       return messagePromise.then(message => {
-        if (!message.user().id) {
+        if (message.from && !message.user().id) {
           return this.user_repository.get_user_by_id(message.from).then(userEntity => {
             message.user(userEntity);
             return message;
