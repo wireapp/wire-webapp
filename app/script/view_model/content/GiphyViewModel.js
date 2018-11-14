@@ -141,7 +141,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this._getRandomGif();
 
     if (!this.modal) {
-      this.modal = new zeta.webapp.module.Modal('#giphy-modal');
+      this.modal = new z.ui.Modal('#giphy-modal');
     }
 
     this.modal.show();

@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <div data-bind="template: {name: message.super_type}, css: {'message-isreplying': message.id === $root.inputBar.replyMessageId()}"></div>
+        <div data-bind="template: {name: message.super_type}, css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></div>
       </div>
      </div>
    </div>

@@ -253,6 +253,7 @@
 
   close-icon {
     margin-top: 4px;
+    cursor: pointer;
   }
 
   &__body {
@@ -292,15 +293,18 @@
     }
   }
 
-  &__message-text {
+  &__message {
+    overflow: hidden;
     max-width: @conversation-message-max-width;
-    height: 17px;
     margin-top: 4px;
     font-size: 14px;
     font-weight: @font-weight-light;
-    overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &__text {
+      height: 17px;
+    }
 
     .message-mention {
       font-weight: @font-weight-bold;
@@ -309,6 +313,14 @@
     &__image img {
       max-height: 40px;
       border-radius: 2px;
+
+      &[src=''],
+      &[src='#'],
+      &:not([src]) {
+        width: 40px;
+        height: 40px;
+        background-color: @graphite;
+      }
     }
   }
 
