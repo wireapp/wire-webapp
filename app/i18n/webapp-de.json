@@ -127,7 +127,7 @@
   "login.publicComputer": "Dies ist ein öffentlicher Computer",
   "login.ssoLogin": "Login für Unternehmen",
   "ssoLogin.headline": "Login für Unternehmen",
-  "login.subhead": "Gib deine E-Mail-Adresse oder Benutzernamen ein.",
+  "login.subhead": "E-Mail-Adresse oder Benutzernamen eingeben.",
   "ssoLogin.codeInputPlaceholder": "SSO-Code",
   "ssoLogin.overlayDescription": "Falls das Fenster zum SSO nicht erscheint, kann das Login für Unternehmen hier fortgesetzt werden.",
   "ssoLogin.overlayFocusLink": "Klicken, um fortzufahren",

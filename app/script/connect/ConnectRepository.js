@@ -178,7 +178,7 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @returns {Promise} Resolves when phone book was uploaded
    */
   _uploadContacts(phoneBook, source = z.connect.ConnectSource.GMAIL) {
-    const {cards} = phoneBook;
+    const cards = phoneBook.cards;
 
     if (!cards.length) {
       this.logger.warn('No contacts found for upload');

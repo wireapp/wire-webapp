@@ -42,10 +42,10 @@
   }
 
   &__text {
+    overflow: hidden;
     height: 1.5em;
     max-height: 1.5em;
     line-height: 1.5em;
-    overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -54,6 +54,7 @@
     }
 
     &--full {
+      height: unset;
       max-height: unset;
       white-space: normal;
     }

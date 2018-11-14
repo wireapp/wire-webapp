@@ -438,7 +438,6 @@ z.string.el.preferencesAVMicrophone = 'Μικρόφωνο';
 z.string.el.preferencesAVPermissionDetail = 'Ενεργοποίηση από τις Προτιμήσεις του φυλλομετρητή σας';
 z.string.el.preferencesAVSpeakers = 'Ηχεια';
 
-z.string.el.preferencesDevicesActivatedIn = 'σε {{location}}';
 z.string.el.preferencesDevicesActivatedOn = 'Ενεργοποιήθηκε στις {{date}}';
 z.string.el.preferencesDevicesActive = 'Συνδεμένος';
 z.string.el.preferencesDevicesActiveDetail = 'Εάν δεν αναγνωρίζετε μία από τις παραπάνω συσκευές, αφαιρέστε την και επαναφέρετε τον κωδικό σας.';

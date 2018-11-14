@@ -764,7 +764,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _onMessage({data: message}) {
     const callMessage = JSON.parse(message);
     const {resp: response, type} = callMessage;
-    const {conversationEntity} = this.callEntity;
+    const conversationEntity = this.callEntity.conversationEntity;
 
     const logMessage = response
       ? `Received confirmation for '${type}' message via data channel`
@@ -1379,7 +1379,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _getRtcSender(mediaType) {
     for (const rtpSender of this.peerConnection.getSenders()) {
-      const {track: mediaStreamTrack} = rtpSender;
+      const mediaStreamTrack = rtpSender.track;
 
       const isExpectedType = mediaStreamTrack && mediaStreamTrack.kind === mediaType;
       if (isExpectedType) {
@@ -1405,7 +1405,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _removeMediaStreamTrack(trackId, mediaType) {
     for (const rtpSender of this.peerConnection.getSenders()) {
-      const {track: mediaStreamTrack} = rtpSender;
+      const mediaStreamTrack = rtpSender.track;
 
       const isExpectedId = mediaStreamTrack && mediaStreamTrack.id === trackId;
       if (isExpectedId) {
