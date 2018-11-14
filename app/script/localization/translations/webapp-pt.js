@@ -412,7 +412,6 @@ z.string.pt.preferencesAVMicrophone = 'Microfone';
 z.string.pt.preferencesAVPermissionDetail = 'Permitir a partir das definições seu navegador';
 z.string.pt.preferencesAVSpeakers = 'Altifalantes';
 
-z.string.pt.preferencesDevicesActivatedIn = 'em {{location}}';
 z.string.pt.preferencesDevicesActivatedOn = 'Ativado em {{date}}';
 z.string.pt.preferencesDevicesActive = 'Ativo';
 z.string.pt.preferencesDevicesActiveDetail = 'Se não reconhecer um dispositivo acima, remova-o e altere a sua palavra-passe.';
