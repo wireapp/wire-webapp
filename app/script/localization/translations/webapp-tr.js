@@ -413,7 +413,6 @@ z.string.tr.preferencesAVMicrophone = 'Mikrofon';
 z.string.tr.preferencesAVPermissionDetail = 'Tarayıcı Seçeneklerinizden aktifleştirin';
 z.string.tr.preferencesAVSpeakers = 'Hoparlörler';
 
-z.string.tr.preferencesDevicesActivatedIn = '{{location}} ’de';
 z.string.tr.preferencesDevicesActivatedOn = '{{date}} ’da aktif edildi';
 z.string.tr.preferencesDevicesActive = 'Aktif';
 z.string.tr.preferencesDevicesActiveDetail = 'Eğer yukarıdaki cihazı tanımıyorsanız, cihazı kaldırın ve şifrenizi sıfırlayın.';
