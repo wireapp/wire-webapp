@@ -730,16 +730,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    this._generateQuote(replyMessageEntity).then(quoteEntity => {
-      this.conversationRepository
-        .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities, quoteEntity)
-        .catch(error => {
-          if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-            throw error;
-          }
-        });
-      this.cancelMessageReply();
-    });
+    this.conversationRepository
+      .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
+      .catch(error => {
+        if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+          throw error;
+        }
+      });
+    this.cancelMessageReply();
   }
 
   sendPastedFile() {
