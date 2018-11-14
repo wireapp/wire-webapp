@@ -409,7 +409,6 @@ z.string.cs.preferencesAVMicrophone = 'Mikrofon';
 z.string.cs.preferencesAVPermissionDetail = 'Povolte v předvolbách prohlížeče';
 z.string.cs.preferencesAVSpeakers = 'Reproduktory';
 
-z.string.cs.preferencesDevicesActivatedIn = 'v {{location}}';
 z.string.cs.preferencesDevicesActivatedOn = 'Aktivováno v {{date}}';
 z.string.cs.preferencesDevicesActive = 'Aktivní';
 z.string.cs.preferencesDevicesActiveDetail = 'Pokud nepoznáváte přístroj výše, odstraňte ho a změňte své heslo.';

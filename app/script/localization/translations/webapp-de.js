@@ -356,6 +356,7 @@ z.string.de.conversationContextMenuDelete = 'Für mich löschen…';
 z.string.de.conversationContextMenuDeleteEveryone = 'Für alle löschen…';
 z.string.de.conversationContextMenuDownload = 'Herunterladen';
 z.string.de.conversationContextMenuLike = 'Gefällt mir';
+z.string.de.conversationContextMenuReply = 'Antworten';
 z.string.de.conversationContextMenuUnlike = 'Gefällt mir nicht mehr';
 z.string.de.conversationDeleteTimestamp = 'Gelöscht: {{date}}';
 z.string.de.conversationEditTimestamp = 'Editiert: {{date}}';
@@ -420,6 +421,8 @@ z.string.de.conversationsSecondaryLineEphemeralMention = 'Hat dich erwähnt';
 z.string.de.conversationsSecondaryLineEphemeralMentionGroup = 'Jemand hat dich erwähnt';
 z.string.de.conversationsSecondaryLineEphemeralMessage = 'Hat eine Nachricht gesendet';
 z.string.de.conversationsSecondaryLineEphemeralMessageGroup = 'Jemand hat eine Nachricht gesendet';
+z.string.de.conversationsSecondaryLineEphemeralReply = 'Hat dir geantwortet';
+z.string.de.conversationsSecondaryLineEphemeralReplyGroup = 'Jemand hat dir geantwortet';
 z.string.de.conversationsSecondaryLineIncomingCall = '{{user}} ruft an';
 z.string.de.conversationsSecondaryLinePeopleLeft = '{{number}} Personen entfernt';
 z.string.de.conversationsSecondaryLinePersonLeft = '{{user}} hat die Unterhaltung verlassen';
@@ -437,7 +440,9 @@ z.string.de.conversationsSecondaryLineSummaryMentions = '{{number}} Erwähnungen
 z.string.de.conversationsSecondaryLineSummaryMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineSummaryMissedCalls = '{{number}} verpasste Anrufe';
 z.string.de.conversationsSecondaryLineSummaryPing = '{{number}} Ping';
-z.string.de.conversationsSecondaryLineSummaryPings = '{{number}} Pings';
+z.string.de.conversationsSecondaryLineSummaryPings = '{{number}} Pings'
+z.string.de.conversationsSecondaryLineSummaryReply = '{{number}} Antwort';
+z.string.de.conversationsSecondaryLineSummaryReplies = '{{number}} Antworten';
 z.string.de.conversationsSecondaryLineYouLeft = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversationsSecondaryLineYouWereRemoved = 'Du wurdest entfent';
 
@@ -463,8 +468,8 @@ z.string.de.extensionsGiphyNoGifs = 'Ups, kein GIF';
 z.string.de.extensionsGiphyRandom = 'Zufällig';
 
 z.string.de.addParticipantsConfirmLabel = 'Hinzufügen';
-z.string.de.addParticipantsHeader = 'Personen hinzufügen';
-z.string.de.addParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
+z.string.de.addParticipantsHeader = 'Teilnehmer hinzufügen';
+z.string.de.addParticipantsHeaderWithCounter = 'Teilnehmer hinzufügen ({{number}})';
 z.string.de.addParticipantsManageServices = 'Dienste verwalten';
 z.string.de.addParticipantsManageServicesNoResults = 'Dienste verwalten';
 z.string.de.addParticipantsNoServicesManager = 'Dienste sind Helfer, die den Workflow verbessern können.';
@@ -475,7 +480,7 @@ z.string.de.addParticipantsTabsPeople = 'Kontakte';
 z.string.de.addParticipantsTabsServices = 'Dienste';
 
 z.string.de.conversationDetailsActionArchive = 'Archivieren';
-z.string.de.conversationDetailsActionAddParticipants = 'Personen hinzufügen';
+z.string.de.conversationDetailsActionAddParticipants = 'Teilnehmer hinzufügen';
 z.string.de.conversationDetailsActionBlock = 'Kontakt blockieren…';
 z.string.de.conversationDetailsActionCancelRequest = 'Anfrage abbrechen…';
 z.string.de.conversationDetailsActionClear = 'Unterhaltungsverlauf löschen…';
@@ -521,9 +526,9 @@ z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
 z.string.de.guestOptionsTitle = 'Gäste und Dienste';
 
 z.string.de.notificationSettingsTitle = 'Benachrichtigungen';
-z.string.de.notificationSettingsDisclaimer = 'Immer benachrichtigen (einschließlich Audio- und Videoanrufe) oder nur bei Erwähnungen.';
+z.string.de.notificationSettingsDisclaimer = 'Immer benachrichtigen (einschließlich Audio- und Videoanrufe) oder nur bei Erwähnungen oder wenn jemand auf eine deiner Nachrichten antwortet.';
 z.string.de.notificationSettingsEverything = 'Alles';
-z.string.de.notificationSettingsOnlyMentions = 'Nur Erwähnungen';
+z.string.de.notificationSettingsMentionsAndReplies = 'Erwähnungen und Antworten';
 z.string.de.notificationSettingsNothing = 'Nichts';
 
 z.string.de.timedMessagesTitle = 'Temporäre Nachrichten';
@@ -754,12 +759,14 @@ z.string.de.notificationMemberJoinMany = '{{user}} hat {{number}} Kontakte zur U
 z.string.de.notificationMemberJoinSelf = '{{user}} ist der Unterhaltung beigetreten';
 z.string.de.notificationMemberJoinOne = '{{user1}} hat {{user2}} zur Unterhaltung hinzugefügt';
 z.string.de.notificationMemberLeaveRemovedYou = '{{user}} hat dich aus der Unterhaltung entfernt';
-z.string.de.notificationMention = 'Neue Erwähnung:';
+z.string.de.notificationMention = 'Erwähnung: {{text}}';
 z.string.de.notificationObfuscated = 'Hat eine Nachricht gesendet';
 z.string.de.notificationObfuscatedMention = 'Hat dich erwähnt';
+z.string.de.notificationObfuscatedReply = 'Hat dir geantwortet';
 z.string.de.notificationObfuscatedTitle = 'Jemand';
 z.string.de.notificationPing = 'Hat gepingt';
 z.string.de.notificationReaction = '{{reaction}} deine Nachricht';
+z.string.de.notificationReply = 'Antwort: {{text}}';
 z.string.de.notificationSharedAudio = 'Hat eine Audio-Nachricht geteilt';
 z.string.de.notificationSharedFile = 'Hat eine Datei geteilt';
 z.string.de.notificationSharedLocation = 'Hat einen Standort geteilt';
@@ -791,7 +798,7 @@ z.string.de.tooltipConversationsPreferences = 'Einstellungen öffnen';
 z.string.de.tooltipConversationsSilence = 'Stummschalten ({{shortcut}})';
 z.string.de.tooltipConversationsStart = 'Unterhaltung beginnen ({{shortcut}})';
 
-z.string.de.tooltipConversationDetailsAddPeople = 'Kontakte zur Unterhaltung hinzufügen ({{shortcut}})';
+z.string.de.tooltipConversationDetailsAddPeople = 'Teilnehmer zur Unterhaltung hinzufügen ({{shortcut}})';
 z.string.de.tooltipConversationDetailsRename = 'Unterhaltung umbenennen';
 
 z.string.de.tooltipPreferencesContactsGmail = 'Melde dich an deinem Gmail-Konto an, um deine Kontakte zu teilen';
@@ -824,4 +831,11 @@ z.string.de.ephemeralUnitsWeeks = 'Wochen';
 z.string.de.ephemeralUnitsYear = 'Jahr';
 z.string.de.ephemeralUnitsYears = 'Jahre';
 z.string.de.ephemeralRemaining = 'verbleibend';
+
+z.string.de.replyAudioMessage = 'Audionachricht';
+z.string.de.replyQuoteError = 'Diese Nachricht ist nicht sichtbar.';
+z.string.de.replyQuoteShowMore = 'Mehr anzeigen';
+z.string.de.replyQuoteShowLess = 'Weniger anzeigen';
+z.string.de.replyQuoteTimeStampDate = 'Ursprüngliche Nachricht vom {{date}}';
+z.string.de.replyQuoteTimeStampTime = 'Ursprüngliche Nachricht von {{time}}'
 

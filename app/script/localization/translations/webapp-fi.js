@@ -411,8 +411,7 @@ z.string.fi.preferencesAVMicrophone = 'Mikrofoni';
 z.string.fi.preferencesAVPermissionDetail = 'Salli selaimesi asetuksista';
 z.string.fi.preferencesAVSpeakers = 'Kaiuttimet';
 
-z.string.fi.preferencesDevicesActivatedIn = '{{location}}: ssa';
-z.string.fi.preferencesDevicesActivatedOn = 'Aktivoitu {{date}}: ssa';
+z.string.fi.preferencesDevicesActivatedOn = 'Aktivoitu {{date}}';
 z.string.fi.preferencesDevicesActive = 'Aktiivinen';
 z.string.fi.preferencesDevicesActiveDetail = 'Jos et tunnista yllä olevaa laitetta, poista se ja vaihda salasanasi.';
 z.string.fi.preferencesDevicesCurrent = 'Nykyinen';
