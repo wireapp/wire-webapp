@@ -104,8 +104,11 @@ z.components.MessageQuote = class MessageQuote {
   updateCanShowMore(elements) {
     const textQuote = elements.find(element => element.classList && element.classList.contains('message-quote__text'));
     if (textQuote) {
-      const isWider = textQuote.scrollWidth > textQuote.clientWidth;
-      const isHigher = textQuote.scrollHeight > textQuote.clientHeight;
+      const preNode = textQuote.querySelector('pre');
+      const width = Math.max(textQuote.scrollWidth, preNode ? preNode.scrollWidth : 0);
+      const height = Math.max(textQuote.scrollHeight, preNode ? preNode.scrollHeight : 0);
+      const isWider = width > textQuote.clientWidth;
+      const isHigher = height > textQuote.clientHeight;
       this.canShowMore(isWider || isHigher);
     }
   }
