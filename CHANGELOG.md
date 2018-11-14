@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.1.6...@wireapp/api-client@3.1.7) (2018-11-14)
+
+
+### Bug Fixes
+
+* Token refresh ([#1297](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1297)) ([cb85fe0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/cb85fe0))
+
+
+
+
+
 ## [3.1.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.1.5...@wireapp/api-client@3.1.6) (2018-11-12)
 
 **Note:** Version bump only for package @wireapp/api-client
