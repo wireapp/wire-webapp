@@ -1925,10 +1925,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of message
    * @returns {Promise} Resolves after sending the message
    */
-  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
+  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities) {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.message_id;
 
@@ -1936,7 +1935,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .getLinkPreviewFromString(textMessage)
       .then(linkPreview => {
         if (linkPreview) {
-          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, quoteEntity, [linkPreview]);
+          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, undefined, [linkPreview]);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
