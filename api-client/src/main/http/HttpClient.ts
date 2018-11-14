@@ -23,7 +23,7 @@ import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as EventEmitter from 'events';
 import * as logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
-import {BackendErrorLabel, BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
+import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
 import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
@@ -119,7 +119,6 @@ class HttpClient extends EventEmitter {
       return response;
     } catch (error) {
       const {response, request} = error;
-
       // Map Axios errors
       const isNetworkError = !response && request && !Object.keys(request).length;
       if (isNetworkError) {
@@ -134,14 +133,13 @@ class HttpClient extends EventEmitter {
         const isBackendError = errorData && errorData.code && errorData.label && errorData.message;
 
         if (isBackendError) {
-          const isForbidden = errorStatus === StatusCode.FORBIDDEN;
-          const isInvalidCredentials = errorData.label === BackendErrorLabel.INVALID_CREDENTIALS;
-          const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
-          if (isForbidden && isInvalidCredentials && hasAccessToken && firstTry) {
-            return this.refreshAccessToken().then(() => this._sendRequest<T>(config, tokenAsParam, true));
-          }
-
           error = BackendErrorMapper.map(errorData);
+        } else {
+          const isUnauthorized = errorStatus === StatusCode.UNAUTHORIZED;
+          const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
+          if (isUnauthorized && hasAccessToken && firstTry) {
+            return this.refreshAccessToken().then(() => this._sendRequest<T>(config, tokenAsParam, false));
+          }
         }
       }
 

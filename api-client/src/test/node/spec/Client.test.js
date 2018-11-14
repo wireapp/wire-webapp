@@ -165,11 +165,7 @@ describe('Client', () => {
         .get(UserAPI.URL.USERS)
         .query({handles: 'webappbot'})
         .once()
-        .reply(403, {
-          code: 403,
-          label: 'invalid-credentials',
-          message: 'Token expired',
-        });
+        .reply(401);
 
       nock(baseURL)
         .get(UserAPI.URL.USERS)
