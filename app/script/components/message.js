@@ -37,6 +37,8 @@ window.z.components = z.components || {};
       onClickMessage,
       onClickTimestamp,
       onClickParticipants,
+      onClickResetSession,
+      onClickCancelRequest,
       onLike,
       conversationRepository,
       locationRepository,
@@ -56,6 +58,8 @@ window.z.components = z.components || {};
       this.onClickMessage = onClickMessage;
       this.onClickTimestamp = onClickTimestamp;
       this.onClickParticipants = onClickParticipants;
+      this.onClickResetSession = onClickResetSession;
+      this.onClickCancelRequest = onClickCancelRequest;
       this.onLike = onLike;
 
       this.conversationRepository = conversationRepository;
@@ -74,6 +78,13 @@ window.z.components = z.components || {};
         [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
       };
       return iconComponents[message.system_message_type];
+    }
+
+    clickOnDevice(messageEntity) {
+      const topic = messageEntity.isSelfClient()
+        ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
+        : z.event.WebApp.SHORTCUT.PEOPLE;
+      amplify.publish(topic);
     }
 
     showContextMenu(messageEntity, event) {
@@ -192,7 +203,7 @@ window.z.components = z.components || {};
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
             background_image: asset.resource,
-            click: function(data, event) {$parent.onClickImage(message, event)},
+            click: (data, event) => $parent.onClickImage(message, event),
             css: {'bg-color-ephemeral': message.isObfuscated()},
             " data-uie-name="go-image-detail">
             <!-- ko if: message.isObfuscated() -->
@@ -313,7 +324,7 @@ window.z.components = z.components || {};
           <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
         </svg>
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
-              data-bind="click: $parent.on_session_reset_click, l10n_text: z.string.conversationUnableToDecryptResetSession, style : {visibility : !is_resetting_session() ? 'visible' : 'hidden'}"></span>
+              data-bind="click: () => onClickResetSession(message), l10n_text: z.string.conversationUnableToDecryptResetSession, style : {visibility : !is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
       <!-- /ko -->
     </div>
@@ -355,7 +366,7 @@ window.z.components = z.components || {};
   const deleteTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.showUserDetails, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
@@ -386,15 +397,15 @@ window.z.components = z.components || {};
       <!-- ko if: message.isTypeUnverified() -->
         <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceUnverified"></span>
-        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: () => clickOnDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewDevice() -->
         <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
         <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
-        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionNewDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: () => clickOnDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: () => clickOnDevice(message), l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -436,7 +447,7 @@ window.z.components = z.components || {};
                    params="participant: message.otherUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: message.otherUser().isOutgoingRequest() -->
         <div class="message-connected-cancel text-theme"
-             data-bind="click: $parent.click_on_cancel_request,
+             data-bind="click: () => onClickCancelRequest(message),
                         l10n_text: z.string.conversationConnectionCancelRequest"
              data-uie-name="do-cancel-request"></div>
       <!-- /ko -->
