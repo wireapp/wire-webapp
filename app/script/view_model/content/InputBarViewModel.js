@@ -85,11 +85,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
     };
 
+    let inputBarHeight;
+
+    this.replyMessageEntity.subscribe(() => {
+      inputBarHeight = document.getElementById('conversation-input-bar').offsetHeight;
+    }, 'beforeChange');
+
     ko.pureComputed(() => !!this.replyMessageEntity())
       .extend({notify: 'always', rateLimit: 100})
       .subscribeChanged((isReplyingToMessage, wasReplyingToMessage) => {
         if (isReplyingToMessage !== wasReplyingToMessage) {
-          this.triggerInputChangeEvent();
+          const inputBarNewHeight = document.getElementById('conversation-input-bar').offsetHeight;
+          this.triggerInputChangeEvent(inputBarNewHeight, inputBarHeight);
           if (isReplyingToMessage) {
             amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
             amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
