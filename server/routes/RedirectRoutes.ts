@@ -19,7 +19,7 @@
 
 import * as express from 'express';
 
-import {ServerConfig} from '../config';
+import {ServerConfig} from '../ServerConfig';
 import * as BrowserUtil from '../util/BrowserUtil';
 
 const STATUS_CODE_FOUND = 302;
@@ -64,8 +64,11 @@ const RedirectRoutes = (config: ServerConfig) => [
       return res.sendStatus(500);
     }
   }),
+  router.get('/commit/?', (req, res) => {
+    return res.send(config.COMMIT);
+  }),
   router.get('/version/?', (req, res) => {
-    return res.contentType('application/json; charset=UTF-8').send(`{"version": "${config.CLIENT.VERSION}"}`);
+    return res.json({version: config.CLIENT.VERSION});
   }),
 ];
 

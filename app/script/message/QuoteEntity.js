@@ -17,10 +17,38 @@
  *
  */
 
-import {RootState} from '../reducer';
+'use strict';
 
-export const isChecking = (state: RootState) =>
-  state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;
-export const hasIndexedDbSupport = (state: RootState) => state.runtimeState.hasIndexedDbSupport;
-export const hasCookieSupport = (state: RootState) => state.runtimeState.hasCookieSupport;
-export const isSupportedBrowser = (state: RootState) => state.runtimeState.isSupportedBrowser;
+window.z = window.z || {};
+window.z.message = z.message || {};
+
+z.message.QuoteEntity = class QuoteEntity {
+  static get ERROR() {
+    return {
+      INVALID_HASH: 'INVALID_HASH',
+      MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
+    };
+  }
+
+  constructor({error, hash, messageId, userId}) {
+    this.messageId = messageId;
+    this.hash = hash;
+    this.userId = userId;
+    this.error = error;
+  }
+
+  isQuoteFromUser(userId) {
+    return this.userId === userId;
+  }
+
+  toJSON() {
+    return {
+      messageId: this.messageId,
+      userId: this.userId,
+    };
+  }
+
+  toProto() {
+    return new z.proto.Quote(this.messageId, new Uint8Array(this.hash));
+  }
+};

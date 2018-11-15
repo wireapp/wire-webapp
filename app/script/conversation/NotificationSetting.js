@@ -27,7 +27,7 @@ z.conversation.NotificationSetting = {
 
   STATE: {
     EVERYTHING: 0b00,
-    ONLY_MENTIONS: 0b01,
+    MENTIONS_AND_REPLIES: 0b01,
     NOTHING: 0b11,
   },
 
@@ -36,7 +36,7 @@ z.conversation.NotificationSetting = {
   getText(status) {
     const statusTexts = {
       [z.conversation.NotificationSetting.STATE.EVERYTHING]: z.string.notificationSettingsEverything,
-      [z.conversation.NotificationSetting.STATE.ONLY_MENTIONS]: z.string.notificationSettingsOnlyMentions,
+      [z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES]: z.string.notificationSettingsMentionsAndReplies,
       [z.conversation.NotificationSetting.STATE.NOTHING]: z.string.notificationSettingsNothing,
     };
     return z.l10n.text(statusTexts[status]);

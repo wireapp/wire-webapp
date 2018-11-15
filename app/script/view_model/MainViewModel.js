@@ -149,14 +149,14 @@ z.viewModel.MainViewModel = class MainViewModel {
             this.isPanelOpen(true);
             overlay.addEventListener('click', this.closePanelOnClick);
           }
-          window.dispatchEvent(new Event('resize'));
 
-          z.util.afterRender(() => {
-            const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
-            if (scrollToBottom) {
-              $('.messages-wrap').scrollToBottom();
-            }
-          });
+          if (!isNarrowScreen) {
+            // In case we are not on a narrow screen, opening a panel will resize a bunch of elements
+            // we need to warn them by triggering a window resize event.
+            // When the screen is narrow, the panel just goes on top, no elements are resized
+            window.dispatchEvent(new Event('resize'));
+          }
+
           resolve();
         }
       };

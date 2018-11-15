@@ -237,46 +237,45 @@ class ClientItem extends React.Component<CombinedProps, State> {
             </div>
             <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
           </ContainerXS>
-          {requirePassword &&
-            (selected || isAnimating) && (
-              <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
-                <Form>
-                  <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
-                    <Input
-                      autoComplete="section-login password"
-                      autoFocus
-                      data-uie-name="remove-device-password"
-                      innerRef={node => (this.passwordInput = node)}
-                      maxLength={1024}
-                      minLength={8}
-                      name="password"
-                      onChange={event =>
-                        this.setState({
-                          password: event.target.value,
-                          validPassword: true,
-                        })
-                      }
-                      pattern=".{8,1024}"
-                      placeholder={_(clientItemStrings.passwordPlaceholder)}
-                      required
-                      style={{background: 'transparent'}}
-                      type="password"
-                      value={password}
-                    />
-                    <RoundIconButton
-                      color={COLOR.RED}
-                      data-uie-name="do-remove-device"
-                      disabled={!password || !validPassword}
-                      formNoValidate
-                      icon={ICON_NAME.TRASH}
-                      onClick={this.handleSubmit}
-                      style={{marginBottom: '-4px'}}
-                      type="submit"
-                    />
-                  </InputSubmitCombo>
-                </Form>
-              </ContainerXS>
-            )}
+          {requirePassword && (selected || isAnimating) && (
+            <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
+              <Form>
+                <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
+                  <Input
+                    autoComplete="section-login password"
+                    autoFocus
+                    data-uie-name="remove-device-password"
+                    innerRef={node => (this.passwordInput = node)}
+                    maxLength={1024}
+                    minLength={8}
+                    name="password"
+                    onChange={event =>
+                      this.setState({
+                        password: event.target.value,
+                        validPassword: true,
+                      })
+                    }
+                    pattern=".{8,1024}"
+                    placeholder={_(clientItemStrings.passwordPlaceholder)}
+                    required
+                    style={{background: 'transparent'}}
+                    type="password"
+                    value={password}
+                  />
+                  <RoundIconButton
+                    color={COLOR.RED}
+                    data-uie-name="do-remove-device"
+                    disabled={!password || !validPassword}
+                    formNoValidate
+                    icon={ICON_NAME.TRASH}
+                    onClick={this.handleSubmit}
+                    style={{marginBottom: '-4px'}}
+                    type="submit"
+                  />
+                </InputSubmitCombo>
+              </Form>
+            </ContainerXS>
+          )}
         </ContainerXS>
         {validationError && selected ? (
           <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>

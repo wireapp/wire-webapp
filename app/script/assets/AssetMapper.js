@@ -36,13 +36,15 @@ z.assets.AssetMapper = {
       preview: 'preview',
     };
 
-    return assets.filter(asset => asset.type === 'image').reduce((mappedAssets, asset) => {
-      const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
+    return assets
+      .filter(asset => asset.type === 'image')
+      .reduce((mappedAssets, asset) => {
+        const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
 
-      return !sizeMap[asset.size]
-        ? mappedAssets
-        : Object.assign({}, mappedAssets, {[sizeMap[asset.size]]: assetRemoteData});
-    }, {});
+        return !sizeMap[asset.size]
+          ? mappedAssets
+          : Object.assign({}, mappedAssets, {[sizeMap[asset.size]]: assetRemoteData});
+      }, {});
   },
 
   /**

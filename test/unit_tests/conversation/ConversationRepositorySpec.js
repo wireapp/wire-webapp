@@ -176,12 +176,12 @@ describe('ConversationRepository', () => {
         Promise.resolve(conversation_et)
       );
 
-      expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).toBeDefined();
+      expect(conversation_et.getMessage(messageEntityToDelete.id)).toBeDefined();
 
       return TestFactory.conversation_repository
         .deleteMessageForEveryone(conversation_et, messageEntityToDelete)
         .then(() => {
-          expect(conversation_et.get_message_by_id(messageEntityToDelete.id)).not.toBeDefined();
+          expect(conversation_et.getMessage(messageEntityToDelete.id)).not.toBeDefined();
         });
     });
   });
@@ -761,7 +761,7 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
         };
 
-        expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
+        expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         TestFactory.conversation_repository
           ._handleConversationEvent(message_delete_event)
           .then(done.fail)
@@ -769,7 +769,7 @@ describe('ConversationRepository', () => {
             expect(error).toEqual(jasmine.any(z.error.ConversationError));
             expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
+            expect(conversation_et.getMessage(message_et.id)).toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
             done();
           });
@@ -787,10 +787,10 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
         };
 
-        expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
+        expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
           expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-          expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
+          expect(conversation_et.getMessage(message_et.id)).not.toBeDefined();
           expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
         });
       });
@@ -810,10 +810,10 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
         };
 
-        expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
+        expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
           expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-          expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
+          expect(conversation_et.getMessage(message_et.id)).not.toBeDefined();
           expect(TestFactory.conversation_repository._addDeleteMessage).toHaveBeenCalled();
         });
       });
@@ -834,10 +834,10 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
         };
 
-        expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
+        expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
           expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-          expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
+          expect(conversation_et.getMessage(message_et.id)).not.toBeDefined();
           expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
         });
       });
@@ -871,7 +871,7 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
         };
 
-        expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
+        expect(conversation_et.getMessage(messageId)).toBeDefined();
 
         TestFactory.conversation_repository
           ._handleConversationEvent(messageHiddenEvent)
@@ -880,7 +880,7 @@ describe('ConversationRepository', () => {
             expect(error).toEqual(jasmine.any(z.error.ConversationError));
             expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
+            expect(conversation_et.getMessage(messageId)).toBeDefined();
             done();
           });
       });
@@ -898,11 +898,11 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
         };
 
-        expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
+        expect(conversation_et.getMessage(messageId)).toBeDefined();
 
         return TestFactory.conversation_repository._handleConversationEvent(messageHiddenEvent).then(() => {
           expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-          expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
+          expect(conversation_et.getMessage(messageId)).not.toBeDefined();
         });
       });
 
@@ -919,11 +919,11 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
         };
 
-        expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
+        expect(conversation_et.getMessage(messageId)).toBeDefined();
 
         return TestFactory.conversation_repository._onMessageHidden(messageHiddenEvent).then(() => {
           expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-          expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
+          expect(conversation_et.getMessage(messageId)).not.toBeDefined();
         });
       });
     });

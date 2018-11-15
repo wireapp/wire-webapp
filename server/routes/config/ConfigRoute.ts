@@ -17,7 +17,7 @@
  *
  */
 import {Router} from 'express';
-import {ServerConfig} from '../../config';
+import {ServerConfig} from '../../ServerConfig';
 
 const ConfigRoute = (config: ServerConfig) =>
   Router().get('/config.js', (req, res) => {

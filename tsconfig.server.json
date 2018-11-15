@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "commonjs",
     "outDir": "aws",
     "removeComments": true,
     "rootDir": "server"

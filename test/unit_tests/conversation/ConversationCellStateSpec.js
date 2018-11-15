@@ -39,8 +39,8 @@ describe('z.conversation.ConversationCellState', () => {
       expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'none'});
     });
 
-    it('returns the muted icon if only mentions are set', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
+    it('returns the muted icon if state is set to mentions and replies', () => {
+      conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
 
       expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
@@ -60,6 +60,7 @@ describe('z.conversation.ConversationCellState', () => {
       otherMessages: [],
       pings: [],
       selfMentions: [],
+      selfReplies: [],
     };
 
     const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
