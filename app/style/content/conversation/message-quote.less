@@ -49,6 +49,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 
+    pre {
+      overflow: hidden;
+      margin: 0;
+      text-overflow: ellipsis;
+    }
+
     &--large {
       font-size: 32px;
     }
@@ -57,6 +63,11 @@
       height: unset;
       max-height: unset;
       white-space: normal;
+
+      pre {
+        overflow: auto;
+        text-overflow: unset;
+      }
     }
 
     &__show-more {
