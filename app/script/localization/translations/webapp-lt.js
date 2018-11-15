@@ -102,7 +102,7 @@ z.string.lt.callNoCameraAccess = 'Nėra galimybės naudotis kamera';
 
 z.string.lt.videoCallOverlayFitVideoLabel = 'Spustelėkite dukart ir vaizdas bus įtalpintas arba užpildytas';
 z.string.lt.videoCallOverlayConversations = 'Susirašinėjimai';
-z.string.lt.videoCallOverlayMute = 'Nutildyti';
+z.string.lt.videoCallOverlayMute = 'Išjungti susirašinėjimo pranešimus';
 z.string.lt.videoCallOverlayVideo = 'Vaizdas';
 z.string.lt.videoCallOverlayShareScreen = 'Siųsti ekrano vaizdą';
 z.string.lt.videoCallOverlayHangUp = 'Užbaigti';
@@ -577,7 +577,6 @@ z.string.lt.preferencesAVTemporaryDisclaimer = 'Svečiai negali pradėti vaizdo 
 z.string.lt.preferencesAVNoCamera = '„Wire“ neturi galimybės prisijungti prie kameros.[br][faqLink]Perskaitykite šį pagalbos straipsnį[/faqLink] ir sužinosite, kaip tai sutvarkyti.';
 z.string.lt.preferencesAVTryAgain = 'Bandykite dar kartą';
 
-z.string.lt.preferencesDevicesActivatedIn = 'šalia {{location}}';
 z.string.lt.preferencesDevicesActivatedOn = 'Aktyvuotas {{date}}';
 z.string.lt.preferencesDevicesActive = 'Aktyvus';
 z.string.lt.preferencesDevicesActiveDetail = 'Jeigu jūs neatpažįstate aukščiau esančio įrenginio, pašalinkite jį ir atstatykite savo slaptažodį.';

@@ -82,7 +82,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     const {preventClose = false, action: actionFn, close: closeFn, secondary: secondaryFn} = options;
-    const modal = new zeta.webapp.module.Modal(type, null, () => {
+    const modal = new z.ui.Modal(type, null, () => {
       $(type)
         .find('.modal-close')
         .off('click');
@@ -138,11 +138,11 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         modal.hide();
       });
 
-    if (!modal.is_shown()) {
+    if (!modal.isShown()) {
       this.logger.info(`Show modal of type '${type}'`);
     }
 
-    modal.autoclose = !preventClose;
+    modal.setAutoclose(!preventClose);
     modal.toggle();
   }
 

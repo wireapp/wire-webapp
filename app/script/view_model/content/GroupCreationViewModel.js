@@ -124,8 +124,8 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.method = method;
 
     if (!this.modal) {
-      this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
-      this.modal.autoclose = false;
+      this.modal = new z.ui.Modal('#group-creation-modal', this._afterHideModal.bind(this));
+      this.modal.setAutoclose(false);
     }
 
     this.state(GroupCreationViewModel.STATE.PREFERENCES);

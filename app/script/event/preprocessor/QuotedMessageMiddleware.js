@@ -63,7 +63,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
 
   _handleDeleteEvent(event) {
     const originalMessageId = event.data.message_id;
-    return this._findRepliesToMessage(event.conversation, originalMessageId).then(replies => {
+    return this._findRepliesToMessage(event.conversation, originalMessageId).then(({replies}) => {
       this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
       replies.forEach(reply => {
         reply.data.quote = {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
@@ -75,13 +75,20 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
 
   _handleEditEvent(event) {
     const originalMessageId = event.data.replacing_message_id;
-    return this._findRepliesToMessage(event.conversation, originalMessageId).then(replies => {
+    return this._findRepliesToMessage(event.conversation, originalMessageId).then(({originalEvent, replies}) => {
+      if (!originalEvent) {
+        return event;
+      }
+
       this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
+
       replies.forEach(reply => {
         reply.data.quote.message_id = event.id;
         this.eventService.replaceEvent(reply);
       });
-      return event;
+
+      const decoratedData = Object.assign({}, event.data, {quote: originalEvent.data.quote});
+      return Object.assign({}, event, {data: decoratedData});
     });
   }
 
@@ -136,9 +143,16 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   _findRepliesToMessage(conversationId, messageId) {
     return this.eventService.loadEvent(conversationId, messageId).then(originalEvent => {
       if (!originalEvent) {
-        return [];
+        return {
+          replies: [],
+        };
       }
-      return this.eventService.loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time);
+      return this.eventService
+        .loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time)
+        .then(replies => ({
+          originalEvent,
+          replies,
+        }));
     });
   }
 };

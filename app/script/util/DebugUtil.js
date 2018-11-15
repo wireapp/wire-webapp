@@ -185,7 +185,7 @@ z.util.DebugUtil = class DebugUtil {
       const additionalNotifications = !remoteUserId
         ? notifications
         : notifications.filter(notification => {
-            const {payload} = notification;
+            const payload = notification.payload;
             for (const {data, from} of payload) {
               if (data && [localUserId, remoteUserId].includes(from)) {
                 const {sender, recipient} = data;

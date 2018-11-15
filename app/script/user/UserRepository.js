@@ -104,7 +104,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   on_user_event(event_json, source) {
-    const {type} = event_json;
+    const type = event_json.type;
 
     const logObject = {eventJson: JSON.stringify(event_json), eventObject: event_json};
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);

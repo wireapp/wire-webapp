@@ -146,8 +146,10 @@
               <div class="conversation-details__notifications">
                 <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                   <notification-icon class="panel__action-item__icon"></notification-icon>
-                  <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionNotifications"></div>
-                  <div class="panel__action-item__status" data-bind="l10n_text: notificationStatusText" data-uie-name="status-notifications"></div>
+                  <div class="panel__action-item__summary">
+                    <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionNotifications"></div>
+                    <div class="panel__action-item__status" data-bind="l10n_text: notificationStatusText" data-uie-name="status-notifications"></div>
+                  </div>
                   <disclose-icon></disclose-icon>
                 </div>
               </div>

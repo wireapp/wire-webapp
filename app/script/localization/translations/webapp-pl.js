@@ -440,7 +440,6 @@ z.string.pl.preferencesAVMicrophone = 'Mikrofon';
 z.string.pl.preferencesAVPermissionDetail = 'Włącz w Preferencjach Twojej przeglądarki';
 z.string.pl.preferencesAVSpeakers = 'Głośniki';
 
-z.string.pl.preferencesDevicesActivatedIn = 'w {{location}}';
 z.string.pl.preferencesDevicesActivatedOn = 'Aktywowano {{date}}';
 z.string.pl.preferencesDevicesActive = 'Aktywne';
 z.string.pl.preferencesDevicesActiveDetail = 'Jeśli nie rozpoznajesz urządzenia poniżej, usuń je i zresetuj hasło.';

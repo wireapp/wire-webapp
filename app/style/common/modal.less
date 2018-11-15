@@ -18,12 +18,36 @@
  */
 
 .modal {
+  position: fixed;
   z-index: @z-index-modal;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
   overflow-x: hidden;
   overflow-y: auto;
 
+  &.modal-show {
+    display: flex;
+  }
+
   &::before {
     position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: fade(#000, 64%);
+
+    content: ' ';
+    opacity: 0;
+    transition-delay: 0.35s;
+    transition-duration: 0.55s;
+    transition-property: opacity;
+    transition-timing-function: @ease-out-quart;
   }
 
   .modal-header {
@@ -32,11 +56,31 @@
     }
   }
 
+  &.modal-fadein {
+    &:before {
+      opacity: 1;
+      transition-delay: 0s;
+      transition-duration: 0.35s;
+      transition-property: opacity;
+      transition-timing-function: @ease-out-quart;
+    }
+
+    .modal-content {
+      .modal-content-anim-open();
+    }
+  }
+
   .modal-content {
+    .modal-content-anim-close();
     position: relative;
+    display: block;
+    overflow: hidden;
     width: 384px;
     padding: @modal-padding;
     margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
+
+    background-color: #fff;
+    border-radius: 4px;
     cursor: default;
 
     a.close {
@@ -168,4 +212,23 @@
   & div:nth-child(even) {
     margin-bottom: 16px;
   }
+}
+
+// mixings
+.modal-content-anim-close {
+  opacity: 0;
+  transform: scale(0.88);
+  transition-delay: 0s, 0s;
+  transition-duration: 0.35s, 0.35s;
+  transition-property: transform, opacity;
+  transition-timing-function: @ease-in-expo, @ease-in-expo;
+}
+
+.modal-content-anim-open {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.15s, 0.15s;
+  transition-duration: 0.55s, 0.55s;
+  transition-property: transform, opacity;
+  transition-timing-function: @ease-out-expo, @ease-out-expo;
 }

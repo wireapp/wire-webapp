@@ -525,7 +525,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves when self join was handled
    */
   _remoteSelfJoin(callEntity, callMessageEntity) {
-    const {conversationEntity} = callEntity;
+    const conversationEntity = callEntity.conversationEntity;
 
     if (callEntity.selfClientJoined()) {
       const logMessage = {
@@ -745,7 +745,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the call
    */
   _confirmCallMessage(callEntity, incomingCallMessageEntity) {
-    const {response} = incomingCallMessageEntity;
+    const response = incomingCallMessageEntity.response;
 
     const skipConfirmation = response || !callEntity.selfClientJoined();
     return skipConfirmation
@@ -1416,7 +1416,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the new call entity
    */
   _createOutgoingCall(callMessageEntity) {
-    const {properties} = callMessageEntity;
+    const properties = callMessageEntity.properties;
 
     const direction = z.calling.enum.CALL_STATE.OUTGOING;
     return this._createCall(callMessageEntity, this.userRepository.self(), direction).then(callEntity => {
@@ -1598,7 +1598,7 @@ z.calling.CallingRepository = class CallingRepository {
       if (callingConfig) {
         this._clearConfigTimeout();
 
-        const {DEFAULT_CONFIG_TTL} = CallingRepository.CONFIG;
+        const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
         const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
         const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
         const expirationDate = new Date(Date.now() + timeout);

@@ -410,7 +410,6 @@ z.string.sk.preferencesAVMicrophone = 'Mikrofón';
 z.string.sk.preferencesAVPermissionDetail = 'Povoliť v nastaveniach prehliadača';
 z.string.sk.preferencesAVSpeakers = 'Reproduktory';
 
-z.string.sk.preferencesDevicesActivatedIn = 'v {{location}}';
 z.string.sk.preferencesDevicesActivatedOn = 'Aktivované {{date}}';
 z.string.sk.preferencesDevicesActive = 'Aktívne';
 z.string.sk.preferencesDevicesActiveDetail = 'Ak nepoznáte zariadenie vyššie, odstráňte ho a nastavte nové heslo.';

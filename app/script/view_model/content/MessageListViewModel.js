@@ -26,7 +26,6 @@ window.z.viewModel.content = z.viewModel.content || {};
 /**
  * Message list rendering view model.
  *
- * @todo Get rid of the $('.conversation') opacity
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jquery selectors
  */
@@ -68,6 +67,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     amplify.subscribe(z.event.WebApp.INPUT.RESIZE, this._handleInputResize.bind(this));
 
+    this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
 
@@ -78,9 +78,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.capture_scrolling_event = false;
 
     // Store message subscription id
-    this.messages_subscription = undefined;
-
-    this.recalculate_timeout = undefined;
+    this.messagesChangeSubscription = undefined;
+    this.messagesBeforeChangeSubscription = undefined;
 
     this.onMouseWheel = _.throttle((data, event) => {
       const element = $(event.currentTarget);
@@ -164,8 +163,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (conversation_et) {
       conversation_et.release();
     }
-    if (this.messages_subscription) {
-      this.messages_subscription.dispose();
+    if (this.messagesBeforeChangeSubscription) {
+      this.messagesBeforeChangeSubscription.dispose();
+    }
+    if (this.messagesChangeSubscription) {
+      this.messagesChangeSubscription.dispose();
     }
     this.capture_scrolling_event = false;
     this.conversation_last_read_timestamp(false);
@@ -194,6 +196,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (inputSizeDiff) {
       this._getMessagesContainer().scrollBy(inputSizeDiff);
+    } else if (this._shouldStickToBottom()) {
+      this._getMessagesContainer().scrollToBottom();
     }
   }
 
@@ -206,6 +210,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   changeConversation(conversationEntity, messageEntity) {
     // Clean up old conversation
+    this.conversationLoaded(false);
     if (this.conversation()) {
       this.release_conversation(this.conversation());
     }
@@ -218,21 +223,22 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
     }
 
-    // @todo Rethink conversation.is_loaded
-    if (conversationEntity.is_loaded()) {
-      return this._renderConversation(conversationEntity, messageEntity);
-    }
+    conversationEntity.is_loaded(false);
+    return this._loadConversation(conversationEntity, messageEntity)
+      .then(() => this._renderConversation(conversationEntity, messageEntity))
+      .then(() => {
+        conversationEntity.is_loaded(true);
+        this.conversationLoaded(true);
+      });
+  }
 
+  _loadConversation(conversationEntity, messageEntity) {
     return this.conversation_repository
       .updateParticipatingUserEntities(conversationEntity, false, true)
       .then(_conversationEntity => {
         return messageEntity
           ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, messageEntity)
           : this.conversation_repository.getPrecedingMessages(_conversationEntity);
-      })
-      .then(() => {
-        conversationEntity.is_loaded(true);
-        return this._renderConversation(conversationEntity, messageEntity);
       });
   }
 
@@ -260,10 +266,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {Promise} Resolves when conversation was rendered
    */
   _renderConversation(conversationEntity, messageEntity) {
-    // Hide conversation until everything is processed
-    const conversationElement = $('.conversation');
-    conversationElement.css({opacity: 0});
-
     const messages_container = this._getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
@@ -277,33 +279,43 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // Reset scroll position
         messages_container.scrollTop(0);
 
-        if (!this._conversationHasExtraMessages(this.conversation())) {
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        }
-
         if (messageEntity) {
           this.focusMessage(messageEntity.id);
         } else {
           const unread_message = $('.message-timestamp-unread');
           if (unread_message.length) {
-            const unread_message_position = unread_message
-              .parent()
-              .parent()
-              .position();
+            const unreadMarkerPosition = unread_message.parents('.message').position();
 
-            messages_container.scrollBy(unread_message_position.top);
+            messages_container.scrollBy(unreadMarkerPosition.top);
           } else {
             messages_container.scrollToBottom();
           }
         }
 
-        conversationElement.css({opacity: 1});
+        if (!messages_container.isScrollable() && !this._conversationHasExtraMessages(this.conversation())) {
+          this._mark_conversation_as_read_on_focus(this.conversation());
+        }
+
         this.capture_scrolling_event = true;
         window.addEventListener('resize', this._handleWindowResize);
 
+        let shouldStickToBottomOnMessageAdd;
+
+        this.messagesBeforeChangeSubscription = conversationEntity.messages_visible.subscribe(
+          () => {
+            // we need to keep track of the scroll position before the message array has changed
+            shouldStickToBottomOnMessageAdd = this._shouldStickToBottom();
+          },
+          null,
+          'beforeChange'
+        );
+
         // Subscribe for incoming messages
-        this.messages_subscription = conversationEntity.messages_visible.subscribe(
-          this._scrollAddedMessagesIntoView,
+        this.messagesChangeSubscription = conversationEntity.messages_visible.subscribe(
+          changedMessages => {
+            this._scrollAddedMessagesIntoView(changedMessages, shouldStickToBottomOnMessageAdd);
+            shouldStickToBottomOnMessageAdd = undefined;
+          },
           null,
           'arrayChange'
         );
@@ -315,9 +327,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Checks how to scroll message list and if conversation should be marked as unread.
    * @param {Array} changedMessages - List of the messages that were added or removed from the list
+   * @param {boolean} shouldStickToBottom - should the list stick to the bottom
    * @returns {undefined} No return value
    */
-  _scrollAddedMessagesIntoView(changedMessages) {
+  _scrollAddedMessagesIntoView(changedMessages, shouldStickToBottom) {
     const messages_container = this._getMessagesContainer();
     const lastAddedItem = changedMessages
       .slice()
@@ -345,7 +358,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     // Scroll to the end of the list if we are under a certain threshold
-    if (this._shouldStickToBottom()) {
+    if (shouldStickToBottom) {
       window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
@@ -417,7 +430,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           .get_message_in_conversation_by_id(conversationEntity, messageId)
           .then(messageEntity => {
             conversationEntity.remove_messages();
-            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity, 30);
+            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
           });
 
     loadMessagePromise.then(() => {

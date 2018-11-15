@@ -429,7 +429,6 @@ z.string.nl.preferencesAVMicrophone = 'Microfoon';
 z.string.nl.preferencesAVPermissionDetail = 'Schakel in vanuit je browser instellingen';
 z.string.nl.preferencesAVSpeakers = 'Luidsprekers';
 
-z.string.nl.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.nl.preferencesDevicesActivatedOn = 'Eerste keer gebruikt op {{date}}';
 z.string.nl.preferencesDevicesActive = 'Actief';
 z.string.nl.preferencesDevicesActiveDetail = 'Als je een van de bovengenoemde apparaten niet kent, verwijder deze dan en wijzig je wachtwoord.';

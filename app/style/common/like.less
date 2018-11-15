@@ -33,7 +33,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    color: @w-red;
+    color: @graphite;
     transform-origin: 0 0;
 
     &:last-child {
@@ -47,9 +47,13 @@
 }
 
 .like-button-liked {
-  > span:last-child {
-    .like-transform-mixin(1);
+  > span {
+    color: @w-red;
 
-    opacity: 1;
+    &:last-child {
+      .like-transform-mixin(1);
+
+      opacity: 1;
+    }
   }
 }

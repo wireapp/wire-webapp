@@ -375,7 +375,6 @@ z.string.hr.preferencesAVMicrophone = 'Mikrofon';
 z.string.hr.preferencesAVPermissionDetail = 'Omogućite iz opcija preglednika';
 z.string.hr.preferencesAVSpeakers = 'Zvučnici';
 
-z.string.hr.preferencesDevicesActivatedIn = 'u {{location}}';
 z.string.hr.preferencesDevicesActivatedOn = 'Aktiviran u {{date}}';
 z.string.hr.preferencesDevicesActive = 'Aktivno';
 z.string.hr.preferencesDevicesActiveDetail = 'Ako ne prepoznajete neki od navedenih uređaja, uklonite ga i resetirajte Vašu lozinku.';

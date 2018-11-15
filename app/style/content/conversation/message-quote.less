@@ -4,7 +4,7 @@
   padding-left: 88px;
   margin-bottom: 10px;
   font-size: 14px;
-  line-height: 21px;
+  line-height: 1.5em;
 
   &::before {
     position: absolute;
@@ -29,15 +29,45 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: @font-weight-bold;
+
+    edit-icon {
+      margin-left: 4px;
+
+      svg {
+        width: 8px;
+        height: 8px;
+        fill: fade(@graphite-dark, 40%);
+      }
+    }
   }
 
   &__text {
-    overflow-x: hidden;
+    overflow: hidden;
+    height: 1.5em;
+    max-height: 1.5em;
+    line-height: 1.5em;
     text-overflow: ellipsis;
     white-space: nowrap;
 
+    pre {
+      overflow: hidden;
+      margin: 0;
+      text-overflow: ellipsis;
+    }
+
+    &--large {
+      font-size: 32px;
+    }
+
     &--full {
+      height: unset;
+      max-height: unset;
       white-space: normal;
+
+      pre {
+        overflow: auto;
+        text-overflow: unset;
+      }
     }
 
     &__show-more {

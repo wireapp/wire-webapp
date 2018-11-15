@@ -402,7 +402,6 @@ z.string.sl.preferencesAVMicrophone = 'Mikrofon';
 z.string.sl.preferencesAVPermissionDetail = 'Omogoči iz nastavitev vašega brskalnika';
 z.string.sl.preferencesAVSpeakers = 'Zvočniki';
 
-z.string.sl.preferencesDevicesActivatedIn = 'v {{location}}';
 z.string.sl.preferencesDevicesActivatedOn = 'Aktiviran ob {{date}}';
 z.string.sl.preferencesDevicesActive = 'Aktivno';
 z.string.sl.preferencesDevicesActiveDetail = 'Če ne prepoznate zgornje naprave, jo odstranite in ponastavite vaše geslo.';
