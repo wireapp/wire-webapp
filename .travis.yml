@@ -92,7 +92,7 @@ deploy:
       repo: wireapp/wire-webapp
       branch: staging
 
-  # https://wire-webapp-prod-next.wire.com/
+  # https://wire-webapp-prod.wire.com/
   - provider: elasticbeanstalk
     skip_cleanup: true
     zip-file: 'aws/s3/ebs.zip'
