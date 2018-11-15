@@ -37,20 +37,4 @@ module.exports = {
       paths: '<%= dir.app_ %>',
     },
   },
-
-  //##############################################################################
-  // Local deployment related
-  //##############################################################################
-  dist: {
-    files: [
-      {
-        '<%= dir.dist %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
-        '<%= dir.dist %>/style/main.css': '<%= dir.app.style %>/main.less',
-        '<%= dir.dist %>/style/support.css': '<%= dir.app.style %>/support.less',
-      },
-    ],
-    options: {
-      paths: '<%= dir.app_ %>',
-    },
-  },
 };

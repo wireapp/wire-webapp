@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- Wire, Copyright (C) 2017 Wire Swiss GmbH -->
-<!-- {{config.CURRENT_VERSION_ID}} -->
+<!-- Wire, Copyright (C) 2018 Wire Swiss GmbH -->
+<!-- {{@config.VERSION}} -->
 <html class="support theme-gray bg-theme">
   <head>
     <meta charset="utf-8" />
@@ -9,15 +9,13 @@
     <link rel="icon" href="/image/icon/wire-icon-256.png" sizes="256x256" type="image/png">
     <link rel="icon" href="/image/icon/wire-icon-128.png" sizes="128x128" type="image/png">
     <link rel="icon" href="/image/icon/wire-icon-64.png" sizes="64x64" type="image/png">
-    <title>{% if title %}{{title}} – {% endif %}Wire</title>
+    <title>Wire Error</title>
     <link rel="stylesheet" href="/style/support.css">
     <meta property="og:title" content="Wire for Web – modern, private communications in your browsers.">
     <meta property="og:description" name="description" content="Crystal clear voice, video and group chats. No advertising. Always encrypted.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://app.wire.com">
     <meta property="og:image" content="https://lh3.googleusercontent.com/ElqTCcY1N0c3EAX27MRFoXynZlbTaJD2KEqYNXAPn5YQPZa6Bvsux4NCgEMoUhazdIWWelAU__Kzmr55j55EsgM=s1024">
-    # block header
-    # endblock
   </head>
 
   <body>
@@ -30,8 +28,7 @@
             </svg>
           </a>
         </div>
-        # block content
-        # endblock
+        <p>{{@error.code}} — {{@error.message}}</p>
         <div class="footer">
           <p>
             <a href="https://wire.com/legal/terms/">Terms of Use</a> ·

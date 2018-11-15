@@ -14,7 +14,7 @@
     [
       "@babel/preset-env",
       {
-        "debug": true,
+        "debug": false,
         "modules": false,
         "targets": {
           "browsers": ["chrome >= 56", "firefox >= 60", "edge >= 15", "opera >= 43"]

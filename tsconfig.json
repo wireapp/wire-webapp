@@ -11,9 +11,9 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "app/script/auth",
-    "rootDir": "app/script",
+    "rootDirs": ["app/script"],
     "sourceMap": true,
-    "target": "ES6"
+    "target": "es6"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "server"]
 }

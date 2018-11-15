@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <!-- Wire, Copyright (C) 2018 Wire Swiss GmbH -->
-<!-- {{config.CURRENT_VERSION_ID}} -->
+<!-- {{@config.VERSION}} -->
 <html>
   <head>
     #include('meta.htm')
     #include('graph.htm')
     <title>Wire</title>
-    <link rel="stylesheet" href="/style/auth.css?{{config.CURRENT_VERSION_ID}}">
+    <link rel="stylesheet" href="/style/auth.css?{{@config.VERSION}}">
   </head>
 
   <body>
@@ -275,6 +275,7 @@
       </div>
     </div>
 
+    #include('#dest/config.htm')
     #include('#dest/vendor.htm')
     #include('#dest/component.htm')
     #include('#dest/app.htm')

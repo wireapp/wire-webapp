@@ -80,7 +80,7 @@ z.util.Environment = (() => {
   const isInternal = () => window.location.hostname === APP_ENV.INTERNAL;
   const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
   const isProduction = () => {
-    const isProductionHost = window.location.hostname.endsWith(APP_ENV.PRODUCTION);
+    const isProductionHost = window.wire.env.ENVIRONMENT === z.service.BackendEnvironment.PRODUCTION;
     return isProductionHost && !isInternal();
   };
 

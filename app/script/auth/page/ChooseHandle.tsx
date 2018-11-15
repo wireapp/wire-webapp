@@ -77,9 +77,9 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   componentDidMount() {
     const suggestions = createSuggestions(this.props.name);
+    this.props.doGetConsents();
     this.props
-      .doGetConsents()
-      .then(() => this.props.checkHandles(suggestions))
+      .checkHandles(suggestions)
       .then(handle => this.setState({handle}))
       .catch(error => this.setState({error}));
   }

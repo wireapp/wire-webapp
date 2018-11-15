@@ -93,7 +93,6 @@ module.exports = grunt => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('default', ['prepare_dist', 'host']);
   grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack', 'scripts']);
 
   // Deploy to different environments
@@ -101,19 +100,58 @@ module.exports = grunt => {
   grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);
   grunt.registerTask('app_deploy_prod', ['gitinfo', 'set_version:prod', 'aws_deploy']);
 
-  grunt.registerTask('app_deploy_travis', target => {
-    if (target === 'prod' || target === 'staging') {
-      grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
-    } else if (target === 'dev') {
-      grunt.task.run('set_version:staging', 'init', 'prepare_staging', 'aws_prepare');
-    } else {
-      grunt.fail.warn('Invalid target specified. Valid targets are: "prod" & "staging"');
-    }
+  grunt.registerTask('app_deploy_travis', () => {
+    grunt.task.run('set_version', 'init', 'prepare', 'aws_prepare');
+  });
+
+  grunt.registerTask('build_dev', () => {
+    grunt.task.run(
+      'clean:temp',
+      'clean:deploy',
+      'clean:deploy_app',
+      'clean:deploy_script',
+      'clean:aws',
+      'clean:aws_app',
+      'clean:aws_s3',
+      'set_version:staging',
+      'aws_version_file',
+      'copy:frontend',
+      'scripts',
+      'less:deploy',
+      'postcss:deploy',
+      'copy:deploy',
+      'copy:deploy_audio',
+      'copy:deploy_favicon',
+      'includereplace:deploy_index',
+      'includereplace:deploy_auth',
+      'includereplace:deploy_login',
+      'includereplace:deploy_demo',
+      'concat:dev',
+      'copy:aws'
+    );
+  });
+
+  grunt.registerTask('build_dev_script', () => {
+    grunt.task.run('scripts', 'copy:deploy', 'concat:dev', 'copy:aws');
+  });
+
+  grunt.registerTask('build_dev_style', () => {
+    grunt.task.run('less:deploy', 'postcss:deploy', 'copy:deploy', 'copy:aws');
+  });
+
+  grunt.registerTask('build_dev_markup', () => {
+    grunt.task.run(
+      'includereplace:deploy_index',
+      'includereplace:deploy_auth',
+      'includereplace:deploy_login',
+      'includereplace:deploy_demo',
+      'copy:aws'
+    );
   });
 
   // Test Related
   grunt.registerTask('test', () =>
-    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])
+    grunt.task.run(['clean:docs_coverage', 'scripts', 'build_dev', 'test_prepare', 'karma:test'])
   );
 
   grunt.registerTask('npmWebpack', function() {
@@ -150,8 +188,6 @@ module.exports = grunt => {
 
     grunt.config('karma.options.files', files);
   });
-
-  grunt.registerTask('test_init', ['prepare_dist']);
 
   grunt.registerTask('test_run', testName => {
     grunt.config('karma.options.reporters', ['spec']);
