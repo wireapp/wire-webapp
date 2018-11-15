@@ -342,7 +342,7 @@ z.user.UserRepository = class UserRepository {
    * @param {string} userId - User ID
    * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
    */
-  fetchUserById(userId) {
+  _fetchUserById(userId) {
     return this.user_service
       .getUser(userId)
       .then(response => (response ? this.user_mapper.mapUserFromJson(response) : undefined))
@@ -471,7 +471,7 @@ z.user.UserRepository = class UserRepository {
       .catch(error => {
         const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
-          return this.fetchUserById(user_id);
+          return this._fetchUserById(user_id);
         }
         throw error;
       })
