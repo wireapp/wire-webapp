@@ -68,7 +68,7 @@ const RedirectRoutes = (config: ServerConfig) => [
     return res.send(config.COMMIT);
   }),
   router.get('/version/?', (req, res) => {
-    return res.contentType('application/json; charset=UTF-8').send(`{"version": "${config.CLIENT.VERSION}"}`);
+    return res.json({version: config.CLIENT.VERSION});
   }),
 ];
 
