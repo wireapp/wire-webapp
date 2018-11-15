@@ -486,7 +486,7 @@ z.user.UserRepository = class UserRepository {
 
   get_user_id_by_handle(handle) {
     return this.user_service
-      .getUsersHandles(handle.toLowerCase())
+      .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
         if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
@@ -724,7 +724,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<string>} A list with usernames that are not taken.
    */
   verify_usernames(usernames) {
-    return this.user_service.headUsersHandles(usernames);
+    return this.user_service.checkUserHandles(usernames);
   }
 
   /**
@@ -734,7 +734,7 @@ z.user.UserRepository = class UserRepository {
    */
   verify_username(username) {
     return this.user_service
-      .postUsersHandles(username)
+      .checkUserHandle(username)
       .catch(({code: error_code}) => {
         if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;

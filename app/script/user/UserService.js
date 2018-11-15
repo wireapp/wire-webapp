@@ -126,14 +126,14 @@ z.user.UserService = class UserService {
    * @param {string} username - Username
    * @returns {Promise} Resolves with backend response.
    */
-  headUsersHandles(username) {
+  checkUserHandle(username) {
     return this.backendClient.sendRequest({
       type: 'HEAD',
       url: `${UserService.URL.USERS}/handles/${username}`,
     });
   }
 
-  getUsersHandles(username) {
+  getUserByHandle(username) {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${UserService.URL.USERS}/handles/${username}`,
@@ -150,7 +150,7 @@ z.user.UserService = class UserService {
    * @param {number} amount - amount of usernames to return
    * @returns {Promise} Resolves with backend response.
    */
-  postUsersHandles(usernames, amount = 1) {
+  checkUserHandles(usernames, amount = 1) {
     return this.backendClient.sendJson({
       data: {
         handles: usernames,
