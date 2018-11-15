@@ -25,7 +25,6 @@ window.z.ui = z.ui || {};
 z.ui.WindowHandler = class WindowHandler {
   constructor() {
     this.init = this.init.bind(this);
-    this._listenToWindowResize = this._listenToWindowResize.bind(this);
     this.logger = new z.util.Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
 
     this.height = 0;
@@ -40,7 +39,6 @@ z.ui.WindowHandler = class WindowHandler {
     this.width = $(window).width();
     this.height = $(window).height();
     this._listenToUnhandledPromiseRejection();
-    this._listenToWindowResize();
 
     document.addEventListener('visibilitychange', () => {
       const isVisible = document.visibilityState === 'visible';
@@ -48,22 +46,6 @@ z.ui.WindowHandler = class WindowHandler {
     });
 
     return this;
-  }
-
-  _listenToWindowResize() {
-    $(window).on('resize', () => {
-      const currentHeight = $(window).height();
-      const currentWidth = $(window).width();
-
-      const changeInWidth = this.width - currentWidth;
-      const changeInHeight = this.height - currentHeight;
-
-      amplify.publish(z.event.WebApp.WINDOW.RESIZE.WIDTH, changeInWidth);
-      amplify.publish(z.event.WebApp.WINDOW.RESIZE.HEIGHT, changeInHeight);
-
-      this.width = currentWidth;
-      this.height = currentHeight;
-    });
   }
 
   _listenToUnhandledPromiseRejection() {

@@ -437,7 +437,6 @@ z.string.ro.preferencesAVMicrophone = 'Microfon';
 z.string.ro.preferencesAVPermissionDetail = 'Activează din preferințele browserului';
 z.string.ro.preferencesAVSpeakers = 'Difuzoare';
 
-z.string.ro.preferencesDevicesActivatedIn = 'în {{location}}';
 z.string.ro.preferencesDevicesActivatedOn = 'Activat la {{date}}';
 z.string.ro.preferencesDevicesActive = 'Activ';
 z.string.ro.preferencesDevicesActiveDetail = 'Dacă nu recunoști un dispozitiv de mai sus, elimină-l și resetează parola.';

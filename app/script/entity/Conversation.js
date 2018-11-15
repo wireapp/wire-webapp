@@ -116,26 +116,27 @@ z.entity.Conversation = class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
+      const NOTIIFCATION_STATE = z.conversation.NotificationSetting.STATE;
       if (!this.selfUser()) {
-        return z.conversation.NotificationSetting.STATE.NOTHING;
+        return NOTIIFCATION_STATE.NOTHING;
       }
 
-      const knownNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
+      const knownNotificationStates = Object.values(NOTIIFCATION_STATE);
       if (knownNotificationStates.includes(this.mutedState())) {
-        const isStateOnlyMentions = this.mutedState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
-        const isInvalidState = isStateOnlyMentions && !this.selfUser().inTeam();
+        const isStateMentionsAndReplies = this.mutedState() === NOTIIFCATION_STATE.MENTIONS_AND_REPLIES;
+        const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
 
-        return isInvalidState ? z.conversation.NotificationSetting.STATE.NOTHING : this.mutedState();
+        return isInvalidState ? NOTIIFCATION_STATE.NOTHING : this.mutedState();
       }
 
       if (typeof this.mutedState() === 'boolean') {
         const migratedMutedState = this.selfUser().inTeam()
-          ? z.conversation.NotificationSetting.STATE.ONLY_MENTIONS
-          : z.conversation.NotificationSetting.STATE.NOTHING;
-        return this.mutedState() ? migratedMutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
+          ? NOTIIFCATION_STATE.MENTIONS_AND_REPLIES
+          : NOTIIFCATION_STATE.NOTHING;
+        return this.mutedState() ? migratedMutedState : NOTIIFCATION_STATE.EVERYTHING;
       }
 
-      return z.conversation.NotificationSetting.STATE.EVERYTHING;
+      return NOTIIFCATION_STATE.EVERYTHING;
     });
 
     this.is_archived = this.archivedState;
@@ -157,8 +158,8 @@ z.entity.Conversation = class Conversation {
     this.showNotificationsNothing = ko.pureComputed(() => {
       return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
     });
-    this.showNotificationsOnlyMentions = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.ONLY_MENTIONS;
+    this.showNotificationsMentionsAndReplies = ko.pureComputed(() => {
+      return this.notificationState() === z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES;
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -205,6 +206,7 @@ z.entity.Conversation = class Conversation {
         otherMessages: [],
         pings: [],
         selfMentions: [],
+        selfReplies: [],
       };
 
       for (let index = this.messages().length - 1; index >= 0; index--) {
@@ -218,14 +220,17 @@ z.entity.Conversation = class Conversation {
           const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
-          const isSelfMention = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
+          const isSelfMentioned = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
+          const isSelfQuoted = isMessage && this.selfUser() && messageEntity.isUserQuoted(this.selfUser().id);
 
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity);
           }
 
-          if (isSelfMention) {
+          if (isSelfMentioned) {
             unreadState.selfMentions.push(messageEntity);
+          } else if (isSelfQuoted) {
+            unreadState.selfReplies.push(messageEntity);
           } else if (isMissedCall) {
             unreadState.calls.push(messageEntity);
           } else if (isPing) {
@@ -380,7 +385,7 @@ z.entity.Conversation = class Conversation {
    * Adds a single message to the conversation.
    * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
    * @param {boolean} replaceDuplicate - If a duplicate (or a message that should be replaced) already exists, replace it with the new entity.
-   * @returns {undefined} No return value.
+   * @returns {z.entity.Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
    */
   add_message(messageEntity, replaceDuplicate = false) {
     if (messageEntity) {
@@ -390,11 +395,14 @@ z.entity.Conversation = class Conversation {
       this.update_timestamps(messageEntity);
       if (entityToReplace) {
         if (replaceDuplicate) {
+          if (messageEntity.is_content()) {
+            messageEntity.quote(entityToReplace.quote());
+          }
           const duplicateIndex = this.messages_unordered.indexOf(entityToReplace);
           this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
         }
         // The duplicated message has been treated (either replaced or ignored). Our job here is done.
-        return;
+        return entityToReplace;
       }
       this.messages_unordered.push(messageEntity);
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
@@ -508,16 +516,18 @@ z.entity.Conversation = class Conversation {
 
     const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
 
-    if (this.showNotificationsOnlyMentions()) {
-      return this.unreadState().selfMentions.some(isNewerMessage);
+    const {allEvents, allMessages, selfMentions, selfReplies} = this.unreadState();
+    if (this.showNotificationsMentionsAndReplies()) {
+      const mentionsAndReplies = selfMentions.concat(selfReplies);
+      return mentionsAndReplies.some(isNewerMessage);
     }
 
-    const hasNewMessage = this.unreadState().allMessages.some(isNewerMessage);
+    const hasNewMessage = allMessages.some(isNewerMessage);
     if (hasNewMessage) {
       return true;
     }
 
-    return this.unreadState().allEvents.some(messageEntity => {
+    return allEvents.some(messageEntity => {
       if (!isNewerMessage(messageEntity)) {
         return false;
       }
@@ -660,15 +670,13 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Get a message by it's unique ID.
-   * @param {string} id - ID of message to be retrieved
+   * Only lookup in the loaded message list which is a limited view of all the messages in DB.
+   *
+   * @param {string} messageId - ID of message to be retrieved
    * @returns {z.entity.Message|undefined} Message with ID or undefined
    */
-  get_message_by_id(id) {
-    for (const message_et of this.messages()) {
-      if (message_et.id === id) {
-        return message_et;
-      }
-    }
+  getMessage(messageId) {
+    return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
 
   /**

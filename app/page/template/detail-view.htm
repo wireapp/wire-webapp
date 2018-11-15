@@ -12,28 +12,22 @@
         <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
-        <!-- ko if: messageEntity().is_downloadable() -->
-          <span class="detail-view-action-button" data-bind="click: clickOnDownload" data-uie-name="do-download-fullscreen-picture">
-            <span class="icon-download"></span>
-            <span data-bind="l10n_text: z.string.conversationContextMenuDownload"></span>
-          </span>
-        <!-- /ko -->
         <!-- ko if: messageEntity().is_reactable() && !conversationEntity().removed_from_conversation() -->
           <span class="detail-view-action-button" data-bind="click: clickOnLike" data-uie-name="do-like-fullscreen-picture">
             <span data-bind="css: messageEntity().is_liked() ? 'icon-liked text-red' : 'icon-like'"></span>
             <span data-bind="l10n_text: z.string.conversationContextMenuLike"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: messageEntity().is_deletable() -->
-          <span class="detail-view-action-button" data-bind="click: clickOnDelete" data-uie-name="do-delete-fullscreen-picture">
-            <span class="icon-delete-for-me"></span>
-            <span data-bind="l10n_text: z.string.conversationContextMenuDelete"></span>
+        <!-- ko if: messageEntity().isReplyable() && !conversationEntity().removed_from_conversation() -->
+          <span class="detail-view-action-button" data-bind="click: clickOnReply" data-uie-name="do-reply-fullscreen-picture">
+            <reply-icon></reply-icon>
+            <span data-bind="l10n_text: z.string.conversationContextMenuReply"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: messageEntity().user().is_me && messageEntity().status() !== z.message.StatusType.SENDING && !conversationEntity().removed_from_conversation() -->
-          <span class="detail-view-action-button" data-bind="click: clickOnDeleteForEveryone" data-uie-name="do-delete-everywhere-fullscreen-picture">
-            <span class="icon-delete-for-everyone"></span>
-            <span data-bind="l10n_text: z.string.conversationContextMenuDeleteEveryone"></span>
+        <!-- ko if: messageEntity().is_downloadable() -->
+          <span class="detail-view-action-button" data-bind="click: clickOnDownload" data-uie-name="do-download-fullscreen-picture">
+            <span class="icon-download"></span>
+            <span data-bind="l10n_text: z.string.conversationContextMenuDownload"></span>
           </span>
         <!-- /ko -->
       </footer>

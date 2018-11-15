@@ -374,6 +374,7 @@ z.string.conversationContextMenuDelete = 'Delete for Me…';
 z.string.conversationContextMenuDeleteEveryone = 'Delete for Everyone…';
 z.string.conversationContextMenuDownload = 'Download';
 z.string.conversationContextMenuLike = 'Like';
+z.string.conversationContextMenuReply = 'Reply';
 z.string.conversationContextMenuUnlike = 'Unlike';
 z.string.conversationDeleteTimestamp = 'Deleted: {{date}}';
 z.string.conversationEditTimestamp = 'Edited: {{date}}';
@@ -445,6 +446,8 @@ z.string.conversationsSecondaryLineEphemeralMention = 'Mentioned you';
 z.string.conversationsSecondaryLineEphemeralMentionGroup = 'Someone mentioned you';
 z.string.conversationsSecondaryLineEphemeralMessage = 'Sent a message';
 z.string.conversationsSecondaryLineEphemeralMessageGroup = 'Someone sent a message';
+z.string.conversationsSecondaryLineEphemeralReply = 'Replied to you';
+z.string.conversationsSecondaryLineEphemeralReplyGroup = 'Someone replied to you';
 z.string.conversationsSecondaryLineIncomingCall = '{{user}} is calling';
 z.string.conversationsSecondaryLinePeopleLeft = '{{number}} people left';
 z.string.conversationsSecondaryLinePersonLeft = '{{user}} left';
@@ -462,7 +465,9 @@ z.string.conversationsSecondaryLineSummaryMentions = '{{number}} mentions';
 z.string.conversationsSecondaryLineSummaryMissedCall = '{{number}} missed call';
 z.string.conversationsSecondaryLineSummaryMissedCalls = '{{number}} missed calls';
 z.string.conversationsSecondaryLineSummaryPing = '{{number}} ping';
-z.string.conversationsSecondaryLineSummaryPings = '{{number}} pings';
+z.string.conversationsSecondaryLineSummaryPings = '{{number}} pings'
+z.string.conversationsSecondaryLineSummaryReply = '{{number}} reply';
+z.string.conversationsSecondaryLineSummaryReplies = '{{number}} replies';
 z.string.conversationsSecondaryLineYouLeft = 'You left';
 z.string.conversationsSecondaryLineYouWereRemoved = 'You were removed';
 
@@ -557,9 +562,9 @@ z.string.guestOptionsTitle = 'Guests and services';
 
 // Panel: Notifications
 z.string.notificationSettingsTitle = 'Notifications';
-z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when you are mentioned.';
+z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when someone mentions you or replies to one of your messages.';
 z.string.notificationSettingsEverything = 'Everything';
-z.string.notificationSettingsOnlyMentions = 'Only mentions';
+z.string.notificationSettingsMentionsAndReplies = 'Mentions and replies';
 z.string.notificationSettingsNothing = 'Nothing';
 
 // Panel: Timed messages
@@ -802,12 +807,14 @@ z.string.notificationMemberJoinMany = '{{user}} added {{number}} people to the c
 z.string.notificationMemberJoinSelf = '{{user}} joined the conversation';
 z.string.notificationMemberJoinOne = '{{user1}} added {{user2}} to the conversation';
 z.string.notificationMemberLeaveRemovedYou = '{{user}} removed you from the conversation';
-z.string.notificationMention = 'New mention:';
+z.string.notificationMention = 'Mention: {{text}}';
 z.string.notificationObfuscated = 'Sent a message';
 z.string.notificationObfuscatedMention = 'Mentioned you';
+z.string.notificationObfuscatedReply = 'Replied to you';
 z.string.notificationObfuscatedTitle = 'Someone';
 z.string.notificationPing = 'Pinged';
 z.string.notificationReaction = '{{reaction}} your message';
+z.string.notificationReply = 'Reply: {{text}}';
 z.string.notificationSharedAudio = 'Shared an audio message';
 z.string.notificationSharedFile = 'Shared a file';
 z.string.notificationSharedLocation = 'Shared a location';
@@ -874,3 +881,11 @@ z.string.ephemeralUnitsWeeks = 'weeks';
 z.string.ephemeralUnitsYear = 'year';
 z.string.ephemeralUnitsYears = 'years';
 z.string.ephemeralRemaining = 'remaining';
+
+// Replies
+z.string.replyAudioMessage = 'Audio Message';
+z.string.replyQuoteError = 'You cannot see this message.';
+z.string.replyQuoteShowMore = 'Show more';
+z.string.replyQuoteShowLess = 'Show less';
+z.string.replyQuoteTimeStampDate = 'Original message from {{date}}';
+z.string.replyQuoteTimeStampTime = 'Original message from {{time}}'

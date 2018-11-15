@@ -53,8 +53,9 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
       this.preview_subscription = this.asset.preview_resource.subscribe(this._load_video_preview.bind(this));
     }
 
-    this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
+    this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
+    this.displaySmall = ko.observable(!!params.isQuote);
   }
 
   _load_video_preview() {
@@ -79,7 +80,8 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     this.logger.error('Video cannot be played', jquery_event);
   }
 
-  on_play_button_clicked() {
+  onPlayButtonClicked() {
+    this.displaySmall(false);
     if (this.video_src()) {
       if (this.video_element) {
         this.video_element.play();
@@ -119,7 +121,11 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 ko.components.register('video-asset', {
   template: `
     <!-- ko ifnot: message.isObfuscated() -->
-      <div class="video-asset-container" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}" data-uie-name="video-asset">
+      <div class="video-asset-container" 
+        data-bind="hide_controls: 2000, 
+                   attr: {'data-uie-value': asset.file_name}, 
+                   css: {'video-asset-container--small': displaySmall()}" 
+        data-uie-name="video-asset">
         <video playsinline
                data-bind="attr: {src: video_src},
                           css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
@@ -139,15 +145,25 @@ ko.components.register('video-asset', {
               </div>
             </div>
           <!-- /ko -->
+
           <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
             <div class="video-controls-center">
-              <media-button params="src: video_element,
-                                    large: true,
-                                    asset: asset,
-                                    play: on_play_button_clicked,
-                                    pause: on_pause_button_clicked,
-                                    cancel: function() {asset.cancel($parents[1])}">
-              </media-button>
+              <!-- ko if: displaySmall() -->
+                <media-button params="src: video_element,
+                                      large: false,
+                                      asset: asset,
+                                      play: onPlayButtonClicked">
+                </media-button>
+              <!-- /ko -->           
+              <!-- ko ifnot: displaySmall() -->
+                <media-button params="src: video_element,
+                                      large: true,
+                                      asset: asset,
+                                      play: onPlayButtonClicked,
+                                      pause: on_pause_button_clicked,
+                                      cancel: () => asset.cancel($parents[1])">
+                </media-button>
+              <!-- /ko -->
             </div>
             <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
               <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
@@ -156,6 +172,7 @@ ko.components.register('video-asset', {
           <!-- /ko -->
         <!-- /ko -->
       </div>
+      <div class="video-asset-container__sizer"></div>
     <!-- /ko -->
   `,
   viewModel: {

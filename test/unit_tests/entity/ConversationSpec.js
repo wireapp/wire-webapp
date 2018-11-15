@@ -926,7 +926,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.ONLY_MENTIONS);
+      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -1060,7 +1060,7 @@ describe('Conversation', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-      conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
+      conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
@@ -1075,16 +1075,16 @@ describe('Conversation', () => {
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(true);
 
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-      conversationEntity.mutedState(NOTIFICATION_STATES.ONLY_MENTIONS);
+      conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
 
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.ONLY_MENTIONS);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);

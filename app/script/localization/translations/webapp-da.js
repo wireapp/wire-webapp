@@ -96,7 +96,7 @@ z.string.da.callJoin = 'Deltag';
 z.string.da.callChooseSharedScreen = 'Vælg en skærm som du vil dele';
 z.string.da.callParticipants = '{{number}} i samtalen';
 
-z.string.da.videoCallOverlayMute = 'Lyd fra';
+z.string.da.videoCallOverlayMute = 'Stum samtale';
 z.string.da.videoCallOverlayHangUp = 'Læg På';
 
 z.string.da.modalAcknowledgeAction = 'Ok';
@@ -513,7 +513,6 @@ z.string.da.preferencesAVPermissionDetail = 'Aktivér fra din browser indstillin
 z.string.da.preferencesAVSpeakers = 'Højtalere';
 z.string.da.preferencesAVTryAgain = 'Prøv Igen';
 
-z.string.da.preferencesDevicesActivatedIn = 'i {{location}}';
 z.string.da.preferencesDevicesActivatedOn = 'Aktiveret på {{date}}';
 z.string.da.preferencesDevicesActive = 'Aktiv';
 z.string.da.preferencesDevicesActiveDetail = 'Hvis du ikke kan genkende en enhed ovenfor, fjern den og nulstil din adgangskode.';

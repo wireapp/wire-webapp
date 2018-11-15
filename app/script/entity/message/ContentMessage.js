@@ -39,6 +39,8 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
         .join(', ');
     });
 
+    this.quote = ko.observable();
+
     this.display_edited_timestamp = () => {
       return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
     };
@@ -108,10 +110,30 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     }
   }
 
+  /**
+   * @param {string} userId - The user id to check
+   * @returns {boolean} True if the message mentions the user.
+   */
   isUserMentioned(userId) {
     return this.has_asset_text()
       ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isUserMentioned(userId))
       : false;
+  }
+
+  /**
+   * @param {string} userId - The user id to check
+   * @returns {boolean} True if the message quotes the user.
+   */
+  isUserQuoted(userId) {
+    return this.quote() ? this.quote().isQuoteFromUser(userId) : false;
+  }
+
+  /**
+   * @param {string} userId - The user id to check
+   * @returns {boolean} True if the user was mentioned or quoted.
+   */
+  isUserTargeted(userId) {
+    return this.isUserMentioned(userId) || this.isUserQuoted(userId);
   }
 
   /**

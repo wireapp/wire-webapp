@@ -28,34 +28,52 @@ z.conversation.ConversationCellState = (() => {
     MENTION: 'ConversationCellState.ACTIVITY_TYPE.MENTION',
     MESSAGE: 'ConversationCellState.ACTIVITY_TYPE.MESSAGE',
     PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
+    REPLY: 'ConversationCellState.ACTIVITY_TYPE.REPLY',
   };
 
-  const _accumulateSummary = (conversationEntity, prioritizeSelfMention) => {
+  const _accumulateSummary = (conversationEntity, prioritizeMentionAndReply) => {
     const {
       calls: unreadCalls,
       otherMessages: unreadOtherMessages,
       pings: unreadPings,
       selfMentions: unreadSelfMentions,
+      selfReplies: unreadSelfReplies,
     } = conversationEntity.unreadState();
 
-    // sorted in order of priority
+    // Sorted in order of alert type priority
     const activities = {
       [ACTIVITY_TYPE.MENTION]: unreadSelfMentions.length,
+      [ACTIVITY_TYPE.REPLY]: unreadSelfReplies.length,
       [ACTIVITY_TYPE.CALL]: unreadCalls.length,
       [ACTIVITY_TYPE.PING]: unreadPings.length,
       [ACTIVITY_TYPE.MESSAGE]: unreadOtherMessages.length,
     };
 
-    if (prioritizeSelfMention && activities[ACTIVITY_TYPE.MENTION] === 1) {
-      const numberOfAlerts = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+    const alertCount = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+    const hasSingleAlert = alertCount === 1;
+    const hasOnlyReplies = activities[ACTIVITY_TYPE.REPLY] > 0 && alertCount === activities[ACTIVITY_TYPE.REPLY];
 
-      if (numberOfAlerts === 1) {
-        const [messageEntity] = unreadSelfMentions;
+    if (prioritizeMentionAndReply && (hasSingleAlert || hasOnlyReplies)) {
+      const hasSingleMention = activities[ACTIVITY_TYPE.MENTION] === 1;
+
+      if (hasSingleMention || hasOnlyReplies) {
+        const [mentionMessageEntity] = unreadSelfMentions;
+        const [replyMessageEntity] = unreadSelfReplies;
+        const messageEntity = mentionMessageEntity || replyMessageEntity;
 
         if (messageEntity.is_ephemeral()) {
-          const stringId = conversationEntity.isGroup()
-            ? z.string.conversationsSecondaryLineEphemeralMentionGroup
-            : z.string.conversationsSecondaryLineEphemeralMention;
+          let stringId;
+
+          if (hasSingleMention) {
+            stringId = conversationEntity.isGroup()
+              ? z.string.conversationsSecondaryLineEphemeralMentionGroup
+              : z.string.conversationsSecondaryLineEphemeralMention;
+          } else {
+            stringId = conversationEntity.isGroup()
+              ? z.string.conversationsSecondaryLineEphemeralReplyGroup
+              : z.string.conversationsSecondaryLineEphemeralReply;
+          }
+
           return z.l10n.text(stringId);
         }
 
@@ -104,6 +122,13 @@ z.conversation.ConversationCellState = (() => {
               break;
             }
 
+            case ACTIVITY_TYPE.REPLY: {
+              stringId = activityCountIsOne
+                ? z.string.conversationsSecondaryLineSummaryReply
+                : z.string.conversationsSecondaryLineSummaryReplies;
+              break;
+            }
+
             default:
               throw new z.error.ConversationError();
           }
@@ -122,10 +147,15 @@ z.conversation.ConversationCellState = (() => {
         calls: unreadCalls,
         pings: unreadPings,
         selfMentions: unreadSelfMentions,
+        selfReplies: unreadSelfReplies,
       } = conversationEntity.unreadState();
 
       if (unreadSelfMentions.length) {
         return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+      }
+
+      if (unreadSelfReplies.length) {
+        return z.conversation.ConversationStatusIcon.UNREAD_REPLY;
       }
 
       if (unreadCalls.length) {
@@ -141,8 +171,16 @@ z.conversation.ConversationCellState = (() => {
         calls: unreadCalls,
         pings: unreadPings,
         selfMentions: unreadSelfMentions,
+        selfReplies: unreadSelfReplies,
       } = conversationEntity.unreadState();
-      return unreadCalls.length || unreadPings.length || unreadSelfMentions.length;
+
+      const hasUnreadActivities =
+        unreadCalls.length > 0 ||
+        unreadPings.length > 0 ||
+        unreadSelfMentions.length > 0 ||
+        unreadSelfReplies.length > 0;
+
+      return hasUnreadActivities;
     },
   };
 
@@ -153,9 +191,9 @@ z.conversation.ConversationCellState = (() => {
     },
     icon: () => z.conversation.ConversationStatusIcon.NONE,
     match: conversationEntity => {
-      if (conversationEntity.call()) {
-        return conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined();
-      }
+      return conversationEntity.call()
+        ? conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined()
+        : false;
     },
   };
 
@@ -243,15 +281,23 @@ z.conversation.ConversationCellState = (() => {
 
   const _getStateMuted = {
     description: conversationEntity => {
-      return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsOnlyMentions());
+      return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsMentionsAndReplies());
     },
     icon: conversationEntity => {
-      const hasSelfMentions = conversationEntity.unreadState().selfMentions.length;
-      const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsOnlyMentions();
+      const hasSelfMentions = conversationEntity.unreadState().selfMentions.length > 0;
+      const hasSelfReplies = conversationEntity.unreadState().selfReplies.length > 0;
+      const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsMentionsAndReplies();
+      const showRepliesIcon = hasSelfReplies && conversationEntity.showNotificationsMentionsAndReplies();
 
-      return showMentionsIcon
-        ? z.conversation.ConversationStatusIcon.UNREAD_MENTION
-        : z.conversation.ConversationStatusIcon.MUTED;
+      if (showMentionsIcon) {
+        return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+      }
+
+      if (showRepliesIcon) {
+        return z.conversation.ConversationStatusIcon.UNREAD_REPLY;
+      }
+
+      return z.conversation.ConversationStatusIcon.MUTED;
     },
     match: conversationEntity => !conversationEntity.showNotificationsEverything(),
   };

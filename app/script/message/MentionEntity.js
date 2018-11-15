@@ -44,9 +44,9 @@ z.message.MentionEntity = class MentionEntity {
     this.userId = userId;
   }
 
-  targetsUser(selfId) {
+  targetsUser(userId) {
     const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-    return isTypeUserId && this.userId === selfId;
+    return isTypeUserId && this.userId === userId;
   }
 
   // Index of first char outside of mention

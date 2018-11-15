@@ -32,4 +32,5 @@ z.conversation.ConversationStatusIcon = {
   UNREAD_MENTION: 'mention',
   UNREAD_MESSAGES: 'messages',
   UNREAD_PING: 'ping',
+  UNREAD_REPLY: 'reply',
 };

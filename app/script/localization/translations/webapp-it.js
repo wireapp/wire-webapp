@@ -404,7 +404,6 @@ z.string.it.preferencesAVMicrophone = 'Microfono';
 z.string.it.preferencesAVPermissionDetail = 'Attiva dalle tue preferenze di browser';
 z.string.it.preferencesAVSpeakers = 'Altoparlanti';
 
-z.string.it.preferencesDevicesActivatedIn = 'a {{location}}';
 z.string.it.preferencesDevicesActivatedOn = 'Attivato il {{date}}';
 z.string.it.preferencesDevicesActive = 'Attivi';
 z.string.it.preferencesDevicesActiveDetail = 'Se non riconosci un dispositivo qui sopra, rimuovilo e reimposta la password.';

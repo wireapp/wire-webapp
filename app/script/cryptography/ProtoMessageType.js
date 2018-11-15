@@ -33,5 +33,6 @@ z.cryptography.PROTO_MESSAGE_TYPE = {
   LINK_PREVIEWS: 'link_preview',
   MENTION_TYPE_USER_ID: 'user_id',
   MENTIONS: 'mentions',
+  QUOTE: 'quote',
   TWEET: 'tweet',
 };

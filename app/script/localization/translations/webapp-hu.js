@@ -534,7 +534,6 @@ z.string.hu.preferencesAVPermissionDetail = 'Engedélyezze a böngésző Beáll�
 z.string.hu.preferencesAVSpeakers = 'Hangszórók';
 z.string.hu.preferencesAVTryAgain = 'Próbáld újra';
 
-z.string.hu.preferencesDevicesActivatedIn = 'itt: {{location}}';
 z.string.hu.preferencesDevicesActivatedOn = 'Legutóbb aktiválva: {{date}}';
 z.string.hu.preferencesDevicesActive = 'Aktív';
 z.string.hu.preferencesDevicesActiveDetail = 'Ha a fenti eszközök közül valamelyik nem ismerős, akkor töröld azt és változtass jelszót.';

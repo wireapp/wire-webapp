@@ -29,8 +29,8 @@ ko.components.register('add-participants-icon', {
 
 ko.components.register('archive-icon', {
   template: `
-  <svg width="16" height="14" viewBox="0 0 16 14">
-    <path d="M0 10h6v2h4v-2h6v4H0v-4zm0-6h6v2h4V4h6v4H0V4zm16-4v2H0V0h16z"></path>
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M1 7h14v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7zm6 2a1 1 0 1 0 0 2h2a1 1 0 0 0 0-2H7zM2.5 0h11c.8 0 1.2 0 1.5.3.3.1.6.4.7.7.2.3.3.7.3 1.5V4c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V2.5C0 1.7 0 1.3.3 1 .4.7.7.4 1 .3c.3-.2.7-.3 1.5-.3z"></path>
   </svg>
   `,
 });
@@ -47,6 +47,14 @@ ko.components.register('attachment-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
     <path d="M1.63 7.7l4.74-4.78a3.33 3.33 0 0 1 4.73 0 3.4 3.4 0 0 1 0 4.78L9.75 9.07l-4.4 4.43a1.9 1.9 0 0 1-2.7 0 1.94 1.94 0 0 1 0-2.73L4 9.41l4.4-4.45a.47.47 0 0 1 .68 0c.18.2.19.5 0 .69l-4.75 4.79a.97.97 0 0 0 0 1.36c.38.38.98.38 1.36 0l4.74-4.79c.94-.94.93-2.46 0-3.4a2.37 2.37 0 0 0-3.38-.01l-4.4 4.44-1.36 1.37a3.89 3.89 0 0 0 0 5.46 3.8 3.8 0 0 0 5.42 0l4.4-4.44 1.35-1.37a5.34 5.34 0 0 0 0-7.5 5.23 5.23 0 0 0-7.44 0L.28 6.32a.97.97 0 0 0 0 1.37c.37.38.98.38 1.35 0z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('audio-icon', {
+  template: `
+  <svg width="12" height="16" viewBox="0 0 12 16">
+    <path d="M10.5 12l1.4 1.4a8 8 0 0 1-11.9 0L1.4 12a6 6 0 0 0 9.1 0zM6 12a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4 4 4 0 0 1 4 4v4a4 4 0 0 1-4 4z"></path>
   </svg>
   `,
 });
@@ -211,6 +219,14 @@ ko.components.register('leave-icon', {
   `,
 });
 
+ko.components.register('location-icon', {
+  template: `
+  <svg width="12" height="16" viewBox="0 0 12 16">
+    <path d="M12 6c0 6-6 10-6 10S0 12 0 6a6 6 0 1 1 12 0zM6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('markdown-icon', {
   template: `
   <svg width="15" height="14" viewBox="0 0 15 14">
@@ -319,6 +335,14 @@ ko.components.register('profile-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('reply-icon', {
+  template: `
+  <svg width="16" height="15" viewBox="0 0 16 15">
+    <path d="M3.3 4h7.1C13.5 4 16 6.6 16 9.6c0 3-2.5 5.4-5.6 5.4H7a1 1 0 0 1 0-2h3.4c2 0 3.6-1.4 3.6-3.4S12.5 6 10.4 6h-7l2.4 2.4a1 1 0 0 1 0 1.3 1 1 0 0 1-1.4 0l-4.1-4a1 1 0 0 1-.2-.3 1 1 0 0 1 .2-1l4-4.1a1 1 0 0 1 1.5 0 1 1 0 0 1 0 1.3L3.3 4z"></path>
   </svg>
   `,
 });

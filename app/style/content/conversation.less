@@ -17,18 +17,6 @@
  *
  */
 
-@keyframes content-incoming {
-  0% {
-    opacity: 0;
-    transform: translate(24px, 0);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-}
-
 @keyframes loading-spinner-fade-in {
   0% {
     opacity: 0;
@@ -51,14 +39,23 @@
 .conversation-loading {
   .full-screen;
   .flex-center;
+  display: none;
 
   max-width: @conversation-max-width;
   animation-duration: 1s;
   animation-name: loading-spinner-fade-in;
+
+  .loading & {
+    display: flex;
+  }
 }
 
-.content-animation-incoming {
-  animation-duration: @animation-timing-slow;
-  animation-name: content-incoming;
-  animation-timing-function: @ease-out-expo;
+.conversation-title-bar,
+.message-list,
+.conversation-input-bar {
+  opacity: 1;
+
+  .loading & {
+    opacity: 0;
+  }
 }
