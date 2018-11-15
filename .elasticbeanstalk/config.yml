@@ -1,5 +1,5 @@
 branch-defaults:
-  self-hosting:
+  dev:
     environment: wire-webapp-dev
 deploy:
   artifact: aws/s3/ebs.zip

@@ -38,7 +38,7 @@ notifications:
 # http://docs.travis-ci.com/user/deployment/
 before_deploy:
   - echo -e "$TRAVIS_COMMIT" > ./aws/commit
-  - if [ "$TRAVIS_BRANCH" == "self-hosting" ]; then yarn deploy-travis; fi
+  - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn deploy-travis; fi
   - if [ "$TRAVIS_BRANCH" == "edge" ]; then yarn deploy-travis; fi
   - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn deploy-travis; fi
   - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn deploy-travis || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
