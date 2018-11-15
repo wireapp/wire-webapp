@@ -28,7 +28,6 @@ cache:
   yarn: true
   directories:
     - $HOME/cryptobox
-    - "node_modules"
 
 before_script:
   - npm rebuild node-sass
