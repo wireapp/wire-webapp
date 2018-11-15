@@ -75,7 +75,7 @@ deploy:
     bucket_name: wire-webapp-builds
     on:
       repo: wireapp/wire-webapp
-      branch: self-hosting
+      branch: dev
 
   # https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
