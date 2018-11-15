@@ -75,50 +75,6 @@ z.user.UserService = class UserService {
   //##############################################################################
 
   /**
-   * Initiate a password reset.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/beginPasswordReset
-   *
-   * @param {string} email - Email address
-   * @param {string} phoneNumber - E.164 formatted phone number
-   * @returns {Promise} Promise that resolves when password reset process has been triggered
-   */
-  postPasswordReset(email, phoneNumber) {
-    return this.backendClient.sendJson({
-      data: {
-        email: email,
-        phone: phoneNumber,
-      },
-      type: 'POST',
-      url: UserService.URL.PASSWORD_RESET,
-    });
-  }
-
-  /**
-   * Complete a password reset.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/completePasswordReset
-   *
-   * @param {string} code - Password reset code
-   * @param {string} newPassword - New password to be set
-   * @param {string} email - Email address
-   * @param {string} phoneNumber - E.164 formatted phone number
-   * @returns {Promise} Promise that resolves when password reset process has been triggered
-   */
-  postPasswordResetComplete(code, newPassword, email, phoneNumber) {
-    return this.backendClient.sendJson({
-      data: {
-        code: code,
-        email: email,
-        password: newPassword,
-        phone: phoneNumber,
-      },
-      type: 'POST',
-      url: `${UserService.URL.PASSWORD_RESET}/complete`,
-    });
-  }
-
-  /**
    * Check if a username exists.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
