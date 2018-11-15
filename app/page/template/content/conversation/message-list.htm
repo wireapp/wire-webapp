@@ -21,10 +21,10 @@
         <message params="
             message: message,
             conversation: $parent.conversation,
-            showAvatar: !$parent.should_hide_user_avatar(message),
-            showInvitePeople: $parent.showInvitePeople(),
+            shouldShowAvatar: !$parent.should_hide_user_avatar(message),
+            shouldShowInvitePeople: $parent.showInvitePeople(),
             selfId: $parent.selfUser().id,
-            isTemporaryGuest: $parent.selfUser().isTemporaryGuest(),
+            isSelfTemporaryGuest: $parent.selfUser().isTemporaryGuest(),
             isLastDeliveredMessage: $parent.is_last_delivered_message(message),
             conversationRepository: $parent.conversation_repository,
             locationRepository: $parent.locationRepository,

@@ -19,19 +19,16 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
 (() => {
   class Message {
     constructor({
       message,
       conversation,
       selfId,
-      isTemporaryGuest,
+      isSelfTemporaryGuest,
       isLastDeliveredMessage,
-      showAvatar,
-      showInvitePeople,
+      shouldShowAvatar,
+      shouldShowInvitePeople,
       onClickAvatar,
       onClickImage,
       onClickMessage,
@@ -47,10 +44,10 @@ window.z.components = z.components || {};
       this.message = message;
       this.conversation = conversation;
 
-      this.showAvatar = showAvatar;
-      this.showInvitePeople = showInvitePeople;
+      this.shouldShowAvatar = shouldShowAvatar;
+      this.shouldShowInvitePeople = shouldShowInvitePeople;
       this.selfId = selfId;
-      this.isTemporaryGuest = isTemporaryGuest;
+      this.isSelfTemporaryGuest = isSelfTemporaryGuest;
       this.isLastDeliveredMessage = isLastDeliveredMessage;
 
       this.onClickImage = onClickImage;
@@ -162,7 +159,7 @@ window.z.components = z.components || {};
   }
 
   const normalTemplate = `
-  <!-- ko if: showAvatar -->
+  <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
         <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
@@ -487,13 +484,13 @@ window.z.components = z.components || {};
     <!-- /ko -->
 
     <!-- ko if: message.isGroupCreation() -->
-      <!-- ko if: showInvitePeople -->
+      <!-- ko if: shouldShowInvitePeople -->
         <div class="message-member-footer">
           <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
           <div class="message-member-footer-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
         </div>
       <!-- /ko -->
-      <!-- ko if: isTemporaryGuest -->
+      <!-- ko if: isSelfTemporaryGuest -->
         <div class="message-member-footer">
           <div class="message-member-footer-message" data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
           <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
@@ -501,7 +498,7 @@ window.z.components = z.components || {};
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko if: message.isMemberLeave() && message.user().is_me && isTemporaryGuest -->
+    <!-- ko if: message.isMemberLeave() && message.user().is_me && isSelfTemporaryGuest -->
       <div class="message-member-footer">
         <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestLeaveDescription"></div>
       </div>
