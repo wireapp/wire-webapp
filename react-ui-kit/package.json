@@ -15,7 +15,7 @@
   "devDependencies": {
     "@babel/core": "7.1.6",
     "@babel/plugin-proposal-class-properties": "7.1.0",
-    "@babel/preset-env": "7.1.5",
+    "@babel/preset-env": "7.1.6",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
     "@types/recompose": "0.27.0",
