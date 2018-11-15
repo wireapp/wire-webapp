@@ -118,21 +118,6 @@ z.user.UserService = class UserService {
   }
 
   /**
-   * Get a user by ID.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
-   *
-   * @param {string} user_id - User ID
-   * @returns {Promise} Resolves with backend response.
-   */
-  getUser(user_id) {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${UserService.URL.USERS}/${user_id}`,
-    });
-  }
-
-  /**
    * Get a set of users.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
@@ -148,6 +133,21 @@ z.user.UserService = class UserService {
       },
       type: 'GET',
       url: UserService.URL.USERS,
+    });
+  }
+
+  /**
+   * Get a user by ID.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
+   *
+   * @param {string} userId - User ID
+   * @returns {Promise} Resolves with backend response.
+   */
+  getUser(userId) {
+    return this.backendClient.sendRequest({
+      type: 'GET',
+      url: `${UserService.URL.USERS}/${userId}`,
     });
   }
 };
