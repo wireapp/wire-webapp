@@ -34,6 +34,15 @@ z.user.UserMapper = class UserMapper {
   }
 
   /**
+   * Converts JSON user into user entity.
+   * @param {Object} userData - User data
+   * @returns {z.entity.User} Mapped user entity
+   */
+  mapUserFromJson(userData) {
+    return this.updateUserFromObject(new z.entity.User(), userData);
+  }
+
+  /**
    * Converts JSON self user into user entity.
    * @param {Object} userData - User data
    * @returns {z.entity.User} Mapped user entity
@@ -47,15 +56,6 @@ z.user.UserMapper = class UserMapper {
     }
 
     return userEntity;
-  }
-
-  /**
-   * Converts JSON user into user entity.
-   * @param {Object} userData - User data
-   * @returns {z.entity.User} Mapped user entity
-   */
-  mapUserFromJson(userData) {
-    return this.updateUserFromObject(new z.entity.User(), userData);
   }
 
   /**
