@@ -142,7 +142,7 @@
     "request": "2.88.0",
     "sinon": "7.1.1",
     "stylelint": "9.7.1",
-    "stylelint-config-idiomatic-order": "6.1.0",
+    "stylelint-config-idiomatic-order": "6.2.0",
     "stylelint-config-prettier": "4.0.0",
     "tslint": "5.11.0",
     "tslint-config-prettier": "1.15.0",
