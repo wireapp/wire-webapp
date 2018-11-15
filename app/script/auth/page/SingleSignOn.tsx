@@ -417,24 +417,23 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
                   <Muted>{_(ssoLoginStrings.subhead)}</Muted>
                   <Form style={{marginTop: 30}} data-uie-name="sso">
                     <InputSubmitCombo>
-                      {isSupportingClipboard() &&
-                        !code && (
-                          <Button
-                            style={{
-                              borderRadius: '4px',
-                              fontSize: '11px',
-                              lineHeight: '16px',
-                              margin: '0 0 0 12px',
-                              maxHeight: '32px',
-                              minWidth: '100px',
-                              padding: '0 12px',
-                            }}
-                            onClick={this.extractSSOLink}
-                            data-uie-name="do-paste-sso-code"
-                          >
-                            {_(ssoLoginStrings.pasteButton)}
-                          </Button>
-                        )}
+                      {isSupportingClipboard() && !code && (
+                        <Button
+                          style={{
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            lineHeight: '16px',
+                            margin: '0 0 0 12px',
+                            maxHeight: '32px',
+                            minWidth: '100px',
+                            padding: '0 12px',
+                          }}
+                          onClick={this.extractSSOLink}
+                          data-uie-name="do-paste-sso-code"
+                        >
+                          {_(ssoLoginStrings.pasteButton)}
+                        </Button>
+                      )}
                       <Input
                         name="sso-code"
                         tabIndex={1}
