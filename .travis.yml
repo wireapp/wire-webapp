@@ -23,7 +23,6 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 # https://docs.travis-ci.com/user/caching/
-# https://blog.travis-ci.com/2013-12-05-speed-up-your-builds-cache-your-dependencies
 cache:
   yarn: true
   directories:
