@@ -254,7 +254,10 @@
       "js": "dist/antiscroll-2.js"
     },
     "@bower_components/bazinga64": {
-      "js/": "dist/window/*.js"
+      "js/": [
+        "dist/window/*.js",
+        "dist/window/*.js.map"
+      ]
     },
     "@bower_components/bytebuffer": {
       "js": "dist/ByteBufferAB.js"
@@ -269,7 +272,10 @@
       ]
     },
     "@bower_components/dexie": {
-      "js": "dist/dexie.js"
+      "js": [
+        "dist/dexie.js",
+        "dist/dexie.js.map"
+      ]
     },
     "@bower_components/generic-message-proto": {
       "proto": "proto/messages.proto"
