@@ -25,10 +25,18 @@ export class Converter {
       if (typeof window === 'object' && 'TextDecoder' in window) {
         return new TextDecoder('utf-8').decode(arrayBufferView);
       }
-      return Array.from(arrayBufferView)
-        .map(char => String.fromCharCode(char))
-        .join('');
+      return Converter.arrayBufferViewToBaselineString(arrayBufferView);
     }
+  }
+
+  public static arrayBufferViewToBaselineString(arrayBufferView: Uint8Array): string {
+    // https://stackoverflow.com/questions/22747068/is-there-a-max-number-of-arguments-javascript-functions-can-accept/22747272#22747272
+    const chunkSize = 32000;
+    const array = Array.from(arrayBufferView);
+    const chunkCount = Math.ceil(array.length / chunkSize);
+    return Array.from({length: chunkCount}, (value, index) =>
+      String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize))
+    ).join('');
   }
 
   public static jsonToArrayBufferView(objectSource: {[key: number]: number}): Uint8Array {
@@ -124,9 +132,7 @@ export class Converter {
   }
 
   private static arrayBufferViewToString(arrayBufferView: Uint8Array): string {
-    const binaryString = Array.prototype.map
-      .call(arrayBufferView, (index: number) => String.fromCharCode(index))
-      .join('');
+    const binaryString = Converter.arrayBufferViewToBaselineString(arrayBufferView);
 
     const escapedString = binaryString.replace(/(.)/g, (match: string) => {
       const code = match
@@ -202,9 +208,7 @@ export class Encoder {
 
   private static fromByteArray(decoded: Uint8Array): string {
     if (typeof window === 'object') {
-      const decodedString = Array.from(decoded)
-        .map(char => String.fromCharCode(char))
-        .join('');
+      const decodedString = Converter.arrayBufferViewToBaselineString(decoded);
       return window.btoa(decodedString);
     }
 
