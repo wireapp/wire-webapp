@@ -32,5 +32,8 @@ module.exports = {
       'deploy/min/wire-login.min.js': ['<%= scripts.login %>'].concat('<%= scripts_minified.login %>'),
       'deploy/min/wire-vendor.min.js': ['<%= scripts.vendor %>'].concat('<%= scripts_minified.vendor %>'),
     },
+    options: {
+      sourceMap: true,
+    },
   },
 };
