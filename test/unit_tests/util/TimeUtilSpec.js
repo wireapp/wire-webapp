@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/TimeUtil
+// grunt test_run:util/TimeUtil
 
 'use strict';
 

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:message/MessageHasher
+// grunt test_run:message/MessageHasher
 
 'use strict';
 

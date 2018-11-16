@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:telemetry/calling/CallLogger
+// grunt test_run:telemetry/calling/CallLogger
 
 describe('z.telemetry.calling.CallLogger', () => {
   const callLogger = new z.telemetry.calling.CallLogger('test', null, {}, 'test');

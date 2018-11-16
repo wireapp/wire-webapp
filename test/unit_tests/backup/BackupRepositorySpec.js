@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:backup/BackupRepository
+// grunt test_run:backup/BackupRepository
 
 const noop = () => {};
 

@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:tracking/EventTrackingRepository
+// grunt test_run:tracking/EventTrackingRepository
 
 describe('z.tracking.EventTrackingRepository', () => {
   const test_factory = new TestFactory();

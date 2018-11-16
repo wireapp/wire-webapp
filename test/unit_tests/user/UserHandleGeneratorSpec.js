@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:user/UserHandleGenerator
+// grunt test_run:user/UserHandleGenerator
 
 'use strict';
 

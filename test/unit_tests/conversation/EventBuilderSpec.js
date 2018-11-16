@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/EventBuilder
+// grunt test_run:conversation/EventBuilder
 
 'use strict';
 

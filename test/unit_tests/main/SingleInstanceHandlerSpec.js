@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:main/SingleInstanceHandler
+// grunt test_run:main/SingleInstanceHandler
 
 describe('z.main.SingleInstanceHandler', () => {
   describe('registerInstance', () => {

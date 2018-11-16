@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:event/EventRepository
+// grunt test_run:event/EventRepository
 
 'use strict';
 

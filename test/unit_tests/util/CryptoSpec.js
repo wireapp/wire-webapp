@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/Crypto
+// grunt test_run:util/Crypto
 
 'use strict';
 

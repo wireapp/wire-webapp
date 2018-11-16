@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:calling/handler/MediaStreamHandler
+// grunt test_run:calling/handler/MediaStreamHandler
 
 window.wire = window.wire || {};
 window.wire.auth = wire.auth || {};

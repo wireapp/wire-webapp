@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/ConversationCellState
+// grunt test_run:conversation/ConversationCellState
 
 'use strict';
 

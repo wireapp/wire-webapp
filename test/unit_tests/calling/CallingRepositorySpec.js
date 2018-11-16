@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:calling/CallingRepository
+// grunt test_run:calling/CallingRepository
 
 describe('z.calling.CallingRepository', () => {
   const testFactory = new TestFactory();

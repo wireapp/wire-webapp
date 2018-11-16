@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/ConversationService
+// grunt test_run:conversation/ConversationService
 
 'use strict';
 

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:search/SearchRepository
+// grunt test_run:search/SearchRepository
 
 'use strict';
 
