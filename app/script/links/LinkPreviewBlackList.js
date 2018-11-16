@@ -23,9 +23,34 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewBlackList = (() => {
-  const BLACKLIST = ['soundcloud', 'spotify', 'youtu[.]?be', 'vimeo'];
+  const soundcloudStatic = [
+    'about',
+    'channels',
+    'charts',
+    'discover',
+    'discussion',
+    'featured',
+    'messages',
+    'mobile',
+    'pages',
+    'playlists',
+    'sets',
+    'settings',
+    'stream',
+    'terms-of-use',
+    'upload',
+    'videos',
+    'you',
+  ];
+  const BLACKLIST = [
+    `soundcloud.com/(?!(${soundcloudStatic.join('|')}))`,
+    'spotify.com/(?![A-z]{2}/)',
+    'youtu.be',
+    'youtube(-nocookie)?.com/watch',
+    'vimeo.com/(channels(/[^/]+)?/)?[0-9]+',
+  ];
 
   return {
-    isBlacklisted: url => RegExp(BLACKLIST.join('|')).test(url),
+    isBlacklisted: url => new RegExp(BLACKLIST.join('|')).test(url),
   };
 })();

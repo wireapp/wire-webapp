@@ -417,7 +417,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
 
-      it('doesn’t render user https://vimeo.com/user38597062', () => {
+      it("doesn't render user https://vimeo.com/user38597062", () => {
         const message = build_message_with_anchor('https://vimeo.com/user38597062');
 
         expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
