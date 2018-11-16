@@ -23,39 +23,46 @@
 
 describe('MediaEmbeds', () => {
   // Will test all common link variations
-  const test_link_variants = function(site, re) {
+  const test_link_variants = (site, re) => {
     expect(`http://${site}.com`.match(re)).toBe(null);
+    expect(`http://${site}.com/`.match(re)).toBe(null);
     expect(`https://${site}.com`.match(re)).toBe(null);
+    expect(`https://${site}.com/`.match(re)).toBe(null);
     expect(`${site}.com`.match(re)).toBe(null);
+    expect(`${site}.com/`.match(re)).toBe(null);
     expect(`http://m.${site}.com`.match(re)).toBe(null);
+    expect(`http://m.${site}.com/`.match(re)).toBe(null);
     expect(`https://m.${site}.com`.match(re)).toBe(null);
+    expect(`https://m.${site}.com/`.match(re)).toBe(null);
     expect(`m.${site}.com`.match(re)).toBe(null);
+    expect(`m.${site}.com/`.match(re)).toBe(null);
     expect(`www.${site}.com`.match(re)).toBe(null);
+    expect(`www.${site}.com/`.match(re)).toBe(null);
   };
 
   const build_message_with_anchor = link => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
-  const build_youtube_iframe = function(link) {
+  const build_youtube_iframe = link => {
     const embed_url = z.media.MediaEmbeds.generateYouTubeEmbedUrl(link);
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="${embed_url}" frameborder="0" allowfullscreen></iframe></div>`;
   };
 
-  const build_soundcloud_iframe_for_tracks = function(link) {
+  const build_soundcloud_iframe_for_tracks = link => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="soundcloud" width="100%" height="164" src="https://w.soundcloud.com/player/?url=${link}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true" frameborder="0"></iframe></div>`;
   };
 
-  const build_soundcloud_iframe_for_playlists = function(link) {
+  const build_soundcloud_iframe_for_playlists = link => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="soundcloud" width="100%" height="465" src="https://w.soundcloud.com/player/?url=${link}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true" frameborder="0"></iframe></div>`;
   };
 
-  const build_spotify_iframe = function(link, partial_link) {
+  const build_spotify_iframe = (link, partial_link) => {
     partial_link = partial_link.replace(/\//g, ':');
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(
       partial_link
     )}" frameborder="0"></iframe></div>`;
   };
 
-  const build_vimeo_iframe = function(link, id) {
+  const build_vimeo_iframe = (link, id) => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="vimeo" width="100%" height="100%" src="https://player.vimeo.com/video/${id}?portrait=0&color=333&badge=0" frameborder="0" allowfullscreen></iframe></div>`;
   };
 
