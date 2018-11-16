@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/PromiseQueue
+// grunt test_run:util/PromiseQueue
 
 'use strict';
 

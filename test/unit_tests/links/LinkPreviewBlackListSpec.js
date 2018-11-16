@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:links/LinkPreviewBlackList
+// grunt test_run:links/LinkPreviewBlackList
 
 describe('is_blacklisted', () => {
   it('should return true if link is youtu.be', () => {

@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:message/MentionEntity
+// grunt test_run:message/MentionEntity
 
 describe('MentionEntity', () => {
   const userId = '7bec1483-5b11-429d-9759-ec71369654b5';

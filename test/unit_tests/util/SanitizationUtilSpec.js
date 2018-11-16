@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/SanitizationUtil
+// grunt test_run:util/SanitizationUtil
 
 'use strict';
 

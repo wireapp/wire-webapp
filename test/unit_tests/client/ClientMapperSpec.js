@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:client/ClientMapper
+// grunt test_run:client/ClientMapper
 
 'use strict';
 

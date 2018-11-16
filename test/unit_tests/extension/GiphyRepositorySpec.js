@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:extension/GiphyRepositorySpecs
+// grunt test_run:extension/GiphyRepositorySpecs
 
 'use strict';
 

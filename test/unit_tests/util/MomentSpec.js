@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/Moment
+// grunt test_run:util/Moment
 
 'use strict';
 

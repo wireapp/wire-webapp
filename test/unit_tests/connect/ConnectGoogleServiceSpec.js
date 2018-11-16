@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:connect/ConnectGoogleService
+// grunt test_run:connect/ConnectGoogleService
 
 'use strict';
 

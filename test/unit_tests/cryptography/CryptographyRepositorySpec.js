@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:cryptography/CryptographyRepository
+// grunt test_run:cryptography/CryptographyRepository
 
 'use strict';
 

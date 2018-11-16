@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:view_model/InputBarViewModel
+// grunt test_run:view_model/InputBarViewModel
 
 describe('z.viewModel.content.InputBarViewModel', () => {
   const testFactory = new TestFactory();

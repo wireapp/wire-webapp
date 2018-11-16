@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:calling/entities/CallMessageEntity
+// grunt test_run:calling/entities/CallMessageEntity
 
 'use strict';
 

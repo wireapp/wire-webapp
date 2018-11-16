@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:lifecycle/LifecycleService
+// grunt test_run:lifecycle/LifecycleService
 
 'use strict';
 

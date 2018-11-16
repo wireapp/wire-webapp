@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:auth/AuthRepository
+// grunt test_run:auth/AuthRepository
 
 'use strict';
 

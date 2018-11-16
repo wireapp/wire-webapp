@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:entity/message/MessageEntities
+// grunt test_run:entity/message/MessageEntities
 
 describe('Message Entities', () => {
   describe('generateNameString', () => {

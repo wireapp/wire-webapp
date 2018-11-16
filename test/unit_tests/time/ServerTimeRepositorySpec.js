@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:time/ServerTimeRepository
+// grunt test_run:time/ServerTimeRepository
 
 'use strict';
 
