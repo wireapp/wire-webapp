@@ -77,7 +77,7 @@
       return iconComponents[message.system_message_type];
     }
 
-    clickOnDevice(messageEntity) {
+    showDevice(messageEntity) {
       const topic = messageEntity.isSelfClient()
         ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
         : z.event.WebApp.SHORTCUT.PEOPLE;
@@ -394,15 +394,15 @@
       <!-- ko if: message.isTypeUnverified() -->
         <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceUnverified"></span>
-        <span class="message-verification-action text-theme" data-bind="click: () => clickOnDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewDevice() -->
         <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
         <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
-        <span class="message-verification-action text-theme" data-bind="click: () => clickOnDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: () => clickOnDevice(message), l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
