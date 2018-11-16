@@ -38,7 +38,7 @@ describe('User Service', () => {
 
   afterEach(() => server.restore());
 
-  describe('get_users', () => {
+  describe('getUsers', () => {
     it('can get a single existing user from the server', done => {
       const request_url = `${urls.restUrl}/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f`;
       server.respondWith('GET', request_url, [
@@ -48,7 +48,7 @@ describe('User Service', () => {
       ]);
 
       userService
-        .get_users(['7025598b-ffac-4993-8a81-af3f35b7147f'])
+        .getUsers(['7025598b-ffac-4993-8a81-af3f35b7147f'])
         .then(response => {
           expect(response.length).toBe(1);
           expect(response[0].id).toBe('d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5');
@@ -64,7 +64,7 @@ describe('User Service', () => {
       server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
       userService
-        .get_users(['7025598b-ffac-4993-8a81-af3f35b71414'])
+        .getUsers(['7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(done.fail)
         .catch(error => {
           expect(error.code).toBe(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
@@ -85,7 +85,7 @@ describe('User Service', () => {
       ]);
 
       userService
-        .get_users(['7025598b-ffac-4993-8a81-af3f35b7147f', '7025598b-ffac-4993-8a81-af3f35b71414'])
+        .getUsers(['7025598b-ffac-4993-8a81-af3f35b7147f', '7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(response => {
           expect(response.length).toBe(2);
           expect(response[0].id).toBe('d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5');
@@ -103,7 +103,7 @@ describe('User Service', () => {
       server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
       userService
-        .get_users(['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414'])
+        .getUsers(['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(done.fail)
         .catch(error => {
           expect(error.code).toBe(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
@@ -124,7 +124,7 @@ describe('User Service', () => {
       ]);
 
       userService
-        .get_users(['d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', '7025598b-ffac-4993-8a81-af3f35b71425'])
+        .getUsers(['d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', '7025598b-ffac-4993-8a81-af3f35b71425'])
         .then(response => {
           expect(response.length).toBe(1);
           expect(response[0].id).toBe('d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5');

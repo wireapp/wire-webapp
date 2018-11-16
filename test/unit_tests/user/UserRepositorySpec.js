@@ -38,7 +38,7 @@ describe('z.user.UserRepository', () => {
   });
 
   describe('users', () => {
-    describe('fetchUserById', () => {
+    describe('fetchUsersById', () => {
       it('should handle malformed input', () => {
         return TestFactory.user_repository
           .fetchUsersById()
