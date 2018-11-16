@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/KeyboardUtil
+// grunt test_run:util/KeyboardUtil
 
 'use strict';
 

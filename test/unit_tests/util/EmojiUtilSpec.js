@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/EmojiUtil
+// grunt test_run:util/EmojiUtil
 
 'use strict';
 

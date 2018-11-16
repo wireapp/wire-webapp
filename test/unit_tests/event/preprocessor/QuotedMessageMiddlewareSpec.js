@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:event/preprocessor/QuotedMessageMiddleware
+// grunt test_run:event/preprocessor/QuotedMessageMiddleware
 
 describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();

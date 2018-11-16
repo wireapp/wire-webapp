@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:entity/Conversation
+// grunt test_run:entity/Conversation
 
 'use strict';
 

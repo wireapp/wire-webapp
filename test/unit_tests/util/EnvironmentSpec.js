@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/Environment
+// grunt test_run:util/Environment
 
 'use strict';
 

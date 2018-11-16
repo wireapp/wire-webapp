@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:user/UserService
+// grunt test_run:user/UserService
 
 'use strict';
 

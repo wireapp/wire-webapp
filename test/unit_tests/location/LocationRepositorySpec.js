@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:location/LocationRepository
+// grunt test_run:location/LocationRepository
 
 'use strict';
 

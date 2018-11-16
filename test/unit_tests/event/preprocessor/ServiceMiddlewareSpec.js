@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:event/preprocessor/ServiceMiddleware
+// grunt test_run:event/preprocessor/ServiceMiddleware
 
 describe('z.event.preprocessor.ServiceMiddleware', () => {
   const testFactory = new TestFactory();

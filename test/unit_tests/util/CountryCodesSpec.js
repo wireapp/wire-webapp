@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/CountryCodes
+// grunt test_run:util/CountryCodes
 
 'use strict';
 

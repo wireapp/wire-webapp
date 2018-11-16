@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:audio/AudioRepository
+// grunt test_run:audio/AudioRepository
 
 'use strict';
 

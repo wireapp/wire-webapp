@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:user/UserRepository
+// grunt test_run:user/UserRepository
 
 'use strict';
 

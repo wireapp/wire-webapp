@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:links/LinkPreviewProtoBuilder
+// grunt test_run:links/LinkPreviewProtoBuilder
 
 describe('LinkPreviewProtoBuilder', () => {
   const compare_article_with_mock = function(url, offset, preview, mock) {

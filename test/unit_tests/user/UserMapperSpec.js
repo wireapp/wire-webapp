@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:user/UserMapper
+// grunt test_run:user/UserMapper
 
 describe('User Mapper', () => {
   const mapper = new z.user.UserMapper(new z.time.ServerTimeRepository());

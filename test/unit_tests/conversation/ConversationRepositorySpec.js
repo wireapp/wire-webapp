@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/ConversationRepository
+// grunt test_run:conversation/ConversationRepository
 
 'use strict';
 
