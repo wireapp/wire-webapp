@@ -49,12 +49,12 @@ export const APP_NAME = window.wire.env.APP_NAME || 'Webapp';
 export const BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
 export const BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
 export const ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
-export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com/';
+export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
 export const URL = window.wire.env.URL || {
-  ACCOUNT_BASE: 'https://account.wire.com/',
+  ACCOUNT_BASE: 'https://account.wire.com',
   MOBILE_BASE: '/',
-  TEAMS_BASE: 'https://teams.wire.com/',
-  WEBSITE_BASE: 'https://wire.com/',
+  TEAMS_BASE: 'https://teams.wire.com',
+  WEBSITE_BASE: 'https://wire.com',
 };
 export const VERSION = window.wire.env.VERSION || '0.0.0';
 export const FEATURE = window.wire.env.FEATURE || {
