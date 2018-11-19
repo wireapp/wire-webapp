@@ -123,7 +123,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
 
   _initTemporaryGuestAccount() {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+    this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, false);
     return Promise.resolve(this._publishProperties());
   }
 

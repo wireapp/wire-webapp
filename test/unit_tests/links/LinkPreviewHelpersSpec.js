@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:links/LinkPreviewHelpers
+// grunt test_run:links/LinkPreviewHelpers
 
 describe('containsOnlyLink', () => {
   it('should return true if text only contains url (naked domain)', () => {

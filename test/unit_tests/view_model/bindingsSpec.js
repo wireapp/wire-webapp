@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:view_model/bindings
+// grunt test_run:view_model/bindings
 
 'use strict';
 

@@ -19,7 +19,8 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:links/LinkPreviewRepository
+// grunt test_run:links/LinkPreviewRepository
+
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
@@ -79,7 +80,7 @@ describe('z.links.LinkPreviewRepository', () => {
       window.openGraph = mockSucceedingOpenGraph();
 
       link_preview_repository
-        .getLinkPreview('youtube.com')
+        .getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.error.LinkPreviewError.TYPE.BLACKLISTED);

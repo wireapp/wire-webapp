@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:connection/ConnectionMapper
+// grunt test_run:connection/ConnectionMapper
 
 'use strict';
 

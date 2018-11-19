@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/ArrayUtil
+// grunt test_run:util/ArrayUtil
 
 'use strict';
 

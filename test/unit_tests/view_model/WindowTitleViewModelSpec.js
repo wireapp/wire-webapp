@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:view_model/WindowTitleViewModel
+// grunt test_run:view_model/WindowTitleViewModel
 
 describe('z.viewModel.WindowTitleViewModel', () => {
   const suffix = z.l10n.text(z.string.wire);

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:connection/ConnectionRepository
+// grunt test_run:connection/ConnectionRepository
 
 'use strict';
 

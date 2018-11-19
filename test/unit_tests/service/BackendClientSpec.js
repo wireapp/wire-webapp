@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:service/BackendClient
+// grunt test_run:service/BackendClient
 
 'use strict';
 

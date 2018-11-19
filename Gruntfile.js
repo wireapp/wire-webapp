@@ -196,6 +196,6 @@ module.exports = grunt => {
     grunt.config('karma.options.specReporter', {
       showSpecTiming: true,
     });
-    grunt.task.run(['scripts', 'newer:copy:dist_js', `test_prepare:${testName}`, 'karma:test']);
+    grunt.task.run(['scripts', 'build_dev_script', `test_prepare:${testName}`, 'karma:test']);
   });
 };

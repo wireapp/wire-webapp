@@ -19,7 +19,7 @@
 /* eslint-disable */
 'use strict';
 
-// grunt test_init && grunt test_run:media/MediaDevicesHandler
+// grunt test_run:media/MediaDevicesHandler
 
 describe('z.media.MediaDevicesHandler', () => {
   const test_factory = new TestFactory();

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/StringUtil
+// grunt test_run:util/StringUtil
 
 'use strict';
 

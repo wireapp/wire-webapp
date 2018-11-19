@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/ClientMismatchHandler
+// grunt test_run:conversation/ClientMismatchHandler
 
 'use strict';
 
