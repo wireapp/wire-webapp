@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.links = z.links || {};
 
-const codeBlockRegex = new RegExp('`(``)?[\\s\\S]*?`(``)?', 'gm');
+const codeBlockRegex = /(`|```)[^]*?\1/gm
 
 z.links.LinkPreviewHelpers = {
   /**
