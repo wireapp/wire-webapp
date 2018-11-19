@@ -19,6 +19,9 @@
 
 'use strict';
 
+import bazinga64 from 'bazinga64';
+import UUID from 'uuidjs';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 

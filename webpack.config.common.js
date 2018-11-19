@@ -48,6 +48,7 @@ module.exports = {
     fs: 'empty',
     path: 'empty',
   },
+
   optimization: {
     splitChunks: {
       cacheGroups: {
@@ -72,7 +73,16 @@ module.exports = {
     path: path.resolve(__dirname, dist),
     publicPath: '/',
   },
-  plugins: [new webpack.IgnorePlugin(/^.\/locale$/, /moment$/)],
+  plugins: [
+    new webpack.IgnorePlugin(/^.\/locale$/, /moment$/),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      _: 'underscore',
+      jQuery: 'jquery',
+      ko: 'knockout',
+      moment: 'moment',
+    }),
+  ],
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     modules: [path.resolve(srcScript), 'node_modules'],

@@ -19,6 +19,8 @@
 
 'use strict';
 
+import Cookies from 'js-cookie';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 

@@ -19,6 +19,8 @@
 
 'use strict';
 
+import Dexie from 'dexie';
+
 window.z = window.z || {};
 window.z.storage = z.storage || {};
 
