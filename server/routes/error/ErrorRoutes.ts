@@ -43,7 +43,7 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, ne
   };
   req.app.locals.error = error;
   req.app.locals.request = request;
-  return res.render('error');
+  return res.status(error.code).render('error');
 };
 
 const NotFoundRoute = () =>
@@ -60,7 +60,7 @@ const NotFoundRoute = () =>
     };
     req.app.locals.error = error;
     req.app.locals.request = request;
-    return res.render('error');
+    return res.status(error.code).render('error');
   });
 
 export {InternalErrorRoute, NotFoundRoute};
