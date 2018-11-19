@@ -30,6 +30,7 @@ z.links.LinkPreviewBlackList = (() => {
     'discover',
     'discussion',
     'featured',
+    'home',
     'messages',
     'mobile',
     'pages',
@@ -46,7 +47,7 @@ z.links.LinkPreviewBlackList = (() => {
     `soundcloud.com/(?!(${soundcloudStatic.join('|')}))`,
     'spotify.com/(?![A-z]{2}/)',
     'youtu.be',
-    'youtube(-nocookie)?.com/watch',
+    'youtube(-nocookie)?.com/(watch|embed)',
     'vimeo.com/(channels(/[^/]+)?/)?[0-9]+',
   ];
 

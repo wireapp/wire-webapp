@@ -81,7 +81,7 @@ describe('MediaEmbeds', () => {
         ).not.toBeNull();
       });
 
-      it('doesn’t match normal Spotify links', () => {
+      it("doesn't match normal Spotify links", () => {
         test_link_variants('spotify', re_spotify);
       });
     });
@@ -98,11 +98,11 @@ describe('MediaEmbeds', () => {
         expect('https://soundcloud.com/groups/playlist-digital-sintonia'.match(re_soundcloud)).not.toBeNull();
       });
 
-      it('doesn’t match https://soundcloud.com/dp-conference', () => {
+      it("doesn't match https://soundcloud.com/dp-conference", () => {
         expect('https://soundcloud.com/dp-conference'.match(re_soundcloud)).toBeNull();
       });
 
-      it('doesn’t match normal SoundCloud links', () => {
+      it("doesn't match normal SoundCloud links", () => {
         test_link_variants('soundcloud', re_soundcloud);
       });
     });
@@ -114,7 +114,7 @@ describe('MediaEmbeds', () => {
         expect('https://vimeo.com/27999954'.match(re_vimeo)).not.toBeNull();
       });
 
-      it('doesn’t match normal Vimeo links', () => {
+      it("doesn't match normal Vimeo links", () => {
         test_link_variants('vimeo', re_vimeo);
       });
     });
@@ -151,14 +151,14 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
-      it('https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd', () => {
+      it('renders a playlist', () => {
         const link = 'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
         const message = build_message_with_anchor(link);
 
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
-      it('renders link with params (http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded)', () => {
+      it('renders a link with params', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded';
 
         const message = build_message_with_anchor(link);
@@ -167,7 +167,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders link with params (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index)', () => {
+      it('renders a link with params', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index';
 
         const message = build_message_with_anchor(link);
@@ -176,7 +176,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders link with params (http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0)', () => {
+      it('renders a link with params', () => {
         const link = 'http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0';
 
         const message = build_message_with_anchor(link);
@@ -185,7 +185,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders link with timestamp (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s)', () => {
+      it('renders a link with timestamp', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s';
 
         const message = build_message_with_anchor(link);
@@ -194,7 +194,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders link with timestamp inverted (https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo)', () => {
+      it('renders a link with timestamp inverted', () => {
         const link = 'https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo';
 
         const message = build_message_with_anchor(link);
@@ -203,7 +203,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders embed link (http://www.youtube-nocookie.com/embed/0zM3nApSvMg?rel=0)', () => {
+      it('renders an embed link', () => {
         const link = 'http://www.youtube-nocookie.com/embed/0zM3nApSvMg?rel=0';
 
         const message = build_message_with_anchor(link);
@@ -212,7 +212,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders watch link (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg)', () => {
+      it('renders a watch link', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg';
 
         const message = build_message_with_anchor(link);
@@ -221,7 +221,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders a short link (http://youtu.be/0zM3nApSvMg)', () => {
+      it('renders a short link', () => {
         const link = 'http://youtu.be/0zM3nApSvMg';
 
         const message = build_message_with_anchor(link);
@@ -230,7 +230,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders a short link playlist (https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN)', () => {
+      it('renders a short link playlist', () => {
         const link = 'https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN';
 
         const message = build_message_with_anchor(link);
@@ -239,7 +239,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders a mobile link (https://m.youtube-nocookie.com/?#/watch?v=0zM3nApSvMg)', () => {
+      it('renders a mobile link', () => {
         const link = 'https://m.youtube-nocookie.com/?#/watch?v=0zM3nApSvMg';
 
         const message = build_message_with_anchor(link);
@@ -248,7 +248,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders another mobile link (https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be)', () => {
+      it('renders another mobile link', () => {
         const link = 'https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be';
 
         const message = build_message_with_anchor(link);
@@ -257,7 +257,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('doesn`t render Youtube profile link', () => {
+      it("doesn't render YouTube profile link", () => {
         const message =
           '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
         const iframe =
@@ -266,7 +266,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1)', () => {
+      it('removes autoplay param from url', () => {
         const link = 'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
 
         const message = build_message_with_anchor(link);
@@ -276,7 +276,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      return it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0)', () => {
+      it('removes autoplay param from url', () => {
         const link = 'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
 
         const message = build_message_with_anchor(link);
@@ -288,7 +288,7 @@ describe('MediaEmbeds', () => {
     });
 
     describe('SoundCloud', () => {
-      it('renders a track (https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod)', () => {
+      it('renders a track', () => {
         const link = 'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod';
 
         const message = build_message_with_anchor(link);
@@ -297,7 +297,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders a playlist (https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist)', () => {
+      it('renders a playlist', () => {
         const link = 'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist';
 
         const message = build_message_with_anchor(link);
@@ -306,19 +306,19 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders profiles without embeds (https://soundcloud.com/dp-conference)', () => {
+      it('renders profiles without embeds', () => {
         const message = build_message_with_anchor('https://soundcloud.com/dp-conference');
 
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
-      it('renders profiles without embeds even if profiles have a trailing slash (https://soundcloud.com/dp-conference/)', () => {
+      it('renders profiles without embeds even if profiles have a trailing slash', () => {
         const message = build_message_with_anchor('https://soundcloud.com/dp-conference/');
 
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
-      it('renders a group (https://soundcloud.com/groups/playlist-digital-sintonia)', () => {
+      it('renders a group', () => {
         const link = 'https://soundcloud.com/groups/playlist-digital-sintonia';
 
         const message = build_message_with_anchor(link);
@@ -327,7 +327,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders a track without trailing slash (https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download)', () => {
+      it('renders a track without trailing slash', () => {
         const link = 'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download';
 
         const message = build_message_with_anchor(link);
@@ -336,7 +336,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders a track with trailing slash (https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/)', () => {
+      it('renders a track with trailing slash', () => {
         const link = 'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/';
 
         const message = build_message_with_anchor(link);
@@ -345,7 +345,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      return it('doesn’t render links which cannot be rendered (https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended)', () => {
+      it("doesn't render SoundCloud links which cannot be rendered", () => {
         const link = 'https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended';
         const message = `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
@@ -394,7 +394,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      return it('renders track with params (https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open)', () => {
+      it('renders track with params (https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open)', () => {
         const link =
           'https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open';
         const partial_link = 'track/5yEPxDjbbzUzyauGtnmVEC';
@@ -407,7 +407,7 @@ describe('MediaEmbeds', () => {
     });
 
     describe('Vimeo', () => {
-      it('renders https://vimeo.com/27999954', () => {
+      it('renders a video', () => {
         const id = '27999954';
         const link = 'https://vimeo.com/27999954';
 
@@ -417,13 +417,13 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
 
-      it("doesn't render user https://vimeo.com/user38597062", () => {
+      it("doesn't render a user's profile page", () => {
         const message = build_message_with_anchor('https://vimeo.com/user38597062');
 
         expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 
-      return it('renders link with params (https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914)', () => {
+      it('renders link with params', () => {
         const id = '127053285';
         const link = 'https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914';
 
@@ -436,19 +436,19 @@ describe('MediaEmbeds', () => {
   });
 
   describe('convertYouTubeTimestampToSeconds', () => {
-    it('doesn´t convert timestamp that only contains numbers', () => {
+    it("doesn't convert a timestamp that only contains numbers", () => {
       expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('125')).toBe(125);
     });
 
-    it('converts timestamp with only seconds', () => {
+    it('converts a timestamp with only seconds', () => {
       expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('25s')).toBe(25);
     });
 
-    it('converts timestamp with only minutes and seconds', () => {
+    it('converts a timestamp with only minutes and seconds', () => {
       expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('31m08s')).toBe(1868);
     });
 
-    it('converts timestamp with hours, minutes and seconds', () => {
+    it('converts a timestamp with hours, minutes and seconds', () => {
       expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('1h1m1s')).toBe(3661);
     });
 
