@@ -31,6 +31,7 @@
       shouldShowInvitePeople,
       onClickAvatar,
       onClickImage,
+      onClickInvitePeople,
       onClickMessage,
       onClickTimestamp,
       onClickParticipants,
@@ -51,6 +52,7 @@
       this.isLastDeliveredMessage = isLastDeliveredMessage;
 
       this.onClickImage = onClickImage;
+      this.onClickInvitePeople = onClickInvitePeople;
       this.onClickAvatar = onClickAvatar;
       this.onClickMessage = onClickMessage;
       this.onClickTimestamp = onClickTimestamp;
@@ -487,7 +489,7 @@
       <!-- ko if: shouldShowInvitePeople -->
         <div class="message-member-footer">
           <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
-          <div class="message-member-footer-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
+          <div class="message-member-footer-button" data-bind="click: onClickInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
         </div>
       <!-- /ko -->
       <!-- ko if: isSelfTemporaryGuest -->
