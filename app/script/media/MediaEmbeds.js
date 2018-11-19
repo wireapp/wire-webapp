@@ -70,7 +70,7 @@ z.media.MediaEmbeds = (function() {
     // example: http://regexr.com/3ase5
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,
     spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([^?]+)/g,
-    vimeo: /https?:\/\/(?:(?:player\.)?vimeo\.com\/)(?:channels(?:\/[^/]+)?\/)?([0-9]+)/g,
+    vimeo: /https?:\/\/(?:(?:player\.)?vimeo\.com\/)(?:channels(?:\/[^/]+)?\/|video\/)?([0-9]+)/g,
     youtube: /(?:youtube(?:-nocookie)?\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
   };
 

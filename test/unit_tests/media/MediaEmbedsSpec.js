@@ -114,6 +114,10 @@ describe('MediaEmbeds', () => {
         expect('https://vimeo.com/27999954'.match(re_vimeo)).not.toBeNull();
       });
 
+      it('matches valid Vimeo embed URLs', () => {
+        expect('https://player.vimeo.com/video/27999954'.match(re_vimeo)).not.toBeNull();
+      });
+
       it("doesn't match normal Vimeo links", () => {
         test_link_variants('vimeo', re_vimeo);
       });

@@ -48,7 +48,7 @@ z.links.LinkPreviewBlackList = (() => {
     'spotify.com/(?![A-z]{2}/)',
     'youtu.be',
     'youtube(-nocookie)?.com/(watch|embed)',
-    'vimeo.com/(channels(/[^/]+)?/)?[0-9]+',
+    'vimeo.com/(channels(/[^/]+)?/|video/)?[0-9]+',
   ];
 
   return {

@@ -70,6 +70,12 @@ describe('is_blacklisted', () => {
     expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
+  it('should return true if link is Vimeo embed', () => {
+    const url = 'https://player.vimeo.com/video/27999954';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
   it('should return false if link is Vimeo static', () => {
     const url = 'https://vimeo.com/upload';
 
