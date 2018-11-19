@@ -14,10 +14,9 @@
     #include('wire-main.htm')
     #include('loading.htm')
 
-    #include('#dest/config.htm')
-    #include('#dest/vendor.htm')
-    #include('#dest/component.htm')
-    #include('#dest/app.htm')
+    <script src="/config.js?{{@config.VERSION}}"></script>
+    <script src="/min/vendor.js?{{@config.VERSION}}"></script>
+    <script src="/min/app.js?{{@config.VERSION}}"></script>
 
     #include('partials/template-user-profile.htm')
   </body>

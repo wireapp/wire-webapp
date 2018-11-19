@@ -35,8 +35,6 @@
     "@bower_components/keyboardjs": "RobertWHurst/KeyboardJS#v2.4.1",
     "@bower_components/knockout": "knockout/knockout#v3.4.1",
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
-    "@bower_components/long": "dcodeIO/Long.js#3.2.0",
-    "@bower_components/moment": "moment/moment#2.22.2",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
     "@bower_components/pako": "nodeca/pako#1.0.6",
     "@bower_components/phone-format": "albeebe/phoneformat.js#1.0.6",
@@ -302,35 +300,6 @@
     },
     "@bower_components/libsodium.js": {
       "js": "dist/browsers-sumo/sodium.js"
-    },
-    "@bower_components/long": {
-      "js": "dist/long.js"
-    },
-    "@bower_components/moment": {
-      "js": [
-        "moment.js",
-        "locale/cs.js",
-        "locale/da.js",
-        "locale/de.js",
-        "locale/el.js",
-        "locale/es.js",
-        "locale/et.js",
-        "locale/fi.js",
-        "locale/fr.js",
-        "locale/hr.js",
-        "locale/hu.js",
-        "locale/it.js",
-        "locale/lt.js",
-        "locale/nl.js",
-        "locale/pl.js",
-        "locale/pt.js",
-        "locale/ro.js",
-        "locale/ru.js",
-        "locale/sk.js",
-        "locale/sl.js",
-        "locale/tr.js",
-        "locale/uk.js"
-      ]
     },
     "@bower_components/normalize-css": {
       "css": "normalize.css"

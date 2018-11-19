@@ -22,11 +22,13 @@ const webpack = require('webpack');
 
 const dist = 'aws/static/';
 const srcScript = 'app/script/auth/';
+const appSrc = 'app/script/';
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    script: path.resolve(__dirname, srcScript, 'main.tsx'),
+    app: path.resolve(__dirname, appSrc, 'main/app.js'),
+    auth: path.resolve(__dirname, srcScript, 'main.tsx'),
   },
   externals: {
     'fs-extra': '{}',
@@ -36,6 +38,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
+        include: path.resolve(__dirname, srcScript),
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },
@@ -46,7 +49,6 @@ module.exports = {
     path: 'empty',
   },
   optimization: {
-    runtimeChunk: 'single',
     splitChunks: {
       cacheGroups: {
         dexie: {

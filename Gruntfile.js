@@ -75,7 +75,6 @@ module.exports = grunt => {
     npmBower: require('./grunt/config/npmBower'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
-    concat: require('./grunt/config/concat'),
     connect: require('./grunt/config/connect'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
@@ -92,7 +91,7 @@ module.exports = grunt => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack', 'scripts']);
+  grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack']);
 
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
@@ -115,7 +114,6 @@ module.exports = grunt => {
       'set_version:staging',
       'aws_version_file',
       'copy:frontend',
-      'scripts',
       'shell:less',
       'postcss:deploy',
       'copy:deploy',
@@ -125,13 +123,12 @@ module.exports = grunt => {
       'includereplace:prod_auth',
       'includereplace:prod_login',
       'includereplace:deploy_demo',
-      'concat:dev',
       'copy:aws'
     );
   });
 
   grunt.registerTask('build_dev_script', () => {
-    grunt.task.run('scripts', 'copy:deploy', 'concat:dev', 'copy:aws');
+    grunt.task.run('copy:deploy', 'copy:aws');
   });
 
   grunt.registerTask('build_dev_style', () => {
@@ -152,9 +149,7 @@ module.exports = grunt => {
   });
 
   // Test Related
-  grunt.registerTask('test', () =>
-    grunt.task.run(['clean:docs_coverage', 'scripts', 'build_dev', 'test_prepare', 'karma:test'])
-  );
+  grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'build_dev', 'test_prepare', 'karma:test']));
 
   grunt.registerTask('npmWebpack', function() {
     const done = this.async();
@@ -175,18 +170,8 @@ module.exports = grunt => {
   });
 
   grunt.registerTask('test_prepare', testName => {
-    const scripts = grunt.config('scripts');
-    const scriptsMinified = grunt.config('scripts_minified');
-
-    const prepareFileNames = fileNames => fileNames.map(name => name.replace('deploy/', ''));
-
-    const helperFiles = grunt.config.get('karma.options.files');
-    const appFiles = prepareFileNames(scriptsMinified.app.concat(scripts.app));
-    const componentFiles = prepareFileNames(scriptsMinified.component.concat(scripts.component));
-    const vendorFiles = prepareFileNames(scriptsMinified.vendor.concat(scripts.vendor));
-    const testFiles = testName ? [`../test/unit_tests/${testName}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
-
-    const files = [].concat(helperFiles, vendorFiles, componentFiles, appFiles, testFiles);
+    //TODO feed files to the test runner
+    const files = []; //.concat(helperFiles, vendorFiles, componentFiles, appFiles, testFiles);
 
     grunt.config('karma.options.files', files);
   });
@@ -196,6 +181,6 @@ module.exports = grunt => {
     grunt.config('karma.options.specReporter', {
       showSpecTiming: true,
     });
-    grunt.task.run(['scripts', 'build_dev_script', `test_prepare:${testName}`, 'karma:test']);
+    grunt.task.run(['build_dev_script', `test_prepare:${testName}`, 'karma:test']);
   });
 };
