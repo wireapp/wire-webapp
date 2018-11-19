@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewBlackList = (() => {
-  const soundcloudStatic = [
+  const soundCloudStatic = [
     'about',
     'channels',
     'charts',
@@ -44,7 +44,7 @@ z.links.LinkPreviewBlackList = (() => {
     'you',
   ];
   const BLACKLIST = [
-    `soundcloud.com/(?!${soundcloudStatic.join('|')})`,
+    `soundcloud.com/(?!${soundCloudStatic.join('|')})`,
     'spotify.com/(?!\\w\\w/)',
     'youtu.be',
     'youtube(-nocookie)?.com/(watch|embed)',
