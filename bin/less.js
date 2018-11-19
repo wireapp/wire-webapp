@@ -18,13 +18,13 @@ Object.entries(files).forEach(file => {
   renderCSS(file[1], file[0]);
 });
 
-function renderCSS(lessInput, ouputFolder) {
+function renderCSS(lessInput, outputPath) {
   less
     .render(lessInput, {sourceMap: {}})
     .then(output => {
-      fs.writeFileSync(ouputFolder, output.css, 'utf8');
+      fs.writeFileSync(outputPath, output.css, 'utf8');
       if (output.map) {
-        fs.writeFileSync(`${ouputFolder}.map`, output.map, 'utf8');
+        fs.writeFileSync(`${outputPath}.map`, output.map, 'utf8');
       }
     })
     .catch(error => console.error('error', error));
