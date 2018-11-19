@@ -19,6 +19,8 @@
 
 'use strict';
 
+import StoreEngine from '@wireapp/store-engine';
+
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 

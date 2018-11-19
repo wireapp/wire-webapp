@@ -16,21 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-/* eslint-disable no-unused-vars */
-import configGlobal from '../config.js';
-
-import envGlobal from '../util/Environment.js';
-import backendClientGlobal from '../service/BackendClient.js';
-import backendEnvGlobal from '../service/BackendEnvironment.js';
-import authServiceGlobal from '../auth/AuthService.js';
-import authRepoGlobal from '../auth/AuthRepository.js';
-import authUrlParamGlobal from '../auth/URLParameter.js';
-import audioRepoGlobal from '../audio/AudioRepository.js';
-import audioPreferenceGlobal from '../audio/AudioPreference.js';
-
-import urlUtil from '../util/URLUtil.js';
-/* eslint-enable no-unused-vars */
-
 window.z = window.z || {};
 window.z.main = z.main || {};
 

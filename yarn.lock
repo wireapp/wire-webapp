@@ -883,34 +883,13 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bower_components/amplify@wireapp/amplify#v1.1.7":
-  version "1.1.7"
-  resolved "https://codeload.github.com/wireapp/amplify/tar.gz/446e1fe1b6b6702818a0d37f9669720e95d5fa70"
-  dependencies:
-    "@types/jquery" "3.3.14"
-
 "@bower_components/antiscroll-2@wireapp/antiscroll-2#v1.3.1":
   version "1.3.1"
   resolved "https://codeload.github.com/wireapp/antiscroll-2/tar.gz/36f68aeabfccf170d3f8cf78ce249f2a4f0bda55"
 
-"@bower_components/bazinga64@wireapp/bazinga64#v5.0.3":
-  version "5.0.3"
-  resolved "https://codeload.github.com/wireapp/bazinga64/tar.gz/dda8ab93bc0c985a1fd3d8990e7b3a21b26565f2"
-
-"@bower_components/bytebuffer@dcodeIO/ByteBuffer.js#3.5.5":
-  version "3.5.5"
-  resolved "https://codeload.github.com/dcodeIO/ByteBuffer.js/tar.gz/83b98043f13f6073b9e073f0eb39849dab5ae257"
-  dependencies:
-    bufferview "~1"
-    long "~2 >=2.2.3"
-
 "@bower_components/cryptojs@brix/crypto-js#3.1.9-1":
   version "3.1.9"
   resolved "https://codeload.github.com/brix/crypto-js/tar.gz/0596faee7aa619f6f25e43e770e545ae7233b095"
-
-"@bower_components/dexie@dfahlander/Dexie.js#v2.0.4":
-  version "2.0.4"
-  resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/70b22f3b85368762129639928075ea0c4865a199"
 
 "@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.22.1":
   version "1.22.1"
@@ -926,35 +905,15 @@
   version "3.1.13"
   resolved "https://codeload.github.com/jquery/jquery-mousewheel/tar.gz/67289b6b2aa0066d7d78a5807f520387135ffb22"
 
-"@bower_components/jquery@jquery/jquery#3.3.1":
-  version "3.3.1"
-  resolved "https://codeload.github.com/jquery/jquery/tar.gz/32b00373b3f42e5cdcb709df53f3b08b7184a944"
-
 "@bower_components/js-cookie@js-cookie/js-cookie#v2.2.0":
   version "2.2.0"
   resolved "https://codeload.github.com/js-cookie/js-cookie/tar.gz/34f056cd261982828072b84a9bbdcd8c3d9931ad"
-
-"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#v2.4.1":
-  version "2.4.1"
-  resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/4fa305890b8a99a64a190a0f4d6572cbf8b6b8ab"
-
-"@bower_components/knockout@knockout/knockout#v3.4.1":
-  version "3.4.1"
-  resolved "https://codeload.github.com/knockout/knockout/tar.gz/7a83820efc96d47742e2f8c9b4fcd2459c81dd21"
 
 "@bower_components/libsodium.js@jedisct1/libsodium.js#0.7.3":
   version "0.7.3"
   resolved "https://codeload.github.com/jedisct1/libsodium.js/tar.gz/ef2cc92f2388e37ebf714d37bfae85850ed302d4"
   dependencies:
     libsodium "0.7.3"
-
-"@bower_components/long@dcodeIO/Long.js#3.2.0":
-  version "3.2.0"
-  resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
-
-"@bower_components/moment@moment/moment#2.22.2":
-  version "2.22.2"
-  resolved "https://codeload.github.com/moment/moment/tar.gz/2e2a5b35439665d4b0200143d808a7c26d6cd30f"
 
 "@bower_components/normalize-css@necolas/normalize.css#3.0.3":
   version "3.0.3"
@@ -996,10 +955,6 @@
 "@bower_components/uint32@fxa/uint32.js#0.2.1":
   version "0.2.1"
   resolved "https://codeload.github.com/fxa/uint32.js/tar.gz/ab04fe14206e46688009d7228e3e8de0fdc8eeb0"
-
-"@bower_components/underscore@jashkenas/underscore#1.9.1":
-  version "1.9.1"
-  resolved "https://codeload.github.com/jashkenas/underscore/tar.gz/ae037f7c41323807ae6f1533c45512e6d31a1574"
 
 "@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#v5.0.0":
   version "5.0.0"
@@ -1900,6 +1855,12 @@ amp@0.3.1, amp@~0.3.1:
   resolved "https://registry.yarnpkg.com/amp/-/amp-0.3.1.tgz#6adf8d58a74f361e82c1fa8d389c079e139fc47d"
   integrity sha1-at+NWKdPNh6CwfqNOJwHnhOfxH0=
 
+"amplify@git+https://git@github.com/wireapp/amplify":
+  version "1.1.7"
+  resolved "git+https://git@github.com/wireapp/amplify#446e1fe1b6b6702818a0d37f9669720e95d5fa70"
+  dependencies:
+    "@types/jquery" "3.3.14"
+
 ansi-colors@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-3.1.0.tgz#dcfaacc90ef9187de413ec3ef8d5eb981a98808f"
@@ -2754,11 +2715,6 @@ buffer@^5.0.3:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
 
-bufferview@~1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/bufferview/-/bufferview-1.0.1.tgz#7afd74a45f937fa422a1d338c08bbfdc76cd725d"
-  integrity sha1-ev10pF+Tf6QiodM4wIu/3HbNcl0=
-
 builtin-modules@^1.0.0, builtin-modules@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/builtin-modules/-/builtin-modules-1.1.1.tgz#270f076c5a72c02f5b65a47df94c5fe3a278892f"
@@ -2769,7 +2725,7 @@ builtin-status-codes@^3.0.0:
   resolved "https://registry.yarnpkg.com/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
 
-bytebuffer@~5:
+bytebuffer@5.0.1, bytebuffer@~5:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/bytebuffer/-/bytebuffer-5.0.1.tgz#582eea4b1a873b6d020a48d58df85f0bba6cfddd"
   integrity sha1-WC7qSxqHO20CCkjVjfhfC7ps/d0=
@@ -4991,6 +4947,14 @@ expect-ct@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.1.tgz#de84476a2dbcb85000d5903737e9bc8a5ba7b897"
   integrity sha512-ngXzTfoRGG7fYens3/RMb6yYoVLvLMfmsSllP/mZPxNHgFq41TmPSLF/nLY7fwoclI2vElvAmILFWGUYqdjfCg==
+
+exports-loader@0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/exports-loader/-/exports-loader-0.7.0.tgz#84881c784dea6036b8e1cd1dac3da9b6409e21a5"
+  integrity sha512-RKwCrO4A6IiKm0pG3c9V46JxIHcDplwwGJn6+JJ1RcVnh/WSGJa0xkmk5cRVtgOPzCAtTMGj2F7nluh9L0vpSA==
+  dependencies:
+    loader-utils "^1.1.0"
+    source-map "0.5.0"
 
 express-sitemap-xml@1.0.2:
   version "1.0.2"
@@ -7541,6 +7505,11 @@ karma@3.1.1:
     tmp "0.0.33"
     useragent "2.2.1"
 
+keyboardjs@2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/keyboardjs/-/keyboardjs-2.5.1.tgz#2eb5d96bd1028e07136cd71919f607579edca716"
+  integrity sha512-mRf7MQMiFcudADEpPn3vTtl/rtFELo5MAiKA6yH4ShsFsnwwjMrVfaNt6bpYhBDeODs/T5NXwltz4+ktRQyP7A==
+
 killable@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -7569,6 +7538,11 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
   integrity sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==
+
+knockout@3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.4.2.tgz#e87958de77ad1e936f7ce645bab8b5d7c456d937"
+  integrity sha1-6HlY3netHpNvfOZFuri118RW2Tc=
 
 known-css-properties@^0.9.0:
   version "0.9.0"
@@ -8017,11 +7991,6 @@ long@4.0.0, long@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
   integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
-
-"long@~2 >=2.2.3":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/long/-/long-2.4.0.tgz#9fa180bb1d9500cdc29c4156766a1995e1f4524f"
-  integrity sha1-n6GAux2VAM3CnEFWdmoZleH0Uk8=
 
 long@~3:
   version "3.2.0"
@@ -11958,6 +11927,11 @@ source-map-url@^0.4.0:
   resolved "https://registry.yarnpkg.com/source-map-url/-/source-map-url-0.4.0.tgz#3e935d7ddd73631b97659956d55128e87b5084a3"
   integrity sha1-PpNdfd1zYxuXZZlW1VEo6HtQhKM=
 
+source-map@0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.0.tgz#0fe96503ac86a5adb5de63f4e412ae4872cdbe86"
+  integrity sha1-D+llA6yGpa213mP05BKuSHLNvoY=
+
 source-map@^0.4.2, source-map@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.4.4.tgz#eba4f5da9c0dc999de68032d8b4f76173652036b"
@@ -12938,6 +12912,11 @@ underscore.string@~3.3.4:
     sprintf-js "^1.0.3"
     util-deprecate "^1.0.2"
 
+underscore@1.9.1:
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.9.1.tgz#06dce34a0e68a7babc29b365b8e74b8925203961"
+  integrity sha512-5/4etnCkd9c8gwgowi5/om/mYO5ajCaOgdzj/oW+0eQV9WxKBDZw5+ycmKmeaTXjInS/W0BzpGLo2xR2aBwZdg==
+
 underscore@~1.4.4:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.4.4.tgz#61a6a32010622afa07963bf325203cf12239d604"
@@ -13188,6 +13167,11 @@ uuid@3.3.2, uuid@^3.0.1, uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
+
+uuidjs@4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.0.3.tgz#4b4113a98e70507643a9a55a0493ff95b1d2538d"
+  integrity sha512-xG2pb5orynGRMwR3MtiJDKrMQ7rl4+IVchTjKBlddBJy9sIDw336u3quWdWiu81XhM5ckgQuWtFzxdqXTec4uA==
 
 v8-compile-cache@^2.0.0, v8-compile-cache@^2.0.2:
   version "2.0.2"
