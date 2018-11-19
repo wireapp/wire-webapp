@@ -33,4 +33,10 @@ module.exports = {
       stdout: true,
     },
   },
+  less: {
+    command: 'yarn build:style',
+    options: {
+      stdout: true,
+    },
+  },
 };

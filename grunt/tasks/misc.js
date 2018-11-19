@@ -54,7 +54,7 @@ module.exports = grunt => {
 
   grunt.registerTask('prepare', [
     'clean:deploy',
-    'less:deploy',
+    'shell:less',
     'postcss:deploy',
     'copy:deploy',
     'copy:deploy_audio',
