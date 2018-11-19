@@ -273,7 +273,7 @@
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: () => showLikes(true)">
-        <span class="font-size-xs text-graphite" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
+        <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
         <!-- ko if: !showLikes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
@@ -281,7 +281,7 @@
       <!-- ko if: showLikes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar params="participant: $data, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, click: $parent.onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: () => showLikes(false)"></span>
         </div>
