@@ -14,9 +14,7 @@ const files = {
   [`${dist}/support.css`]: fs.readFileSync(`${src}/support.less`, 'utf8'),
 };
 
-Object.entries(files).forEach(file => {
-  renderCSS(file[1], file[0]);
-});
+Object.entries(files).forEach(([outputPath, lessInput]) => renderCSS(lessInput, outputPath));
 
 function renderCSS(lessInput, outputPath) {
   less
