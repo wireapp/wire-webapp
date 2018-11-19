@@ -309,7 +309,7 @@
     <div class="message-header-label ellipsis">
       <span data-bind="html: message.htmlCaption()"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
+      <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
@@ -532,9 +532,6 @@
     <!-- /ko -->
     <!-- ko if: message.super_type === 'member' -->
       ${memberTemplate}
-    <!-- /ko -->
-    <!-- ko if: message.super_type === 'unable-to-decrypt' -->
-      ${unableToDecryptTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
