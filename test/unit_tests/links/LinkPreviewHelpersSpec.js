@@ -51,13 +51,13 @@ describe('containsOnlyLink', () => {
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBe(false);
   });
 
-  it('should return false when text contains domain and other text', () => {
+  it('should return false when text contains a domain and other text', () => {
     const text = 'see this http://wire.com';
 
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBe(false);
   });
 
-  it('should return false when text contains domain a code block', () => {
+  it('should return false when text contains a domain in a code block', () => {
     const text = '`see this http://wire.com`';
 
     expect(z.links.LinkPreviewHelpers.containsOnlyLink(text)).toBe(false);
@@ -68,37 +68,37 @@ describe('getFirstLinkWithOffset', () => {
   it('should not return anything for a simple text', () => {
     const text = 'foo bar baz';
 
-    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(text)).not.toBeDefined();
+    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(text)).toBeUndefined();
   });
 
   it('should not return anything for links in code blocks)', () => {
-    const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('cool code: `wire.com`');
+    const text = 'cool code: `wire.com`';
 
-    expect(link_preview).toBeUndefined();
+    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(text)).toBeUndefined();
   });
 
-  it('should return correct link and offset for a single link without text)', () => {
+  it('should return the correct link and offset for a single link without text)', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('wire.com');
 
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });
 
-  it('should return correct link and offset for a single link with text in front)', () => {
+  it('should return the correct link and offset for a single link with text in front)', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('Hey check wire.com');
 
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
 
-  it('should return correct link and offset for a single link surrounded by text)', () => {
+  it('should return the correct link and offset for a single link surrounded by text)', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset('Hey check wire.com PLEASE!');
 
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
 
-  it('should return correct link and offset for a single link surrounded by text)', () => {
+  it('should return the correct link and offset for a single link surrounded by text)', () => {
     const link_preview = z.links.LinkPreviewHelpers.getFirstLinkWithOffset(
       'wire.com wire.com wire.com wire.com wire.com'
     );
