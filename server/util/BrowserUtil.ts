@@ -85,8 +85,8 @@ function parseUserAgent(userAgent?: string): ParsedUserAgent | null {
   const isElectron = !!electronVersion;
   const isFranz = !!franzVersion;
   const isGoogleBot = userAgent.includes('googlebot');
-  const isIOS = agent.platform.includes('ios');
-  const isOSX = agent.platform.includes('mac');
+  const isIOS = agent.platform.toLowerCase().includes('ios');
+  const isOSX = agent.platform.toLowerCase().includes('mac');
   const isWire = !!wireVersion;
   const isYahooBot = userAgent.includes('yahoo');
 
