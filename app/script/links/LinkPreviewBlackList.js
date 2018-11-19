@@ -44,11 +44,11 @@ z.links.LinkPreviewBlackList = (() => {
     'you',
   ];
   const BLACKLIST = [
-    `soundcloud.com/(?!(${soundcloudStatic.join('|')}))`,
-    'spotify.com/(?![A-z]{2}/)',
+    `soundcloud.com/(?!${soundcloudStatic.join('|')})`,
+    'spotify.com/(?!\\w\\w/)',
     'youtu.be',
     'youtube(-nocookie)?.com/(watch|embed)',
-    'vimeo.com/(channels(/[^/]+)?/|video/)?[0-9]+',
+    'vimeo.com/(channels/[^/]+/|video/)?[0-9]+',
   ];
 
   return {
