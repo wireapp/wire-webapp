@@ -80,7 +80,6 @@ module.exports = grunt => {
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
     karma: require('./grunt/config/karma'),
-    less: require('./grunt/config/less'),
     open: require('./grunt/config/open'),
     path: require('path'),
     postcss: require('./grunt/config/postcss'),
@@ -117,14 +116,14 @@ module.exports = grunt => {
       'aws_version_file',
       'copy:frontend',
       'scripts',
-      'less:deploy',
+      'shell:less',
       'postcss:deploy',
       'copy:deploy',
       'copy:deploy_audio',
       'copy:deploy_favicon',
-      'includereplace:deploy_index',
-      'includereplace:deploy_auth',
-      'includereplace:deploy_login',
+      'includereplace:prod_index',
+      'includereplace:prod_auth',
+      'includereplace:prod_login',
       'includereplace:deploy_demo',
       'concat:dev',
       'copy:aws'
@@ -136,17 +135,20 @@ module.exports = grunt => {
   });
 
   grunt.registerTask('build_dev_style', () => {
-    grunt.task.run('less:deploy', 'postcss:deploy', 'copy:deploy', 'copy:aws');
-  });
-
-  grunt.registerTask('build_dev_markup', () => {
     grunt.task.run(
-      'includereplace:deploy_index',
-      'includereplace:deploy_auth',
-      'includereplace:deploy_login',
+      'scripts',
+      'shell:less',
+      'postcss:deploy',
+      'includereplace:prod_index',
+      'includereplace:prod_auth',
+      'includereplace:prod_login',
       'includereplace:deploy_demo',
       'copy:aws'
     );
+  });
+
+  grunt.registerTask('build_dev_markup', () => {
+    grunt.task.run('includereplace:prod_index', 'includereplace:prod_auth', 'includereplace:prod_login', 'copy:aws');
   });
 
   // Test Related

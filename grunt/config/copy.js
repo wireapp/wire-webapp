@@ -45,7 +45,6 @@ module.exports = {
       'audio/**/*',
       'image/**/*',
       'font/**/*',
-      'style/*.css',
       'script/**/*.js',
       'worker/*',
       '*.js',
