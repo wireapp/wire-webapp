@@ -85,7 +85,7 @@ ko.components.register('file-asset', {
             </div>
           <!-- /ko -->
           <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
-            <div class="media-button icon-close" data-bind="click: function() {asset.cancel($parents[1])}, clickBubble: false">
+            <div class="media-button icon-close" data-bind="click: function() {asset.cancel(message)}, clickBubble: false">
               <div class='media-button-border-file-fill'></div>
               <div class='media-button-border-fill'></div>
               <svg class="svg-theme" viewBox="0 0 32 32">

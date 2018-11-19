@@ -31,6 +31,7 @@
       shouldShowInvitePeople,
       onClickAvatar,
       onClickImage,
+      onClickInvitePeople,
       onClickMessage,
       onClickTimestamp,
       onClickParticipants,
@@ -51,6 +52,7 @@
       this.isLastDeliveredMessage = isLastDeliveredMessage;
 
       this.onClickImage = onClickImage;
+      this.onClickInvitePeople = onClickInvitePeople;
       this.onClickAvatar = onClickAvatar;
       this.onClickMessage = onClickMessage;
       this.onClickTimestamp = onClickTimestamp;
@@ -221,7 +223,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render($parent.selfId), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render($parent.selfId()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></link-preview-asset>
@@ -273,7 +275,7 @@
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: () => showLikes(true)">
-        <span class="font-size-xs text-graphite" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
+        <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
         <!-- ko if: !showLikes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
@@ -281,7 +283,7 @@
       <!-- ko if: showLikes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar params="participant: $data, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, click: $parent.onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: () => showLikes(false)"></span>
         </div>
@@ -307,7 +309,7 @@
     <div class="message-header-label ellipsis">
       <span data-bind="html: message.htmlCaption()"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
+      <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
@@ -487,7 +489,7 @@
       <!-- ko if: shouldShowInvitePeople -->
         <div class="message-member-footer">
           <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
-          <div class="message-member-footer-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
+          <div class="message-member-footer-button" data-bind="click: onClickInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
         </div>
       <!-- /ko -->
       <!-- ko if: isSelfTemporaryGuest -->
@@ -530,9 +532,6 @@
     <!-- /ko -->
     <!-- ko if: message.super_type === 'member' -->
       ${memberTemplate}
-    <!-- /ko -->
-    <!-- ko if: message.super_type === 'unable-to-decrypt' -->
-      ${unableToDecryptTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
