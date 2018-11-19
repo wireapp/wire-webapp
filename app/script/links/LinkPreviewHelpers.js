@@ -22,6 +22,8 @@
 window.z = window.z || {};
 window.z.links = z.links || {};
 
+const codeBlockRegex = new RegExp('`(``)?[\\s\\S]*?`(``)?', 'gm');
+
 z.links.LinkPreviewHelpers = {
   /**
    * Check if the text contains only one link
@@ -29,9 +31,9 @@ z.links.LinkPreviewHelpers = {
    * @returns {boolean} Text contains only a link
    */
   containsOnlyLink(text) {
-    text = text.trim();
-    const urls = linkify.find(text, 'url');
-    return urls.length === 1 && urls[0].value === text;
+    const textWithoutCode = text.trim().replace(codeBlockRegex, '');
+    const urls = linkify.find(textWithoutCode, 'url');
+    return urls.length === 1 && urls[0].value === textWithoutCode;
   },
 
   /**
@@ -40,10 +42,12 @@ z.links.LinkPreviewHelpers = {
    * @returns {Object} Containing link and its offset
    */
   getFirstLinkWithOffset(text) {
-    const [firstLink] = linkify.find(text, 'url');
+    const textWithoutCode = text.trim().replace(codeBlockRegex, '');
+
+    const [firstLink] = linkify.find(textWithoutCode, 'url');
 
     if (firstLink) {
-      const linkOffset = text.indexOf(firstLink.value);
+      const linkOffset = textWithoutCode.indexOf(firstLink.value);
       return {
         offset: linkOffset,
         url: firstLink.value,
