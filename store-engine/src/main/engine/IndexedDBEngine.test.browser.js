@@ -19,6 +19,7 @@
 
 import Dexie from 'dexie';
 import {IndexedDBEngine} from '@wireapp/store-engine';
+import {error as StoreEngineError} from '@wireapp/store-engine';
 
 describe('IndexedDBEngine', () => {
   const STORE_NAME = 'store-name';
@@ -99,6 +100,33 @@ describe('IndexedDBEngine', () => {
   describe('"deleteAll"', () => {
     Object.entries(require('../../test/shared/deleteAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
+    });
+  });
+
+  describe('"hasEnoughQuota"', () => {
+    it('says if there is enough storage available to use IndexedDB', async () => {
+      engine = new IndexedDBEngine();
+      const hasEnoughQuota = await engine.hasEnoughQuota();
+      expect(hasEnoughQuota).toBe(true);
+    });
+
+    it('throws an error if there is not enough disk space available', async done => {
+      spyOn(navigator.storage, 'estimate').and.returnValue(
+        Promise.resolve({
+          quota: 0,
+          usage: 0,
+        })
+      );
+
+      engine = new IndexedDBEngine();
+
+      try {
+        await engine.hasEnoughQuota();
+        done.fail();
+      } catch (error) {
+        expect(error instanceof StoreEngineError.LowDiskSpaceError).toBe(true);
+        done();
+      }
     });
   });
 

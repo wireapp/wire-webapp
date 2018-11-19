@@ -1,5 +1,6 @@
 import {FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine/';
 import {
+  LowDiskSpaceError,
   PathValidationError,
   RecordAlreadyExistsError,
   RecordNotFoundError,
@@ -21,6 +22,7 @@ export = {
     TransientStore,
   },
   error: {
+    LowDiskSpaceError,
     PathValidationError,
     RecordAlreadyExistsError,
     RecordNotFoundError,

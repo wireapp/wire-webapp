@@ -1,9 +1,8 @@
 import Dexie from 'dexie';
 import CRUDEngine from './CRUDEngine';
-import {UnsupportedError} from './error/';
+import {LowDiskSpaceError, RecordTypeError, UnsupportedError} from './error/';
 import RecordAlreadyExistsError from './error/RecordAlreadyExistsError';
 import RecordNotFoundError from './error/RecordNotFoundError';
-import RecordTypeError from './error/RecordTypeError';
 
 export interface DexieInstance extends Dexie {
   [index: string]: any;
@@ -13,6 +12,7 @@ export default class IndexedDBEngine implements CRUDEngine {
   private db?: DexieInstance;
   public storeName = '';
 
+  // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on page "about:blank")
   private canUseIndexedDB(): Promise<void> {
     const platform = typeof global === 'undefined' ? window : global;
     if ('indexedDB' in platform) {
@@ -29,21 +29,24 @@ export default class IndexedDBEngine implements CRUDEngine {
         };
       });
     } else {
-      return Promise.reject(new Error('Could not find indexedDB in global scope'));
+      return Promise.reject(new UnsupportedError('Could not find indexedDB in global scope'));
+    }
+  }
+
+  // @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space
+  private async hasEnoughQuota(): Promise<boolean> {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const {quota, usage} = await navigator.storage.estimate();
+      const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
+      return quota ? Promise.resolve(true) : Promise.reject(new LowDiskSpaceError(errorMessage));
+    } else {
+      return Promise.resolve(true);
     }
   }
 
   public async isSupported(): Promise<void> {
-    const message = `IndexedDB is not available on your platform.`;
-    const unsupportedError = new UnsupportedError(message);
-
-    try {
-      // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode)
-      await this.canUseIndexedDB();
-    } catch (error) {
-      // This will be triggered on pages like "about:blank"
-      throw unsupportedError;
-    }
+    await this.canUseIndexedDB();
+    await this.hasEnoughQuota();
   }
 
   public async init(storeName: string): Promise<any> {
