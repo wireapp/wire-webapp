@@ -25,36 +25,60 @@ describe('is_blacklisted', () => {
   it('should return true if link is youtu.be', () => {
     const url = 'https://youtu.be/t4gjl-uwUHc';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return true if link is youtube', () => {
+  it('should return true if link is YouTube', () => {
     const url = 'https://www.youtube.com/watch?v=t4gjl-uwUHc';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return true if link is spotify', () => {
-    const url = 'spotify.com';
+  it('should return false if link is YouTube static', () => {
+    const url = 'https://www.youtube.com/account';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
   });
 
-  it('should return true if link is soundcloud', () => {
-    const url = 'soundcloud.com';
+  it('should return true if link is Spotify', () => {
+    const url = 'https://play.spotify.com/artist/7Ln80lUS6He07XvHI8qqHH/';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return true if link is vimeo', () => {
-    const url = 'vimeo.com';
+  it('should return false if link is Spotify static', () => {
+    const url = 'https://www.spotify.com/en/legal';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
+  });
+
+  it('should return true if link is SoundCloud', () => {
+    const url = 'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it('should return false if link is SoundCloud static', () => {
+    const url = 'https://soundcloud.com/discover';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
+  });
+
+  it('should return true if link is Vimeo', () => {
+    const url = 'https://vimeo.com/27999954';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it('should return false if link is Vimeo static', () => {
+    const url = 'https://vimeo.com/upload';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
   });
 
   it('should return false if link is wire.com', () => {
     const url = 'wire.com';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeFalsy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
   });
 });
