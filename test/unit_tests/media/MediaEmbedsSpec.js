@@ -261,7 +261,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it("doesn't render YouTube profile link", () => {
+      it("doesn't render a YouTube profile link", () => {
         const message =
           '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
         const iframe =
@@ -358,7 +358,7 @@ describe('MediaEmbeds', () => {
     });
 
     describe('Spotify', () => {
-      it('renders artists (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', () => {
+      it('renders artists', () => {
         const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
 
@@ -368,7 +368,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders track (https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8)', () => {
+      it('renders a track', () => {
         const link = 'https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8';
         const partial_link = 'track/26fwlVGkISUr5P91hAeTW8';
 
@@ -378,7 +378,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders album (https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9)', () => {
+      it('renders an album', () => {
         const link = 'https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9';
         const partial_link = 'album/7iN0r7Sl624EkOUNUCOGu9';
 
@@ -388,7 +388,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders playlist (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', () => {
+      it('renders a playlist (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', () => {
         const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
 
@@ -398,7 +398,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
-      it('renders track with params (https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open)', () => {
+      it('renders a track with params', () => {
         const link =
           'https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open';
         const partial_link = 'track/5yEPxDjbbzUzyauGtnmVEC';
@@ -427,7 +427,7 @@ describe('MediaEmbeds', () => {
         expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 
-      it('renders link with params', () => {
+      it('renders a link with params', () => {
         const id = '127053285';
         const link = 'https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914';
 
