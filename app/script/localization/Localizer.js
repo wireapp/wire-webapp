@@ -20,6 +20,29 @@
 'use strict';
 
 import moment from 'moment';
+/* eslint-disable no-unused-vars */
+import cs from 'moment/locale/cs.js';
+import da from 'moment/locale/da.js';
+import de from 'moment/locale/de.js';
+import el from 'moment/locale/el.js';
+import es from 'moment/locale/es.js';
+import et from 'moment/locale/et.js';
+import fi from 'moment/locale/fi.js';
+import fr from 'moment/locale/fr.js';
+import hr from 'moment/locale/hr.js';
+import hu from 'moment/locale/hu.js';
+import it from 'moment/locale/it.js';
+import lt from 'moment/locale/lt.js';
+import nl from 'moment/locale/nl.js';
+import pl from 'moment/locale/pl.js';
+import pt from 'moment/locale/pt.js';
+import ro from 'moment/locale/ro.js';
+import ru from 'moment/locale/ru.js';
+import sk from 'moment/locale/sk.js';
+import sl from 'moment/locale/sl.js';
+import tr from 'moment/locale/tr.js';
+import uk from 'moment/locale/uk.js';
+/* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 
