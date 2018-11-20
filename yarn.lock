@@ -883,10 +883,6 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bower_components/antiscroll-2@wireapp/antiscroll-2#v1.3.1":
-  version "1.3.1"
-  resolved "https://codeload.github.com/wireapp/antiscroll-2/tar.gz/36f68aeabfccf170d3f8cf78ce249f2a4f0bda55"
-
 "@bower_components/cryptojs@brix/crypto-js#3.1.9-1":
   version "3.1.9"
   resolved "https://codeload.github.com/brix/crypto-js/tar.gz/0596faee7aa619f6f25e43e770e545ae7233b095"
@@ -896,10 +892,6 @@
   resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/eaf8625985f235915ae4db7925576d8e2dd4bb08"
   dependencies:
     protobufjs "6.8.8"
-
-"@bower_components/highlightjs@components/highlightjs#9.12.0":
-  version "9.12.0"
-  resolved "https://codeload.github.com/components/highlightjs/tar.gz/3686afa1decd999857ac9e1ae27c24df2e64be3a"
 
 "@bower_components/jquery-mousewheel@jquery/jquery-mousewheel#3.1.13":
   version "3.1.13"
@@ -956,13 +948,6 @@
 "@bower_components/webapp-module-namespace@wireapp/webapp-module-namespace#1.0.2":
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
-
-"@bower_components/webrtc-adapter@webrtcHacks/adapter#v6.4.4":
-  version "6.4.4"
-  resolved "https://codeload.github.com/webrtcHacks/adapter/tar.gz/09510081a6cdbe1ab2236b485012c42d5806bed7"
-  dependencies:
-    rtcpeerconnection-shim "^1.2.14"
-    sdp "^2.9.0"
 
 "@bower_components/wire-audio-files@wireapp/wire-audio-files#v1.1.2":
   version "1.1.2"
@@ -1575,6 +1560,11 @@
     "@webassemblyjs/ast" "1.7.11"
     "@webassemblyjs/wast-parser" "1.7.11"
     "@xtuc/long" "4.2.1"
+
+"@wireapp/antiscroll-2@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
+  integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
 "@wireapp/api-client@3.2.4":
   version "3.2.4"
@@ -6303,6 +6293,11 @@ hide-powered-by@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/hide-powered-by/-/hide-powered-by-1.0.0.tgz#4a85ad65881f62857fc70af7174a1184dccce32b"
   integrity sha1-SoWtZYgfYoV/xwr3F0oRhNzM4ys=
+
+highlightjs@9.12.0:
+  version "9.12.0"
+  resolved "https://registry.yarnpkg.com/highlightjs/-/highlightjs-9.12.0.tgz#9b84eb42a7aa8488eb69ac79fec44cf495bf72a1"
+  integrity sha512-eAhWMtDZaOZIQdxIP4UEB1vNp/CVXQPdMSihTSuaExhFIRC0BVpXbtP3mTP1hDoGOyh7nbB3cuC3sOPhG5wGDA==
 
 history@^4.7.2:
   version "4.7.2"
