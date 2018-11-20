@@ -29,7 +29,6 @@ import platform from 'platform';
 import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
 import index from '../../ext/js/url-search-params-polyfill/index.js';
 import raygun from '../../ext/js/raygun4js/raygun.vanilla.js';
-import poster from '../../ext/js/poster-image/poster.js';
 
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
 import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';

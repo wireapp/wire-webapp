@@ -903,14 +903,6 @@
   version "3.0.3"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
 
-"@bower_components/phone-format@albeebe/phoneformat.js#1.0.6":
-  version "1.0.5"
-  resolved "https://codeload.github.com/albeebe/phoneformat.js/tar.gz/6adb62e70153d9a5edb95f42deba144d6f914f37"
-
-"@bower_components/platform.js@bestiejs/platform.js#1.3.5":
-  version "1.3.5"
-  resolved "https://codeload.github.com/bestiejs/platform.js/tar.gz/b3f1c56de9d39ea4cd1ca8271155faceb1e93092"
-
 "@bower_components/poster-image@herrmannplatz/poster-image#v1.1.1":
   version "1.1.1"
   resolved "https://codeload.github.com/herrmannplatz/poster-image/tar.gz/27cace8eead6a17d056377a072b3080468e1cee2"
@@ -10359,6 +10351,11 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2, postcss@^7.0.3, postcss@^7.0.5:
     chalk "^2.4.1"
     source-map "^0.6.1"
     supports-color "^5.5.0"
+
+poster-image@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/poster-image/-/poster-image-1.1.1.tgz#fe263322b583aef7ad4190c248644027914d534a"
+  integrity sha512-o1s09JA5FLQocp/XVbxOwS9FhLqA8N0vgLhFsMX4rNt+i2oyMJsNON+OHR5tOA66EPF9zfxCCyOL9bqPZ5p85g==
 
 prebuild-install@^2.3.0:
   version "2.3.0"
