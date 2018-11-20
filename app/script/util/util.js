@@ -22,6 +22,7 @@
 import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import marked from './marked.js';
+import hljs from 'highlightjs';
 
 window.z = window.z || {};
 window.z.util = z.util || {};

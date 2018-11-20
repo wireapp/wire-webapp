@@ -20,6 +20,9 @@
 'use strict';
 
 import SimpleBar from 'simplebar';
+/* eslint-disable no-unused-vars */
+import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
+/* eslint-enable no-unused-vars */
 
 /**
  * Use it on the drop area.

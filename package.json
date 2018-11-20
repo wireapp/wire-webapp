@@ -2,6 +2,7 @@
   "name": "wire-webapp",
   "license": "GPL-3.0",
   "dependencies": {
+    "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "0.6.27",
     "@wireapp/cryptobox": "9.0.24",
     "@wireapp/lru-cache": "3.0.15",
@@ -18,6 +19,7 @@
     "geolite2": "1.3.0",
     "hbs": "4.0.1",
     "helmet": "3.15.0",
+    "highlightjs": "9.12.0",
     "keyboardjs": "2.5.1",
     "knockout": "3.4.2",
     "logdown": "3.2.7",
@@ -36,10 +38,8 @@
     "@babel/preset-env": "7.1.5",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
-    "@bower_components/antiscroll-2": "wireapp/antiscroll-2#v1.3.1",
     "@bower_components/cryptojs": "brix/crypto-js#3.1.9-1",
     "@bower_components/generic-message-proto": "wireapp/generic-message-proto#v1.22.1",
-    "@bower_components/highlightjs": "components/highlightjs#9.12.0",
     "@bower_components/jquery-mousewheel": "jquery/jquery-mousewheel#3.1.13",
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
@@ -247,10 +247,6 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "exportsOverride": {
-    "@bower_components/antiscroll-2": {
-      "css": "dist/antiscroll-2.css",
-      "js": "dist/antiscroll-2.js"
-    },
     "@bower_components/cryptojs": {
       "js": [
         "core.js",
@@ -259,10 +255,6 @@
         "enc-base64.js",
         "sha256.js"
       ]
-    },
-    "@bower_components/highlightjs": {
-      "js": "highlight.pack.js",
-      "css": "styles/github.css"
     },
     "@bower_components/jquery-mousewheel": {
       "js": "jquery.mousewheel.js"
