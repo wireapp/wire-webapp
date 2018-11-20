@@ -1,3 +1,5 @@
+import CryptoJS from 'crypto-js';
+
 z.telemetry.calling.CallLogger = class CallLogger {
   static get CONFIG() {
     return {
