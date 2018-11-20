@@ -26,7 +26,6 @@ import {amplify} from 'amplify';
 import platform from 'platform';
 
 import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
-import index from '../../ext/js/url-search-params-polyfill/index.js';
 import raygun from '../../ext/js/raygun4js/raygun.vanilla.js';
 
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
@@ -91,7 +90,6 @@ import StorageKeyGlobal from '../storage/StorageKey.js';
 import StorageRepositoryGlobal from '../storage/StorageRepository.js';
 import StorageSchemataGlobal from '../storage/StorageSchemata.js';
 import StorageServiceGlobal from '../storage/StorageService.js';
-import webappGlobal from '../localization/webapp.js';
 import LocalizerGlobal from '../localization/Localizer.js';
 import TrackConversationTypeGlobal from '../tracking/attribute/ConversationType.js';
 import DeleteTypeGlobal from '../tracking/attribute/DeleteType.js';

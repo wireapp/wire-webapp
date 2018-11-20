@@ -883,12 +883,6 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bower_components/generic-message-proto@wireapp/generic-message-proto#v1.22.1":
-  version "1.22.1"
-  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/eaf8625985f235915ae4db7925576d8e2dd4bb08"
-  dependencies:
-    protobufjs "6.8.8"
-
 "@bower_components/jquery-mousewheel@jquery/jquery-mousewheel#3.1.13":
   version "3.1.13"
   resolved "https://codeload.github.com/jquery/jquery-mousewheel/tar.gz/67289b6b2aa0066d7d78a5807f520387135ffb22"
@@ -903,10 +897,6 @@
   version "3.0.3"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
 
-"@bower_components/poster-image@herrmannplatz/poster-image#v1.1.1":
-  version "1.1.1"
-  resolved "https://codeload.github.com/herrmannplatz/poster-image/tar.gz/27cace8eead6a17d056377a072b3080468e1cee2"
-
 "@bower_components/raygun4js@MindscapeHQ/raygun4js#v2.13.2":
   version "2.13.2"
   resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/3a240172d66d70cc406437cee1c19fea0ae63c26"
@@ -914,10 +904,6 @@
 "@bower_components/speakingurl@pid/speakingurl#v14.0.1":
   version "14.0.1"
   resolved "https://codeload.github.com/pid/speakingurl/tar.gz/d4b7a23985308d0c1f32eaa242f9ff99c5567a04"
-
-"@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#v5.0.0":
-  version "5.0.0"
-  resolved "https://codeload.github.com/jerrybendy/url-search-params-polyfill/tar.gz/edb62235e522bcaa7d2db97e15262e286b5971f6"
 
 "@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.1":
   version "1.1.1"
@@ -13151,6 +13137,11 @@ url-parse@^1.4.3:
   dependencies:
     querystringify "^2.0.0"
     requires-port "^1.0.0"
+
+url-search-params-polyfill@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-5.0.0.tgz#09b98337c89dcf6c6a6a0bfeb096f6ba83b7526b"
+  integrity sha512-+SCD22QJp4UnqPOI5UTTR0Ljuh8cHbjEf1lIiZrZ8nHTlTixqwVsVQTSfk5vrmDz7N09/Y+ka5jQr0ff35FnQQ==
 
 url@^0.11.0:
   version "0.11.0"
