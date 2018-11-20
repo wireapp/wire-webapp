@@ -26,7 +26,6 @@ import {amplify} from 'amplify';
 window.amplify = amplify;
 import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
 import index from '../../ext/js/url-search-params-polyfill/index.js';
-import adapter from '../../ext/js/webrtc-adapter/adapter.js';
 import antiscroll2 from '../../ext/js/antiscroll-2/antiscroll-2.js';
 import highlight from '../../ext/js/highlightjs/highlight.pack.js';
 // import cs from 'moment/locale/cs.js';

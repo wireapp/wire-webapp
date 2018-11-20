@@ -27,7 +27,8 @@
     "protobufjs": "https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "uint32": "0.2.1",
     "underscore": "1.9.1",
-    "uuidjs": "4.0.3"
+    "uuidjs": "4.0.3",
+    "webrtc-adapter": "6.4.6"
   },
   "devDependencies": {
     "@babel/core": "7.1.5",
@@ -52,7 +53,6 @@
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
-    "@bower_components/webrtc-adapter": "webrtcHacks/adapter#v6.4.4",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#v1.1.2",
     "@bower_components/wire-theme": "wireapp/wire-theme#v1.0.6",
     "@types/dotenv": "6.1.0",
@@ -309,9 +309,6 @@
     },
     "@bower_components/webapp-module-namespace": {
       "js": "js/*.js"
-    },
-    "@bower_components/webrtc-adapter": {
-      "js": "release/adapter.js"
     },
     "@bower_components/wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
