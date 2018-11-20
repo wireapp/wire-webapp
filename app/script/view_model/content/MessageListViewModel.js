@@ -19,6 +19,8 @@
 
 'use strict';
 
+import moment from 'moment';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
