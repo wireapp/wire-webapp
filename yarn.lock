@@ -905,10 +905,6 @@
   version "3.1.13"
   resolved "https://codeload.github.com/jquery/jquery-mousewheel/tar.gz/67289b6b2aa0066d7d78a5807f520387135ffb22"
 
-"@bower_components/js-cookie@js-cookie/js-cookie#v2.2.0":
-  version "2.2.0"
-  resolved "https://codeload.github.com/js-cookie/js-cookie/tar.gz/34f056cd261982828072b84a9bbdcd8c3d9931ad"
-
 "@bower_components/libsodium.js@jedisct1/libsodium.js#0.7.3":
   version "0.7.3"
   resolved "https://codeload.github.com/jedisct1/libsodium.js/tar.gz/ef2cc92f2388e37ebf714d37bfae85850ed302d4"
@@ -918,10 +914,6 @@
 "@bower_components/normalize-css@necolas/normalize.css#3.0.3":
   version "3.0.3"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
-
-"@bower_components/pako@nodeca/pako#1.0.6":
-  version "1.0.6"
-  resolved "https://codeload.github.com/nodeca/pako/tar.gz/893381abcafa10fa2081ce60dae7d4d8e873a658"
 
 "@bower_components/phone-format@albeebe/phoneformat.js#1.0.6":
   version "1.0.5"
@@ -9303,15 +9295,15 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.0.0.tgz#85080bb87c64688fa47996fe8f7dfbe8211760b1"
   integrity sha512-hMp0onDKIajHfIkdRk3P4CdCmErkYAxxDtP3Wx/4nZ3aGlau2VKh3mZpcuFkH27WQkL/3WBCPOktzA9ZOAnMQQ==
 
+pako@1.0.6, pako@~1.0.2:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
+  integrity sha512-lQe48YPsMJAig+yngZ87Lus+NF+3mtu7DVOBu6b/gHO1YpKwIj5AWjZ/TOS7i46HD/UixzWb1zeWDZfGZ3iYcg==
+
 pako@^0.2.5, pako@~0.2.0:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
   integrity sha1-8/dSL073gjSNqBYbrZ7P1Rv4OnU=
-
-pako@~1.0.2:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
-  integrity sha512-lQe48YPsMJAig+yngZ87Lus+NF+3mtu7DVOBu6b/gHO1YpKwIj5AWjZ/TOS7i46HD/UixzWb1zeWDZfGZ3iYcg==
 
 parallel-transform@^1.1.0:
   version "1.1.0"

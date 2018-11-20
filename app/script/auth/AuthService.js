@@ -19,6 +19,8 @@
 
 'use strict';
 
+import pako from 'pako';
+
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 

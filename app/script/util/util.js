@@ -19,8 +19,9 @@
 
 'use strict';
 
-import bazinga64 from 'bazinga64';
+import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
+import marked from './marked.js';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -201,14 +202,14 @@ z.util.stripDataUri = string => string.replace(/^data:.*,/, '');
  * @param {string} base64 - base64 encoded string
  * @returns {UInt8Array} Typed array
  */
-z.util.base64ToArray = base64 => bazinga64.Decoder.fromBase64(z.util.stripDataUri(base64)).asBytes;
+z.util.base64ToArray = base64 => Decoder.fromBase64(z.util.stripDataUri(base64)).asBytes;
 
 /**
  * Convert ArrayBuffer or UInt8Array to base64 string
  * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
  * @returns {string} Base64-encoded string
  */
-z.util.arrayToBase64 = array => bazinga64.Encoder.toBase64(new Uint8Array(array)).asString;
+z.util.arrayToBase64 = array => Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
