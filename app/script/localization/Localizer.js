@@ -20,32 +20,27 @@
 'use strict';
 
 window.z = window.z || {};
-z.localization = z.localization || {};
 
-class Localizer {
-  constructor() {
-    const DEFAULT_LOCALE = 'en';
-    const queryParam = z.util.URLUtil.getParameter(z.auth.URLParameter.LOCALE);
-    const currentBrowserLocale = navigator.language.substr(0, 2);
-    let storedLocale = z.util.StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
+(function setAppLocale() {
+  const DEFAULT_LOCALE = 'en';
+  const queryParam = z.util.URLUtil.getParameter(z.auth.URLParameter.LOCALE);
+  const currentBrowserLocale = navigator.language.substr(0, 2);
+  let storedLocale = z.util.StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
 
-    if (queryParam) {
-      storedLocale = z.util.StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
-    }
-
-    this.locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
-
-    document.getElementsByTagName('html')[0].setAttribute('lang', this.locale);
-
-    moment.locale([this.locale, DEFAULT_LOCALE]);
-
-    if (z.string[this.locale]) {
-      Object.assign(z.string, z.string[this.locale]);
-    }
+  if (queryParam) {
+    storedLocale = z.util.StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
-}
 
-z.localization.Localizer = new Localizer();
+  const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
+
+  document.getElementsByTagName('html')[0].setAttribute('lang', locale);
+
+  moment.locale([locale, DEFAULT_LOCALE]);
+
+  if (z.string[locale]) {
+    Object.assign(z.string, z.string[locale]);
+  }
+})();
 
 z.l10n = (() => {
   const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);

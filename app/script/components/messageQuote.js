@@ -51,6 +51,7 @@ z.components.MessageQuote = class MessageQuote {
 
     this.locationRepository = locationRepository;
     this.selfId = selfId;
+    this.moment = moment;
 
     this.canShowMore = ko.observable(false);
     this.showFullText = ko.observable(false);
