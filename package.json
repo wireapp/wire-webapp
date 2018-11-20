@@ -6,6 +6,7 @@
     "@wireapp/cryptobox": "9.0.24",
     "@wireapp/lru-cache": "3.0.15",
     "@wireapp/proteus": "8.0.17",
+    "@wireapp/protocol-messaging": "1.22.1",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "bytebuffer": "5.0.1",
     "dexie": "2.0.4",
