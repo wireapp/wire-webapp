@@ -19,148 +19,147 @@
 
 'use strict';
 
-(() => {
-  class Message {
-    constructor({
-      message,
-      conversation,
-      selfId,
-      isSelfTemporaryGuest,
-      isLastDeliveredMessage,
-      shouldShowAvatar,
-      shouldShowInvitePeople,
-      onClickAvatar,
-      onClickImage,
-      onClickInvitePeople,
-      onClickMessage,
-      onClickTimestamp,
-      onClickParticipants,
-      onClickResetSession,
-      onClickCancelRequest,
-      onLike,
-      conversationRepository,
-      locationRepository,
-      actionsViewModel,
-    }) {
-      this.message = message;
-      this.conversation = conversation;
+class Message {
+  constructor({
+    message,
+    conversation,
+    selfId,
+    isSelfTemporaryGuest,
+    isLastDeliveredMessage,
+    shouldShowAvatar,
+    shouldShowInvitePeople,
+    onClickAvatar,
+    onClickImage,
+    onClickInvitePeople,
+    onClickMessage,
+    onClickTimestamp,
+    onClickParticipants,
+    onClickResetSession,
+    onClickCancelRequest,
+    onLike,
+    conversationRepository,
+    locationRepository,
+    actionsViewModel,
+  }) {
+    this.message = message;
+    this.conversation = conversation;
 
-      this.shouldShowAvatar = shouldShowAvatar;
-      this.shouldShowInvitePeople = shouldShowInvitePeople;
-      this.selfId = selfId;
-      this.isSelfTemporaryGuest = isSelfTemporaryGuest;
-      this.isLastDeliveredMessage = isLastDeliveredMessage;
+    this.shouldShowAvatar = shouldShowAvatar;
+    this.shouldShowInvitePeople = shouldShowInvitePeople;
+    this.selfId = selfId;
+    this.isSelfTemporaryGuest = isSelfTemporaryGuest;
+    this.isLastDeliveredMessage = isLastDeliveredMessage;
 
-      this.onClickImage = onClickImage;
-      this.onClickInvitePeople = onClickInvitePeople;
-      this.onClickAvatar = onClickAvatar;
-      this.onClickMessage = onClickMessage;
-      this.onClickTimestamp = onClickTimestamp;
-      this.onClickParticipants = onClickParticipants;
-      this.onClickResetSession = onClickResetSession;
-      this.onClickCancelRequest = onClickCancelRequest;
-      this.onLike = onLike;
+    this.onClickImage = onClickImage;
+    this.onClickInvitePeople = onClickInvitePeople;
+    this.onClickAvatar = onClickAvatar;
+    this.onClickMessage = onClickMessage;
+    this.onClickTimestamp = onClickTimestamp;
+    this.onClickParticipants = onClickParticipants;
+    this.onClickResetSession = onClickResetSession;
+    this.onClickCancelRequest = onClickCancelRequest;
+    this.onLike = onLike;
 
-      this.conversationRepository = conversationRepository;
-      this.locationRepository = locationRepository;
+    this.conversationRepository = conversationRepository;
+    this.locationRepository = locationRepository;
 
-      this.actionsViewModel = actionsViewModel;
+    this.actionsViewModel = actionsViewModel;
 
-      this.showLikes = ko.observable(false);
+    this.showLikes = ko.observable(false);
 
-      this.bindShowMore = this.bindShowMore.bind(this);
-    }
-
-    getSystemMessageIconComponent(message) {
-      const iconComponents = {
-        [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-        [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
-      };
-      return iconComponents[message.system_message_type];
-    }
-
-    showDevice(messageEntity) {
-      const topic = messageEntity.isSelfClient()
-        ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
-        : z.event.WebApp.SHORTCUT.PEOPLE;
-      amplify.publish(topic);
-    }
-
-    showContextMenu(messageEntity, event) {
-      const entries = [];
-
-      if (messageEntity.is_downloadable()) {
-        entries.push({
-          click: () => messageEntity.download(),
-          label: z.l10n.text(z.string.conversationContextMenuDownload),
-        });
-      }
-
-      if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
-        const stringId = messageEntity.is_liked()
-          ? z.string.conversationContextMenuUnlike
-          : z.string.conversationContextMenuLike;
-
-        entries.push({
-          click: () => this.onLike(messageEntity, false),
-          label: z.l10n.text(stringId),
-        });
-      }
-
-      if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
-        entries.push({
-          click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuEdit),
-        });
-      }
-
-      if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
-        entries.push({
-          click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuReply),
-        });
-      }
-
-      if (messageEntity.isCopyable()) {
-        entries.push({
-          click: () => messageEntity.copy(),
-          label: z.l10n.text(z.string.conversationContextMenuCopy),
-        });
-      }
-
-      if (messageEntity.is_deletable()) {
-        entries.push({
-          click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuDelete),
-        });
-      }
-
-      const isSendingMessage = messageEntity.status() === z.message.StatusType.SENDING;
-      const canDelete =
-        messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
-      if (canDelete) {
-        entries.push({
-          click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
-        });
-      }
-
-      z.ui.Context.from(event, entries, 'message-options-menu');
-    }
-
-    bindShowMore(elements, scope) {
-      const label = elements.find(element => element.className === 'message-header-label');
-      if (!label) {
-        return;
-      }
-      const link = label.querySelector('.message-header-show-more');
-      if (link) {
-        link.addEventListener('click', () => this.onClickParticipants(scope.message.highlightedUsers()));
-      }
-    }
+    this.bindShowMore = this.bindShowMore.bind(this);
   }
 
-  const normalTemplate = `
+  getSystemMessageIconComponent(message) {
+    const iconComponents = {
+      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+    };
+    return iconComponents[message.system_message_type];
+  }
+
+  showDevice(messageEntity) {
+    const topic = messageEntity.isSelfClient()
+      ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
+      : z.event.WebApp.SHORTCUT.PEOPLE;
+    amplify.publish(topic);
+  }
+
+  showContextMenu(messageEntity, event) {
+    const entries = [];
+
+    if (messageEntity.is_downloadable()) {
+      entries.push({
+        click: () => messageEntity.download(),
+        label: z.l10n.text(z.string.conversationContextMenuDownload),
+      });
+    }
+
+    if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
+      const stringId = messageEntity.is_liked()
+        ? z.string.conversationContextMenuUnlike
+        : z.string.conversationContextMenuLike;
+
+      entries.push({
+        click: () => this.onLike(messageEntity, false),
+        label: z.l10n.text(stringId),
+      });
+    }
+
+    if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuEdit),
+      });
+    }
+
+    if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuReply),
+      });
+    }
+
+    if (messageEntity.isCopyable()) {
+      entries.push({
+        click: () => messageEntity.copy(),
+        label: z.l10n.text(z.string.conversationContextMenuCopy),
+      });
+    }
+
+    if (messageEntity.is_deletable()) {
+      entries.push({
+        click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuDelete),
+      });
+    }
+
+    const isSendingMessage = messageEntity.status() === z.message.StatusType.SENDING;
+    const canDelete =
+      messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
+    if (canDelete) {
+      entries.push({
+        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
+      });
+    }
+
+    z.ui.Context.from(event, entries, 'message-options-menu');
+  }
+
+  bindShowMore(elements, scope) {
+    const label = elements.find(element => element.className === 'message-header-label');
+    if (!label) {
+      return;
+    }
+    const link = label.querySelector('.message-header-show-more');
+    if (link) {
+      link.addEventListener('click', () => this.onClickParticipants(scope.message.highlightedUsers()));
+    }
+  }
+}
+
+const normalTemplate = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
@@ -292,7 +291,7 @@
   <!-- /ko -->
   `;
 
-  const missedTemplate = `
+const missedTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -301,7 +300,7 @@
   </div>
   `;
 
-  const unableToDecryptTemplate = `
+const unableToDecryptTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -330,7 +329,7 @@
   </div>
   `;
 
-  const systemTemplate = `
+const systemTemplate = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg text-graphite">
       <span data-bind="component: getSystemMessageIconComponent(message)"></span>
@@ -347,7 +346,7 @@
   <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
   `;
 
-  const pingTemplate = `
+const pingTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
@@ -362,7 +361,7 @@
   </div>
   `;
 
-  const deleteTemplate = `
+const deleteTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
@@ -377,7 +376,7 @@
   </div>
   `;
 
-  const verificationTemplate = `
+const verificationTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <!-- ko if: message.isTypeVerified() -->
@@ -411,7 +410,7 @@
   </div>
   `;
 
-  const callTemplate = `
+const callTemplate = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
       <!-- ko if: message.was_completed() -->
@@ -431,7 +430,7 @@
   </div>
   `;
 
-  const memberTemplate = `
+const memberTemplate = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: message.otherUser().name()'></span>
@@ -507,8 +506,8 @@
     <!-- /ko -->
   <!-- /ko -->  `;
 
-  ko.components.register('message', {
-    template: `
+ko.components.register('message', {
+  template: `
     <!-- ko if: message.super_type === 'normal' -->
       ${normalTemplate}
     <!-- /ko -->
@@ -537,6 +536,5 @@
       ${pingTemplate}
     <!-- /ko -->
     `,
-    viewModel: Message,
-  });
-})();
+  viewModel: Message,
+});
