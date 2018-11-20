@@ -19,6 +19,8 @@
 
 'use strict';
 
+import moment from 'moment';
+
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
  */

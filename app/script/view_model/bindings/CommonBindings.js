@@ -19,6 +19,7 @@
 
 'use strict';
 
+import moment from 'moment';
 import SimpleBar from 'simplebar';
 /* eslint-disable no-unused-vars */
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';

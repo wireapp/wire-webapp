@@ -18,6 +18,7 @@
  */
 
 'use strict';
+import moment from 'moment';
 
 moment.fn.isToday = function() {
   return this.isSame(new Date(), 'd');
