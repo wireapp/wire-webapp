@@ -3,7 +3,7 @@
     "@types/bro-fs": "0.4.1",
     "@types/filesystem": "0.0.29",
     "@types/node": "10.12.9",
-    "bro-fs": "0.4.0",
+    "bro-fs": "0.5.0",
     "dexie": "2.0.4",
     "fs-extra": "7.0.1"
   },
