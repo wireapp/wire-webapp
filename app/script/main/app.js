@@ -64,7 +64,6 @@ import sha256 from '../../ext/js/crypto-js/sha256.js';
 import simplebar from '../../ext/js/simplebar/dist/simplebar.min.js';
 // import sodium from '../../ext/js/libsodium.js/sodium.js';
 // import cbor from '../../ext/js/@wireapp/cbor/dist/cbor.bundle.js';
-// import jszip from '../../ext/js/jszip/dist/jszip.js';
 
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
 import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
