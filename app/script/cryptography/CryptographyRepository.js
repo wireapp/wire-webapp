@@ -20,6 +20,7 @@
 'use strict';
 
 import StoreEngine from '@wireapp/store-engine';
+import {Cryptobox} from '@wireapp/cryptobox';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -96,9 +97,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
       const storeEngine = new StoreEngine.IndexedDBEngine();
       storeEngine.initWithDb(database);
-      this.cryptobox = new cryptobox.Cryptobox(storeEngine, 10);
+      this.cryptobox = new Cryptobox(storeEngine, 10);
 
-      this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
+      this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
         const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
 
         this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
@@ -107,7 +108,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         });
       });
 
-      this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, sessionId => {
+      this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
         const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
         amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId}, true);
       });

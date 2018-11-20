@@ -935,15 +935,6 @@
   version "1.1.1"
   resolved "https://codeload.github.com/herrmannplatz/poster-image/tar.gz/27cace8eead6a17d056377a072b3080468e1cee2"
 
-"@bower_components/protobuf@gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a":
-  version "5.0.1"
-  resolved "https://codeload.github.com/gregor/protobuf.js/tar.gz/32ada41d3c963bd5f43d7cdadced2d6d2ccd082a"
-  dependencies:
-    ascli "~1"
-    bytebuffer "~5"
-    glob "^5.0.10"
-    yargs "^3.10.0"
-
 "@bower_components/raygun4js@MindscapeHQ/raygun4js#v2.13.2":
   version "2.13.2"
   resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/3a240172d66d70cc406437cee1c19fea0ae63c26"
@@ -951,10 +942,6 @@
 "@bower_components/speakingurl@pid/speakingurl#v14.0.1":
   version "14.0.1"
   resolved "https://codeload.github.com/pid/speakingurl/tar.gz/d4b7a23985308d0c1f32eaa242f9ff99c5567a04"
-
-"@bower_components/uint32@fxa/uint32.js#0.2.1":
-  version "0.2.1"
-  resolved "https://codeload.github.com/fxa/uint32.js/tar.gz/ab04fe14206e46688009d7228e3e8de0fdc8eeb0"
 
 "@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#v5.0.0":
   version "5.0.0"
@@ -1319,7 +1306,7 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.0.tgz#5a7306e367c539b9f6543499de8dd519fac37a8b"
   integrity sha512-A2TAGbTFdBw9azHbpVd+/FkdW2T6msN1uct1O9bH3vTerEHKZhTXJUQXy+hNq1B0RagfU8U+KBdqiZpxjhOUQA==
 
-"@types/node@*", "@types/node@10.12.9", "@types/node@^10.1.0":
+"@types/node@*", "@types/node@10.12.9":
   version "10.12.9"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.9.tgz#a07bfa74331471e1dc22a47eb72026843f7b95c8"
   integrity sha512-eajkMXG812/w3w4a1OcBlaTwsFPO5F7fJ/amy+tieQxEMWBlbV1JGSjkFM+zkHNf81Cad+dfIRA+IBkvmvdAeA==
@@ -1333,6 +1320,11 @@
   version "10.12.10"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.10.tgz#4fa76e6598b7de3f0cb6ec3abacc4f59e5b3a2ce"
   integrity sha512-8xZEYckCbUVgK8Eg7lf5Iy4COKJ5uXlnIOnePN0WUwSQggy9tolM+tDJf7wMOnT/JT/W9xDYIaYggt3mRV2O5w==
+
+"@types/node@^10.1.0":
+  version "10.5.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.2.tgz#f19f05314d5421fe37e74153254201a7bf00a707"
+  integrity sha512-m9zXmifkZsMHZBOyxZWilMwmTlpC8x5Ty360JKTiXvlXZfBWYpsg9ZZvP/Ye+iZUh+Q+MxDLjItVTWIsfwz+8Q==
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -1609,6 +1601,11 @@
     spark-md5 "3.0.0"
     tough-cookie "2.4.3"
 
+"@wireapp/cbor@3.0.105":
+  version "3.0.105"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.105.tgz#7f40598b6c75ed3374ba2ce6789178e4df3c4328"
+  integrity sha512-XUIJdcdMXY9SWPIGIn4GK1+YMMHkMrSsrC1sicbkqvCiAUYUvrMFhxy18ZL6f4ri+IAquA7pwnsdbnvXq/5Dzw==
+
 "@wireapp/cbor@3.0.106":
   version "3.0.106"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.106.tgz#e2da8dd8599632ce77b943c4c81d23bafcdbc424"
@@ -1638,6 +1635,22 @@
     protobufjs "6.8.8"
     pure-uuid "1.5.5"
 
+"@wireapp/cryptobox@9.0.24":
+  version "9.0.24"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-9.0.24.tgz#88c2fcedd7deb042246225905818e141b378912a"
+  integrity sha512-cdKj3txHpahFxWzWtbZo9fmNko+zXmflBST3wc3+XIlPJ0AHPFtiHq5ujpk3l8uvp88qTOF9JkIfibL4CrlbJg==
+  dependencies:
+    "@types/fs-extra" "5.0.4"
+    "@types/node" "10.12.9"
+    "@wireapp/lru-cache" "3.0.16"
+    "@wireapp/priority-queue" "0.2.45"
+    "@wireapp/proteus" "8.0.17"
+    "@wireapp/store-engine" "1.1.2"
+    bazinga64 "5.3.29"
+    dexie "2.0.4"
+    fs-extra "7.0.1"
+    logdown "3.2.7"
+
 "@wireapp/cryptobox@9.0.27":
   version "9.0.27"
   resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-9.0.27.tgz#927e2940622548599b41437c8e0bec10fba6272a"
@@ -1654,10 +1667,23 @@
     fs-extra "7.0.1"
     logdown "3.2.7"
 
+"@wireapp/lru-cache@3.0.15":
+  version "3.0.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-3.0.15.tgz#b5985120522e5a6bde2b8ca30eaaccb630edbdcd"
+  integrity sha512-G7xc3NsSKUevRhd6DsNdNWRZK0UPICnS2y4htPqIosuiYYio2ga8+7WW5xs16ys+bDoSyxuTbgbdWgDsOdm9CA==
+
 "@wireapp/lru-cache@3.0.16":
   version "3.0.16"
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-3.0.16.tgz#fac46c6d02e2840aab6f56742061c4d57d7c89c1"
   integrity sha512-8AWvgoFhmRNnywO9gcgYHUYf1n5c3XVQ/sxBQSlJ2YCrl8pfJbInjUBnSSfpIIrb8OsDrlVBKx+NMYVvUHJgmg==
+
+"@wireapp/priority-queue@0.2.45":
+  version "0.2.45"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.2.45.tgz#ab7c6aa8f037e6d58a02eab2ec3775922073de3f"
+  integrity sha512-2if5rCIO/5wXK6GTG7KRDhhqE4uIpPlF/DCdQqnBrJa0r3fadABtCvKeHaab0nXod4/C9h9R6f+wp5ZulsgIYA==
+  dependencies:
+    "@types/node" "10.12.9"
+    pure-uuid "1.5.5"
 
 "@wireapp/priority-queue@0.2.46":
   version "0.2.46"
@@ -1666,6 +1692,18 @@
   dependencies:
     "@types/node" "10.12.10"
     pure-uuid "1.5.5"
+
+"@wireapp/proteus@8.0.17":
+  version "8.0.17"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-8.0.17.tgz#b98fe0c86834101dfeb7b794b9740804729ad85d"
+  integrity sha512-bm4XiA4FfTcE08aI1CQCSzWt9aH49GPBPs8Tr5rNiq0yjf+2M21n7U58+26zGGUE+XdV4eGDwUolFCBuUUL7bg==
+  dependencies:
+    "@types/chai" "4.1.7"
+    "@types/ed2curve" "0.2.2"
+    "@types/node" "10.12.9"
+    "@wireapp/cbor" "3.0.105"
+    ed2curve "0.2.1"
+    libsodium-wrappers-sumo "0.7.3"
 
 "@wireapp/proteus@8.0.18":
   version "8.0.18"
@@ -1701,6 +1739,18 @@
     styled-components "3.4.10"
     styled-normalize "8.0.2"
     styled-transition-group "1.0.0"
+
+"@wireapp/store-engine@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-1.1.2.tgz#8c4d9c10b7f7275af562f2cac60f1f8338105692"
+  integrity sha512-K62AIvaxCWVyVbDaUM9d0UHzoRdzCFjcvcehJeKi2gAqJ4kzWnsxdZf6CexxHc8DOCWqydVvBFpFi/GmHDQU7w==
+  dependencies:
+    "@types/bro-fs" "0.4.1"
+    "@types/filesystem" "0.0.29"
+    "@types/node" "10.12.9"
+    bro-fs "0.5.0"
+    dexie "2.0.4"
+    fs-extra "7.0.1"
 
 "@wireapp/store-engine@1.1.5":
   version "1.1.5"
@@ -4947,14 +4997,6 @@ expect-ct@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.1.tgz#de84476a2dbcb85000d5903737e9bc8a5ba7b897"
   integrity sha512-ngXzTfoRGG7fYens3/RMb6yYoVLvLMfmsSllP/mZPxNHgFq41TmPSLF/nLY7fwoclI2vElvAmILFWGUYqdjfCg==
-
-exports-loader@0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/exports-loader/-/exports-loader-0.7.0.tgz#84881c784dea6036b8e1cd1dac3da9b6409e21a5"
-  integrity sha512-RKwCrO4A6IiKm0pG3c9V46JxIHcDplwwGJn6+JJ1RcVnh/WSGJa0xkmk5cRVtgOPzCAtTMGj2F7nluh9L0vpSA==
-  dependencies:
-    loader-utils "^1.1.0"
-    source-map "0.5.0"
 
 express-sitemap-xml@1.0.2:
   version "1.0.2"
@@ -10482,6 +10524,15 @@ protobufjs@6.8.8:
     "@types/node" "^10.1.0"
     long "^4.0.0"
 
+"protobufjs@https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a":
+  version "5.0.1"
+  resolved "https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a"
+  dependencies:
+    ascli "~1"
+    bytebuffer "~5"
+    glob "^5.0.10"
+    yargs "^3.10.0"
+
 proxy-addr@~2.0.3, proxy-addr@~2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.4.tgz#ecfc733bf22ff8c6f407fa275327b9ab67e48b93"
@@ -11927,11 +11978,6 @@ source-map-url@^0.4.0:
   resolved "https://registry.yarnpkg.com/source-map-url/-/source-map-url-0.4.0.tgz#3e935d7ddd73631b97659956d55128e87b5084a3"
   integrity sha1-PpNdfd1zYxuXZZlW1VEo6HtQhKM=
 
-source-map@0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.0.tgz#0fe96503ac86a5adb5de63f4e412ae4872cdbe86"
-  integrity sha1-D+llA6yGpa213mP05BKuSHLNvoY=
-
 source-map@^0.4.2, source-map@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.4.4.tgz#eba4f5da9c0dc999de68032d8b4f76173652036b"
@@ -12893,6 +12939,11 @@ uglifyjs-webpack-plugin@1.3.0, uglifyjs-webpack-plugin@^1.2.4:
     uglify-es "^3.3.4"
     webpack-sources "^1.1.0"
     worker-farm "^1.5.2"
+
+uint32@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/uint32/-/uint32-0.2.1.tgz#e618d802d7fffd28b708fccecc7315608bac47f2"
+  integrity sha1-5hjYAtf//Si3CPzOzHMVYIusR/I=
 
 ultron@~1.1.0:
   version "1.1.1"

@@ -19,13 +19,15 @@
 
 'use strict';
 
+import protobuf from 'protobufjs';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.protobuf = {
   loadProtos: file => {
     return new Promise((resolve, reject) => {
-      dcodeIO.ProtoBuf.loadProtoFile(file, (error, builder) => {
+      protobuf.loadProtoFile(file, (error, builder) => {
         if (error) {
           return reject(new Error(`Loading protocol buffer file failed: ${error.message}`));
         }
