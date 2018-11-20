@@ -927,10 +927,6 @@
   version "5.0.0"
   resolved "https://codeload.github.com/jerrybendy/url-search-params-polyfill/tar.gz/edb62235e522bcaa7d2db97e15262e286b5971f6"
 
-"@bower_components/uuid@LiosK/UUID.js#v4.0.3":
-  version "4.0.3"
-  resolved "https://codeload.github.com/LiosK/UUID.js/tar.gz/900d6be34f52ac12f08770d3ad68416d54c71340"
-
 "@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.1":
   version "1.1.1"
   resolved "https://codeload.github.com/wireapp/webapp-module-bubble/tar.gz/c4c5a47aefa135d33d88b90df139e4e195983b7d"
@@ -9500,6 +9496,11 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
+
+phoneformat.js@1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.7.tgz#5f33e354f8bb5c0fb808ad0ae3d583c541fb1644"
+  integrity sha512-9SRtgfcYhMZNMcPjH7y1sAPhcsN58hXlY5CXjdCpWvSXG2EihG/XaOjHXht8/k+so98plmSy4pIYWXJf81iC2w==
 
 pidusage@^2.0.14:
   version "2.0.17"

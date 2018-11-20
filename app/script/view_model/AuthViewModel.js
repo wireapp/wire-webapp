@@ -19,6 +19,7 @@
 
 'use strict';
 
+import PhoneFormat from 'phoneformat.js';
 import Cookies from 'js-cookie';
 
 window.z = window.z || {};

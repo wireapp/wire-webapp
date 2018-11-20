@@ -24,10 +24,10 @@ window.sodium = {
 /* eslint-disable no-unused-vars */
 import {amplify} from 'amplify';
 window.amplify = amplify;
+import platform from 'platform';
+
 import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
 import index from '../../ext/js/url-search-params-polyfill/index.js';
-import phoneFormatGlobal from '../../ext/js/phoneformat/phone-format-global.js';
-import platform from '../../ext/js/platform.js/platform.js';
 import raygun from '../../ext/js/raygun4js/raygun.vanilla.js';
 import poster from '../../ext/js/poster-image/poster.js';
 
