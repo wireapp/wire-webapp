@@ -52,11 +52,6 @@ import platform from '../../ext/js/platform.js/platform.js';
 import raygun from '../../ext/js/raygun4js/raygun.vanilla.js';
 import poster from '../../ext/js/poster-image/poster.js';
 import sdpTransform from '../../ext/js/sdp-transform/sdp-transform.bundle.js';
-import cryptoCore from '../../ext/js/crypto-js/core.js';
-import encBase64 from '../../ext/js/crypto-js/enc-base64.js';
-import libTypedarrays from '../../ext/js/crypto-js/lib-typedarrays.js';
-import md5 from '../../ext/js/crypto-js/md5.js';
-import sha256 from '../../ext/js/crypto-js/sha256.js';
 
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
 import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';

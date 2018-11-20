@@ -23,6 +23,7 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import marked from './marked.js';
 import hljs from 'highlightjs';
+import CryptoJS from 'crypto-js';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
