@@ -934,9 +934,10 @@
   version "2.2.0"
   resolved "https://codeload.github.com/js-cookie/js-cookie/tar.gz/34f056cd261982828072b84a9bbdcd8c3d9931ad"
 
-"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#v2.4.1":
-  version "2.4.1"
-  resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/4fa305890b8a99a64a190a0f4d6572cbf8b6b8ab"
+"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#v2.5.0":
+  version "2.5.0"
+  uid "2eae9f4184c0a9587819a5ee6d5b893a8d301226"
+  resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/2eae9f4184c0a9587819a5ee6d5b893a8d301226"
 
 "@bower_components/knockout@knockout/knockout#v3.4.1":
   version "3.4.1"
