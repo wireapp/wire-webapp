@@ -168,10 +168,9 @@ class Server {
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
-        req.path.startsWith('/apple-app-site-association') ||
-        req.path.startsWith('/unsupported');
+        req.path.startsWith('/apple-app-site-association');
 
-      if (ignoredPath || this.config.SERVER.DEVELOPMENT) {
+      if (ignoredPath) {
         return next();
       }
 
@@ -195,10 +194,10 @@ class Server {
           }
         })();
         if (invalidBrowser || !supportedBrowser) {
-          return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
+          return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
         }
       } else {
-        return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
+        return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
       }
       return next();
     });
