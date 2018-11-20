@@ -45,7 +45,7 @@ const RedirectRoutes = (config: ServerConfig) => [
     const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     if (!parseResult) {
-      return res.redirect(STATUS_CODE_FOUND, '/unsupported/');
+      return res.redirect(STATUS_CODE_FOUND, `${config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
     }
 
     return res.json(parseResult);
