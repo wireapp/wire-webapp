@@ -76,10 +76,7 @@ module.exports = {
         src: [
           '@wireapp/cbor/dist/cbor.bundle.js',
           '@wireapp/cbor/dist/cbor.bundle.js.map',
-          '@wireapp/proteus/dist/proteus.bundle.js',
-          '@wireapp/proteus/dist/proteus.bundle.js.map',
           '@wireapp/protocol-messaging/proto/messages.proto',
-          'jszip/dist/jszip.js',
           'simplebar/dist/simplebar.min.js',
         ],
       },
