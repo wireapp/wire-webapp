@@ -19,6 +19,8 @@
 
 'use strict';
 
+import moment from 'moment';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -75,7 +77,12 @@ z.components.MessageQuote = class MessageQuote {
           this.quotedMessage(message);
           this.quotedMessageId(message.id);
         })
-        .catch(() => this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND));
+        .catch(error => {
+          if (error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+            return this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+          }
+          throw error;
+        });
     }
 
     const handleQuoteDeleted = messageId => {
@@ -140,10 +147,10 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_text() -->
-            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()), 
-                                                        event: {click: $parent.handleClickOnMessage}, 
-                                                        css: {'message-quote__text--full': $parent.showFullText(), 
-                                                              'message-quote__text--large': z.util.EmojiUtil.includesOnlyEmojies(asset.text)}" 
+            <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()),
+                                                        event: {click: $parent.handleClickOnMessage},
+                                                        css: {'message-quote__text--full': $parent.showFullText(),
+                                                              'message-quote__text--large': z.util.EmojiUtil.includesOnlyEmojies(asset.text)}"
               dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
@@ -169,12 +176,12 @@ ko.components.register('message-quote', {
             <location-asset params="asset: asset, locationRepository: $parent.locationRepository" data-uie-name="media-location-quote"></location-asset>
           <!-- /ko -->
         <!-- /ko -->
-        <div class="message-quote__timestamp" 
+        <div class="message-quote__timestamp"
           data-bind="l10n_text: {
-              id: quotedMessageIsBeforeToday() ? z.string.replyQuoteTimeStampDate : z.string.replyQuoteTimeStampTime, 
+              id: quotedMessageIsBeforeToday() ? z.string.replyQuoteTimeStampDate : z.string.replyQuoteTimeStampTime,
               substitute: moment(quotedMessage().timestamp()).format(quotedMessageIsBeforeToday() ? 'DD.MM.YYYY' : 'HH:mm')
             },
-            click: focusMessage" 
+            click: focusMessage"
           data-uie-name="label-timestamp-quote">
         </div>
       <!-- /ko -->
