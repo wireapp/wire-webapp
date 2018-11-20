@@ -28,6 +28,7 @@
     "pako": "1.0.6",
     "phoneformat.js": "1.0.7",
     "pm2": "3.2.2",
+    "poster-image": "1.1.1",
     "protobufjs": "https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "uint32": "0.2.1",
     "underscore": "1.9.1",
@@ -44,7 +45,6 @@
     "@bower_components/jquery-mousewheel": "jquery/jquery-mousewheel#3.1.13",
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
-    "@bower_components/poster-image": "herrmannplatz/poster-image#v1.1.1",
     "@bower_components/raygun4js": "MindscapeHQ/raygun4js#v2.13.2",
     "@bower_components/speakingurl": "pid/speakingurl#v14.0.1",
     "@bower_components/url-search-params-polyfill": "jerrybendy/url-search-params-polyfill#v5.0.0",
@@ -256,9 +256,6 @@
     },
     "@bower_components/protobuf": {
       "js": "dist/protobuf.js"
-    },
-    "@bower_components/poster-image": {
-      "js": "poster.js"
     },
     "@bower_components/raygun4js": {
       "js": "dist/raygun.vanilla.js"
