@@ -24,6 +24,7 @@ import UUID from 'uuidjs';
 import marked from './marked.js';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
+import PhoneFormat from 'phoneformat.js';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -280,7 +281,7 @@ z.util.downloadFile = (url, fileName, mimeType) => {
 };
 
 z.util.phoneNumberToE164 = (phoneNumber, countryCode) => {
-  return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
+  return PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
 z.util.createRandomUuid = () => UUID.genV4().hexString;
