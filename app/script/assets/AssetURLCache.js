@@ -19,14 +19,13 @@
 
 'use strict';
 
-import LRUCache from '@wireapp/lru-cache';
+import {LRUCache} from '@wireapp/lru-cache';
 
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetURLCache = (() => {
-  // FIXME
-  const _lruCache = new LRUCache.LRUCache(100);
+  const _lruCache = new LRUCache(100);
 
   const _getUrl = identifier => _lruCache.get(identifier);
 

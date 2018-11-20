@@ -57,7 +57,6 @@ import platform from '../../ext/js/platform.js/platform.js';
 import raygun from '../../ext/js/raygun4js/raygun.vanilla.js';
 import speakingurl from '../../ext/js/speakingurl/speakingurl.min.js';
 import poster from '../../ext/js/poster-image/poster.js';
-import uint32 from '../../ext/js/uint32/uint32.js';
 import sdpTransform from '../../ext/js/sdp-transform/sdp-transform.bundle.js';
 import cryptoCore from '../../ext/js/crypto-js/core.js';
 import encBase64 from '../../ext/js/crypto-js/enc-base64.js';
@@ -68,8 +67,6 @@ import simplebar from '../../ext/js/simplebar/dist/simplebar.min.js';
 // import sodium from '../../ext/js/libsodium.js/sodium.js';
 // import cbor from '../../ext/js/@wireapp/cbor/dist/cbor.bundle.js';
 // import proteus from '../../ext/js/@wireapp/proteus/dist/proteus.bundle.js';
-// import cryptobox from '../../ext/js/@wireapp/cryptobox/dist/cryptobox.bundle.js';
-// import protobuf from '../../ext/js/protobuf/protobuf.js';
 // import jszip from '../../ext/js/jszip/dist/jszip.js';
 
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
@@ -737,7 +734,9 @@ class App {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-        const protoFile = `ext/proto/@wireapp/protocol-messaging/messages.proto?${z.util.Environment.version(false)}`;
+        const protoFile = `ext/js/@wireapp/protocol-messaging/proto/messages.proto?${z.util.Environment.version(
+          false
+        )}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
