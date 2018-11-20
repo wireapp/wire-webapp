@@ -44,7 +44,7 @@ import tr from 'moment/locale/tr.js';
 import uk from 'moment/locale/uk.js';
 
 import initGlobal from '../localization/strings-init.js';
-/* FIXME (relies on global scope variables)
+import webappGlobal from '../localization/webapp.js';
 import csGlobal from '../localization/translations/webapp-cs.js';
 import daGlobal from '../localization/translations/webapp-da.js';
 import deGlobal from '../localization/translations/webapp-de.js';
@@ -66,7 +66,6 @@ import skGlobal from '../localization/translations/webapp-sk.js';
 import slGlobal from '../localization/translations/webapp-sl.js';
 import trGlobal from '../localization/translations/webapp-tr.js';
 import ukGlobal from '../localization/translations/webapp-uk.js';
-*/
 /* eslint-enable no-unused-vars */
 
 window.z = window.z || {};

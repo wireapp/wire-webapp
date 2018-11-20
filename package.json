@@ -32,6 +32,7 @@
     "protobufjs": "https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "uint32": "0.2.1",
     "underscore": "1.9.1",
+    "url-search-params-polyfill": "5.0.0",
     "uuidjs": "4.0.3",
     "webrtc-adapter": "6.4.6"
   },
@@ -41,13 +42,11 @@
     "@babel/preset-env": "7.1.5",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
-    "@bower_components/generic-message-proto": "wireapp/generic-message-proto#v1.22.1",
     "@bower_components/jquery-mousewheel": "jquery/jquery-mousewheel#3.1.13",
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
     "@bower_components/raygun4js": "MindscapeHQ/raygun4js#v2.13.2",
     "@bower_components/speakingurl": "pid/speakingurl#v14.0.1",
-    "@bower_components/url-search-params-polyfill": "jerrybendy/url-search-params-polyfill#v5.0.0",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
@@ -259,12 +258,6 @@
     },
     "@bower_components/raygun4js": {
       "js": "dist/raygun.vanilla.js"
-    },
-    "@bower_components/speakingurl": {
-      "js": "speakingurl.min.js"
-    },
-    "@bower_components/url-search-params-polyfill": {
-      "js/": "index.js"
     },
     "@bower_components/wire-audio-files": {
       "audio": "webapp/*"
