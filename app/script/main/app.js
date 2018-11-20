@@ -23,7 +23,6 @@ window.sodium = {
 
 /* eslint-disable no-unused-vars */
 import {amplify} from 'amplify';
-window.amplify = amplify;
 import platform from 'platform';
 
 import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
@@ -88,33 +87,10 @@ import AudioPlayingTypeGlobal from '../audio/AudioPlayingType.js';
 import SignOutReasonGlobal from '../auth/SignOutReason.js';
 import authUrlParamGlobal from '../auth/URLParameter.js';
 import QueueStateGlobal from '../service/QueueState.js';
-// import authGlobal from '../main/auth.js';
 import StorageKeyGlobal from '../storage/StorageKey.js';
 import StorageRepositoryGlobal from '../storage/StorageRepository.js';
 import StorageSchemataGlobal from '../storage/StorageSchemata.js';
 import StorageServiceGlobal from '../storage/StorageService.js';
-import initGlobal from '../localization/strings-init.js';
-// import csGlobal from '../localization/translations/webapp-cs.js';
-// import daGlobal from '../localization/translations/webapp-da.js';
-// import deGlobal from '../localization/translations/webapp-de.js';
-// import elGlobal from '../localization/translations/webapp-el.js';
-// import esGlobal from '../localization/translations/webapp-es.js';
-// import etGlobal from '../localization/translations/webapp-et.js';
-// import fiGlobal from '../localization/translations/webapp-fi.js';
-// import frGlobal from '../localization/translations/webapp-fr.js';
-// import hrGlobal from '../localization/translations/webapp-hr.js';
-// import huGlobal from '../localization/translations/webapp-hu.js';
-// import itGlobal from '../localization/translations/webapp-it.js';
-// import ltGlobal from '../localization/translations/webapp-lt.js';
-// import nlGlobal from '../localization/translations/webapp-nl.js';
-// import plGlobal from '../localization/translations/webapp-pl.js';
-// import ptGlobal from '../localization/translations/webapp-pt.js';
-// import roGlobal from '../localization/translations/webapp-ro.js';
-// import ruGlobal from '../localization/translations/webapp-ru.js';
-// import skGlobal from '../localization/translations/webapp-sk.js';
-// import slGlobal from '../localization/translations/webapp-sl.js';
-// import trGlobal from '../localization/translations/webapp-tr.js';
-// import ukGlobal from '../localization/translations/webapp-uk.js';
 import webappGlobal from '../localization/webapp.js';
 import LocalizerGlobal from '../localization/Localizer.js';
 import TrackConversationTypeGlobal from '../tracking/attribute/ConversationType.js';
@@ -431,7 +407,6 @@ import ShortcutGlobal from '../ui/Shortcut.js';
 import ViewportObserverGlobal from '../ui/ViewportObserver.js';
 import WindowHandlerGlobal from '../ui/WindowHandler.js';
 import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
-// import appGlobal from '../main/app.js';
 
 import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';
@@ -442,6 +417,8 @@ import audioPreferenceGlobal from '../audio/AudioPreference.js';
 
 import auth from './auth';
 /* eslint-enable no-unused-vars */
+
+window.amplify = amplify;
 
 class App {
   static get CONFIG() {

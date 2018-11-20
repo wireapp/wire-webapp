@@ -42,6 +42,31 @@ import sk from 'moment/locale/sk.js';
 import sl from 'moment/locale/sl.js';
 import tr from 'moment/locale/tr.js';
 import uk from 'moment/locale/uk.js';
+
+import initGlobal from '../localization/strings-init.js';
+/* FIXME (relies on global scope variables)
+import csGlobal from '../localization/translations/webapp-cs.js';
+import daGlobal from '../localization/translations/webapp-da.js';
+import deGlobal from '../localization/translations/webapp-de.js';
+import elGlobal from '../localization/translations/webapp-el.js';
+import esGlobal from '../localization/translations/webapp-es.js';
+import etGlobal from '../localization/translations/webapp-et.js';
+import fiGlobal from '../localization/translations/webapp-fi.js';
+import frGlobal from '../localization/translations/webapp-fr.js';
+import hrGlobal from '../localization/translations/webapp-hr.js';
+import huGlobal from '../localization/translations/webapp-hu.js';
+import itGlobal from '../localization/translations/webapp-it.js';
+import ltGlobal from '../localization/translations/webapp-lt.js';
+import nlGlobal from '../localization/translations/webapp-nl.js';
+import plGlobal from '../localization/translations/webapp-pl.js';
+import ptGlobal from '../localization/translations/webapp-pt.js';
+import roGlobal from '../localization/translations/webapp-ro.js';
+import ruGlobal from '../localization/translations/webapp-ru.js';
+import skGlobal from '../localization/translations/webapp-sk.js';
+import slGlobal from '../localization/translations/webapp-sl.js';
+import trGlobal from '../localization/translations/webapp-tr.js';
+import ukGlobal from '../localization/translations/webapp-uk.js';
+*/
 /* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
