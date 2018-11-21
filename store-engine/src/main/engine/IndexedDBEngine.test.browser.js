@@ -49,6 +49,14 @@ describe('IndexedDBEngine', () => {
     window.indexedDB.deleteDatabase(STORE_NAME);
   });
 
+  describe('"init"', () => {
+    it('resolves with the database instance to which the records will be saved.', async () => {
+      engine = new IndexedDBEngine();
+      const instance = await engine.init(STORE_NAME);
+      expect(instance instanceof Dexie).toBe(true);
+    });
+  });
+
   describe('"append"', () => {
     Object.entries(require('../../test/shared/append')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));

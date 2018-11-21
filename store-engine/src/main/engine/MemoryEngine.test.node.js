@@ -35,6 +35,14 @@ describe('MemoryEngine', () => {
     done();
   });
 
+  describe('"init"', () => {
+    it('resolves with direct access to the complete in-memory store.', async () => {
+      engine = new MemoryEngine();
+      const inMemory = await engine.init(STORE_NAME);
+      expect(inMemory[STORE_NAME]).toBeDefined();
+    });
+  });
+
   describe('"append"', () => {
     Object.entries(require('../../test/shared/append')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));

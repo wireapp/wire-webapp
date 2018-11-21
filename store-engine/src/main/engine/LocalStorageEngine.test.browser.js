@@ -37,6 +37,14 @@ describe('LocalStorageEngine', () => {
 
   afterEach(() => window.localStorage.clear());
 
+  describe('"init"', () => {
+    it('resolves with direct access to the LocalStorage.', async () => {
+      engine = new LocalStorageEngine();
+      const instance = await engine.init(STORE_NAME);
+      expect(instance).toBe(window.localStorage);
+    });
+  });
+
   describe('"append"', () => {
     Object.entries(require('../../test/shared/append')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));

@@ -134,6 +134,18 @@ describe('FileEngine', () => {
     });
   });
 
+  describe('"init"', () => {
+    it('resolves with the directory to which the records will be saved.', async () => {
+      const options = {
+        fileExtension: '.json',
+      };
+      engine = new FileEngine(BASE_DIRECTORY);
+      const directory = await engine.init(STORE_NAME, options);
+      const fileStatus = fs.statSync(directory);
+      expect(fileStatus.isDirectory()).toBe(true);
+    });
+  });
+
   describe('"append"', () => {
     Object.entries(require('../../test/shared/append')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));

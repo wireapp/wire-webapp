@@ -12,9 +12,10 @@ export default class LocalStorageEngine implements CRUDEngine {
     }
   }
 
-  public async init(storeName: string): Promise<any> {
+  public async init(storeName: string): Promise<Storage> {
     await this.isSupported();
     this.storeName = storeName;
+    return window.localStorage;
   }
 
   public async purge(): Promise<void> {

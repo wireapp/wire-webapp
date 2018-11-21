@@ -1,17 +1,22 @@
 import CRUDEngine from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error/';
 
+export interface MemoryStore {
+  [index: string]: {[index: string]: any};
+}
+
 export default class MemoryEngine implements CRUDEngine {
   public storeName = '';
-  private readonly stores: {[index: string]: {[index: string]: any}} = {};
+  private readonly stores: MemoryStore = {};
 
   public async isSupported(): Promise<void> {
     // Always available
   }
 
-  public async init(storeName: string): Promise<any> {
+  public async init(storeName: string): Promise<MemoryStore> {
     this.storeName = storeName;
     this.stores[this.storeName] = this.stores[this.storeName] || {};
+    return this.stores;
   }
 
   public async purge(): Promise<void> {

@@ -15,6 +15,7 @@ export default class FileEngine implements CRUDEngine {
   private options: {fileExtension: string} = {
     fileExtension: '.dat',
   };
+  // Using a reference to Node.js' "path" module to influence the platform-specific behaviour in our tests
   private static readonly path = path;
 
   constructor(private readonly baseDirectory = './') {}
@@ -26,14 +27,15 @@ export default class FileEngine implements CRUDEngine {
     }
   }
 
-  public async init(storeName = '', options?: {fileExtension: string}): Promise<any> {
+  public async init(storeName = '', options?: {fileExtension: string}): Promise<string> {
     await this.isSupported();
 
     FileEngine.enforcePathRestrictions(this.baseDirectory, storeName);
     this.storeName = FileEngine.path.resolve(this.baseDirectory, storeName);
+    await fs.ensureDir(this.storeName);
 
     this.options = {...this.options, ...options};
-    return Promise.resolve(storeName);
+    return Promise.resolve(this.storeName);
   }
 
   public purge(): Promise<void> {
