@@ -33,14 +33,6 @@ module.exports = {
   options: {
     livereload: 32123,
   },
-  script: {
-    files: ['<%= dir.app_ %>/**/*.js'],
-    options: {
-      debounceDelay: 250,
-      spawn: false,
-    },
-    tasks: ['build_dev_script'],
-  },
   style: {
     files: ['<%= dir.app_ %>/**/*.less'],
     options: {

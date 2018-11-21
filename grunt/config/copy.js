@@ -22,70 +22,24 @@
 // https://github.com/gruntjs/grunt-contrib-copy
 
 module.exports = {
-  //##############################################################################
-  // Amazon Web Services related
-  //##############################################################################
-  aws: {
-    cwd: '<%= dir.deploy %>',
-    dest: '<%= dir.aws.static %>',
-    expand: true,
-    src: '**/*',
-  },
-  //##############################################################################
-  // Prod/Staging/Edge deployment related
-  //##############################################################################
-  deploy: {
+  dist: {
     cwd: '<%= dir.app_ %>',
-    dest: '<%= dir.deploy %>',
+    dest: '<%= dir.dist.static %>',
     expand: true,
-    src: [
-      'ext/image/**/*',
-      'ext/js/**/*',
-      'ext/proto/**/*',
-      'audio/**/*',
-      'image/**/*',
-      'font/**/*',
-      'script/**/*.js',
-      'worker/*',
-      '*.js',
-    ],
+    src: ['ext/image/**/*', 'ext/js/**/*', 'audio/**/*', 'image/**/*', 'font/**/*', 'worker/*', 'sw.js'],
   },
 
-  deploy_audio: {
+  dist_audio: {
     cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files',
-    dest: '<%= dir.deploy %>/audio',
+    dest: '<%= dir.dist.static %>/audio',
     expand: true,
     src: '*',
   },
 
-  deploy_favicon: {
-    cwd: '<%= dir.deploy %>/image',
-    dest: '<%= dir.deploy %>',
+  dist_favicon: {
+    cwd: '<%= dir.dist.static %>/image',
+    dest: '<%= dir.dist.static %>',
     expand: true,
     src: 'favicon.ico',
-  },
-  //##############################################################################
-  // Local deployment related
-  //##############################################################################
-  frontend: {
-    files: [
-      {
-        cwd: 'node_modules',
-        dest: '<%= dir.app.ext %>/js/',
-        expand: true,
-        src: [
-          '@wireapp/cbor/dist/cbor.bundle.js',
-          '@wireapp/cbor/dist/cbor.bundle.js.map',
-          '@wireapp/protocol-messaging/proto/messages.proto',
-          'simplebar/dist/simplebar.min.js',
-        ],
-      },
-      {
-        cwd: 'node_modules',
-        dest: '<%= dir.app.ext %>/css/',
-        expand: true,
-        src: ['simplebar/dist/simplebar.min.css'],
-      },
-    ],
   },
 };

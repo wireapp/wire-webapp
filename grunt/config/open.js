@@ -22,9 +22,6 @@
 // https://github.com/jsoverson/grunt-open
 
 module.exports = {
-  aws: {
-    path: 'http://localhost:<%= config.aws.port %>/',
-  },
   ebs: {
     path: '<%= grunt.config("aws.deploy.options.application_versions") %>',
   },

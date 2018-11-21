@@ -22,15 +22,6 @@
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
-  const config = {
-    aws: {
-      port: 5000,
-    },
-    server: {
-      port: 8888,
-    },
-  };
-
   /* eslint-disable sort-keys */
   const dir = {
     app_: 'app',
@@ -38,23 +29,18 @@ module.exports = grunt => {
       demo: 'app/demo',
       ext: 'app/ext',
       page: 'app/page',
-      script: 'app/script',
       style: 'app/style',
-      templateDist: 'app/page/template/_dist',
     },
-    aws_: 'aws',
-    aws: {
-      s3: 'aws/s3',
-      static: 'aws/static',
-      templates: 'aws/templates',
+    dist: {
+      s3: 'dist/s3',
+      static: 'dist/static',
+      templates: 'dist/templates',
     },
-    deploy: 'deploy',
-    dist: 'dist',
+    dist_: 'dist',
     docs: {
       api: 'docs/api',
       coverage: 'docs/coverage',
     },
-    temp: 'temp',
     test_: 'test',
     test: {
       api: 'test/api',
@@ -65,83 +51,48 @@ module.exports = grunt => {
   };
 
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    config: config,
     dir: dir,
     aws_s3: require('./grunt/config/aws_s3'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
-    connect: require('./grunt/config/connect'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
     karma: require('./grunt/config/karma'),
     open: require('./grunt/config/open'),
-    path: require('path'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
-    todo: require('./grunt/config/todo'),
-    uglify: require('./grunt/config/uglify'),
     watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys */
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('init', ['clean:temp', 'copy:frontend']);
 
-  // Deploy to different environments
-  grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
-  grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);
-  grunt.registerTask('app_deploy_prod', ['gitinfo', 'set_version:prod', 'aws_deploy']);
+  grunt.registerTask('app_deploy_travis', ['set_version', 'prepare', 'aws_prepare']);
 
-  grunt.registerTask('app_deploy_travis', () => {
-    grunt.task.run('set_version', 'init', 'prepare', 'aws_prepare');
-  });
+  grunt.registerTask('build_dev', [
+    'clean:dist',
+    'clean:dist_app',
+    'clean:dist_s3',
+    'set_version',
+    'build_dev_style',
+    'copy:dist',
+    'copy:dist_audio',
+    'copy:dist_favicon',
+    'build_dev_markup',
+  ]);
 
-  grunt.registerTask('build_dev', () => {
-    grunt.task.run(
-      'clean:temp',
-      'clean:deploy',
-      'clean:deploy_app',
-      'clean:deploy_script',
-      'clean:aws',
-      'clean:aws_app',
-      'clean:aws_s3',
-      'set_version:staging',
-      'aws_version_file',
-      'copy:frontend',
-      'shell:less',
-      'postcss:deploy',
-      'copy:deploy',
-      'copy:deploy_audio',
-      'copy:deploy_favicon',
-      'includereplace:prod_index',
-      'includereplace:prod_auth',
-      'includereplace:prod_login',
-      'includereplace:deploy_demo',
-      'copy:aws'
-    );
-  });
+  grunt.registerTask('build_dev_style', ['shell:less', 'postcss']);
 
-  grunt.registerTask('build_dev_style', () => {
-    grunt.task.run(
-      'scripts',
-      'shell:less',
-      'postcss:deploy',
-      'includereplace:prod_index',
-      'includereplace:prod_auth',
-      'includereplace:prod_login',
-      'includereplace:deploy_demo',
-      'copy:aws'
-    );
-  });
-
-  grunt.registerTask('build_dev_markup', () => {
-    grunt.task.run('includereplace:prod_index', 'includereplace:prod_auth', 'includereplace:prod_login', 'copy:aws');
-  });
+  grunt.registerTask('build_dev_markup', [
+    'includereplace:prod_index',
+    'includereplace:prod_auth',
+    'includereplace:prod_login',
+    'includereplace:deploy_demo',
+  ]);
 
   // Test Related
-  grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'karma:test']));
+  grunt.registerTask('test', ['clean:docs_coverage', 'karma:test']);
 
   grunt.registerTask('test_run', testName => {
     grunt.config('karma.options.reporters', ['spec']);
