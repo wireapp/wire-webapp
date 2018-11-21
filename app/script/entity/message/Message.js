@@ -276,15 +276,31 @@ z.entity.Message = class Message {
   }
 
   /**
+   * Check if message has an unavailable (uploading or failed) asset.
+   * @returns {boolean} True, if first asset is unavailable.
+   */
+  hasUnavailableAsset() {
+    if (this.has_asset()) {
+      return this.assets().some(asset => {
+        const assetStatus = asset.status();
+        return (
+          assetStatus === z.assets.AssetTransferState.UPLOADING ||
+          assetStatus === z.assets.AssetTransferState.UPLOAD_FAILED
+        );
+      });
+    }
+  }
+
+  /**
    * Check if message can be reacted to.
    * @returns {boolean} True, if message type supports reactions.
    */
   isReactable() {
-    const isUnavailableAsset = this.has_asset()
-      ? this.get_first_asset().status() !== z.assets.AssetTransferState.UPLOADED
-      : false;
     return (
-      this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING && !isUnavailableAsset
+      this.is_content() &&
+      !this.is_ephemeral() &&
+      this.status() !== z.message.StatusType.SENDING &&
+      !this.hasUnavailableAsset()
     );
   }
 
@@ -293,11 +309,11 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if message type supports replies.
    */
   isReplyable() {
-    const isUnavailableAsset = this.has_asset()
-      ? this.get_first_asset().status() !== z.assets.AssetTransferState.UPLOADED
-      : false;
     return (
-      this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING && !isUnavailableAsset
+      this.is_content() &&
+      !this.is_ephemeral() &&
+      this.status() !== z.message.StatusType.SENDING &&
+      !this.hasUnavailableAsset()
     );
   }
 
