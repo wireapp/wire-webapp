@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.1.19...@wireapp/api-client@3.2.0) (2018-11-21)
+
+
+### Features
+
+* **api-client,core:** Implement OTR Muted Status ([#1186](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1186)) ([b3f5964](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b3f5964))
+
+
+
+
+
 ## [3.1.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.1.18...@wireapp/api-client@3.1.19) (2018-11-21)
 
 **Note:** Version bump only for package @wireapp/api-client
