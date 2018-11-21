@@ -164,12 +164,7 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if message is deletable.
    */
   is_deletable() {
-    if (this.is_ping() || !this.has_asset()) {
-      return true;
-    }
-    return ![z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING].includes(
-      this.get_first_asset().status()
-    );
+    return this.status() !== z.message.StatusType.SENDING;
   }
 
   /**
@@ -184,6 +179,12 @@ z.entity.Message = class Message {
 
     if (this.is_content()) {
       const assetEntity = this.get_first_asset();
+
+      if (this.has_asset()) {
+        const assetStatus = assetEntity.status();
+        return assetStatus === z.assets.AssetTransferState.UPLOADED;
+      }
+
       if (assetEntity && typeof assetEntity.download === 'function') {
         return true;
       }
@@ -278,8 +279,13 @@ z.entity.Message = class Message {
    * Check if message can be reacted to.
    * @returns {boolean} True, if message type supports reactions.
    */
-  is_reactable() {
-    return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
+  isReactable() {
+    const isUnavailableAsset = this.has_asset()
+      ? this.get_first_asset().status() !== z.assets.AssetTransferState.UPLOADED
+      : false;
+    return (
+      this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING && !isUnavailableAsset
+    );
   }
 
   /**
@@ -287,7 +293,12 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if message type supports replies.
    */
   isReplyable() {
-    return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
+    const isUnavailableAsset = this.has_asset()
+      ? this.get_first_asset().status() !== z.assets.AssetTransferState.UPLOADED
+      : false;
+    return (
+      this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING && !isUnavailableAsset
+    );
   }
 
   // Start the ephemeral timer for the message.
