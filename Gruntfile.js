@@ -19,9 +19,6 @@
 
 'use strict';
 
-const webpack = require('webpack');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
-
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
@@ -72,7 +69,6 @@ module.exports = grunt => {
     config: config,
     dir: dir,
     aws_s3: require('./grunt/config/aws_s3'),
-    npmBower: require('./grunt/config/npmBower'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
     connect: require('./grunt/config/connect'),
@@ -91,7 +87,7 @@ module.exports = grunt => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack']);
+  grunt.registerTask('init', ['clean:temp', 'copy:frontend']);
 
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
@@ -127,10 +123,6 @@ module.exports = grunt => {
     );
   });
 
-  grunt.registerTask('build_dev_script', () => {
-    grunt.task.run('copy:deploy', 'copy:aws');
-  });
-
   grunt.registerTask('build_dev_style', () => {
     grunt.task.run(
       'scripts',
@@ -149,38 +141,13 @@ module.exports = grunt => {
   });
 
   // Test Related
-  grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'build_dev', 'test_prepare', 'karma:test']));
-
-  grunt.registerTask('npmWebpack', function() {
-    const done = this.async();
-
-    const compiler = webpack(require('./webpack.config.npm.js'));
-    const progress = new ProgressPlugin((percentage, message) => grunt.log.ok(`${~~(percentage * 100)}%`, message));
-
-    compiler.apply(progress);
-
-    compiler.run(error => {
-      if (error) {
-        grunt.log.error(`Plugin failed: ${error.message}`);
-        throw error;
-      }
-
-      done();
-    });
-  });
-
-  grunt.registerTask('test_prepare', testName => {
-    //TODO feed files to the test runner
-    const files = []; //.concat(helperFiles, vendorFiles, componentFiles, appFiles, testFiles);
-
-    grunt.config('karma.options.files', files);
-  });
+  grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'karma:test']));
 
   grunt.registerTask('test_run', testName => {
     grunt.config('karma.options.reporters', ['spec']);
     grunt.config('karma.options.specReporter', {
       showSpecTiming: true,
     });
-    grunt.task.run(['build_dev_script', `test_prepare:${testName}`, 'karma:test']);
+    grunt.task.run(['karma:test']);
   });
 };
