@@ -17,16 +17,12 @@
  *
  */
 
-import {MutedStatus} from '../conversation/';
-
-interface MemberUpdate {
-  hidden_ref?: string;
-  hidden?: boolean;
-  otr_archived_ref?: string;
-  otr_archived?: boolean;
-  otr_muted_ref?: string | null;
-  otr_muted?: boolean | null;
-  otr_muted_status?: MutedStatus | null;
+/* tslint:disable:object-literal-sort-keys */
+enum MutedStatus {
+  ALL_NOTIFICATIONS = 0b00,
+  ONLY_MENTIONS = 0b01,
+  NO_NOTIFICATIONS = 0b11,
 }
+/* tslint:enable:object-literal-sort-keys */
 
-export {MemberUpdate};
+export {MutedStatus};
