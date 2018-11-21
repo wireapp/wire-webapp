@@ -17,7 +17,7 @@
  *
  */
 
-import {ServiceRef} from '../conversation/';
+import {MutedStatus, ServiceRef} from '../conversation/';
 
 interface Member {
   hidden_ref?: string;
@@ -25,8 +25,9 @@ interface Member {
   id: string;
   otr_archived_ref?: string;
   otr_archived?: boolean;
-  otr_muted_ref?: string;
-  otr_muted?: boolean;
+  otr_muted_ref?: string | null;
+  otr_muted?: boolean | null;
+  otr_muted_status?: MutedStatus | null;
   service?: ServiceRef;
 }
 

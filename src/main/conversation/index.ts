@@ -31,6 +31,7 @@ export * from './IncomingNotification';
 export * from './Invite';
 export * from './Member';
 export * from './MemberUpdate';
+export * from './MutedStatus';
 export * from './NewConversation';
 export * from './NewOTRMessage';
 export * from './OtherMember';

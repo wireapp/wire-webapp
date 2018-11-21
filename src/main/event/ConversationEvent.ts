@@ -22,6 +22,7 @@ import {
   CONVERSATION_ACCESS_ROLE,
   Conversation,
   ConversationMessageTimerUpdate,
+  MemberUpdate,
 } from '../conversation/';
 import {BackendEvent} from './BackendEvent';
 
@@ -114,14 +115,7 @@ interface ConversationMemberLeaveEvent extends ConversationEvent {
 }
 
 interface ConversationMemberUpdateEvent extends ConversationEvent {
-  data: {
-    hidden_ref?: string;
-    hidden?: boolean;
-    otr_archived_ref?: string;
-    otr_archived?: boolean;
-    otr_muted_ref?: string;
-    otr_muted?: boolean;
-  };
+  data: MemberUpdate;
   type: CONVERSATION_EVENT.MEMBER_UPDATE;
 }
 
