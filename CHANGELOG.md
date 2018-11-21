@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.2.27...@wireapp/core@7.3.0) (2018-11-21)
+
+
+### Features
+
+* **api-client,core:** Implement OTR Muted Status ([#1186](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1186)) ([b3f5964](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/b3f5964))
+
+
+
+
+
 ## [7.2.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.2.26...@wireapp/core@7.2.27) (2018-11-21)
 
 **Note:** Version bump only for package @wireapp/core
