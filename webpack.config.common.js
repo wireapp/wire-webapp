@@ -20,7 +20,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const dist = 'aws/static/';
+const dist = 'dist/static/';
 const srcScript = 'app/script/auth/';
 const appSrc = 'app/script/';
 

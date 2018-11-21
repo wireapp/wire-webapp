@@ -27,7 +27,7 @@ module.exports = {
   //##############################################################################
   deploy_auth: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
+    dest: '<%= dir.dist.static %>/auth',
     expand: true,
     options: {
       globals: {
@@ -44,7 +44,7 @@ module.exports = {
 
   deploy_demo: {
     cwd: '<%= dir.app.demo %>',
-    dest: '<%= dir.deploy %>/demo',
+    dest: '<%= dir.dist.static %>/demo',
     expand: true,
     options: {
       globals: {
@@ -61,7 +61,7 @@ module.exports = {
 
   deploy_index: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>',
+    dest: '<%= dir.dist.static %>',
     expand: true,
     options: {
       globals: {
@@ -75,7 +75,7 @@ module.exports = {
 
   deploy_login: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/login',
+    dest: '<%= dir.dist.static %>/login',
     expand: true,
     options: {
       globals: {
@@ -95,7 +95,7 @@ module.exports = {
   //##############################################################################
   prod_auth: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
+    dest: '<%= dir.dist.static %>/auth',
     expand: true,
     options: {
       globals: {
@@ -112,7 +112,7 @@ module.exports = {
 
   prod_demo: {
     cwd: '<%= dir.app.demo %>',
-    dest: '<%= dir.deploy %>/demo',
+    dest: '<%= dir.dist.static %>/demo',
     expand: true,
     options: {
       globals: {
@@ -129,7 +129,7 @@ module.exports = {
 
   prod_index: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>',
+    dest: '<%= dir.dist.static %>',
     expand: true,
     options: {
       globals: {
@@ -143,7 +143,7 @@ module.exports = {
 
   prod_login: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/login',
+    dest: '<%= dir.dist.static %>/login',
     expand: true,
     options: {
       globals: {

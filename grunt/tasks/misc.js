@@ -19,15 +19,13 @@
 
 'use strict';
 
-module.exports = grunt => {
-  grunt.registerTask('log', () => {
-    const pkg = grunt.file.readJSON('package.json');
-    grunt.log.writeln(`Deployed: ${pkg.name} (v${pkg.version})`);
-  });
+const path = require('path');
 
-  grunt.registerTask('set_version', (target = grunt.config('gitinfo.local.branch.current.name')) => {
-    grunt.option('target', target);
-    grunt.log.ok(`Version target set to ${grunt.option('target')}`);
+module.exports = grunt => {
+  grunt.registerTask('set_version', () => {
+    grunt.task.run('gitinfo');
+    const target = grunt.config('gitinfo.local.branch.current.name');
+    grunt.log.ok(`Version target set to ${target}`);
 
     let user = grunt.config('gitinfo.local.branch.current.currentUser');
     if (user) {
@@ -48,43 +46,21 @@ module.exports = grunt => {
       version = `${version}-${target}`;
     }
 
-    grunt.option('version', version);
     grunt.log.ok(`Version set to ${version}`);
+    grunt.file.write(path.join('dist', 'version'), version);
   });
 
   grunt.registerTask('prepare', [
-    'clean:deploy',
+    'clean:dist',
     'shell:less',
-    'postcss:deploy',
-    'copy:deploy',
-    'copy:deploy_audio',
-    'copy:deploy_favicon',
+    'postcss',
+    'copy:dist',
+    'copy:dist_audio',
+    'copy:dist_favicon',
     'includereplace:prod_index',
     'includereplace:prod_auth',
     'includereplace:prod_login',
-    'clean:deploy_app',
-    'uglify:deploy',
-    'concat:deploy',
-    'clean:deploy_script',
+    'clean:dist_app',
+    'clean:dist_script',
   ]);
-
-  grunt.registerTask('check', file => {
-    grunt.log.writeln(`=== ${grunt.task.current.name.toUpperCase()} ===`);
-
-    if (file !== undefined) {
-      const files = [file];
-      grunt.config('todo.src', files);
-    }
-
-    grunt.task.run(['todo']);
-  });
-
-  return grunt.registerTask('host', port => {
-    if (port !== undefined) {
-      grunt.config('connect.server.port', port);
-    }
-
-    grunt.task.run('connect');
-    grunt.task.run('watch');
-  });
 };

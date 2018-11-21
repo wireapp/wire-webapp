@@ -26,7 +26,7 @@ module.exports = {
     files: [
       {
         dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip',
-        src: '<%= dir.aws.s3 %>/ebs.zip',
+        src: '<%= dir.dist.s3 %>/ebs.zip',
         stream: true,
       },
     ],

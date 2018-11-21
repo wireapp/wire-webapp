@@ -19,33 +19,14 @@
 
 'use strict';
 
-const path = require('path');
-
 module.exports = grunt => {
-  grunt.registerTask('aws_deploy', () => {
-    grunt.task.run('init');
-
-    grunt.option('target' || grunt.config('gitinfo.local.branch.current.name'));
-    grunt.task.run('prepare');
-    const version = grunt.option('version');
-
-    grunt.config('aws.deploy.options.version', version);
-    grunt.config(
-      'aws.deploy.options.application_versions',
-      'https://eu-west-1.console.aws.amazon.com/elasticbeanstalk/home?region=eu-west-1#/application/versions?applicationName=Webapp'
-    );
-    grunt.task.run('aws_prepare', 'aws_s3:default', 'shell:aws_deploy', 'open:ebs');
-  });
-
-  grunt.registerTask('aws_version_file', () => grunt.file.write(path.join('aws', 'version'), grunt.option('version')));
-
   grunt.registerTask('aws_prepare', [
-    'aws_version_file',
-    'clean:aws',
-    'copy:aws',
-    'clean:aws_app',
-    'clean:aws_s3',
-    'shell:aws_pack',
-    'compress:aws',
+    'set_version',
+    'clean:dist',
+    'copy:dist',
+    'clean:dist_app',
+    'clean:dist_s3',
+    'shell:dist_bundle',
+    'compress',
   ]);
 };
