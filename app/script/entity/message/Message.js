@@ -289,6 +289,7 @@ z.entity.Message = class Message {
         );
       });
     }
+    return false;
   }
 
   /**
