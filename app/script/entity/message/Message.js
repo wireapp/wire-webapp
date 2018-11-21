@@ -277,7 +277,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
-   * @returns {boolean} True, if first asset is unavailable.
+   * @returns {boolean} True, if an asset is unavailable.
    */
   hasUnavailableAsset() {
     if (this.has_asset()) {

@@ -95,6 +95,14 @@ describe('Message Entities', () => {
 
       expect(message_et.is_deletable()).toBe(false);
     });
+
+    it('should not be deletable when message is a file and uploading or downloading', () => {
+      const file_et = new z.entity.File();
+      file_et.status(z.assets.AssetTransferState.UPLOADING);
+      message_et.assets.push(file_et);
+
+      expect(message_et.is_deletable()).toBe(true);
+    });
   });
 
   describe('has_asset_file', () => {
