@@ -41,9 +41,7 @@ describe('Message Entities', () => {
 
     it('message with file asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
-      const fileAsset = new z.entity.File();
-      fileAsset.status(z.assets.AssetTransferState.UPLOADED);
-      message_et.assets.push(fileAsset);
+      message_et.assets.push(new z.entity.File());
 
       expect(message_et.is_downloadable()).toBe(true);
     });

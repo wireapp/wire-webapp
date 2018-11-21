@@ -177,13 +177,12 @@ z.entity.Message = class Message {
       return false;
     }
 
+    if (this.hasUnavailableAsset()) {
+      return false;
+    }
+
     if (this.is_content()) {
       const assetEntity = this.get_first_asset();
-
-      if (this.has_asset()) {
-        const assetStatus = assetEntity.status();
-        return assetStatus === z.assets.AssetTransferState.UPLOADED;
-      }
 
       if (assetEntity && typeof assetEntity.download === 'function') {
         return true;

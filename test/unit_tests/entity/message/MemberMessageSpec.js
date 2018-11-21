@@ -19,9 +19,9 @@
 
 'use strict';
 
-// grunt test_run:entity/message/MessageEntities
+// grunt test_run:entity/message/MemberMessage
 
-describe('Message Entities', () => {
+describe('Member Message', () => {
   describe('generateNameString', () => {
     let message_et = null;
 
