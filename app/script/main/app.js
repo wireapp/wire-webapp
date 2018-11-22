@@ -61,7 +61,6 @@ z.main.App = class App {
     this.util = this._setup_utils();
 
     // @todo Added for wrapper backwards compatibility. Remove after uptake of version > 3.2.
-    this.service.connect_google = this.service.connectGoogle;
 
     this.instanceId = z.util.createRandomUuid();
 
@@ -121,11 +120,7 @@ z.main.App = class App {
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
-    repositories.connect = new z.connect.ConnectRepository(
-      this.service.connect,
-      this.service.connectGoogle,
-      repositories.properties
-    );
+    repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
@@ -212,7 +207,6 @@ z.main.App = class App {
       calling: new z.calling.CallingService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
-      connectGoogle: new z.connect.ConnectGoogleService(),
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),

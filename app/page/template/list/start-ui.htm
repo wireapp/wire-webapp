@@ -135,22 +135,16 @@
 
   <!-- ko if: showNoContacts() -->
     <div class="start-ui-import-container">
-      <div>
-        <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.searchInviteHeadline"></h1>
-        <!-- ko if: window.wAddressBook -->
+      <!-- ko if: window.wAddressBook -->
+        <div>
+          <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.searchInviteHeadline"></h1>
           <div class="start-ui-import-buttons" data-bind="click: clickOnImportContacts" data-uie-name="from-contacts">
             <div class="start-ui-import-buttons-icon icon-contacts"></div>
             <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonContacts"></span>
           </div>
-        <!-- /ko -->
-        <div class="start-ui-import-buttons" data-bind="click: clickOnImportGmail" data-uie-name="from-gmail">
-          <svg class="start-ui-import-buttons-icon">
-            <use xlink:href="#icon-gmail"></use>
-          </svg>
-          <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonGmail"></span>
+          <div class="start-ui-import-detail" data-bind="l10n_text: z.string.searchInviteDetail"></div>
         </div>
-        <div class="start-ui-import-detail" data-bind="l10n_text: z.string.searchInviteDetail"></div>
-      </div>
+      <!-- /ko -->
     </div>
   <!-- /ko -->
 
@@ -221,12 +215,6 @@
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonContacts"></span>
               </div>
             <!-- /ko -->
-            <div class="start-ui-import-buttons" data-bind="click: clickOnImportGmail" data-uie-name="do-google-import">
-              <svg class="start-ui-import-buttons-icon">
-                <use xlink:href="#icon-gmail"></use>
-              </svg>
-              <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonGmail"></span>
-            </div>
             <div class="start-ui-import-detail" data-bind="l10n_text: z.string.searchInviteDetail"></div>
           </div>
         </div>
