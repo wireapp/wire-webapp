@@ -41,7 +41,6 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       },
     };
     this.contact_import = {
-      google: undefined,
       macos: undefined,
     };
     this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
