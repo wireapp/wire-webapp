@@ -64,10 +64,6 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
   }
 
-  connectGoogleContacts() {
-    amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.GMAIL);
-  }
-
   connectMacOSContacts() {
     amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD);
   }

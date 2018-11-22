@@ -24,7 +24,6 @@ window.z.properties = z.properties || {};
 
 z.properties.PROPERTIES_TYPE = {
   CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
     MACOS: 'contact_import.macos',
   },
   EMOJI: {
