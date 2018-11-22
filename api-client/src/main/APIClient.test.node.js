@@ -25,7 +25,7 @@ const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/au
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
-describe('Client', () => {
+describe('APIClient', () => {
   const baseURL = APIClient.BACKEND.PRODUCTION.rest;
 
   let accessTokenData = {
@@ -161,15 +161,17 @@ describe('Client', () => {
     });
 
     it('refreshes an access token when it becomes invalid', done => {
+      const queriedHandle = 'webappbot';
+
       nock(baseURL)
         .get(UserAPI.URL.USERS)
-        .query({handles: 'webappbot'})
+        .query({handles: queriedHandle})
         .once()
         .reply(401);
 
       nock(baseURL)
         .get(UserAPI.URL.USERS)
-        .query({handles: 'webappbot'})
+        .query({handles: queriedHandle})
         .twice()
         .reply(200, userData);
 
@@ -182,10 +184,14 @@ describe('Client', () => {
         .login(loginData)
         .then(context => {
           expect(context.userId).toBe(accessTokenData.user);
-          // Overwrite access token
+          // Make access token invalid
           client.accessTokenStore.accessToken.access_token = undefined;
-          // Make a backend call
-          return client.user.api.getUsers({handles: ['webappbot']});
+          /**
+           * Make a backend call. This will fail because the access token was made invalid.
+           * Thus the client needs to run an access token refresh in the background and
+           * automatically retry the backend call right after.
+           */
+          return client.user.api.getUsers({handles: [queriedHandle]});
         })
         .then(response => {
           expect(response.name).toBe(userData.name);
