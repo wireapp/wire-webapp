@@ -754,10 +754,6 @@ z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you
 z.string.temporaryGuestLeaveMessage = ' are no longer part of this conversation.';
 z.string.temporaryGuestLeaveDescription = 'If you close or refresh this page, you will lose access to the conversation history.';
 
-// Google contacts upload
-z.string.uploadGoogleHeadline = 'Find people\nto talk to.';
-z.string.uploadGoogleMessage = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
-
 // URLs & Warnings: Permission requests & permission callbacks
 z.string.urlSupportRoot = '/';
 z.string.urlSupportArticles = '/hc/en-us/articles/';
