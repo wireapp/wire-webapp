@@ -60,7 +60,6 @@ z.main.App = class App {
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
-    // @todo Added for wrapper backwards compatibility. Remove after uptake of version > 3.2.
 
     this.instanceId = z.util.createRandomUuid();
 
