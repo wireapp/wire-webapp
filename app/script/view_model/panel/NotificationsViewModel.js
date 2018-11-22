@@ -26,10 +26,8 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends z.viewModel.panel.BasePanelViewModel {
   constructor(params) {
     super(params);
-    this.clickOnNotificationSetting = this.clickOnNotificationSetting.bind(this);
 
-    const conversation = params.repositories.conversation;
-    this.conversationRepository = conversation;
+    this.conversationRepository = params.repositories.conversation;
 
     this.logger = new z.util.Logger('z.viewModel.panel.NotificationsViewModel', z.config.LOGGER.OPTIONS);
 
@@ -40,8 +38,18 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
 
-    this.currentNotificationSetting = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().notificationState();
+    this.currentNotificationSetting = ko.observable();
+
+    this.activeConversation.subscribe(conversation => {
+      if (conversation) {
+        this.currentNotificationSetting(conversation.notificationState());
+      }
+    });
+
+    this.currentNotificationSetting.subscribe(value => {
+      if (this.activeConversation()) {
+        this.conversationRepository.setNotificationState(this.activeConversation(), value);
+      }
     });
 
     this.shouldUpdateScrollbar = ko
@@ -51,11 +59,5 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
 
   getElementId() {
     return 'notification-settings';
-  }
-
-  clickOnNotificationSetting({value}) {
-    if (this.activeConversation()) {
-      this.conversationRepository.setNotificationState(this.activeConversation(), value);
-    }
   }
 };

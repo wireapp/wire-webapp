@@ -8,13 +8,11 @@
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
         <!-- ko foreach: {data: settings, afterRender: () => isRendered(true)} -->
-          <div class="panel__action-item" data-bind="click: $parent.clickOnNotificationSetting" data-uie-name="item-notification-option">
-            <div class="panel__action-item__text" data-bind="text: text"></div>
-              <!-- ko if: $parent.currentNotificationSetting() === value -->
-                <check-icon></check-icon>
-              <!-- /ko -->
-            </div>
-          <!-- /ko -->
+          <label class="panel__action-item panel__action-item__option" data-uie-name="item-notification-option">
+            <input type="radio" name="notification-settings" data-bind="checked: $parent.currentNotificationSetting, value: value"/>
+            <span data-bind="text: text"></span>
+          </label>
+        <!-- /ko -->
         <div class="panel__info-text notification-settings__disclaimer" data-bind="l10n_text: z.string.notificationSettingsDisclaimer"></div>
       </div>
     </div>
