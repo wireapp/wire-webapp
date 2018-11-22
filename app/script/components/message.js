@@ -96,7 +96,7 @@
         });
       }
 
-      if (messageEntity.is_reactable() && !this.conversation().removed_from_conversation()) {
+      if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
         const stringId = messageEntity.is_liked()
           ? z.string.conversationContextMenuUnlike
           : z.string.conversationContextMenuLike;
@@ -243,7 +243,7 @@
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko if: !message.other_likes().length && message.is_reactable() -->
+    <!-- ko if: !message.other_likes().length && message.isReactable() -->
       <div class="message-body-like">
         <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: () => onLike(message)">
           <span class="icon-like-small"></span>

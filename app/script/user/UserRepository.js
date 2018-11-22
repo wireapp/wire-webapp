@@ -593,7 +593,7 @@ z.user.UserRepository = class UserRepository {
         throw error;
       });
 
-    return Promise.all([getLocalUser(userId), this.user_service.get_user_by_id(userId)])
+    return Promise.all([getLocalUser(userId), this.user_service.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
         this.user_mapper.updateUserFromObject(localUserEntity, updatedUserData)
       )
