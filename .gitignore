@@ -1,15 +1,10 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
 !/dist/templates/
-.DS_Store
 .grunt
 .Icon
-.vscode
-*.rej
-/_SpecRunner.html
 /.idea/**/*.xml
 /app/ext
-/app/min
 /app/i18n/**/*
 !/app/i18n/**/*.json
 /dist/s3
@@ -21,9 +16,6 @@
 /dist/Server.*
 /dist/ServerConfig.*
 /dist/util
-/bower_components
-/debug.log
-/deploy
 /doc
 /docs/auth-coverage
 /docs/coverage
@@ -33,9 +25,6 @@
 /package-lock.json
 /tags
 /temp
-/test/_SpecRunner.html
-/Web.config
-/workspace.xml*
 aws-keys.json
 npm-debug.log
 yarn-error.log

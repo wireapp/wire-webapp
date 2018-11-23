@@ -17,7 +17,7 @@
  *
  */
 
-const dist = 'aws/static/min';
+const dist = 'dist/static/min';
 const test = 'test';
 
 const preprocessors = {};
@@ -48,7 +48,6 @@ module.exports = function(config) {
     files: [
       `${test}/config.test.js`,
       `${test}/main.test.js`,
-      `${dist}/runtime.js`,
       `${dist}/dexie.js`,
       `${dist}/vendor.js`,
       `${dist}/test.js`,
