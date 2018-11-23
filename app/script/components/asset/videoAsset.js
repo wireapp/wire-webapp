@@ -121,10 +121,10 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 ko.components.register('video-asset', {
   template: `
     <!-- ko ifnot: message.isObfuscated() -->
-      <div class="video-asset-container" 
-        data-bind="hide_controls: 2000, 
-                   attr: {'data-uie-value': asset.file_name}, 
-                   css: {'video-asset-container--small': displaySmall()}" 
+      <div class="video-asset-container"
+        data-bind="hide_controls: 2000,
+                   attr: {'data-uie-value': asset.file_name},
+                   css: {'video-asset-container--small': displaySmall()}"
         data-uie-name="video-asset">
         <video playsinline
                data-bind="attr: {src: video_src},
@@ -154,14 +154,14 @@ ko.components.register('video-asset', {
                                       asset: asset,
                                       play: onPlayButtonClicked">
                 </media-button>
-              <!-- /ko -->           
+              <!-- /ko -->
               <!-- ko ifnot: displaySmall() -->
                 <media-button params="src: video_element,
                                       large: true,
                                       asset: asset,
                                       play: onPlayButtonClicked,
                                       pause: on_pause_button_clicked,
-                                      cancel: () => asset.cancel($parents[1])">
+                                      cancel: () => asset.cancel(message)">
                 </media-button>
               <!-- /ko -->
             </div>

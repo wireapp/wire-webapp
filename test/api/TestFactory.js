@@ -322,11 +322,9 @@ window.TestFactory.prototype.exposeConnectActors = function() {
       this.logger.info('✓ exposedUserActors');
 
       TestFactory.connectService = new z.connect.ConnectService(this.backendClient);
-      TestFactory.connectGoogleService = new z.connect.ConnectGoogleService();
 
       TestFactory.connect_repository = new z.connect.ConnectRepository(
         TestFactory.connectService,
-        TestFactory.connectGoogleService,
         TestFactory.user_repository
       );
 

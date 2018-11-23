@@ -428,10 +428,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this._importContacts(z.connect.ConnectSource.ICLOUD);
   }
 
-  clickOnImportGmail() {
-    this._importContacts(z.connect.ConnectSource.GMAIL);
-  }
-
   clickToCloseGenericInvite() {
     this.showInviteForm(false);
   }

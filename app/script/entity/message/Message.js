@@ -164,12 +164,7 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if message is deletable.
    */
   is_deletable() {
-    if (this.is_ping() || !this.has_asset()) {
-      return true;
-    }
-    return ![z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING].includes(
-      this.get_first_asset().status()
-    );
+    return this.status() !== z.message.StatusType.SENDING;
   }
 
   /**
@@ -182,8 +177,13 @@ z.entity.Message = class Message {
       return false;
     }
 
+    if (this.hasUnavailableAsset()) {
+      return false;
+    }
+
     if (this.is_content()) {
       const assetEntity = this.get_first_asset();
+
       if (assetEntity && typeof assetEntity.download === 'function') {
         return true;
       }
@@ -275,11 +275,33 @@ z.entity.Message = class Message {
   }
 
   /**
+   * Check if message has an unavailable (uploading or failed) asset.
+   * @returns {boolean} True, if an asset is unavailable.
+   */
+  hasUnavailableAsset() {
+    if (this.has_asset()) {
+      return this.assets().some(asset => {
+        const assetStatus = asset.status();
+        return (
+          assetStatus === z.assets.AssetTransferState.UPLOADING ||
+          assetStatus === z.assets.AssetTransferState.UPLOAD_FAILED
+        );
+      });
+    }
+    return false;
+  }
+
+  /**
    * Check if message can be reacted to.
    * @returns {boolean} True, if message type supports reactions.
    */
-  is_reactable() {
-    return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
+  isReactable() {
+    return (
+      this.is_content() &&
+      !this.is_ephemeral() &&
+      this.status() !== z.message.StatusType.SENDING &&
+      !this.hasUnavailableAsset()
+    );
   }
 
   /**
@@ -287,7 +309,12 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if message type supports replies.
    */
   isReplyable() {
-    return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
+    return (
+      this.is_content() &&
+      !this.is_ephemeral() &&
+      this.status() !== z.message.StatusType.SENDING &&
+      !this.hasUnavailableAsset()
+    );
   }
 
   // Start the ephemeral timer for the message.
