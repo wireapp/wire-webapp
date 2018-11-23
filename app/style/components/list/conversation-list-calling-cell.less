@@ -25,9 +25,9 @@
     align-items: center;
     justify-content: center;
     animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
-    background-color: fade(@graphite-dark, 8%);
+    background-color: fade(@graphite-negative, 8%);
     border-radius: 12px;
-    color: @graphite-dark;
+    color: @graphite-negative;
     cursor: pointer;
     font-size: 12px;
     line-height: 24px;
@@ -38,11 +38,11 @@
     }
 
     svg > path {
-      fill: @graphite-dark;
+      fill: @graphite-negative;
     }
 
     &--active {
-      background-color: @graphite-dark;
+      background-color: @graphite-negative;
       color: @app-bg-secondary;
 
       svg > path {
@@ -118,12 +118,12 @@
     &__wrapper {
       overflow: hidden;
       max-height: 0;
-      color: @graphite-dark;
+      color: @graphite-negative;
 
       &::before {
         display: block;
         margin: 0 16px;
-        border-top: 1px solid fade(@graphite-dark, 4%);
+        border-top: 1px solid fade(@graphite-negative, 4%);
         content: '';
       }
 
@@ -135,7 +135,7 @@
     .participant-item {
       height: 40px;
       cursor: default;
-      fill: @graphite-dark;
+      fill: @graphite-negative;
       pointer-events: none;
 
       .participant-item-image {
@@ -168,10 +168,10 @@
   }
 
   &__avatar {
-    border: 1px solid fade(@graphite-dark, 8%);
+    border: 1px solid fade(@graphite-negative, 8%);
 
     .group-avatar-box-wrapper {
-      background: fade(@graphite-dark, 16%);
+      background: fade(@graphite-negative, 16%);
     }
   }
 }
@@ -203,17 +203,17 @@ conversation-list-calling-cell {
     color: @app-bg-secondary;
 
     &::before {
-      background-color: fade(@graphite-dark, 80%);
+      background-color: fade(@graphite-negative, 80%);
     }
   }
 
   .conversation-list-cell-name {
-    color: @graphite-dark;
+    color: @graphite-negative;
   }
 
   .conversation-list-cell-description {
     margin-top: 0;
-    color: fade(@graphite-dark, 40%);
+    color: fade(@graphite-negative, 40%);
     font-size: 11px;
     opacity: 1;
   }

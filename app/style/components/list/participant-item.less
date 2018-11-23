@@ -67,7 +67,7 @@ participant-item {
 
   &.highlighted {
     animation: fadeInUserHighlighting 1s @ease-out-quart;
-    background-color: fade(@graphite-dark, 8%);
+    background-color: fade(@graphite-negative, 8%);
   }
 
   .participant-item {
@@ -131,10 +131,10 @@ participant-item {
 @keyframes fadeInUserHighlighting {
   0%,
   50% {
-    background-color: fade(@graphite-dark, 0%);
+    background-color: fade(@graphite-negative, 0%);
   }
   100% {
-    background-color: fade(@graphite-dark, 8%);
+    background-color: fade(@graphite-negative, 8%);
   }
 }
 

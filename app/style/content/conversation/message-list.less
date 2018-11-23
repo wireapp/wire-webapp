@@ -97,7 +97,7 @@
 
     &.self-mention {
       background-color: fade(@w-yellow, 48%);
-      color: @graphite-dark;
+      color: @graphite-negative;
     }
 
     &:not(.self-mention) {
@@ -153,7 +153,7 @@
 
   width: @conversation-message-sender-width;
   max-height: @avatar-diameter-xs;
-  color: @graphite-dark;
+  color: @graphite-negative;
 
   &--svg {
     line-height: 0;
@@ -231,7 +231,7 @@
     height: 12px;
 
     path {
-      fill: fade(@graphite-dark, 40%);
+      fill: fade(@graphite-negative, 40%);
     }
   }
 }
@@ -584,7 +584,7 @@
 
 .message-member-footer-description {
   margin-top: 8px;
-  color: fade(@graphite-dark, 40%);
+  color: fade(@graphite-negative, 40%);
   font-weight: @font-weight-regular;
   line-height: 16px;
 }
