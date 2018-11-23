@@ -57,7 +57,6 @@ module.exports = grunt => {
     compress: require('./grunt/config/compress'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
-    karma: require('./grunt/config/karma'),
     open: require('./grunt/config/open'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
@@ -90,15 +89,4 @@ module.exports = grunt => {
     'includereplace:prod_login',
     'includereplace:deploy_demo',
   ]);
-
-  // Test Related
-  grunt.registerTask('test', ['clean:docs_coverage', 'karma:test']);
-
-  grunt.registerTask('test_run', testName => {
-    grunt.config('karma.options.reporters', ['spec']);
-    grunt.config('karma.options.specReporter', {
-      showSpecTiming: true,
-    });
-    grunt.task.run(['karma:test']);
-  });
 };

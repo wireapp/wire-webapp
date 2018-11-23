@@ -20,16 +20,19 @@
 // grunt test_run:event/EventRepository
 
 'use strict';
+import {MemoryEngine} from '@wireapp/store-engine';
+import {Cryptobox} from '@wireapp/cryptobox';
+import * as Proteus from '@wireapp/proteus';
 
 async function createEncodedCiphertext(
   preKey,
   text = 'Hello, World!',
   receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity
 ) {
-  const bobEngine = new window.StoreEngine.MemoryEngine();
+  const bobEngine = new MemoryEngine();
   await bobEngine.init('bob');
 
-  const sender = new window.cryptobox.Cryptobox(bobEngine, 1);
+  const sender = new Cryptobox(bobEngine, 1);
   await sender.create();
 
   const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
@@ -63,7 +66,7 @@ describe('Event Repository', () => {
 
   beforeAll(() => {
     return z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
       .then(() => test_factory.exposeClientActors());
   });
 

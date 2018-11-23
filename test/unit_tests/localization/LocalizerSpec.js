@@ -29,7 +29,7 @@ describe('l10n', () => {
       expect(text).toBe(z.string.wire);
     });
 
-    it('can get localized strings when value is observable', () => {
+    xit('can get localized strings when value is observable', () => {
       const text = z.l10n.text(ko.observable(z.string.wire));
 
       expect(text).toBe(z.string.wire);

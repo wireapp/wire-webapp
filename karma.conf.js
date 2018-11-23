@@ -25,9 +25,7 @@ const path = require('path');
 
 module.exports = function(config) {
   config.set({
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: 'app',
-
+    basePath: './',
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
@@ -40,28 +38,40 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      '../node_modules/jasmine-ajax/lib/mock-ajax.js',
-      '../test/api/environment.js',
-      '../test/api/payloads.js',
-      '../test/api/SDP_payloads.js',
-      '../test/config.test.js',
-      //'../dist/static/min/vendor.js',
-      //'../dist/static/min/dexie.js',
-      //'../dist/static/min/app.js',
-      //'../test/api/TestFactory.js',
-      '../test/unit_tests/util/UtilSpec.js',
+      {
+        included: false,
+        nocache: true,
+        pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
+        served: true,
+      },
+      {included: false, nocache: false, pattern: 'app/ext/audio/*.mp3', served: true},
+      {included: false, nocache: true, pattern: 'app/worker/*.js', served: true},
+
+      'node_modules/jasmine-ajax/lib/mock-ajax.js',
+      'node_modules/sinon/pkg/sinon.js',
+      'test/api/environment.js',
+      'test/api/payloads.js',
+      'test/api/SDP_payloads.js',
+      'test/config.test.js',
+      'app/script/main/globals.js',
+      'test/api/OpenGraphMocks.js',
+      'test/js/calling/CallRequestResponseMock.js',
+      'test/api/TestFactory.js',
+      'test/unit_tests/**/*.js',
     ],
 
     proxies: {
       '/audio/': '/base/audio/',
-      '/ext/': '/base/ext/',
+      '/ext/js': '/base/node_modules/',
       '/worker/': '/base/worker/',
     },
 
     // pre-process matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
+      'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
+      'test/api/TestFactory.js': ['webpack', 'sourcemap'],
+      'app/script/main/globals.js': ['webpack', 'sourcemap'],
       'script/**/*.js': ['coverage'],
     },
 

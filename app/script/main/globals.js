@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import {amplify} from 'amplify';
+import Cookies from 'js-cookie';
 import moment from 'moment';
 import ko from 'knockout';
+import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
 import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
@@ -389,9 +391,9 @@ import audioRepoGlobal from '../audio/AudioRepository.js';
 import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 
-window.amplify = amplify;
-
 // can be removed if we migrate 'webapp-module-logger'
 window.moment = moment;
 
+window.amplify = amplify;
+window.Cookies = Cookies;
 window.ko = ko;
