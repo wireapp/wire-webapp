@@ -85,7 +85,8 @@ export default class IndexedDBEngine implements CRUDEngine {
           const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
           throw new RecordAlreadyExistsError(message);
         } else if (error instanceof Dexie.AbortError) {
-          // TODO: Exchange with "Dexie.QuotaExceededError" when bug in Dexie got fixed.
+          // TODO: Exchange with "Dexie.QuotaExceededError" when bug in Dexie gets fixed:
+          // https://github.com/dfahlander/Dexie.js/issues/776
           const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
           throw new LowDiskSpaceError(message);
         } else {
