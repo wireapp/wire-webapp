@@ -883,17 +883,9 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bower_components/jquery-mousewheel@jquery/jquery-mousewheel#3.1.13":
-  version "3.1.13"
-  resolved "https://codeload.github.com/jquery/jquery-mousewheel/tar.gz/67289b6b2aa0066d7d78a5807f520387135ffb22"
-
 "@bower_components/normalize-css@necolas/normalize.css#3.0.3":
   version "3.0.3"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
-
-"@bower_components/speakingurl@pid/speakingurl#v14.0.1":
-  version "14.0.1"
-  resolved "https://codeload.github.com/pid/speakingurl/tar.gz/d4b7a23985308d0c1f32eaa242f9ff99c5567a04"
 
 "@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.1":
   version "1.1.1"

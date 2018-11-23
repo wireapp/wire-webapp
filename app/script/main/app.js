@@ -20,8 +20,6 @@
 import platform from 'platform';
 
 /* eslint-disable no-unused-vars */
-import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
-
 import globals from './globals';
 
 import auth from './auth';

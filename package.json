@@ -46,9 +46,7 @@
     "@babel/preset-env": "7.1.5",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
-    "@bower_components/jquery-mousewheel": "jquery/jquery-mousewheel#3.1.13",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
-    "@bower_components/speakingurl": "pid/speakingurl#v14.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
@@ -239,14 +237,8 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "exportsOverride": {
-    "@bower_components/jquery-mousewheel": {
-      "js": "jquery.mousewheel.js"
-    },
     "@bower_components/normalize-css": {
       "css": "normalize.css"
-    },
-    "@bower_components/protobuf": {
-      "js": "dist/protobuf.js"
     },
     "@bower_components/wire-audio-files": {
       "audio": "webapp/*"
