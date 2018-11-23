@@ -23,9 +23,8 @@ window.z = window.z || {};
 window.z.connect = z.connect || {};
 
 z.connect.ConnectRepository = class ConnectRepository {
-  constructor(connectService, connectGoogleService, propertiesRepository) {
+  constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
-    this.connectGoogleService = connectGoogleService;
     this.propertiesRepository = propertiesRepository;
     this.logger = new z.util.Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
   }
@@ -36,10 +35,7 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @returns {Promise} Resolves with the matched user IDs
    */
   getContacts(source) {
-    const importFromIcloud = source === z.connect.ConnectSource.ICLOUD;
-
-    const importPromise = importFromIcloud ? this._getMacosContacts() : this._getGoogleContacts();
-    return importPromise.then(phoneBook => this._uploadContacts(phoneBook, source));
+    return this._getMacosContacts().then(phoneBook => this._uploadContacts(phoneBook, source));
   }
 
   /**
@@ -61,24 +57,6 @@ z.connect.ConnectRepository = class ConnectRepository {
     });
 
     return phoneBook;
-  }
-
-  /**
-   * Retrieve a user's Google Contacts.
-   * @private
-   * @returns {Promise} Resolves with the user's Google contacts that match on Wire
-   */
-  _getGoogleContacts() {
-    return this.connectGoogleService
-      .getContacts()
-      .then(response => {
-        amplify.publish(z.event.WebApp.SEARCH.SHOW);
-        return this._parseGoogleContacts(response);
-      })
-      .catch(error => {
-        this.logger.info(`Google Contacts SDK error: ${error.message}`, error);
-        throw new z.error.ConnectError(z.error.ConnectError.TYPE.GOOGLE_DOWNLOAD);
-      });
   }
 
   /**
@@ -131,45 +109,6 @@ z.connect.ConnectRepository = class ConnectRepository {
   }
 
   /**
-   * Parse a user's Google Contacts.
-   *
-   * @private
-   * @param {Array} users - Contacts response from Google API
-   * @returns {z.connect.PhoneBook} Encoded phone book data
-   */
-  _parseGoogleContacts({entry: users}) {
-    const phoneBook = new z.connect.PhoneBook();
-
-    // Add Google contacts
-    if (users) {
-      users.forEach(user => {
-        if (user.gd$phoneNumber) {
-          const card = {
-            card_id: user.gd$etag,
-            contact: [],
-          };
-
-          if (user.gd$phoneNumber) {
-            user.gd$phoneNumber.forEach(number => {
-              if (number.uri) {
-                card.contact.push(number.uri);
-              } else {
-                card.contact.push(number.$t);
-              }
-            });
-          }
-
-          if (card.contact.length) {
-            phoneBook.cards.push(card);
-          }
-        }
-      });
-    }
-
-    return this._encodePhoneBook(phoneBook);
-  }
-
-  /**
    * Upload hashed phone booked to backend for matching.
    *
    * @private
@@ -177,7 +116,7 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @param {z.connect.ConnectSource} source - Source of phone book data
    * @returns {Promise} Resolves when phone book was uploaded
    */
-  _uploadContacts(phoneBook, source = z.connect.ConnectSource.GMAIL) {
+  _uploadContacts(phoneBook, source) {
     const cards = phoneBook.cards;
 
     if (!cards.length) {
@@ -190,13 +129,10 @@ z.connect.ConnectRepository = class ConnectRepository {
       .postOnboarding(phoneBook)
       .then(({results}) => {
         this.logger.info(`Upload of '${source}' contacts upload successful: ${results.length} matches`, results);
-        this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
         return results.map(result => result.id);
       })
       .catch(error => {
         switch (error.type) {
-          case z.error.ConnectError.TYPE.GOOGLE_DOWNLOAD:
-            throw error;
           case z.error.ConnectError.TYPE.NO_CONTACTS:
             return {};
           default:

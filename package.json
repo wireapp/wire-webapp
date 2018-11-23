@@ -74,7 +74,7 @@
     "@types/speakingurl": "13.0.2",
     "@types/uuid": "3.4.4",
     "@types/webpack-env": "1.13.6",
-    "@wireapp/core": "7.2.11",
+    "@wireapp/core": "7.2.14",
     "@wireapp/react-ui-kit": "4.3.6",
     "autoprefixer": "9.3.1",
     "babel-eslint": "10.0.1",
