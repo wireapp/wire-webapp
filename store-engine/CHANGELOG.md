@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.4...@wireapp/store-engine@1.1.5) (2018-11-23)
+
+
+### Bug Fixes
+
+* **api-client,store-engine:** Propagate database errors ([#1332](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1332)) ([9698d4b](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/9698d4b))
+
+
+
+
+
 ## [1.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.3...@wireapp/store-engine@1.1.4) (2018-11-22)
 
 **Note:** Version bump only for package @wireapp/store-engine

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.3...@wireapp/api-client@3.2.4) (2018-11-23)
+
+
+### Bug Fixes
+
+* **api-client,store-engine:** Propagate database errors ([#1332](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1332)) ([9698d4b](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/9698d4b))
+
+
+
+
+
 ## [3.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.2...@wireapp/api-client@3.2.3) (2018-11-22)
 
 **Note:** Version bump only for package @wireapp/api-client
