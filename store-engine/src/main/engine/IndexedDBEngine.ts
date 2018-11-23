@@ -4,6 +4,7 @@ import {LowDiskSpaceError, RecordTypeError, UnsupportedError} from './error/';
 import RecordAlreadyExistsError from './error/RecordAlreadyExistsError';
 import RecordNotFoundError from './error/RecordNotFoundError';
 
+// @see https://dexie.org/docs/Typescript#create-a-subclass
 export interface DexieInstance extends Dexie {
   [index: string]: any;
 }
@@ -12,7 +13,8 @@ export default class IndexedDBEngine implements CRUDEngine {
   private db?: DexieInstance;
   public storeName = '';
 
-  // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on page "about:blank")
+  // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on
+  // page "about:blank")
   private canUseIndexedDB(): Promise<void> {
     const platform = typeof global === 'undefined' ? window : global;
     if ('indexedDB' in platform) {
@@ -34,14 +36,20 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   // @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space
-  private async hasEnoughQuota(): Promise<boolean> {
+  private async hasEnoughQuota(): Promise<void> {
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       const {quota, usage} = await navigator.storage.estimate();
-      const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
-      return quota ? Promise.resolve(true) : Promise.reject(new LowDiskSpaceError(errorMessage));
-    } else {
-      return Promise.resolve(true);
+
+      if (typeof quota === 'number' && typeof usage === 'number') {
+        const diskIsFull = usage >= quota;
+        if (diskIsFull) {
+          const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
+          return Promise.reject(new LowDiskSpaceError(errorMessage));
+        }
+      }
     }
+
+    return Promise.resolve();
   }
 
   public async isSupported(): Promise<void> {
@@ -51,15 +59,19 @@ export default class IndexedDBEngine implements CRUDEngine {
 
   public async init(storeName: string): Promise<DexieInstance> {
     await this.isSupported();
-    this.db = new Dexie(storeName);
-    this.storeName = this.db.name;
-    return this.db;
+    return this.assignDb(new Dexie(storeName));
   }
 
   public initWithDb(db: DexieInstance): Promise<DexieInstance> {
+    return Promise.resolve(this.assignDb(db));
+  }
+
+  // If you want to add listeners to the database and you don't care if it is a new database (init)
+  // or an existing (initWithDB) one, then this method is the right place to do it.
+  private assignDb(db: DexieInstance): DexieInstance {
     this.db = db;
     this.storeName = this.db.name;
-    return Promise.resolve(this.db);
+    return this.db;
   }
 
   public purge(): Promise<void> {
@@ -72,6 +84,10 @@ export default class IndexedDBEngine implements CRUDEngine {
         if (error instanceof Dexie.ConstraintError) {
           const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
           throw new RecordAlreadyExistsError(message);
+        } else if (error instanceof Dexie.AbortError) {
+          // TODO: Exchange with "Dexie.QuotaExceededError" when bug in Dexie got fixed.
+          const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
+          throw new LowDiskSpaceError(message);
         } else {
           throw error;
         }

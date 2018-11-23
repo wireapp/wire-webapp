@@ -114,11 +114,31 @@ describe('IndexedDBEngine', () => {
   describe('"hasEnoughQuota"', () => {
     it('says if there is enough storage available to use IndexedDB', async () => {
       engine = new IndexedDBEngine();
-      const hasEnoughQuota = await engine.hasEnoughQuota();
-      expect(hasEnoughQuota).toBe(true);
+      expect(async () => {
+        await engine.hasEnoughQuota();
+      }).not.toThrow();
     });
 
-    it('throws an error if there is not enough disk space available', async done => {
+    it('throws an error if there is no quota available', async done => {
+      spyOn(navigator.storage, 'estimate').and.returnValue(
+        Promise.resolve({
+          quota: 26025,
+          usage: 26025,
+        })
+      );
+
+      engine = new IndexedDBEngine();
+
+      try {
+        await engine.hasEnoughQuota();
+        done.fail();
+      } catch (error) {
+        expect(error instanceof StoreEngineError.LowDiskSpaceError).toBe(true);
+        done();
+      }
+    });
+
+    it('throws an error if there is no quota is given', async done => {
       spyOn(navigator.storage, 'estimate').and.returnValue(
         Promise.resolve({
           quota: 0,

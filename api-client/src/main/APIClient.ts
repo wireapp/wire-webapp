@@ -237,13 +237,15 @@ class APIClient {
         if (this.config.schemaCallback) {
           this.config.schemaCallback(db);
         } else {
-          throw new Error('Could not initialize database - missing schema definition');
+          const message = `Could not initialize store "${dbName}". Missing schema definition.`;
+          throw new Error(message);
         }
         // In case the database got purged, db.close() is called automatically and we have to reopen it.
         await db.open();
       }
     } catch (error) {
-      throw new Error(`Could not initialize database: "${error.message}`);
+      this.logger.error(`Could not initialize store "${dbName}": ${error.message}`);
+      throw error;
     }
     return this.config.store;
   }

@@ -1,5 +1,5 @@
 class LowDiskSpaceError extends Error {
-  constructor(public message: string) {
+  constructor(public message: string = 'Not enough storage to save the record.') {
     super(message);
     Object.setPrototypeOf(this, LowDiskSpaceError.prototype);
 
