@@ -97,7 +97,34 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
   }
 
-  setTheme(isDarkModeActivated) {}
+  setTheme(isDarkModeActivated) {
+    const styleId = 'wDarkMode';
+
+    // Transition
+    $('<style>')
+      .prop('id', `${styleId}__transition`)
+      .prop('type', 'text/css')
+      .html(
+        `*, *:after, *:before {
+        transition-delay: 0s;
+        transition-duration: 250ms;
+        transition-property: color, fill, background-color;
+        transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+      }`
+      )
+      .appendTo('head');
+    setTimeout(() => $(`#${styleId}__transition`).remove(), 250);
+
+    if (isDarkModeActivated) {
+      $('<link>')
+        .prop('id', styleId)
+        .prop('rel', 'stylesheet')
+        .prop('href', './style/dark.css')
+        .appendTo('head');
+    } else {
+      $(`#${styleId}`).remove();
+    }
+  }
 
   updateProperties(properties) {
     this.optionAudio(properties.settings.sound.alerts);
