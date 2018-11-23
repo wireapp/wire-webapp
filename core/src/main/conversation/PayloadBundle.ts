@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationContent} from '../conversation/content';
+import {ConversationContent} from '../conversation/content/';
 
 enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
