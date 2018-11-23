@@ -19,6 +19,8 @@
  *
  */
 
+// this file
+
 const less = require('less');
 const path = require('path');
 const fs = require('fs-extra');
@@ -31,7 +33,8 @@ fs.mkdirpSync(dist);
 
 const files = {
   [`${dist}/auth.css`]: fs.readFileSync(`${src}/auth/auth.less`, 'utf8'),
-  [`${dist}/main.css`]: fs.readFileSync(`${src}/main.less`, 'utf8'),
+  [`${dist}/default.css`]: fs.readFileSync(`${src}/default.less`, 'utf8'),
+  [`${dist}/dark.css`]: fs.readFileSync(`${src}/dark.less`, 'utf8'),
   [`${dist}/support.css`]: fs.readFileSync(`${src}/support.less`, 'utf8'),
 };
 
