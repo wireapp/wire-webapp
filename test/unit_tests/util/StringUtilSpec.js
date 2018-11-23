@@ -21,6 +21,8 @@
 
 'use strict';
 
+import _ from 'underscore';
+
 describe('z.util.StringUtil', () => {
   describe('compareTransliteration', () => {
     it('René equals Rene', () => {

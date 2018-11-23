@@ -19,6 +19,8 @@
 
 'use strict';
 
+import $ from 'jquery';
+
 $.fn.scrollEnd = function() {
   const element = $(this).get(0);
   if (!element) {

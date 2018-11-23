@@ -79,11 +79,15 @@ module.exports = {
       $: 'jquery',
       _: 'underscore',
       jQuery: 'jquery',
+      jQuery: 'jquery',
       ko: 'knockout',
-      moment: 'moment',
     }),
   ],
   resolve: {
+    alias: {
+      // override phoneformat export, because the 'main' file is not exporting anything
+      'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
+    },
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     modules: [path.resolve(srcScript), 'node_modules'],
   },

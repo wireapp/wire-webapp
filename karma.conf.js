@@ -20,11 +20,13 @@
 /* eslint-disable sort-keys */
 
 'use strict';
+const webpack = require('webpack');
+const path = require('path');
 
 module.exports = function(config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: 'deploy',
+    basePath: 'app',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -38,18 +40,58 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      // Do not write files or patterns here. Put them in grunt/config/karma.js
+      '../node_modules/jasmine-ajax/lib/mock-ajax.js',
+      '../test/api/environment.js',
+      '../test/api/payloads.js',
+      '../test/api/SDP_payloads.js',
+      '../test/config.test.js',
+      //'../dist/static/min/vendor.js',
+      //'../dist/static/min/dexie.js',
+      //'../dist/static/min/app.js',
+      //'../test/api/TestFactory.js',
+      '../test/unit_tests/util/UtilSpec.js',
     ],
 
-    proxies: {},
-
-    // list of files to exclude
-    exclude: [],
+    proxies: {
+      '/audio/': '/base/audio/',
+      '/ext/': '/base/ext/',
+      '/worker/': '/base/worker/',
+    },
 
     // pre-process matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../deploy/script/**/*.js': ['coverage'],
+      '../test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
+      'script/**/*.js': ['coverage'],
+    },
+
+    webpack: {
+      mode: 'development',
+      node: {
+        fs: 'empty',
+        path: 'empty',
+      },
+      externals: {
+        'fs-extra': '{}',
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+          _: 'underscore',
+          ko: 'knockout',
+        }),
+      ],
+      resolve: {
+        alias: {
+          // override phoneformat export, because the 'main' file is not exporting anything
+          'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
+        },
+      },
+    },
+
+    webpackMiddleware: {
+      stats: 'errors-only',
     },
 
     // test results reporter to use

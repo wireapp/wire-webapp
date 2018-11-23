@@ -5,6 +5,10 @@
  */
 /*global define*/
 
+// Need to keep those imporst as commonjs flavor because this file uses `module.exports`
+const _ = require('underscore');
+require('./linkify');
+
 (function() {
   /**
    * Block-Level Grammar
@@ -719,7 +723,7 @@
 
   function unescape(html) {
     // explicitly match decimal, hex, and named HTML entities
-    return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, (_, n) => {
+    return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, (a, n) => {
       n = n.toLowerCase();
       if (n === 'colon') {
         return ':';
