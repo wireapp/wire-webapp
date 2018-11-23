@@ -202,7 +202,7 @@
 
     position: relative;
     margin: -@bubble-border-radius;
-    background: #fff;
+    background: @app-bg-secondary;
     border-radius: 4px;
     color: @graphite-negative;
   }
@@ -264,10 +264,16 @@
   &.start-ui-service-bubble.bubble-left-top,
   &.start-ui-service-bubble.bubble-left {
     &::before {
-      background-color: @app-bg;
+      background-color: @app-bg-secondary;
     }
     &::after {
-      background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
+      background: linear-gradient(
+        -45deg,
+        @app-bg-secondary 0%,
+        @app-bg-secondary 50%,
+        transparent 50%,
+        transparent 100%
+      );
     }
   }
 }

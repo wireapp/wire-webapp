@@ -56,3 +56,10 @@ input[type='text']::-ms-clear {
 pre {
   direction: ltr;
 }
+
+// Set the right background color for bubbles
+.bubble {
+  &:after {
+    background: linear-gradient(-45deg, @app-bg-secondary, @app-bg-secondary 50%, transparent 0, transparent);
+  }
+}
