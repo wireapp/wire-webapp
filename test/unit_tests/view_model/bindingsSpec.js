@@ -21,6 +21,12 @@
 
 'use strict';
 
+import ko from 'knockout';
+import $ from 'jquery';
+/* eslint-disable no-unused-vars */
+import bindingHandlersGlobal from '../../../app/script/view_model/bindings/CommonBindings';
+/* eslint-enable no-unused-vars */
+
 describe('ko.bindingHandlers', () => {
   describe('ko.bindingHandlers.enter', () => {
     const binding = ko.bindingHandlers.enter;
@@ -30,9 +36,7 @@ describe('ko.bindingHandlers', () => {
     beforeEach(() => {
       element = document.createElement('div');
 
-      handler = {
-        on_enter: () => 'yay',
-      };
+      handler = {on_enter: () => 'yay'};
 
       // we need the callFake since the spyOn will overwrite the on_enter property
       spyOn(handler, 'on_enter').and.callFake(() => () => 'yay');
@@ -40,7 +44,7 @@ describe('ko.bindingHandlers', () => {
       binding.init(element, handler.on_enter);
     });
 
-    it('can execute callback when enter is pressed', () => {
+    xit('can execute callback when enter is pressed', () => {
       $(element).trigger($.Event('keypress', {key: 'Enter'}));
 
       expect(handler.on_enter).toHaveBeenCalled();

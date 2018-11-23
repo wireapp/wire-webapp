@@ -20,6 +20,7 @@
 'use strict';
 
 import ko from 'knockout';
+import $ from 'jquery';
 import moment from 'moment';
 import SimpleBar from 'simplebar';
 /* eslint-disable no-unused-vars */
