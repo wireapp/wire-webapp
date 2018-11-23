@@ -24,7 +24,11 @@ import UUID from 'uuidjs';
 import marked from './marked.js';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
-import PhoneFormat from 'phoneformat.js';
+
+/* eslint-disable no-unused-vars */
+import PhoneFormatGlobal from 'phoneformat.js';
+import StringUtilGlobal from './StringUtil';
+/* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -281,7 +285,7 @@ z.util.downloadFile = (url, fileName, mimeType) => {
 };
 
 z.util.phoneNumberToE164 = (phoneNumber, countryCode) => {
-  return PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
+  return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
 z.util.createRandomUuid = () => UUID.genV4().hexString;

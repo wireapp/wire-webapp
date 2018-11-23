@@ -21,6 +21,8 @@
 
 'use strict';
 
+import UUID from 'uuidjs';
+
 describe('z.util.ValidationUtil', () => {
   describe('"asset.legacy"', () => {
     it('detects a valid asset below v3', () => {

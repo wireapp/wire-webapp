@@ -19,6 +19,7 @@
 
 'use strict';
 
+import ko from 'knockout';
 import moment from 'moment';
 import SimpleBar from 'simplebar';
 /* eslint-disable no-unused-vars */

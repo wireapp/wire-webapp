@@ -19,7 +19,10 @@
 
 // grunt test_run:util/Moment
 
-'use strict';
+import moment from 'moment';
+/* eslint-disable no-unused-vars */
+import momentutil from '../../../app/script/util/moment';
+/* eslint-enable no-unused-vars */
 
 describe('z.util.moment', () => {
   describe('isToday', () => {
