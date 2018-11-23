@@ -7,11 +7,10 @@
     #include('../../page/template/#dest/style.htm')
 
     <style>
-
       body {
         overflow-x: hidden;
         overflow-y: scroll !important;
-        background-color: rgba(0,0,0,.08);
+        background-color: rgba(0, 0, 0, 0.08);
         padding: 48px;
       }
 
@@ -27,13 +26,13 @@
         list-style: none;
         display: flex;
         z-index: 10000;
-        -webkit-transition: all .35s;
-                transition: all .35s;
+        -webkit-transition: all 0.35s;
+        transition: all 0.35s;
       }
 
       .microbar-hidden {
         -webkit-transform: translateY(-32px);
-                transform: translateY(-32px);
+        transform: translateY(-32px);
       }
 
       .microbar > li {
@@ -47,7 +46,6 @@
         text-transform: uppercase;
         cursor: pointer;
       }
-
 
       /* user avatars */
       .user-avatars {
@@ -82,7 +80,7 @@
       }
 
       .modal-wrapper .modal {
-       position: absolute;
+        position: absolute;
       }
 
       /* list */
@@ -110,76 +108,99 @@
         display: flex;
         margin-top: 8px;
       }
-      .iconpreview__icon{
+      .iconpreview__icon {
         flex-basis: 32px;
       }
-      .iconpreview__icon svg{
+      .iconpreview__icon svg {
         max-width: 16px;
         max-height: 16px;
       }
-      .iconpreview__icon:not(.override-color) svg path{
+      .iconpreview__icon:not(.override-color) svg path {
         fill: currentColor;
       }
     </style>
   </head>
 
   <body class="theme-blue main-accent-color-1">
-  #include('../../page/template/#dest/vendor.htm')
-  #include('../../page/template/#dest/component.htm')
-  <script src="../script/components/icons.js"></script>
-  #include('microbar.htm')
-  <h1>Colors</h1>
-  #include('colors.htm')
-  <h1>Buttons</h1>
-  #include('buttons.htm')
-  <h1>Media Controls</h1>
-  #include('media-controls.htm')
-  <h1>Checkbox</h1>
-  #include('checkbox.htm')
-  <h1>Popover</h1>
-  #include('popovers.htm')
-  <h1>Avatars</h1>
-  #include('avatars.htm')
-  <h1>Dots</h1>
-  #include('dots.htm')
-  <h1>SVG Icons</h1>
-  #include('icons.htm')
+    #include('../../page/template/#dest/vendor.htm') #include('../../page/template/#dest/component.htm')
+    <script src="../script/components/icons.js"></script>
+    #include('microbar.htm')
+    <h1>Colors</h1>
+    #include('colors.htm')
+    <h1>Buttons</h1>
+    #include('buttons.htm')
+    <h1>Media Controls</h1>
+    #include('media-controls.htm')
+    <h1>Checkbox</h1>
+    #include('checkbox.htm')
+    <h1>Popover</h1>
+    #include('popovers.htm')
+    <h1>Avatars</h1>
+    #include('avatars.htm')
+    <h1>Dots</h1>
+    #include('dots.htm')
+    <h1>SVG Icons</h1>
+    #include('icons.htm')
+    <h1>Emoji range covered by 'emoji' fontface</h1>
+    <div id="emojis"></div>
 
-
-  <script>
-    $(() => {
-      // microbar
-      $('.microbar > li').click(event => {
-        const item = $(event.currentTarget);
-        $('body')
-          .removeClass()
-          .addClass('theme-' + item.text())
-          .addClass('main-accent-color-' + (item.index('li') + 1));
-      });
-
-      let previousScroll = 0;
-      $(window).scroll(() => {
-         const scroll = $(window).scrollTop();
-         $('.microbar').toggleClass('microbar-hidden', scroll > previousScroll);
-         previousScroll = scroll;
-      });
-
-      // user avatars animation
-      $('.avatar-image-loaded').click(function() {
-        const avatar = $(this).removeClass('avatar-loading-transition avatar-image-loaded');
-        window.setTimeout(() => avatar.addClass('avatar-loading-transition avatar-image-loaded'), 200);
-      });
-
-      // popovers
-      $('#popovers .button-round').each(function(element) {
-        new zeta.webapp.module.Bubble({
-          host_selector: "#" + ($(this).attr('id')),
-          scroll_selector: window,
-          enable_click: true,
+    <script>
+      $(() => {
+        // microbar
+        $('.microbar > li').click(event => {
+          const item = $(event.currentTarget);
+          $('body')
+            .removeClass()
+            .addClass('theme-' + item.text())
+            .addClass('main-accent-color-' + (item.index('li') + 1));
         });
+
+        let previousScroll = 0;
+        $(window).scroll(() => {
+          const scroll = $(window).scrollTop();
+          $('.microbar').toggleClass('microbar-hidden', scroll > previousScroll);
+          previousScroll = scroll;
+        });
+
+        // user avatars animation
+        $('.avatar-image-loaded').click(function() {
+          const avatar = $(this).removeClass('avatar-loading-transition avatar-image-loaded');
+          window.setTimeout(() => avatar.addClass('avatar-loading-transition avatar-image-loaded'), 200);
+        });
+
+        // popovers
+        $('#popovers .button-round').each(function(element) {
+          new zeta.webapp.module.Bubble({
+            host_selector: '#' + $(this).attr('id'),
+            scroll_selector: window,
+            enable_click: true,
+          });
+        });
+
+        const generateEmojis = () => {
+          const generateRange = (from, to = from) =>
+            Array.from({length: to - from + 1}, (value, index) => index + from);
+
+          const styleSheets = Array.from(document.styleSheets);
+          const rules = styleSheets.map(sheet => Array.from(sheet.cssRules || sheet.rules || []));
+          const allRules = [].concat(...rules);
+          const emojiFontFace = allRules.find(
+            rule => rule.constructor.name === 'CSSFontFaceRule' && rule.style.fontFamily === 'emoji'
+          );
+          const range = emojiFontFace.style.unicodeRange || '';
+          const values = range.replace(/u\+|\s/gi, '').split(',');
+          const ranges = values.map(value => {
+            const rangeLimits = value.split('-').map(numString => parseInt(numString, 16));
+            return generateRange(...rangeLimits);
+          });
+          const unicodeValues = [].concat(...ranges);
+          
+          return String.fromCodePoint(...unicodeValues);
+        }
+
+        ko.applyBindings(() => {}, document.querySelector('#icons'));
+        document.querySelector('#emojis').textContent = generateEmojis();
       });
-      ko.applyBindings(()=>{},document.querySelector('#icons'));
-    });
-  </script>
+    </script>
   </body>
 </html>
