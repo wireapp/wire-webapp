@@ -21,7 +21,6 @@ import platform from 'platform';
 
 /* eslint-disable no-unused-vars */
 import jqueryMousewheel from '../../ext/js/jquery-mousewheel/jquery.mousewheel.js';
-import raygun from '../../ext/js/raygun4js/raygun.vanilla.js';
 
 import globals from './globals';
 

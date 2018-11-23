@@ -20,8 +20,8 @@
 'use strict';
 
 import StoreEngine from '@wireapp/store-engine';
-import {Cryptobox} from '@wireapp/cryptobox';
-import {error as ProteusErrors} from '@wireapp/proteus';
+import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
+import {errors as ProteusErrors} from '@wireapp/proteus';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -521,7 +521,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const customData = {
       clientLocalClass: this.currentClient().class,
       clientLocalType: this.currentClient().type,
-      cryptoboxVersion: cryptobox.version,
+      cryptoboxVersion: cryptoboxVersion,
       errorCode: error.code,
       eventType: eventType,
     };

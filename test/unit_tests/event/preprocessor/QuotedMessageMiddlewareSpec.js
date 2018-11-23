@@ -25,7 +25,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
   beforeEach(() => {
     return z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
       .then(() => testFactory.exposeEventActors())
       .then(() => {
         quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(

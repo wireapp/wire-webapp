@@ -891,10 +891,6 @@
   version "3.0.3"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
 
-"@bower_components/raygun4js@MindscapeHQ/raygun4js#v2.13.2":
-  version "2.13.2"
-  resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/3a240172d66d70cc406437cee1c19fea0ae63c26"
-
 "@bower_components/speakingurl@pid/speakingurl#v14.0.1":
   version "14.0.1"
   resolved "https://codeload.github.com/pid/speakingurl/tar.gz/d4b7a23985308d0c1f32eaa242f9ff99c5567a04"
@@ -5945,13 +5941,6 @@ grunt-include-replace@5.0.0:
   resolved "https://registry.yarnpkg.com/grunt-include-replace/-/grunt-include-replace-5.0.0.tgz#09539163b1681a6c5609106954504e1c1a66e077"
   integrity sha1-CVORY7FoGmxWCRBpVFBOHBpm4Hc=
 
-grunt-karma@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/grunt-karma/-/grunt-karma-3.0.0.tgz#534f695728db21ab7fa09257969977f6d90d073f"
-  integrity sha512-E111KL3o5v2aoc4w0CkCSdd/MzA3sB7xHeUw5b/hRW3LwRgJWUrsP8BTX3nsOshi1yHhws1st9jFSKHYI2bY+g==
-  dependencies:
-    lodash "^4.17.10"
-
 grunt-known-options@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/grunt-known-options/-/grunt-known-options-1.1.0.tgz#a4274eeb32fa765da5a7a3b1712617ce3b144149"
@@ -10723,6 +10712,11 @@ raw-body@~1.1.0:
   dependencies:
     bytes "1"
     string_decoder "0.10"
+
+raygun4js@2.13.3:
+  version "2.13.3"
+  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.13.3.tgz#e3817c341656cc302c5825f3e17683dc3bb2da6d"
+  integrity sha512-Un4mMuKKsoSdjeGf9/c4+p33XJunpMniAd5EkOacTs6ts7Q7zjxI9IQuUuhpKFTDaP8xKqtecCR9cFRb95MI1A==
 
 rc@^1.1.6:
   version "1.2.2"

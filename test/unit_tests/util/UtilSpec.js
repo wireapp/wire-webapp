@@ -23,10 +23,6 @@
 
 import ko from 'knockout';
 
-/* eslint-disable no-unused-vars */
-import globals from '../../../app/script/main/globals';
-/* eslint-enable no-unused-vars */
-
 describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {
     const expected =
