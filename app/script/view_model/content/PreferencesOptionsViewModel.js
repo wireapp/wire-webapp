@@ -48,6 +48,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.optionDarkMode = ko.observable();
     this.optionDarkMode.subscribe(darkModePreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.DARK_MODE, darkModePreference);
       this.setTheme(darkModePreference);
     });
 
@@ -96,9 +97,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
   }
 
-  setTheme(darkModePreference) {
-    this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.DARK_MODE, darkModePreference);
-  }
+  setTheme(isDarkModeActivated) {}
 
   updateProperties(properties) {
     this.optionAudio(properties.settings.sound.alerts);
