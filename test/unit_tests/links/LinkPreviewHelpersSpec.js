@@ -71,10 +71,14 @@ describe('getFirstLinkWithOffset', () => {
     expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(text)).toBeUndefined();
   });
 
-  it('should not return anything for links in code blocks)', () => {
-    const text = 'cool code: `wire.com`';
+  it('should not return anything for links in code blocks', () => {
+    const singleTick = 'cool code: `wire.com`';
+    const moreTicks = 'cool code: ```\nwire.com\n```';
+    const manyTicks = 'cool code: ``````\nwire.com\n``````';
 
-    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(text)).toBeUndefined();
+    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(singleTick)).toBeUndefined();
+    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(moreTicks)).toBeUndefined();
+    expect(z.links.LinkPreviewHelpers.getFirstLinkWithOffset(manyTicks)).toBeUndefined();
   });
 
   it('should return the correct link and offset for a single link without text)', () => {
