@@ -40,7 +40,7 @@ z.viewModel.DarkModeViewModel = class DarkModeViewModel {
     this.isTransitioning(true);
     this.isDarkMode(newPreference);
 
-    const ANIMATION_DURATION = 1000;
+    const ANIMATION_DURATION = 250;
     setTimeout(() => this.isTransitioning(false), ANIMATION_DURATION);
   }
 };
