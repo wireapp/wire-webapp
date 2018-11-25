@@ -74,5 +74,6 @@ processLessFiles({
   [`${dist}/auth.css`]: `${src}/auth/auth.less`,
   [`${dist}/default.css`]: `${src}/default.less`,
   [`${dist}/dark.css`]: `${src}/dark.less`,
+  [`${dist}/transitioning.css`]: `${src}/transitioning.less`,
   [`${dist}/support.css`]: `${src}/support.less`,
 });

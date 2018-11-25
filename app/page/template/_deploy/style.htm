@@ -1,14 +1,5 @@
-<style type="text/css">
-  #include('../../../deploy/style/default.css')
-</style>
+<style type="text/css">#include('../../../deploy/style/default.css')</style>
 <link type="text/css" rel="prefetch" href="style/dark.css?{{@config.VERSION}}" data-bind="attr: { rel: isDarkMode() ? 'stylesheet' : 'prefetch' }" />
 <!-- ko if: isTransitioning() -->
-<style type="text/css">
-  *, *:after, *:before {
-  -webkit-transition-delay: 0s;
-  -webkit-transition-duration: 500ms;
-  -webkit-transition-property: color, fill, background-color;
-  -webkit-transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-</style>
+<style type="text/css">#include('../../../deploy/style/transitioning.css')</style>
 <!-- /ko -->
