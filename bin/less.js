@@ -19,10 +19,31 @@
  *
  */
 
+const fs = require('fs-extra');
 const less = require('less');
 const path = require('path');
-const fs = require('fs-extra');
-const DEFAULT_ENCODING = 'utf8';
+
+const read = pathToFile => {
+  return new Promise((resolve, reject) => {
+    return fs.readFile(pathToFile, {encoding: 'utf8', flag: 'r'}, (error, data) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(data);
+    });
+  });
+};
+
+const write = (pathToFile, data) => {
+  return new Promise((resolve, reject) => {
+    return fs.writeFile(pathToFile, data, {encoding: 'utf8'}, error => {
+      if (error) {
+        return reject(error);
+      }
+      resolve();
+    });
+  });
+};
 
 function renderCSS(lessInput) {
   return less.render(lessInput, {sourceMap: {}});
@@ -31,11 +52,11 @@ function renderCSS(lessInput) {
 async function processLessFiles(files) {
   try {
     for (const outputPath in files) {
-      const lessInput = fs.readFileSync(files[outputPath], DEFAULT_ENCODING);
+      const lessInput = await read(files[outputPath]);
       const output = await renderCSS(lessInput);
-      fs.writeFileSync(outputPath, output.css, DEFAULT_ENCODING);
+      await write(outputPath, output.css);
       if (output.map) {
-        fs.writeFileSync(`${outputPath}.map`, output.map, DEFAULT_ENCODING);
+        await write(`${outputPath}.map`, output.map);
       }
     }
   } catch (error) {
