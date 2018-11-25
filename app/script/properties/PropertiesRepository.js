@@ -189,8 +189,8 @@ z.properties.PropertiesRepository = class PropertiesRepository {
       case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.DARK_MODE:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.DARK_MODE, updatedPreference);
+      case z.properties.PROPERTIES_TYPE.APPEARANCE.DARK:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, updatedPreference);
         break;
       case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);

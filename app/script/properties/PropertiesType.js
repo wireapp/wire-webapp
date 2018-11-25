@@ -23,10 +23,12 @@ window.z = window.z || {};
 window.z.properties = z.properties || {};
 
 z.properties.PROPERTIES_TYPE = {
+  APPEARANCE: {
+    DARK: 'settings.appearance.dark',
+  },
   CONTACT_IMPORT: {
     MACOS: 'contact_import.macos',
   },
-  DARK_MODE: 'settings.dark_mode',
   EMOJI: {
     REPLACE_INLINE: 'settings.emoji.replace_inline',
   },

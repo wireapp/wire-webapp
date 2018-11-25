@@ -24,13 +24,15 @@ window.z.viewModel = z.viewModel || {};
 
 z.viewModel.DarkModeViewModel = class DarkModeViewModel {
   constructor(mainViewModel, repositories) {
+    this.propertiesRepository = repositories.properties;
+
     this.isDarkMode = ko.observable(undefined);
     this.isTransitioning = ko.observable(undefined);
     this.setTheme = this.setTheme.bind(this);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.DARK_MODE, this.setTheme);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, this.setTheme);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
-      this.setTheme(properties.settings.dark_mode);
+      this.setTheme(properties.settings.appearance.dark);
     });
 
     ko.applyBindings(this, document.getElementsByTagName('head')[0]);

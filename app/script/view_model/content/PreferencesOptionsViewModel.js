@@ -48,8 +48,9 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.optionDarkMode = ko.observable();
     this.optionDarkMode.subscribe(darkModePreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.DARK_MODE, darkModePreference);
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.APPEARANCE.DARK, darkModePreference);
     });
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.SYSTEM_CHANGED, this.optionDarkMode);
 
     this.optionReplaceInlineEmoji = ko.observable();
     this.optionReplaceInlineEmoji.subscribe(emojiPreference => {
@@ -99,7 +100,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   updateProperties(properties) {
     this.optionAudio(properties.settings.sound.alerts);
     this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
-    this.optionDarkMode(properties.settings.dark_mode);
+    this.optionDarkMode(properties.settings.appearance.dark);
     this.optionSendPreviews(properties.settings.previews.send);
     this.optionNotifications(properties.settings.notifications);
   }

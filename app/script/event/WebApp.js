@@ -172,8 +172,11 @@ z.event.WebApp = {
   },
   PROPERTIES: {
     UPDATE: {
+      APPEARANCE: {
+        DARK: 'wire.webapp.properties.update.appearance.dark',
+        SYSTEM_CHANGED: 'wire.webapp.properties.update.appearance.system_changed',
+      },
       CONTACTS: 'wire.webapp.properties.update.contacts',
-      DARK_MODE: 'wire.webapp.properties.update.dark_mode',
       EMOJI: {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
       },
