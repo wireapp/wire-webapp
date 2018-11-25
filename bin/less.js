@@ -19,11 +19,29 @@
  *
  */
 
-// this file
-
 const less = require('less');
 const path = require('path');
 const fs = require('fs-extra');
+const DEFAULT_ENCODING = 'utf8';
+
+function renderCSS(lessInput) {
+  return less.render(lessInput, {sourceMap: {}});
+}
+
+async function processLessFiles(files) {
+  try {
+    for (const outputPath in files) {
+      const lessInput = fs.readFileSync(files[outputPath], DEFAULT_ENCODING);
+      const output = await renderCSS(lessInput);
+      fs.writeFileSync(outputPath, output.css, DEFAULT_ENCODING);
+      if (output.map) {
+        fs.writeFileSync(`${outputPath}.map`, output.map, DEFAULT_ENCODING);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 const src = path.resolve(__dirname, '../app/style');
 const dist = path.resolve(__dirname, '../deploy/style');
@@ -31,23 +49,9 @@ const dist = path.resolve(__dirname, '../deploy/style');
 process.chdir(src);
 fs.mkdirpSync(dist);
 
-const files = {
-  [`${dist}/auth.css`]: fs.readFileSync(`${src}/auth/auth.less`, 'utf8'),
-  [`${dist}/default.css`]: fs.readFileSync(`${src}/default.less`, 'utf8'),
-  [`${dist}/dark.css`]: fs.readFileSync(`${src}/dark.less`, 'utf8'),
-  [`${dist}/support.css`]: fs.readFileSync(`${src}/support.less`, 'utf8'),
-};
-
-Object.entries(files).forEach(([outputPath, lessInput]) => renderCSS(lessInput, outputPath));
-
-function renderCSS(lessInput, outputPath) {
-  less
-    .render(lessInput, {sourceMap: {}})
-    .then(output => {
-      fs.writeFileSync(outputPath, output.css, 'utf8');
-      if (output.map) {
-        fs.writeFileSync(`${outputPath}.map`, output.map, 'utf8');
-      }
-    })
-    .catch(error => console.error('error', error));
-}
+processLessFiles({
+  [`${dist}/auth.css`]: `${src}/auth/auth.less`,
+  [`${dist}/default.css`]: `${src}/default.less`,
+  [`${dist}/dark.css`]: `${src}/dark.less`,
+  [`${dist}/support.css`]: `${src}/support.less`,
+});
