@@ -26,6 +26,7 @@ z.properties.PropertiesEntity = class PropertiesEntity {
   constructor() {
     this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
+      dark_mode: false,
       emoji: {
         replace_inline: true,
       },

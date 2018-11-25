@@ -75,6 +75,7 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
+    this.darkMode = new z.viewModel.DarkModeViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();
