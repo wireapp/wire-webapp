@@ -308,6 +308,7 @@ z.string.pl.groupCreationPreferencesAction = 'Dalej';
 z.string.pl.groupCreationParticipantsActionCreate = 'Zakończono';
 z.string.pl.groupCreationParticipantsPlaceholder = 'Szukaj według nazwy';
 
+
 z.string.pl.collectionShowAll = 'Pokaż wszystkie {{number}}';
 z.string.pl.collectionSectionLinks = 'Linki';
 z.string.pl.collectionSectionImages = 'Zdjęcia';
@@ -462,7 +463,6 @@ z.string.pl.preferencesOptionsAudioNoneDetail = 'Csiiii!';
 z.string.pl.preferencesOptionsAudioSome = 'Niektóre';
 z.string.pl.preferencesOptionsAudioSomeDetail = 'Pingi i połączenia';
 z.string.pl.preferencesOptionsContacts = 'Kontakty';
-z.string.pl.preferencesOptionsContactsGmail = 'Import z Gmail';
 z.string.pl.preferencesOptionsContactsMacos = 'Import z Kontaktów';
 z.string.pl.preferencesOptionsContactsDetail = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
 z.string.pl.preferencesOptionsPopular = 'Różne';
@@ -497,7 +497,6 @@ z.string.pl.searchOthers = 'Połącz';
 z.string.pl.searchInvite = 'Zaproś innych do Wire';
 z.string.pl.searchInviteDetail = 'Udostępnianie kontaktów pomaga połączyć się z innymi. Wszystkie informacje są anonimowe i nie udostępniamy ich nikomu.';
 z.string.pl.searchInviteButtonContacts = 'Z kontaktów';
-z.string.pl.searchInviteButtonGmail = 'Z Gmaila';
 z.string.pl.searchInviteHeadline = 'Zaproś znajomych';
 z.string.pl.searchInviteShare = 'Udostępnij kontakty';
 
@@ -505,9 +504,6 @@ z.string.pl.searchListEveryoneParticipates = 'Wszyscy, z którymi masz połącze
 z.string.pl.searchListNoMatches = 'Brak wyników. Spróbuj wprowadzić inną nazwę.';
 
 z.string.pl.temporaryGuestCta = 'Utwórz konto';
-
-z.string.pl.uploadGoogleHeadline = 'Znajdź osoby do rozmowy.';
-z.string.pl.uploadGoogleMessage = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
 
 z.string.pl.warningCallUnsupportedIncoming = 'Dzwoni {{user}}. Twoja przeglądarka nie obsługuje rozmów.';
 z.string.pl.warningCallUnsupportedOutgoing = 'Nie możesz zadzwonić, ponieważ Twoja przeglądarka nie obsługuje rozmów.';
@@ -573,7 +569,6 @@ z.string.pl.tooltipConversationsStart = 'Zacznij rozmowę ({{shortcut}})';
 
 z.string.pl.tooltipConversationDetailsRename = 'Zmień nazwę konwersacji';
 
-z.string.pl.tooltipPreferencesContactsGmail = 'Zaloguj się do swojego konta Gmail i udostępniaj kontakty';
 z.string.pl.tooltipPreferencesContactsMacos = 'Udostępnij wszystkie kontakty z aplikacji Kontakty macOS';
 z.string.pl.tooltipPreferencesPassword = 'Otwórz stronę resetowania hasła';
 z.string.pl.tooltipPreferencesPicture = 'Zmień swój obraz…';

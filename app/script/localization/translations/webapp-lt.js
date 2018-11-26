@@ -601,7 +601,6 @@ z.string.lt.preferencesOptionsAudioNoneDetail = 'Ša!';
 z.string.lt.preferencesOptionsAudioSome = 'Kai kurie';
 z.string.lt.preferencesOptionsAudioSomeDetail = 'Ryšio tikrinimai ir skambučiai';
 z.string.lt.preferencesOptionsContacts = 'Kontaktai';
-z.string.lt.preferencesOptionsContactsGmail = 'Importuoti iš Gmail';
 z.string.lt.preferencesOptionsContactsMacos = 'Importuoti iš kontaktų';
 z.string.lt.preferencesOptionsContactsDetail = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
 z.string.lt.preferencesOptionsPopular = 'Pagal populiarias užklausas';
@@ -673,7 +672,6 @@ z.string.lt.searchOthers = 'Užmegzti kontaktą';
 z.string.lt.searchInvite = 'Pakvieskite žmones į Wire';
 z.string.lt.searchInviteDetail = 'Dalinimasis kontaktais padeda jums užmegzti kontaktą su kitais žmonėmis. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
 z.string.lt.searchInviteButtonContacts = 'Iš kontaktų';
-z.string.lt.searchInviteButtonGmail = 'Iš Gmail';
 z.string.lt.searchInviteHeadline = 'Pasikvieskite savo draugus';
 z.string.lt.searchInviteShare = 'Dalintis kontaktais';
 
@@ -691,9 +689,6 @@ z.string.lt.temporaryGuestJoinDescription = 'Jei puslapį uždarysite arba perkr
 
 z.string.lt.temporaryGuestLeaveMessage = ' išėjo iš šio susirašinėjimo.';
 z.string.lt.temporaryGuestLeaveDescription = 'Jei puslapį uždarysite arba perkrausite iš naujo, susirašinėjimo praeities matyti nebegalėsite.';
-
-z.string.lt.uploadGoogleHeadline = 'Raskite žmones\nsu kuriais pasikalbėti.';
-z.string.lt.uploadGoogleMessage = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
 
 z.string.lt.warningCallUnsupportedIncoming = 'Skambina {{user}}. Jūsų naršyklė nepalaiko skambučių.';
 z.string.lt.warningCallUnsupportedOutgoing = 'Jūs negalite skambinti, nes jūsų naršyklė nepalaiko skambučių.';
@@ -769,7 +764,6 @@ z.string.lt.tooltipConversationsStart = 'Pradėti pokalbį ({{shortcut}})';
 z.string.lt.tooltipConversationDetailsAddPeople = 'Pridėti dalyvių prie susirašinėjimo ({{shortcut}})';
 z.string.lt.tooltipConversationDetailsRename = 'Pakeisti pokalbio pavadinimą';
 
-z.string.lt.tooltipPreferencesContactsGmail = 'Prisijunkite prie savo Gmail paskyros, norėdami bendrinti kontaktus';
 z.string.lt.tooltipPreferencesContactsMacos = 'Bendrinti visus savo kontaktus iš macOS Kontaktų programos';
 z.string.lt.tooltipPreferencesPassword = 'Atverti kitą svetainę, skirtą slaptažodžio atstatymui';
 z.string.lt.tooltipPreferencesPicture = 'Pakeisti savo paveikslą…';

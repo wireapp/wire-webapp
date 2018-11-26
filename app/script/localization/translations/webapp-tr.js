@@ -201,6 +201,7 @@ z.string.tr.modalConversationTooManyMembersHeadline = 'Dolup taşmış';
 z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabilir değil';
 z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
 
+
 z.string.tr.modalImproveWireAction = 'Kabul et';
 z.string.tr.modalImproveWireSecondary = 'Hayır';
 
@@ -278,6 +279,7 @@ z.string.tr.conversationTweetAuthor = ' Twitter’da';
 z.string.tr.groupCreationPreferencesAction = 'İleri';
 z.string.tr.groupCreationParticipantsActionCreate = 'Yapıldı';
 z.string.tr.groupCreationParticipantsPlaceholder = 'İsme göre ara';
+
 
 z.string.tr.collectionShowAll = '{{number}}’nun tümünü göster';
 z.string.tr.collectionSectionLinks = 'Bağlantılar';
@@ -434,7 +436,6 @@ z.string.tr.preferencesOptionsAudioNoneDetail = 'Şüşşş!';
 z.string.tr.preferencesOptionsAudioSome = 'Bazıları';
 z.string.tr.preferencesOptionsAudioSomeDetail = 'Pingler ve aramalar';
 z.string.tr.preferencesOptionsContacts = 'Kişiler';
-z.string.tr.preferencesOptionsContactsGmail = 'Gmail’den içe aktar';
 z.string.tr.preferencesOptionsContactsMacos = 'Kişilerden içe aktar';
 z.string.tr.preferencesOptionsContactsDetail = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
 z.string.tr.preferencesOptionsPopular = 'Yoğun istek üzerine';
@@ -468,7 +469,6 @@ z.string.tr.searchOthers = 'Bağlan';
 z.string.tr.searchInvite = 'İnsanları Wire’a katılmaya davet edin';
 z.string.tr.searchInviteDetail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
 z.string.tr.searchInviteButtonContacts = 'Kişilerden';
-z.string.tr.searchInviteButtonGmail = 'Gmail’den';
 z.string.tr.searchInviteHeadline = 'Arkadaşlarınızı getirin';
 z.string.tr.searchInviteShare = 'Kişileri Paylaş';
 
@@ -476,9 +476,6 @@ z.string.tr.searchListEveryoneParticipates = 'Bağlantıda olduğun herkes zaten
 z.string.tr.searchListNoMatches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi deneyin.';
 
 z.string.tr.temporaryGuestCta = 'Bir hesap oluştur';
-
-z.string.tr.uploadGoogleHeadline = 'Konuşmak için\ninsanları bul.';
-z.string.tr.uploadGoogleMessage = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
 
 z.string.tr.warningCallUnsupportedIncoming = '{{user}} arıyor. Ancak tarayıcınız sesli aramaları desteklemiyor.';
 z.string.tr.warningCallUnsupportedOutgoing = 'Arama yapamazsınız çünkü tarayıcınız sesli aramaları desteklemiyor.';
@@ -549,7 +546,6 @@ z.string.tr.tooltipConversationsStart = 'Konuşma başlat ({{shortcut}})';
 
 z.string.tr.tooltipConversationDetailsRename = 'Konuşma adını değiştir';
 
-z.string.tr.tooltipPreferencesContactsGmail = 'Kişilerinizi paylaşmak için Gmail hesabınıza giriş yapınız';
 z.string.tr.tooltipPreferencesContactsMacos = 'MacOS Kişiler uygulaması aracılığıyla tüm kişilerinizi paylaşın';
 z.string.tr.tooltipPreferencesPassword = 'Şifreyi sıfırlamak için yeni bir pencere aç';
 z.string.tr.tooltipPreferencesPicture = 'Resminizi değiştirin…';
