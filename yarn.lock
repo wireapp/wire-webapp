@@ -1369,11 +1369,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.9.tgz#a07bfa74331471e1dc22a47eb72026843f7b95c8"
   integrity sha512-eajkMXG812/w3w4a1OcBlaTwsFPO5F7fJ/amy+tieQxEMWBlbV1JGSjkFM+zkHNf81Cad+dfIRA+IBkvmvdAeA==
 
-"@types/node@10.12.0":
-  version "10.12.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.0.tgz#ea6dcbddbc5b584c83f06c60e82736d8fbb0c235"
-  integrity sha512-3TUHC3jsBAB7qVRGxT6lWyYo2v96BMmD2PTcl47H25Lu7UXtFH/2qqmKiVrnel6Ne//0TFYf6uvNX+HW2FRkLQ==
-
 "@types/node@10.12.10":
   version "10.12.10"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.10.tgz#4fa76e6598b7de3f0cb6ec3abacc4f59e5b3a2ce"
@@ -1659,12 +1654,12 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.106.tgz#e2da8dd8599632ce77b943c4c81d23bafcdbc424"
   integrity sha512-gGVJ2foWxIkroz+GMf0gQjSc3B8NLwmAT1X+j0VYUPzl6rARcEIMQf9qnGDNzOItINXPoiDgDclpEnxxje2j/Q==
 
-"@wireapp/commons@0.6.27":
-  version "0.6.27"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-0.6.27.tgz#89ed450684f6e2b570e788a84b2407141a6994db"
-  integrity sha512-iuKO7PTfjoTeEio8RpGS+E8h2HZcL87ZNa3yw1li3UE63YPSSo1HrvtQHaFGKt9ubT9yAl+JcnQ4Q1E9dEI/Eg==
+"@wireapp/commons@0.9.16":
+  version "0.9.16"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-0.9.16.tgz#03f1cdc7ac17eb9ce929df866dafe87622c7d7c1"
+  integrity sha512-LQ4Hs198rUueW4ZV7Kt9WKu20imkZSjMxBIOkllIPo/d/b46uxj2d7N7i/RqBQWPw6DdIWu2R/63qQzerdefcw==
   dependencies:
-    "@types/node" "10.12.0"
+    "@types/node" "10.12.10"
     "@types/platform" "1.3.1"
     platform "1.3.5"
 
