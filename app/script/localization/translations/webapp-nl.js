@@ -203,7 +203,6 @@ z.string.nl.modalConversationTooManyMembersHeadline = 'Full house';
 z.string.nl.modalIntegrationUnavailableHeadline = 'Bots zijn nu niet beschikbaar';
 z.string.nl.modalIntegrationUnavailableMessage = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
 
-
 z.string.nl.modalImproveWireAction = 'Neem op';
 z.string.nl.modalImproveWireSecondary = 'Nee';
 
@@ -291,7 +290,6 @@ z.string.nl.groupCreationParticipantsActionCreate = 'Klaar';
 z.string.nl.groupCreationParticipantsActionSkip = 'Sla over';
 z.string.nl.groupCreationParticipantsHeader = 'Personen toevoegen';
 z.string.nl.groupCreationParticipantsPlaceholder = 'Zoeken op naam';
-
 
 z.string.nl.collectionShowAll = 'Toon alle {{number}}';
 z.string.nl.collectionSectionLinks = 'Links';

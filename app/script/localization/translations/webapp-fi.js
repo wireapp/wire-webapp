@@ -200,7 +200,6 @@ z.string.fi.modalConversationTooManyMembersHeadline = 'Kaikki puhelukanavat vara
 z.string.fi.modalIntegrationUnavailableHeadline = 'Botit eivät käytettävissä';
 z.string.fi.modalIntegrationUnavailableMessage = 'Kiitos mielenkiinnostasi botteihin. Tämä palvelu on väliaikaisesti pois käytöstä, koska työstämme seuraavaa versiota.';
 
-
 z.string.fi.modalImproveWireAction = 'Hyväksy';
 z.string.fi.modalImproveWireSecondary = 'Ei';
 
@@ -278,7 +277,6 @@ z.string.fi.conversationTweetAuthor = ' Twitterissä';
 z.string.fi.groupCreationPreferencesAction = 'Seuraava';
 z.string.fi.groupCreationParticipantsActionCreate = 'Valmis';
 z.string.fi.groupCreationParticipantsPlaceholder = 'Hae nimellä';
-
 
 z.string.fi.collectionShowAll = 'Näytä kaikki {{number}}';
 z.string.fi.collectionSectionLinks = 'Linkit';
@@ -474,7 +472,6 @@ z.string.fi.searchInviteShare = 'Jaa yhteystietoja';
 
 z.string.fi.searchListEveryoneParticipates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
 z.string.fi.searchListNoMatches = 'Ei vastaavia tuloksia. Yritä toisella nimellä.';
-
 
 z.string.fi.uploadGoogleHeadline = 'Etsi ihmisiä joiden kanssa jutella.';
 z.string.fi.uploadGoogleMessage = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';

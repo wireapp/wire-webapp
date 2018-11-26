@@ -185,8 +185,6 @@ z.string.hr.modalConversationRemoveGuestsAction = 'Ukloni';
 
 z.string.hr.modalConversationTooManyMembersHeadline = 'Puna kuća';
 
-
-
 z.string.hr.modalImproveWireAction = 'Prihvati';
 z.string.hr.modalImproveWireSecondary = 'Ne';
 
@@ -258,7 +256,6 @@ z.string.hr.conversationSomeone = 'Netko';
 z.string.hr.conversationTweetAuthor = ' na Twitteru';
 
 z.string.hr.groupCreationParticipantsPlaceholder = 'Traži po imenu';
-
 
 z.string.hr.collectionSectionLinks = 'Linkovi';
 z.string.hr.collectionSectionImages = 'Slike';
@@ -429,7 +426,6 @@ z.string.hr.searchInviteShare = 'Podijeli kontakte';
 
 z.string.hr.searchListEveryoneParticipates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
 z.string.hr.searchListNoMatches = 'Nema odgovarajućih rezultata. Pokušajte unijeti drugačije ime.';
-
 
 z.string.hr.uploadGoogleHeadline = 'Pronađi ljude za razgovor.';
 z.string.hr.uploadGoogleMessage = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';

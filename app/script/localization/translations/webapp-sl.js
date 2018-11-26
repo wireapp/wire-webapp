@@ -194,8 +194,6 @@ z.string.sl.modalConversationRemoveGuestsAction = 'Odstrani';
 
 z.string.sl.modalConversationTooManyMembersHeadline = 'Polna hiša';
 
-
-
 z.string.sl.modalImproveWireAction = 'Sprejmi';
 z.string.sl.modalImproveWireSecondary = 'Ne';
 
@@ -269,7 +267,6 @@ z.string.sl.conversationSomeone = 'Nekdo';
 z.string.sl.conversationTweetAuthor = ' na Twitterju';
 
 z.string.sl.groupCreationParticipantsPlaceholder = 'Iskanje po imenu';
-
 
 z.string.sl.collectionShowAll = 'Prikaži vse {{number}}';
 z.string.sl.collectionSectionLinks = 'Povezave';
@@ -465,7 +462,6 @@ z.string.sl.searchInviteShare = 'Deli Stike';
 
 z.string.sl.searchListEveryoneParticipates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
 z.string.sl.searchListNoMatches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti drugo ime.';
-
 
 z.string.sl.uploadGoogleHeadline = 'Poiščite osebe\nza pogovor.';
 z.string.sl.uploadGoogleMessage = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';

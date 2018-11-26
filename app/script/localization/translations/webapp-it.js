@@ -195,8 +195,6 @@ z.string.it.modalConversationRemoveGuestsAction = 'Rimuovi';
 
 z.string.it.modalConversationTooManyMembersHeadline = 'Chiamata piena';
 
-
-
 z.string.it.modalImproveWireAction = 'Accetta';
 z.string.it.modalImproveWireSecondary = 'No';
 
@@ -272,7 +270,6 @@ z.string.it.conversationSomeone = 'Qualcuno';
 z.string.it.conversationTweetAuthor = ' su Twitter';
 
 z.string.it.groupCreationParticipantsPlaceholder = 'Cerca per nome';
-
 
 z.string.it.collectionShowAll = 'Mostra tutti i {{number}}';
 z.string.it.collectionSectionLinks = 'Link';
@@ -467,7 +464,6 @@ z.string.it.searchInviteShare = 'Condividi contatti';
 
 z.string.it.searchListEveryoneParticipates = 'Tutte le persone a cui sei connesso sono già in questa conversazione.';
 z.string.it.searchListNoMatches = 'Nessun risultato corrispondente. Provare ad inserire un nome diverso.';
-
 
 z.string.it.uploadGoogleHeadline = 'Trova persone con cui parlare.';
 z.string.it.uploadGoogleMessage = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';

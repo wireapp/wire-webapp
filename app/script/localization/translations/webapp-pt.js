@@ -201,7 +201,6 @@ z.string.pt.modalConversationTooManyMembersHeadline = 'Casa cheia';
 z.string.pt.modalIntegrationUnavailableHeadline = 'Atualmente os "bots" não estão disponíveis';
 z.string.pt.modalIntegrationUnavailableMessage = 'Obrigado pelo seu interesse nos "bots". Atualmente o serviço está suspenso enquanto preparamos a nova versão. Fique atento.';
 
-
 z.string.pt.modalImproveWireAction = 'Aceitar';
 z.string.pt.modalImproveWireSecondary = 'Não';
 
@@ -279,7 +278,6 @@ z.string.pt.conversationTweetAuthor = ' no Twitter';
 z.string.pt.groupCreationPreferencesAction = 'Seguinte';
 z.string.pt.groupCreationParticipantsActionCreate = 'Pronto';
 z.string.pt.groupCreationParticipantsPlaceholder = 'Pesquisar por nome';
-
 
 z.string.pt.collectionShowAll = 'Mostrar todos os {{number}}';
 z.string.pt.collectionSectionLinks = 'Ligações';
@@ -475,7 +473,6 @@ z.string.pt.searchInviteShare = 'Partilhar Contactos';
 
 z.string.pt.searchListEveryoneParticipates = 'Todas as pessoas a que está ligado já estão nesta conversa.';
 z.string.pt.searchListNoMatches = 'Sem resultados. Tente um nome diferente.';
-
 
 z.string.pt.uploadGoogleHeadline = 'Encontre pessoas para conversar.';
 z.string.pt.uploadGoogleMessage = 'Usamos seus dados de contacto para liga-lo aos outros. Nós anonimizamos toda a informação e não a partilhamos com outras entidades.';

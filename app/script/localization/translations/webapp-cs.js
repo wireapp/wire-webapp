@@ -200,7 +200,6 @@ z.string.cs.modalConversationTooManyMembersHeadline = 'Přeplněné kupé';
 z.string.cs.modalIntegrationUnavailableHeadline = 'Roboti jsou momentálně nedostupní';
 z.string.cs.modalIntegrationUnavailableMessage = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
 
-
 z.string.cs.modalImproveWireAction = 'Přijmout';
 z.string.cs.modalImproveWireSecondary = 'Ne';
 
@@ -277,7 +276,6 @@ z.string.cs.conversationTweetAuthor = ' na Twittru';
 
 z.string.cs.groupCreationPreferencesAction = 'Další';
 z.string.cs.groupCreationParticipantsPlaceholder = 'Hledat podle jména';
-
 
 z.string.cs.collectionShowAll = 'Zobrazit všechny {{number}}';
 z.string.cs.collectionSectionLinks = 'Odkazy';
@@ -472,7 +470,6 @@ z.string.cs.searchInviteShare = 'Sdílet kontakty';
 
 z.string.cs.searchListEveryoneParticipates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
 z.string.cs.searchListNoMatches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
-
 
 z.string.cs.uploadGoogleHeadline = 'Najít kontakty\npro konverzaci.';
 z.string.cs.uploadGoogleMessage = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';

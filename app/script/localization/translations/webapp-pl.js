@@ -308,7 +308,6 @@ z.string.pl.groupCreationPreferencesAction = 'Dalej';
 z.string.pl.groupCreationParticipantsActionCreate = 'Zakończono';
 z.string.pl.groupCreationParticipantsPlaceholder = 'Szukaj według nazwy';
 
-
 z.string.pl.collectionShowAll = 'Pokaż wszystkie {{number}}';
 z.string.pl.collectionSectionLinks = 'Linki';
 z.string.pl.collectionSectionImages = 'Zdjęcia';

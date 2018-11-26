@@ -525,7 +525,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.SSO_GENERIC_ERROR',
   },
   [LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE]: {
-    defaultMessage: 'Not enough quota',
+    defaultMessage: 'Not enough disk space',
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   },
   unexpected: {

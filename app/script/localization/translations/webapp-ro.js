@@ -211,7 +211,6 @@ z.string.ro.modalConversationTooManyMembersHeadline = 'Canalul este plin';
 z.string.ro.modalIntegrationUnavailableHeadline = 'Roboții nu sunt momentan disponibili';
 z.string.ro.modalIntegrationUnavailableMessage = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
 
-
 z.string.ro.modalImproveWireAction = 'Acceptă';
 z.string.ro.modalImproveWireSecondary = 'Nu';
 
@@ -299,7 +298,6 @@ z.string.ro.groupCreationPreferencesPlaceholder = 'Nume grup';
 z.string.ro.groupCreationParticipantsActionCreate = 'Gata';
 z.string.ro.groupCreationParticipantsHeader = 'Adaugă persoane';
 z.string.ro.groupCreationParticipantsPlaceholder = 'Caută după nume';
-
 
 z.string.ro.collectionShowAll = 'Arată toate {{number}}';
 z.string.ro.collectionSectionLinks = 'Legături';
@@ -504,7 +502,6 @@ z.string.ro.searchServiceConfirmButton = 'Adaugă serviciu';
 
 z.string.ro.searchListEveryoneParticipates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
 z.string.ro.searchListNoMatches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un alt nume.';
-
 
 z.string.ro.uploadGoogleHeadline = 'Caută persoane\ncu care să vorbești.';
 z.string.ro.uploadGoogleMessage = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';

@@ -201,7 +201,6 @@ z.string.tr.modalConversationTooManyMembersHeadline = 'Dolup taşmış';
 z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabilir değil';
 z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
 
-
 z.string.tr.modalImproveWireAction = 'Kabul et';
 z.string.tr.modalImproveWireSecondary = 'Hayır';
 
@@ -279,7 +278,6 @@ z.string.tr.conversationTweetAuthor = ' Twitter’da';
 z.string.tr.groupCreationPreferencesAction = 'İleri';
 z.string.tr.groupCreationParticipantsActionCreate = 'Yapıldı';
 z.string.tr.groupCreationParticipantsPlaceholder = 'İsme göre ara';
-
 
 z.string.tr.collectionShowAll = '{{number}}’nun tümünü göster';
 z.string.tr.collectionSectionLinks = 'Bağlantılar';
