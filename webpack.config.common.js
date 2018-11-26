@@ -76,7 +76,13 @@ module.exports = {
   },
   plugins: [
     new webpack.IgnorePlugin(/^.\/locale$/, /moment$/),
-    new CopyWebpackPlugin([{from: './node_modules/@wireapp/protocol-messaging/proto/messages.proto', to: 'proto'}]),
+    new CopyWebpackPlugin(
+      [
+        {from: './node_modules/@wireapp/protocol-messaging/proto/messages.proto', to: 'proto'},
+        {from: './node_modules/@bower_components/wire-audio-files/webapp/', to: 'audio'},
+      ],
+      {debug: 'debug'}
+    ),
     new webpack.ProvidePlugin({
       $: 'jquery',
       _: 'underscore',
