@@ -276,9 +276,7 @@ class App {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-        const protoFile = `ext/js/@wireapp/protocol-messaging/proto/messages.proto?${z.util.Environment.version(
-          false
-        )}`;
+        const protoFile = `/proto/messages.proto?${z.util.Environment.version(false)}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {

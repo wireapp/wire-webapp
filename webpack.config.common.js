@@ -19,6 +19,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const dist = 'dist/static/';
 const srcScript = 'app/script/auth/';
@@ -75,6 +76,7 @@ module.exports = {
   },
   plugins: [
     new webpack.IgnorePlugin(/^.\/locale$/, /moment$/),
+    new CopyWebpackPlugin([{from: './node_modules/@wireapp/protocol-messaging/proto/messages.proto', to: 'proto'}]),
     new webpack.ProvidePlugin({
       $: 'jquery',
       _: 'underscore',
