@@ -70,7 +70,6 @@ class App {
 
     this._subscribeToEvents();
 
-    this.initDebugging();
     this.initApp();
     this.initServiceWorker();
   }
@@ -805,33 +804,11 @@ class App {
   }
 
   /**
-   * Initialize debugging features.
-   * @returns {undefined} No return value
-   */
-  initDebugging() {
-    if (z.util.Environment.frontend.isLocalhost()) {
-      this._attachLiveReload();
-    }
-  }
-
-  /**
    * Report call telemetry to Raygun for analysis.
    * @returns {undefined} No return value
    */
   reportCall() {
     this.repository.calling.reportCall();
-  }
-
-  /**
-   * Attach live reload on localhost.
-   * @returns {undefined} No return value
-   */
-  _attachLiveReload() {
-    const liveReload = document.createElement('script');
-    liveReload.id = 'liveReload';
-    liveReload.src = 'http://localhost:32123/livereload.js';
-    document.body.appendChild(liveReload);
-    $('html').addClass('development');
   }
 
   _onExtraInstanceStarted() {

@@ -165,7 +165,6 @@
     "webpack": "4.25.1",
     "webpack-cli": "3.1.2",
     "webpack-dev-middleware": "3.4.0",
-    "webpack-dev-server": "3.1.10",
     "webpack-hot-middleware": "2.24.3"
   },
   "engines": {
