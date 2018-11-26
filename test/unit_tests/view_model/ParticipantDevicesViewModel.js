@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:view_model/ParticipantDevicesViewModel
+// grunt test_run:view_model/ParticipantDevicesViewModel
 
 describe('z.viewModel.panel.ParticipantDevicesViewModel', () => {
   let viewModel;

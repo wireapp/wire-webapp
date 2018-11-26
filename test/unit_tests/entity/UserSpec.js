@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:entity/User
+// grunt test_run:entity/User
 
 'use strict';
 

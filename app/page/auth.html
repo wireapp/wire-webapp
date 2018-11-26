@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- Wire, Copyright (C) 2018 Wire Swiss GmbH -->
-<!-- {{config.CURRENT_VERSION_ID}} -->
+<!-- {{@config.VERSION}} -->
 <html>
   <head>
     #include('meta.htm')
@@ -10,9 +10,10 @@
 
   <body>
     <div id="main"></div>
-    <script src="/min/runtime.js?{{config.CURRENT_VERSION_ID}}"></script>
-    <script src="/min/dexie.js?{{config.CURRENT_VERSION_ID}}"></script>
-    <script src="/min/vendor.js?{{config.CURRENT_VERSION_ID}}"></script>
-    <script src="/min/script.js?{{config.CURRENT_VERSION_ID}}"></script>
+    <script src="/config.js?{{@config.VERSION}}"></script>
+    <script src="/min/runtime.js?{{@config.VERSION}}"></script>
+    <script src="/min/dexie.js?{{@config.VERSION}}"></script>
+    <script src="/min/vendor.js?{{@config.VERSION}}"></script>
+    <script src="/min/script.js?{{@config.VERSION}}"></script>
   </body>
 </html>

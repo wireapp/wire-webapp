@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/ConversationVerificationStateHandler
+// grunt test_run:conversation/ConversationVerificationStateHandler
 
 'use strict';
 

@@ -108,7 +108,7 @@ ko.components.register('audio-asset', {
                                 asset: asset,
                                 play: on_play_button_clicked,
                                 pause: on_pause_button_clicked,
-                                cancel: function() {asset.cancel($parents[1])}">
+                                cancel: function() {asset.cancel(message)}">
           </media-button>
           <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOADING -->
             <span class="audio-controls-time label-xs"

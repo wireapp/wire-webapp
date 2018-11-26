@@ -19,7 +19,7 @@
 
 /* eslint no-undef: "off" */
 
-// grunt test_init && grunt test_run:location/LocationService
+// grunt test_run:location/LocationService
 
 'use strict';
 

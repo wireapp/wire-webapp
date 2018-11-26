@@ -18,7 +18,27 @@
           </div>
         </div>
 
-        <div data-bind="template: {name: message.super_type}, css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></div>
+        <message params="
+            message: message,
+            conversation: $parent.conversation,
+            shouldShowAvatar: !$parent.should_hide_user_avatar(message),
+            shouldShowInvitePeople: $parent.showInvitePeople(),
+            selfId: $parent.selfUser().id,
+            isSelfTemporaryGuest: $parent.selfUser().isTemporaryGuest(),
+            isLastDeliveredMessage: $parent.is_last_delivered_message(message),
+            conversationRepository: $parent.conversation_repository,
+            locationRepository: $parent.locationRepository,
+            onClickAvatar: $parent.showUserDetails,
+            onClickImage: $parent.show_detail,
+            onClickInvitePeople: $parent.clickOnInvitePeople,
+            onClickMessage: $parent.handleClickOnMessage,
+            onClickTimestamp: $parent.focusMessage,
+            onClickParticipants: $parent.showParticipants,
+            onClickResetSession: $parent.on_session_reset_click,
+            onClickCancelRequest: $parent.click_on_cancel_request,
+            onLike: $parent.click_on_like,
+            actionsViewModel: $parent.actionsViewModel"
+          data-bind="css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>
       </div>
      </div>
    </div>

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:user/UserRepository
+// grunt test_run:user/UserRepository
 
 'use strict';
 
@@ -38,7 +38,7 @@ describe('z.user.UserRepository', () => {
   });
 
   describe('users', () => {
-    describe('fetchUserById', () => {
+    describe('fetchUsersById', () => {
       it('should handle malformed input', () => {
         return TestFactory.user_repository
           .fetchUsersById()

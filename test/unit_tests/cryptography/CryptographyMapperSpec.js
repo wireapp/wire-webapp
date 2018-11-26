@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:cryptography/CryptographyMapper
+// grunt test_run:cryptography/CryptographyMapper
 
 'use strict';
 

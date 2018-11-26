@@ -27,8 +27,6 @@ module.exports = {
   //##############################################################################
   // Local/Test deployment related
   //##############################################################################
-  dist: '<%= dir.dist %>',
-  dist_app: '<%= dir.dist %>/app',
   docs: '<%= dir.docs %>',
   docs_coverage: '<%= dir.docs.coverage %>',
   temp: '<%= dir.temp %>',

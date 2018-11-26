@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:calling/SDPMapper
+// grunt test_run:calling/SDPMapper
 
 describe('z.calling.SDPMapper', () => {
   const envInitialState = Object.assign({}, z.util.Environment);

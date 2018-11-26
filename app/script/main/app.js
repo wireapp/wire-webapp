@@ -60,9 +60,6 @@ z.main.App = class App {
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
-    // @todo Added for wrapper backwards compatibility. Remove after uptake of version > 3.2.
-    this.service.connect_google = this.service.connectGoogle;
-
     this.instanceId = z.util.createRandomUuid();
 
     this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
@@ -121,11 +118,7 @@ z.main.App = class App {
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
-    repositories.connect = new z.connect.ConnectRepository(
-      this.service.connect,
-      this.service.connectGoogle,
-      repositories.properties
-    );
+    repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
@@ -212,7 +205,6 @@ z.main.App = class App {
       calling: new z.calling.CallingService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
-      connectGoogle: new z.connect.ConnectGoogleService(),
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
@@ -237,7 +229,7 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return z.util.Environment.frontend.isProduction() ? {} : {debug: new z.util.DebugUtil(this.repository)};
+    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new z.util.DebugUtil(this.repository)} : {};
   }
 
   /**
@@ -768,8 +760,7 @@ z.main.App = class App {
           return window.location.replace(url);
         }
 
-        const baseUrl = z.util.Environment.frontend.isLocalhost() ? '/page/auth.html' : '/auth/';
-        let url = `${baseUrl}${location.search}`;
+        let url = `/auth/${location.search}`;
         const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
         if (isImmediateSignOutReason) {
           url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);

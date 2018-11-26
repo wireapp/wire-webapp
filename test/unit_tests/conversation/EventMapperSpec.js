@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/EventMapper
+// grunt test_run:conversation/EventMapper
 
 'use strict';
 

@@ -77,9 +77,9 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   componentDidMount() {
     const suggestions = createSuggestions(this.props.name);
+    this.props.doGetConsents();
     this.props
-      .doGetConsents()
-      .then(() => this.props.checkHandles(suggestions))
+      .checkHandles(suggestions)
       .then(handle => this.setState({handle}))
       .catch(error => this.setState({error}));
   }
@@ -140,13 +140,12 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
           </Form>
           <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
         </ContainerXS>
-        {!this.props.isFetching &&
-          this.props.hasUnsetMarketingConsent && (
-            <AcceptNewsModal
-              onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
-              onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
-            />
-          )}
+        {!this.props.isFetching && this.props.hasUnsetMarketingConsent && (
+          <AcceptNewsModal
+            onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
+            onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
+          />
+        )}
       </Page>
     );
   }

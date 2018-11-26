@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:storage/StorageRepository
+// grunt test_run:storage/StorageRepository
 
 describe('z.storage.StorageRepository', () => {
   const test_factory = new TestFactory();

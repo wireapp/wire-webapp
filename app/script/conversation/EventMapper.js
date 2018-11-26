@@ -204,7 +204,7 @@ z.conversation.EventMapper = class EventMapper {
       messageEntity.status(event.status || z.message.StatusType.SENT);
     }
 
-    if (messageEntity.is_reactable()) {
+    if (messageEntity.isReactable()) {
       messageEntity.reactions(event.reactions || {});
     }
 

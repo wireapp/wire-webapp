@@ -126,7 +126,9 @@
 }
 
 .message-isreplying {
-  opacity: 0.6;
+  .message-body {
+    opacity: 0.6;
+  }
 }
 
 // MESSAGE - HEADER
@@ -238,8 +240,8 @@
   min-width: @conversation-message-timestamp-width;
   height: 1px;
   flex: 1;
-  border: none;
   margin-left: 16px;
+  border: none;
   background: @seperator-color;
 }
 
@@ -247,8 +249,8 @@
 .message-timestamp {
   height: 48px;
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
-  border-bottom: 1px solid @seperator-color;
   margin-bottom: 16px;
+  border-bottom: 1px solid @seperator-color;
   line-height: 40px;
   user-select: none;
 
@@ -267,8 +269,8 @@
   }
 
   &:not(.message-timestamp-day) {
-    border: 0;
     margin-right: @conversation-message-timestamp-width;
+    border: 0;
 
     .message-header-label {
       border-bottom: 1px dotted @seperator-color;

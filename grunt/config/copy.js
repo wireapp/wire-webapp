@@ -31,13 +31,6 @@ module.exports = {
     expand: true,
     src: '**/*',
   },
-
-  aws_templates: {
-    cwd: '<%= dir.aws.static %>/',
-    dest: '<%= dir.aws.templates %>',
-    expand: true,
-    src: ['**/*.html', 'sw.js'],
-  },
   //##############################################################################
   // Prod/Staging/Edge deployment related
   //##############################################################################
@@ -52,7 +45,6 @@ module.exports = {
       'audio/**/*',
       'image/**/*',
       'font/**/*',
-      'style/*.css',
       'script/**/*.js',
       'worker/*',
       '*.js',
@@ -75,45 +67,6 @@ module.exports = {
   //##############################################################################
   // Local deployment related
   //##############################################################################
-  dist: {
-    cwd: '<%= dir.app_ %>',
-    dest: '<%= dir.dist %>',
-    expand: true,
-    src: [
-      'ext/image/**/*',
-      'ext/js/**/*',
-      'ext/proto/**/*',
-      'audio/**/*',
-      'image/**/*',
-      'font/**/*',
-      'style/*.css',
-      'script/**/*.js',
-      'worker/*',
-      '*.js',
-    ],
-  },
-
-  dist_audio: {
-    cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files',
-    dest: '<%= dir.dist %>/audio',
-    expand: true,
-    src: '*',
-  },
-
-  dist_favicon: {
-    cwd: '<%= dir.dist %>/image',
-    dest: '<%= dir.dist %>',
-    expand: true,
-    src: 'favicon.ico',
-  },
-
-  dist_js: {
-    cwd: '<%= dir.app_ %>',
-    dest: '<%= dir.dist %>',
-    expand: true,
-    src: 'script/**/*.js',
-  },
-
   frontend: {
     files: [
       {

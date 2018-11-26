@@ -19,9 +19,9 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:entity/message/MessageEntities
+// grunt test_run:entity/message/MemberMessage
 
-describe('Message Entities', () => {
+describe('Member Message', () => {
   describe('generateNameString', () => {
     let message_et = null;
 
@@ -83,31 +83,25 @@ describe('Message Entities', () => {
       message_et = new z.entity.ContentMessage();
     });
 
-    it('should return true when message is not a file', () => {
+    it('should be deletable when message is not sending', () => {
       message_et.assets.push(new z.entity.Text());
 
-      expect(message_et.is_deletable()).toBeTruthy();
+      expect(message_et.is_deletable()).toBe(true);
     });
 
-    it('should return false when message is a file and uploading or downloading', () => {
+    it('should not be deletable while message is sending', () => {
+      message_et.assets.push(new z.entity.Text());
+      message_et.status(z.message.StatusType.SENDING);
+
+      expect(message_et.is_deletable()).toBe(false);
+    });
+
+    it('should be deletable when message is a file and uploading or downloading', () => {
       const file_et = new z.entity.File();
-      message_et.assets.push(file_et);
-
-      file_et.status(z.assets.AssetTransferState.DOWNLOADING);
-
-      expect(message_et.is_deletable()).toBeFalsy();
-
       file_et.status(z.assets.AssetTransferState.UPLOADING);
-
-      expect(message_et.is_deletable()).toBeFalsy();
-    });
-
-    it('should return false when message is a file and uploading or downloading', () => {
-      const file_et = new z.entity.File();
-      file_et.status(z.assets.AssetTransferState.UPLOADED);
       message_et.assets.push(file_et);
 
-      expect(message_et.is_deletable()).toBeTruthy();
+      expect(message_et.is_deletable()).toBe(true);
     });
   });
 

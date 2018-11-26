@@ -49,7 +49,7 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import * as Environment from '../Environment';
+import * as config from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -269,8 +269,8 @@ class Login extends React.Component<CombinedProps, State> {
   };
 
   isValidPhoneNumber = (phoneNumber: string) => {
-    const isProductionBackend = Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION);
-    const e164regex = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
+    const allowDebugPhoneNumbers = config.FEATURE.ENABLE_DEBUG;
+    const e164regex = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
     return e164regex.test(phoneNumber);
   };

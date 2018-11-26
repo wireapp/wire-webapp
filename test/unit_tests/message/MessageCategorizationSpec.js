@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:message/MessageCategorization
+// grunt test_run:message/MessageCategorization
 
 describe('z.message.MessageCategorization', () => {
   describe('categoryFromEvent', () => {

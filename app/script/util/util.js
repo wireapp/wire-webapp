@@ -305,7 +305,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
 
   let mentionlessText = mentionEntities
     .slice()
-    // sort mentions to start with the lastest mention first (in order not to have to recompute the index everytime we modify the original text)
+    // sort mentions to start with the latest mention first (in order not to have to recompute the index everytime we modify the original text)
     .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
     .reduce((strippedText, mention) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
@@ -331,7 +331,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       });
       if (containsMentions) {
         // disable code highlighting if there is a mention in there
-        // hightlighting will be wrong anyway because this is not valid code
+        // highlighting will be wrong anyway because this is not valid code
         return code;
       }
       return hljs.highlightAuto(code).value;
@@ -339,7 +339,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
     sanitize: true,
   });
 
-  // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
+  // TODO: Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
   mentionlessText = mentionlessText.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message
@@ -448,8 +448,8 @@ z.util.isValidEmail = email => {
  * @returns {boolean} True, if the input a phone number
  */
 z.util.isValidPhoneNumber = phoneNumber => {
-  const isProductionBackend = z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
-  const regularExpression = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
+  const allowDebugPhoneNumbers = window.wire.env.FEATURE.ENABLE_DEBUG;
+  const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
   return regularExpression.test(phoneNumber);
 };

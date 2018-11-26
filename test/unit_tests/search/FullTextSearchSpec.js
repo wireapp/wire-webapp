@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:search/FullTextSearch
+// grunt test_run:search/FullTextSearch
 
 describe('z.search.FullTextSearch', () => {
   describe('search', () => {

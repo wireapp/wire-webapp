@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:entity/message/File
+// grunt test_run:entity/message/File
 
 describe('z.entity.File', () => {
   let file = null;

@@ -661,7 +661,6 @@ z.string.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.preferencesOptionsAudioSome = 'Some';
 z.string.preferencesOptionsAudioSomeDetail = 'Pings and calls';
 z.string.preferencesOptionsContacts = 'Contacts';
-z.string.preferencesOptionsContactsGmail = 'Import from Gmail';
 z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
 z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferencesOptionsPopular = 'By popular demand';
@@ -735,7 +734,6 @@ z.string.searchOthers = 'Connect';
 z.string.searchInvite = 'Invite people to join Wire';
 z.string.searchInviteDetail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
 z.string.searchInviteButtonContacts = 'From Contacts';
-z.string.searchInviteButtonGmail = 'From Gmail';
 z.string.searchInviteHeadline = 'Bring your friends';
 z.string.searchInviteShare = 'Share Contacts';
 
@@ -755,10 +753,6 @@ z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you
 
 z.string.temporaryGuestLeaveMessage = ' are no longer part of this conversation.';
 z.string.temporaryGuestLeaveDescription = 'If you close or refresh this page, you will lose access to the conversation history.';
-
-// Google contacts upload
-z.string.uploadGoogleHeadline = 'Find people\nto talk to.';
-z.string.uploadGoogleMessage = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 
 // URLs & Warnings: Permission requests & permission callbacks
 z.string.urlSupportRoot = '/';
@@ -850,7 +844,6 @@ z.string.tooltipConversationsStart = 'Start conversation ({{shortcut}})';
 z.string.tooltipConversationDetailsAddPeople = 'Add participants to conversation ({{shortcut}})';
 z.string.tooltipConversationDetailsRename = 'Change conversation name';
 
-z.string.tooltipPreferencesContactsGmail = 'Log in to your Gmail account to share contacts';
 z.string.tooltipPreferencesContactsMacos = 'Share all your contacts from the macOS Contacts app';
 z.string.tooltipPreferencesPassword = 'Open another website to reset your password';
 z.string.tooltipPreferencesPicture = 'Change your picture…';

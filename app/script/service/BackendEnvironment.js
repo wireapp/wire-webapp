@@ -23,6 +23,6 @@ window.z = window.z || {};
 window.z.service = z.service || {};
 
 z.service.BackendEnvironment = {
+  DEVELOPMENT: 'development',
   PRODUCTION: 'production',
-  STAGING: 'staging',
 };

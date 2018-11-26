@@ -1,24 +1,11 @@
 branch-defaults:
   dev:
     environment: wire-webapp-dev
-  master:
-    environment: wire-webapp-prod
-  staging:
-    environment: wire-webapp-staging
 deploy:
   artifact: aws/s3/ebs.zip
-environment-defaults:
-  wire-webapp:
-    branch: null
-    repository: null
 global:
   application_name: Webapp
-  default_ec2_keyname: null
-  default_platform: Python 2.7
-  default_region: eu-west-1
-  instance_profile: null
-  platform_name: null
-  platform_version: null
-  profile: null
+  default_platform: Node.js
+  default_region: eu-central-1
   sc: git
   workspace_type: Application

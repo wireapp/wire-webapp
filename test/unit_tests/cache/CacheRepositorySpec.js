@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:cache/CacheRepository
+// grunt test_run:cache/CacheRepository
 
 'use strict';
 

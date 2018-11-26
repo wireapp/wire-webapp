@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:calling/videoGridRepository
+// grunt test_run:calling/videoGridRepository
 
 describe('z.calling.VideoGridRepository', () => {
   let groupVideoGrid;

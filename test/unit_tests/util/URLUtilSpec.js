@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/URLUtil
+// grunt test_run:util/URLUtil
 
 describe('z.util.URLUtil', () => {
   describe('appendParameter', () => {

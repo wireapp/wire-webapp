@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:conversation/ConversationMapper
+// grunt test_run:conversation/ConversationMapper
 
 'use strict';
 

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:client/Client
+// grunt test_run:client/Client
 
 'use strict';
 

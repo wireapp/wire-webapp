@@ -78,7 +78,8 @@ export class CookieAction {
     return (dispatch, getState, {cookieStore}) => {
       return Promise.resolve()
         .then(() => {
-          if (cookieStore.get(name).includes(value)) {
+          const cookie = cookieStore.get(name);
+          if (cookie && cookie.includes(value)) {
             cookieStore.remove(name);
             dispatch(CookieActionCreator.successfulRemoveCookie({name}));
           }

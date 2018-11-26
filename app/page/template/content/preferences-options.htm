@@ -2,25 +2,15 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesOptions"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko if: isActivatedAccount() && !isTeam()-->
+      <!-- ko if: isActivatedAccount() && !isTeam() && window.wAddressBook -->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsContacts"></header>
-          <div class="preferences-option" data-uie-name="do-share-contacts">
-            <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connectGoogleContacts, l10n_tooltip: z.string.tooltipPreferencesContactsGmail">
-              <svg>
-                <use xlink:href="#icon-gmail"></use>
-              </svg>
-            </div>
-            <label class="preferences-option-label" data-bind="click: connectGoogleContacts, l10n_text: z.string.preferencesOptionsContactsGmail, l10n_tooltip: z.string.tooltipPreferencesContactsGmail"></label>
-          </div>
-          <!-- ko if: window.wAddressBook -->
             <div class="preferences-option" data-uie-name="do-share-osx-contacts">
               <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connectMacOSContacts, l10n_tooltip: z.string.tooltipPreferencesContactsMacos">
                 <div class="icon-contacts"></div>
               </div>
               <label class="preferences-option-label" data-bind="click: connectMacOSContacts, l10n_text: z.string.preferencesOptionsContactsMacos, l10n_tooltip: z.string.tooltipPreferencesContactsMacos"></label>
             </div>
-          <!-- /ko -->
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsContactsDetail"></div>
         </section>
       <!-- /ko -->

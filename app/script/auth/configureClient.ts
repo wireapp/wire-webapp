@@ -19,7 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {IndexedDBEngine} from '@wireapp/store-engine';
-import {BACKEND} from './Environment';
+import * as config from './config';
 
 const configureClient = () => {
   return new APIClient({
@@ -48,7 +48,11 @@ const configureClient = () => {
       );
     },
     store: new IndexedDBEngine(),
-    urls: BACKEND,
+    urls: {
+      name: config.ENVIRONMENT,
+      rest: config.BACKEND_REST,
+      ws: config.BACKEND_WS,
+    },
   });
 };
 
