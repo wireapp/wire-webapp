@@ -71,8 +71,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
     it('adapts protocol for an offer created by Firefox > 63', () => {
       const firefoxSdp = `
 ${sdpStr}
-m=application 0 UDP/DTLS/SCTP webrtc-datachannel
-`.replace(/\n/g, '\r\n');
+m=application 0 UDP/DTLS/SCTP webrtc-datachannel`.replace(/\n/g, '\r\n');
 
       const rtcSdp = {
         sdp: firefoxSdp,
