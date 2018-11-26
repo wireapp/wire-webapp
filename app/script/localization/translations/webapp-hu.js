@@ -558,7 +558,6 @@ z.string.hu.preferencesOptionsAudioNoneDetail = 'Pssszt!';
 z.string.hu.preferencesOptionsAudioSome = 'Néhány';
 z.string.hu.preferencesOptionsAudioSomeDetail = 'Kopogások és hívások';
 z.string.hu.preferencesOptionsContacts = 'Névjegyek';
-z.string.hu.preferencesOptionsContactsGmail = 'Importálás Gmail-ből';
 z.string.hu.preferencesOptionsContactsMacos = 'Importálás Névjegyek-ből';
 z.string.hu.preferencesOptionsContactsDetail = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
 z.string.hu.preferencesOptionsPopular = 'Közkívánatra';
@@ -626,7 +625,6 @@ z.string.hu.searchOthers = 'Csatlakozás';
 z.string.hu.searchInvite = 'Hívj meg másokat is a Wire-re';
 z.string.hu.searchInviteDetail = 'Névjegyeid megosztása megkönnyíti, hogy kapcsolatba lépj másokkal. Az összes információt anonimizáljuk és nem osztjuk meg senki mással.';
 z.string.hu.searchInviteButtonContacts = 'Névjegyekből';
-z.string.hu.searchInviteButtonGmail = 'Gmail-ből';
 z.string.hu.searchInviteHeadline = 'Hozd a barátaidat is';
 z.string.hu.searchInviteShare = 'Névjegyek megosztása';
 
@@ -644,9 +642,6 @@ z.string.hu.temporaryGuestJoinDescription = 'Ha bezárod vagy újratöltöd ezt 
 
 z.string.hu.temporaryGuestLeaveMessage = ' már nem részesei ennek a beszélgetésnek.';
 z.string.hu.temporaryGuestLeaveDescription = 'Ha bezárod vagy újratöltöd ezt az oldalt, akkor elveszted a hozzáférést a beszélgetés előzményeihez.';
-
-z.string.hu.uploadGoogleHeadline = 'Keress partnereket\na Wire-ön.';
-z.string.hu.uploadGoogleMessage = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
 
 z.string.hu.urlSupportRoot = '/';
 z.string.hu.urlSupportArticles = '/hc/en-us/articles/';
@@ -726,7 +721,6 @@ z.string.hu.tooltipConversationsStart = 'Beszélgetés megkezdése ({{shortcut}}
 z.string.hu.tooltipConversationDetailsAddPeople = 'Résztvevők hozzáadása a beszélgetéshez ({{shortcut}})';
 z.string.hu.tooltipConversationDetailsRename = 'Beszélgetés nevének megváltoztatása';
 
-z.string.hu.tooltipPreferencesContactsGmail = 'Kapcsolataid megosztásához jelentkezz be Gmail fiókodba';
 z.string.hu.tooltipPreferencesContactsMacos = 'Oszd meg névjegyeidet a macOS Névjegyek alkalmazásából';
 z.string.hu.tooltipPreferencesPassword = 'Nyiss meg egy másik weboldalt jelszavad visszaállításához';
 z.string.hu.tooltipPreferencesPicture = 'Profilkép módosítása…';

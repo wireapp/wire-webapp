@@ -53,6 +53,7 @@ import * as config from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
+import LabeledError from '../module/action/LabeledError';
 import ValidationError from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -255,6 +256,9 @@ class Login extends React.Component<CombinedProps, State> {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             this.props.resetAuthError();
             return this.props.history.push(ROUTE.CLIENTS);
+          }
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+            return;
           }
           default: {
             throw error;

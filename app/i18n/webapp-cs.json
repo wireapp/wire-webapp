@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Zadejte jméno s alespoň 2 znaky",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Zadejte jméno s alespoň 2 znaky",

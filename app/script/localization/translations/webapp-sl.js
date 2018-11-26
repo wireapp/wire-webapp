@@ -425,7 +425,6 @@ z.string.sl.preferencesOptionsAudioNoneDetail = 'Pssst!';
 z.string.sl.preferencesOptionsAudioSome = 'Nekateri';
 z.string.sl.preferencesOptionsAudioSomeDetail = 'Pingi in klici';
 z.string.sl.preferencesOptionsContacts = 'Stiki';
-z.string.sl.preferencesOptionsContactsGmail = 'Uvozi iz Gmail';
 z.string.sl.preferencesOptionsContactsMacos = 'Uvozi iz imenika stikov';
 z.string.sl.preferencesOptionsContactsDetail = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
 z.string.sl.preferencesOptionsPopular = 'Po priljubljenosti';
@@ -459,16 +458,12 @@ z.string.sl.searchOthers = 'Poveži';
 z.string.sl.searchInvite = 'Povabi ostale osebe na Wire';
 z.string.sl.searchInviteDetail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
 z.string.sl.searchInviteButtonContacts = 'Iz imenika stikov';
-z.string.sl.searchInviteButtonGmail = 'Iz Gmail';
 z.string.sl.searchInviteHeadline = 'Pripeljite vaše prijatelje';
 z.string.sl.searchInviteShare = 'Deli Stike';
 
 z.string.sl.searchListEveryoneParticipates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
 z.string.sl.searchListNoMatches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti drugo ime.';
 
-
-z.string.sl.uploadGoogleHeadline = 'Poiščite osebe\nza pogovor.';
-z.string.sl.uploadGoogleMessage = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
 
 z.string.sl.warningCallUnsupportedIncoming = '{{user}} kliče. Vaš brskalnik ne podpira klicev.';
 z.string.sl.warningCallUnsupportedOutgoing = 'Ne morete klicati, ker vaš brskalnik ne podpira klicev.';
@@ -534,7 +529,6 @@ z.string.sl.tooltipConversationsStart = 'Začni pogovor ({{shortcut}})';
 
 z.string.sl.tooltipConversationDetailsRename = 'Spremeni ime pogovora';
 
-z.string.sl.tooltipPreferencesContactsGmail = 'Prijavite se v vaš Gmail račun za deljenje stikov';
 z.string.sl.tooltipPreferencesContactsMacos = 'Deli vse vaše stike iz macOS aplikacije Contacts';
 z.string.sl.tooltipPreferencesPassword = 'Odpri drugo spletno stran za ponastavitev gesla';
 z.string.sl.tooltipPreferencesPicture = 'Spremenite vašo sliko…';

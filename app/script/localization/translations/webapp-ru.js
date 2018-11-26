@@ -622,7 +622,6 @@ z.string.ru.preferencesOptionsAudioNoneDetail = 'Тсссс!';
 z.string.ru.preferencesOptionsAudioSome = 'Некоторые';
 z.string.ru.preferencesOptionsAudioSomeDetail = 'Пинги и вызовы';
 z.string.ru.preferencesOptionsContacts = 'Контакты';
-z.string.ru.preferencesOptionsContactsGmail = 'Импортировать из Gmail';
 z.string.ru.preferencesOptionsContactsMacos = 'Импортировать из Контактов';
 z.string.ru.preferencesOptionsContactsDetail = 'Мы используем ваши контактные данные для связи с другими пользователями. Мы анонимизируем всю информацию и не делимся ею с кем-либо еще.';
 z.string.ru.preferencesOptionsPopular = 'По многочисленным просьбам';
@@ -694,7 +693,6 @@ z.string.ru.searchOthers = 'Связаться';
 z.string.ru.searchInvite = 'Пригласите друзей в Wire';
 z.string.ru.searchInviteDetail = 'Доступ к контактам поможет установить связь с другими пользователями. Мы анонимизируем всю информацию и не делимся ею с кем-либо еще.';
 z.string.ru.searchInviteButtonContacts = 'Из Контактов';
-z.string.ru.searchInviteButtonGmail = 'Из Gmail';
 z.string.ru.searchInviteHeadline = 'Приведи своих друзей';
 z.string.ru.searchInviteShare = 'Пригласить друзей';
 
@@ -712,9 +710,6 @@ z.string.ru.temporaryGuestJoinDescription = 'Если вы закроете ил
 
 z.string.ru.temporaryGuestLeaveMessage = ' больше не участвуете в этом разговоре.';
 z.string.ru.temporaryGuestLeaveDescription = 'Если вы закроете или обновите эту страницу, то потеряете доступ к истории разговоров.';
-
-z.string.ru.uploadGoogleHeadline = 'Найти людей с которыми\nможно поговорить.';
-z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные для связи с другими пользователями. Мы анонимизируем всю информацию и не делимся ею с кем-либо еще.';
 
 z.string.ru.urlSupportRoot = '/';
 z.string.ru.urlSupportArticles = '/hc/ru/articles/';
@@ -802,7 +797,6 @@ z.string.ru.tooltipConversationsStart = 'Начать разговор ({{shortc
 z.string.ru.tooltipConversationDetailsAddPeople = 'Добавить участников в разговор ({{shortcut}})';
 z.string.ru.tooltipConversationDetailsRename = 'Изменить название разговора';
 
-z.string.ru.tooltipPreferencesContactsGmail = 'Войдите в свой аккаунт Gmail, чтобы поделиться контактами';
 z.string.ru.tooltipPreferencesContactsMacos = 'Поделитесь своими контактами из приложения macOS Контакты';
 z.string.ru.tooltipPreferencesPassword = 'Открыть страницу сброса пароля';
 z.string.ru.tooltipPreferencesPicture = 'Изменить свое фото…';

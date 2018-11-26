@@ -434,7 +434,6 @@ z.string.fi.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.fi.preferencesOptionsAudioSome = 'Jotain';
 z.string.fi.preferencesOptionsAudioSomeDetail = 'Pingit ja puhelut';
 z.string.fi.preferencesOptionsContacts = 'Yhteystiedot';
-z.string.fi.preferencesOptionsContactsGmail = 'Tuo Gmailista';
 z.string.fi.preferencesOptionsContactsMacos = 'Tuo Yhteystiedoista';
 z.string.fi.preferencesOptionsContactsDetail = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
 z.string.fi.preferencesOptionsPopular = 'Yleisön pyynnöstä';
@@ -468,16 +467,12 @@ z.string.fi.searchOthers = 'Yhdistä';
 z.string.fi.searchInvite = 'Kutsu henkilöitä Wireen';
 z.string.fi.searchInviteDetail = 'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
 z.string.fi.searchInviteButtonContacts = 'Kontakteista';
-z.string.fi.searchInviteButtonGmail = 'Gmailista';
 z.string.fi.searchInviteHeadline = 'Kutsu kavereitasi';
 z.string.fi.searchInviteShare = 'Jaa yhteystietoja';
 
 z.string.fi.searchListEveryoneParticipates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
 z.string.fi.searchListNoMatches = 'Ei vastaavia tuloksia. Yritä toisella nimellä.';
 
-
-z.string.fi.uploadGoogleHeadline = 'Etsi ihmisiä joiden kanssa jutella.';
-z.string.fi.uploadGoogleMessage = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
 
 z.string.fi.warningCallUnsupportedIncoming = '{{user}} soittaa. Selaimesi ei tue puheluja.';
 z.string.fi.warningCallUnsupportedOutgoing = 'Et voi soittaa puhelua koska selaimesi ei tue puheluja.';
@@ -543,7 +538,6 @@ z.string.fi.tooltipConversationsStart = 'Aloita keskustelu ({{shortcut}})';
 
 z.string.fi.tooltipConversationDetailsRename = 'Muuta keskustelun nimeä';
 
-z.string.fi.tooltipPreferencesContactsGmail = 'Kirjaudu gmail-tilillesi jakaaksesi kontakteja';
 z.string.fi.tooltipPreferencesContactsMacos = 'Jaa kaikki yhteystietosi macOs Yhteystieto sovelluksesta';
 z.string.fi.tooltipPreferencesPassword = 'Avaa toinen nettisivu vaihtaaksesi salasanasi';
 z.string.fi.tooltipPreferencesPicture = 'Vaihda kuvasi…';

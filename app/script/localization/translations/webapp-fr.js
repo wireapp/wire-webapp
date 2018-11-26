@@ -622,7 +622,6 @@ z.string.fr.preferencesOptionsAudioNoneDetail = 'Chuuut !';
 z.string.fr.preferencesOptionsAudioSome = 'Certaines';
 z.string.fr.preferencesOptionsAudioSomeDetail = 'Signes et appels';
 z.string.fr.preferencesOptionsContacts = 'Contacts';
-z.string.fr.preferencesOptionsContactsGmail = 'Importer depuis Gmail';
 z.string.fr.preferencesOptionsContactsMacos = 'Importer depuis Contacts';
 z.string.fr.preferencesOptionsContactsDetail = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
 z.string.fr.preferencesOptionsPopular = 'À la demande générale';
@@ -694,7 +693,6 @@ z.string.fr.searchOthers = 'Se connecter';
 z.string.fr.searchInvite = 'Invitez des personnes à rejoindre Wire';
 z.string.fr.searchInviteDetail = 'Partager vos contacts vous permet de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
 z.string.fr.searchInviteButtonContacts = 'Depuis vos contacts';
-z.string.fr.searchInviteButtonGmail = 'Depuis Gmail';
 z.string.fr.searchInviteHeadline = 'Invitez vos amis';
 z.string.fr.searchInviteShare = 'Partagez vos contacts';
 
@@ -712,9 +710,6 @@ z.string.fr.temporaryGuestJoinDescription = 'Si vous fermez ou rafraîchissez ce
 
 z.string.fr.temporaryGuestLeaveMessage = ' ne font plus partie de cette conversation.';
 z.string.fr.temporaryGuestLeaveDescription = 'Si vous fermez ou rafraîchissez cette page, votre n’aurez plus accès à l’historique de cette conversation.';
-
-z.string.fr.uploadGoogleHeadline = 'Trouvez des personnes\nà qui parler.';
-z.string.fr.uploadGoogleMessage = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
 
 z.string.fr.urlSupportRoot = '/';
 z.string.fr.urlWebappRoot = '/';
@@ -799,7 +794,6 @@ z.string.fr.tooltipConversationsStart = 'Commencer une conversation ({{shortcut}
 z.string.fr.tooltipConversationDetailsAddPeople = 'Ajouter des participants à la conversation ({{shortcut}})';
 z.string.fr.tooltipConversationDetailsRename = 'Changer le nom de la conversation';
 
-z.string.fr.tooltipPreferencesContactsGmail = 'Connectez-vous à votre compte Gmail pour importer des contacts';
 z.string.fr.tooltipPreferencesContactsMacos = 'Partagez tous vos contacts depuis l’application Contacts de macOS';
 z.string.fr.tooltipPreferencesPassword = 'Ouvre une page web pour réinitialiser votre mot de passe';
 z.string.fr.tooltipPreferencesPicture = 'Changez votre image de profil…';

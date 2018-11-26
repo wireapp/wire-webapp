@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Ein Fehler ist aufgetreten. Bitte für Details an den Team-Administrator wenden (Fehler 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Ein Fehler ist aufgetreten. Bitte für Details an den Team-Administrator wenden (Fehler 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Ein Fehler ist aufgetreten. Bitte für Details an den Team-Administrator wenden (Fehler 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Nicht genug Speicherplatz",
   "BackendError.unexpected": "Unerwarteter Fehler",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Gib einen Namen mit mindestens zwei Zeichen ein",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Gib einen Namen mit mindestens zwei Zeichen ein",

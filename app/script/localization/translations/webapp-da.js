@@ -537,7 +537,6 @@ z.string.da.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.da.preferencesOptionsAudioSome = 'Nogle';
 z.string.da.preferencesOptionsAudioSomeDetail = 'Ping og opkald';
 z.string.da.preferencesOptionsContacts = 'Kontakter';
-z.string.da.preferencesOptionsContactsGmail = 'Importér fra Gmail';
 z.string.da.preferencesOptionsContactsMacos = 'Omportér fra Kontakter';
 z.string.da.preferencesOptionsContactsDetail = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
 z.string.da.preferencesOptionsPopular = 'Ved populær efterspørgsel';
@@ -602,7 +601,6 @@ z.string.da.searchOthers = 'Forbind';
 z.string.da.searchInvite = 'Inviter personer til Wire';
 z.string.da.searchInviteDetail = 'At dele dine kontakter hjælper med at forbinde til andre. Vi anonymiserer al information og deler det ikke med nogen andre.';
 z.string.da.searchInviteButtonContacts = 'Fra Kontakter';
-z.string.da.searchInviteButtonGmail = 'Fra Gmail';
 z.string.da.searchInviteHeadline = 'Få dine venner med';
 z.string.da.searchInviteShare = 'Del Kontakter';
 
@@ -620,9 +618,6 @@ z.string.da.temporaryGuestJoinDescription = 'Hvis du lukker eller opdaterer denn
 
 z.string.da.temporaryGuestLeaveMessage = ' er ikke længere med i denne samtale.';
 z.string.da.temporaryGuestLeaveDescription = 'Hvis du lukker eller opdaterer denne side, vil du miste adgang til samtale historikken.';
-
-z.string.da.uploadGoogleHeadline = 'Finde personer at snakke med.';
-z.string.da.uploadGoogleMessage = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
 
 z.string.da.warningCallUnsupportedIncoming = '{{user}} ringer. Din browser understøtter ikke opkald.';
 z.string.da.warningCallUnsupportedOutgoing = 'Du kan ikke ringe, fordi din browser ikke understøtter opkald.';
@@ -695,7 +690,6 @@ z.string.da.tooltipConversationsStart = 'Start samtale ({{shortcut}})';
 z.string.da.tooltipConversationDetailsAddPeople = 'Tilføj deltagere til samtalen ({{shortcut}})';
 z.string.da.tooltipConversationDetailsRename = 'Ændre samtalens navn';
 
-z.string.da.tooltipPreferencesContactsGmail = 'Log ind på din Gmail konto for at dele kontakter';
 z.string.da.tooltipPreferencesContactsMacos = 'Del alle dine kontakter fra macOS Kontakter app';
 z.string.da.tooltipPreferencesPassword = 'Åbn en anden hjemmeside for at nulstille din adgangskode';
 z.string.da.tooltipPreferencesPicture = 'Ændre dit billede…';
