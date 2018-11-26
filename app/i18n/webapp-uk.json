@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Щось пішло не так. Будь ласка, зверніться до вашого системного адміністратора за деталями (Код помилки 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Щось пішло не так. Будь ласка, зверніться до вашого системного адміністратора за деталями (Код помилки 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Щось пішло не так. Будь ласка, зверніться до вашого системного адміністратора за деталями (Код помилки 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "",
   "BackendError.unexpected": "Непередбачувана помилка",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введіть ім’я довжиною не менше 2 символи",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Введіть ім’я довжиною не менше 2 символи",

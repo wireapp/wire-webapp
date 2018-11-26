@@ -20,6 +20,7 @@
 import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
+import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import {APP_INSTANCE_ID} from '../../config';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
@@ -27,6 +28,7 @@ import {RegistrationDataState} from '../reducer/authReducer';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 import BackendError from './BackendError';
 import {AuthActionCreator} from './creator/';
+import LabeledError from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => void;
@@ -75,6 +77,9 @@ export class AuthAction {
           if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
             dispatch(AuthActionCreator.successfulLogin());
           } else {
+            if (error instanceof LowDiskSpaceError) {
+              error = new LabeledError(LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE, error);
+            }
             dispatch(AuthActionCreator.failedLogin(error));
           }
           throw error;

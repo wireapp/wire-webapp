@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Midagi läks valesti. Palun kontakteeru oma meeskonna administraatoriga lisateabe saamiseks (viga 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Midagi läks valesti. Palun kontakteeru oma meeskonna administraatoriga lisateabe saamiseks (viga 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Midagi läks valesti. Palun kontakteeru oma meeskonna administraatoriga lisateabe saamiseks (viga 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "",
   "BackendError.unexpected": "Ootamatu viga",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Sisesta vähemalt 2-täheline nimi",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Sisesta vähemalt 2-täheline nimi",

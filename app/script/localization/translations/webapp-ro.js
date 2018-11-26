@@ -460,7 +460,6 @@ z.string.ro.preferencesOptionsAudioNoneDetail = 'Psst!';
 z.string.ro.preferencesOptionsAudioSome = 'Unele';
 z.string.ro.preferencesOptionsAudioSomeDetail = 'Bipuri și apeluri';
 z.string.ro.preferencesOptionsContacts = 'Contacte';
-z.string.ro.preferencesOptionsContactsGmail = 'Importă din Gmail';
 z.string.ro.preferencesOptionsContactsMacos = 'Importă din contacte';
 z.string.ro.preferencesOptionsContactsDetail = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
 z.string.ro.preferencesOptionsPopular = 'În urma cererilor populare';
@@ -496,7 +495,6 @@ z.string.ro.searchOthers = 'Conectare';
 z.string.ro.searchInvite = 'Invită persoane pe Wire';
 z.string.ro.searchInviteDetail = 'Împărtășirea contactelor ne ajută să te conectăm cu alții. Noi anonimizăm toate informațiile și nu le împărtășim cu terți.';
 z.string.ro.searchInviteButtonContacts = 'Din Contacte';
-z.string.ro.searchInviteButtonGmail = 'Din Gmail';
 z.string.ro.searchInviteHeadline = 'Invită prietenii';
 z.string.ro.searchInviteShare = 'Împărtășește contacte';
 
@@ -505,9 +503,6 @@ z.string.ro.searchServiceConfirmButton = 'Adaugă serviciu';
 z.string.ro.searchListEveryoneParticipates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
 z.string.ro.searchListNoMatches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un alt nume.';
 
-
-z.string.ro.uploadGoogleHeadline = 'Caută persoane\ncu care să vorbești.';
-z.string.ro.uploadGoogleMessage = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
 
 z.string.ro.warningCallUnsupportedIncoming = '{{user}} te sună. Browserul tău nu suportă apelurile.';
 z.string.ro.warningCallUnsupportedOutgoing = 'Nu poți suna pentru că browserul tău nu suportă apelurile.';
@@ -578,7 +573,6 @@ z.string.ro.tooltipConversationsStart = 'Începe conversația ({{shortcut}})';
 
 z.string.ro.tooltipConversationDetailsRename = 'Schimbă numele conversației';
 
-z.string.ro.tooltipPreferencesContactsGmail = 'Autentifică-te în conturile Gmail pentru a partaja contacte';
 z.string.ro.tooltipPreferencesContactsMacos = 'Partajează toate contactele de pe aplicația Contacts din macOS';
 z.string.ro.tooltipPreferencesPassword = 'Deschide un alt site web pentru a reseta parola';
 z.string.ro.tooltipPreferencesPicture = 'Schimbă poza de profil…';

@@ -432,7 +432,6 @@ z.string.cs.preferencesOptionsAudioNoneDetail = 'Pssst!';
 z.string.cs.preferencesOptionsAudioSome = 'Některé';
 z.string.cs.preferencesOptionsAudioSomeDetail = 'Chaty a hovory';
 z.string.cs.preferencesOptionsContacts = 'Kontakty';
-z.string.cs.preferencesOptionsContactsGmail = 'Importovat ze služby Gmail';
 z.string.cs.preferencesOptionsContactsMacos = 'Import z kontaktů';
 z.string.cs.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
 z.string.cs.preferencesOptionsPopular = 'Podle popularity poptávky';
@@ -466,16 +465,12 @@ z.string.cs.searchOthers = 'Připojit';
 z.string.cs.searchInvite = 'Pozvat lidi do aplikace Wire';
 z.string.cs.searchInviteDetail = 'Sdílením svých kontaktů si zjednodušíte propojení s ostatními. Všechny informace anonymizujeme a nikdy je neposkytujeme nikomu dalšímu.';
 z.string.cs.searchInviteButtonContacts = 'Z kontaktů';
-z.string.cs.searchInviteButtonGmail = 'Z Gmailu';
 z.string.cs.searchInviteHeadline = 'Přiveďte své přátele';
 z.string.cs.searchInviteShare = 'Sdílet kontakty';
 
 z.string.cs.searchListEveryoneParticipates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
 z.string.cs.searchListNoMatches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
 
-
-z.string.cs.uploadGoogleHeadline = 'Najít kontakty\npro konverzaci.';
-z.string.cs.uploadGoogleMessage = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
 
 z.string.cs.warningCallUnsupportedIncoming = 'Volá {{user}}. Tento prohlížeč nepodporuje volání.';
 z.string.cs.warningCallUnsupportedOutgoing = 'Nemůžete volat, protože prohlížeč nepodporuje volání.';
@@ -541,7 +536,6 @@ z.string.cs.tooltipConversationsStart = 'Spustit konverzaci ({{shortcut}})';
 
 z.string.cs.tooltipConversationDetailsRename = 'Změnit název konverzace';
 
-z.string.cs.tooltipPreferencesContactsGmail = 'Přihlaste se ke svému Gmail účtu pro sdílení kontaktů';
 z.string.cs.tooltipPreferencesContactsMacos = 'Sdílejte všechny své kontakty z aplikace kontaktů systému macOS';
 z.string.cs.tooltipPreferencesPassword = 'Pro změnu hesla otevřete další webovou stránku';
 z.string.cs.tooltipPreferencesPicture = 'Změnit obrázek…';

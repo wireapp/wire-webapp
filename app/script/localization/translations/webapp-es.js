@@ -614,7 +614,6 @@ z.string.es.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.es.preferencesOptionsAudioSome = 'Algunos';
 z.string.es.preferencesOptionsAudioSomeDetail = 'Pings y llamadas';
 z.string.es.preferencesOptionsContacts = 'Contactos';
-z.string.es.preferencesOptionsContactsGmail = 'Importar desde Gmail';
 z.string.es.preferencesOptionsContactsMacos = 'Importar desde Contactos';
 z.string.es.preferencesOptionsContactsDetail = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.';
 z.string.es.preferencesOptionsPopular = 'Por demanda popular';
@@ -685,7 +684,6 @@ z.string.es.searchOthers = 'Conectar';
 z.string.es.searchInvite = 'Invitar amigos a Wire';
 z.string.es.searchInviteDetail = 'Compartir tus contactos te ayuda a conectar con otros. Anonimizamos toda la información y no la compartimos con nadie.';
 z.string.es.searchInviteButtonContacts = 'Desde los contactos';
-z.string.es.searchInviteButtonGmail = 'Desde Gmail';
 z.string.es.searchInviteHeadline = 'Tráete a tus amigos';
 z.string.es.searchInviteShare = 'Compartir contactos';
 
@@ -703,9 +701,6 @@ z.string.es.temporaryGuestJoinDescription = 'Si cierras o actualizas esta págin
 
 z.string.es.temporaryGuestLeaveMessage = ' ya no eres parte de esta conversación.';
 z.string.es.temporaryGuestLeaveDescription = 'Si cierras o actualizas esta página, perderás acceso al historial de conversación.';
-
-z.string.es.uploadGoogleHeadline = 'Buscar con quien hablar.';
-z.string.es.uploadGoogleMessage = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.';
 
 z.string.es.warningCallUnsupportedIncoming = '{{user}} está llamando. Tu navegador no está configurada para llamadas.';
 z.string.es.warningCallUnsupportedOutgoing = 'No puedes llamar porque tu navegador no está configurada para llamadas.';
@@ -784,7 +779,6 @@ z.string.es.tooltipConversationsStart = 'Empezar una conversación ({{shortcut}}
 z.string.es.tooltipConversationDetailsAddPeople = 'Añadir participantes a la conversación ({{shortcut}})';
 z.string.es.tooltipConversationDetailsRename = 'Cambiar nombre de la conversación';
 
-z.string.es.tooltipPreferencesContactsGmail = 'Iniciar sesión en tu cuenta de Gmail para compartir los contactos';
 z.string.es.tooltipPreferencesContactsMacos = 'Compartir todos tus contactos desde la aplicación de Contactos de macOS';
 z.string.es.tooltipPreferencesPassword = 'Abrir otra página web para restablecer su contraseña';
 z.string.es.tooltipPreferencesPicture = 'Cambiar tu foto…';

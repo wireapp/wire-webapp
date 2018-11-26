@@ -621,7 +621,6 @@ z.string.de.preferencesOptionsAudioNoneDetail = 'Pssst!';
 z.string.de.preferencesOptionsAudioSome = 'Einige';
 z.string.de.preferencesOptionsAudioSomeDetail = 'Pings und Anrufe';
 z.string.de.preferencesOptionsContacts = 'Kontakte';
-z.string.de.preferencesOptionsContactsGmail = 'Aus Gmail importieren';
 z.string.de.preferencesOptionsContactsMacos = 'Aus Kontakte importieren';
 z.string.de.preferencesOptionsContactsDetail = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
 z.string.de.preferencesOptionsPopular = 'Auf allgemeinen Wunsch';
@@ -693,7 +692,6 @@ z.string.de.searchOthers = 'Suchergebnisse';
 z.string.de.searchInvite = 'Lade Freunde zu Wire ein';
 z.string.de.searchInviteDetail = 'Wir verwenden deine Kontaktdaten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und geben sie nicht weiter.';
 z.string.de.searchInviteButtonContacts = 'Aus Kontakte';
-z.string.de.searchInviteButtonGmail = 'Aus Gmail';
 z.string.de.searchInviteHeadline = 'Hole deine Freunde';
 z.string.de.searchInviteShare = 'Teile deine Kontakte';
 
@@ -711,9 +709,6 @@ z.string.de.temporaryGuestJoinDescription = 'Wenn du diese Seite schließt oder 
 
 z.string.de.temporaryGuestLeaveMessage = ' bist nicht länger Teil dieser Unterhaltung.';
 z.string.de.temporaryGuestLeaveDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff auf den Unterhaltungsverlauf.';
-
-z.string.de.uploadGoogleHeadline = 'Finde Kontakte \nauf Wire.';
-z.string.de.uploadGoogleMessage = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
 
 z.string.de.urlSupportRoot = '/hc/de/';
 z.string.de.urlSupportArticles = '/hc/de/articles/';
@@ -801,7 +796,6 @@ z.string.de.tooltipConversationsStart = 'Unterhaltung beginnen ({{shortcut}})';
 z.string.de.tooltipConversationDetailsAddPeople = 'Teilnehmer zur Unterhaltung hinzufügen ({{shortcut}})';
 z.string.de.tooltipConversationDetailsRename = 'Unterhaltung umbenennen';
 
-z.string.de.tooltipPreferencesContactsGmail = 'Melde dich an deinem Gmail-Konto an, um deine Kontakte zu teilen';
 z.string.de.tooltipPreferencesContactsMacos = 'Teile alle deine Kontakte aus der macOS Kontakte-App';
 z.string.de.tooltipPreferencesPassword = 'Öffne eine andere Website, um dein Passwort zurückzusetzen';
 z.string.de.tooltipPreferencesPicture = 'Ändere dein Bild…';

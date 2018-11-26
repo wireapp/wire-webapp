@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Что-то пошло не так. Для получения дополнительной информации обратитесь к администратору вашей команды (Ошибка 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Что-то пошло не так. Для получения дополнительной информации обратитесь к администратору вашей команды (Ошибка 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Что-то пошло не так. Для получения дополнительной информации обратитесь к администратору вашей команды (Ошибка 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "",
   "BackendError.unexpected": "Неожиданная ошибка",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введите имя длиной не менее 2 символов",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Введите имя длиной не менее 2 символов",
