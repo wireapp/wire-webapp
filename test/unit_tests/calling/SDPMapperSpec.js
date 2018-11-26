@@ -68,6 +68,53 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
       checkUntouchedLines(rtcSdp.sdp, remoteSdp.sdp);
     });
 
+    it('adapts protocol for an offer created by Firefox > 63', () => {
+      const firefoxSdp = `
+${sdpStr}
+m=application 0 UDP/DTLS/SCTP webrtc-datachannel
+`.replace(/\n/g, '\r\n');
+
+      const rtcSdp = {
+        sdp: firefoxSdp,
+        type: z.calling.rtc.SDP_TYPE.OFFER,
+      };
+
+      z.util.Environment.browser.firefox = true;
+
+      const flowEntity = {
+        negotiationMode: () => '',
+      };
+
+      const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+
+      expect(localSdp.sdp).not.toContain('UDP/DTLS/');
+      expect(localSdp.sdp).toContain('DTLS/SCTP');
+      checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
+    });
+
+    it('Use the most recent syntax to define the sctp port', () => {
+      const remoteSdp = `${sdpStr}
+a=sctpmap:5000 webrtc-datachannel 1024
+`.replace(/\n/g, '\r\n');
+
+      const rtcSdp = {
+        sdp: remoteSdp,
+        type: z.calling.rtc.SDP_TYPE.OFFER,
+      };
+
+      z.util.Environment.browser.firefox = true;
+
+      const flowEntity = {
+        negotiationMode: () => '',
+      };
+
+      const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, flowEntity);
+
+      expect(localSdp.sdp).not.toContain('a=sctpmap:5000 webrtc-datachannel 1024');
+      expect(localSdp.sdp).toContain('a=sctp-port:5000');
+      checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
+    });
+
     it('adds the browser name and app version for local SDP', () => {
       const rtcSdp = {
         sdp: sdpStr,
@@ -192,6 +239,8 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
         .replace(/b=AS:.*?(\r\n|$)/g, '')
         .replace(/a=ptime:.*?(\r\n|$)/g, '')
         .replace(/m=(application|video).*?(\r\n|$)/g, '')
+        .replace(/a=sctpmap:.*?(\r\n|$)/g, '')
+        .replace(/a=sctp-port:.*?(\r\n|$)/g, '')
         .replace(/a=rtpmap.*?(\r\n|$)/g, '');
     };
 
