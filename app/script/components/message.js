@@ -324,8 +324,7 @@ const unableToDecryptTemplate = `
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
               data-bind="click: () => onClickResetSession(message), l10n_text: z.string.conversationUnableToDecryptResetSession, style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
-      <!-- /ko -->
-    </div>
+    <!-- /ko -->
   </div>
   `;
 
