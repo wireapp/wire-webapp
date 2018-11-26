@@ -5,9 +5,9 @@ import moment from 'moment';
 import ko from 'knockout';
 import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 
-import namespace from '../../../node_modules/@bower_components/webapp-module-namespace/js/Namespace.js';
-import bubble from '../../../node_modules/@bower_components/webapp-module-bubble/dist/script/webapp-module-bubble.js';
-import logger from '../../../node_modules/@bower_components/webapp-module-logger/dist/js/Logger.js';
+import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
+import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
+import logger from '../../ext/js/webapp-module-logger/Logger.js';
 
 import configGlobal from '../config.js';
 import envGlobal from '../util/Environment.js';

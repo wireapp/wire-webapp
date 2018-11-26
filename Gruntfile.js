@@ -57,6 +57,7 @@ module.exports = grunt => {
     compress: require('./grunt/config/compress'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
+    npmBower: require('./grunt/config/npmBower'),
     open: require('./grunt/config/open'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
@@ -66,6 +67,8 @@ module.exports = grunt => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
+
+  grunt.registerTask('init', 'npmBower');
 
   grunt.registerTask('app_deploy_travis', ['set_version', 'prepare', 'aws_prepare']);
 
