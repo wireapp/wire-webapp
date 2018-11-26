@@ -20,8 +20,8 @@
 export default class LabeledError extends Error {
   public label: string;
 
-  constructor(label: string, message: string);
   constructor(label: string, error: Error);
+  constructor(label: string, message: string);
   constructor(label: string, messageOrError: string | Error) {
     super();
     this.label = label;
