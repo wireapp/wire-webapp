@@ -26,7 +26,7 @@ module.exports = {
     cwd: '<%= dir.app_ %>',
     dest: '<%= dir.dist.static %>',
     expand: true,
-    src: ['ext/image/**/*', 'ext/js/**/*', 'audio/**/*', 'image/**/*', 'font/**/*', 'worker/*', 'sw.js'],
+    src: ['audio/**/*', 'image/**/*', 'font/**/*', 'worker/*', 'sw.js'],
   },
 
   dist_audio: {
