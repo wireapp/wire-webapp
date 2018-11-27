@@ -127,6 +127,45 @@
     font-weight: @font-weight-regular;
     user-select: none;
 
+    &__option {
+      font-size: 14px;
+
+      input {
+        display: none;
+
+        & + span {
+          display: flex;
+          align-items: center;
+
+          &::before {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            box-sizing: border-box;
+            margin-right: 16px;
+            border: 2px solid @graphite;
+            border-radius: 50%;
+            content: '';
+            cursor: pointer;
+            transition: all 0.15s;
+          }
+        }
+
+        &:checked + span::before {
+          border: 6px solid currentColor;
+        }
+
+        &:disabled {
+          color: @graphite;
+          cursor: default;
+
+          & + span::before {
+            display: none;
+          }
+        }
+      }
+    }
+
     &.custom {
       cursor: default;
     }
