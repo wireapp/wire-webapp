@@ -825,3 +825,5 @@ $(() => {
     wire.app = new App(wire.auth);
   }
 });
+
+export default App;
