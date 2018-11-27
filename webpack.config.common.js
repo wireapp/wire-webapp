@@ -52,6 +52,7 @@ module.exports = {
   },
 
   optimization: {
+    runtimeChunk: 'single',
     splitChunks: {
       cacheGroups: {
         dexie: {
