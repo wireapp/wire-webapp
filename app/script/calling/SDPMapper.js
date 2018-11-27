@@ -84,11 +84,9 @@ z.calling.SDPMapper = {
     sessionDescription = isLocalSdp ? sdp.replace('UDP/TLS/', '') : sdp;
 
     if (isFirefox) {
-      if (isLocalSdp) {
-        sessionDescription = sessionDescription.replace(/\bUDP\/DTLS\/SCTP\b/, 'DTLS/SCTP');
-      } else {
-        sessionDescription = sessionDescription.replace(/\bDTLS\/SCTP\b/, 'UDP/DTLS/SCTP');
-      }
+      sessionDescription = isLocalSdp
+        ? sessionDescription.replace(' UDP/DTLS/SCTP', ' DTLS/SCTP')
+        : sessionDescription.replace(' DTLS/SCTP', ' UDP/DTLS/SCTP');
     }
 
     sessionDescription.split('\r\n').forEach(sdpLine => {
