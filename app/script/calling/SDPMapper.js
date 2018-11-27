@@ -85,13 +85,9 @@ z.calling.SDPMapper = {
 
     if (isFirefox) {
       if (isLocalSdp) {
-        sessionDescription = isOffer
-          ? sessionDescription.replace(/\bUDP\/DTLS\/SCTP\b/, 'DTLS/SCTP')
-          : sessionDescription;
+        sessionDescription = sessionDescription.replace(/\bUDP\/DTLS\/SCTP\b/, 'DTLS/SCTP');
       } else {
-        sessionDescription = !isOffer
-          ? sessionDescription.replace(/\bDTLS\/SCTP\b/, 'UDP/DTLS/SCTP')
-          : sessionDescription;
+        sessionDescription = sessionDescription.replace(/\bDTLS\/SCTP\b/, 'UDP/DTLS/SCTP');
       }
     }
 
