@@ -275,10 +275,9 @@
       </div>
     </div>
 
-    #include('#dest/config.htm')
-    #include('#dest/vendor.htm')
-    #include('#dest/component.htm')
-    #include('#dest/app.htm')
-    <script src="/min/wire-login.min.js?{{@config.VERSION}}"></script>
+    <script src="/config.js?{{@config.VERSION}}"></script>
+    <script src="/min/dexie.js?{{@config.VERSION}}"></script>
+    <script src="/min/vendor.js?{{@config.VERSION}}"></script>
+    <script src="/min/login.js?{{@config.VERSION}}"></script>
   </body>
 </html>

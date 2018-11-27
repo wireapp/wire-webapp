@@ -19,7 +19,10 @@
 
 'use strict';
 
-import PhoneFormat from 'phoneformat.js';
+import App from '../main/app';
+/* eslint-disable no-unused-vars */
+import PhoneFormatGlobal from 'phoneformat.js';
+/* eslint-enable no-unused-vars */
 import Cookies from 'js-cookie';
 
 window.z = window.z || {};
@@ -212,15 +215,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       },
     };
 
-    // Debugging
-    if (z.util.Environment.frontend.isLocalhost()) {
-      const live_reload = document.createElement('script');
-      live_reload.id = 'live_reload';
-      live_reload.src = 'http://localhost:32123/livereload.js';
-      document.body.appendChild(live_reload);
-      $('html').addClass('development');
-    }
-
     ko.applyBindings(this, document.getElementById(this.elementId));
 
     this.tabsCheckIntervalId = undefined;
@@ -300,7 +294,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise} Resolves when cookies are enabled
    */
   _check_cookies(current_hash) {
-    const cookie_name = z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
+    const cookie_name = App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
 
     const cookies_enabled = () => {
       if (current_hash === z.auth.AuthView.MODE.BLOCKED_COOKIES) {

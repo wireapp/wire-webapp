@@ -30,6 +30,7 @@ module.exports = {
   entry: {
     app: path.resolve(__dirname, appSrc, 'main/app.js'),
     auth: path.resolve(__dirname, srcScript, 'main.tsx'),
+    login: path.resolve(__dirname, appSrc, 'main/login.js'),
   },
   externals: {
     'fs-extra': '{}',

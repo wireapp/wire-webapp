@@ -90,6 +90,5 @@ module.exports = grunt => {
     'includereplace:prod_index',
     'includereplace:prod_auth',
     'includereplace:prod_login',
-    'includereplace:deploy_demo',
   ]);
 };
