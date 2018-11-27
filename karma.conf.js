@@ -72,7 +72,7 @@ module.exports = function(config) {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
       'app/script/main/globals.js': ['webpack', 'sourcemap'],
-      'script/**/*.js': ['coverage'],
+      // FIXME fails because of import statements 'app/script/**/*.js': ['coverage'],
     },
 
     webpack: {
@@ -144,11 +144,11 @@ module.exports = function(config) {
     coverageReporter: {
       reporters: [
         {
-          dir: '../docs/coverage',
+          dir: 'docs/coverage',
           type: 'html',
         },
         {
-          dir: '../docs/coverage',
+          dir: 'docs/coverage',
           file: 'coverage-summary.txt',
           type: 'text-summary',
         },
