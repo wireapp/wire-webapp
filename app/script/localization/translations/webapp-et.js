@@ -622,7 +622,6 @@ z.string.et.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.et.preferencesOptionsAudioSome = 'Mõned';
 z.string.et.preferencesOptionsAudioSomeDetail = 'Pingid ja kõned';
 z.string.et.preferencesOptionsContacts = 'Kontaktid';
-z.string.et.preferencesOptionsContactsGmail = 'Impordi Gmailist';
 z.string.et.preferencesOptionsContactsMacos = 'Impordi kontaktidest';
 z.string.et.preferencesOptionsContactsDetail = 'Me kasutame su kontakte, et ühendada sind teistega. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
 z.string.et.preferencesOptionsPopular = 'Publiku nõudmisel';
@@ -694,7 +693,6 @@ z.string.et.searchOthers = 'Ühendu';
 z.string.et.searchInvite = 'Kutsu inimesi Wire’iga liituma';
 z.string.et.searchInviteDetail = 'Kontaktide jagamine aitab sul teistega ühenduda. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
 z.string.et.searchInviteButtonContacts = 'Kontaktidest';
-z.string.et.searchInviteButtonGmail = 'Gmailist';
 z.string.et.searchInviteHeadline = 'Too oma sõbrad';
 z.string.et.searchInviteShare = 'Jaga kontakte';
 
@@ -712,9 +710,6 @@ z.string.et.temporaryGuestJoinDescription = 'Kui sa lehe sulged või laadid uues
 
 z.string.et.temporaryGuestLeaveMessage = ' pole enam selles vestluses.';
 z.string.et.temporaryGuestLeaveDescription = 'Kui sa lehe sulged või laadid uuesti, kaotad ligipääsu vestlusajaloole.';
-
-z.string.et.uploadGoogleHeadline = 'Otsi inimesi\nkellega rääkida.';
-z.string.et.uploadGoogleMessage = 'Me kasutame su kontakte, et ühendada sind teistega. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
 
 z.string.et.urlSupportRoot = '/';
 z.string.et.urlSupportArticles = '/hc/en-us/articles/';
@@ -802,7 +797,6 @@ z.string.et.tooltipConversationsStart = 'Alusta vestlust ({{shortcut}})';
 z.string.et.tooltipConversationDetailsAddPeople = 'Lisa vestlusesse osalejaid ({{shortcut}})';
 z.string.et.tooltipConversationDetailsRename = 'Muuda vestluse nime';
 
-z.string.et.tooltipPreferencesContactsGmail = 'Logi oma Gmaili kontosse sisse, et jagada kontakte';
 z.string.et.tooltipPreferencesContactsMacos = 'Jaga kõiki oma kontakte macOS Kontaktide rakendusest';
 z.string.et.tooltipPreferencesPassword = 'Ava teine veebileht oma parooli lähtestamiseks';
 z.string.et.tooltipPreferencesPicture = 'Muuda oma pilti…';

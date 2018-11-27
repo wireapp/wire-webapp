@@ -433,7 +433,6 @@ z.string.sk.preferencesOptionsAudioNoneDetail = 'Pssst!';
 z.string.sk.preferencesOptionsAudioSome = 'Niektoré';
 z.string.sk.preferencesOptionsAudioSomeDetail = 'Pingy a hovory';
 z.string.sk.preferencesOptionsContacts = 'Kontakty';
-z.string.sk.preferencesOptionsContactsGmail = 'Import z Gmailu';
 z.string.sk.preferencesOptionsContactsMacos = 'Import z Kontaktov';
 z.string.sk.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
 z.string.sk.preferencesOptionsPopular = 'Populárnej požiadavky';
@@ -467,16 +466,12 @@ z.string.sk.searchOthers = 'Pripojiť';
 z.string.sk.searchInvite = 'Pozvať ľudí do Wire';
 z.string.sk.searchInviteDetail = 'Zdieľanie kontaktov Vám pomôže spojiť sa s ostatnými. Anonymizujeme všetky informácie a nezdieľame ich s nikým iným.';
 z.string.sk.searchInviteButtonContacts = 'Z kontaktov';
-z.string.sk.searchInviteButtonGmail = 'Z Gmailu';
 z.string.sk.searchInviteHeadline = 'Pozvať priateľov';
 z.string.sk.searchInviteShare = 'Zdieľať kontakty';
 
 z.string.sk.searchListEveryoneParticipates = 'Všetci pripojení sú už v tomto rozhovore.';
 z.string.sk.searchListNoMatches = 'Žiadne výsledky. Skúste zadať iné meno.';
 
-
-z.string.sk.uploadGoogleHeadline = 'Nájsť ľudí\npre rozhovor.';
-z.string.sk.uploadGoogleMessage = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
 
 z.string.sk.warningCallUnsupportedIncoming = 'Volá {{user}}. Váš prehliadač nepodporuje hovory.';
 z.string.sk.warningCallUnsupportedOutgoing = 'Nemôžete volať, pretože Váš prehliadač nepodporuje hovory.';
@@ -542,7 +537,6 @@ z.string.sk.tooltipConversationsStart = 'Začať rozhovor ({{shortcut}})';
 
 z.string.sk.tooltipConversationDetailsRename = 'Zmeniť názov rozhovoru';
 
-z.string.sk.tooltipPreferencesContactsGmail = 'Pre zdieľanie kontaktov sa prihláste do svojho Gmail účtu';
 z.string.sk.tooltipPreferencesContactsMacos = 'Zdieľať všetky svoje kontakty z aplikácie kontaktov systému macOS';
 z.string.sk.tooltipPreferencesPassword = 'Pre zmenu hesla otvorte ďalšiu webovú stránku';
 z.string.sk.tooltipPreferencesPicture = 'Zmeniť obrázok…';

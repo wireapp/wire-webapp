@@ -427,7 +427,6 @@ z.string.it.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.it.preferencesOptionsAudioSome = 'Alcuni';
 z.string.it.preferencesOptionsAudioSomeDetail = 'Trilli e chiamate';
 z.string.it.preferencesOptionsContacts = 'Contatti';
-z.string.it.preferencesOptionsContactsGmail = 'Importa da Gmail';
 z.string.it.preferencesOptionsContactsMacos = 'Importa dalla rubrica';
 z.string.it.preferencesOptionsContactsDetail = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
 z.string.it.preferencesOptionsPopular = 'A grande richiesta';
@@ -461,16 +460,12 @@ z.string.it.searchOthers = 'Connetti';
 z.string.it.searchInvite = 'Invita amici ad usare Wire';
 z.string.it.searchInviteDetail = 'Condividere i contatti dalla rubrica ti aiuta a connetterti con gli altri. Rendiamo tutte le informazioni dei contatti anonime e non sono cedute a nessun altro.';
 z.string.it.searchInviteButtonContacts = 'Dalla rubrica';
-z.string.it.searchInviteButtonGmail = 'Da Gmail';
 z.string.it.searchInviteHeadline = 'Invita i tuoi amici';
 z.string.it.searchInviteShare = 'Condividi contatti';
 
 z.string.it.searchListEveryoneParticipates = 'Tutte le persone a cui sei connesso sono già in questa conversazione.';
 z.string.it.searchListNoMatches = 'Nessun risultato corrispondente. Provare ad inserire un nome diverso.';
 
-
-z.string.it.uploadGoogleHeadline = 'Trova persone con cui parlare.';
-z.string.it.uploadGoogleMessage = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
 
 z.string.it.warningCallUnsupportedIncoming = '{{user}} sta chiamando. Il tuo browser non supporta le chiamate.';
 z.string.it.warningCallUnsupportedOutgoing = 'Non puoi chiamare perchè il tuo browser non supporta le chiamate.';
@@ -536,7 +531,6 @@ z.string.it.tooltipConversationsStart = 'Avviare conversazione ({{shortcut}})';
 
 z.string.it.tooltipConversationDetailsRename = 'Cambia il nome della conversazione';
 
-z.string.it.tooltipPreferencesContactsGmail = 'Accedi al tuo account Gmail per condividere i contatti';
 z.string.it.tooltipPreferencesContactsMacos = 'Condividi tutti i tuoi contatti dall’app Contatti di macOS';
 z.string.it.tooltipPreferencesPassword = 'Apri un altro sito per reimpostare la password';
 z.string.it.tooltipPreferencesPicture = 'Cambia la tua foto…';
