@@ -17,19 +17,17 @@
  *
  */
 
-'use strict';
+import Cookies from 'js-cookie';
 
 import App from '../main/app';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
+import view from '../auth/AuthView';
+import validationError from '../auth/ValidationError';
 /* eslint-enable no-unused-vars */
-import Cookies from 'js-cookie';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
 
 // @formatter:off
-z.viewModel.AuthViewModel = class AuthViewModel {
+class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [
@@ -1626,13 +1624,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         }
       });
   }
-};
-
-$(() => {
-  if ($('.auth-page').length) {
-    wire.auth.view = new z.viewModel.AuthViewModel(wire.auth);
-  }
-});
+}
 
 // jQuery helpers
 $.fn.extend({
@@ -1645,3 +1637,5 @@ $.fn.extend({
     });
   },
 });
+
+export default AuthViewModel;
