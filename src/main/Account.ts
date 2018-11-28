@@ -321,9 +321,9 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.CONFIRMATION: {
-        const confirmMessageId = genericMessage[GenericMessageType.CONFIRMATION].firstMessageId;
+        const {firstMessageId, moreMessageIds, type} = genericMessage[GenericMessageType.CONFIRMATION];
 
-        const content: ConfirmationContent = {confirmMessageId};
+        const content: ConfirmationContent = {firstMessageId, moreMessageIds, type};
 
         return {
           content,

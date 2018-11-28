@@ -64,12 +64,18 @@ const messageIdCache = {};
     );
 
     if (CONFIRM_TYPES.includes(type)) {
-      const confirmationPayload = account.service.conversation.createConfirmation(messageId);
+      const deliveredPayload = account.service.conversation.createConfirmationDelivered(messageId);
       logger.log(
-        `Sending: "${confirmationPayload.type}" ("${confirmationPayload.id}") in "${conversationId}"`,
-        confirmationPayload.content
+        `Sending: "${deliveredPayload.type}" ("${deliveredPayload.id}") in "${conversationId}"`,
+        deliveredPayload.content
       );
-      await account.service.conversation.send(conversationId, confirmationPayload);
+      await account.service.conversation.send(conversationId, deliveredPayload);
+
+      if (content.expectsReadConfirmation) {
+        const readPayload = account.service.conversation.createConfirmationRead(messageId);
+        logger.log(`Sending: "${readPayload.type}" ("${readPayload.id}") in "${conversationId}"`, readPayload.content);
+        await account.service.conversation.send(conversationId, readPayload);
+      }
 
       if (messageTimer) {
         logger.log(

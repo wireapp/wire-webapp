@@ -21,7 +21,6 @@ export * from './AbortReason';
 export * from './AssetService';
 export * from './AssetTransferState';
 export * from './ClientActionType';
-export * from './ConfirmationType';
 export * from './ConversationService';
 export * from './GenericMessageType';
 export * from './MessageTimer';
