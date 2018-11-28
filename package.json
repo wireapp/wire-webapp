@@ -6,7 +6,7 @@
     "@types/node": "10.12.10",
     "@wireapp/api-client": "3.2.7",
     "@wireapp/cryptobox": "9.0.29",
-    "@wireapp/protocol-messaging": "1.22.1",
+    "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/store-engine": "1.1.7",
     "bazinga64": "5.3.30",
     "logdown": "3.2.7",
