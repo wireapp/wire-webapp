@@ -47,7 +47,7 @@ module.exports = grunt => {
     }
 
     grunt.log.ok(`Version set to ${version}`);
-    grunt.file.write(path.join('dist', 'version'), version);
+    grunt.file.write(path.join('server', 'dist', 'version'), version);
   });
 
   grunt.registerTask('prepare', [

@@ -1,0 +1,6 @@
+node_modules/
+dist/*
+!dist/templates/
+!dist/robots/
+!dist/app-app-site-association.json
+!dist/.ebextensions/

@@ -21,7 +21,7 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const dist = 'dist/static/';
+const dist = 'server/dist/static/';
 const srcScript = 'app/script/auth/';
 const appSrc = 'app/script/';
 
