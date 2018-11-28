@@ -1,5 +1,6 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
+.DS_Store
 /.idea/**/*.xml
 /app/ext
 /app/i18n/**/*
