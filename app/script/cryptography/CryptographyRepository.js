@@ -521,7 +521,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const customData = {
       clientLocalClass: this.currentClient().class,
       clientLocalType: this.currentClient().type,
-      cryptoboxVersion: cryptoboxVersion,
+      cryptoboxVersion,
       errorCode: error.code,
       eventType: eventType,
     };
