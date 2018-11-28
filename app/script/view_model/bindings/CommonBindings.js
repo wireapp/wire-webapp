@@ -328,17 +328,17 @@ ko.subscribable.fn.trimmed = function() {
  * Will only fire once when the value has changed.
  * @param {*} handler - Handler
  * @param {ko.observable} owner - Subscription owner
- * @param {string} event_name - Event name
+ * @param {string} eventName - Event name
  * @returns {undefined} No return value
  */
-ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
+ko.subscribable.fn.subscribe_once = function(handler, owner, eventName) {
   const subscription = this.subscribe(
-    new_value => {
+    newValue => {
       subscription.dispose();
-      handler(new_value);
+      handler(newValue);
     },
     owner,
-    event_name
+    eventName
   );
 };
 
@@ -348,7 +348,6 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
  * @param {function} handler - Handler
  * @returns {ko.subscription} knockout subscription
  */
-
 ko.subscribable.fn.subscribeChanged = function(handler) {
   let savedValue = this.peek();
   return this.subscribe(latestValue => {
@@ -356,6 +355,33 @@ ko.subscribable.fn.subscribeChanged = function(handler) {
     savedValue = latestValue;
     handler(latestValue, oldValue);
   });
+};
+
+/**
+ * Returns a suspendable subscription
+ * https://github.com/knockout/knockout/issues/270#issuecomment-11360312
+ * @param {function} handler - Handler
+ * @param {ko.observable} owner - Subscription owner
+ * @param {string} eventName - Event name
+ * @returns {ko.subscription} knockout subscription with suspend and unsuspend methods
+ */
+ko.subscribable.fn.suspendableSubscribe = function(handler, owner, eventName) {
+  let isSuspended = false;
+  return ko.utils.extend(
+    this.subscribe(
+      value => {
+        if (!isSuspended) {
+          handler(value);
+        }
+      },
+      owner,
+      eventName
+    ),
+    {
+      suspend: () => (isSuspended = true),
+      unsuspend: () => (isSuspended = false),
+    }
+  );
 };
 
 /**
