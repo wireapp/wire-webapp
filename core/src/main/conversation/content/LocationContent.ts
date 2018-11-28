@@ -18,6 +18,7 @@
  */
 
 interface LocationContent {
+  expectsReadConfirmation?: boolean;
   latitude: number;
   longitude: number;
   name?: string;

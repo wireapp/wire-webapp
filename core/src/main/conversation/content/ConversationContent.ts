@@ -13,6 +13,7 @@ import {
   HiddenContent,
   ImageAssetContent,
   ImageContent,
+  KnockContent,
   LocationContent,
   ReactionContent,
   TextContent,
@@ -33,6 +34,7 @@ type ConversationContent =
   | HiddenContent
   | ImageAssetContent
   | ImageContent
+  | KnockContent
   | LocationContent
   | ReactionContent
   | TextContent;

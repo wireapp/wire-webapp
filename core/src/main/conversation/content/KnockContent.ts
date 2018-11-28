@@ -17,9 +17,9 @@
  *
  */
 
-enum ConfirmationType {
-  DELIVERED = 0,
-  READ = 1,
+interface KnockContent {
+  hotKnock?: boolean;
+  expectsReadConfirmation?: boolean;
 }
 
-export {ConfirmationType};
+export {KnockContent};

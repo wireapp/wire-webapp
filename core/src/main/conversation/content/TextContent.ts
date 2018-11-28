@@ -20,6 +20,7 @@
 import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content/';
 
 interface TextContent {
+  expectsReadConfirmation?: boolean;
   linkPreviews?: LinkPreviewUploadedContent[];
   mentions?: MentionContent[];
   quote?: QuoteContent;

@@ -53,9 +53,9 @@ abstract class MessageHandler {
     }
   }
 
-  public async sendConfirmation(conversationId: string, confirmMessageId: string): Promise<void> {
+  public async sendConfirmation(conversationId: string, firstMessageId: string): Promise<void> {
     if (this.account && this.account.service) {
-      const confirmationPayload = this.account.service.conversation.createConfirmation(confirmMessageId);
+      const confirmationPayload = this.account.service.conversation.createConfirmationDelivered(firstMessageId);
       await this.account.service.conversation.send(conversationId, confirmationPayload);
     }
   }
