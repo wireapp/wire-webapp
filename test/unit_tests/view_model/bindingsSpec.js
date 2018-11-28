@@ -44,8 +44,9 @@ describe('ko.bindingHandlers', () => {
       binding.init(element, handler.on_enter);
     });
 
-    xit('can execute callback when enter is pressed', () => {
-      $(element).trigger($.Event('keypress', {key: 'Enter'}));
+    it('can execute callback when enter is pressed', () => {
+      const keyboardEvent = new KeyboardEvent('keypress', {key: 'Enter'});
+      element.dispatchEvent(keyboardEvent);
 
       expect(handler.on_enter).toHaveBeenCalled();
     });
