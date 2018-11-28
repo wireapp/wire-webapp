@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/URLUtil
+// KARMA_SPECS=util/URLUtil yarn test:app
 
 describe('z.util.URLUtil', () => {
   describe('appendParameter', () => {

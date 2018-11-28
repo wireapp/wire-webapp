@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ClientMismatchHandler
+// KARMA_SPECS=conversation/ClientMismatchHandler yarn test:app
 
 'use strict';
 

@@ -19,7 +19,13 @@
 
 /* eslint-disable sort-keys */
 
-'use strict';
+function getSpecs(specList) {
+  if (specList) {
+    return specList.split(',').map(path => `test/unit_tests/${path}Spec.js`);
+  }
+  return ['test/unit_tests/**/*.js'];
+}
+
 const webpack = require('webpack');
 const path = require('path');
 
@@ -57,8 +63,7 @@ module.exports = function(config) {
       'test/api/OpenGraphMocks.js',
       'test/js/calling/CallRequestResponseMock.js',
       'test/api/TestFactory.js',
-      'test/unit_tests/**/*.js',
-    ],
+    ].concat(getSpecs(process.env.KARMA_SPECS)),
 
     proxies: {
       '/audio/': '/base/audio/',

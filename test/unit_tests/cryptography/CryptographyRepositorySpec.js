@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:cryptography/CryptographyRepository
+// KARMA_SPECS=cryptography/CryptographyRepository yarn test:app
 
 'use strict';
 

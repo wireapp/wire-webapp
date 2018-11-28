@@ -19,7 +19,7 @@
 
 /* eslint no-undef: "off" */
 
-// grunt test_run:location/LocationService
+// KARMA_SPECS=location/LocationService yarn test:app
 
 'use strict';
 

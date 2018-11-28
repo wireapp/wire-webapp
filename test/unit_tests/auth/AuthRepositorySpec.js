@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:auth/AuthRepository
+// KARMA_SPECS=auth/AuthRepository yarn test:app
 
 'use strict';
 

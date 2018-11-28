@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_run:telemetry/calling/CallLogger
+// KARMA_SPECS=telemetry/calling/CallLogger yarn test:app
 
 import sdpTransform from 'sdp-transform';
 

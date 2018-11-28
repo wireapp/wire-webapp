@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:view_model/bindings
+// KARMA_SPECS=view_model/bindings yarn test:app
 
 'use strict';
 

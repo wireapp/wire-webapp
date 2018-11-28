@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/EventMapper
+// KARMA_SPECS=conversation/EventMapper yarn test:app
 
 'use strict';
 

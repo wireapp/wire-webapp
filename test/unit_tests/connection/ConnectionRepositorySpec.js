@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:connection/ConnectionRepository
+// KARMA_SPECS=connection/ConnectionRepository yarn test:app
 
 'use strict';
 

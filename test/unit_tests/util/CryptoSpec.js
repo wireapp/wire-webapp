@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/Crypto
+// KARMA_SPECS=util/Crypto yarn test:app
 
 'use strict';
 

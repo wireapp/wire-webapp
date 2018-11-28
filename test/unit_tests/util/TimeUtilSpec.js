@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/TimeUtil
+// KARMA_SPECS=util/TimeUtil yarn test:app
 
 'use strict';
 

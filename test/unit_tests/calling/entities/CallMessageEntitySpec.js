@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:calling/entities/CallMessageEntity
+// KARMA_SPECS=calling/entities/CallMessageEntity yarn test:app
 
 'use strict';
 

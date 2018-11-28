@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/ArrayUtil
+// KARMA_SPECS=util/ArrayUtil yarn test:app
 
 'use strict';
 
