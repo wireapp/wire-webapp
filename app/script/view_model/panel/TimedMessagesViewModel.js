@@ -27,16 +27,26 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
   constructor(params) {
     super(params);
 
-    this.conversationRepository = params.repositories.conversation;
-
-    this.logger = new z.util.Logger('z.viewModel.panel.TimedMessagesViewModel', z.config.LOGGER.OPTIONS);
+    const conversationRepository = params.repositories.conversation;
 
     this.currentMessageTimer = ko.observable();
+
+    const currentMessageTimerSubscription = this.currentMessageTimer.suspendableSubscribe(value => {
+      if (this.activeConversation()) {
+        const finalValue = value === 0 ? null : value;
+        this.activeConversation().globalMessageTimer(finalValue);
+        conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalValue);
+      }
+    });
 
     ko.pureComputed(() => {
       const hasGlobalMessageTimer = this.activeConversation() && this.activeConversation().hasGlobalMessageTimer();
       return hasGlobalMessageTimer ? this.activeConversation().messageTimer() : 0;
-    }).subscribe(timer => this.currentMessageTimer(timer));
+    }).subscribe(timer => {
+      currentMessageTimerSubscription.suspend();
+      this.currentMessageTimer(timer);
+      currentMessageTimerSubscription.unsuspend();
+    });
 
     const hasCustomTime = ko.pureComputed(() => {
       return !!this.currentMessageTimer() && !z.ephemeral.timings.VALUES.includes(this.currentMessageTimer());
@@ -64,14 +74,6 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
     });
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
-
-    this.currentMessageTimer.subscribe(value => {
-      if (this.activeConversation()) {
-        const finalValue = value === 0 ? null : value;
-        this.activeConversation().globalMessageTimer(finalValue);
-        this.conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalValue);
-      }
-    });
 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.isRendered())
