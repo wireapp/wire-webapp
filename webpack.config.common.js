@@ -83,7 +83,6 @@ module.exports = {
       $: 'jquery',
       _: 'underscore',
       jQuery: 'jquery',
-      jQuery: 'jquery',
       ko: 'knockout',
     }),
   ],
