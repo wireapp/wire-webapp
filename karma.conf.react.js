@@ -41,13 +41,14 @@ module.exports = function(config) {
     },
     customLaunchers: {
       ChromeNoSandbox: {
-        base: 'Chrome',
+        base: 'ChromeHeadless',
         flags: ['--no-sandbox'],
       },
     },
     files: [
       `${test}/config.test.js`,
       `${test}/main.test.js`,
+      `${dist}/runtime.js`,
       `${dist}/dexie.js`,
       `${dist}/vendor.js`,
       `${dist}/test.js`,
