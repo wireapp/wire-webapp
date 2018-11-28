@@ -29,7 +29,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
 
     const conversationRepository = params.repositories.conversation;
 
-    this.currentMessageTimer = ko.observable();
+    this.currentMessageTimer = ko.observable(0);
 
     const currentMessageTimerSubscription = this.currentMessageTimer.suspendableSubscribe(value => {
       if (this.activeConversation()) {
