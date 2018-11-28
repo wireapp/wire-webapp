@@ -27,30 +27,30 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
   constructor(params) {
     super(params);
 
-    this.conversationRepository = params.repositories.conversation;
-
-    this.logger = new z.util.Logger('z.viewModel.panel.NotificationsViewModel', z.config.LOGGER.OPTIONS);
+    const conversationRepository = params.repositories.conversation;
 
     this.settings = Object.values(z.conversation.NotificationSetting.STATE).map(status => ({
       text: z.conversation.NotificationSetting.getText(status),
       value: status,
     }));
 
-    this.isRendered = ko.observable(false).extend({notify: 'always'});
-
     this.currentNotificationSetting = ko.observable();
 
-    this.activeConversation.subscribe(conversation => {
-      if (conversation) {
-        this.currentNotificationSetting(conversation.notificationState());
+    const currentNotificationSettingSubscription = this.currentNotificationSetting.suspendableSubscribe(value => {
+      if (this.activeConversation()) {
+        conversationRepository.setNotificationState(this.activeConversation(), value);
       }
     });
 
-    this.currentNotificationSetting.subscribe(value => {
-      if (this.activeConversation()) {
-        this.conversationRepository.setNotificationState(this.activeConversation(), value);
-      }
+    ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().notificationState();
+    }).subscribe(setting => {
+      currentNotificationSettingSubscription.suspend();
+      this.currentNotificationSetting(setting);
+      currentNotificationSettingSubscription.unsuspend();
     });
+
+    this.isRendered = ko.observable(false).extend({notify: 'always'});
 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.isRendered())
