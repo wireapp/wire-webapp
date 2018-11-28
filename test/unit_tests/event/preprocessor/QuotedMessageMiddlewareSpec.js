@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:event/preprocessor/QuotedMessageMiddleware
+// KARMA_SPECS=event/preprocessor/QuotedMessageMiddleware yarn test:app
 
 describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();

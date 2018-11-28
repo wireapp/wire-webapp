@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/StringUtil
+// KARMA_SPECS=util/StringUtil yarn test:app
 
 'use strict';
 

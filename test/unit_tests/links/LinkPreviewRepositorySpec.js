@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_run:links/LinkPreviewRepository
+// KARMA_SPECS=links/LinkPreviewRepository yarn test:app
 
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;

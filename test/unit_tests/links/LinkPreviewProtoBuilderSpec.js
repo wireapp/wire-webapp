@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_run:links/LinkPreviewProtoBuilder
+// KARMA_SPECS=links/LinkPreviewProtoBuilder yarn test:app
 
 describe('LinkPreviewProtoBuilder', () => {
   const compare_article_with_mock = function(url, offset, preview, mock) {

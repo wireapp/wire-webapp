@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:team/TeamRepository
+// KARMA_SPECS=team/TeamRepository yarn test:app
 
 'use strict';
 

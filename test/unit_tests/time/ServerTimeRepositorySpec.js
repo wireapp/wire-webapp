@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:time/ServerTimeRepository
+// KARMA_SPECS=time/ServerTimeRepository yarn test:app
 
 'use strict';
 

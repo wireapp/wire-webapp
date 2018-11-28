@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:extension/GiphyRepositorySpecs
+// KARMA_SPECS=extension/GiphyRepositorySpecs yarn test:app
 
 'use strict';
 

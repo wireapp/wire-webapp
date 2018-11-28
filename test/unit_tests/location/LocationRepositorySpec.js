@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:location/LocationRepository
+// KARMA_SPECS=location/LocationRepository yarn test:app
 
 'use strict';
 

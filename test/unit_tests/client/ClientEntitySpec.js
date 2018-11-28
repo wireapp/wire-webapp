@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:client/Client
+// KARMA_SPECS=client/Client yarn test:app
 
 'use strict';
 

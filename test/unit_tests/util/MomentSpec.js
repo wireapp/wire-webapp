@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/Moment
+// KARMA_SPECS=util/Moment yarn test:app
 
 import moment from 'moment';
 /* eslint-disable no-unused-vars */
