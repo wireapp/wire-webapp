@@ -54,12 +54,13 @@
   label::before {
     width: 16px;
     height: 16px;
-    border: 1px solid @graphite;
+    border: 2px solid @graphite;
+    transition: all 0.15s;
   }
 
   input[type='radio']:checked + label::before {
     border-width: 6px;
-    border-color: currentColor;
+    border-color: @graphite-dark;
     background-color: #fff;
   }
 }

@@ -27,17 +27,16 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
   constructor(params) {
     super(params);
 
-    this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
-    this.clickOnMessageTimeOff = this.clickOnMessageTime.bind(this, {value: null});
-
-    const conversation = params.repositories.conversation;
-    this.conversationRepository = conversation;
+    this.conversationRepository = params.repositories.conversation;
 
     this.logger = new z.util.Logger('z.viewModel.panel.TimedMessagesViewModel', z.config.LOGGER.OPTIONS);
 
+    const hasCustomTime = ko.pureComputed(() => {
+      return !!this.currentMessageTimer() && !z.ephemeral.timings.VALUES.includes(this.currentMessageTimer());
+    });
+
     this.messageTimes = ko.pureComputed(() => {
       const times = z.ephemeral.timings.VALUES;
-      const currentTime = this.currentMessageTimer();
 
       times.sort((timeA, timeB) => timeA - timeB);
 
@@ -46,11 +45,11 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
         value: time,
       }));
 
-      if (currentTime && !times.includes(currentTime)) {
+      if (hasCustomTime()) {
         mappedTimes.push({
           isCustom: true,
-          text: z.util.TimeUtil.formatDuration(currentTime).text,
-          value: currentTime,
+          text: z.util.TimeUtil.formatDuration(this.currentMessageTimer()).text,
+          value: this.currentMessageTimer(),
         });
       }
 
@@ -59,10 +58,21 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
 
-    this.currentMessageTimer = ko.pureComputed(() => {
-      return this.activeConversation().hasGlobalMessageTimer() ? this.activeConversation().messageTimer() : 0;
+    this.currentMessageTimer = ko.observable();
+
+    this.activeConversation.subscribe(conversation => {
+      if (conversation) {
+        this.currentMessageTimer(
+          this.activeConversation().hasGlobalMessageTimer() ? this.activeConversation().messageTimer() : 0
+        );
+      }
     });
 
+    this.currentMessageTimer.subscribe(value => {
+      const finalValue = value === 0 ? null : value;
+      this.activeConversation().globalMessageTimer(finalValue);
+      this.conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalValue);
+    });
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.isRendered())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
@@ -70,11 +80,5 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
 
   getElementId() {
     return 'timed-messages';
-  }
-
-  clickOnMessageTime({value}) {
-    const activeConversation = this.activeConversation();
-    activeConversation.globalMessageTimer(value);
-    this.conversationRepository.updateConversationMessageTimer(activeConversation, value);
   }
 };
