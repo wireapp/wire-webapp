@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ConversationCellState
+// KARMA_SPECS=conversation/ConversationCellState yarn test:app
 
 'use strict';
 

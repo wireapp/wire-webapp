@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:entity/User
+// KARMA_SPECS=entity/User yarn test:app
 
 'use strict';
 

@@ -17,13 +17,17 @@
  *
  */
 
-'use strict';
+import Cookies from 'js-cookie';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
+import App from '../main/app';
+/* eslint-disable no-unused-vars */
+import PhoneFormatGlobal from 'phoneformat.js';
+import view from '../auth/AuthView';
+import validationError from '../auth/ValidationError';
+/* eslint-enable no-unused-vars */
 
 // @formatter:off
-z.viewModel.AuthViewModel = class AuthViewModel {
+class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [
@@ -209,15 +213,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       },
     };
 
-    // Debugging
-    if (z.util.Environment.frontend.isLocalhost()) {
-      const live_reload = document.createElement('script');
-      live_reload.id = 'live_reload';
-      live_reload.src = 'http://localhost:32123/livereload.js';
-      document.body.appendChild(live_reload);
-      $('html').addClass('development');
-    }
-
     ko.applyBindings(this, document.getElementById(this.elementId));
 
     this.tabsCheckIntervalId = undefined;
@@ -297,7 +292,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise} Resolves when cookies are enabled
    */
   _check_cookies(current_hash) {
-    const cookie_name = z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
+    const cookie_name = App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
 
     const cookies_enabled = () => {
       if (current_hash === z.auth.AuthView.MODE.BLOCKED_COOKIES) {
@@ -1629,13 +1624,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         }
       });
   }
-};
-
-$(() => {
-  if ($('.auth-page').length) {
-    wire.auth.view = new z.viewModel.AuthViewModel(wire.auth);
-  }
-});
+}
 
 // jQuery helpers
 $.fn.extend({
@@ -1648,3 +1637,5 @@ $.fn.extend({
     });
   },
 });
+
+export default AuthViewModel;

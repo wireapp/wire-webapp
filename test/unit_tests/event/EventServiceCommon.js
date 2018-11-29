@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ConversationService
+// KARMA_SPECS=conversation/ConversationService yarn test:app
 
 'use strict';
 

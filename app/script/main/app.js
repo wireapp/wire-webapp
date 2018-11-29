@@ -17,12 +17,15 @@
  *
  */
 
-'use strict';
+import platform from 'platform';
 
-window.z = window.z || {};
-window.z.main = z.main || {};
+/* eslint-disable no-unused-vars */
+import globals from './globals';
 
-z.main.App = class App {
+import auth from './auth';
+/* eslint-enable no-unused-vars */
+
+class App {
   static get CONFIG() {
     return {
       COOKIES_CHECK: {
@@ -67,7 +70,6 @@ z.main.App = class App {
 
     this._subscribeToEvents();
 
-    this.initDebugging();
     this.initApp();
     this.initServiceWorker();
   }
@@ -277,7 +279,7 @@ z.main.App = class App {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-        const protoFile = `ext/proto/@wireapp/protocol-messaging/messages.proto?${z.util.Environment.version(false)}`;
+        const protoFile = `/proto/messages.proto?${z.util.Environment.version(false)}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
@@ -802,16 +804,6 @@ z.main.App = class App {
   }
 
   /**
-   * Initialize debugging features.
-   * @returns {undefined} No return value
-   */
-  initDebugging() {
-    if (z.util.Environment.frontend.isLocalhost()) {
-      this._attachLiveReload();
-    }
-  }
-
-  /**
    * Report call telemetry to Raygun for analysis.
    * @returns {undefined} No return value
    */
@@ -819,22 +811,10 @@ z.main.App = class App {
     this.repository.calling.reportCall();
   }
 
-  /**
-   * Attach live reload on localhost.
-   * @returns {undefined} No return value
-   */
-  _attachLiveReload() {
-    const liveReload = document.createElement('script');
-    liveReload.id = 'liveReload';
-    liveReload.src = 'http://localhost:32123/livereload.js';
-    document.body.appendChild(liveReload);
-    $('html').addClass('development');
-  }
-
   _onExtraInstanceStarted() {
     return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
   }
-};
+}
 
 //##############################################################################
 // Setting up the App
@@ -842,6 +822,8 @@ z.main.App = class App {
 
 $(() => {
   if ($('#wire-main-app').length !== 0) {
-    wire.app = new z.main.App(wire.auth);
+    wire.app = new App(wire.auth);
   }
 });
+
+export default App;

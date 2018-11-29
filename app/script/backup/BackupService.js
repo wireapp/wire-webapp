@@ -19,6 +19,8 @@
 
 'use strict';
 
+import DexieBatch from 'dexie-batch';
+
 window.z = window.z || {};
 window.z.backup = z.backup || {};
 

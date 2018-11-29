@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:audio/AudioRepository
+// KARMA_SPECS=audio/AudioRepository yarn test:app
 
 'use strict';
 

@@ -19,14 +19,14 @@
 
 const webpack = require('webpack');
 const commonConfig = require('./webpack.config.common');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const TerserJSPlugin = require('terser-webpack-plugin');
 
 module.exports = Object.assign({}, commonConfig, {
   mode: 'production',
   optimization: {
     ...commonConfig.optimization,
     minimizer: [
-      new UglifyJSPlugin({
+      new TerserJSPlugin({
         /* Dexie has issues with UglifyJS */
         exclude: /dexie/g,
         sourceMap: true,

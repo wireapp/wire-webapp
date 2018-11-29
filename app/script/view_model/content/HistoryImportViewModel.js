@@ -19,6 +19,8 @@
 
 'use strict';
 
+import JSZip from 'jszip';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};

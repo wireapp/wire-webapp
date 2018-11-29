@@ -17,9 +17,11 @@
  *
  */
 
-// grunt test_run:util/Util
+// KARMA_SPECS=util/Util yarn test:app
 
 'use strict';
+
+import ko from 'knockout';
 
 describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {

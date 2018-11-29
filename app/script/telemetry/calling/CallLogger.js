@@ -1,3 +1,6 @@
+import CryptoJS from 'crypto-js';
+import sdpTransform from 'sdp-transform';
+
 z.telemetry.calling.CallLogger = class CallLogger {
   static get CONFIG() {
     return {
@@ -71,11 +74,11 @@ z.telemetry.calling.CallLogger = class CallLogger {
   }
 
   obfuscateSdp(sdpMessage) {
-    if (!sdpMessage || !window.sdpTransform) {
+    if (!sdpMessage) {
       return '[Unknown]';
     }
 
-    const decodedSdpMessage = window.sdpTransform.parse(sdpMessage);
+    const decodedSdpMessage = sdpTransform.parse(sdpMessage);
 
     decodedSdpMessage.media.forEach(({fingerprint, icePwd, invalid}, index) => {
       // Remove fingerprints
@@ -101,7 +104,7 @@ z.telemetry.calling.CallLogger = class CallLogger {
       }
     });
 
-    return window.sdpTransform.write(decodedSdpMessage);
+    return sdpTransform.write(decodedSdpMessage);
   }
 
   getDebugType(number) {

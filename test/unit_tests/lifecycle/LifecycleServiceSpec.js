@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:lifecycle/LifecycleService
+// KARMA_SPECS=lifecycle/LifecycleService yarn test:app
 
 'use strict';
 

@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/KeyboardUtil
+// KARMA_SPECS=util/KeyboardUtil yarn test:app
 
 'use strict';
 

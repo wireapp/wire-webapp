@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_run:storage/StorageRepository
+// KARMA_SPECS=storage/StorageRepository yarn test:app
 
 describe('z.storage.StorageRepository', () => {
   const test_factory = new TestFactory();

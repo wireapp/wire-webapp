@@ -21,6 +21,8 @@
 
 'use strict';
 
+import ko from 'knockout';
+
 /**
  * @param {function} [logger_level] - A function returning the logger level.
  * @returns {Window.TestFactory} A TestFactory instance.

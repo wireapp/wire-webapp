@@ -19,6 +19,8 @@
 
 'use strict';
 
+import poster from 'poster-image';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 

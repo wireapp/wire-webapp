@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/EventMapper
+// KARMA_SPECS=conversation/EventMapper yarn test:app
 
 'use strict';
 
@@ -28,7 +28,7 @@ describe('Event Mapper', () => {
 
   beforeAll(() => {
     return z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
       .then(() => test_factory.exposeUserActors())
       .then(() => {
         wire.app = {
