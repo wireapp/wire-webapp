@@ -5,15 +5,11 @@
 /app/ext
 /app/i18n/**/*
 !/app/i18n/**/*.json
-/dist
-!/dist/templates/
-!/dist/robots/
-!/dist/app-app-site-association.json
 /doc
 /docs/auth-coverage
 /docs/coverage
 /keys
-/node_modules
+node_modules
 /package-lock.json
 /tags
 aws-keys.json

@@ -32,11 +32,11 @@ module.exports = grunt => {
       style: 'app/style',
     },
     dist: {
-      s3: 'dist/s3',
-      static: 'dist/static',
-      templates: 'dist/templates',
+      s3: 'server/dist/s3',
+      static: 'server/dist/static',
+      templates: 'server/dist/templates',
     },
-    dist_: 'dist',
+    dist_: 'server/dist',
     docs: {
       api: 'docs/api',
       coverage: 'docs/coverage',

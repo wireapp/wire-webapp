@@ -22,14 +22,16 @@
 // https://github.com/gruntjs/grunt-contrib-compress
 
 module.exports = {
-  files: [
-    {
-      cwd: '<%= dir.dist_ %>',
-      expand: true,
-      src: ['../package.json', '**/*', '.**/*', '!<%= dir.dist.s3 %>'],
+  server: {
+    files: [
+      {
+        cwd: '<%= dir.dist_ %>',
+        expand: true,
+        src: ['../package.json', '**/*', '.**/*', '!<%= dir.dist.s3 %>'],
+      },
+    ],
+    options: {
+      archive: '<%= dir.dist.s3 %>/ebs.zip',
     },
-  ],
-  options: {
-    archive: '<%= dir.dist.s3 %>/ebs.zip',
   },
 };

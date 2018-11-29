@@ -67,7 +67,7 @@ class Server {
 
   private initWebpack() {
     if (this.config.SERVER.DEVELOPMENT) {
-      const webpackCompiler = require('webpack')(require('../webpack.config.dev'));
+      const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
       const webpackDevMiddleware = require('webpack-dev-middleware');
       const webpackHotMiddleware = require('webpack-hot-middleware');
 

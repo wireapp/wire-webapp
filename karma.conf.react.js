@@ -17,7 +17,7 @@
  *
  */
 
-const dist = 'dist/static/min';
+const dist = 'server/dist/static/min';
 const test = 'test';
 
 const preprocessors = {};
