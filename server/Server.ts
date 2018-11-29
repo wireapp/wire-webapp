@@ -149,6 +149,7 @@ class Server {
     this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
     this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
     this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
+    this.app.use('/proto', express.static(path.join(__dirname, 'static', 'proto')));
     this.app.use('/style', express.static(path.join(__dirname, 'static', 'style')));
     this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
 
