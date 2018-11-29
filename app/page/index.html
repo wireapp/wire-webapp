@@ -6,7 +6,11 @@
     #include('meta.htm')
     #include('graph.htm')
     <title>Wire</title>
-    <style>#include('../../../server/dist/static/style/main.css')</style>
+    <style type="text/css">#include('../../../server/dist/static/style/default.css')</style>
+    <link type="text/css" rel="prefetch" href="style/dark.css?{{@config.VERSION}}" data-bind="attr: { rel: isDarkMode() ? 'stylesheet' : 'prefetch' }" />
+    <!-- ko if: isTransitioning() -->
+    <style type="text/css">#include('../../../server/dist/static/style/transitioning.css')</style>
+    <!-- /ko -->
   </head>
 
   <body>
