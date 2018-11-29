@@ -61,6 +61,5 @@ module.exports = grunt => {
     'includereplace:prod_auth',
     'includereplace:prod_login',
     'clean:dist_app',
-    'clean:dist_script',
   ]);
 };
