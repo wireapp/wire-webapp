@@ -23,6 +23,7 @@ class PropertiesRepository {
   static get CONFIG() {
     return {
       PROPERTIES_KEY: 'webapp',
+      WIRE_ENABLE_READ_RECEIPTS: 'WIRE_ENABLE_READ_RECEIPTS',
     };
   }
 
@@ -100,20 +101,33 @@ class PropertiesRepository {
     return this.selfUser().isTemporaryGuest() ? this._initTemporaryGuestAccount() : this._initActivatedAccount();
   }
 
+  _fetchWebAppSettings() {
+    return this.propertiesService
+      .getPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY)
+      .then(properties => $.extend(true, this.properties, properties));
+  }
+
+  _fetchReadReceiptsSetting() {
+    return this.propertiesService
+      .getPropertiesByKey(PropertiesRepository.CONFIG.WIRE_ENABLE_READ_RECEIPTS)
+      .then(enableReadReceipts => (this.properties.settings.privacy.enable_read_receipts = enableReadReceipts));
+  }
+
   _initActivatedAccount() {
+    const propertiesMapping = {
+      [PropertiesRepository.CONFIG.PROPERTIES_KEY]: this._fetchWebAppSettings,
+      [PropertiesRepository.CONFIG.WIRE_ENABLE_READ_RECEIPTS]: this._fetchReadReceiptsSetting,
+    };
+
     return this.propertiesService
       .getProperties()
       .then(keys => {
-        if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
-          return this.propertiesService
-            .getPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY)
-            .then(properties => {
-              $.extend(true, this.properties, properties);
-              this.logger.info('Loaded user properties', this.properties);
-            });
-        }
+        const settingCalls = keys.map(key => propertiesMapping[key]).filter(Boolean);
 
-        this.logger.info('No properties found: Using default properties');
+        if (settingCalls.length) {
+          return Promise.all(settingCalls).then(() => this.logger.info('Loaded user properties', this.properties));
+        }
+        this.logger.info('No properties found: Using default properties', this.properties);
       })
       .then(() => this._publishProperties());
   }
