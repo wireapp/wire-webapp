@@ -19,6 +19,8 @@
 
 'use strict';
 
+const path = require('path');
+
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
@@ -70,25 +72,53 @@ module.exports = grunt => {
 
   grunt.registerTask('init', 'npmBower');
 
-  grunt.registerTask('app_deploy_travis', ['set_version', 'prepare', 'aws_prepare']);
-
-  grunt.registerTask('build_dev', [
+  grunt.registerTask('build', [
     'clean:dist',
     'clean:dist_app',
     'clean:dist_s3',
     'set_version',
-    'build_dev_style',
+    'build_style',
     'copy:dist',
     'copy:dist_audio',
     'copy:dist_favicon',
-    'build_dev_markup',
+    'build_markup',
   ]);
 
-  grunt.registerTask('build_dev_style', ['shell:less', 'postcss']);
+  grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
-  grunt.registerTask('build_dev_markup', [
+  grunt.registerTask('build_markup', [
     'includereplace:prod_index',
     'includereplace:prod_auth',
     'includereplace:prod_login',
   ]);
+
+  grunt.registerTask('build_prod', ['build', 'shell:dist_bundle', 'compress']);
+
+  grunt.registerTask('set_version', () => {
+    grunt.task.run('gitinfo');
+    const target = grunt.config('gitinfo.local.branch.current.name');
+    grunt.log.ok(`Version target set to ${target}`);
+
+    let user = grunt.config('gitinfo.local.branch.current.currentUser');
+    if (user) {
+      user = user.substr(0, user.indexOf(' ')).toLowerCase();
+    }
+
+    const date = new Date();
+    const month = `0${date.getMonth() + 1}`.slice(-2);
+    const day = `0${date.getDate()}`.slice(-2);
+    const hour = `0${date.getHours()}`.slice(-2);
+    const minute = `0${date.getMinutes()}`.slice(-2);
+
+    let version = `${date.getFullYear()}-${month}-${day}-${hour}-${minute}`;
+    if (user) {
+      version = `${version}-${user}`;
+    }
+    if (target) {
+      version = `${version}-${target}`;
+    }
+
+    grunt.log.ok(`Version set to ${version}`);
+    grunt.file.write(path.join('server', 'dist', 'version'), version);
+  });
 };
