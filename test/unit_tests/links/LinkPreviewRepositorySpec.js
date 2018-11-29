@@ -19,13 +19,15 @@
 
 'use strict';
 
+import PropertiesRepository from 'app/script/properties/PropertiesRepository';
+
 // KARMA_SPECS=links/LinkPreviewRepository yarn test:app
 
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
-    const properties_repository = new z.properties.PropertiesRepository();
+    const properties_repository = new PropertiesRepository();
     link_preview_repository = new z.links.LinkPreviewRepository(undefined, properties_repository);
   });
 
