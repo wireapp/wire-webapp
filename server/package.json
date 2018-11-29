@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "0.6.27",
+    "@wireapp/commons": "0.9.16",
     "dotenv": "6.1.0",
     "express": "4.16.4",
     "express-sitemap-xml": "1.0.2",
@@ -35,8 +35,11 @@
     "typescript": "3.1.6"
   },
   "scripts": {
-    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
     "build": "tsc -P tsconfig.json",
-    "lint": "tslint --config tslint.json --project tsconfig.json"
+    "fix": "yarn fix:ts",
+    "fix:ts": "yarn lint:ts --fix",
+    "lint": "yarn lint:ts",
+    "lint:ts": "tslint --config tslint.json --project tsconfig.json",
+    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs"
   }
 }
