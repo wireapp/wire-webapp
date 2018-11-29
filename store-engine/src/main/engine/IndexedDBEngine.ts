@@ -78,20 +78,27 @@ export default class IndexedDBEngine implements CRUDEngine {
     return this.db ? this.db.delete() : Dexie.delete(this.storeName);
   }
 
+  private mapDatabaseError(error: Dexie.DexieError, tableName: string, primaryKey: string): Error {
+    const isAlreadyExisting = error instanceof Dexie.ConstraintError;
+    /** @see https://github.com/dfahlander/Dexie.js/issues/776 */
+    const hasNotEnoughDiskSpace =
+      error.name === Dexie.errnames.QuotaExceeded || (error.inner && error.inner.name === Dexie.errnames.QuotaExceeded);
+
+    if (isAlreadyExisting) {
+      const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+      return new RecordAlreadyExistsError(message);
+    } else if (hasNotEnoughDiskSpace) {
+      const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
+      return new LowDiskSpaceError(message);
+    } else {
+      return error;
+    }
+  }
+
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
       return this.db![tableName].add(entity, primaryKey).catch((error: Dexie.DexieError) => {
-        if (error instanceof Dexie.ConstraintError) {
-          const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
-          throw new RecordAlreadyExistsError(message);
-        } else if (error instanceof Dexie.AbortError) {
-          // TODO: Exchange with "Dexie.QuotaExceededError" when bug in Dexie gets fixed:
-          // https://github.com/dfahlander/Dexie.js/issues/776
-          const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
-          throw new LowDiskSpaceError(message);
-        } else {
-          throw error;
-        }
+        throw this.mapDatabaseError(error, tableName, primaryKey);
       });
     }
     const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
