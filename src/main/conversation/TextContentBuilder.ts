@@ -18,7 +18,14 @@
  */
 
 import {PayloadBundleOutgoingUnsent} from '../conversation/';
-import {LinkPreviewUploadedContent, MentionContent, QuoteContent, TextContent} from '../conversation/content/';
+import {
+  LinkPreviewUploadedContent,
+  MentionContent,
+  QuoteContent,
+  QuoteMessageContent,
+  TextContent,
+} from '../conversation/content/';
+import {MessageHashService} from '../cryptography/';
 
 class TextContentBuilder {
   private readonly content: TextContent;
@@ -50,9 +57,21 @@ class TextContentBuilder {
     return this;
   }
 
-  public withQuote(quote?: QuoteContent): TextContentBuilder {
+  public withQuote(quote: QuoteMessageContent, timestamp: number): TextContentBuilder;
+  public withQuote(quote?: QuoteContent): TextContentBuilder;
+  public withQuote(quote?: QuoteContent | QuoteMessageContent, timestamp?: number): TextContentBuilder {
     if (quote) {
-      this.content.quote = quote;
+      if (timestamp) {
+        const messageHashService = new MessageHashService((quote as QuoteMessageContent).content, timestamp);
+        const messageHashBuffer = messageHashService.getHash();
+
+        this.content.quote = {
+          quotedMessageId: quote.quotedMessageId,
+          quotedMessageSha256: new Uint8Array(messageHashBuffer),
+        };
+      } else {
+        this.content.quote = quote as QuoteContent;
+      }
     }
 
     return this;

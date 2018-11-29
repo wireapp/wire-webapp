@@ -163,20 +163,16 @@ const {FileEngine} = require('@wireapp/store-engine');
 
     const {id: messageId} = await account.service.conversation.send(CONVERSATION_ID, textPayload);
 
-    const sha256String = crypto
-      .createHash('sha256')
-      .update(text)
-      .digest('hex');
-    const quotedMessageSha256 = new Uint8Array(Buffer.from(sha256String));
-
     const quoteText = 'Hello again';
+
+    const quote = {
+      content: textPayload.content,
+      quotedMessageId: messageId,
+    };
 
     const quotePayload = account.service.conversation
       .createText(quoteText)
-      .withQuote({
-        quotedMessageId: messageId,
-        quotedMessageSha256,
-      })
+      .withQuote(quote, textPayload.timestamp)
       .build();
 
     await account.service.conversation.send(CONVERSATION_ID, quotePayload);
