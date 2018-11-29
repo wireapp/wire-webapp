@@ -205,6 +205,10 @@ z.main.App = class App {
       calling: new z.calling.CallingService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
+      // Can be removed once desktop version with the following PR has been published (probably v3.5):
+      // https://github.com/wireapp/wire-desktop/pull/1938/files
+      connect_google: {},
+      connectGoogle: {},
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
