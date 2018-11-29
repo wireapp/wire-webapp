@@ -18,10 +18,10 @@
  */
 
 import platform from 'platform';
+import PropertiesRepository from '../properties/PropertiesRepository';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
-
 import auth from './auth';
 /* eslint-enable no-unused-vars */
 
@@ -118,7 +118,7 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
+    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
