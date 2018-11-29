@@ -23,7 +23,7 @@ const {CSSDiffReducer} = require('@pwnsdx/css-diff-reducer');
 const fs = require('fs-extra');
 const path = require('path');
 
-const dist = path.resolve(__dirname, '../deploy/style');
+const dist = path.resolve(__dirname, '../server/dist/static/style');
 const DEFAULT_CSS = `${dist}/default.css`;
 const DARK_MODE_CSS = `${dist}/dark.css`;
 
