@@ -35,8 +35,11 @@
     "typescript": "3.1.6"
   },
   "scripts": {
-    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
     "build": "tsc -P tsconfig.json",
-    "lint": "tslint --config tslint.json --project tsconfig.json"
+    "fix": "yarn fix:ts",
+    "fix:ts": "yarn lint:ts --fix",
+    "lint": "yarn lint:ts",
+    "lint:ts": "tslint --config tslint.json --project tsconfig.json",
+    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs"
   }
 }
