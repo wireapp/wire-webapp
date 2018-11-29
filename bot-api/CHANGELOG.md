@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@2.1.43...@wireapp/bot-api@3.0.0) (2018-11-29)
+
+
+* [ci skip] feat(core): Read receipts [BREAKING] (WEBFOUND-56) (#1336) ([f7501b3](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/f7501b3)), closes [#1336](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1336)
+
+
+### BREAKING CHANGES
+
+* removed createConfirmation(), removed ConfirmationType, changed the method signature of createPing()
+
+
+
+
+
 ## [2.1.43](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@2.1.42...@wireapp/bot-api@2.1.43) (2018-11-27)
 
 **Note:** Version bump only for package @wireapp/bot-api
