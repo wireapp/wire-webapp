@@ -28,7 +28,7 @@ module.exports = {
       debounceDelay: 250,
       spawn: false,
     },
-    tasks: ['build_dev_markup'],
+    tasks: ['build_markup'],
   },
   options: {
     livereload: 32123,
@@ -39,6 +39,6 @@ module.exports = {
       debounceDelay: 250,
       spawn: false,
     },
-    tasks: ['build_dev_style'],
+    tasks: ['build_style'],
   },
 };
