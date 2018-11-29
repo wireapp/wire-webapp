@@ -1,6 +1,5 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
-.DS_Store
 /.idea/**/*.xml
 /app/ext
 /app/i18n/**/*
@@ -12,6 +11,7 @@
 node_modules
 /package-lock.json
 /tags
+/temp
 aws-keys.json
 npm-debug.log
 yarn-error.log
