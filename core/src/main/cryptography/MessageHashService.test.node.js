@@ -111,7 +111,7 @@ describe('MessageHashService', () => {
       expect(hashValue).toBe(expectedHashValue);
     });
 
-    it('correctly creates a location bytes buffer.', async () => {
+    it('correctly creates a location bytes buffer.', () => {
       const expectedHashValue = '56a5fa30081bc16688574fdfbbe96c2eee004d1fb37dc714eec6efb340192816';
 
       const content = {

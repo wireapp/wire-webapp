@@ -20,4 +20,4 @@
 export * from './CryptographyService';
 export * from './EncryptedAsset';
 export * from './SessionPayloadBundle';
-export * from './MessageHashService.node';
+export * from './MessageHashService';
