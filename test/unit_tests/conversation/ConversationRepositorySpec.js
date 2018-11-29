@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ConversationRepository
+// KARMA_SPECS=conversation/ConversationRepository yarn test:app
 
 'use strict';
 
@@ -57,7 +57,7 @@ describe('ConversationRepository', () => {
     return conversation;
   };
 
-  beforeAll(() => z.util.protobuf.loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto'));
+  beforeAll(() => z.util.protobuf.loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto'));
 
   beforeEach(() => {
     server = sinon.fakeServer.create();

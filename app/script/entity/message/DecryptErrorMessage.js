@@ -19,12 +19,14 @@
 
 'use strict';
 
+import {errors as ProteusErrors} from '@wireapp/proteus';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Message {
   static get REMOTE_IDENTITY_CHANGED_ERROR() {
-    return Proteus.errors.DecryptError.CODE.CASE_204.toString();
+    return ProteusErrors.DecryptError.CODE.CASE_204.toString();
   }
 
   constructor() {

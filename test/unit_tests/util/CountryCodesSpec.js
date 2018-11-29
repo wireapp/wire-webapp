@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/CountryCodes
+// KARMA_SPECS=util/CountryCodes yarn test:app
 
 'use strict';
 

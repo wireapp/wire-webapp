@@ -28,18 +28,10 @@ module.exports = {
       debounceDelay: 250,
       spawn: false,
     },
-    tasks: ['build_dev_markup'],
+    tasks: ['build_markup'],
   },
   options: {
     livereload: 32123,
-  },
-  script: {
-    files: ['<%= dir.app_ %>/**/*.js'],
-    options: {
-      debounceDelay: 250,
-      spawn: false,
-    },
-    tasks: ['build_dev_script'],
   },
   style: {
     files: ['<%= dir.app_ %>/**/*.less'],
@@ -47,6 +39,6 @@ module.exports = {
       debounceDelay: 250,
       spawn: false,
     },
-    tasks: ['build_dev_style'],
+    tasks: ['build_style'],
   },
 };

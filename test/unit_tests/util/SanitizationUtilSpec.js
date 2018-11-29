@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/SanitizationUtil
+// KARMA_SPECS=util/SanitizationUtil yarn test:app
 
 'use strict';
 

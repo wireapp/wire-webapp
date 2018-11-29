@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_run:message/MessageCategorization
+// KARMA_SPECS=message/MessageCategorization yarn test:app
 
 describe('z.message.MessageCategorization', () => {
   describe('categoryFromEvent', () => {

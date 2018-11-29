@@ -1,0 +1,6 @@
+node_modules/
+dist/*
+!dist/templates/
+!dist/robots/
+!dist/apple-app-site-association.json
+!dist/.ebextensions/

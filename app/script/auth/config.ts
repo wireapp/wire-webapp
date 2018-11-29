@@ -39,6 +39,7 @@ declare global {
           CHECK_CONSENT: boolean;
           ENABLE_DEBUG: boolean;
           ENABLE_SSO: boolean;
+          SHOW_LOADING_INFORMATION: boolean;
         };
       };
     };

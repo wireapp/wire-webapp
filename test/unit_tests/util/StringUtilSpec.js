@@ -17,9 +17,11 @@
  *
  */
 
-// grunt test_run:util/StringUtil
+// KARMA_SPECS=util/StringUtil yarn test:app
 
 'use strict';
+
+import _ from 'underscore';
 
 describe('z.util.StringUtil', () => {
   describe('compareTransliteration', () => {

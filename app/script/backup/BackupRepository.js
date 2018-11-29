@@ -19,6 +19,8 @@
 
 'use strict';
 
+import JSZip from 'jszip';
+
 window.z = window.z || {};
 window.z.backup = z.backup || {};
 

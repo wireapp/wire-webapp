@@ -29,19 +29,11 @@ module.exports = {
   //##############################################################################
   docs: '<%= dir.docs %>',
   docs_coverage: '<%= dir.docs.coverage %>',
-  temp: '<%= dir.temp %>',
-
-  //##############################################################################
-  // Production/Staging/Edge deployment related
-  //##############################################################################
-  deploy: '<%= dir.deploy %>',
-  deploy_app: '<%= dir.deploy %>/app',
-  deploy_script: ['<%= dir.deploy %>/script'],
 
   //##############################################################################
   // Amazon Web Services related
   //##############################################################################
-  aws: '<%= dir.aws.static %>',
-  aws_app: '<%= dir.aws.templates %>/app',
-  aws_s3: '<%= dir.aws.s3 %>',
+  dist: '<%= dir.dist.static %>',
+  dist_app: '<%= dir.dist.templates %>/app',
+  dist_s3: '<%= dir.dist.s3 %>',
 };

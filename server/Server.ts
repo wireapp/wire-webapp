@@ -67,7 +67,7 @@ class Server {
 
   private initWebpack() {
     if (this.config.SERVER.DEVELOPMENT) {
-      const webpackCompiler = require('webpack')(require('../webpack.config.dev'));
+      const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
       const webpackDevMiddleware = require('webpack-dev-middleware');
       const webpackHotMiddleware = require('webpack-hot-middleware');
 
@@ -149,6 +149,7 @@ class Server {
     this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
     this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
     this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
+    this.app.use('/proto', express.static(path.join(__dirname, 'static', 'proto')));
     this.app.use('/style', express.static(path.join(__dirname, 'static', 'style')));
     this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
 

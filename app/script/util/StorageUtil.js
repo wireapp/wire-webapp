@@ -18,6 +18,7 @@
  */
 
 'use strict';
+import {amplify} from 'amplify';
 
 window.z = window.z || {};
 window.z.util = z.util || {};

@@ -21,6 +21,8 @@
 
 'use strict';
 
+import moment from 'moment';
+
 /**
  * @typedef {object} DiscreteTimeUnit
  * @property {string} longUnit

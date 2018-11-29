@@ -27,10 +27,10 @@ const processors = [
 ];
 
 module.exports = {
-  deploy: {
-    options: {
-      processors,
-    },
-    src: '<%= dir.deploy %>/**/*.css',
+  dist: {
+    src: '<%= dir.dist.static %>/**/*.css',
+  },
+  options: {
+    processors,
   },
 };

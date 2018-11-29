@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:search/SearchRepository
+// KARMA_SPECS=search/SearchRepository yarn test:app
 
 'use strict';
 

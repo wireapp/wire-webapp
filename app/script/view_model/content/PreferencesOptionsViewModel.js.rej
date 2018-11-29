@@ -1,0 +1,5 @@
+diff a/app/script/view_model/content/PreferencesOptionsViewModel.js b/app/script/view_model/content/PreferencesOptionsViewModel.js	(rejected hunks)
+@@ -100,2 +100 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
+-  setTheme(isDarkModeActivated) {
+-  }
++  setTheme(isDarkModeActivated) {}

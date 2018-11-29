@@ -387,7 +387,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
 
     if (accessCode.uri && isTeamConversation) {
-      conversationEntity.accessCode(accessCode.uri);
+      const accessCodeUrl = `${window.wire.env.APP_BASE}/join/?key=${accessCode.key}&code=${accessCode.code}`;
+      conversationEntity.accessCode(accessCodeUrl);
     }
   }
 

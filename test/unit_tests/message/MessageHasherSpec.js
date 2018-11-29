@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:message/MessageHasher
+// KARMA_SPECS=message/MessageHasher yarn test:app
 
 'use strict';
 

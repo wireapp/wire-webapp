@@ -17,50 +17,51 @@
  *
  */
 
-// grunt test_run:localization/Localizer
+// KARMA_SPECS=localization/Localizer yarn test:app
+import ko from 'knockout';
 
-'use strict';
+import localizer from '../../../app/script/localization/Localizer';
 
 describe('l10n', () => {
   describe('text', () => {
     it('can get localized strings', () => {
-      const text = z.l10n.text(z.string.wire);
+      const text = localizer.text(z.string.wire);
 
       expect(text).toBe(z.string.wire);
     });
 
     it('can get localized strings when value is observable', () => {
-      const text = z.l10n.text(ko.observable(z.string.wire));
+      const text = localizer.text(ko.observable(z.string.wire));
 
       expect(text).toBe(z.string.wire);
     });
 
     it('can replace placeholders in localized strings using shorthand string version', () => {
-      const text = z.l10n.text('Hey {{name}}', 'Tod');
+      const text = localizer.text('Hey {{name}}', 'Tod');
 
       expect(text).toBe('Hey Tod');
     });
 
     it('can replace placeholders in localized strings using shorthand number version', () => {
-      const text = z.l10n.text('Number {{name}} is alive', 5);
+      const text = localizer.text('Number {{name}} is alive', 5);
 
       expect(text).toBe('Number 5 is alive');
     });
 
     it('can replace placeholders in localized strings using an object', () => {
-      const text = z.l10n.text('Hey {{name}}', {name: 'Tod'});
+      const text = localizer.text('Hey {{name}}', {name: 'Tod'});
 
       expect(text).toBe('Hey Tod');
     });
 
     it('can replace placeholders in localized strings using a more complex object', () => {
-      const text = z.l10n.text('{{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
+      const text = localizer.text('{{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
 
       expect(text).toBe('Hey Tod');
     });
 
     it('can replace duplicate placeholders in localized strings using a more complex object', () => {
-      const text = z.l10n.text('{{greeting}} {{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
+      const text = localizer.text('{{greeting}} {{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
 
       expect(text).toBe('Hey Hey Tod');
     });
@@ -75,7 +76,7 @@ describe('l10n', () => {
       ];
 
       tests.forEach(({raw, expected}) => {
-        const result = z.l10n.safeHtml(raw);
+        const result = localizer.safeHtml(raw);
 
         expect(result).toBe(expected);
       });
@@ -98,7 +99,7 @@ describe('l10n', () => {
       ];
 
       tests.forEach(({params, expected}) => {
-        const result = z.l10n.safeHtml(params.text, params.substitutions);
+        const result = localizer.safeHtml(params.text, params.substitutions);
 
         expect(result).toBe(expected);
       });
@@ -133,7 +134,7 @@ describe('l10n', () => {
       ];
 
       tests.forEach(({params, expected}) => {
-        const result = z.l10n.safeHtml(params.text, params.substitutions);
+        const result = localizer.safeHtml(params.text, params.substitutions);
 
         expect(result).toBe(expected);
       });
@@ -160,7 +161,7 @@ describe('l10n', () => {
       ];
 
       tests.forEach(({params, expected}) => {
-        const result = z.l10n.safeHtml(params.text, params.substitutions);
+        const result = localizer.safeHtml(params.text, params.substitutions);
 
         expect(result).toBe(expected);
       });
@@ -178,7 +179,7 @@ describe('l10n', () => {
       ];
 
       tests.forEach(({params, expected}) => {
-        const result = z.l10n.safeHtml(params.text, params.substitutions);
+        const result = localizer.safeHtml(params.text, params.substitutions);
 
         expect(result).toBe(expected);
       });

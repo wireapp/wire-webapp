@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:util/PromiseQueue
+// KARMA_SPECS=util/PromiseQueue yarn test:app
 
 'use strict';
 

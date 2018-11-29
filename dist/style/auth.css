@@ -1,0 +1,6028 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+/**
+ * 1. Set default font family to sans-serif.
+ * 2. Prevent iOS and IE text size adjust after device orientation change,
+ *    without disabling user zoom.
+ */
+html {
+  font-family: sans-serif;
+  /* 1 */
+  -ms-text-size-adjust: 100%;
+  /* 2 */
+  -webkit-text-size-adjust: 100%;
+  /* 2 */
+}
+/**
+ * Remove default margin.
+ */
+body {
+  margin: 0;
+}
+/* HTML5 display definitions
+   ========================================================================== */
+/**
+ * Correct `block` display not defined for any HTML5 element in IE 8/9.
+ * Correct `block` display not defined for `details` or `summary` in IE 10/11
+ * and Firefox.
+ * Correct `block` display not defined for `main` in IE 11.
+ */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+/**
+ * 1. Correct `inline-block` display not defined in IE 8/9.
+ * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
+ */
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  /* 1 */
+  vertical-align: baseline;
+  /* 2 */
+}
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+/**
+ * Address `[hidden]` styling not present in IE 8/9/10.
+ * Hide the `template` element in IE 8/9/10/11, Safari, and Firefox < 22.
+ */
+[hidden],
+template {
+  display: none;
+}
+/* Links
+   ========================================================================== */
+/**
+ * Remove the gray background color from active links in IE 10.
+ */
+a {
+  background-color: transparent;
+}
+/**
+ * Improve readability of focused elements when they are also in an
+ * active/hover state.
+ */
+a:active,
+a:hover {
+  outline: 0;
+}
+/* Text-level semantics
+   ========================================================================== */
+/**
+ * Address styling not present in IE 8/9/10/11, Safari, and Chrome.
+ */
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+/**
+ * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
+ */
+b,
+strong {
+  font-weight: bold;
+}
+/**
+ * Address styling not present in Safari and Chrome.
+ */
+dfn {
+  font-style: italic;
+}
+/**
+ * Address variable `h1` font-size and margin within `section` and `article`
+ * contexts in Firefox 4+, Safari, and Chrome.
+ */
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+/**
+ * Address styling not present in IE 8/9.
+ */
+mark {
+  background: #ff0;
+  color: #000;
+}
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+small {
+  font-size: 80%;
+}
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+/* Embedded content
+   ========================================================================== */
+/**
+ * Remove border when inside `a` element in IE 8/9/10.
+ */
+img {
+  border: 0;
+}
+/**
+ * Correct overflow not hidden in IE 9/10/11.
+ */
+svg:not(:root) {
+  overflow: hidden;
+}
+/* Grouping content
+   ========================================================================== */
+/**
+ * Address margin not present in IE 8/9 and Safari.
+ */
+figure {
+  margin: 1em 40px;
+}
+/**
+ * Address differences between Firefox and other browsers.
+ */
+hr {
+  box-sizing: content-box;
+  height: 0;
+}
+/**
+ * Contain overflow in all browsers.
+ */
+pre {
+  overflow: auto;
+}
+/**
+ * Address odd `em`-unit font size rendering in all browsers.
+ */
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+/* Forms
+   ========================================================================== */
+/**
+ * Known limitation: by default, Chrome and Safari on OS X allow very limited
+ * styling of `select`, unless a `border` property is set.
+ */
+/**
+ * 1. Correct color not being inherited.
+ *    Known issue: affects color of disabled elements.
+ * 2. Correct font properties not being inherited.
+ * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
+ */
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  /* 1 */
+  font: inherit;
+  /* 2 */
+  margin: 0;
+  /* 3 */
+}
+/**
+ * Address `overflow` set to `hidden` in IE 8/9/10/11.
+ */
+button {
+  overflow: visible;
+}
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
+ * Correct `select` style inheritance in Firefox.
+ */
+button,
+select {
+  text-transform: none;
+}
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ */
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  /* 2 */
+  cursor: pointer;
+  /* 3 */
+}
+/**
+ * Re-set default cursor for disabled elements.
+ */
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+/**
+ * Remove inner padding and border in Firefox 4+.
+ */
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+/**
+ * Address Firefox 4+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+input {
+  line-height: normal;
+}
+/**
+ * It's recommended that you don't attempt to style these elements.
+ * Firefox's implementation doesn't respect box-sizing, padding, or width.
+ *
+ * 1. Address box sizing set to `content-box` in IE 8/9/10.
+ * 2. Remove excess padding in IE 8/9/10.
+ */
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  /* 1 */
+  padding: 0;
+  /* 2 */
+}
+/**
+ * Fix the cursor style for Chrome's increment/decrement buttons. For certain
+ * `font-size` values of the `input`, it causes the cursor style of the
+ * decrement button to change from `default` to `text`.
+ */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari and Chrome.
+ */
+input[type="search"] {
+  -webkit-appearance: textfield;
+  /* 1 */
+  box-sizing: content-box;
+  /* 2 */
+}
+/**
+ * Remove inner padding and search cancel button in Safari and Chrome on OS X.
+ * Safari (but not Chrome) clips the cancel button when the search input has
+ * padding (and `textfield` appearance).
+ */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+/**
+ * Define consistent border, margin, and padding.
+ */
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+/**
+ * 1. Correct `color` not being inherited in IE 8/9/10/11.
+ * 2. Remove padding so people aren't caught out if they zero out fieldsets.
+ */
+legend {
+  border: 0;
+  /* 1 */
+  padding: 0;
+  /* 2 */
+}
+/**
+ * Remove default vertical scrollbar in IE 8/9/10/11.
+ */
+textarea {
+  overflow: auto;
+}
+/**
+ * Don't inherit the `font-weight` (applied by a rule above).
+ * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
+ */
+optgroup {
+  font-weight: bold;
+}
+/* Tables
+   ========================================================================== */
+/**
+ * Remove most spacing between table cells.
+ */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+@font-face {
+  font-family: 'Wire';
+  src: url('/font/Wire.ttf?call') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+[class^="icon-"],
+[class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'Wire' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-options:before {
+  content: "\e135";
+}
+.icon-wire:before {
+  content: "\e202";
+}
+.icon-plus:before {
+  content: "\e100";
+}
+.icon-minus:before {
+  content: "\e101";
+}
+.icon-check:before {
+  content: "\e102";
+}
+.icon-close:before {
+  content: "\e603";
+}
+.icon-block:before {
+  content: "\e104";
+}
+.icon-back:before {
+  content: "\e110";
+}
+.icon-forward:before {
+  content: "\e111";
+}
+.icon-down:before {
+  content: "\e113";
+}
+.icon-reload:before {
+  content: "\e117";
+}
+.icon-grid:before {
+  content: "\e123";
+}
+.icon-more:before {
+  content: "\e125";
+}
+.icon-spinner:before {
+  content: "\e126";
+}
+.icon-play:before {
+  content: "\e131";
+}
+.icon-pause:before {
+  content: "\e132";
+}
+.icon-ping:before {
+  content: "\e137";
+}
+.icon-ping-timed:before {
+  content: "\e637";
+}
+.icon-people:before {
+  content: "\e142";
+}
+.icon-camera:before {
+  content: "\e143";
+}
+.icon-library:before {
+  content: "\e145";
+}
+.icon-library-timed:before {
+  content: "\e645";
+}
+.icon-movie:before {
+  content: "\e146";
+}
+.icon-location:before {
+  content: "\e148";
+}
+.icon-file:before {
+  content: "\e152";
+}
+.icon-attachment:before {
+  content: "\e154";
+}
+.icon-attachment-timed:before {
+  content: "\e654";
+}
+.icon-speaker:before {
+  content: "\e158";
+}
+.icon-microphone:before {
+  content: "\e160";
+}
+.icon-silence:before {
+  content: "\e162";
+}
+.icon-search:before {
+  content: "\e163";
+}
+.icon-settings:before {
+  content: "\e164";
+}
+.icon-pending:before {
+  content: "\e165";
+}
+.icon-link:before {
+  content: "\e167";
+}
+.icon-envelope:before {
+  content: "\e172";
+}
+.icon-edit:before {
+  content: "\e177";
+}
+.icon-like:before {
+  content: "\e183";
+}
+.icon-like-small:before {
+  content: "\e1830";
+}
+.icon-liked:before {
+  content: "\e184";
+}
+.icon-liked-small:before {
+  content: "\e1840";
+}
+.icon-view:before {
+  content: "\e185";
+}
+.icon-trash:before {
+  content: "\e186";
+}
+.icon-delete-for-me:before {
+  content: "\e1861";
+}
+.icon-delete-for-everyone:before {
+  content: "\e1862";
+}
+.icon-download:before {
+  content: "\e197";
+}
+.icon-error:before {
+  content: "\e208";
+}
+.icon-call:before {
+  content: "\e211";
+}
+.icon-archive:before {
+  content: "\e212";
+}
+.icon-gif:before {
+  content: "\e219";
+}
+.icon-gif-timed:before {
+  content: "\e719";
+}
+.icon-end-call:before {
+  content: "\e222";
+}
+.icon-invite:before {
+  content: "\e223";
+}
+.icon-sysmsg-error:before {
+  content: "\e225";
+}
+.icon-video:before {
+  content: "\e226";
+}
+.icon-screensharing:before {
+  content: "\e227";
+}
+.icon-send:before {
+  content: "\e235";
+}
+.icon-emoji:before {
+  content: "\e237";
+}
+.icon-hourglass:before {
+  content: "\e239";
+}
+.icon-av:before {
+  content: "\e261";
+}
+.icon-dismiss:before {
+  content: "\e262";
+}
+.icon-contacts:before {
+  content: "\e602";
+}
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.modal {
+  align-items: center;
+  justify-content: center;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.modal.modal-show {
+  display: flex;
+}
+.modal:before {
+  transition-property: opacity;
+  transition-duration: .55s;
+  transition-delay: .35s;
+  transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  background-color: rgba(0, 0, 0, 0.64);
+  opacity: 0;
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.modal.modal-fadein:before {
+  transition-property: opacity;
+  transition-duration: .35s;
+  transition-delay: 0s;
+  transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  opacity: 1;
+}
+.modal.modal-fadein .modal-content {
+  transition-property: transform, opacity;
+  transition-duration: .55s, .55s;
+  transition-delay: .15s, .15s;
+  transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1), cubic-bezier(0.19, 1, 0.22, 1);
+  transform: scale(1);
+  opacity: 1;
+}
+.modal .modal-content {
+  transition-property: transform, opacity;
+  transition-duration: .35s, .35s;
+  transition-delay: 0s, 0s;
+  transition-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335), cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transform: scale(0.88);
+  opacity: 0;
+  display: block;
+  background-color: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.modal-content-anim-close {
+  transition-property: transform, opacity;
+  transition-duration: .35s, .35s;
+  transition-delay: 0s, 0s;
+  transition-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335), cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transform: scale(0.88);
+  opacity: 0;
+}
+.modal-content-anim-open {
+  transition-property: transform, opacity;
+  transition-duration: .55s, .55s;
+  transition-delay: .15s, .15s;
+  transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1), cubic-bezier(0.19, 1, 0.22, 1);
+  transform: scale(1);
+  opacity: 1;
+}
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.range-theme {
+  -webkit-appearance: none;
+  border: 0px solid transparent;
+  cursor: pointer;
+  height: 20px;
+  padding: 0px;
+}
+.range-theme:focus {
+  outline: none;
+}
+.range-theme::-moz-range-track {
+  width: 100%;
+  height: 2px;
+  border: none;
+  border-radius: 4px;
+}
+.range-theme::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  border: none;
+  border-radius: 4px;
+}
+.range-theme::-ms-track {
+  width: 100%;
+  height: 2px;
+  border: none;
+  border-radius: 4px;
+}
+.range-theme::-moz-range-thumb {
+  -webkit-appearance: none;
+  border-width: 2px;
+  border-style: solid;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  margin-top: -7px;
+}
+.range-theme::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border-width: 2px;
+  border-style: solid;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  margin-top: -7px;
+}
+.range-theme::-ms-thumb {
+  -webkit-appearance: none;
+  border-width: 2px;
+  border-style: solid;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  margin-top: -7px;
+}
+.bg-theme,
+.bg-theme {
+  background-color: #bac8d1;
+}
+.bg-theme .btn-theme,
+.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #89a1b0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.bg-theme .btn-theme:focus,
+.bg-theme .btn-theme:focus,
+.bg-theme .btn-theme.focus,
+.bg-theme .btn-theme.focus,
+.bg-theme .btn-theme:active,
+.bg-theme .btn-theme:active,
+.bg-theme .btn-theme.active,
+.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #718da0;
+  border-color: rgba(0, 0, 0, 0);
+}
+.bg-theme .btn-theme.disabled,
+.bg-theme .btn-theme.disabled,
+.bg-theme .btn-theme[disabled],
+.bg-theme .btn-theme[disabled],
+fieldset[disabled] .bg-theme .btn-theme,
+fieldset[disabled] .bg-theme .btn-theme,
+.bg-theme .btn-theme.disabled:focus,
+.bg-theme .btn-theme.disabled:focus,
+.bg-theme .btn-theme[disabled]:focus,
+.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .bg-theme .btn-theme:focus,
+fieldset[disabled] .bg-theme .btn-theme:focus,
+.bg-theme .btn-theme.disabled.focus,
+.bg-theme .btn-theme.disabled.focus,
+.bg-theme .btn-theme[disabled].focus,
+.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .bg-theme .btn-theme.focus,
+fieldset[disabled] .bg-theme .btn-theme.focus,
+.bg-theme .btn-theme.disabled:active,
+.bg-theme .btn-theme.disabled:active,
+.bg-theme .btn-theme[disabled]:active,
+.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .bg-theme .btn-theme:active,
+fieldset[disabled] .bg-theme .btn-theme:active,
+.bg-theme .btn-theme.disabled.active,
+.bg-theme .btn-theme.disabled.active,
+.bg-theme .btn-theme[disabled].active,
+.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .bg-theme .btn-theme.active,
+fieldset[disabled] .bg-theme .btn-theme.active {
+  background-color: #89a1b0;
+  border-color: transparent;
+}
+.bg-theme .btn-outline-theme,
+.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #89a1b0;
+  border-style: solid;
+  border-width: 2px;
+}
+.bg-theme .btn-outline-theme:focus,
+.bg-theme .btn-outline-theme:focus,
+.bg-theme .btn-outline-theme.focus,
+.bg-theme .btn-outline-theme.focus,
+.bg-theme .btn-outline-theme:active,
+.bg-theme .btn-outline-theme:active,
+.bg-theme .btn-outline-theme.active,
+.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #718da0;
+}
+.bg-theme .btn-outline-theme.disabled,
+.bg-theme .btn-outline-theme.disabled,
+.bg-theme .btn-outline-theme[disabled],
+.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .bg-theme .btn-outline-theme,
+fieldset[disabled] .bg-theme .btn-outline-theme,
+.bg-theme .btn-outline-theme.disabled:focus,
+.bg-theme .btn-outline-theme.disabled:focus,
+.bg-theme .btn-outline-theme[disabled]:focus,
+.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .bg-theme .btn-outline-theme:focus,
+.bg-theme .btn-outline-theme.disabled.focus,
+.bg-theme .btn-outline-theme.disabled.focus,
+.bg-theme .btn-outline-theme[disabled].focus,
+.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .bg-theme .btn-outline-theme.focus,
+.bg-theme .btn-outline-theme.disabled:active,
+.bg-theme .btn-outline-theme.disabled:active,
+.bg-theme .btn-outline-theme[disabled]:active,
+.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .bg-theme .btn-outline-theme:active,
+.bg-theme .btn-outline-theme.disabled.active,
+.bg-theme .btn-outline-theme.disabled.active,
+.bg-theme .btn-outline-theme[disabled].active,
+.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #89a1b0;
+}
+.bg-theme .border-theme,
+.bg-theme .border-theme {
+  border-color: #89a1b0;
+}
+.bg-theme .text-theme,
+.bg-theme .text-theme {
+  color: #ffffff;
+}
+.bg-theme .svg-theme .fill-theme,
+.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.bg-theme .svg-theme .stroke-theme,
+.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.bg-theme a,
+.bg-theme a {
+  color: #ffffff;
+}
+.bg-theme a:hover,
+.bg-theme a:hover,
+.bg-theme a:focus,
+.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.bg-theme .range-theme::-webkit-slider-runnable-track,
+.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.bg-theme .range-theme::-moz-range-track,
+.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.bg-theme .range-theme::-ms-track,
+.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.bg-theme .range-theme:focus::-moz-range-track,
+.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.bg-theme .range-theme:focus::-ms-track,
+.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.bg-theme .range-theme::-webkit-slider-thumb,
+.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #bac8d1;
+  border-color: #ffffff;
+}
+.bg-theme .range-theme::-moz-range-thumb,
+.bg-theme .range-theme::-moz-range-thumb {
+  background: #bac8d1;
+  border-color: #ffffff;
+}
+.bg-theme .range-theme::-ms-thumb,
+.bg-theme .range-theme::-ms-thumb {
+  background: #bac8d1;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.bg-theme .range-theme::-ms-fill-lower,
+.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.bg-theme .range-theme::-ms-fill-upper,
+.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.bg-theme .range-theme::-ms-tooltip,
+.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.bg-hover-theme:hover {
+  color: #fff;
+  background-color: #bac8d1;
+}
+.btn-theme {
+  color: #fff;
+  background-color: #bac8d1;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.btn-theme:focus,
+.btn-theme.focus,
+.btn-theme:active,
+.btn-theme.active {
+  color: #fff;
+  background-color: #a2b4c1;
+  border-color: rgba(0, 0, 0, 0);
+}
+.btn-theme.disabled,
+.btn-theme[disabled],
+fieldset[disabled] .btn-theme,
+.btn-theme.disabled:focus,
+.btn-theme[disabled]:focus,
+fieldset[disabled] .btn-theme:focus,
+.btn-theme.disabled.focus,
+.btn-theme[disabled].focus,
+fieldset[disabled] .btn-theme.focus,
+.btn-theme.disabled:active,
+.btn-theme[disabled]:active,
+fieldset[disabled] .btn-theme:active,
+.btn-theme.disabled.active,
+.btn-theme[disabled].active,
+fieldset[disabled] .btn-theme.active {
+  background-color: #bac8d1;
+  border-color: transparent;
+}
+.btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #bac8d1;
+  border-style: solid;
+  border-width: 2px;
+}
+.btn-outline-theme:focus,
+.btn-outline-theme.focus,
+.btn-outline-theme:active,
+.btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #a2b4c1;
+}
+.btn-outline-theme.disabled,
+.btn-outline-theme[disabled],
+fieldset[disabled] .btn-outline-theme,
+.btn-outline-theme.disabled:focus,
+.btn-outline-theme[disabled]:focus,
+fieldset[disabled] .btn-outline-theme:focus,
+.btn-outline-theme.disabled.focus,
+.btn-outline-theme[disabled].focus,
+fieldset[disabled] .btn-outline-theme.focus,
+.btn-outline-theme.disabled:active,
+.btn-outline-theme[disabled]:active,
+fieldset[disabled] .btn-outline-theme:active,
+.btn-outline-theme.disabled.active,
+.btn-outline-theme[disabled].active,
+fieldset[disabled] .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #bac8d1;
+}
+.border-theme {
+  border-color: #bac8d1;
+}
+.text-theme {
+  color: #bac8d1;
+}
+.svg-theme .fill-theme {
+  fill: #bac8d1;
+}
+.svg-theme .stroke-theme {
+  stroke: #bac8d1;
+}
+a {
+  color: #bac8d1;
+}
+.range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #bac8d1;
+}
+.range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #bac8d1;
+}
+.range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #bac8d1;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-blue .bg-theme,
+.theme-blue.bg-theme {
+  background-color: #2391d3;
+}
+.theme-blue .bg-theme .btn-theme,
+.theme-blue.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #17618d;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-blue .bg-theme .btn-theme:focus,
+.theme-blue.bg-theme .btn-theme:focus,
+.theme-blue .bg-theme .btn-theme.focus,
+.theme-blue.bg-theme .btn-theme.focus,
+.theme-blue .bg-theme .btn-theme:active,
+.theme-blue.bg-theme .btn-theme:active,
+.theme-blue .bg-theme .btn-theme.active,
+.theme-blue.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #12496a;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-blue .bg-theme .btn-theme.disabled,
+.theme-blue.bg-theme .btn-theme.disabled,
+.theme-blue .bg-theme .btn-theme[disabled],
+.theme-blue.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-blue .bg-theme .btn-theme,
+fieldset[disabled] .theme-blue.bg-theme .btn-theme,
+.theme-blue .bg-theme .btn-theme.disabled:focus,
+.theme-blue.bg-theme .btn-theme.disabled:focus,
+.theme-blue .bg-theme .btn-theme[disabled]:focus,
+.theme-blue.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-blue .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-blue.bg-theme .btn-theme:focus,
+.theme-blue .bg-theme .btn-theme.disabled.focus,
+.theme-blue.bg-theme .btn-theme.disabled.focus,
+.theme-blue .bg-theme .btn-theme[disabled].focus,
+.theme-blue.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-blue .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-blue.bg-theme .btn-theme.focus,
+.theme-blue .bg-theme .btn-theme.disabled:active,
+.theme-blue.bg-theme .btn-theme.disabled:active,
+.theme-blue .bg-theme .btn-theme[disabled]:active,
+.theme-blue.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-blue .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-blue.bg-theme .btn-theme:active,
+.theme-blue .bg-theme .btn-theme.disabled.active,
+.theme-blue.bg-theme .btn-theme.disabled.active,
+.theme-blue .bg-theme .btn-theme[disabled].active,
+.theme-blue.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-blue .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-blue.bg-theme .btn-theme.active {
+  background-color: #17618d;
+  border-color: transparent;
+}
+.theme-blue .bg-theme .btn-outline-theme,
+.theme-blue.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #17618d;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-blue .bg-theme .btn-outline-theme:focus,
+.theme-blue.bg-theme .btn-outline-theme:focus,
+.theme-blue .bg-theme .btn-outline-theme.focus,
+.theme-blue.bg-theme .btn-outline-theme.focus,
+.theme-blue .bg-theme .btn-outline-theme:active,
+.theme-blue.bg-theme .btn-outline-theme:active,
+.theme-blue .bg-theme .btn-outline-theme.active,
+.theme-blue.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #12496a;
+}
+.theme-blue .bg-theme .btn-outline-theme.disabled,
+.theme-blue.bg-theme .btn-outline-theme.disabled,
+.theme-blue .bg-theme .btn-outline-theme[disabled],
+.theme-blue.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-blue .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-blue.bg-theme .btn-outline-theme,
+.theme-blue .bg-theme .btn-outline-theme.disabled:focus,
+.theme-blue.bg-theme .btn-outline-theme.disabled:focus,
+.theme-blue .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-blue.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-blue .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-blue.bg-theme .btn-outline-theme:focus,
+.theme-blue .bg-theme .btn-outline-theme.disabled.focus,
+.theme-blue.bg-theme .btn-outline-theme.disabled.focus,
+.theme-blue .bg-theme .btn-outline-theme[disabled].focus,
+.theme-blue.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-blue .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-blue.bg-theme .btn-outline-theme.focus,
+.theme-blue .bg-theme .btn-outline-theme.disabled:active,
+.theme-blue.bg-theme .btn-outline-theme.disabled:active,
+.theme-blue .bg-theme .btn-outline-theme[disabled]:active,
+.theme-blue.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-blue .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-blue.bg-theme .btn-outline-theme:active,
+.theme-blue .bg-theme .btn-outline-theme.disabled.active,
+.theme-blue.bg-theme .btn-outline-theme.disabled.active,
+.theme-blue .bg-theme .btn-outline-theme[disabled].active,
+.theme-blue.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-blue .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-blue.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #17618d;
+}
+.theme-blue .bg-theme .border-theme,
+.theme-blue.bg-theme .border-theme {
+  border-color: #17618d;
+}
+.theme-blue .bg-theme .text-theme,
+.theme-blue.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-blue .bg-theme .svg-theme .fill-theme,
+.theme-blue.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-blue .bg-theme .svg-theme .stroke-theme,
+.theme-blue.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-blue .bg-theme a,
+.theme-blue.bg-theme a {
+  color: #ffffff;
+}
+.theme-blue .bg-theme a:hover,
+.theme-blue.bg-theme a:hover,
+.theme-blue .bg-theme a:focus,
+.theme-blue.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-blue .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-blue.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-blue .bg-theme .range-theme::-moz-range-track,
+.theme-blue.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-blue .bg-theme .range-theme::-ms-track,
+.theme-blue.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-blue .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-blue.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-blue .bg-theme .range-theme:focus::-moz-range-track,
+.theme-blue.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-blue .bg-theme .range-theme:focus::-ms-track,
+.theme-blue.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-blue .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-blue.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #2391d3;
+  border-color: #ffffff;
+}
+.theme-blue .bg-theme .range-theme::-moz-range-thumb,
+.theme-blue.bg-theme .range-theme::-moz-range-thumb {
+  background: #2391d3;
+  border-color: #ffffff;
+}
+.theme-blue .bg-theme .range-theme::-ms-thumb,
+.theme-blue.bg-theme .range-theme::-ms-thumb {
+  background: #2391d3;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-blue .bg-theme .range-theme::-ms-fill-lower,
+.theme-blue.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-blue .bg-theme .range-theme::-ms-fill-upper,
+.theme-blue.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-blue .bg-theme .range-theme::-ms-tooltip,
+.theme-blue.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-blue .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #2391d3;
+}
+.theme-blue .btn-theme {
+  color: #fff;
+  background-color: #2391d3;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-blue .btn-theme:focus,
+.theme-blue .btn-theme.focus,
+.theme-blue .btn-theme:active,
+.theme-blue .btn-theme.active {
+  color: #fff;
+  background-color: #1d79b0;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-blue .btn-theme.disabled,
+.theme-blue .btn-theme[disabled],
+fieldset[disabled] .theme-blue .btn-theme,
+.theme-blue .btn-theme.disabled:focus,
+.theme-blue .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-blue .btn-theme:focus,
+.theme-blue .btn-theme.disabled.focus,
+.theme-blue .btn-theme[disabled].focus,
+fieldset[disabled] .theme-blue .btn-theme.focus,
+.theme-blue .btn-theme.disabled:active,
+.theme-blue .btn-theme[disabled]:active,
+fieldset[disabled] .theme-blue .btn-theme:active,
+.theme-blue .btn-theme.disabled.active,
+.theme-blue .btn-theme[disabled].active,
+fieldset[disabled] .theme-blue .btn-theme.active {
+  background-color: #2391d3;
+  border-color: transparent;
+}
+.theme-blue .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #2391d3;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-blue .btn-outline-theme:focus,
+.theme-blue .btn-outline-theme.focus,
+.theme-blue .btn-outline-theme:active,
+.theme-blue .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #1d79b0;
+}
+.theme-blue .btn-outline-theme.disabled,
+.theme-blue .btn-outline-theme[disabled],
+fieldset[disabled] .theme-blue .btn-outline-theme,
+.theme-blue .btn-outline-theme.disabled:focus,
+.theme-blue .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-blue .btn-outline-theme:focus,
+.theme-blue .btn-outline-theme.disabled.focus,
+.theme-blue .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-blue .btn-outline-theme.focus,
+.theme-blue .btn-outline-theme.disabled:active,
+.theme-blue .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-blue .btn-outline-theme:active,
+.theme-blue .btn-outline-theme.disabled.active,
+.theme-blue .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-blue .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #2391d3;
+}
+.theme-blue .border-theme {
+  border-color: #2391d3;
+}
+.theme-blue .text-theme {
+  color: #2391d3;
+}
+.theme-blue .svg-theme .fill-theme {
+  fill: #2391d3;
+}
+.theme-blue .svg-theme .stroke-theme {
+  stroke: #2391d3;
+}
+.theme-blue a {
+  color: #2391d3;
+}
+.theme-blue .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-blue .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-blue .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-blue .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-blue .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-blue .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-blue .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #2391d3;
+}
+.theme-blue .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #2391d3;
+}
+.theme-blue .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #2391d3;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-blue .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-blue .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-blue .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-green .bg-theme,
+.theme-green.bg-theme {
+  background-color: #00c800;
+}
+.theme-green .bg-theme .btn-theme,
+.theme-green.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #007600;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-green .bg-theme .btn-theme:focus,
+.theme-green.bg-theme .btn-theme:focus,
+.theme-green .bg-theme .btn-theme.focus,
+.theme-green.bg-theme .btn-theme.focus,
+.theme-green .bg-theme .btn-theme:active,
+.theme-green.bg-theme .btn-theme:active,
+.theme-green .bg-theme .btn-theme.active,
+.theme-green.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #004e00;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-green .bg-theme .btn-theme.disabled,
+.theme-green.bg-theme .btn-theme.disabled,
+.theme-green .bg-theme .btn-theme[disabled],
+.theme-green.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-green .bg-theme .btn-theme,
+fieldset[disabled] .theme-green.bg-theme .btn-theme,
+.theme-green .bg-theme .btn-theme.disabled:focus,
+.theme-green.bg-theme .btn-theme.disabled:focus,
+.theme-green .bg-theme .btn-theme[disabled]:focus,
+.theme-green.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-green .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-green.bg-theme .btn-theme:focus,
+.theme-green .bg-theme .btn-theme.disabled.focus,
+.theme-green.bg-theme .btn-theme.disabled.focus,
+.theme-green .bg-theme .btn-theme[disabled].focus,
+.theme-green.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-green .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-green.bg-theme .btn-theme.focus,
+.theme-green .bg-theme .btn-theme.disabled:active,
+.theme-green.bg-theme .btn-theme.disabled:active,
+.theme-green .bg-theme .btn-theme[disabled]:active,
+.theme-green.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-green .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-green.bg-theme .btn-theme:active,
+.theme-green .bg-theme .btn-theme.disabled.active,
+.theme-green.bg-theme .btn-theme.disabled.active,
+.theme-green .bg-theme .btn-theme[disabled].active,
+.theme-green.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-green .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-green.bg-theme .btn-theme.active {
+  background-color: #007600;
+  border-color: transparent;
+}
+.theme-green .bg-theme .btn-outline-theme,
+.theme-green.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #007600;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-green .bg-theme .btn-outline-theme:focus,
+.theme-green.bg-theme .btn-outline-theme:focus,
+.theme-green .bg-theme .btn-outline-theme.focus,
+.theme-green.bg-theme .btn-outline-theme.focus,
+.theme-green .bg-theme .btn-outline-theme:active,
+.theme-green.bg-theme .btn-outline-theme:active,
+.theme-green .bg-theme .btn-outline-theme.active,
+.theme-green.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #004e00;
+}
+.theme-green .bg-theme .btn-outline-theme.disabled,
+.theme-green.bg-theme .btn-outline-theme.disabled,
+.theme-green .bg-theme .btn-outline-theme[disabled],
+.theme-green.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-green .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-green.bg-theme .btn-outline-theme,
+.theme-green .bg-theme .btn-outline-theme.disabled:focus,
+.theme-green.bg-theme .btn-outline-theme.disabled:focus,
+.theme-green .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-green.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-green .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-green.bg-theme .btn-outline-theme:focus,
+.theme-green .bg-theme .btn-outline-theme.disabled.focus,
+.theme-green.bg-theme .btn-outline-theme.disabled.focus,
+.theme-green .bg-theme .btn-outline-theme[disabled].focus,
+.theme-green.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-green .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-green.bg-theme .btn-outline-theme.focus,
+.theme-green .bg-theme .btn-outline-theme.disabled:active,
+.theme-green.bg-theme .btn-outline-theme.disabled:active,
+.theme-green .bg-theme .btn-outline-theme[disabled]:active,
+.theme-green.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-green .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-green.bg-theme .btn-outline-theme:active,
+.theme-green .bg-theme .btn-outline-theme.disabled.active,
+.theme-green.bg-theme .btn-outline-theme.disabled.active,
+.theme-green .bg-theme .btn-outline-theme[disabled].active,
+.theme-green.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-green .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-green.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #007600;
+}
+.theme-green .bg-theme .border-theme,
+.theme-green.bg-theme .border-theme {
+  border-color: #007600;
+}
+.theme-green .bg-theme .text-theme,
+.theme-green.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-green .bg-theme .svg-theme .fill-theme,
+.theme-green.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-green .bg-theme .svg-theme .stroke-theme,
+.theme-green.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-green .bg-theme a,
+.theme-green.bg-theme a {
+  color: #ffffff;
+}
+.theme-green .bg-theme a:hover,
+.theme-green.bg-theme a:hover,
+.theme-green .bg-theme a:focus,
+.theme-green.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-green .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-green.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-green .bg-theme .range-theme::-moz-range-track,
+.theme-green.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-green .bg-theme .range-theme::-ms-track,
+.theme-green.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-green .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-green.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-green .bg-theme .range-theme:focus::-moz-range-track,
+.theme-green.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-green .bg-theme .range-theme:focus::-ms-track,
+.theme-green.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-green .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-green.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #00c800;
+  border-color: #ffffff;
+}
+.theme-green .bg-theme .range-theme::-moz-range-thumb,
+.theme-green.bg-theme .range-theme::-moz-range-thumb {
+  background: #00c800;
+  border-color: #ffffff;
+}
+.theme-green .bg-theme .range-theme::-ms-thumb,
+.theme-green.bg-theme .range-theme::-ms-thumb {
+  background: #00c800;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-green .bg-theme .range-theme::-ms-fill-lower,
+.theme-green.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-green .bg-theme .range-theme::-ms-fill-upper,
+.theme-green.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-green .bg-theme .range-theme::-ms-tooltip,
+.theme-green.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-green .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #00c800;
+}
+.theme-green .btn-theme {
+  color: #fff;
+  background-color: #00c800;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-green .btn-theme:focus,
+.theme-green .btn-theme.focus,
+.theme-green .btn-theme:active,
+.theme-green .btn-theme.active {
+  color: #fff;
+  background-color: #009f00;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-green .btn-theme.disabled,
+.theme-green .btn-theme[disabled],
+fieldset[disabled] .theme-green .btn-theme,
+.theme-green .btn-theme.disabled:focus,
+.theme-green .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-green .btn-theme:focus,
+.theme-green .btn-theme.disabled.focus,
+.theme-green .btn-theme[disabled].focus,
+fieldset[disabled] .theme-green .btn-theme.focus,
+.theme-green .btn-theme.disabled:active,
+.theme-green .btn-theme[disabled]:active,
+fieldset[disabled] .theme-green .btn-theme:active,
+.theme-green .btn-theme.disabled.active,
+.theme-green .btn-theme[disabled].active,
+fieldset[disabled] .theme-green .btn-theme.active {
+  background-color: #00c800;
+  border-color: transparent;
+}
+.theme-green .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #00c800;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-green .btn-outline-theme:focus,
+.theme-green .btn-outline-theme.focus,
+.theme-green .btn-outline-theme:active,
+.theme-green .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #009f00;
+}
+.theme-green .btn-outline-theme.disabled,
+.theme-green .btn-outline-theme[disabled],
+fieldset[disabled] .theme-green .btn-outline-theme,
+.theme-green .btn-outline-theme.disabled:focus,
+.theme-green .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-green .btn-outline-theme:focus,
+.theme-green .btn-outline-theme.disabled.focus,
+.theme-green .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-green .btn-outline-theme.focus,
+.theme-green .btn-outline-theme.disabled:active,
+.theme-green .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-green .btn-outline-theme:active,
+.theme-green .btn-outline-theme.disabled.active,
+.theme-green .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-green .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #00c800;
+}
+.theme-green .border-theme {
+  border-color: #00c800;
+}
+.theme-green .text-theme {
+  color: #00c800;
+}
+.theme-green .svg-theme .fill-theme {
+  fill: #00c800;
+}
+.theme-green .svg-theme .stroke-theme {
+  stroke: #00c800;
+}
+.theme-green a {
+  color: #00c800;
+}
+.theme-green .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-green .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-green .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-green .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-green .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-green .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-green .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #00c800;
+}
+.theme-green .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #00c800;
+}
+.theme-green .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #00c800;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-green .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-green .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-green .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-gray .bg-theme,
+.theme-gray.bg-theme {
+  background-color: #bac8d1;
+}
+.theme-gray .bg-theme .btn-theme,
+.theme-gray.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #89a1b0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-gray .bg-theme .btn-theme:focus,
+.theme-gray.bg-theme .btn-theme:focus,
+.theme-gray .bg-theme .btn-theme.focus,
+.theme-gray.bg-theme .btn-theme.focus,
+.theme-gray .bg-theme .btn-theme:active,
+.theme-gray.bg-theme .btn-theme:active,
+.theme-gray .bg-theme .btn-theme.active,
+.theme-gray.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #718da0;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-gray .bg-theme .btn-theme.disabled,
+.theme-gray.bg-theme .btn-theme.disabled,
+.theme-gray .bg-theme .btn-theme[disabled],
+.theme-gray.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-gray .bg-theme .btn-theme,
+fieldset[disabled] .theme-gray.bg-theme .btn-theme,
+.theme-gray .bg-theme .btn-theme.disabled:focus,
+.theme-gray.bg-theme .btn-theme.disabled:focus,
+.theme-gray .bg-theme .btn-theme[disabled]:focus,
+.theme-gray.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-gray .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-gray.bg-theme .btn-theme:focus,
+.theme-gray .bg-theme .btn-theme.disabled.focus,
+.theme-gray.bg-theme .btn-theme.disabled.focus,
+.theme-gray .bg-theme .btn-theme[disabled].focus,
+.theme-gray.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-gray .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-gray.bg-theme .btn-theme.focus,
+.theme-gray .bg-theme .btn-theme.disabled:active,
+.theme-gray.bg-theme .btn-theme.disabled:active,
+.theme-gray .bg-theme .btn-theme[disabled]:active,
+.theme-gray.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-gray .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-gray.bg-theme .btn-theme:active,
+.theme-gray .bg-theme .btn-theme.disabled.active,
+.theme-gray.bg-theme .btn-theme.disabled.active,
+.theme-gray .bg-theme .btn-theme[disabled].active,
+.theme-gray.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-gray .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-gray.bg-theme .btn-theme.active {
+  background-color: #89a1b0;
+  border-color: transparent;
+}
+.theme-gray .bg-theme .btn-outline-theme,
+.theme-gray.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #89a1b0;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-gray .bg-theme .btn-outline-theme:focus,
+.theme-gray.bg-theme .btn-outline-theme:focus,
+.theme-gray .bg-theme .btn-outline-theme.focus,
+.theme-gray.bg-theme .btn-outline-theme.focus,
+.theme-gray .bg-theme .btn-outline-theme:active,
+.theme-gray.bg-theme .btn-outline-theme:active,
+.theme-gray .bg-theme .btn-outline-theme.active,
+.theme-gray.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #718da0;
+}
+.theme-gray .bg-theme .btn-outline-theme.disabled,
+.theme-gray.bg-theme .btn-outline-theme.disabled,
+.theme-gray .bg-theme .btn-outline-theme[disabled],
+.theme-gray.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-gray .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-gray.bg-theme .btn-outline-theme,
+.theme-gray .bg-theme .btn-outline-theme.disabled:focus,
+.theme-gray.bg-theme .btn-outline-theme.disabled:focus,
+.theme-gray .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-gray.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-gray .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-gray.bg-theme .btn-outline-theme:focus,
+.theme-gray .bg-theme .btn-outline-theme.disabled.focus,
+.theme-gray.bg-theme .btn-outline-theme.disabled.focus,
+.theme-gray .bg-theme .btn-outline-theme[disabled].focus,
+.theme-gray.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-gray .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-gray.bg-theme .btn-outline-theme.focus,
+.theme-gray .bg-theme .btn-outline-theme.disabled:active,
+.theme-gray.bg-theme .btn-outline-theme.disabled:active,
+.theme-gray .bg-theme .btn-outline-theme[disabled]:active,
+.theme-gray.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-gray .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-gray.bg-theme .btn-outline-theme:active,
+.theme-gray .bg-theme .btn-outline-theme.disabled.active,
+.theme-gray.bg-theme .btn-outline-theme.disabled.active,
+.theme-gray .bg-theme .btn-outline-theme[disabled].active,
+.theme-gray.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-gray .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-gray.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #89a1b0;
+}
+.theme-gray .bg-theme .border-theme,
+.theme-gray.bg-theme .border-theme {
+  border-color: #89a1b0;
+}
+.theme-gray .bg-theme .text-theme,
+.theme-gray.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-gray .bg-theme .svg-theme .fill-theme,
+.theme-gray.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-gray .bg-theme .svg-theme .stroke-theme,
+.theme-gray.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-gray .bg-theme a,
+.theme-gray.bg-theme a {
+  color: #ffffff;
+}
+.theme-gray .bg-theme a:hover,
+.theme-gray.bg-theme a:hover,
+.theme-gray .bg-theme a:focus,
+.theme-gray.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-gray .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-gray.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-gray .bg-theme .range-theme::-moz-range-track,
+.theme-gray.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-gray .bg-theme .range-theme::-ms-track,
+.theme-gray.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-gray .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-gray.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-gray .bg-theme .range-theme:focus::-moz-range-track,
+.theme-gray.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-gray .bg-theme .range-theme:focus::-ms-track,
+.theme-gray.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-gray .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-gray.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #bac8d1;
+  border-color: #ffffff;
+}
+.theme-gray .bg-theme .range-theme::-moz-range-thumb,
+.theme-gray.bg-theme .range-theme::-moz-range-thumb {
+  background: #bac8d1;
+  border-color: #ffffff;
+}
+.theme-gray .bg-theme .range-theme::-ms-thumb,
+.theme-gray.bg-theme .range-theme::-ms-thumb {
+  background: #bac8d1;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-gray .bg-theme .range-theme::-ms-fill-lower,
+.theme-gray.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-gray .bg-theme .range-theme::-ms-fill-upper,
+.theme-gray.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-gray .bg-theme .range-theme::-ms-tooltip,
+.theme-gray.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-gray .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #bac8d1;
+}
+.theme-gray .btn-theme {
+  color: #fff;
+  background-color: #bac8d1;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-gray .btn-theme:focus,
+.theme-gray .btn-theme.focus,
+.theme-gray .btn-theme:active,
+.theme-gray .btn-theme.active {
+  color: #fff;
+  background-color: #a2b4c1;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-gray .btn-theme.disabled,
+.theme-gray .btn-theme[disabled],
+fieldset[disabled] .theme-gray .btn-theme,
+.theme-gray .btn-theme.disabled:focus,
+.theme-gray .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-gray .btn-theme:focus,
+.theme-gray .btn-theme.disabled.focus,
+.theme-gray .btn-theme[disabled].focus,
+fieldset[disabled] .theme-gray .btn-theme.focus,
+.theme-gray .btn-theme.disabled:active,
+.theme-gray .btn-theme[disabled]:active,
+fieldset[disabled] .theme-gray .btn-theme:active,
+.theme-gray .btn-theme.disabled.active,
+.theme-gray .btn-theme[disabled].active,
+fieldset[disabled] .theme-gray .btn-theme.active {
+  background-color: #bac8d1;
+  border-color: transparent;
+}
+.theme-gray .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #bac8d1;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-gray .btn-outline-theme:focus,
+.theme-gray .btn-outline-theme.focus,
+.theme-gray .btn-outline-theme:active,
+.theme-gray .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #a2b4c1;
+}
+.theme-gray .btn-outline-theme.disabled,
+.theme-gray .btn-outline-theme[disabled],
+fieldset[disabled] .theme-gray .btn-outline-theme,
+.theme-gray .btn-outline-theme.disabled:focus,
+.theme-gray .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-gray .btn-outline-theme:focus,
+.theme-gray .btn-outline-theme.disabled.focus,
+.theme-gray .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-gray .btn-outline-theme.focus,
+.theme-gray .btn-outline-theme.disabled:active,
+.theme-gray .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-gray .btn-outline-theme:active,
+.theme-gray .btn-outline-theme.disabled.active,
+.theme-gray .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-gray .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #bac8d1;
+}
+.theme-gray .border-theme {
+  border-color: #bac8d1;
+}
+.theme-gray .text-theme {
+  color: #bac8d1;
+}
+.theme-gray .svg-theme .fill-theme {
+  fill: #bac8d1;
+}
+.theme-gray .svg-theme .stroke-theme {
+  stroke: #bac8d1;
+}
+.theme-gray a {
+  color: #bac8d1;
+}
+.theme-gray .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-gray .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-gray .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-gray .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-gray .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-gray .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-gray .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #bac8d1;
+}
+.theme-gray .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #bac8d1;
+}
+.theme-gray .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #bac8d1;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-gray .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-gray .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-gray .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-orange .bg-theme,
+.theme-orange.bg-theme {
+  background-color: #ff8900;
+}
+.theme-orange .bg-theme .btn-theme,
+.theme-orange.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #ad5d00;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-orange .bg-theme .btn-theme:focus,
+.theme-orange.bg-theme .btn-theme:focus,
+.theme-orange .bg-theme .btn-theme.focus,
+.theme-orange.bg-theme .btn-theme.focus,
+.theme-orange .bg-theme .btn-theme:active,
+.theme-orange.bg-theme .btn-theme:active,
+.theme-orange .bg-theme .btn-theme.active,
+.theme-orange.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #854700;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-orange .bg-theme .btn-theme.disabled,
+.theme-orange.bg-theme .btn-theme.disabled,
+.theme-orange .bg-theme .btn-theme[disabled],
+.theme-orange.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-orange .bg-theme .btn-theme,
+fieldset[disabled] .theme-orange.bg-theme .btn-theme,
+.theme-orange .bg-theme .btn-theme.disabled:focus,
+.theme-orange.bg-theme .btn-theme.disabled:focus,
+.theme-orange .bg-theme .btn-theme[disabled]:focus,
+.theme-orange.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-orange .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-orange.bg-theme .btn-theme:focus,
+.theme-orange .bg-theme .btn-theme.disabled.focus,
+.theme-orange.bg-theme .btn-theme.disabled.focus,
+.theme-orange .bg-theme .btn-theme[disabled].focus,
+.theme-orange.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-orange .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-orange.bg-theme .btn-theme.focus,
+.theme-orange .bg-theme .btn-theme.disabled:active,
+.theme-orange.bg-theme .btn-theme.disabled:active,
+.theme-orange .bg-theme .btn-theme[disabled]:active,
+.theme-orange.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-orange .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-orange.bg-theme .btn-theme:active,
+.theme-orange .bg-theme .btn-theme.disabled.active,
+.theme-orange.bg-theme .btn-theme.disabled.active,
+.theme-orange .bg-theme .btn-theme[disabled].active,
+.theme-orange.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-orange .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-orange.bg-theme .btn-theme.active {
+  background-color: #ad5d00;
+  border-color: transparent;
+}
+.theme-orange .bg-theme .btn-outline-theme,
+.theme-orange.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #ad5d00;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-orange .bg-theme .btn-outline-theme:focus,
+.theme-orange.bg-theme .btn-outline-theme:focus,
+.theme-orange .bg-theme .btn-outline-theme.focus,
+.theme-orange.bg-theme .btn-outline-theme.focus,
+.theme-orange .bg-theme .btn-outline-theme:active,
+.theme-orange.bg-theme .btn-outline-theme:active,
+.theme-orange .bg-theme .btn-outline-theme.active,
+.theme-orange.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #854700;
+}
+.theme-orange .bg-theme .btn-outline-theme.disabled,
+.theme-orange.bg-theme .btn-outline-theme.disabled,
+.theme-orange .bg-theme .btn-outline-theme[disabled],
+.theme-orange.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-orange .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-orange.bg-theme .btn-outline-theme,
+.theme-orange .bg-theme .btn-outline-theme.disabled:focus,
+.theme-orange.bg-theme .btn-outline-theme.disabled:focus,
+.theme-orange .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-orange.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-orange .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-orange.bg-theme .btn-outline-theme:focus,
+.theme-orange .bg-theme .btn-outline-theme.disabled.focus,
+.theme-orange.bg-theme .btn-outline-theme.disabled.focus,
+.theme-orange .bg-theme .btn-outline-theme[disabled].focus,
+.theme-orange.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-orange .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-orange.bg-theme .btn-outline-theme.focus,
+.theme-orange .bg-theme .btn-outline-theme.disabled:active,
+.theme-orange.bg-theme .btn-outline-theme.disabled:active,
+.theme-orange .bg-theme .btn-outline-theme[disabled]:active,
+.theme-orange.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-orange .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-orange.bg-theme .btn-outline-theme:active,
+.theme-orange .bg-theme .btn-outline-theme.disabled.active,
+.theme-orange.bg-theme .btn-outline-theme.disabled.active,
+.theme-orange .bg-theme .btn-outline-theme[disabled].active,
+.theme-orange.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-orange .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-orange.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #ad5d00;
+}
+.theme-orange .bg-theme .border-theme,
+.theme-orange.bg-theme .border-theme {
+  border-color: #ad5d00;
+}
+.theme-orange .bg-theme .text-theme,
+.theme-orange.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-orange .bg-theme .svg-theme .fill-theme,
+.theme-orange.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-orange .bg-theme .svg-theme .stroke-theme,
+.theme-orange.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-orange .bg-theme a,
+.theme-orange.bg-theme a {
+  color: #ffffff;
+}
+.theme-orange .bg-theme a:hover,
+.theme-orange.bg-theme a:hover,
+.theme-orange .bg-theme a:focus,
+.theme-orange.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-orange .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-orange.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-orange .bg-theme .range-theme::-moz-range-track,
+.theme-orange.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-orange .bg-theme .range-theme::-ms-track,
+.theme-orange.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-orange .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-orange.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-orange .bg-theme .range-theme:focus::-moz-range-track,
+.theme-orange.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-orange .bg-theme .range-theme:focus::-ms-track,
+.theme-orange.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-orange .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-orange.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #ff8900;
+  border-color: #ffffff;
+}
+.theme-orange .bg-theme .range-theme::-moz-range-thumb,
+.theme-orange.bg-theme .range-theme::-moz-range-thumb {
+  background: #ff8900;
+  border-color: #ffffff;
+}
+.theme-orange .bg-theme .range-theme::-ms-thumb,
+.theme-orange.bg-theme .range-theme::-ms-thumb {
+  background: #ff8900;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-orange .bg-theme .range-theme::-ms-fill-lower,
+.theme-orange.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-orange .bg-theme .range-theme::-ms-fill-upper,
+.theme-orange.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-orange .bg-theme .range-theme::-ms-tooltip,
+.theme-orange.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-orange .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #ff8900;
+}
+.theme-orange .btn-theme {
+  color: #fff;
+  background-color: #ff8900;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-orange .btn-theme:focus,
+.theme-orange .btn-theme.focus,
+.theme-orange .btn-theme:active,
+.theme-orange .btn-theme.active {
+  color: #fff;
+  background-color: #d67300;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-orange .btn-theme.disabled,
+.theme-orange .btn-theme[disabled],
+fieldset[disabled] .theme-orange .btn-theme,
+.theme-orange .btn-theme.disabled:focus,
+.theme-orange .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-orange .btn-theme:focus,
+.theme-orange .btn-theme.disabled.focus,
+.theme-orange .btn-theme[disabled].focus,
+fieldset[disabled] .theme-orange .btn-theme.focus,
+.theme-orange .btn-theme.disabled:active,
+.theme-orange .btn-theme[disabled]:active,
+fieldset[disabled] .theme-orange .btn-theme:active,
+.theme-orange .btn-theme.disabled.active,
+.theme-orange .btn-theme[disabled].active,
+fieldset[disabled] .theme-orange .btn-theme.active {
+  background-color: #ff8900;
+  border-color: transparent;
+}
+.theme-orange .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #ff8900;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-orange .btn-outline-theme:focus,
+.theme-orange .btn-outline-theme.focus,
+.theme-orange .btn-outline-theme:active,
+.theme-orange .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #d67300;
+}
+.theme-orange .btn-outline-theme.disabled,
+.theme-orange .btn-outline-theme[disabled],
+fieldset[disabled] .theme-orange .btn-outline-theme,
+.theme-orange .btn-outline-theme.disabled:focus,
+.theme-orange .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-orange .btn-outline-theme:focus,
+.theme-orange .btn-outline-theme.disabled.focus,
+.theme-orange .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-orange .btn-outline-theme.focus,
+.theme-orange .btn-outline-theme.disabled:active,
+.theme-orange .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-orange .btn-outline-theme:active,
+.theme-orange .btn-outline-theme.disabled.active,
+.theme-orange .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-orange .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #ff8900;
+}
+.theme-orange .border-theme {
+  border-color: #ff8900;
+}
+.theme-orange .text-theme {
+  color: #ff8900;
+}
+.theme-orange .svg-theme .fill-theme {
+  fill: #ff8900;
+}
+.theme-orange .svg-theme .stroke-theme {
+  stroke: #ff8900;
+}
+.theme-orange a {
+  color: #ff8900;
+}
+.theme-orange .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-orange .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-orange .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-orange .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-orange .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-orange .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-orange .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #ff8900;
+}
+.theme-orange .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #ff8900;
+}
+.theme-orange .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #ff8900;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-orange .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-orange .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-orange .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-pink .bg-theme,
+.theme-pink.bg-theme {
+  background-color: #fe5ebd;
+}
+.theme-pink .bg-theme .btn-theme,
+.theme-pink.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #fd0d9c;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-pink .bg-theme .btn-theme:focus,
+.theme-pink.bg-theme .btn-theme:focus,
+.theme-pink .bg-theme .btn-theme.focus,
+.theme-pink.bg-theme .btn-theme.focus,
+.theme-pink .bg-theme .btn-theme:active,
+.theme-pink.bg-theme .btn-theme:active,
+.theme-pink .bg-theme .btn-theme.active,
+.theme-pink.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #e00186;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-pink .bg-theme .btn-theme.disabled,
+.theme-pink.bg-theme .btn-theme.disabled,
+.theme-pink .bg-theme .btn-theme[disabled],
+.theme-pink.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-pink .bg-theme .btn-theme,
+fieldset[disabled] .theme-pink.bg-theme .btn-theme,
+.theme-pink .bg-theme .btn-theme.disabled:focus,
+.theme-pink.bg-theme .btn-theme.disabled:focus,
+.theme-pink .bg-theme .btn-theme[disabled]:focus,
+.theme-pink.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-pink .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-pink.bg-theme .btn-theme:focus,
+.theme-pink .bg-theme .btn-theme.disabled.focus,
+.theme-pink.bg-theme .btn-theme.disabled.focus,
+.theme-pink .bg-theme .btn-theme[disabled].focus,
+.theme-pink.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-pink .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-pink.bg-theme .btn-theme.focus,
+.theme-pink .bg-theme .btn-theme.disabled:active,
+.theme-pink.bg-theme .btn-theme.disabled:active,
+.theme-pink .bg-theme .btn-theme[disabled]:active,
+.theme-pink.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-pink .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-pink.bg-theme .btn-theme:active,
+.theme-pink .bg-theme .btn-theme.disabled.active,
+.theme-pink.bg-theme .btn-theme.disabled.active,
+.theme-pink .bg-theme .btn-theme[disabled].active,
+.theme-pink.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-pink .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-pink.bg-theme .btn-theme.active {
+  background-color: #fd0d9c;
+  border-color: transparent;
+}
+.theme-pink .bg-theme .btn-outline-theme,
+.theme-pink.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #fd0d9c;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-pink .bg-theme .btn-outline-theme:focus,
+.theme-pink.bg-theme .btn-outline-theme:focus,
+.theme-pink .bg-theme .btn-outline-theme.focus,
+.theme-pink.bg-theme .btn-outline-theme.focus,
+.theme-pink .bg-theme .btn-outline-theme:active,
+.theme-pink.bg-theme .btn-outline-theme:active,
+.theme-pink .bg-theme .btn-outline-theme.active,
+.theme-pink.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #e00186;
+}
+.theme-pink .bg-theme .btn-outline-theme.disabled,
+.theme-pink.bg-theme .btn-outline-theme.disabled,
+.theme-pink .bg-theme .btn-outline-theme[disabled],
+.theme-pink.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-pink .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-pink.bg-theme .btn-outline-theme,
+.theme-pink .bg-theme .btn-outline-theme.disabled:focus,
+.theme-pink.bg-theme .btn-outline-theme.disabled:focus,
+.theme-pink .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-pink.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-pink .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-pink.bg-theme .btn-outline-theme:focus,
+.theme-pink .bg-theme .btn-outline-theme.disabled.focus,
+.theme-pink.bg-theme .btn-outline-theme.disabled.focus,
+.theme-pink .bg-theme .btn-outline-theme[disabled].focus,
+.theme-pink.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-pink .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-pink.bg-theme .btn-outline-theme.focus,
+.theme-pink .bg-theme .btn-outline-theme.disabled:active,
+.theme-pink.bg-theme .btn-outline-theme.disabled:active,
+.theme-pink .bg-theme .btn-outline-theme[disabled]:active,
+.theme-pink.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-pink .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-pink.bg-theme .btn-outline-theme:active,
+.theme-pink .bg-theme .btn-outline-theme.disabled.active,
+.theme-pink.bg-theme .btn-outline-theme.disabled.active,
+.theme-pink .bg-theme .btn-outline-theme[disabled].active,
+.theme-pink.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-pink .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-pink.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #fd0d9c;
+}
+.theme-pink .bg-theme .border-theme,
+.theme-pink.bg-theme .border-theme {
+  border-color: #fd0d9c;
+}
+.theme-pink .bg-theme .text-theme,
+.theme-pink.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-pink .bg-theme .svg-theme .fill-theme,
+.theme-pink.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-pink .bg-theme .svg-theme .stroke-theme,
+.theme-pink.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-pink .bg-theme a,
+.theme-pink.bg-theme a {
+  color: #ffffff;
+}
+.theme-pink .bg-theme a:hover,
+.theme-pink.bg-theme a:hover,
+.theme-pink .bg-theme a:focus,
+.theme-pink.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-pink .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-pink.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-pink .bg-theme .range-theme::-moz-range-track,
+.theme-pink.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-pink .bg-theme .range-theme::-ms-track,
+.theme-pink.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-pink .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-pink.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-pink .bg-theme .range-theme:focus::-moz-range-track,
+.theme-pink.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-pink .bg-theme .range-theme:focus::-ms-track,
+.theme-pink.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-pink .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-pink.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #fe5ebd;
+  border-color: #ffffff;
+}
+.theme-pink .bg-theme .range-theme::-moz-range-thumb,
+.theme-pink.bg-theme .range-theme::-moz-range-thumb {
+  background: #fe5ebd;
+  border-color: #ffffff;
+}
+.theme-pink .bg-theme .range-theme::-ms-thumb,
+.theme-pink.bg-theme .range-theme::-ms-thumb {
+  background: #fe5ebd;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-pink .bg-theme .range-theme::-ms-fill-lower,
+.theme-pink.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-pink .bg-theme .range-theme::-ms-fill-upper,
+.theme-pink.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-pink .bg-theme .range-theme::-ms-tooltip,
+.theme-pink.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-pink .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #fe5ebd;
+}
+.theme-pink .btn-theme {
+  color: #fff;
+  background-color: #fe5ebd;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-pink .btn-theme:focus,
+.theme-pink .btn-theme.focus,
+.theme-pink .btn-theme:active,
+.theme-pink .btn-theme.active {
+  color: #fff;
+  background-color: #fe35ac;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-pink .btn-theme.disabled,
+.theme-pink .btn-theme[disabled],
+fieldset[disabled] .theme-pink .btn-theme,
+.theme-pink .btn-theme.disabled:focus,
+.theme-pink .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-pink .btn-theme:focus,
+.theme-pink .btn-theme.disabled.focus,
+.theme-pink .btn-theme[disabled].focus,
+fieldset[disabled] .theme-pink .btn-theme.focus,
+.theme-pink .btn-theme.disabled:active,
+.theme-pink .btn-theme[disabled]:active,
+fieldset[disabled] .theme-pink .btn-theme:active,
+.theme-pink .btn-theme.disabled.active,
+.theme-pink .btn-theme[disabled].active,
+fieldset[disabled] .theme-pink .btn-theme.active {
+  background-color: #fe5ebd;
+  border-color: transparent;
+}
+.theme-pink .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #fe5ebd;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-pink .btn-outline-theme:focus,
+.theme-pink .btn-outline-theme.focus,
+.theme-pink .btn-outline-theme:active,
+.theme-pink .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #fe35ac;
+}
+.theme-pink .btn-outline-theme.disabled,
+.theme-pink .btn-outline-theme[disabled],
+fieldset[disabled] .theme-pink .btn-outline-theme,
+.theme-pink .btn-outline-theme.disabled:focus,
+.theme-pink .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-pink .btn-outline-theme:focus,
+.theme-pink .btn-outline-theme.disabled.focus,
+.theme-pink .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-pink .btn-outline-theme.focus,
+.theme-pink .btn-outline-theme.disabled:active,
+.theme-pink .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-pink .btn-outline-theme:active,
+.theme-pink .btn-outline-theme.disabled.active,
+.theme-pink .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-pink .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #fe5ebd;
+}
+.theme-pink .border-theme {
+  border-color: #fe5ebd;
+}
+.theme-pink .text-theme {
+  color: #fe5ebd;
+}
+.theme-pink .svg-theme .fill-theme {
+  fill: #fe5ebd;
+}
+.theme-pink .svg-theme .stroke-theme {
+  stroke: #fe5ebd;
+}
+.theme-pink a {
+  color: #fe5ebd;
+}
+.theme-pink .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-pink .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-pink .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-pink .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-pink .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-pink .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-pink .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #fe5ebd;
+}
+.theme-pink .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #fe5ebd;
+}
+.theme-pink .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #fe5ebd;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-pink .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-pink .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-pink .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-purple .bg-theme,
+.theme-purple.bg-theme {
+  background-color: #9c00fe;
+}
+.theme-purple .bg-theme .btn-theme,
+.theme-purple.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #6a00ac;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-purple .bg-theme .btn-theme:focus,
+.theme-purple.bg-theme .btn-theme:focus,
+.theme-purple .bg-theme .btn-theme.focus,
+.theme-purple.bg-theme .btn-theme.focus,
+.theme-purple .bg-theme .btn-theme:active,
+.theme-purple.bg-theme .btn-theme:active,
+.theme-purple .bg-theme .btn-theme.active,
+.theme-purple.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #510084;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-purple .bg-theme .btn-theme.disabled,
+.theme-purple.bg-theme .btn-theme.disabled,
+.theme-purple .bg-theme .btn-theme[disabled],
+.theme-purple.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-purple .bg-theme .btn-theme,
+fieldset[disabled] .theme-purple.bg-theme .btn-theme,
+.theme-purple .bg-theme .btn-theme.disabled:focus,
+.theme-purple.bg-theme .btn-theme.disabled:focus,
+.theme-purple .bg-theme .btn-theme[disabled]:focus,
+.theme-purple.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-purple .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-purple.bg-theme .btn-theme:focus,
+.theme-purple .bg-theme .btn-theme.disabled.focus,
+.theme-purple.bg-theme .btn-theme.disabled.focus,
+.theme-purple .bg-theme .btn-theme[disabled].focus,
+.theme-purple.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-purple .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-purple.bg-theme .btn-theme.focus,
+.theme-purple .bg-theme .btn-theme.disabled:active,
+.theme-purple.bg-theme .btn-theme.disabled:active,
+.theme-purple .bg-theme .btn-theme[disabled]:active,
+.theme-purple.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-purple .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-purple.bg-theme .btn-theme:active,
+.theme-purple .bg-theme .btn-theme.disabled.active,
+.theme-purple.bg-theme .btn-theme.disabled.active,
+.theme-purple .bg-theme .btn-theme[disabled].active,
+.theme-purple.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-purple .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-purple.bg-theme .btn-theme.active {
+  background-color: #6a00ac;
+  border-color: transparent;
+}
+.theme-purple .bg-theme .btn-outline-theme,
+.theme-purple.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #6a00ac;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-purple .bg-theme .btn-outline-theme:focus,
+.theme-purple.bg-theme .btn-outline-theme:focus,
+.theme-purple .bg-theme .btn-outline-theme.focus,
+.theme-purple.bg-theme .btn-outline-theme.focus,
+.theme-purple .bg-theme .btn-outline-theme:active,
+.theme-purple.bg-theme .btn-outline-theme:active,
+.theme-purple .bg-theme .btn-outline-theme.active,
+.theme-purple.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #510084;
+}
+.theme-purple .bg-theme .btn-outline-theme.disabled,
+.theme-purple.bg-theme .btn-outline-theme.disabled,
+.theme-purple .bg-theme .btn-outline-theme[disabled],
+.theme-purple.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-purple .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-purple.bg-theme .btn-outline-theme,
+.theme-purple .bg-theme .btn-outline-theme.disabled:focus,
+.theme-purple.bg-theme .btn-outline-theme.disabled:focus,
+.theme-purple .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-purple.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-purple .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-purple.bg-theme .btn-outline-theme:focus,
+.theme-purple .bg-theme .btn-outline-theme.disabled.focus,
+.theme-purple.bg-theme .btn-outline-theme.disabled.focus,
+.theme-purple .bg-theme .btn-outline-theme[disabled].focus,
+.theme-purple.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-purple .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-purple.bg-theme .btn-outline-theme.focus,
+.theme-purple .bg-theme .btn-outline-theme.disabled:active,
+.theme-purple.bg-theme .btn-outline-theme.disabled:active,
+.theme-purple .bg-theme .btn-outline-theme[disabled]:active,
+.theme-purple.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-purple .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-purple.bg-theme .btn-outline-theme:active,
+.theme-purple .bg-theme .btn-outline-theme.disabled.active,
+.theme-purple.bg-theme .btn-outline-theme.disabled.active,
+.theme-purple .bg-theme .btn-outline-theme[disabled].active,
+.theme-purple.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-purple .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-purple.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #6a00ac;
+}
+.theme-purple .bg-theme .border-theme,
+.theme-purple.bg-theme .border-theme {
+  border-color: #6a00ac;
+}
+.theme-purple .bg-theme .text-theme,
+.theme-purple.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-purple .bg-theme .svg-theme .fill-theme,
+.theme-purple.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-purple .bg-theme .svg-theme .stroke-theme,
+.theme-purple.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-purple .bg-theme a,
+.theme-purple.bg-theme a {
+  color: #ffffff;
+}
+.theme-purple .bg-theme a:hover,
+.theme-purple.bg-theme a:hover,
+.theme-purple .bg-theme a:focus,
+.theme-purple.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-purple .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-purple.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-purple .bg-theme .range-theme::-moz-range-track,
+.theme-purple.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-purple .bg-theme .range-theme::-ms-track,
+.theme-purple.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-purple .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-purple.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-purple .bg-theme .range-theme:focus::-moz-range-track,
+.theme-purple.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-purple .bg-theme .range-theme:focus::-ms-track,
+.theme-purple.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-purple .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-purple.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #9c00fe;
+  border-color: #ffffff;
+}
+.theme-purple .bg-theme .range-theme::-moz-range-thumb,
+.theme-purple.bg-theme .range-theme::-moz-range-thumb {
+  background: #9c00fe;
+  border-color: #ffffff;
+}
+.theme-purple .bg-theme .range-theme::-ms-thumb,
+.theme-purple.bg-theme .range-theme::-ms-thumb {
+  background: #9c00fe;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-purple .bg-theme .range-theme::-ms-fill-lower,
+.theme-purple.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-purple .bg-theme .range-theme::-ms-fill-upper,
+.theme-purple.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-purple .bg-theme .range-theme::-ms-tooltip,
+.theme-purple.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-purple .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #9c00fe;
+}
+.theme-purple .btn-theme {
+  color: #fff;
+  background-color: #9c00fe;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-purple .btn-theme:focus,
+.theme-purple .btn-theme.focus,
+.theme-purple .btn-theme:active,
+.theme-purple .btn-theme.active {
+  color: #fff;
+  background-color: #8300d5;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-purple .btn-theme.disabled,
+.theme-purple .btn-theme[disabled],
+fieldset[disabled] .theme-purple .btn-theme,
+.theme-purple .btn-theme.disabled:focus,
+.theme-purple .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-purple .btn-theme:focus,
+.theme-purple .btn-theme.disabled.focus,
+.theme-purple .btn-theme[disabled].focus,
+fieldset[disabled] .theme-purple .btn-theme.focus,
+.theme-purple .btn-theme.disabled:active,
+.theme-purple .btn-theme[disabled]:active,
+fieldset[disabled] .theme-purple .btn-theme:active,
+.theme-purple .btn-theme.disabled.active,
+.theme-purple .btn-theme[disabled].active,
+fieldset[disabled] .theme-purple .btn-theme.active {
+  background-color: #9c00fe;
+  border-color: transparent;
+}
+.theme-purple .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #9c00fe;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-purple .btn-outline-theme:focus,
+.theme-purple .btn-outline-theme.focus,
+.theme-purple .btn-outline-theme:active,
+.theme-purple .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #8300d5;
+}
+.theme-purple .btn-outline-theme.disabled,
+.theme-purple .btn-outline-theme[disabled],
+fieldset[disabled] .theme-purple .btn-outline-theme,
+.theme-purple .btn-outline-theme.disabled:focus,
+.theme-purple .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-purple .btn-outline-theme:focus,
+.theme-purple .btn-outline-theme.disabled.focus,
+.theme-purple .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-purple .btn-outline-theme.focus,
+.theme-purple .btn-outline-theme.disabled:active,
+.theme-purple .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-purple .btn-outline-theme:active,
+.theme-purple .btn-outline-theme.disabled.active,
+.theme-purple .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-purple .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #9c00fe;
+}
+.theme-purple .border-theme {
+  border-color: #9c00fe;
+}
+.theme-purple .text-theme {
+  color: #9c00fe;
+}
+.theme-purple .svg-theme .fill-theme {
+  fill: #9c00fe;
+}
+.theme-purple .svg-theme .stroke-theme {
+  stroke: #9c00fe;
+}
+.theme-purple a {
+  color: #9c00fe;
+}
+.theme-purple .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-purple .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-purple .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-purple .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-purple .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-purple .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-purple .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #9c00fe;
+}
+.theme-purple .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #9c00fe;
+}
+.theme-purple .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #9c00fe;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-purple .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-purple .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-purple .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-red .bg-theme,
+.theme-red.bg-theme {
+  background-color: #fb0807;
+}
+.theme-red .bg-theme .btn-theme,
+.theme-red.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #ae0403;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-red .bg-theme .btn-theme:focus,
+.theme-red.bg-theme .btn-theme:focus,
+.theme-red .bg-theme .btn-theme.focus,
+.theme-red.bg-theme .btn-theme.focus,
+.theme-red .bg-theme .btn-theme:active,
+.theme-red.bg-theme .btn-theme:active,
+.theme-red .bg-theme .btn-theme.active,
+.theme-red.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #850302;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-red .bg-theme .btn-theme.disabled,
+.theme-red.bg-theme .btn-theme.disabled,
+.theme-red .bg-theme .btn-theme[disabled],
+.theme-red.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-red .bg-theme .btn-theme,
+fieldset[disabled] .theme-red.bg-theme .btn-theme,
+.theme-red .bg-theme .btn-theme.disabled:focus,
+.theme-red.bg-theme .btn-theme.disabled:focus,
+.theme-red .bg-theme .btn-theme[disabled]:focus,
+.theme-red.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-red .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-red.bg-theme .btn-theme:focus,
+.theme-red .bg-theme .btn-theme.disabled.focus,
+.theme-red.bg-theme .btn-theme.disabled.focus,
+.theme-red .bg-theme .btn-theme[disabled].focus,
+.theme-red.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-red .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-red.bg-theme .btn-theme.focus,
+.theme-red .bg-theme .btn-theme.disabled:active,
+.theme-red.bg-theme .btn-theme.disabled:active,
+.theme-red .bg-theme .btn-theme[disabled]:active,
+.theme-red.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-red .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-red.bg-theme .btn-theme:active,
+.theme-red .bg-theme .btn-theme.disabled.active,
+.theme-red.bg-theme .btn-theme.disabled.active,
+.theme-red .bg-theme .btn-theme[disabled].active,
+.theme-red.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-red .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-red.bg-theme .btn-theme.active {
+  background-color: #ae0403;
+  border-color: transparent;
+}
+.theme-red .bg-theme .btn-outline-theme,
+.theme-red.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #ae0403;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-red .bg-theme .btn-outline-theme:focus,
+.theme-red.bg-theme .btn-outline-theme:focus,
+.theme-red .bg-theme .btn-outline-theme.focus,
+.theme-red.bg-theme .btn-outline-theme.focus,
+.theme-red .bg-theme .btn-outline-theme:active,
+.theme-red.bg-theme .btn-outline-theme:active,
+.theme-red .bg-theme .btn-outline-theme.active,
+.theme-red.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #850302;
+}
+.theme-red .bg-theme .btn-outline-theme.disabled,
+.theme-red.bg-theme .btn-outline-theme.disabled,
+.theme-red .bg-theme .btn-outline-theme[disabled],
+.theme-red.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-red .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-red.bg-theme .btn-outline-theme,
+.theme-red .bg-theme .btn-outline-theme.disabled:focus,
+.theme-red.bg-theme .btn-outline-theme.disabled:focus,
+.theme-red .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-red.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-red .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-red.bg-theme .btn-outline-theme:focus,
+.theme-red .bg-theme .btn-outline-theme.disabled.focus,
+.theme-red.bg-theme .btn-outline-theme.disabled.focus,
+.theme-red .bg-theme .btn-outline-theme[disabled].focus,
+.theme-red.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-red .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-red.bg-theme .btn-outline-theme.focus,
+.theme-red .bg-theme .btn-outline-theme.disabled:active,
+.theme-red.bg-theme .btn-outline-theme.disabled:active,
+.theme-red .bg-theme .btn-outline-theme[disabled]:active,
+.theme-red.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-red .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-red.bg-theme .btn-outline-theme:active,
+.theme-red .bg-theme .btn-outline-theme.disabled.active,
+.theme-red.bg-theme .btn-outline-theme.disabled.active,
+.theme-red .bg-theme .btn-outline-theme[disabled].active,
+.theme-red.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-red .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-red.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #ae0403;
+}
+.theme-red .bg-theme .border-theme,
+.theme-red.bg-theme .border-theme {
+  border-color: #ae0403;
+}
+.theme-red .bg-theme .text-theme,
+.theme-red.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-red .bg-theme .svg-theme .fill-theme,
+.theme-red.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-red .bg-theme .svg-theme .stroke-theme,
+.theme-red.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-red .bg-theme a,
+.theme-red.bg-theme a {
+  color: #ffffff;
+}
+.theme-red .bg-theme a:hover,
+.theme-red.bg-theme a:hover,
+.theme-red .bg-theme a:focus,
+.theme-red.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-red .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-red.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-red .bg-theme .range-theme::-moz-range-track,
+.theme-red.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-red .bg-theme .range-theme::-ms-track,
+.theme-red.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-red .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-red.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-red .bg-theme .range-theme:focus::-moz-range-track,
+.theme-red.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-red .bg-theme .range-theme:focus::-ms-track,
+.theme-red.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-red .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-red.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #fb0807;
+  border-color: #ffffff;
+}
+.theme-red .bg-theme .range-theme::-moz-range-thumb,
+.theme-red.bg-theme .range-theme::-moz-range-thumb {
+  background: #fb0807;
+  border-color: #ffffff;
+}
+.theme-red .bg-theme .range-theme::-ms-thumb,
+.theme-red.bg-theme .range-theme::-ms-thumb {
+  background: #fb0807;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-red .bg-theme .range-theme::-ms-fill-lower,
+.theme-red.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-red .bg-theme .range-theme::-ms-fill-upper,
+.theme-red.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-red .bg-theme .range-theme::-ms-tooltip,
+.theme-red.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-red .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #fb0807;
+}
+.theme-red .btn-theme {
+  color: #fff;
+  background-color: #fb0807;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-red .btn-theme:focus,
+.theme-red .btn-theme.focus,
+.theme-red .btn-theme:active,
+.theme-red .btn-theme.active {
+  color: #fff;
+  background-color: #d60403;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-red .btn-theme.disabled,
+.theme-red .btn-theme[disabled],
+fieldset[disabled] .theme-red .btn-theme,
+.theme-red .btn-theme.disabled:focus,
+.theme-red .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-red .btn-theme:focus,
+.theme-red .btn-theme.disabled.focus,
+.theme-red .btn-theme[disabled].focus,
+fieldset[disabled] .theme-red .btn-theme.focus,
+.theme-red .btn-theme.disabled:active,
+.theme-red .btn-theme[disabled]:active,
+fieldset[disabled] .theme-red .btn-theme:active,
+.theme-red .btn-theme.disabled.active,
+.theme-red .btn-theme[disabled].active,
+fieldset[disabled] .theme-red .btn-theme.active {
+  background-color: #fb0807;
+  border-color: transparent;
+}
+.theme-red .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #fb0807;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-red .btn-outline-theme:focus,
+.theme-red .btn-outline-theme.focus,
+.theme-red .btn-outline-theme:active,
+.theme-red .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #d60403;
+}
+.theme-red .btn-outline-theme.disabled,
+.theme-red .btn-outline-theme[disabled],
+fieldset[disabled] .theme-red .btn-outline-theme,
+.theme-red .btn-outline-theme.disabled:focus,
+.theme-red .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-red .btn-outline-theme:focus,
+.theme-red .btn-outline-theme.disabled.focus,
+.theme-red .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-red .btn-outline-theme.focus,
+.theme-red .btn-outline-theme.disabled:active,
+.theme-red .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-red .btn-outline-theme:active,
+.theme-red .btn-outline-theme.disabled.active,
+.theme-red .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-red .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #fb0807;
+}
+.theme-red .border-theme {
+  border-color: #fb0807;
+}
+.theme-red .text-theme {
+  color: #fb0807;
+}
+.theme-red .svg-theme .fill-theme {
+  fill: #fb0807;
+}
+.theme-red .svg-theme .stroke-theme {
+  stroke: #fb0807;
+}
+.theme-red a {
+  color: #fb0807;
+}
+.theme-red .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-red .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-red .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-red .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-red .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-red .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-red .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #fb0807;
+}
+.theme-red .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #fb0807;
+}
+.theme-red .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #fb0807;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-red .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-red .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-red .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-yellow .bg-theme,
+.theme-yellow.bg-theme {
+  background-color: #febf02;
+}
+.theme-yellow .bg-theme .btn-theme,
+.theme-yellow.bg-theme .btn-theme {
+  color: #fff;
+  background-color: #ae8201;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-yellow .bg-theme .btn-theme:focus,
+.theme-yellow.bg-theme .btn-theme:focus,
+.theme-yellow .bg-theme .btn-theme.focus,
+.theme-yellow.bg-theme .btn-theme.focus,
+.theme-yellow .bg-theme .btn-theme:active,
+.theme-yellow.bg-theme .btn-theme:active,
+.theme-yellow .bg-theme .btn-theme.active,
+.theme-yellow.bg-theme .btn-theme.active {
+  color: #fff;
+  background-color: #856401;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-yellow .bg-theme .btn-theme.disabled,
+.theme-yellow.bg-theme .btn-theme.disabled,
+.theme-yellow .bg-theme .btn-theme[disabled],
+.theme-yellow.bg-theme .btn-theme[disabled],
+fieldset[disabled] .theme-yellow .bg-theme .btn-theme,
+fieldset[disabled] .theme-yellow.bg-theme .btn-theme,
+.theme-yellow .bg-theme .btn-theme.disabled:focus,
+.theme-yellow.bg-theme .btn-theme.disabled:focus,
+.theme-yellow .bg-theme .btn-theme[disabled]:focus,
+.theme-yellow.bg-theme .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-yellow .bg-theme .btn-theme:focus,
+fieldset[disabled] .theme-yellow.bg-theme .btn-theme:focus,
+.theme-yellow .bg-theme .btn-theme.disabled.focus,
+.theme-yellow.bg-theme .btn-theme.disabled.focus,
+.theme-yellow .bg-theme .btn-theme[disabled].focus,
+.theme-yellow.bg-theme .btn-theme[disabled].focus,
+fieldset[disabled] .theme-yellow .bg-theme .btn-theme.focus,
+fieldset[disabled] .theme-yellow.bg-theme .btn-theme.focus,
+.theme-yellow .bg-theme .btn-theme.disabled:active,
+.theme-yellow.bg-theme .btn-theme.disabled:active,
+.theme-yellow .bg-theme .btn-theme[disabled]:active,
+.theme-yellow.bg-theme .btn-theme[disabled]:active,
+fieldset[disabled] .theme-yellow .bg-theme .btn-theme:active,
+fieldset[disabled] .theme-yellow.bg-theme .btn-theme:active,
+.theme-yellow .bg-theme .btn-theme.disabled.active,
+.theme-yellow.bg-theme .btn-theme.disabled.active,
+.theme-yellow .bg-theme .btn-theme[disabled].active,
+.theme-yellow.bg-theme .btn-theme[disabled].active,
+fieldset[disabled] .theme-yellow .bg-theme .btn-theme.active,
+fieldset[disabled] .theme-yellow.bg-theme .btn-theme.active {
+  background-color: #ae8201;
+  border-color: transparent;
+}
+.theme-yellow .bg-theme .btn-outline-theme,
+.theme-yellow.bg-theme .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #ae8201;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-yellow .bg-theme .btn-outline-theme:focus,
+.theme-yellow.bg-theme .btn-outline-theme:focus,
+.theme-yellow .bg-theme .btn-outline-theme.focus,
+.theme-yellow.bg-theme .btn-outline-theme.focus,
+.theme-yellow .bg-theme .btn-outline-theme:active,
+.theme-yellow.bg-theme .btn-outline-theme:active,
+.theme-yellow .bg-theme .btn-outline-theme.active,
+.theme-yellow.bg-theme .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #856401;
+}
+.theme-yellow .bg-theme .btn-outline-theme.disabled,
+.theme-yellow.bg-theme .btn-outline-theme.disabled,
+.theme-yellow .bg-theme .btn-outline-theme[disabled],
+.theme-yellow.bg-theme .btn-outline-theme[disabled],
+fieldset[disabled] .theme-yellow .bg-theme .btn-outline-theme,
+fieldset[disabled] .theme-yellow.bg-theme .btn-outline-theme,
+.theme-yellow .bg-theme .btn-outline-theme.disabled:focus,
+.theme-yellow.bg-theme .btn-outline-theme.disabled:focus,
+.theme-yellow .bg-theme .btn-outline-theme[disabled]:focus,
+.theme-yellow.bg-theme .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-yellow .bg-theme .btn-outline-theme:focus,
+fieldset[disabled] .theme-yellow.bg-theme .btn-outline-theme:focus,
+.theme-yellow .bg-theme .btn-outline-theme.disabled.focus,
+.theme-yellow.bg-theme .btn-outline-theme.disabled.focus,
+.theme-yellow .bg-theme .btn-outline-theme[disabled].focus,
+.theme-yellow.bg-theme .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-yellow .bg-theme .btn-outline-theme.focus,
+fieldset[disabled] .theme-yellow.bg-theme .btn-outline-theme.focus,
+.theme-yellow .bg-theme .btn-outline-theme.disabled:active,
+.theme-yellow.bg-theme .btn-outline-theme.disabled:active,
+.theme-yellow .bg-theme .btn-outline-theme[disabled]:active,
+.theme-yellow.bg-theme .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-yellow .bg-theme .btn-outline-theme:active,
+fieldset[disabled] .theme-yellow.bg-theme .btn-outline-theme:active,
+.theme-yellow .bg-theme .btn-outline-theme.disabled.active,
+.theme-yellow.bg-theme .btn-outline-theme.disabled.active,
+.theme-yellow .bg-theme .btn-outline-theme[disabled].active,
+.theme-yellow.bg-theme .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-yellow .bg-theme .btn-outline-theme.active,
+fieldset[disabled] .theme-yellow.bg-theme .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #ae8201;
+}
+.theme-yellow .bg-theme .border-theme,
+.theme-yellow.bg-theme .border-theme {
+  border-color: #ae8201;
+}
+.theme-yellow .bg-theme .text-theme,
+.theme-yellow.bg-theme .text-theme {
+  color: #ffffff;
+}
+.theme-yellow .bg-theme .svg-theme .fill-theme,
+.theme-yellow.bg-theme .svg-theme .fill-theme {
+  fill: #ffffff;
+}
+.theme-yellow .bg-theme .svg-theme .stroke-theme,
+.theme-yellow.bg-theme .svg-theme .stroke-theme {
+  stroke: #ffffff;
+}
+.theme-yellow .bg-theme a,
+.theme-yellow.bg-theme a {
+  color: #ffffff;
+}
+.theme-yellow .bg-theme a:hover,
+.theme-yellow.bg-theme a:hover,
+.theme-yellow .bg-theme a:focus,
+.theme-yellow.bg-theme a:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+.theme-yellow .bg-theme .range-theme::-webkit-slider-runnable-track,
+.theme-yellow.bg-theme .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-yellow .bg-theme .range-theme::-moz-range-track,
+.theme-yellow.bg-theme .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-yellow .bg-theme .range-theme::-ms-track,
+.theme-yellow.bg-theme .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-yellow .bg-theme .range-theme:focus::-webkit-slider-runnable-track,
+.theme-yellow.bg-theme .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-yellow .bg-theme .range-theme:focus::-moz-range-track,
+.theme-yellow.bg-theme .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-yellow .bg-theme .range-theme:focus::-ms-track,
+.theme-yellow.bg-theme .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-yellow .bg-theme .range-theme::-webkit-slider-thumb,
+.theme-yellow.bg-theme .range-theme::-webkit-slider-thumb {
+  background: #febf02;
+  border-color: #ffffff;
+}
+.theme-yellow .bg-theme .range-theme::-moz-range-thumb,
+.theme-yellow.bg-theme .range-theme::-moz-range-thumb {
+  background: #febf02;
+  border-color: #ffffff;
+}
+.theme-yellow .bg-theme .range-theme::-ms-thumb,
+.theme-yellow.bg-theme .range-theme::-ms-thumb {
+  background: #febf02;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-yellow .bg-theme .range-theme::-ms-fill-lower,
+.theme-yellow.bg-theme .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-yellow .bg-theme .range-theme::-ms-fill-upper,
+.theme-yellow.bg-theme .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-yellow .bg-theme .range-theme::-ms-tooltip,
+.theme-yellow.bg-theme .range-theme::-ms-tooltip {
+  display: none;
+}
+.theme-yellow .bg-hover-theme:hover {
+  color: #fff;
+  background-color: #febf02;
+}
+.theme-yellow .btn-theme {
+  color: #fff;
+  background-color: #febf02;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-yellow .btn-theme:focus,
+.theme-yellow .btn-theme.focus,
+.theme-yellow .btn-theme:active,
+.theme-yellow .btn-theme.active {
+  color: #fff;
+  background-color: #d6a101;
+  border-color: rgba(0, 0, 0, 0);
+}
+.theme-yellow .btn-theme.disabled,
+.theme-yellow .btn-theme[disabled],
+fieldset[disabled] .theme-yellow .btn-theme,
+.theme-yellow .btn-theme.disabled:focus,
+.theme-yellow .btn-theme[disabled]:focus,
+fieldset[disabled] .theme-yellow .btn-theme:focus,
+.theme-yellow .btn-theme.disabled.focus,
+.theme-yellow .btn-theme[disabled].focus,
+fieldset[disabled] .theme-yellow .btn-theme.focus,
+.theme-yellow .btn-theme.disabled:active,
+.theme-yellow .btn-theme[disabled]:active,
+fieldset[disabled] .theme-yellow .btn-theme:active,
+.theme-yellow .btn-theme.disabled.active,
+.theme-yellow .btn-theme[disabled].active,
+fieldset[disabled] .theme-yellow .btn-theme.active {
+  background-color: #febf02;
+  border-color: transparent;
+}
+.theme-yellow .btn-outline-theme {
+  color: #fff;
+  background-color: transparent;
+  border-color: #febf02;
+  border-style: solid;
+  border-width: 2px;
+}
+.theme-yellow .btn-outline-theme:focus,
+.theme-yellow .btn-outline-theme.focus,
+.theme-yellow .btn-outline-theme:active,
+.theme-yellow .btn-outline-theme.active {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #d6a101;
+}
+.theme-yellow .btn-outline-theme.disabled,
+.theme-yellow .btn-outline-theme[disabled],
+fieldset[disabled] .theme-yellow .btn-outline-theme,
+.theme-yellow .btn-outline-theme.disabled:focus,
+.theme-yellow .btn-outline-theme[disabled]:focus,
+fieldset[disabled] .theme-yellow .btn-outline-theme:focus,
+.theme-yellow .btn-outline-theme.disabled.focus,
+.theme-yellow .btn-outline-theme[disabled].focus,
+fieldset[disabled] .theme-yellow .btn-outline-theme.focus,
+.theme-yellow .btn-outline-theme.disabled:active,
+.theme-yellow .btn-outline-theme[disabled]:active,
+fieldset[disabled] .theme-yellow .btn-outline-theme:active,
+.theme-yellow .btn-outline-theme.disabled.active,
+.theme-yellow .btn-outline-theme[disabled].active,
+fieldset[disabled] .theme-yellow .btn-outline-theme.active {
+  background-color: transparent;
+  border-color: #febf02;
+}
+.theme-yellow .border-theme {
+  border-color: #febf02;
+}
+.theme-yellow .text-theme {
+  color: #febf02;
+}
+.theme-yellow .svg-theme .fill-theme {
+  fill: #febf02;
+}
+.theme-yellow .svg-theme .stroke-theme {
+  stroke: #febf02;
+}
+.theme-yellow a {
+  color: #febf02;
+}
+.theme-yellow .range-theme::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-yellow .range-theme::-moz-range-track {
+  background: rgba(0, 0, 0, 0.16);
+}
+.theme-yellow .range-theme::-ms-track {
+  background: rgba(0, 0, 0, 0.16);
+  color: transparent;
+}
+.theme-yellow .range-theme:focus::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-yellow .range-theme:focus::-moz-range-track {
+  background: rgba(0, 0, 0, 0.32);
+}
+.theme-yellow .range-theme:focus::-ms-track {
+  background: rgba(0, 0, 0, 0.32);
+  color: transparent;
+}
+.theme-yellow .range-theme::-webkit-slider-thumb {
+  background: #ffffff;
+  border-color: #febf02;
+}
+.theme-yellow .range-theme::-moz-range-thumb {
+  background: #ffffff;
+  border-color: #febf02;
+}
+.theme-yellow .range-theme::-ms-thumb {
+  background: #ffffff;
+  border-color: #febf02;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+.theme-yellow .range-theme::-ms-fill-lower {
+  background: transparent;
+}
+.theme-yellow .range-theme::-ms-fill-upper {
+  background: transparent;
+}
+.theme-yellow .range-theme::-ms-tooltip {
+  display: none;
+}
+.bg-black {
+  background-color: rgba(0, 0, 0, 0.32);
+}
+.bg-blue {
+  background-color: rgba(35, 145, 211, 0.32);
+}
+.bg-green {
+  background-color: rgba(0, 200, 0, 0.32);
+}
+.bg-gray {
+  background-color: rgba(186, 200, 209, 0.32);
+}
+.bg-orange {
+  background-color: rgba(255, 137, 0, 0.32);
+}
+.bg-pink {
+  background-color: rgba(254, 94, 189, 0.32);
+}
+.bg-purple {
+  background-color: rgba(156, 0, 254, 0.32);
+}
+.bg-red {
+  background-color: rgba(251, 8, 7, 0.32);
+}
+.bg-white {
+  background-color: rgba(255, 255, 255, 0.32);
+}
+.bg-yellow {
+  background-color: rgba(254, 191, 2, 0.32);
+}
+.btn {
+  padding: 6px 20px;
+  font-size: 14px;
+  font-weight: 4px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.btn:hover,
+.btn:focus,
+.btn.focus {
+  text-decoration: none;
+}
+.btn:active,
+.btn.active {
+  outline: 0;
+}
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .65;
+}
+.btn-lg {
+  padding: 10px 24px;
+  font-size: 17px;
+  font-weight: 4px;
+  line-height: 30px;
+  border-radius: 4px;
+}
+.btn-sm {
+  padding: 5px 16px;
+  font-size: 12px;
+  font-weight: 4px;
+  line-height: 17px;
+  border-radius: 4px;
+}
+.btn-xs {
+  padding: 1px 12px;
+  font-size: 12px;
+  font-weight: 4px;
+  line-height: 17px;
+  border-radius: 4px;
+}
+.btn-block {
+  display: block;
+  width: 100%;
+}
+.btn-block + .btn-block {
+  margin-top: 4px;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.button {
+  width: 192px;
+  height: 40px;
+  line-height: 38px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 11px;
+  display: inline-block;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.main-accent-color-1 .button {
+  background-color: #2391d3;
+}
+.main-accent-color-2 .button {
+  background-color: #00c800;
+}
+.main-accent-color-3 .button {
+  background-color: #febf02;
+}
+.main-accent-color-4 .button {
+  background-color: #fb0807;
+}
+.main-accent-color-5 .button {
+  background-color: #ff8900;
+}
+.main-accent-color-6 .button {
+  background-color: #fe5ebd;
+}
+.main-accent-color-7 .button {
+  background-color: #9c00fe;
+}
+.button > input {
+  position: absolute;
+  left: -9999px;
+}
+.button:focus {
+  outline: 0;
+}
+.button.button-inverted {
+  background-color: transparent;
+}
+.main-accent-color-1 .button.button-inverted {
+  color: #2391d3;
+}
+.main-accent-color-2 .button.button-inverted {
+  color: #00c800;
+}
+.main-accent-color-3 .button.button-inverted {
+  color: #febf02;
+}
+.main-accent-color-4 .button.button-inverted {
+  color: #fb0807;
+}
+.main-accent-color-5 .button.button-inverted {
+  color: #ff8900;
+}
+.main-accent-color-6 .button.button-inverted {
+  color: #fe5ebd;
+}
+.main-accent-color-7 .button.button-inverted {
+  color: #9c00fe;
+}
+.main-accent-color-1 .button.button-inverted {
+  border-color: #2391d3;
+}
+.main-accent-color-2 .button.button-inverted {
+  border-color: #00c800;
+}
+.main-accent-color-3 .button.button-inverted {
+  border-color: #febf02;
+}
+.main-accent-color-4 .button.button-inverted {
+  border-color: #fb0807;
+}
+.main-accent-color-5 .button.button-inverted {
+  border-color: #ff8900;
+}
+.main-accent-color-6 .button.button-inverted {
+  border-color: #fe5ebd;
+}
+.main-accent-color-7 .button.button-inverted {
+  border-color: #9c00fe;
+}
+.button.button-white {
+  background-color: #fff;
+  border-color: #fff;
+  color: #222;
+}
+.button.button-white:active,
+.button.button-white:focus {
+  background-color: #d6d6d6;
+  border-color: #d6d6d6;
+  color: #000000;
+}
+.button.button-outline {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.32);
+  font-weight: normal;
+}
+.button.button-outline:active,
+.button.button-outline:focus {
+  background-color: rgba(50, 54, 57, 0.16);
+  border-color: rgba(214, 214, 214, 0.32);
+  color: #d6d6d6;
+}
+.button.button-large {
+  width: 192px;
+  height: 40px;
+  line-height: 38px;
+}
+.button.button-small,
+.button.button-medium {
+  width: 108px;
+  min-width: 108px;
+  height: 28px;
+  line-height: 26px;
+}
+.button.button-fluid {
+  width: auto;
+}
+.button.button-full {
+  width: 100%;
+}
+.button:disabled,
+.button.button-disabled {
+  cursor: default;
+  opacity: 0.32;
+  pointer-events: none;
+}
+.button.button-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+}
+.button.button-pill span + span {
+  margin-left: 8px;
+}
+.button-group {
+  display: flex;
+  width: 100%;
+}
+.button-group > .button {
+  flex: 1 1;
+}
+.button-group > .button:first-child {
+  margin-right: 4%;
+}
+.icon-button,
+.button-icon {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.icon-button > label,
+.button-icon > label,
+.icon-button > span,
+.button-icon > span {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  margin-left: 8px;
+  color: #323639;
+  cursor: pointer;
+}
+.icon-button > input,
+.button-icon > input {
+  position: absolute;
+  left: -9999px;
+}
+.icon-button.disabled,
+.button-icon.disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+.button-icon-large {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+}
+.button-icon-large > label,
+.button-icon-large > span {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  margin-left: 8px;
+  color: #323639;
+  cursor: pointer;
+}
+.button-icon-large > input {
+  position: absolute;
+  left: -9999px;
+}
+.button-icon-large.disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+.button-label {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  border: 0;
+  -webkit-appearance: none;
+  background: none;
+  cursor: pointer;
+  line-height: 24px;
+  outline: 0;
+}
+.button-theme {
+  border: none;
+  color: #fff;
+}
+.main-accent-color-1 .button-theme {
+  background-color: #2391d3;
+}
+.main-accent-color-2 .button-theme {
+  background-color: #00c800;
+}
+.main-accent-color-3 .button-theme {
+  background-color: #febf02;
+}
+.main-accent-color-4 .button-theme {
+  background-color: #fb0807;
+}
+.main-accent-color-5 .button-theme {
+  background-color: #ff8900;
+}
+.main-accent-color-6 .button-theme {
+  background-color: #fe5ebd;
+}
+.main-accent-color-7 .button-theme {
+  background-color: #9c00fe;
+}
+.button-theme.disabled {
+  background: transparent;
+}
+.main-accent-color-1 .button-theme.disabled {
+  color: rgba(35, 145, 211, 0.24);
+}
+.main-accent-color-2 .button-theme.disabled {
+  color: rgba(0, 200, 0, 0.24);
+}
+.main-accent-color-3 .button-theme.disabled {
+  color: rgba(254, 191, 2, 0.24);
+}
+.main-accent-color-4 .button-theme.disabled {
+  color: rgba(251, 8, 7, 0.24);
+}
+.main-accent-color-5 .button-theme.disabled {
+  color: rgba(255, 137, 0, 0.24);
+}
+.main-accent-color-6 .button-theme.disabled {
+  color: rgba(254, 94, 189, 0.24);
+}
+.main-accent-color-7 .button-theme.disabled {
+  color: rgba(156, 0, 254, 0.24);
+}
+.button-theme-blue {
+  border: none;
+  color: #fff;
+  background-color: #2391d3 !important;
+}
+.button-theme-blue.disabled {
+  background: transparent;
+}
+.button-theme-blue.toggled {
+  color: #2391d3 !important;
+}
+.button-theme-blue.disabled {
+  color: rgba(35, 145, 211, 0.24) !important;
+}
+.button-theme-green {
+  border: none;
+  color: #fff;
+  background-color: #00c800 !important;
+}
+.button-theme-green.disabled {
+  background: transparent;
+}
+.button-theme-green.toggled {
+  color: #00c800 !important;
+}
+.button-theme-green.disabled {
+  color: rgba(0, 200, 0, 0.24) !important;
+}
+.button-theme-yellow {
+  border: none;
+  color: #fff;
+  background-color: #febf02 !important;
+}
+.button-theme-yellow.disabled {
+  background: transparent;
+}
+.button-theme-yellow.toggled {
+  color: #febf02 !important;
+}
+.button-theme-yellow.disabled {
+  color: rgba(254, 191, 2, 0.24) !important;
+}
+.button-theme-red {
+  border: none;
+  color: #fff;
+  background-color: #fb0807 !important;
+}
+.button-theme-red.disabled {
+  background: transparent;
+}
+.button-theme-red.toggled {
+  color: #fb0807 !important;
+}
+.button-theme-red.disabled {
+  color: rgba(251, 8, 7, 0.24) !important;
+}
+.button-theme-orange {
+  border: none;
+  color: #fff;
+  background-color: #ff8900 !important;
+}
+.button-theme-orange.disabled {
+  background: transparent;
+}
+.button-theme-orange.toggled {
+  color: #ff8900 !important;
+}
+.button-theme-orange.disabled {
+  color: rgba(255, 137, 0, 0.24) !important;
+}
+.button-theme-pink {
+  border: none;
+  color: #fff;
+  background-color: #fe5ebd !important;
+}
+.button-theme-pink.disabled {
+  background: transparent;
+}
+.button-theme-pink.toggled {
+  color: #fe5ebd !important;
+}
+.button-theme-pink.disabled {
+  color: rgba(254, 94, 189, 0.24) !important;
+}
+.button-theme-purple {
+  border: none;
+  color: #fff;
+  background-color: #9c00fe !important;
+}
+.button-theme-purple.disabled {
+  background: transparent;
+}
+.button-theme-purple.toggled {
+  color: #9c00fe !important;
+}
+.button-theme-purple.disabled {
+  color: rgba(156, 0, 254, 0.24) !important;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.button-round {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+  border: 1px solid rgba(50, 54, 57, 0.4);
+  color: #323639;
+  cursor: pointer;
+  line-height: 26px;
+  text-align: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.button-round > input {
+  position: absolute;
+  left: -9999px;
+}
+.button-round > svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.button-round.hover,
+.button-round:hover {
+  background: rgba(50, 54, 57, 0.16);
+}
+.button-round.active,
+.button-round:active {
+  background: rgba(50, 54, 57, 0.4);
+}
+.button-round.toggled {
+  background: rgba(50, 54, 57, 0.72);
+  border-color: transparent;
+  color: #fff;
+}
+.button-round.disabled {
+  border: 1px solid rgba(50, 54, 57, 0.4);
+  background: transparent;
+  color: rgba(50, 54, 57, 0.72);
+  cursor: default;
+}
+.button-round-theme {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+}
+.main-accent-color-1 .button-round-theme {
+  background-color: #2391d3;
+}
+.main-accent-color-2 .button-round-theme {
+  background-color: #00c800;
+}
+.main-accent-color-3 .button-round-theme {
+  background-color: #febf02;
+}
+.main-accent-color-4 .button-round-theme {
+  background-color: #fb0807;
+}
+.main-accent-color-5 .button-round-theme {
+  background-color: #ff8900;
+}
+.main-accent-color-6 .button-round-theme {
+  background-color: #fe5ebd;
+}
+.main-accent-color-7 .button-round-theme {
+  background-color: #9c00fe;
+}
+.button-round-theme.toggled {
+  background: #fff;
+}
+.button-round-theme.disabled {
+  background: transparent;
+}
+.main-accent-color-1 .button-round-theme.toggled {
+  color: #2391d3;
+}
+.main-accent-color-2 .button-round-theme.toggled {
+  color: #00c800;
+}
+.main-accent-color-3 .button-round-theme.toggled {
+  color: #febf02;
+}
+.main-accent-color-4 .button-round-theme.toggled {
+  color: #fb0807;
+}
+.main-accent-color-5 .button-round-theme.toggled {
+  color: #ff8900;
+}
+.main-accent-color-6 .button-round-theme.toggled {
+  color: #fe5ebd;
+}
+.main-accent-color-7 .button-round-theme.toggled {
+  color: #9c00fe;
+}
+.main-accent-color-1 .button-round-theme.disabled {
+  color: rgba(35, 145, 211, 0.24);
+}
+.main-accent-color-2 .button-round-theme.disabled {
+  color: rgba(0, 200, 0, 0.24);
+}
+.main-accent-color-3 .button-round-theme.disabled {
+  color: rgba(254, 191, 2, 0.24);
+}
+.main-accent-color-4 .button-round-theme.disabled {
+  color: rgba(251, 8, 7, 0.24);
+}
+.main-accent-color-5 .button-round-theme.disabled {
+  color: rgba(255, 137, 0, 0.24);
+}
+.main-accent-color-6 .button-round-theme.disabled {
+  color: rgba(254, 94, 189, 0.24);
+}
+.main-accent-color-7 .button-round-theme.disabled {
+  color: rgba(156, 0, 254, 0.24);
+}
+.button-round-theme-blue {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #2391d3 !important;
+}
+.button-round-theme-blue.toggled {
+  background: #fff;
+}
+.button-round-theme-blue.disabled {
+  background: transparent;
+}
+.button-round-theme-blue.toggled {
+  color: #2391d3 !important;
+}
+.button-round-theme-blue.disabled {
+  color: rgba(35, 145, 211, 0.24) !important;
+}
+.button-round-theme-green {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #00c800 !important;
+}
+.button-round-theme-green.toggled {
+  background: #fff;
+}
+.button-round-theme-green.disabled {
+  background: transparent;
+}
+.button-round-theme-green.toggled {
+  color: #00c800 !important;
+}
+.button-round-theme-green.disabled {
+  color: rgba(0, 200, 0, 0.24) !important;
+}
+.button-round-theme-yellow {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #febf02 !important;
+}
+.button-round-theme-yellow.toggled {
+  background: #fff;
+}
+.button-round-theme-yellow.disabled {
+  background: transparent;
+}
+.button-round-theme-yellow.toggled {
+  color: #febf02 !important;
+}
+.button-round-theme-yellow.disabled {
+  color: rgba(254, 191, 2, 0.24) !important;
+}
+.button-round-theme-red {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #fb0807 !important;
+}
+.button-round-theme-red.toggled {
+  background: #fff;
+}
+.button-round-theme-red.disabled {
+  background: transparent;
+}
+.button-round-theme-red.toggled {
+  color: #fb0807 !important;
+}
+.button-round-theme-red.disabled {
+  color: rgba(251, 8, 7, 0.24) !important;
+}
+.button-round-theme-orange {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #ff8900 !important;
+}
+.button-round-theme-orange.toggled {
+  background: #fff;
+}
+.button-round-theme-orange.disabled {
+  background: transparent;
+}
+.button-round-theme-orange.toggled {
+  color: #ff8900 !important;
+}
+.button-round-theme-orange.disabled {
+  color: rgba(255, 137, 0, 0.24) !important;
+}
+.button-round-theme-pink {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #fe5ebd !important;
+}
+.button-round-theme-pink.toggled {
+  background: #fff;
+}
+.button-round-theme-pink.disabled {
+  background: transparent;
+}
+.button-round-theme-pink.toggled {
+  color: #fe5ebd !important;
+}
+.button-round-theme-pink.disabled {
+  color: rgba(254, 94, 189, 0.24) !important;
+}
+.button-round-theme-purple {
+  border: none;
+  color: #fff;
+  line-height: 28px;
+  background-color: #9c00fe !important;
+}
+.button-round-theme-purple.toggled {
+  background: #fff;
+}
+.button-round-theme-purple.disabled {
+  background: transparent;
+}
+.button-round-theme-purple.toggled {
+  color: #9c00fe !important;
+}
+.button-round-theme-purple.disabled {
+  color: rgba(156, 0, 254, 0.24) !important;
+}
+.button-round-dark {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+.button-round-dark.hover,
+.button-round-dark:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.button-round-dark.active,
+.button-round-dark:active {
+  background: rgba(255, 255, 255, 0.24);
+}
+.button-round-dark.toggled {
+  background: #fff;
+  border-color: transparent;
+  color: #323639;
+}
+.button-round-dark.disabled {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+}
+.button-round-text {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+}
+.button-round-label {
+  cursor: pointer;
+}
+.button-round-label > .button-round,
+.button-round-label > span {
+  float: left;
+}
+.button-round-label > span {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  height: 28px;
+  margin-left: 10px;
+  color: #323639;
+  line-height: 28px;
+}
+.button-round-md {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+}
+.button-round-lg {
+  width: 64px;
+  height: 64px;
+  line-height: 64px;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.checkbox {
+  display: inline-block;
+}
+.checkbox input[type='checkbox'] {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+}
+.checkbox input[type='checkbox']:checked + label::after {
+  content: '\e601';
+}
+.checkbox label {
+  position: relative;
+  display: inline-block;
+  padding-left: 24px;
+  cursor: pointer;
+  line-height: 16px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.checkbox label::after {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '\e600';
+  font-family: Wire;
+  font-size: 16px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: 1;
+  text-transform: none;
+}
+.checkbox label > div {
+  color: #323639 !important;
+  line-height: 16px;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.fill-blue {
+  background-color: #2391d3 !important;
+}
+.fill-green {
+  background-color: #00c800 !important;
+}
+.fill-yellow {
+  background-color: #febf02 !important;
+}
+.fill-red {
+  background-color: #fb0807 !important;
+}
+.fill-orange {
+  background-color: #ff8900 !important;
+}
+.fill-pink {
+  background-color: #fe5ebd !important;
+}
+.fill-purple {
+  background-color: #9c00fe !important;
+}
+.fill-graphite {
+  background-color: #8d989f !important;
+}
+.fill-graphite-dark {
+  background-color: #323639 !important;
+}
+.text-blue {
+  color: #2391d3 !important;
+}
+.text-green {
+  color: #00c800 !important;
+}
+.text-yellow {
+  color: #febf02 !important;
+}
+.text-red {
+  color: #fb0807 !important;
+}
+.text-orange {
+  color: #ff8900 !important;
+}
+.text-pink {
+  color: #fe5ebd !important;
+}
+.text-purple {
+  color: #9c00fe !important;
+}
+.text-graphite {
+  color: #8d989f !important;
+}
+.text-graphite-dark {
+  color: #323639 !important;
+}
+.text-white {
+  color: #fff !important;
+}
+.main-accent-color-1 .text-ephemeral {
+  color: #2391d3;
+}
+.main-accent-color-2 .text-ephemeral {
+  color: #00c800;
+}
+.main-accent-color-3 .text-ephemeral {
+  color: #febf02;
+}
+.main-accent-color-4 .text-ephemeral {
+  color: #fb0807;
+}
+.main-accent-color-5 .text-ephemeral {
+  color: #ff8900;
+}
+.main-accent-color-6 .text-ephemeral {
+  color: #fe5ebd;
+}
+.main-accent-color-7 .text-ephemeral {
+  color: #9c00fe;
+}
+.main-accent-color-1 .svg-ephemeral {
+  color: #2391d3;
+}
+.main-accent-color-2 .svg-ephemeral {
+  color: #00c800;
+}
+.main-accent-color-3 .svg-ephemeral {
+  color: #febf02;
+}
+.main-accent-color-4 .svg-ephemeral {
+  color: #fb0807;
+}
+.main-accent-color-5 .svg-ephemeral {
+  color: #ff8900;
+}
+.main-accent-color-6 .svg-ephemeral {
+  color: #fe5ebd;
+}
+.main-accent-color-7 .svg-ephemeral {
+  color: #9c00fe;
+}
+.svg-ephemeral svg path {
+  fill: currentColor;
+}
+.svg-green svg > path {
+  fill: #00c800 !important;
+}
+.svg-red svg > path {
+  fill: #fb0807 !important;
+}
+.font-size-xxs {
+  font-size: 8px !important;
+}
+.font-size-xs {
+  font-size: 11px !important;
+}
+.font-size-sm {
+  font-size: 16px !important;
+}
+.font-size-md {
+  font-size: 20px !important;
+}
+.font-size-lg {
+  font-size: 24px !important;
+}
+.font-size-xl {
+  font-size: 32px !important;
+}
+.font-size-xxl {
+  font-size: 56px !important;
+}
+.font-weight-bold {
+  font-weight: 600 !important;
+}
+.font-weight-regular {
+  font-weight: 400 !important;
+}
+.font-weight-light {
+  font-weight: 300 !important;
+}
+.accent-color-0 {
+  color: transparent;
+}
+.accent-color-1 {
+  color: #2391d3;
+}
+.accent-color-2 {
+  color: #00c800;
+}
+.accent-color-3 {
+  color: #febf02;
+}
+.accent-color-4 {
+  color: #fb0807;
+}
+.accent-color-5 {
+  color: #ff8900;
+}
+.accent-color-6 {
+  color: #fe5ebd;
+}
+.accent-color-7 {
+  color: #9c00fe;
+}
+.accent-color-service {
+  color: #fff;
+}
+.accent-color-temporary {
+  color: rgba(50, 54, 57, 0.08);
+}
+.main-accent-color-1 .bg-color-ephemeral {
+  background-color: rgba(35, 145, 211, 0.16);
+}
+.main-accent-color-2 .bg-color-ephemeral {
+  background-color: rgba(0, 200, 0, 0.16);
+}
+.main-accent-color-3 .bg-color-ephemeral {
+  background-color: rgba(254, 191, 2, 0.16);
+}
+.main-accent-color-4 .bg-color-ephemeral {
+  background-color: rgba(251, 8, 7, 0.16);
+}
+.main-accent-color-5 .bg-color-ephemeral {
+  background-color: rgba(255, 137, 0, 0.16);
+}
+.main-accent-color-6 .bg-color-ephemeral {
+  background-color: rgba(254, 94, 189, 0.16);
+}
+.main-accent-color-7 .bg-color-ephemeral {
+  background-color: rgba(156, 0, 254, 0.16);
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.input-box {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  color: #fff;
+  line-height: 40px;
+  outline: 0;
+}
+.input-box::-ms-clear {
+  display: none;
+}
+.input {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  color: #fff;
+  line-height: 40px;
+  outline: 0;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.input::-ms-clear {
+  display: none;
+}
+.input::-webkit-input-placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.56);
+}
+.input::-ms-input-placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.56);
+}
+.input::placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.56);
+}
+.input-select {
+  position: relative;
+}
+.input-select select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  cursor: pointer;
+}
+.input-select select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #fff;
+}
+.input-select select::-ms-expand {
+  display: none;
+}
+.input-select label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  pointer-events: none;
+  text-align: center;
+}
+.input-group {
+  display: flex;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+.input-group button,
+.input-group input {
+  margin-bottom: 0;
+  border-radius: 0;
+}
+.input-group button:invalid,
+.input-group input:invalid {
+  box-shadow: none;
+}
+.input-group-button {
+  width: 40px;
+  flex: 0 0 auto;
+  padding: 0;
+  line-height: 40px;
+}
+.input-group-button.visible {
+  display: block;
+}
+.has-error .input-group-button,
+.input-group-button:not(.visible) {
+  display: none;
+}
+.input-code {
+  font-size: 24px;
+  letter-spacing: 8px;
+  text-align: center;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.label {
+  text-transform: uppercase;
+}
+.label-xs {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+}
+.label-bold {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.label-bold-xs {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 11px;
+}
+.label-nocase-xs {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: none;
+}
+.label-nocase-bold-xs {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: none;
+  font-weight: 600;
+}
+.label-username:not(.label-username-notext) {
+  cursor: text;
+  -webkit-user-select: initial;
+     -moz-user-select: initial;
+      -ms-user-select: initial;
+          user-select: initial;
+}
+.label-username:not(:empty)::before {
+  content: '@';
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.link {
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+}
+.link,
+.link:hover,
+.link:active {
+  text-decoration: underline;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+.ellipsis-nowrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-nowrap {
+  white-space: nowrap;
+}
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+.text-uppercase {
+  text-transform: uppercase;
+}
+.text-capitalize {
+  text-transform: capitalize;
+}
+.text-underline {
+  text-decoration: underline;
+}
+.font-antialiasing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.no-font-antialiasing {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.cursor-default {
+  cursor: default !important;
+}
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.spin,
+.spin-slow {
+  animation: spin 1s infinite linear;
+}
+.spin-slow {
+  animation-duration: 2.5s;
+}
+.arrow-down::before {
+  content: '\e111';
+  font-family: Wire;
+  font-size: 16px;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: 1;
+  speak: none;
+  text-transform: none;
+  display: inline-block;
+  transform: rotate(90deg);
+}
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pull-left {
+  float: left;
+}
+.pull-right {
+  float: right;
+}
+.clear::after {
+  display: table;
+  clear: both;
+  content: '';
+}
+.see-through {
+  pointer-events: none;
+}
+.not-see-through {
+  pointer-events: auto;
+}
+.full-screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.translucent {
+  opacity: 0.4;
+}
+.element-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.hardware-acc {
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
+}
+.mirror {
+  transform: scaleX(-1);
+}
+.none,
+.off,
+.hide {
+  display: none;
+}
+.block,
+.on,
+.show {
+  display: block;
+}
+.hidden {
+  visibility: hidden;
+}
+.reset-textarea {
+  padding: 0;
+  border: none;
+  margin: 0;
+  outline: 0;
+  resize: none;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.modal {
+  z-index: 10000000;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.modal::before {
+  position: fixed;
+}
+.modal .modal-header .icon-close {
+  margin-top: 4px;
+}
+.modal .modal-content {
+  position: relative;
+  width: 384px;
+  padding: 24px;
+  margin: auto;
+  cursor: default;
+}
+.modal .modal-content a.close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .modal .modal-content {
+    width: 100% !important;
+    min-height: 100% !important;
+    border-radius: 0;
+  }
+}
+.modal .modal-content header {
+  text-align: center;
+  position: relative;
+  margin-bottom: 24px;
+  line-height: 24px;
+}
+.modal .modal-content section {
+  display: flex;
+  padding-bottom: 24px;
+  font-size: 11px;
+}
+.modal .modal-content section:not(:first-child) {
+  padding-top: 24px;
+}
+.modal .modal-content section:not(:last-child) {
+  border-bottom: 1px solid rgba(141, 152, 159, 0.24);
+}
+.modal .modal-input {
+  width: 100%;
+  height: 28px;
+  padding-left: 4px;
+  border: 1px solid rgba(141, 152, 159, 0.56);
+  background: #fff;
+  border-radius: 4px;
+  outline: none;
+}
+.modal .modal-input::-webkit-input-placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(141, 152, 159, 0.56);
+}
+.modal .modal-input::-ms-input-placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(141, 152, 159, 0.56);
+}
+.modal .modal-input::placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(141, 152, 159, 0.56);
+}
+.modal .modal-title {
+  padding-right: 48px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.modal .modal-text {
+  padding-right: 32px;
+  margin-bottom: 16px;
+  line-height: 24px;
+}
+.modal .modal-option {
+  padding-right: 32px;
+  margin-bottom: 16px;
+}
+.modal .modal-option .modal-checkbox {
+  margin-right: 4px;
+}
+.modal .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
+.modal .modal-footer .button:not(:last-child) {
+  margin-right: 16px;
+}
+.modal .modal-button-close {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+}
+.modal-large .modal-content {
+  width: 540px;
+}
+.modal-large .modal-header {
+  min-height: 16px;
+  margin-bottom: 24px;
+}
+.modal-large .modal-center {
+  position: relative;
+  height: 304px;
+  margin-right: -24px;
+  margin-left: -24px;
+}
+.modal-large .modal-footer {
+  height: 72px;
+  margin-bottom: -24px;
+}
+.modal-large .modal-footer .button {
+  width: 210px;
+}
+.modal-acount-new-devices {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  margin-bottom: 16px;
+  line-height: 16px;
+}
+.modal-acount-new-devices div:nth-child(even) {
+  margin-bottom: 16px;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+@font-face {
+  font-family: emoji;
+  src: local('Apple Color Emoji'), local('Segoe UI Emoji'), local('Android Emoji'), local('Noto Color Emoji'), local('Emoji One'), local('Twemoji');
+  unicode-range: U+1f000-1f02b, U+1f004, U+1f02c-1f02f, U+1f030-1f093, U+1f094-1f09f, U+1f0a0-1f0ae, U+1f0af-1f0b0, U+1f0b1-1f0be, U+1f0bf, U+1f0c0, U+1f0c1-1f0cf, U+1f0cf, U+1f0d0, U+1f0d1-1f0df, U+1f0e0-1f0f5, U+1f0f6-1f0ff, U+1f10d-1f10f, U+1f12f, U+1f16c-1f16f, U+1f170-1f171, U+1f17e, U+1f17f, U+1f18e, U+1f191-1f19a, U+1f1ad-1f1e5, U+1f1e6-1f1ff, U+1f201, U+1f201-1f202, U+1f203-1f20f, U+1f21a, U+1f22f, U+1f232-1f236, U+1f232-1f23a, U+1f238-1f23a, U+1f23c-1f23f, U+1f249-1f24f, U+1f250-1f251, U+1f252-1f25f, U+1f260-1f265, U+1f266-1f2ff, U+1f300-1f320, U+1f321, U+1f321-1f32c, U+1f324-1f32c, U+1f32d-1f32f, U+1f330-1f335, U+1f336, U+1f337-1f37c, U+1f37d, U+1f37e-1f37f, U+1f380-1f393, U+1f385, U+1f394-1f39f, U+1f396-1f397, U+1f399-1f39b, U+1f39e-1f39f, U+1f3a0-1f3c4, U+1f3c2-1f3c4, U+1f3c5, U+1f3c6-1f3ca, U+1f3c7, U+1f3ca, U+1f3cb-1f3cc, U+1f3cb-1f3ce, U+1f3cf-1f3d3, U+1f3d4-1f3df, U+1f3e0-1f3f0, U+1f3f1-1f3f7, U+1f3f3-1f3f5, U+1f3f4, U+1f3f7, U+1f3f8-1f3fa, U+1f3f8-1f3ff, U+1f3fb-1f3ff, U+1f400-1f43e, U+1f43f, U+1f440, U+1f441, U+1f442-1f443, U+1f442-1f4f7, U+1f446-1f450, U+1f466-1f469, U+1f46e, U+1f470-1f478, U+1f47c, U+1f481-1f483, U+1f485-1f487, U+1f4aa, U+1f4f8, U+1f4f9-1f4fc, U+1f4fd, U+1f4fd-1f4fe, U+1f4ff, U+1f500-1f53d, U+1f546-1f54a, U+1f549-1f54a, U+1f54b-1f54e, U+1f54b-1f54f, U+1f550-1f567, U+1f568-1f579, U+1f56f-1f570, U+1f573-1f579, U+1f574-1f575, U+1f57a, U+1f57b-1f5a3, U+1f587, U+1f58a-1f58d, U+1f590, U+1f595-1f596, U+1f5a4, U+1f5a5, U+1f5a5-1f5fa, U+1f5a8, U+1f5b1-1f5b2, U+1f5bc, U+1f5c2-1f5c4, U+1f5d1-1f5d3, U+1f5dc-1f5de, U+1f5e1, U+1f5e3, U+1f5e8, U+1f5ef, U+1f5f3, U+1f5fa, U+1f5fb-1f5ff, U+1f600, U+1f601-1f610, U+1f611, U+1f612-1f614, U+1f615, U+1f616, U+1f617, U+1f618, U+1f619, U+1f61a, U+1f61b, U+1f61c-1f61e, U+1f61f, U+1f620-1f625, U+1f626-1f627, U+1f628-1f62b, U+1f62c, U+1f62d, U+1f62e-1f62f, U+1f630-1f633, U+1f634, U+1f635-1f640, U+1f641-1f642, U+1f643-1f644, U+1f645-1f647, U+1f645-1f64f, U+1f64b-1f64f, U+1f680-1f6c5, U+1f6a3, U+1f6b4-1f6b6, U+1f6c0, U+1f6c6-1f6cf, U+1f6cb-1f6cf, U+1f6cc, U+1f6d0, U+1f6d1-1f6d2, U+1f6d3-1f6d4, U+1f6d5-1f6df, U+1f6e0-1f6e5, U+1f6e0-1f6ec, U+1f6e9, U+1f6eb-1f6ec, U+1f6ed-1f6ef, U+1f6f0, U+1f6f0-1f6f3, U+1f6f3, U+1f6f4-1f6f6, U+1f6f7-1f6f8, U+1f6f9, U+1f6fa-1f6ff, U+1f774-1f77f, U+1f7d5-1f7d8, U+1f7d9-1f7ff, U+1f80c-1f80f, U+1f848-1f84f, U+1f85a-1f85f, U+1f888-1f88f, U+1f8ae-1f8ff, U+1f90c-1f90f, U+1f910-1f918, U+1f918, U+1f919-1f91c, U+1f919-1f91e, U+1f91e, U+1f91f, U+1f920-1f927, U+1f926, U+1f928-1f92f, U+1f930, U+1f931-1f932, U+1f933-1f939, U+1f933-1f93a, U+1f93c-1f93e, U+1f93d-1f93e, U+1f93f, U+1f940-1f945, U+1f947-1f94b, U+1f94c, U+1f94d-1f94f, U+1f950-1f95e, U+1f95f-1f96b, U+1f96c-1f970, U+1f971-1f972, U+1f973-1f976, U+1f977-1f979, U+1f97a, U+1f97b, U+1f97c-1f97f, U+1f980-1f984, U+1f985-1f991, U+1f992-1f997, U+1f998-1f9a2, U+1f9a3-1f9af, U+1f9b0-1f9b3, U+1f9b0-1f9b9, U+1f9b5-1f9b6, U+1f9b8-1f9b9, U+1f9ba-1f9bf, U+1f9c0, U+1f9c1-1f9c2, U+1f9c3-1f9cf, U+1f9d0-1f9e6, U+1f9d1-1f9dd, U+1f9e7-1f9ff, U+1fa00-1fa5f, U+1fa60-1fa6d, U+1fa6e-1fffd, U+200d, U+203c, U+2049, U+20e3, U+2139, U+2194-2199, U+21a9-21aa, U+231a-231b, U+2328, U+2388, U+23cf, U+23e9-23ec, U+23e9-23f3, U+23f0, U+23f3, U+23f8-23fa, U+24c2, U+25aa-25ab, U+25b6, U+25c0, U+25fb-25fe, U+25fd-25fe, U+2600-2604, U+2600-2605, U+2607-2612, U+260e, U+2611, U+2614-2615, U+2616-2617, U+2618, U+2619, U+261a-266f, U+261d, U+2620, U+2622-2623, U+2626, U+262a, U+262e-262f, U+2638-263a, U+2640, U+2642, U+2648-2653, U+265f-2660, U+2663, U+2665-2666, U+2668, U+2670-2671, U+2672-267d, U+267b, U+267e-267f, U+267f, U+2680-2685, U+2690-2691, U+2692-2697, U+2692-269c, U+2693, U+2699, U+269b-269c, U+269d, U+269e-269f, U+26a0-26a1, U+26a1, U+26a2-26b1, U+26aa-26ab, U+26b0-26b1, U+26b2, U+26b3-26bc, U+26bd-26be, U+26bd-26bf, U+26c0-26c3, U+26c4-26c5, U+26c4-26cd, U+26c8, U+26ce, U+26cf, U+26cf-26e1, U+26d1, U+26d3-26d4, U+26d4, U+26e2, U+26e3, U+26e4-26e7, U+26e8-26ff, U+26e9-26ea, U+26ea, U+26f0-26f5, U+26f2-26f3, U+26f5, U+26f7-26fa, U+26f9, U+26fa, U+26fd, U+2700, U+2701-2704, U+2702, U+2705, U+2708-2709, U+270a-270b, U+270c-270d, U+270c-2712, U+270f, U+2712, U+2714, U+2716, U+271d, U+2721, U+2728, U+2733-2734, U+2744, U+2747, U+274c, U+274e, U+2753-2755, U+2757, U+2763-2764, U+2763-2767, U+2795-2797, U+27a1, U+27b0, U+27bf, U+2934-2935, U+2b05-2b07, U+2b1b-2b1c, U+2b50, U+2b55, U+3030, U+303d, U+3297, U+3299, U+e0020-e007f, U+fe0f;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  color: #323639;
+  font-family: emoji, BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  overflow-x: hidden;
+  overflow-y: hidden !important;
+  text-rendering: optimizeLegibility;
+}
+[class^='icon-'],
+[class*=' icon-'] {
+  font-size: 16px;
+}
+a,
+object {
+  outline: none !important;
+}
+a {
+  text-decoration: none;
+}
+input[type='text']::-ms-clear {
+  display: none;
+}
+pre {
+  direction: ltr;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+device-card {
+  position: relative;
+  display: flex;
+}
+device-card:not(:last-child) {
+  margin-bottom: 8px;
+}
+device-card:not(.device-card-no-hover) {
+  cursor: pointer;
+}
+device-card disclose-icon {
+  display: flex;
+  height: 8px;
+  align-self: center;
+}
+device-card disclose-icon path {
+  fill: rgba(50, 54, 57, 0.4);
+}
+.device-status {
+  width: 24px;
+}
+.device-info {
+  width: 100%;
+  padding-right: 16px;
+  line-height: 16px;
+}
+.device-label,
+.device-model {
+  font-weight: 600;
+}
+.device-id-part {
+  cursor: text;
+  -webkit-user-select: initial;
+     -moz-user-select: initial;
+      -ms-user-select: initial;
+          user-select: initial;
+  display: inline-block;
+  margin-right: 4px;
+}
+.device-id-part:nth-child(odd) {
+  font-weight: 600;
+}
+.device-id-part:last-child {
+  margin-right: 0;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+device-remove {
+  display: block;
+  height: 28px;
+  line-height: 28px;
+}
+.device-remove-form {
+  display: flex;
+}
+.device-remove-input {
+  max-width: 128px;
+  height: 28px;
+  flex: 1 1;
+  padding: 0 16px;
+  border: none;
+  margin-right: 8px;
+  background-color: rgba(141, 152, 159, 0.24);
+  border-radius: 4px;
+  color: #8d989f;
+  line-height: 28px;
+  outline: 0;
+}
+.device-remove-input::-ms-clear {
+  display: none;
+}
+.device-remove-input::-webkit-input-placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8d989f;
+}
+.device-remove-input::-ms-input-placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8d989f;
+}
+.device-remove-input::placeholder {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8d989f;
+}
+.device-remove-input.device-remove-input-error {
+  border: 2px solid #febf02;
+  background-color: #fff;
+  color: #323639;
+}
+.device-remove-button-remove {
+  background-color: #fb0807 !important;
+  margin-right: 8px;
+}
+.device-remove-button {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  padding: 0;
+  border: 0;
+  -webkit-appearance: none;
+  background: none;
+  cursor: pointer;
+  line-height: 24px;
+  outline: 0;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+#section-account .selector-mode {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.88);
+  margin-bottom: 24px;
+}
+#section-account .selector-mode .btn-mode {
+  width: 100%;
+  padding: 0 8px;
+  background-color: transparent;
+  font-weight: 600;
+}
+#section-account .selector-mode::after {
+  width: 0;
+  height: 0;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid rgba(255, 255, 255, 0.88);
+  border-left: 8px solid transparent;
+  margin-left: 152px;
+  content: '';
+}
+.platform-web #section-account .spacer {
+  min-height: 52px;
+}
+#section-account #form-account-login #login-method-login #wire-login-country-code {
+  width: 72px;
+  flex: 0 0 auto;
+  padding: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+#section-account #form-account-login #login-method-login #wire-login-phone {
+  border-left: 0;
+}
+#section-account #form-account-login #login-method-login .checkbox-remember {
+  height: 24px;
+  margin: 12px 4px 0;
+}
+#section-account input:-webkit-autofill,
+#section-account input:-webkit-autofill:hover,
+#section-account input:-webkit-autofill:focus {
+  border: none;
+  -webkit-box-shadow: 0 0 0 1000px #265f82 inset;
+  -webkit-text-fill-color: #fff;
+  -webkit-transition: background-color 5000s ease-in-out 0s;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+@keyframes outgoing-horizontal-left {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+@keyframes incoming-horizontal-left {
+  0% {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes outgoing-horizontal-right {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+@keyframes incoming-horizontal-right {
+  0% {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes outgoing-vertical-bottom {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+@keyframes incoming-vertical-bottom {
+  0% {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes outgoing-vertical-top {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
+}
+@keyframes incoming-vertical-top {
+  0% {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.outgoing-horizontal-left {
+  animation-name: outgoing-horizontal-left;
+}
+.outgoing-horizontal-right {
+  animation-name: outgoing-horizontal-right;
+}
+.outgoing-vertical-top {
+  animation-name: outgoing-vertical-top;
+}
+.outgoing-vertical-bottom {
+  animation-name: outgoing-vertical-bottom;
+}
+.outgoing-horizontal-left,
+.outgoing-horizontal-right,
+.outgoing-vertical-top,
+.outgoing-vertical-bottom {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+}
+.incoming-horizontal-left {
+  animation-name: incoming-horizontal-left;
+}
+.incoming-horizontal-right {
+  animation-name: incoming-horizontal-right;
+}
+.incoming-vertical-top {
+  animation-name: incoming-vertical-top;
+}
+.incoming-vertical-bottom {
+  animation-name: incoming-vertical-bottom;
+}
+.incoming-horizontal-left,
+.incoming-horizontal-right,
+.incoming-vertical-top,
+.incoming-vertical-bottom {
+  animation-delay: 0.35s;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+html,
+body {
+  height: 100%;
+  color: #fff;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: linear-gradient(0deg, #2391d3, #68b3e0);
+}
+.auth-page-container {
+  display: none;
+  width: 100%;
+  max-width: 952px;
+  margin: 0 auto;
+}
+.auth-page-container .auth-page-navigation {
+  display: flex;
+  flex-basis: 0;
+  flex-grow: 1;
+}
+.auth-page-container .auth-page-navigation-back {
+  display: block;
+  padding: 72px;
+  margin: auto;
+  cursor: pointer;
+}
+.auth-page-container .auth-page {
+  display: none;
+  width: 400px;
+  max-width: 100%;
+  height: 576px;
+  max-height: 100%;
+  flex-basis: 400px;
+  padding: 80px 40px 56px;
+}
+.auth-page-container .auth-page .auth-header .wire-link {
+  display: block;
+  width: 82px;
+  height: 24px;
+  margin-left: -4px;
+  cursor: pointer;
+}
+.auth-page-container .auth-page .auth-header .wire-link .auth-logo {
+  width: 82px;
+  height: 24px;
+  fill: #fff;
+}
+.auth-page-container .auth-page .content {
+  position: relative;
+  width: 320px;
+  height: 416px;
+}
+.auth-page-container .auth-page .content .section {
+  position: absolute;
+  bottom: 0;
+  display: none;
+  width: 100%;
+  opacity: 0;
+}
+.auth-page-container .auth-page .content .footer::after,
+.auth-page-container .auth-page .content .header::after,
+.auth-page-container .auth-page .content .selector::after {
+  display: table;
+  clear: both;
+  content: '';
+}
+.auth-page-container .auth-page .content .footer .column,
+.auth-page-container .auth-page .content .header .column,
+.auth-page-container .auth-page .content .selector .column {
+  width: 50%;
+  float: left;
+}
+.auth-page-container .auth-page .content .row {
+  width: 100%;
+}
+.auth-page-container .auth-page .content .footer {
+  margin-top: 24px;
+}
+.auth-page-container .auth-page .content .footer .btn-action {
+  width: 120px;
+}
+.auth-page-container .auth-page .form,
+.auth-page-container .auth-page .method {
+  display: none;
+  width: 100%;
+  opacity: 0;
+}
+.auth-page-container .auth-page .form-control {
+  position: relative;
+  width: 100%;
+}
+.auth-page-container .auth-page .form-control .input {
+  border: 2px solid transparent;
+}
+.auth-page-container .auth-page .form-control .input-error {
+  border: 2px solid #febf02;
+}
+.auth-page-container .auth-page .error-list {
+  min-height: 16px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.auth-page-container .auth-page .error-list .error {
+  height: 24px;
+  padding-left: 16px;
+  color: #fff;
+  font-size: 13px;
+  text-indent: -12px;
+  visibility: visible;
+}
+.auth-page-container .auth-page .error-list .error::before {
+  color: #febf02;
+  content: '• ';
+}
+.auth-page-container .auth-page .error-list .error:last-child {
+  height: 16px;
+}
+.auth-page-container .auth-page .auth-text {
+  color: rgba(0, 0, 0, 0.64);
+  font-size: 13px;
+}
+.auth-page-container .auth-page .auth-text-link {
+  color: rgba(0, 0, 0, 0.64);
+  font-size: 13px;
+  cursor: pointer;
+}
+.auth-page-container .auth-page .auth-text-link,
+.auth-page-container .auth-page .auth-text-link:hover,
+.auth-page-container .auth-page .auth-text-link:active {
+  text-decoration: underline;
+}
+.auth-page-container .auth-page .auth-link-button {
+  color: rgba(0, 0, 0, 0.64);
+  font-size: 13px;
+  cursor: pointer;
+  float: right;
+  height: 40px;
+  line-height: 40px;
+}
+.auth-page-container .auth-page .auth-link-button,
+.auth-page-container .auth-page .auth-link-button:hover,
+.auth-page-container .auth-page .auth-link-button:active {
+  text-decoration: underline;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+#section-blocked .form-blocked {
+  height: 256px;
+}
+#section-blocked .blocked-headline {
+  margin: 16px 8px 64px 0;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.modal-limit {
+  color: #323639;
+}
+.modal-limit .modal-content {
+  width: 400px;
+}
+.modal-limit-section {
+  flex-direction: column;
+}
+.modal-limit-section-current {
+  border-bottom: 1px solid #323639 !important;
+}
+.modal-limit-section-header {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+#section-posted .posted-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 32px;
+}
+#section-posted .posted-icon [class^='icon-'],
+#section-posted .posted-icon [class*=' icon-'] {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  line-height: 32px;
+}
+#section-posted .posted-icon .icon-check,
+#section-posted .posted-icon .icon-spinner {
+  display: none;
+}
+#section-posted .form-posted {
+  height: 256px;
+}
+#section-posted .form-posted .posted-content {
+  position: absolute;
+  bottom: 24px;
+}
+#section-posted .posted-message-detail {
+  margin: 16px 8px 64px 0;
+}
+#section-posted .posted-action-detail,
+#section-posted .posted-link {
+  font-size: 13px;
+  line-height: 24px;
+}
+#section-posted .wire-sent-email {
+  font-weight: 600;
+}
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+#section-verify .form {
+  position: absolute;
+  bottom: 0;
+}
+#section-verify #form-verify-code .input-code {
+  text-align: center;
+  width: 54px;
+  flex: 0 0 auto;
+  padding: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.4);
+  border-left: 0;
+}
+#section-verify #form-verify-code .input-code:last-child {
+  border-right: 0;
+}
+#section-verify #form-verify-code .verify-code-text {
+  margin: 0 0 32px;
+}
+#section-verify #form-verify-phone-password .verify-password-text {
+  margin: 0 0 32px;
+}
+#section-verify .verify-action-detail,
+#section-verify .verify-link {
+  font-size: 13px;
+  line-height: 24px;
+}
+.auth-headline,
+.auth-headline-sub {
+  font-size: 24px;
+  line-height: 32px;
+}
+.auth-headline {
+  font-weight: 400;
+}
+.auth-headline-sub {
+  margin: 8px 8px 24px 0;
+  font-weight: 200;
+}

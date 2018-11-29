@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:cache/CacheRepository
+// KARMA_SPECS=cache/CacheRepository yarn test:app
 
 'use strict';
 

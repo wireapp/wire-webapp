@@ -25,6 +25,5 @@ module.exports = {
   options: {
     cleanTargetDir: true,
     targetDir: '<%= dir.app.ext %>',
-    verbose: true,
   },
 };

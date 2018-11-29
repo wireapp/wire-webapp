@@ -19,7 +19,7 @@
 /* eslint-disable */
 'use strict';
 
-// grunt test_run:media/MediaDevicesHandler
+// KARMA_SPECS=media/MediaDevicesHandler yarn test:app
 
 describe('z.media.MediaDevicesHandler', () => {
   const test_factory = new TestFactory();

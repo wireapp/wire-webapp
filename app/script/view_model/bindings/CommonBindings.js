@@ -19,6 +19,14 @@
 
 'use strict';
 
+import ko from 'knockout';
+import $ from 'jquery';
+import moment from 'moment';
+import SimpleBar from 'simplebar';
+/* eslint-disable no-unused-vars */
+import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
+/* eslint-enable no-unused-vars */
+
 /**
  * Use it on the drop area.
  */
@@ -430,7 +438,7 @@ ko.bindingHandlers.antiscroll = {
 ko.bindingHandlers.simplebar = {
   init(element, valueAccessor) {
     const {trigger = valueAccessor(), onInit} = valueAccessor();
-    const simpleBar = new window.SimpleBar(element, {autoHide: false});
+    const simpleBar = new SimpleBar(element, {autoHide: false});
     if (ko.isObservable(trigger)) {
       const triggerSubscription = trigger.subscribe(() => simpleBar.recalculate());
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => triggerSubscription.dispose());

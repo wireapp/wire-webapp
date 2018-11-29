@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ConversationVerificationStateHandler
+// KARMA_SPECS=conversation/ConversationVerificationStateHandler yarn test:app
 
 'use strict';
 
