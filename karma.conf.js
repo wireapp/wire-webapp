@@ -106,6 +106,7 @@ module.exports = function(config) {
     },
 
     webpackMiddleware: {
+      logLevel: 'error',
       stats: 'errors-only',
     },
 
