@@ -83,7 +83,7 @@ async function connect(sender, receiver) {
 
 beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000));
 
-describe('Account', () => {
+xdescribe('Account', () => {
   let alice;
   let bob;
   let eve;
