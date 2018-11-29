@@ -17,7 +17,7 @@
  *
  */
 
-import * as crypto from 'crypto';
+import * as hash from 'hash.js';
 import * as Long from 'long';
 
 import {AssetContent, ContentType, ConversationContent, LocationContent, TextContent} from '../conversation/content';
@@ -34,10 +34,11 @@ class MessageHashService {
   }
 
   private createSha256Hash(buffer: Buffer): Buffer {
-    return crypto
-      .createHash('sha256')
+    const hashArray = hash
+      .sha256()
       .update(buffer)
       .digest();
+    return Buffer.from(hashArray);
   }
 
   private convertToUtf16BE(str: string): Buffer {

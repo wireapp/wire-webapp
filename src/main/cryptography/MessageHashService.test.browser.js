@@ -21,7 +21,7 @@
 
 /* eslint-disable no-magic-numbers */
 
-const {MessageHashService} = require('@wireapp/core/dist/cryptography/MessageHashService.browser');
+const {MessageHashService} = require('@wireapp/core/dist/cryptography/');
 
 describe('MessageHashService', () => {
   describe('"getHash"', () => {
@@ -49,9 +49,9 @@ describe('MessageHashService', () => {
       const timestamp = 1540213769;
 
       const messageHashService = new MessageHashService(content, timestamp);
-      const bytes = messageHashService.getTimestampBytes(timestamp);
+      const buffer = messageHashService.getTimestampBuffer(timestamp);
 
-      const hexValue = Buffer.from(bytes).toString('hex');
+      const hexValue = buffer.toString('hex');
       expect(hexValue).toBe(expectedHexValue);
     });
 

@@ -1,7 +1,6 @@
 {
   "browser": {
-    "./dist/cryptography/AssetCryptography.node": "./dist/cryptography/AssetCryptography.browser.js",
-    "./dist/cryptography/MessageHashService.node": "./dist/cryptography/MessageHashService.browser.js"
+    "./dist/cryptography/AssetCryptography.node": "./dist/cryptography/AssetCryptography.browser.js"
   },
   "dependencies": {
     "@types/node": "10.12.10",
@@ -10,7 +9,7 @@
     "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/store-engine": "1.1.7",
     "bazinga64": "5.3.30",
-    "libsodium-wrappers-sumo": "0.7.3",
+    "hash.js": "1.1.5",
     "logdown": "3.2.7",
     "protobufjs": "6.8.8",
     "pure-uuid": "1.5.5"
