@@ -923,9 +923,10 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bower_components/normalize-css@necolas/normalize.css#3.0.3":
-  version "3.0.3"
-  resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
+"@bower_components/normalize-css@necolas/normalize.css#8.0.1":
+  version "8.0.1"
+  uid fc091cce1534909334c1911709a39c22d406977b
+  resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/fc091cce1534909334c1911709a39c22d406977b"
 
 "@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.1":
   version "1.1.1"
