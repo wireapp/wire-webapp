@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.3.8...@wireapp/core@8.0.0) (2018-11-29)
+
+
+* [ci skip] feat(core): Read receipts [BREAKING] (WEBFOUND-56) (#1336) ([f7501b3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f7501b3)), closes [#1336](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1336)
+
+
+### Bug Fixes
+
+* **core:** Exclude flaky smoke test ([#1347](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1347)) ([85e67c8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/85e67c8))
+* **core:** Use hash.js for message hashing ([#1346](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1346)) ([5c9994a](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/5c9994a))
+
+
+### Features
+
+* **core:** Message Hashing for Quotes (WEBFOUND-58) ([#1277](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1277)) ([13a0f81](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/13a0f81))
+
+
+### BREAKING CHANGES
+
+* **core:** - Removed `ConfirmationType`
+- Removed `createConfirmation()`
+- Changed method signature of `createPing()`
+* **core:** removed createConfirmation(), removed ConfirmationType, changed the method signature of createPing()
+* **core:** removed createConfirmation(), removed ConfirmationType, changed the method signature of createPing()
+* removed createConfirmation(), removed ConfirmationType, changed the method signature of createPing()
+
+
+
+
+
 ## [7.3.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@7.3.7...@wireapp/core@7.3.8) (2018-11-27)
 
 **Note:** Version bump only for package @wireapp/core
