@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Se produjo un error. Póngase en contacto con el administrador de equipo para obtener detalles (error 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Se produjo un error. Póngase en contacto con el administrador de equipo para obtener detalles (error 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Se produjo un error. Póngase en contacto con el administrador de equipo para obtener detalles (error 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "",
   "BackendError.unexpected": "Error inesperado",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introduce un nombre con al menos 2 caracteres",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Introduce un nombre con al menos 2 caracteres",

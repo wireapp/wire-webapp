@@ -229,7 +229,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     this.canSetLocalSdp.subscribe(canSet => {
       if (canSet) {
-        this._setLocalSdp();
+        this._setLocalSdp(this.localSdp());
       }
     });
 
@@ -858,14 +858,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
       return;
     }
 
-    const mappedSdp = z.calling.SDPMapper.rewriteSdp(
-      this.peerConnection.localDescription,
-      z.calling.enum.SDP_SOURCE.LOCAL,
-      this
-    );
+    const rawSdp = this.peerConnection.localDescription;
+
+    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rawSdp, z.calling.enum.SDP_SOURCE.LOCAL, this);
+
     Promise.resolve(mappedSdp)
-      .then(({iceCandidates, sdp: localSdp}) => {
-        this.localSdp(localSdp);
+      .then(({iceCandidates, sdp: transformedSdp}) => {
+        this.localSdp(rawSdp);
 
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
@@ -895,17 +894,17 @@ z.calling.entities.FlowEntity = class FlowEntity {
         const logMessage = {
           data: {
             default: [
-              localSdp.type,
+              transformedSdp.type,
               iceCandidates.length,
               iceCandidateTypesLog,
               this.remoteUser.name(),
-              this.localSdp().sdp,
+              transformedSdp.sdp,
             ],
             obfuscated: [
-              localSdp.type,
+              transformedSdp.type,
               iceCandidates.length,
               this.callLogger.obfuscate(this.remoteUser.id),
-              this.callLogger.obfuscateSdp(this.localSdp().sdp),
+              this.callLogger.obfuscateSdp(transformedSdp.sdp),
             ],
           },
           message: `Sending local '{0}' SDP containing '{1}' ICE candidates ({2}) for flow with '{3}'\n{4}`,
@@ -914,10 +913,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         this.shouldSendLocalSdp(false);
 
-        const response = localSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
+        const response = transformedSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
         let callMessageEntity;
 
-        const additionalPayload = this._createAdditionalPayload();
+        const additionalPayload = this._createAdditionalPayload(transformedSdp);
         const sessionId = this.callEntity.sessionId;
         const inDefaultMode = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (inDefaultMode) {
@@ -930,7 +929,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         return this.callEntity.sendCallMessage(callMessageEntity).then(() => {
           this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
-          this.callLogger.debug(`Sending local '${localSdp.type}' SDP successful`, this.localSdp());
+          this.callLogger.debug(`Sending local '${transformedSdp.type}' SDP successful`, transformedSdp.sdp);
         });
       })
       .catch(error => {
@@ -1023,14 +1022,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * Creating local SDP succeeded.
    *
    * @private
-   * @param {RTCSessionDescription} rctSdp - New local SDP
+   * @param {RTCSessionDescription} rtcSdp - New local SDP
    * @returns {undefined} No return value
    */
-  _createSdpSuccess(rctSdp) {
-    this.callLogger.info(`Creating '${rctSdp.type}' successful`, rctSdp);
-
-    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rctSdp, z.calling.enum.SDP_SOURCE.LOCAL, this);
-    this.localSdp(mappedSdp.sdp);
+  _createSdpSuccess(rtcSdp) {
+    this.callLogger.info(`Creating '${rtcSdp.type}' successful`, rtcSdp);
+    this.localSdp(rtcSdp);
   }
 
   /**
@@ -1063,16 +1060,17 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Create the additional payload.
    * @private
+   * @param {RTCSessionDescription} localSdp - local sdp to send
    * @returns {Object} Additional payload
    */
-  _createAdditionalPayload() {
+  _createAdditionalPayload(localSdp) {
     const payload = z.calling.CallMessageBuilder.createPayload(
       this.conversationId,
       this.selfUserId,
       this.remoteUserId,
       this.remoteClientId
     );
-    const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: this.localSdp().sdp}, payload);
+    const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: localSdp.sdp}, payload);
 
     const selfState = this.callEntity.selfState;
     return z.calling.CallMessageBuilder.createPropSync(selfState, additionalPayload);
@@ -1081,11 +1079,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Sets the local Session Description Protocol on the PeerConnection.
    * @private
+   * @param {RTCSessionDescription} localSdp - local sdp to set
    * @returns {undefined} No return value
    */
-  _setLocalSdp() {
+  _setLocalSdp(localSdp) {
     this.sdpStateChanging(true);
-    const localSdp = this.localSdp();
     this.callLogger.debug(`Setting local '${localSdp.type}' SDP`, localSdp);
 
     this.peerConnection

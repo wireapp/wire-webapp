@@ -74,12 +74,20 @@ z.calling.SDPMapper = {
     const iceCandidates = [];
     let sessionDescription;
 
+    const isFirefox = z.util.Environment.browser.firefox;
+
     const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
     const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
     const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
     const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
 
     sessionDescription = isLocalSdp ? sdp.replace('UDP/TLS/', '') : sdp;
+
+    if (isFirefox) {
+      sessionDescription = isLocalSdp
+        ? sessionDescription.replace(' UDP/DTLS/SCTP', ' DTLS/SCTP')
+        : sessionDescription.replace(/ DTLS\/SCTP (5000|webrtc-datachannel)/, ' UDP/DTLS/SCTP webrtc-datachannel');
+    }
 
     sessionDescription.split('\r\n').forEach(sdpLine => {
       let outline = sdpLine;
@@ -105,7 +113,7 @@ z.calling.SDPMapper = {
             sdpLines.push(sdpLine);
             outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
           }
-        } else if (z.util.Environment.browser.firefox && isLocalSdp && isOffer) {
+        } else if (isFirefox && isLocalSdp && isOffer) {
           // Set ports to activate media in outgoing Firefox SDP to ensure enabled media
           outline = sdpLine.replace(/^m=(application|video) 0/, 'm=$1 9');
         }
@@ -115,6 +123,8 @@ z.calling.SDPMapper = {
           sdpLines.push(sdpLine);
           outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
         }
+      } else if (isFirefox && !isLocalSdp && sdpLine.startsWith('a=sctpmap:')) {
+        outline = 'a=sctp-port:5000';
       }
 
       if (outline !== undefined) {

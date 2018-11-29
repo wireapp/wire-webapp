@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Kažkas atsitiko. Papildomai informacijai susisiekite su savo komandos administratoriumi (klaida 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Kažkas atsitiko. Papildomai informacijai susisiekite su savo komandos administratoriumi (klaida 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Kažkas atsitiko. Papildomai informacijai susisiekite su savo komandos administratoriumi (klaida 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "",
   "BackendError.unexpected": "Nežinoma klaida",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Įveskite bent 2 simbolių vardą",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Įveskite bent 2 simbolių vardą",

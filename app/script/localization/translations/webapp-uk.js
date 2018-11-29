@@ -622,7 +622,6 @@ z.string.uk.preferencesOptionsAudioNoneDetail = 'Тихенько!';
 z.string.uk.preferencesOptionsAudioSome = 'Деякі';
 z.string.uk.preferencesOptionsAudioSomeDetail = 'Пінги та дзвінки';
 z.string.uk.preferencesOptionsContacts = 'Контакти';
-z.string.uk.preferencesOptionsContactsGmail = 'Імпорт з Gmail';
 z.string.uk.preferencesOptionsContactsMacos = 'Імпорт з Контактів';
 z.string.uk.preferencesOptionsContactsDetail = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
 z.string.uk.preferencesOptionsPopular = 'У відповідь на численні прохання';
@@ -694,7 +693,6 @@ z.string.uk.searchOthers = 'Додати до контактів';
 z.string.uk.searchInvite = 'Запросіть людей в Wire';
 z.string.uk.searchInviteDetail = 'Поділившись контактами, ви зможете зв’язатись в Wire з людьми, з якими ви, можливо, знайомі. Вся інформація анонімна та не передається третім особам.';
 z.string.uk.searchInviteButtonContacts = 'З контактів';
-z.string.uk.searchInviteButtonGmail = 'З Gmail';
 z.string.uk.searchInviteHeadline = 'Приведіть друзів';
 z.string.uk.searchInviteShare = 'Поділитись контактами';
 
@@ -712,9 +710,6 @@ z.string.uk.temporaryGuestJoinDescription = 'Закривши чи оновив�
 
 z.string.uk.temporaryGuestLeaveMessage = ' більше не є учасниками цієї розмови.';
 z.string.uk.temporaryGuestLeaveDescription = 'Закривши чи оновивши цю сторінку, ви втратите доступ до історії розмови.';
-
-z.string.uk.uploadGoogleHeadline = 'Знайдіть людей,\nщоб порозмовляти.';
-z.string.uk.uploadGoogleMessage = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
 
 z.string.uk.urlSupportRoot = '/';
 z.string.uk.urlSupportArticles = '/hc/en-us/articles/';
@@ -802,7 +797,6 @@ z.string.uk.tooltipConversationsStart = 'Почати розмову ({{shortcut
 z.string.uk.tooltipConversationDetailsAddPeople = 'Додати учасників до розмови ({{shortcut}})';
 z.string.uk.tooltipConversationDetailsRename = 'Змінити ім’я розмови';
 
-z.string.uk.tooltipPreferencesContactsGmail = 'Увійдіть у свій обліковий запис Gmail, щоб поділитися контактами';
 z.string.uk.tooltipPreferencesContactsMacos = 'Поділіться вашими контактами з додатку Контакти для Mac OS';
 z.string.uk.tooltipPreferencesPassword = 'Відкрийте нову вкладку в браузері, щоб змінити ваш пароль';
 z.string.uk.tooltipPreferencesPicture = 'Змініть своє фото…';
