@@ -184,7 +184,7 @@
     ]
   },
   "scripts": {
-    "build:server": "cross-env-shell \"cd server && yarn build\"",
+    "build:server": "cd server && yarn build",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.prod.js",
     "bundle:test": "webpack --config webpack.config.test.js",
@@ -199,7 +199,7 @@
     "lint:js": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore --ext .js app/script/ test/ bin/ grunt/",
     "lint:ts:auth": "tslint --config tslint.json --project tsconfig.json \"app/script/**/*.{ts,tsx}\"",
     "lint:ts:server": "tslint --config tslint.json --project tsconfig.server.json \"server/**/*.{ts,tsx}\"",
-    "postinstall": "grunt init && cross-env-shell \"cd server && yarn\"",
+    "postinstall": "grunt init && cd server && yarn",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "yarn build:server && yarn grunt build_dev && concurrently \"yarn start:server:dev\" \"yarn grunt watch\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
