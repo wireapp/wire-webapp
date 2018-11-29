@@ -1800,10 +1800,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.7.0.tgz#b6695cf2b98da825b418a228c4307ac2d790714d"
-  integrity sha512-blmBnRbEkYBGz+7kxNQzuYUwyMyJ5PYGhrMYe6RXmMSBxZXe2665INgNP5/8WuYdWnDJ1Z8osC/LVKdsbT2fnQ==
+maxmind@2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.11.0.tgz#e744650406ac0a9be295becb98a15ea832c58c1d"
+  integrity sha512-ke0huy9eNbsOX+VMDCgbf48FRrm4ZXrD7/5alYll9maDReAAt/0lNUG69eGaCzKVD+MQ5aCWZ8pxjJBjM8yFrA==
   dependencies:
     big-integer "^1.6.31"
     tiny-lru "^1.6.1"
