@@ -9152,9 +9152,9 @@ scss-tokenizer@^0.2.3:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
 
-sdp-transform@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.5.0.tgz#4829a6d79e854d1a022e4bbc6bbe43eccc3ef624"
+sdp-transform@2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.7.0.tgz#dec4d282c2538ef269cf3372a69b195c7862bcb5"
 
 sdp@^2.6.0, sdp@^2.9.0:
   version "2.9.0"
