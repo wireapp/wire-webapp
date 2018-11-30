@@ -67,9 +67,6 @@ module.exports = grunt => {
   });
   /* eslint-enable sort-keys */
 
-  // Tasks
-  grunt.loadTasks('grunt/tasks');
-
   grunt.registerTask('init', 'npmBower');
 
   grunt.registerTask('build', [
