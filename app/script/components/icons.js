@@ -339,6 +339,14 @@ ko.components.register('profile-icon', {
   `,
 });
 
+ko.components.register('read-icon', {
+  template: `
+  <svg width="16" height="12" viewBox="0 0 16 12">
+    <path d="M16 6a8.5 8.5 0 0 1-8 6 8.5 8.5 0 0 1-8-6c1.2-3.5 4.3-6 8-6s6.8 2.5 8 6zM8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('reply-icon', {
   template: `
   <svg width="16" height="15" viewBox="0 0 16 15">
