@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.9.17...@wireapp/commons@0.10.0) (2018-11-30)
+
+
+### Features
+
+* **commons:** Account pages languages & Language query ([#1351](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1351)) ([bfcd621](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/bfcd621))
+
+
+
+
+
 ## [0.9.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.9.16...@wireapp/commons@0.9.17) (2018-11-30)
 
 **Note:** Version bump only for package @wireapp/commons
