@@ -11,7 +11,7 @@
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/core": "7.3.5",
     "@wireapp/cryptobox": "9.0.24",
-    "@wireapp/lru-cache": "3.0.15",
+    "@wireapp/lru-cache": "3.0.17",
     "@wireapp/proteus": "8.0.17",
     "@wireapp/protocol-messaging": "1.22.1",
     "@wireapp/react-ui-kit": "4.3.6",
