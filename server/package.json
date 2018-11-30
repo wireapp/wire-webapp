@@ -32,7 +32,7 @@
     "tslint-config-prettier": "1.17.0",
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.0.1",
-    "typescript": "3.1.6"
+    "typescript": "3.2.1"
   },
   "scripts": {
     "build": "tsc -P tsconfig.json",
