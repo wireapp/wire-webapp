@@ -1522,6 +1522,11 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.106.tgz#e2da8dd8599632ce77b943c4c81d23bafcdbc424"
   integrity sha512-gGVJ2foWxIkroz+GMf0gQjSc3B8NLwmAT1X+j0VYUPzl6rARcEIMQf9qnGDNzOItINXPoiDgDclpEnxxje2j/Q==
 
+"@wireapp/cbor@3.0.107":
+  version "3.0.107"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.107.tgz#52647ae59a52f78995f6bfdd986c58f597ac6100"
+  integrity sha512-A5AzGWNghavKrZfubZbpMDqyWg1klAgo4NwaUon9hKy6mHRBTk323rjqhfQSup3bPcEvJUKG5Z9gHtVMO3vxAQ==
+
 "@wireapp/core@7.3.5":
   version "7.3.5"
   resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-7.3.5.tgz#1777c51226fd04907320124311b5c61218c83f6f"
@@ -1616,6 +1621,18 @@
     "@types/ed2curve" "0.2.2"
     "@types/node" "10.12.10"
     "@wireapp/cbor" "3.0.106"
+    ed2curve "0.2.1"
+    libsodium-wrappers-sumo "0.7.3"
+
+"@wireapp/proteus@8.0.19":
+  version "8.0.19"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-8.0.19.tgz#0ece5f23e688b85b323fbe6f5c6a74d02a35404a"
+  integrity sha512-n+dB0Ou5mb+6c6JV3cqH62j4XHv+i1c2AFD8EGPnIVppLQ8wy2PtAdbYnxbSIpHvkwrnvvhoIMXdCtfaFwjlvw==
+  dependencies:
+    "@types/chai" "4.1.7"
+    "@types/ed2curve" "0.2.2"
+    "@types/node" "10.12.10"
+    "@wireapp/cbor" "3.0.107"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
