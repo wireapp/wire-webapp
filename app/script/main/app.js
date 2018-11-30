@@ -19,6 +19,7 @@
 
 import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
+import DebugUtil from '../util/DebugUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -235,7 +236,7 @@ class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new z.util.DebugUtil(this.repository)} : {};
+    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
   }
 
   /**
