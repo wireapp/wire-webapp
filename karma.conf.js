@@ -19,15 +19,17 @@
 
 /* eslint-disable sort-keys */
 
+const webpack = require('webpack');
+const path = require('path');
+
+const rootWebpackConfig = require('./webpack.config.common.js');
+
 function getSpecs(specList) {
   if (specList) {
-    return specList.split(',').map(path => `test/unit_tests/${path}Spec.js`);
+    return specList.split(',').map(specPath => `test/unit_tests/${specPath}Spec.js`);
   }
   return ['test/unit_tests/**/*.js'];
 }
-
-const webpack = require('webpack');
-const path = require('path');
 
 module.exports = function(config) {
   config.set({
@@ -98,11 +100,9 @@ module.exports = function(config) {
         }),
       ],
       resolve: {
-        alias: {
+        alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
           app: path.resolve(__dirname, 'app'),
-          // override phoneformat export, because the 'main' file is not exporting anything
-          'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
-        },
+        }),
       },
     },
 
