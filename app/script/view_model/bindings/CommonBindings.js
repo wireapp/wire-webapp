@@ -36,7 +36,7 @@ ko.bindingHandlers.drop_file = {
 
     const onDragOver = (_data, event) => {
       event.preventDefault();
-      event.originalEvent.dataTransfer.dropEffect = 'copy';
+      event.dataTransfer.dropEffect = 'copy';
       event.currentTarget.classList.add('drag-hover');
     };
 
@@ -44,8 +44,7 @@ ko.bindingHandlers.drop_file = {
       event.preventDefault();
       event.currentTarget.classList.remove('drag-hover');
 
-      const {dataTransfer, originalEvent} = event;
-      const eventDataTransfer = dataTransfer || (originalEvent && originalEvent.dataTransfer) || {};
+      const eventDataTransfer = event.dataTransfer;
       const files = eventDataTransfer.files || [];
 
       if (files.length > 0) {
@@ -73,7 +72,7 @@ ko.bindingHandlers.drop_file = {
 ko.bindingHandlers.paste_file = {
   init(element, valueAccessor, allBindings, data, context) {
     const onPaste = (_data, event) => {
-      const clipboardData = event.originalEvent.clipboardData;
+      const clipboardData = event.clipboardData;
       const items = [].slice.call(clipboardData.items || clipboardData.files);
 
       const files = items
@@ -220,13 +219,11 @@ ko.bindingHandlers.scrollSync = {
  */
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function(_data, jquery_event) {
-      const keyboard_event = jquery_event.originalEvent || jquery_event;
-
-      if (z.util.KeyboardUtil.isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
+    const wrapper = function(_data, keyboardEvent) {
+      if (z.util.KeyboardUtil.isEnterKey(keyboardEvent) && !keyboardEvent.shiftKey && !keyboardEvent.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
-          callback.call(this, data, keyboard_event);
+          callback.call(this, data, keyboardEvent);
           return false;
         }
       }
