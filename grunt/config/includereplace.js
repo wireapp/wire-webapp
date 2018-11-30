@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // https://github.com/alanshaw/grunt-include-replace
 
 module.exports = {

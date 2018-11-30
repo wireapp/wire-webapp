@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 module.exports = {
   aws_deploy: {
     command:

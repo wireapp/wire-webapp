@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=calling/entities/CallMessageEntity yarn test:app
 
-'use strict';
-
 describe('z.calling.entities.CallMessageEntity', () => {
   describe('_create_session_id', () => {
     const callMessageEntity = new z.calling.entities.CallMessageEntity();

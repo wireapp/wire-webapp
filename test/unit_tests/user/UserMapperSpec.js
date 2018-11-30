@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=user/UserMapper yarn test:app
 
 describe('User Mapper', () => {

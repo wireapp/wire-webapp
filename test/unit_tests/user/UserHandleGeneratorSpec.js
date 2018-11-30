@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=user/UserHandleGenerator yarn test:app
 
-'use strict';
-
 describe('UserHandleGenerator', () => {
   describe('generate_handle_variations', () => {
     it('generates handle variations', () => {

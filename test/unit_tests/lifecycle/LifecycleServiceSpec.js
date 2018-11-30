@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=lifecycle/LifecycleService yarn test:app
 
-'use strict';
-
 describe('z.lifecycle.LifecycleService', () => {
   let mock_response = undefined;
   const test_factory = new window.TestFactory();

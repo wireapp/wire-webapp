@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import ko from 'knockout';
 import moment from 'moment';
 /* eslint-disable no-unused-vars */

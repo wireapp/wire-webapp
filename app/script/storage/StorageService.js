@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import Dexie from 'dexie';
 
 window.z = window.z || {};

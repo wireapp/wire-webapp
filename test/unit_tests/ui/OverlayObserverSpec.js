@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 describe('OverlayObserver', () => {
   const overlayObserver = z.ui.OverlayedObserver;
 

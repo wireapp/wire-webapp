@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=telemetry/calling/CallLogger yarn test:app
 
 import sdpTransform from 'sdp-transform';

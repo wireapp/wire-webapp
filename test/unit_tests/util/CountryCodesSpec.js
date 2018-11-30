@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=util/CountryCodes yarn test:app
 
-'use strict';
-
 describe('z.util.CountryCodes', () => {
   describe('getCountryCode', () => {
     it('returns the county code for an existing ISO name', () => {

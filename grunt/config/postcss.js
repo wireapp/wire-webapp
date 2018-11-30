@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 const processors = [
   require('autoprefixer')({
     browsers: ['Chrome >= 51', 'Edge >= 14', 'Firefox >= 52', 'Opera >= 40'],

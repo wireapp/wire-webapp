@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=conversation/EventMapper yarn test:app
 
-'use strict';
-
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
   let conversation_et = null;

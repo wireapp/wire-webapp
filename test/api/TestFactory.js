@@ -19,8 +19,6 @@
 
 /* eslint no-undef: "off" */
 
-'use strict';
-
 import ko from 'knockout';
 
 /**

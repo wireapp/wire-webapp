@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=team/TeamRepository yarn test:app
 
-'use strict';
-
 describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();
 
