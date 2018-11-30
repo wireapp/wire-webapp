@@ -20,7 +20,7 @@
 ko.components.register('read-receipt-toggle', {
   template: `
   <div data-bind="text: conversation.receiptMode() ? 'yes' : 'no'"></div>
-  <label><input type="checkbox" data-bind="checked: valueProxy"> receipt mode</label>
+  <label><input type="checkbox" data-uie-name="do-toggle-receipt-mode" data-bind="checked: valueProxy"> receipt mode</label>
   `,
 
   viewModel: function(params) {
