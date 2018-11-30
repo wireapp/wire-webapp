@@ -249,7 +249,6 @@ import ActionsViewModelGlobal from '../view_model/ActionsViewModel.js';
 import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
 import ImageDetailViewViewModelGlobal from '../view_model/ImageDetailViewViewModel.js';
 import LoadingViewModelGlobal from '../view_model/LoadingViewModel.js';
-import DarkModeViewModelGlobal from '../view_model/DarkModeViewModel.js';
 import MainViewModelGlobal from '../view_model/MainViewModel.js';
 import ModalsViewModelGlobal from '../view_model/ModalsViewModel.js';
 import ShortcutsViewModelGlobal from '../view_model/ShortcutsViewModel.js';

@@ -22,6 +22,8 @@
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
+import DarkModeViewModel from '../view_model/DarkModeViewModel';
+
 z.viewModel.MainViewModel = class MainViewModel {
   static get CONFIG() {
     return {
@@ -75,7 +77,7 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
-    this.darkMode = new z.viewModel.DarkModeViewModel(this, repositories);
+    this.darkMode = new DarkModeViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();

@@ -17,12 +17,7 @@
  *
  */
 
-'use strict';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.DarkModeViewModel = class DarkModeViewModel {
+class DarkModeViewModel {
   constructor(mainViewModel, repositories) {
     this.propertiesRepository = repositories.properties;
 
@@ -45,4 +40,6 @@ z.viewModel.DarkModeViewModel = class DarkModeViewModel {
     const ANIMATION_DURATION = 250;
     setTimeout(() => this.isTransitioning(false), ANIMATION_DURATION);
   }
-};
+}
+
+export default DarkModeViewModel;
