@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import moment from 'moment';
 import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
 

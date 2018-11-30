@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=user/UserRepository yarn test:app
 
-'use strict';
-
 describe('z.user.UserRepository', () => {
   let server = null;
   const test_factory = new TestFactory();

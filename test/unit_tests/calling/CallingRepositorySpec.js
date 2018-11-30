@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=calling/CallingRepository yarn test:app
 
 describe('z.calling.CallingRepository', () => {

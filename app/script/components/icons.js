@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 ko.components.register('add-participants-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">

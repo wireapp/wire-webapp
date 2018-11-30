@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=storage/StorageService yarn test:app
 
 describe('z.storage.StorageRepository', () => {

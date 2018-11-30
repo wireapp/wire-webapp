@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=cryptography/CryptographyMapper yarn test:app
 
-'use strict';
-
 describe('z.cryptography.CryptographyMapper', () => {
   const mapper = new z.cryptography.CryptographyMapper();
 

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=links/LinkPreviewBlackList yarn test:app
 
 describe('is_blacklisted', () => {

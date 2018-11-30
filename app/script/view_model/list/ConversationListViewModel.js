@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import keyboardJS from 'keyboardjs';
 
 window.z = window.z || {};

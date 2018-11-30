@@ -18,9 +18,7 @@
  */
 
 (global => {
-  'use strict';
-
-  function cacheRequest(cache, request, response) {
+    function cacheRequest(cache, request, response) {
     return cache
       .put(stripSearchParameters(request.url), response.clone())
       .catch(error => console.warn(`Failed to cache asset: ${error.message}`)) // eslint-disable-line

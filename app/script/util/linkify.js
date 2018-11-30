@@ -1,8 +1,6 @@
 /* eslint-disable */
 (function() {
-  'use strict';
-
-  const _typeof =
+    const _typeof =
     typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
       ? function(obj) {
           return typeof obj;
@@ -14,9 +12,7 @@
         };
 
   (function(exports) {
-    'use strict';
-
-    function inherits(parent, child) {
+        function inherits(parent, child) {
       const props = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       const extended = Object.create(parent.prototype);

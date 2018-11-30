@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=util/EmojiUtil yarn test:app
 
-'use strict';
-
 describe('z.util.emoji', () => {
   describe('includes_only_emojies', () => {
     it('returns false for empty string', () => {

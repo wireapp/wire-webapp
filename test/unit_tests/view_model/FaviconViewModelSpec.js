@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=view_model/FaviconViewModel yarn test:app
 
 describe('z.viewModel.FaviconViewModel', () => {

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import adapter from 'webrtc-adapter';
 
 window.z = window.z || {};

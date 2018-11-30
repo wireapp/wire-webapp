@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=search/FullTextSearch yarn test:app
 
 describe('z.search.FullTextSearch', () => {

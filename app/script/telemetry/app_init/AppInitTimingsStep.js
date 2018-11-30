@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.app_init = z.telemetry.app_init || {};

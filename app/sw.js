@@ -18,9 +18,7 @@
  */
 
 (global => {
-  'use strict';
-
-  importScripts('/worker/sw-toolbox.js');
+    importScripts('/worker/sw-toolbox.js');
   importScripts('/worker/lru-cache-strategy.js');
 
   const ASSET_CACHE_MAX_ITEMS = 1000;

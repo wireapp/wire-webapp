@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=calling/CallMessageBuilder yarn test:app
 
 describe('z.calling.CallMessageBuilder', () => {

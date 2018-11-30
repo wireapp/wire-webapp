@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import uint32 from 'uint32';
 
 window.z = window.z || {};
