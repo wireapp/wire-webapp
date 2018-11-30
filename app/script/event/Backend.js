@@ -35,6 +35,7 @@ z.event.Backend = {
     MEMBER_UPDATE: 'conversation.member-update',
     MESSAGE_TIMER_UPDATE: 'conversation.message-timer-update',
     OTR_MESSAGE_ADD: 'conversation.otr-message-add',
+    RECEIPT_MODE_UPDATE: 'conversation.receipt-mode-update',
     RENAME: 'conversation.rename',
     TYPING: 'conversation.typing',
   },
