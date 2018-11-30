@@ -22,8 +22,9 @@
 class PropertiesRepository {
   static get CONFIG() {
     return {
-      PROPERTIES_KEY: 'webapp',
-      WIRE_ENABLE_READ_RECEIPTS: 'WIRE_ENABLE_READ_RECEIPTS',
+      // Value names are specified by the protocol but key names can be changed.
+      ENABLE_READ_RECEIPTS: 'WIRE_ENABLE_READ_RECEIPTS',
+      WEBAPP_ACCOUNT_SETTINGS: 'webapp',
     };
   }
 
@@ -101,35 +102,43 @@ class PropertiesRepository {
     return this.selfUser().isTemporaryGuest() ? this._initTemporaryGuestAccount() : this._initActivatedAccount();
   }
 
-  _fetchWebAppSettings() {
+  _fetchWebAppAccountSettings() {
     return this.propertiesService
-      .getPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY)
-      .then(properties => $.extend(true, this.properties, properties));
+      .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
+      .then(properties => {
+        $.extend(true, this.properties, properties);
+      })
+      .catch(() => {
+        this.logger.warn(
+          `Property "${
+            PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS
+          }" doesn't exist for this account. Continuing with the default value of "${this.properties.settings}".`
+        );
+      });
   }
 
   _fetchReadReceiptsSetting() {
     return this.propertiesService
-      .getPropertiesByKey(PropertiesRepository.CONFIG.WIRE_ENABLE_READ_RECEIPTS)
-      .then(enableReadReceipts => (this.properties.settings.privacy.enable_read_receipts = enableReadReceipts));
+      .getPropertiesByKey(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS)
+      .then(enableReadReceipts => {
+        this.properties.settings.privacy.enable_read_receipts = enableReadReceipts;
+      })
+      .catch(() => {
+        this.logger.warn(
+          `Property "${
+            PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS
+          }" doesn't exist for this account. Continuing with the default value of "${
+            this.properties.settings.privacy.enable_read_receipts
+          }".`
+        );
+      });
   }
 
   _initActivatedAccount() {
-    const propertiesMapping = {
-      [PropertiesRepository.CONFIG.PROPERTIES_KEY]: this._fetchWebAppSettings,
-      [PropertiesRepository.CONFIG.WIRE_ENABLE_READ_RECEIPTS]: this._fetchReadReceiptsSetting,
-    };
-
-    return this.propertiesService
-      .getProperties()
-      .then(keys => {
-        const settingCalls = keys.map(key => propertiesMapping[key]).filter(Boolean);
-
-        if (settingCalls.length) {
-          return Promise.all(settingCalls).then(() => this.logger.info('Loaded user properties', this.properties));
-        }
-        this.logger.info('No properties found: Using default properties', this.properties);
-      })
-      .then(() => this._publishProperties());
+    return Promise.all([this._fetchWebAppAccountSettings(), this._fetchReadReceiptsSetting()]).then(() => {
+      this.logger.info('Loaded user properties', this.properties);
+      this._publishProperties();
+    });
   }
 
   _initTemporaryGuestAccount() {
@@ -186,7 +195,7 @@ class PropertiesRepository {
 
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
     return this.propertiesService
-      .putPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
+      .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
       .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
   }
 
