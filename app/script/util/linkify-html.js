@@ -1,4 +1,6 @@
 /* eslint-disable */
+'use strict';
+
 (function(window, linkify) {
   const linkifyHtml = (function(linkify) {
     'use strict';
