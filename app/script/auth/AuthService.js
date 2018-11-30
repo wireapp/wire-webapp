@@ -19,8 +19,6 @@
 
 'use strict';
 
-import pako from 'pako';
-
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
@@ -181,10 +179,7 @@ z.auth.AuthService = class AuthService {
       $.ajax({
         contentType: 'application/json; charset=utf-8',
         crossDomain: true,
-        data: pako.gzip(JSON.stringify(login)),
-        headers: {
-          'Content-Encoding': 'gzip',
-        },
+        data: JSON.stringify(login),
         processData: false,
         type: 'POST',
         url: this.backendClient.createUrl(`${AuthService.CONFIG.URL_LOGIN}?persist=${persistParam}`),
