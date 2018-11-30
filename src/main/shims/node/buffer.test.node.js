@@ -17,11 +17,27 @@
  *
  */
 
-const {base64MD5FromBuffer} = require('@wireapp/api-client/dist/commonjs/shims/node/buffer');
+/* eslint-disable no-magic-numbers */
+
+const {base64MD5FromBuffer, bufferToString} = require('@wireapp/api-client/dist/commonjs/shims/node/buffer');
 
 describe('"base64MD5FromBuffer"', () => {
   it('can generate base64 encoded md5 hash from buffer', () => {
     const size = 8;
-    expect(base64MD5FromBuffer(new Uint8Array([size, size]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
+    const array = new Uint8Array([size, size]);
+    const base64Result = base64MD5FromBuffer(array.buffer);
+    const base64Expected = 'w+7NCDwPSCf1JgWbA7deTA==';
+
+    expect(base64Result).toBe(base64Expected);
+  });
+});
+
+describe('"bufferToString"', () => {
+  it('converts an ArrayBuffer to a string', () => {
+    const array = new Uint8Array([87, 105, 114, 101]);
+    const stringResult = bufferToString(array.buffer);
+    const stringExpected = 'Wire';
+
+    expect(stringResult).toBe(stringExpected);
   });
 });
