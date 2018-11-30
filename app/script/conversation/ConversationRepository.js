@@ -1358,6 +1358,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  updateConversationReceiptMode(conversationEntity, receiptMode) {
+    return this.conversation_service
+      .updateConversationReceiptMode(conversationEntity.id, receiptMode)
+      .then(response => {
+        if (response) {
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return response;
+        }
+      });
+  }
+
   reset_session(user_id, client_id, conversation_id) {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 

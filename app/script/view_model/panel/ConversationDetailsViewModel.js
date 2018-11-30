@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
+/* eslint-disable no-unused-vars */
+import receiptModeToggle from 'components/receiptModeToggle';
+/* eslint-enable no-unused-vars */
+
 z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel extends z.viewModel.panel
   .BasePanelViewModel {
   static get CONFIG() {
@@ -36,6 +40,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
+    this.updateConversationReceiptMode = this.updateConversationReceiptMode.bind(this);
 
     const {mainViewModel, repositories} = params;
 
@@ -316,5 +321,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         this.conversationRepository.renameConversation(this.activeConversation(), newConversationName);
       }
     }
+  }
+
+  updateConversationReceiptMode(conversationEntity, receiptMode) {
+    this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
   }
 };
