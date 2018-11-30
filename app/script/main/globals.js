@@ -2,6 +2,7 @@
 import {amplify} from 'amplify';
 import Cookies from 'js-cookie';
 import moment from 'moment';
+import jQuery from 'jquery';
 import ko from 'knockout';
 import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 
@@ -395,4 +396,6 @@ window.moment = moment;
 
 window.amplify = amplify;
 window.Cookies = Cookies;
+// we need to publish jQuery on the window so that knockout can use it
+window.jQuery = jQuery;
 window.ko = ko;
