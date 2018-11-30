@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=conversation/ConversationMapper yarn test:app
 
-'use strict';
-
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
 

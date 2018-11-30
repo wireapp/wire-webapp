@@ -17,12 +17,23 @@
  *
  */
 
-window.z = window.z || {};
-window.z.team = z.team || {};
+import SystemMessage from './SystemMessage';
 
-z.team.TeamMemberEntity = class TeamMemberEntity {
-  constructor() {
-    this.permissions = undefined;
-    this.userId = undefined;
+export default class ReceiptModeUpdateMessage extends SystemMessage {
+  constructor(isReceiptEnabled) {
+    super();
+
+    this.type = z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE;
+    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
+
+    this.caption = ko.pureComputed(() => {
+      let stringId;
+      if (isReceiptEnabled) {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOnYou : z.string.conversationReceiptsOn;
+      } else {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOffYou : z.string.conversationReceiptsOff;
+      }
+      return z.l10n.text(stringId);
+    });
   }
-};
+}

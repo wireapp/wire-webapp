@@ -17,23 +17,24 @@
  *
  */
 
-// KARMA_SPECS=storage/StorageRepository yarn test:app
+ko.components.register('read-receipt-toggle', {
+  template: `
+  <div data-bind="text: conversation.receiptMode() ? 'yes' : 'no'"></div>
+  <label><input type="checkbox" data-uie-name="do-toggle-receipt-mode" data-bind="checked: valueProxy"> receipt mode</label>
+  `,
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+  viewModel: function(params) {
+    this.conversation = params.conversation();
+    this.valueProxy = ko.observable(this.conversation.receiptMode());
 
-  beforeAll(() => test_factory.exposeStorageActors());
-
-  beforeEach(() => TestFactory.storage_repository.clearStores());
-
-  describe('saveValue', () => {
-    it('persists primitive values in an object format', () => {
-      const primary_key = 'test_key';
-      const primitive_value = 'test_value';
-
-      return TestFactory.storage_repository.saveValue(primary_key, primitive_value).then(storage_key => {
-        expect(storage_key).toBe(primary_key);
-      });
+    const valueSubscription = this.valueProxy.subscribe(newValue => {
+      const intValue = newValue ? 1 : 0;
+      this.conversation.receiptMode(intValue);
+      params.onReceiptModeChanged(this.conversation, intValue);
     });
-  });
+
+    this.dispose = () => {
+      valueSubscription.dispose();
+    };
+  },
 });

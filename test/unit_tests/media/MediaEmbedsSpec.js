@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=media/MediaEmbeds yarn test:app
 
 describe('MediaEmbeds', () => {

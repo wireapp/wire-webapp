@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 ko.components.register('panel-user-details', {
   template: `
     <div class="panel-participant">
@@ -35,18 +33,18 @@ ko.components.register('panel-user-details', {
       <!-- /ko -->
 
       <participant-avatar params="participant: participant, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
-      
+
       <!-- ko if: participant().isGuest() -->
         <div class="panel-participant__guest-label" data-uie-name="status-guest">
           <guest-icon></guest-icon>
           <span data-bind="l10n_text: z.string.conversationGuestIndicator"></span>
         </div>
       <!-- /ko -->
-          
+
       <!-- ko if: participant().isTemporaryGuest () -->
         <div class="panel-participant__guest-expiration" data-bind="text: participant().expirationText" data-uie-name="status-expiration-text"></div>
       <!-- /ko -->
-      
+
       <!-- ko if: participant().inTeam() -->
         <availability-state
           class="panel-participant__availability"

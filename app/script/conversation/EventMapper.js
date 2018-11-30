@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -104,6 +104,11 @@ z.conversation.EventMapper = class EventMapper {
 
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
         messageEntity = this._mapEventMemberLeave(event);
+        break;
+      }
+
+      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE: {
+        messageEntity = this._mapEventReceiptModeUpdate(event);
         break;
       }
 
@@ -419,6 +424,17 @@ z.conversation.EventMapper = class EventMapper {
     const messageEntity = new z.entity.RenameMessage();
     messageEntity.name = eventData.name;
     return messageEntity;
+  }
+
+  /**
+   * Maps JSON data of conversation.receipt-mode-update message into message entity.
+   *
+   * @private
+   * @param {Object} eventData - Message data
+   * @returns {ReceiptModeUpdateMessage} receipt mode update message entity
+   */
+  _mapEventReceiptModeUpdate({data: eventData}) {
+    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode);
   }
 
   /**

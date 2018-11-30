@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=calling/SDPMapper yarn test:app
 
 describe('z.calling.SDPMapper', () => {

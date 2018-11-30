@@ -17,12 +17,10 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.Message = class Message {
+class Message {
   /**
    * Sort messages by timestamp
    * @param {Array<z.entity.Message>} message_ets - Message entities
@@ -350,4 +348,7 @@ z.entity.Message = class Message {
     }
     return false;
   }
-};
+}
+
+export default Message;
+z.entity.Message = Message;

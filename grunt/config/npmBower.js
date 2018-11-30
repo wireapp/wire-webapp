@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // https://github.com/wireapp/grunt-npm-bower
 
 module.exports = {

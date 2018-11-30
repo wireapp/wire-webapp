@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.message = z.message || {};
 
@@ -33,6 +31,7 @@ z.message.SystemMessageType = {
   CONNECTION_REQUEST: 'connecting',
   CONVERSATION_CREATE: 'created-group',
   CONVERSATION_MESSAGE_TIMER_UPDATE: 'message-timer-update',
+  CONVERSATION_RECEIPT_MODE_UPDATE: 'receipt-mode-update',
   CONVERSATION_RENAME: 'rename',
   CONVERSATION_RESUME: 'resume',
   MEMBER_JOIN: 'join',

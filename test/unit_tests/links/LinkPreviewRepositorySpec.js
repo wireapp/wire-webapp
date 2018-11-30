@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import PropertiesRepository from 'app/script/properties/PropertiesRepository';
 
 // KARMA_SPECS=links/LinkPreviewRepository yarn test:app

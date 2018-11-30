@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=conversation/ConversationService yarn test:app
 
-'use strict';
-
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
     const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';

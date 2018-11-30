@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // https://github.com/MathieuLoutre/grunt-aws-s3
 
 module.exports = {

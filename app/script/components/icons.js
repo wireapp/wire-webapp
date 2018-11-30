@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 ko.components.register('add-participants-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -335,6 +333,14 @@ ko.components.register('profile-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('read-icon', {
+  template: `
+  <svg width="16" height="12" viewBox="0 0 16 12">
+    <path d="M16 6a8.5 8.5 0 0 1-8 6 8.5 8.5 0 0 1-8-6c1.2-3.5 4.3-6 8-6s6.8 2.5 8 6zM8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
   </svg>
   `,
 });

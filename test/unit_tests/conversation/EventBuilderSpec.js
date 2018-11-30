@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=conversation/EventBuilder yarn test:app
 
-'use strict';
-
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;
   let conversation_et = undefined;

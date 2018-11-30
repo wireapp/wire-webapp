@@ -19,8 +19,6 @@
 
 //@ts-check
 
-'use strict';
-
 import moment from 'moment';
 
 /**

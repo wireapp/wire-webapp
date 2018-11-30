@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=tracking/EventTrackingRepository yarn test:app
 
 describe('z.tracking.helpers', () => {

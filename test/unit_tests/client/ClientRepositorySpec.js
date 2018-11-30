@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=client/ClientRepository yarn test:app
 
-'use strict';
-
 describe('z.client.ClientRepository', () => {
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';

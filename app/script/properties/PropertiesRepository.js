@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 class PropertiesRepository {
   static get CONFIG() {
     return {

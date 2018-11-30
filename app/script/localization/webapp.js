@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.wire = 'Wire';
 z.string.wireMacos = 'Wire for macOS';
 z.string.wireWindows = 'Wire for Windows';
@@ -333,6 +331,7 @@ z.string.conversationCreateWithMore = 'with {{users}}, and [showmore]{{count}} m
 z.string.conversationCreateTeam = 'with [showmore]all team members[/showmore]';
 z.string.conversationCreateTeamGuest = 'with [showmore]all team members and one guest[/showmore]';
 z.string.conversationCreateTeamGuests = 'with [showmore]all team members and {{count}} guests[/showmore]';
+z.string.conversationCreateReceiptsEnabled = 'Read receipts are on';
 z.string.conversationMemberJoined = '[bold]{{name}}[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedYou = '[bold]You[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedMore = '[bold]{{name}}[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
@@ -345,6 +344,10 @@ z.string.conversationMemberRemoved = '[bold]{{name}}[/bold] removed {{users}}';
 z.string.conversationMemberRemovedYou = '[bold]You[/bold] removed {{users}}';
 z.string.conversationTeamLeft = '[bold]{{name}}[/bold] was removed from the team';
 z.string.conversationMessageDelivered = 'Delivered';
+z.string.conversationReceiptsOn = ' turned on read receipts for everyone';
+z.string.conversationReceiptsOnYou = ' turned on read receipts for everyone';
+z.string.conversationReceiptsOff = ' turned off read receipts for everyone';
+z.string.conversationReceiptsOffYou = ' turned off read receipts for everyone';
 z.string.conversationRename = ' renamed the conversation';
 z.string.conversationRenameYou = ' renamed the conversation';
 z.string.conversationUpdatedTimer = ' set the message timer to {{time}}';

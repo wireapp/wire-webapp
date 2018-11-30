@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import moment from 'moment';
 import $ from 'jquery';
 /* eslint-disable no-unused-vars */

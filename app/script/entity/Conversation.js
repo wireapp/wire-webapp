@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import ko from 'knockout';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -175,6 +175,8 @@ z.entity.Conversation = class Conversation {
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
 
+    this.receiptMode = ko.observable(0);
+
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
@@ -316,6 +318,7 @@ z.entity.Conversation = class Conversation {
       this.mutedTimestamp,
       this.name,
       this.participating_user_ids,
+      this.receiptMode,
       this.status,
       this.type,
       this.verification_state,
@@ -755,6 +758,7 @@ z.entity.Conversation = class Conversation {
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
       others: this.participating_user_ids(),
+      receipt_mode: this.receiptMode(),
       status: this.status(),
       team_id: this.team_id,
       type: this.type(),

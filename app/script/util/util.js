@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import marked from './marked.js';

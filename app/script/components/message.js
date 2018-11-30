@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 class Message {
   constructor({
     message,
@@ -74,6 +72,7 @@ class Message {
     const iconComponents = {
       [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
       [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+      [z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
     };
     return iconComponents[message.system_message_type];
   }
@@ -494,6 +493,17 @@ const memberTemplate = `
         <div class="message-member-footer">
           <div class="message-member-footer-message" data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
           <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: true -->
+        <div class="message-header" data-uie-name="label-group-creation-receipts">
+          <div class="message-header-icon message-header-icon--svg text-graphite">
+            <read-icon></read-icon>
+          </div>
+          <div class="message-header-label">
+            <span class="ellipsis" data-bind="l10n_text: z.string.conversationCreateReceiptsEnabled"></span>
+            <hr class="message-header-line" />
+          </div>
         </div>
       <!-- /ko -->
     <!-- /ko -->

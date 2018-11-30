@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import poster from 'poster-image';
 
 window.z = window.z || {};
@@ -1058,6 +1056,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadState().allEvents.length;
       if (isNotMarkedAsRead && !this.block_event_handling()) {
         this._updateLastReadTimestamp(conversationEntity);
+        this._sendReadReceipt(conversationEntity, true);
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
       }
     }
@@ -1357,6 +1356,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  updateConversationReceiptMode(conversationEntity, receiptMode) {
+    return this.conversation_service
+      .updateConversationReceiptMode(conversationEntity.id, receiptMode)
+      .then(response => {
+        if (response) {
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return response;
+        }
+      });
+  }
+
   reset_session(user_id, client_id, conversation_id) {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
@@ -1639,6 +1649,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
+  /**
+   * Send a read receipt for the last message in a conversation.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation to update
+   * @param {boolean} sendToGroup - If the confirmation should be sent to groups
+   * @returns {undefined} No return value
+   */
+  _sendReadReceipt(conversationEntity, sendToGroup = false) {
+    const lastMessage = conversationEntity.getLastMessage();
+
+    if (lastMessage) {
+      this.sendConfirmationStatus(conversationEntity, lastMessage, z.proto.Confirmation.Type.READ, sendToGroup);
+    }
+  }
+
   //##############################################################################
   // Send encrypted events
   //##############################################################################
@@ -1802,10 +1828,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that content message was received in
    * @param {Message} messageEntity - Message for which to acknowledge receipt
+   * @param {z.proto.Confirmation.Type} type - The type of confirmation to send
+   * @param {boolean} sendToGroup - If the confirmation should be sent to groups
    * @returns {undefined} No return value
    */
-  sendConfirmationStatus(conversationEntity, messageEntity) {
-    const otherUserIn1To1 = !messageEntity.user().is_me && conversationEntity.is1to1();
+  sendConfirmationStatus(conversationEntity, messageEntity, type, sendToGroup = false) {
+    const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || sendToGroup);
     const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
@@ -1813,7 +1841,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const sendConfirmation = otherUserIn1To1 && withinThreshold && typeToConfirm;
     if (sendConfirmation) {
       const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      const protoConfirmation = new z.proto.Confirmation(z.proto.Confirmation.Type.DELIVERED, messageEntity.id);
+      const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id);
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
 
       this.sending_queue.push(() => {
@@ -2921,7 +2949,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
-          this.sendConfirmationStatus(conversationEntity, messageEntity);
+          this.sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.DELIVERED);
         }
 
         if (!eventFromStream) {

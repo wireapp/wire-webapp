@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=conversation/ConversationRepository yarn test:app
 
-'use strict';
-
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
 

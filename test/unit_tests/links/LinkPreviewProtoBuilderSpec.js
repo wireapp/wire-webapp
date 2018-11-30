@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=links/LinkPreviewProtoBuilder yarn test:app
 
 describe('LinkPreviewProtoBuilder', () => {
