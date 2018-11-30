@@ -23,7 +23,10 @@ class PropertiesRepository {
   static get CONFIG() {
     return {
       // Value names are specified by the protocol but key names can be changed.
-      ENABLE_READ_RECEIPTS: 'WIRE_ENABLE_READ_RECEIPTS',
+      ENABLE_READ_RECEIPTS: {
+        defaultValue: false,
+        key: 'WIRE_ENABLE_READ_RECEIPTS',
+      },
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
     };
   }
@@ -38,6 +41,10 @@ class PropertiesRepository {
 
     this.properties = new z.properties.PropertiesEntity();
     this.selfUser = ko.observable();
+    this.enableReadReceipts = ko.observable(false);
+    this.enableReadReceipts.subscribe(updatedValue => {
+      this.setProperty(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key, JSON.stringify(updatedValue));
+    });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
@@ -118,17 +125,17 @@ class PropertiesRepository {
   }
 
   _fetchReadReceiptsSetting() {
+    const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+
     return this.propertiesService
-      .getPropertiesByKey(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS)
+      .getPropertiesByKey(property.key)
       .then(enableReadReceipts => {
-        this.properties.settings.privacy.enable_read_receipts = enableReadReceipts;
+        this.enableReadReceipts(enableReadReceipts);
       })
       .catch(() => {
         this.logger.warn(
-          `Property "${
-            PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS
-          }" doesn't exist for this account. Continuing with the default value of "${
-            this.properties.settings.privacy.enable_read_receipts
+          `Property "${property.key}" doesn't exist for this account. Continuing with the default value of "${
+            property.defaultValue
           }".`
         );
       });
@@ -191,6 +198,30 @@ class PropertiesRepository {
 
       savePromise.then(() => this._publishPropertyUpdate(propertiesType, updatedPreference));
     }
+  }
+
+  deleteProperty(key) {
+    switch (key) {
+      case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
+        this.setProperty(key, PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
+        break;
+    }
+  }
+
+  setProperty(key, value) {
+    switch (key) {
+      case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
+        value = JSON.parse(value);
+        if (value !== this.enableReadReceipts()) {
+          this.logger.info(`Setting key "${key}" to value "${value}".`);
+          this.enableReadReceipts(value);
+        }
+        break;
+    }
+  }
+
+  _setPropertyOnBackend(key, value) {
+    return this.propertiesService.putPropertiesByKey(key, value);
   }
 
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {

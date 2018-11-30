@@ -93,6 +93,7 @@ class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
+    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -107,7 +108,8 @@ class App {
       this.service.asset,
       this.service.self,
       repositories.client,
-      repositories.serverTime
+      repositories.serverTime,
+      repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
     repositories.event = new z.event.EventRepository(
@@ -119,7 +121,6 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);

@@ -34,21 +34,14 @@ z.user.UserRepository = class UserRepository {
     };
   }
 
-  /**
-   * Construct a new User repository.
-   * @class z.user.UserRepository
-   * @param {z.user.UserService} user_service - Backend REST API user service implementation
-   * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
-   * @param {z.self.SelfService} selfService - Backend REST API self service implementation
-   * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
-   */
-  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository) {
-    this.user_service = user_service;
-    this.asset_service = asset_service;
-    this.selfService = selfService;
-    this.client_repository = client_repository;
+  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
+
+    this.asset_service = asset_service;
+    this.client_repository = client_repository;
+    this.propertyRepository = propertyRepository;
+    this.selfService = selfService;
+    this.user_service = user_service;
 
     this.user_mapper = new z.user.UserMapper(serverTimeRepository);
     this.should_set_username = false;
@@ -112,6 +105,12 @@ z.user.UserRepository = class UserRepository {
     switch (type) {
       case z.event.Backend.USER.DELETE:
         this.user_delete(event_json);
+        break;
+      case z.event.Backend.USER.PROPERTIES_DELETE:
+        this.propertyRepository.deleteProperty(event_json.key);
+        break;
+      case z.event.Backend.USER.PROPERTIES_SET:
+        this.propertyRepository.setProperty(event_json.key, event_json.value);
         break;
       case z.event.Backend.USER.UPDATE:
         this.user_update(event_json);
