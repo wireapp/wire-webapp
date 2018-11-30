@@ -69,9 +69,9 @@ z.media.MediaEmbeds = (function() {
   const _regex = {
     // example: http://regexr.com/3ase5
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,
-    spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([\w-/]+)/g,
-    vimeo: /https?:\/\/(?:vimeo\.com\/|player\.vimeo\.com\/)(?:video\/|(?:channels\/staffpicks\/|channels\/)|)((\w|-){7,9})/g,
-    youtube: /(?:youtube(?:-nocookie|)\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
+    spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([^?]+)/g,
+    vimeo: /https?:\/\/(?:(?:player\.)?vimeo\.com\/)(?:channels(?:\/[^/]+)?\/|video\/)?([0-9]+)/g,
+    youtube: /(?:youtube(?:-nocookie)?\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
   };
 
   /**
@@ -260,10 +260,6 @@ z.media.MediaEmbeds = (function() {
       const vimeoColor = themeColor ? themeColor.replace('#', '') : undefined;
 
       if (linkSrc.match(_regex.vimeo)) {
-        if (z.util.StringUtil.includes(linkSrc, '/user')) {
-          return message;
-        }
-
         const iframe = _createIframeContainer({
           src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeoColor}&badge=0`,
           type: 'vimeo',

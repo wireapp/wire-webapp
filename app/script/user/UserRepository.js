@@ -342,7 +342,7 @@ z.user.UserRepository = class UserRepository {
    * @param {string} userId - User ID
    * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
    */
-  fetchUserById(userId) {
+  _fetchUserById(userId) {
     return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
   }
 
@@ -360,8 +360,8 @@ z.user.UserRepository = class UserRepository {
 
     const _getUsers = chunkOfUserIds => {
       return this.user_service
-        .get_users(chunkOfUserIds)
-        .then(response => (response ? this.user_mapper.map_users_from_object(response) : []))
+        .getUsers(chunkOfUserIds)
+        .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
         .catch(error => {
           const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
@@ -417,7 +417,7 @@ z.user.UserRepository = class UserRepository {
     return this.selfService
       .getSelf()
       .then(userData => this._upgradePictureAsset(userData))
-      .then(response => this.user_mapper.map_self_user_from_object(response))
+      .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
         const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
         return Promise.all(promises).then(() => userEntity);
@@ -462,7 +462,7 @@ z.user.UserRepository = class UserRepository {
       .catch(error => {
         const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
-          return this.fetchUserById(user_id);
+          return this._fetchUserById(user_id);
         }
         throw error;
       })
@@ -477,7 +477,7 @@ z.user.UserRepository = class UserRepository {
 
   get_user_id_by_handle(handle) {
     return this.user_service
-      .get_username(handle.toLowerCase())
+      .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
         if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
@@ -593,7 +593,7 @@ z.user.UserRepository = class UserRepository {
         throw error;
       });
 
-    return Promise.all([getLocalUser(userId), this.user_service.get_user_by_id(userId)])
+    return Promise.all([getLocalUser(userId), this.user_service.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
         this.user_mapper.updateUserFromObject(localUserEntity, updatedUserData)
       )
@@ -715,7 +715,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<string>} A list with usernames that are not taken.
    */
   verify_usernames(usernames) {
-    return this.user_service.check_usernames(usernames);
+    return this.user_service.checkUserHandles(usernames);
   }
 
   /**
@@ -725,7 +725,7 @@ z.user.UserRepository = class UserRepository {
    */
   verify_username(username) {
     return this.user_service
-      .check_username(username)
+      .checkUserHandle(username)
       .catch(({code: error_code}) => {
         if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
@@ -785,6 +785,10 @@ z.user.UserRepository = class UserRepository {
   }
 
   getMarketingConsent() {
+    if (!window.wire.env.FEATURE.CHECK_CONSENT) {
+      this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
+      return Promise.resolve();
+    }
     return this.selfService
       .getSelfConsent()
       .then(consents => {

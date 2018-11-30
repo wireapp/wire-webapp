@@ -435,7 +435,6 @@ z.string.pt.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.pt.preferencesOptionsAudioSome = 'Alguns';
 z.string.pt.preferencesOptionsAudioSomeDetail = 'Pings e chamadas';
 z.string.pt.preferencesOptionsContacts = 'Contactos';
-z.string.pt.preferencesOptionsContactsGmail = 'Importar do Gmail';
 z.string.pt.preferencesOptionsContactsMacos = 'Importar dos Contactos';
 z.string.pt.preferencesOptionsContactsDetail = 'Usamos seus dados de contacto para liga-lo aos outros. Nós anonimizamos toda a informação e não a partilhamos com outras entidades.';
 z.string.pt.preferencesOptionsPopular = 'A pedido popular';
@@ -469,16 +468,12 @@ z.string.pt.searchOthers = 'Ligar';
 z.string.pt.searchInvite = 'Convidar pessoas para aderir ao Wire';
 z.string.pt.searchInviteDetail = 'Partilhar os seus contacto ajuda a ligar-se aos outros. Anonimizamos toda a informação e não a partilhamos com ninguém.';
 z.string.pt.searchInviteButtonContacts = 'Dos contactos';
-z.string.pt.searchInviteButtonGmail = 'Do Gmail';
 z.string.pt.searchInviteHeadline = 'Traga os seus amigos';
 z.string.pt.searchInviteShare = 'Partilhar Contactos';
 
 z.string.pt.searchListEveryoneParticipates = 'Todas as pessoas a que está ligado já estão nesta conversa.';
 z.string.pt.searchListNoMatches = 'Sem resultados. Tente um nome diferente.';
 
-
-z.string.pt.uploadGoogleHeadline = 'Encontre pessoas para conversar.';
-z.string.pt.uploadGoogleMessage = 'Usamos seus dados de contacto para liga-lo aos outros. Nós anonimizamos toda a informação e não a partilhamos com outras entidades.';
 
 z.string.pt.warningCallUnsupportedIncoming = '{{user}} está a chamar. O seu navegador não suporta chamadas.';
 z.string.pt.warningCallUnsupportedOutgoing = 'Não pode telefonar porque o seu navegador não suporta chamadas.';
@@ -549,7 +544,6 @@ z.string.pt.tooltipConversationsStart = 'Iniciar conversa ({{shortcut}})';
 
 z.string.pt.tooltipConversationDetailsRename = 'Alterar nome da conversa';
 
-z.string.pt.tooltipPreferencesContactsGmail = 'Iniciar sessão na sua conta do Gmail para partilhar contactos';
 z.string.pt.tooltipPreferencesContactsMacos = 'Partilhe os contatos da aplicação de contactos macOS';
 z.string.pt.tooltipPreferencesPassword = 'Abrir um outro site para alterar a sua palavra-passe';
 z.string.pt.tooltipPreferencesPicture = 'Mude sua fotografia…';

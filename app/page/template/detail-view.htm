@@ -12,7 +12,7 @@
         <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
-        <!-- ko if: messageEntity().is_reactable() && !conversationEntity().removed_from_conversation() -->
+        <!-- ko if: messageEntity().isReactable() && !conversationEntity().removed_from_conversation() -->
           <span class="detail-view-action-button" data-bind="click: clickOnLike" data-uie-name="do-like-fullscreen-picture">
             <span data-bind="css: messageEntity().is_liked() ? 'icon-liked text-red' : 'icon-like'"></span>
             <span data-bind="l10n_text: z.string.conversationContextMenuLike"></span>

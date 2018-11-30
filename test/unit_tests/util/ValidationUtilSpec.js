@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/ValidationUtil
+// grunt test_run:util/ValidationUtil
 
 'use strict';
 

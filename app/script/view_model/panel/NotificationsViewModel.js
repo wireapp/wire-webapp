@@ -26,23 +26,31 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends z.viewModel.panel.BasePanelViewModel {
   constructor(params) {
     super(params);
-    this.clickOnNotificationSetting = this.clickOnNotificationSetting.bind(this);
 
-    const conversation = params.repositories.conversation;
-    this.conversationRepository = conversation;
-
-    this.logger = new z.util.Logger('z.viewModel.panel.NotificationsViewModel', z.config.LOGGER.OPTIONS);
+    const conversationRepository = params.repositories.conversation;
 
     this.settings = Object.values(z.conversation.NotificationSetting.STATE).map(status => ({
       text: z.conversation.NotificationSetting.getText(status),
       value: status,
     }));
 
-    this.isRendered = ko.observable(false).extend({notify: 'always'});
+    this.currentNotificationSetting = ko.observable();
 
-    this.currentNotificationSetting = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().notificationState();
+    const currentNotificationSettingSubscription = this.currentNotificationSetting.suspendableSubscribe(value => {
+      if (this.activeConversation()) {
+        conversationRepository.setNotificationState(this.activeConversation(), value);
+      }
     });
+
+    ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().notificationState();
+    }).subscribe(setting => {
+      currentNotificationSettingSubscription.suspend();
+      this.currentNotificationSetting(setting);
+      currentNotificationSettingSubscription.unsuspend();
+    });
+
+    this.isRendered = ko.observable(false).extend({notify: 'always'});
 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.isRendered())
@@ -51,11 +59,5 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
 
   getElementId() {
     return 'notification-settings';
-  }
-
-  clickOnNotificationSetting({value}) {
-    if (this.activeConversation()) {
-      this.conversationRepository.setNotificationState(this.activeConversation(), value);
-    }
   }
 };

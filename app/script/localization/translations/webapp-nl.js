@@ -452,7 +452,6 @@ z.string.nl.preferencesOptionsAudioNoneDetail = 'Sshhh!';
 z.string.nl.preferencesOptionsAudioSome = 'Sommige';
 z.string.nl.preferencesOptionsAudioSomeDetail = 'Pings en oproepen';
 z.string.nl.preferencesOptionsContacts = 'Contacten';
-z.string.nl.preferencesOptionsContactsGmail = 'Importeren uit Gmail';
 z.string.nl.preferencesOptionsContactsMacos = 'Importeren uit contacten';
 z.string.nl.preferencesOptionsContactsDetail = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
 z.string.nl.preferencesOptionsPopular = 'Op veler verzoek';
@@ -488,7 +487,6 @@ z.string.nl.searchOthers = 'Verbind';
 z.string.nl.searchInvite = 'Nodig andere mensen uit voor Wire';
 z.string.nl.searchInviteDetail = 'Het delen van je contacten helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
 z.string.nl.searchInviteButtonContacts = 'Van contacten';
-z.string.nl.searchInviteButtonGmail = 'Van Gmail';
 z.string.nl.searchInviteHeadline = 'Nodig je vrienden uit';
 z.string.nl.searchInviteShare = 'Contacten delen';
 
@@ -498,9 +496,6 @@ z.string.nl.searchListEveryoneParticipates = 'Iedereen met wie je contact hebt z
 z.string.nl.searchListNoMatches = 'Geen overeenkomende resultaten.\nProbeer een andere gebruikersnaam.';
 
 z.string.nl.temporaryGuestCta = 'Een account aanmaken';
-
-z.string.nl.uploadGoogleHeadline = 'Zoek mensen \nom mee te praten.';
-z.string.nl.uploadGoogleMessage = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
 
 z.string.nl.warningCallUnsupportedIncoming = '{{user}} belt, maar je browser ondersteund geen gesprekken.';
 z.string.nl.warningCallUnsupportedOutgoing = 'Je kan niet bellen omdat jou browser dit niet ondersteund.';
@@ -571,7 +566,6 @@ z.string.nl.tooltipConversationsStart = 'Start gesprek ({{shortcut}})';
 
 z.string.nl.tooltipConversationDetailsRename = 'Verander gesprek naam';
 
-z.string.nl.tooltipPreferencesContactsGmail = 'Log in op je Gmail account om je contacten te delen';
 z.string.nl.tooltipPreferencesContactsMacos = 'Deel al je contacten van de macOS Contact app';
 z.string.nl.tooltipPreferencesPassword = 'Open andere website om je wachtwoord te resetten';
 z.string.nl.tooltipPreferencesPicture = 'Verander je foto…';

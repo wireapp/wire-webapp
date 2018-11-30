@@ -52,47 +52,9 @@ module.exports = grunt => {
     grunt.log.ok(`Version set to ${version}`);
   });
 
-  grunt.registerTask('prepare_dist', [
-    'clean:dist',
-    'less:dist',
-    'postcss:distribution',
-    'copy:dist',
-    'copy:dist_audio',
-    'copy:dist_favicon',
-    'includereplace:dist_index',
-    'includereplace:dist_auth',
-    'includereplace:dist_login',
-    'includereplace:dist_demo',
-    'clean:dist_app',
-  ]);
-
-  grunt.registerTask('prepare_template', [
-    'includereplace:dist_index',
-    'includereplace:dist_auth',
-    'includereplace:dist_login',
-    'includereplace:dist_demo',
-  ]);
-
-  grunt.registerTask('prepare_staging', [
+  grunt.registerTask('prepare', [
     'clean:deploy',
-    'less:deploy',
-    'postcss:deploy',
-    'copy:deploy',
-    'copy:deploy_audio',
-    'copy:deploy_favicon',
-    'includereplace:deploy_index',
-    'includereplace:deploy_auth',
-    'includereplace:deploy_login',
-    'includereplace:deploy_demo',
-    'clean:deploy_app',
-    'uglify:deploy',
-    'concat:deploy',
-    'clean:deploy_script',
-  ]);
-
-  grunt.registerTask('prepare_prod', [
-    'clean:deploy',
-    'less:deploy',
+    'shell:less',
     'postcss:deploy',
     'copy:deploy',
     'copy:deploy_audio',

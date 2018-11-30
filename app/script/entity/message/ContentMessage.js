@@ -61,7 +61,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
       },
     });
     this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.is_me));
-    this.show_likes = ko.observable(false);
 
     this.like_caption = ko.pureComputed(() => {
       if (this.reactions_user_ets().length <= 5) {

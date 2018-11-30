@@ -123,7 +123,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
 
   _initTemporaryGuestAccount() {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+    this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, false);
     return Promise.resolve(this._publishProperties());
   }
 
@@ -154,7 +154,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   savePreference(propertiesType, updatedPreference) {
     if (updatedPreference === undefined) {
       switch (propertiesType) {
-        case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
         case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
           updatedPreference = Date.now();
           break;
@@ -187,7 +186,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
 
   _publishPropertyUpdate(propertiesType, updatedPreference) {
     switch (propertiesType) {
-      case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
       case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
         break;

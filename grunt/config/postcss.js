@@ -23,6 +23,7 @@ const processors = [
   require('autoprefixer')({
     browsers: ['Chrome >= 51', 'Edge >= 14', 'Firefox >= 52', 'Opera >= 40'],
   }),
+  require('cssnano')(),
 ];
 
 module.exports = {
@@ -31,11 +32,5 @@ module.exports = {
       processors,
     },
     src: '<%= dir.deploy %>/**/*.css',
-  },
-  distribution: {
-    options: {
-      processors,
-    },
-    src: '<%= dir.dist %>/**/*.css',
   },
 };

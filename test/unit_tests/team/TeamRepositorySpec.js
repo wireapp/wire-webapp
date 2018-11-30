@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:team/TeamRepository
+// grunt test_run:team/TeamRepository
 
 'use strict';
 

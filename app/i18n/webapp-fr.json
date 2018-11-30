@@ -112,6 +112,7 @@
   "BackendError.LABEL.SSO_SERVER_ERROR": "Une erreur est survenue. Veuillez contacter votre administrateur pour plus d'informations (Erreur 6).",
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Une erreur est survenue. Veuillez contacter votre administrateur pour plus d'informations (Erreur 1).",
   "BackendError.LABEL.SSO_GENERIC_ERROR": "Une erreur est survenue. Veuillez contacter votre administrateur pour plus d'informations (Erreur 0).",
+  "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Espace disque insuffisant",
   "BackendError.unexpected": "Erreur innatendue",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Saisissez un nom composé d’au moins 2 caractères",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Saisissez un nom composé d’au moins 2 caractères",

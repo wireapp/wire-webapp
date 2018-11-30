@@ -19,42 +19,90 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:links/LinkPreviewBlackList
+// grunt test_run:links/LinkPreviewBlackList
 
 describe('is_blacklisted', () => {
-  it('should return true if link is youtu.be', () => {
+  it('blacklists youtu.be links', () => {
     const url = 'https://youtu.be/t4gjl-uwUHc';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return true if link is youtube', () => {
+  it('blacklists YouTube video links', () => {
     const url = 'https://www.youtube.com/watch?v=t4gjl-uwUHc';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return true if link is spotify', () => {
-    const url = 'spotify.com';
+  it("doesn't blacklist YouTube static links", () => {
+    const url = 'https://www.youtube.com/account';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
   });
 
-  it('should return true if link is soundcloud', () => {
-    const url = 'soundcloud.com';
+  it('blacklists Spotify artist links', () => {
+    const url = 'https://play.spotify.com/artist/7Ln80lUS6He07XvHI8qqHH/';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return true if link is vimeo', () => {
-    const url = 'vimeo.com';
+  it('blacklists Spotify song links', () => {
+    const url = 'https://open.spotify.com/track/5FVd6KXrgO9B3JPmC8OPst';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeTruthy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
   });
 
-  it('should return false if link is wire.com', () => {
+  it("doesn't blacklist Spotify static links", () => {
+    const url = 'https://www.spotify.com/en/legal';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
+  });
+
+  it('blacklists SoundCloud', () => {
+    const url = 'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it("doesn't blacklist SoundCloud static links", () => {
+    const url = 'https://soundcloud.com/discover';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
+  });
+
+  it('blacklists Vimeo video links', () => {
+    const url = 'https://vimeo.com/27999954';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it('blacklists Vimeo embed video links', () => {
+    const url = 'https://player.vimeo.com/video/27999954';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it('blacklists Vimeo channel video links', () => {
+    const url = 'https://vimeo.com/channels/staffpicks/278174511';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it('blacklists Vimeo embed links', () => {
+    const url = 'https://player.vimeo.com/video/27999954';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(true);
+  });
+
+  it("doesn't blacklist Vimeo static links", () => {
+    const url = 'https://vimeo.com/upload';
+
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
+  });
+
+  it("doesn't blacklist wire.com", () => {
     const url = 'wire.com';
 
-    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBeFalsy();
+    expect(z.links.LinkPreviewBlackList.isBlacklisted(url)).toBe(false);
   });
 });

@@ -7,20 +7,17 @@
     </div>
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
-        <div class="panel__action-item" data-bind="click: clickOnMessageTimeOff" data-uie-name="item-timed-messages-option">
-          <div class="panel__action-item__text" data-bind="l10n_text: z.string.ephemeralUnitsNone"></div>
-          <!-- ko if: currentMessageTimer() === 0 -->
-            <check-icon></check-icon>
-          <!-- /ko -->
-        </div>
+        <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
+          <input type="radio" name="timed-message-settings" data-bind="checked: currentMessageTimer, value: 0"/>
+          <span data-bind="l10n_text: z.string.ephemeralUnitsNone"></span>
+        </label>
+
         <!-- ko foreach: {data: messageTimes, afterRender: () => isRendered(true)} -->
-          <div data-bind="css: $data.isCustom ? 'panel__action-item custom' : 'panel__action-item', click: $data.isCustom ? null : $parent.clickOnMessageTime" data-uie-name="item-timed-messages-option">
-            <div class="panel__action-item__text" data-bind="text: text"></div>
-              <!-- ko if: $parent.currentMessageTimer() === value -->
-                <check-icon></check-icon>
-              <!-- /ko -->
-            </div>
-          <!-- /ko -->
+          <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
+            <input type="radio" name="timed-message-settings" data-bind="checked: $parent.currentMessageTimer, value: value, disabled: isCustom"/>
+            <span data-bind="text: text"></span>
+          </label>
+        <!-- /ko -->
         <div class="panel__info-text timed-messages__disclaimer" data-bind="l10n_text: z.string.timedMessageDisclaimer"></div>
       </div>
     </div>

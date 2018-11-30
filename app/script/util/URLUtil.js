@@ -54,15 +54,15 @@ z.util.URLUtil = (() => {
 
     switch (urlType) {
       case TYPE.ACCOUNT:
-        return isProduction ? z.config.URL.ACCOUNT.PRODUCTION : z.config.URL.ACCOUNT.STAGING;
+        return isProduction ? window.wire.env.URL.ACCOUNT_BASE : z.config.URL.ACCOUNT.STAGING;
       case TYPE.SUPPORT:
         return z.config.URL.SUPPORT;
       case TYPE.TEAM_SETTINGS:
-        return isProduction ? z.config.URL.TEAM_SETTINGS.PRODUCTION : z.config.URL.TEAM_SETTINGS.STAGING;
+        return isProduction ? window.wire.env.URL.TEAMS_BASE : z.config.URL.TEAM_SETTINGS.STAGING;
       case TYPE.WEBAPP:
-        return isProduction ? z.config.URL.WEBAPP.PRODUCTION : z.config.URL.WEBAPP.STAGING;
+        return isProduction ? window.wire.env.APP_BASE : z.config.URL.WEBAPP.STAGING;
       case TYPE.WEBSITE:
-        return isProduction ? z.config.URL.WEBSITE.PRODUCTION : z.config.URL.WEBSITE.STAGING;
+        return isProduction ? window.wire.env.URL.WEBSITE_BASE : z.config.URL.WEBSITE.STAGING;
       default:
         throw new Error('Unknown URL type');
     }

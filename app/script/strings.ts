@@ -19,6 +19,7 @@
 
 import {defineMessages} from 'react-intl';
 import BackendError from './auth/module/action/BackendError';
+import LabeledError from './auth/module/action/LabeledError';
 import ValidationError from './auth/module/action/ValidationError';
 import {LOGOUT_REASON} from './auth/route';
 
@@ -522,6 +523,10 @@ export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.SSO_GENERIC_ERROR]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 0).',
     id: 'BackendError.LABEL.SSO_GENERIC_ERROR',
+  },
+  [LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE]: {
+    defaultMessage: 'Not enough disk space',
+    id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   },
   unexpected: {
     defaultMessage: 'Unexpected error',
