@@ -19,10 +19,7 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
-
-z.properties.PropertiesRepository = class PropertiesRepository {
+class PropertiesRepository {
   static get CONFIG() {
     return {
       PROPERTIES_KEY: 'webapp',
@@ -35,7 +32,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    */
   constructor(propertiesService) {
     this.propertiesService = propertiesService;
-    this.logger = new z.util.Logger('z.properties.PropertiesRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
 
     this.properties = new z.properties.PropertiesEntity();
     this.selfUser = ko.observable();
@@ -238,4 +235,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
         throw new Error(`Failed to set preference of type ${propertiesType}`);
     }
   }
-};
+}
+
+export default PropertiesRepository;
