@@ -104,19 +104,24 @@ z.user.UserRepository = class UserRepository {
       case z.event.Backend.USER.DELETE:
         this.user_delete(event_json);
         break;
-      case z.event.Backend.USER.PROPERTIES_DELETE:
-        this.propertyRepository.deleteProperty(event_json.key);
-        break;
-      case z.event.Backend.USER.PROPERTIES_SET:
-        this.propertyRepository.setProperty(event_json.key, event_json.value);
-        break;
       case z.event.Backend.USER.UPDATE:
         this.user_update(event_json);
         break;
       case z.event.Client.USER.AVAILABILITY:
         this.onUserAvailability(event_json);
         break;
-      default:
+    }
+
+    // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
+    if (source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
+      switch (type) {
+        case z.event.Backend.USER.PROPERTIES_DELETE:
+          this.propertyRepository.deleteProperty(event_json.key);
+          break;
+        case z.event.Backend.USER.PROPERTIES_SET:
+          this.propertyRepository.setProperty(event_json.key, event_json.value);
+          break;
+      }
     }
   }
 

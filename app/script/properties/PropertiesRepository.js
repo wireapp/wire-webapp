@@ -39,10 +39,7 @@ class PropertiesRepository {
 
     this.properties = new z.properties.PropertiesEntity();
     this.selfUser = ko.observable();
-    this.enableReadReceipts = ko.observable(false);
-    this.enableReadReceipts.subscribe(updatedValue => {
-      this.setProperty(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key, JSON.stringify(updatedValue));
-    });
+    this.enableReadReceipts = ko.observable(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
@@ -127,8 +124,8 @@ class PropertiesRepository {
 
     return this.propertiesService
       .getPropertiesByKey(property.key)
-      .then(enableReadReceipts => {
-        this.enableReadReceipts(enableReadReceipts);
+      .then(value => {
+        this.setProperty(property.key, value);
       })
       .catch(() => {
         this.logger.warn(
@@ -198,6 +195,7 @@ class PropertiesRepository {
     }
   }
 
+  // Reset a property to it's default state. This method is only called from external event sources (when other clients sync the settings).
   deleteProperty(key) {
     switch (key) {
       case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
@@ -206,20 +204,25 @@ class PropertiesRepository {
     }
   }
 
+  // Map a property and set it into our state
   setProperty(key, value) {
     switch (key) {
       case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
         value = JSON.parse(value);
-        if (value !== this.enableReadReceipts()) {
-          this.logger.info(`Setting key "${key}" to value "${value}".`);
-          this.enableReadReceipts(value);
-        }
+        this.logger.info(`Setting key "${key}" to value "${value}".`);
+        this.enableReadReceipts(value);
         break;
     }
   }
 
-  _setPropertyOnBackend(key, value) {
-    return this.propertiesService.putPropertiesByKey(key, value);
+  // Save read receipts preference on server to sync between clients
+  saveReadReceipts() {
+    const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+    let value = this.enableReadReceipts();
+    if (typeof value === 'boolean') {
+      value = JSON.stringify(value);
+    }
+    return this.propertiesService.putPropertiesByKey(property.key, value);
   }
 
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
