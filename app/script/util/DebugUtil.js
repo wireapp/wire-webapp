@@ -17,12 +17,10 @@
  *
  */
 
-'use strict';
+import $ from 'jquery';
+import sodium from 'libsodium-wrappers-sumo';
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
-z.util.DebugUtil = class DebugUtil {
+export default class DebugUtil {
   constructor(repositories) {
     const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
 
@@ -34,6 +32,8 @@ z.util.DebugUtil = class DebugUtil {
     this.eventRepository = event;
     this.storageRepository = storage;
     this.userRepository = user;
+    this.$ = $;
+    this.sodium = sodium;
 
     this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
@@ -290,4 +290,4 @@ z.util.DebugUtil = class DebugUtil {
         events.forEach(event => this.eventRepository.processEvent(event, z.event.EventRepository.SOURCE.STREAM));
       });
   }
-};
+}
