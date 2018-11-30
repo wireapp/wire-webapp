@@ -19,6 +19,7 @@
 
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
+import Dexie from 'dexie';
 
 export default class DebugUtil {
   constructor(repositories) {
@@ -34,6 +35,7 @@ export default class DebugUtil {
     this.userRepository = user;
     this.$ = $;
     this.sodium = sodium;
+    this.Dexie = Dexie;
 
     this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
