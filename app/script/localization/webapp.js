@@ -333,6 +333,7 @@ z.string.conversationCreateWithMore = 'with {{users}}, and [showmore]{{count}} m
 z.string.conversationCreateTeam = 'with [showmore]all team members[/showmore]';
 z.string.conversationCreateTeamGuest = 'with [showmore]all team members and one guest[/showmore]';
 z.string.conversationCreateTeamGuests = 'with [showmore]all team members and {{count}} guests[/showmore]';
+z.string.conversationCreateReceiptsEnabled = 'Read receipts are on';
 z.string.conversationMemberJoined = '[bold]{{name}}[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedYou = '[bold]You[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedMore = '[bold]{{name}}[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
