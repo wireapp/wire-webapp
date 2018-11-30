@@ -17,22 +17,23 @@
  *
  */
 
-import Message from './Message';
+import SystemMessage from './SystemMessage';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-class SystemMessage extends Message {
-  constructor() {
+export default class ReceiptModeUpdateMessage extends SystemMessage {
+  constructor(isReceiptEnabled) {
     super();
-    this.super_type = z.message.SuperType.SYSTEM;
-    this.system_message_type = z.message.SystemMessageType.NORMAL;
-  }
 
-  is_conversation_rename() {
-    return this.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME;
+    this.type = z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE;
+    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
+
+    this.caption = ko.pureComputed(() => {
+      let stringId;
+      if (isReceiptEnabled) {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOnYou : z.string.conversationReceiptsOn;
+      } else {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOffYou : z.string.conversationReceiptsOff;
+      }
+      return z.l10n.text(stringId);
+    });
   }
 }
-
-export default SystemMessage;
-z.entity.SystemMessage = SystemMessage;

@@ -74,6 +74,7 @@ class Message {
     const iconComponents = {
       [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
       [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+      [z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
     };
     return iconComponents[message.system_message_type];
   }
