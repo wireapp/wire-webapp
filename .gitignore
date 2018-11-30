@@ -15,3 +15,4 @@ node_modules
 aws-keys.json
 npm-debug.log
 yarn-error.log
+CHANGELOG.md
