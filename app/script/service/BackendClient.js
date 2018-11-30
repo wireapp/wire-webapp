@@ -17,10 +17,6 @@
  *
  */
 
-'use strict';
-
-import pako from 'pako';
-
 window.z = window.z || {};
 window.z.service = z.service || {};
 
@@ -224,8 +220,7 @@ z.service.BackendClient = class BackendClient {
   sendJson(config) {
     const jsonConfig = {
       contentType: 'application/json; charset=utf-8',
-      data: config.data ? pako.gzip(JSON.stringify(config.data)) : undefined,
-      headers: {'Content-Encoding': 'gzip'},
+      data: config.data ? JSON.stringify(config.data) : undefined,
       processData: false,
     };
 

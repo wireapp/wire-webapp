@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.util.PeerConnectionUtil = {
   getIceCandidatesTypes(iceCandidates) {
     return iceCandidates.reduce((types, candidateStr) => {

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import $ from 'jquery';
 
 $.fn.scrollEnd = function() {

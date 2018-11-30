@@ -19,8 +19,6 @@
 
 // @ts-check
 
-'use strict';
-
 /**
  * @typedef {object} ConversationBackendData
  * @property {string[]=} access

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function() {
   const calculate_borders = _.throttle($element => {

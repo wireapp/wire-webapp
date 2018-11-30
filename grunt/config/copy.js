@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // https://github.com/gruntjs/grunt-contrib-copy
 
 module.exports = {

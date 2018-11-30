@@ -17,8 +17,6 @@
  *
  */
 /* eslint-disable */
-'use strict';
-
 // KARMA_SPECS=media/MediaDevicesHandler yarn test:app
 
 describe('z.media.MediaDevicesHandler', () => {

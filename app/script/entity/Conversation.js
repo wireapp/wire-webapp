@@ -17,8 +17,11 @@
  *
  */
 
+<<<<<<< HEAD
 import ko from 'knockout';
 
+=======
+>>>>>>> dev
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 

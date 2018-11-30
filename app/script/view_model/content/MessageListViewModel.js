@@ -17,9 +17,11 @@
  *
  */
 
-'use strict';
-
 import moment from 'moment';
+import $ from 'jquery';
+/* eslint-disable no-unused-vars */
+import mousewheel from 'jquery-mousewheel';
+/* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=message/MessageCategorization yarn test:app
 
 describe('z.message.MessageCategorization', () => {

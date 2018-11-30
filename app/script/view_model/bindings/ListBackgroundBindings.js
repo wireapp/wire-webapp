@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 ko.bindingHandlers.switchBackground = (() => {
   return {
     update(element, valueAccessor) {

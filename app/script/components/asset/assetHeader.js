@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import moment from 'moment';
 
 window.z = window.z || {};

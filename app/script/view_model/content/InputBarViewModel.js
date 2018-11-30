@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -551,7 +549,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         case z.util.KeyboardUtil.KEY.ENTER: {
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
             z.util.KeyboardUtil.insertAtCaret(keyboardEvent.target, '\n');
-            $(keyboardEvent.target).change();
+            ko.utils.triggerEvent(keyboardEvent.target, 'change');
             keyboardEvent.preventDefault();
           }
           break;

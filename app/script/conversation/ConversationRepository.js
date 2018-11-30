@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import poster from 'poster-image';
 
 window.z = window.z || {};

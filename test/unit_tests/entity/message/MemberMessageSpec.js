@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=entity/message/MemberMessage yarn test:app
 
 describe('Member Message', () => {

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=entity/message/File yarn test:app
 
 describe('z.entity.File', () => {

@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=connection/ConnectionService yarn test:app
 
-'use strict';
-
 describe('User Service', () => {
   let server = null;
   const urls = {

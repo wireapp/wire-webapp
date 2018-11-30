@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 describe('Shortcut', () => {
   const map = z.ui.Shortcut.shortcutMap;
 

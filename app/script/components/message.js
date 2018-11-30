@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 class Message {
   constructor({
     message,

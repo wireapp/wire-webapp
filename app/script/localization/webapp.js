@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.wire = 'Wire';
 z.string.wireMacos = 'Wire for macOS';
 z.string.wireWindows = 'Wire for Windows';

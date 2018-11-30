@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import protobuf from 'protobufjs';
 
 window.z = window.z || {};

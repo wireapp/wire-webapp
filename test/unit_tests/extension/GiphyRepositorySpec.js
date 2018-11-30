@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=extension/GiphyRepositorySpecs yarn test:app
 
-'use strict';
-
 describe('Giphy Repository', () => {
   let server = null;
   const urls = {
