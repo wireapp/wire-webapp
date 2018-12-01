@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=util/NumberUtil yarn test:app
 
-'use strict';
-
 describe('z.util.NumberUtil', () => {
   describe('inRange', () => {
     it('returns true for values inside the specified range', () => {

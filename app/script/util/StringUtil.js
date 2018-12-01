@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import getSlug from 'speakingurl';
 
 window.z = window.z || {};

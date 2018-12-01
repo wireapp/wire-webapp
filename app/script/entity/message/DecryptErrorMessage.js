@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import {errors as ProteusErrors} from '@wireapp/proteus';
 
 window.z = window.z || {};

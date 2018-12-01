@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 const sdp_payloads = {
   original: {
     sdp:

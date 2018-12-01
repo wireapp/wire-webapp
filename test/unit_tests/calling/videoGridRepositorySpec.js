@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=calling/videoGridRepository yarn test:app
 
 describe('z.calling.VideoGridRepository', () => {

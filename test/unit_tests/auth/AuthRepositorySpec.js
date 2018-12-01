@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=auth/AuthRepository yarn test:app
 
-'use strict';
-
 describe('z.auth.AuthRepository', () => {
   const test_factory = new TestFactory();
 

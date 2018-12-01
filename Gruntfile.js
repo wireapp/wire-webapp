@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 const path = require('path');
 
 module.exports = grunt => {
@@ -66,9 +64,6 @@ module.exports = grunt => {
     watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys */
-
-  // Tasks
-  grunt.loadTasks('grunt/tasks');
 
   grunt.registerTask('init', 'npmBower');
 

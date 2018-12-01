@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=conversation/ConversationVerificationStateHandler yarn test:app
 
-'use strict';
-
 describe('z.conversation.ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();
   let state_handler = undefined;

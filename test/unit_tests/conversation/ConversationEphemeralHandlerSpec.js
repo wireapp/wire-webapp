@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new z.conversation.ConversationMapper();
   const eventService = new z.event.EventService(null, null);

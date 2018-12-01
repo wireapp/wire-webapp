@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import DexieBatch from 'dexie-batch';
 
 window.z = window.z || {};

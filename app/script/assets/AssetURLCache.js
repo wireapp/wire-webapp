@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import {LRUCache} from '@wireapp/lru-cache';
 
 window.z = window.z || {};

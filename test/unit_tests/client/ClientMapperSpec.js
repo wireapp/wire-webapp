@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=client/ClientMapper yarn test:app
 
-'use strict';
-
 describe('z.client.ClientMapper', () => {
   const mapper = new z.client.ClientMapper();
 
