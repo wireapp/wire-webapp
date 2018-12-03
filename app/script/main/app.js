@@ -21,6 +21,8 @@ import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import DebugUtil from '../util/DebugUtil';
 
+import ReadReceiptMiddleware from '../event/preprocessor/ReadReceiptMiddleware';
+
 /* eslint-disable no-unused-vars */
 import globals from './globals';
 import auth from './auth';
@@ -146,9 +148,12 @@ class App {
       this.service.event,
       z.message.MessageHasher
     );
+    const readReceiptMiddleware = new ReadReceiptMiddleware(this.service.event);
+
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
+      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
