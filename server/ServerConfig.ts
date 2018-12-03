@@ -30,6 +30,7 @@ export interface ServerConfig {
     DEVELOPMENT?: boolean;
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;
+    GOOGLE_WEBMASTER_ID: string;
     PORT_HTTP: number;
     ROBOTS: {
       ALLOWED_HOSTS: string[];
