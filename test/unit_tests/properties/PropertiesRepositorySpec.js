@@ -39,9 +39,11 @@ describe('PropertiesRepository', () => {
     it('resets a known property to its default value', () => {
       const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
       const defaultValue = property.defaultValue;
+
       propertiesRepository.setProperty(property.key, !defaultValue);
 
       expect(propertiesRepository.enableReadReceipts()).not.toBe(defaultValue);
+
       propertiesRepository.deleteProperty(property.key);
 
       expect(propertiesRepository.enableReadReceipts()).toBe(defaultValue);
