@@ -19,6 +19,7 @@
 
 // KARMA_SPECS=event/preprocessor/QuotedMessageMiddleware yarn test:app
 
+import UUID from 'uuidjs';
 import ReadReceiptMiddleware from 'app/script/event/preprocessor/ReadReceiptMiddleware';
 
 describe('ReadReceiptMiddleware', () => {
@@ -36,9 +37,9 @@ describe('ReadReceiptMiddleware', () => {
       spyOn(eventService, 'replaceEvent');
 
       const event = {
-        conversation: 'conversattionid',
+        conversation: UUID.genV4(),
         data: {
-          message_id: 'messageid',
+          message_id: UUID.genV4(),
         },
         type: z.event.Client.CONVERSATION.CONFIRMATION,
       };
@@ -55,11 +56,11 @@ describe('ReadReceiptMiddleware', () => {
       spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve(originalEvent));
 
       const event = {
-        conversation: 'conversattionid',
+        conversation: UUID.genV4(),
         data: {
-          message_id: 'messageid',
+          message_id: UUID.genV4(),
         },
-        from: 'userid',
+        from: UUID.genV4(),
         time: '12-12-12',
         type: z.event.Client.CONVERSATION.CONFIRMATION,
       };
