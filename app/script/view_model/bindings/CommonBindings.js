@@ -364,33 +364,6 @@ ko.subscribable.fn.subscribeChanged = function(handler) {
 };
 
 /**
- * Returns a suspendable subscription
- * https://github.com/knockout/knockout/issues/270#issuecomment-11360312
- * @param {function} handler - Handler
- * @param {ko.observable} owner - Subscription owner
- * @param {string} eventName - Event name
- * @returns {ko.subscription} knockout subscription with suspend and unsuspend methods
- */
-ko.subscribable.fn.suspendableSubscribe = function(handler, owner, eventName) {
-  let isSuspended = false;
-  return ko.utils.extend(
-    this.subscribe(
-      value => {
-        if (!isSuspended) {
-          handler(value);
-        }
-      },
-      owner,
-      eventName
-    ),
-    {
-      suspend: () => (isSuspended = true),
-      unsuspend: () => (isSuspended = false),
-    }
-  );
-};
-
-/**
  * Render antiscroll scrollbar.
  */
 ko.bindingHandlers.antiscroll = {
