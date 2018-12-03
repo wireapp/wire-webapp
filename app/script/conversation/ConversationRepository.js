@@ -1651,7 +1651,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send a read receipt for the last message in a conversation.
    *
-   * @private
    * @param {Conversation} conversationEntity - Conversation to update
    * @param {Message} messageEntity - Message to send a read receipt for
    * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
@@ -1659,13 +1658,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = [], sendToGroup = false) {
-    this.sendConfirmationStatus(
-      conversationEntity,
-      messageEntity,
-      z.proto.Confirmation.Type.READ,
-      moreMessageEntities,
-      sendToGroup
-    );
+    const isUnread = conversationEntity.unreadState().confirmMessages.some(message => message.id === messageEntity.id);
+    if (isUnread) {
+      this.sendConfirmationStatus(
+        conversationEntity,
+        messageEntity,
+        z.proto.Confirmation.Type.READ,
+        moreMessageEntities,
+        sendToGroup
+      );
+    }
   }
 
   //##############################################################################

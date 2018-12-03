@@ -205,6 +205,7 @@ z.entity.Conversation = class Conversation {
         allEvents: [],
         allMessages: [],
         calls: [],
+        confirmMessages: [],
         otherMessages: [],
         pings: [],
         selfMentions: [],
@@ -224,6 +225,11 @@ z.entity.Conversation = class Conversation {
           const isMessage = messageEntity.is_content();
           const isSelfMentioned = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
           const isSelfQuoted = isMessage && this.selfUser() && messageEntity.isUserQuoted(this.selfUser().id);
+          const isTypeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
+
+          if (isTypeToConfirm) {
+            unreadState.confirmMessages.push(messageEntity);
+          }
 
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity);
