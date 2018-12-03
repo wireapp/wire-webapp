@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "0.10.0",
+    "@wireapp/commons": "0.10.1",
     "dotenv": "6.1.0",
     "express": "4.16.4",
     "express-sitemap-xml": "1.0.2",
@@ -26,8 +26,11 @@
     "@types/fs-extra": "5.0.4",
     "@types/hbs": "4.0.0",
     "@types/helmet": "0.0.42",
+    "@types/jasmine": "3.3.0",
     "@types/node": "10.12.11",
+    "jasmine": "3.3.0",
     "rimraf": "2.6.2",
+    "ts-node": "7.0.1",
     "tslint": "5.11.0",
     "tslint-config-prettier": "1.17.0",
     "tslint-eslint-rules": "5.4.0",
@@ -40,6 +43,7 @@
     "fix:ts": "yarn lint:ts --fix",
     "lint": "yarn lint:ts",
     "lint:ts": "tslint --config tslint.json --project tsconfig.json",
-    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs"
+    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
+    "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json"
   }
 }

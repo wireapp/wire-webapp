@@ -1,0 +1,8 @@
+{
+  "spec_dir": ".",
+  "spec_files": ["**/*.test.ts"],
+  "configure": {
+    "oneFailurePerSpec": false,
+    "random": true
+  }
+}
