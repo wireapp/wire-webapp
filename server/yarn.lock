@@ -173,10 +173,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@0.9.16":
-  version "0.9.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-0.9.16.tgz#03f1cdc7ac17eb9ce929df866dafe87622c7d7c1"
-  integrity sha512-LQ4Hs198rUueW4ZV7Kt9WKu20imkZSjMxBIOkllIPo/d/b46uxj2d7N7i/RqBQWPw6DdIWu2R/63qQzerdefcw==
+"@wireapp/commons@0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-0.10.0.tgz#3db35d48d0a2413bce80c092f35e59d8007b6667"
+  integrity sha512-mj12kH8vdTHVvP6buDWBQHWRXxXCfjwnpTfAlwac6+E7Hv1kXmtwLAwwQVnJvAc8Uc88d+mK8al8dN7aHGGIHA==
   dependencies:
     "@types/node" "10.12.10"
     "@types/platform" "1.3.1"
