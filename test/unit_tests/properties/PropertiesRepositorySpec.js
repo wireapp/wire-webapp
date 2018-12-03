@@ -17,10 +17,10 @@
  *
  */
 
+// KARMA_SPECS=properties/PropertiesRepository yarn test:app
+
 import PropertiesRepository from 'app/script/properties/PropertiesRepository';
 import PropertiesService from 'app/script/properties/PropertiesService';
-
-// KARMA_SPECS=properties/PropertiesRepository yarn test:app
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
