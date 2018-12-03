@@ -587,14 +587,25 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {boolean} Message is in viewport
    */
   getInViewportCallback(messageEntity) {
+    const conversationTimestamp = this.conversation().last_read_timestamp();
+    const messageTimestamp = messageEntity.timestamp();
+
+    const sendReadReceipt = () => {
+      this.conversation().last_read_timestamp(messageTimestamp);
+      this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
+    };
+
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
       if (this.conversation().is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
-      return () => {
-        this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
-      };
+
+      if (conversationTimestamp < messageTimestamp) {
+        return sendReadReceipt;
+      }
+
+      return null;
     }
 
     return () => {
@@ -604,8 +615,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
       };
       if (document.hasFocus()) {
+        if (conversationTimestamp < messageTimestamp) {
+          sendReadReceipt();
+        }
         startTimer();
-        this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
       } else {
         $(window).one('focus', startTimer);
       }
