@@ -19,11 +19,12 @@
 
 export const BROWSER = {
   CHROME: 'chrome',
-  CHROMIUM: 'chromium',
-  EDGE: 'microsoft edge',
+  CHROMIUM: 'chromium', // Added for express-useragent
+  EDGE: 'edge', // Added for express-useragent and https://github.com/wireapp/wire-webapp/issues/5263
   ELECTRON: 'electron',
   FIREFOX: 'firefox',
   IE: 'ie',
+  MS_EDGE: 'microsoft edge',
   OPERA: 'opera',
   SAFARI: 'safari',
 };
@@ -33,6 +34,7 @@ export const WEBAPP_SUPPORTED_BROWSERS = {
   [BROWSER.CHROMIUM]: {major: 56, minor: 0},
   [BROWSER.FIREFOX]: {major: 60, minor: 0},
   [BROWSER.EDGE]: {major: 15, minor: 0},
+  [BROWSER.MS_EDGE]: {major: 15, minor: 0},
   [BROWSER.ELECTRON]: {major: 1, minor: 6},
   [BROWSER.OPERA]: {major: 43, minor: 0},
 };

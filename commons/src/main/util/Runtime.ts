@@ -94,7 +94,7 @@ class Runtime {
   }
 
   public static isEdge(): boolean {
-    return Runtime.getBrowserName() === BROWSER.EDGE;
+    return Runtime.getBrowserName() === BROWSER.MS_EDGE;
   }
 
   public static isFirefox(): boolean {
