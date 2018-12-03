@@ -3,7 +3,7 @@
     "./dist/cryptography/AssetCryptography.node": "./dist/cryptography/AssetCryptography.browser.js"
   },
   "dependencies": {
-    "@types/node": "10.12.10",
+    "@types/node": "10.12.11",
     "@wireapp/api-client": "3.2.10",
     "@wireapp/cryptobox": "9.0.31",
     "@wireapp/protocol-messaging": "1.23.0",
