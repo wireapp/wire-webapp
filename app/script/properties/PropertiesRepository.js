@@ -17,10 +17,17 @@
  *
  */
 
+import WebappProperties from './WebappProperties';
+
 class PropertiesRepository {
   static get CONFIG() {
     return {
-      PROPERTIES_KEY: 'webapp',
+      // Value names are specified by the protocol but key names can be changed.
+      ENABLE_READ_RECEIPTS: {
+        defaultValue: false,
+        key: 'WIRE_ENABLE_READ_RECEIPTS',
+      },
+      WEBAPP_ACCOUNT_SETTINGS: 'webapp',
     };
   }
 
@@ -32,8 +39,9 @@ class PropertiesRepository {
     this.propertiesService = propertiesService;
     this.logger = new z.util.Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
 
-    this.properties = new z.properties.PropertiesEntity();
+    this.properties = new WebappProperties();
     this.selfUser = ko.observable();
+    this.enableReadReceipts = ko.observable(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
@@ -98,22 +106,42 @@ class PropertiesRepository {
     return this.selfUser().isTemporaryGuest() ? this._initTemporaryGuestAccount() : this._initActivatedAccount();
   }
 
-  _initActivatedAccount() {
+  _fetchWebAppAccountSettings() {
     return this.propertiesService
-      .getProperties()
-      .then(keys => {
-        if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
-          return this.propertiesService
-            .getPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY)
-            .then(properties => {
-              $.extend(true, this.properties, properties);
-              this.logger.info('Loaded user properties', this.properties);
-            });
-        }
-
-        this.logger.info('No properties found: Using default properties');
+      .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
+      .then(properties => {
+        $.extend(true, this.properties, properties);
       })
-      .then(() => this._publishProperties());
+      .catch(() => {
+        this.logger.warn(
+          `Property "${
+            PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS
+          }" doesn't exist for this account. Continuing with the default value of "${this.properties.settings}".`
+        );
+      });
+  }
+
+  _fetchReadReceiptsSetting() {
+    const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+
+    return this.propertiesService
+      .getPropertiesByKey(property.key)
+      .then(value => {
+        this.setProperty(property.key, value);
+      })
+      .catch(() => {
+        const message = `Property "${
+          property.key
+        }" doesn't exist for this account. Continuing with the default value of "${property.defaultValue}".`;
+        this.logger.warn(message);
+      });
+  }
+
+  _initActivatedAccount() {
+    return Promise.all([this._fetchWebAppAccountSettings(), this._fetchReadReceiptsSetting()]).then(() => {
+      this.logger.info('Loaded user properties', this.properties);
+      this._publishProperties();
+    });
   }
 
   _initTemporaryGuestAccount() {
@@ -168,9 +196,38 @@ class PropertiesRepository {
     }
   }
 
+  // Reset a property to it's default state. This method is only called from external event sources (when other clients sync the settings).
+  deleteProperty(key) {
+    switch (key) {
+      case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
+        this.setProperty(key, PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
+        break;
+    }
+  }
+
+  // Map a property and set it into our state
+  setProperty(key, value) {
+    this.logger.info(`Setting key "${key}" to value "${value}"...`);
+    switch (key) {
+      case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
+        value = JSON.parse(value);
+        this.enableReadReceipts(value);
+        break;
+    }
+  }
+
+  // Save read receipts preference on server to sync between clients
+  saveReadReceipts(enableReadReceipts) {
+    const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+    if (enableReadReceipts) {
+      return this.propertiesService.putPropertiesByKey(property.key, enableReadReceipts);
+    }
+    return this.propertiesService.deletePropertiesByKey(property.key);
+  }
+
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
     return this.propertiesService
-      .putPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
+      .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
       .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
   }
 

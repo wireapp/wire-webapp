@@ -19,6 +19,7 @@
 
 import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
+import PropertiesService from '../properties/PropertiesService';
 import DebugUtil from '../util/DebugUtil';
 
 /* eslint-disable no-unused-vars */
@@ -93,6 +94,7 @@ class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
+    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -107,7 +109,8 @@ class App {
       this.service.asset,
       this.service.self,
       repositories.client,
-      repositories.serverTime
+      repositories.serverTime,
+      repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
     repositories.event = new z.event.EventRepository(
@@ -119,7 +122,6 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
@@ -221,7 +223,7 @@ class App {
       lifecycle: new z.lifecycle.LifecycleService(),
       location: new z.location.LocationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: new z.properties.PropertiesService(this.backendClient),
+      properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
       self: new z.self.SelfService(this.backendClient),
       storage: storageService,

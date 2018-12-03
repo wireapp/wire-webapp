@@ -89,6 +89,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
+    this.optionReadReceipts = this.propertiesRepository.enableReadReceipts;
+
     this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
 
@@ -378,6 +380,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
+  }
+
+  onReadReceiptsChange(viewModel, event) {
+    const enableReadReceipts = event.target.checked;
+    this.propertiesRepository.saveReadReceipts(enableReadReceipts);
+    return true;
   }
 
   updateProperties(properties) {

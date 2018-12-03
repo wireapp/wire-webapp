@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.properties = z.properties || {};
 
-z.properties.PropertiesEntity = class PropertiesEntity {
+class WebappProperties {
   constructor() {
     this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
@@ -33,6 +33,7 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       },
       privacy: {
         improve_wire: undefined,
+        report_errors: undefined,
       },
       sound: {
         alerts: z.audio.AudioPreference.ALL,
@@ -43,4 +44,6 @@ z.properties.PropertiesEntity = class PropertiesEntity {
     };
     this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
   }
-};
+}
+
+export default WebappProperties;
