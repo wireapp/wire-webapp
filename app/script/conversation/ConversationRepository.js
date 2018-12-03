@@ -1056,7 +1056,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadState().allEvents.length;
       if (isNotMarkedAsRead && !this.block_event_handling()) {
         this._updateLastReadTimestamp(conversationEntity);
-        this._sendReadReceipt(conversationEntity, true);
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
       }
     }
@@ -1654,15 +1653,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation to update
+   * @param {Message} messageEntity - Message to send a read receipt for
+   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
    * @param {boolean} sendToGroup - If the confirmation should be sent to groups
    * @returns {undefined} No return value
    */
-  _sendReadReceipt(conversationEntity, sendToGroup = false) {
-    const lastMessage = conversationEntity.getLastMessage();
-
-    if (lastMessage) {
-      this.sendConfirmationStatus(conversationEntity, lastMessage, z.proto.Confirmation.Type.READ, sendToGroup);
-    }
+  sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = [], sendToGroup = false) {
+    this.sendConfirmationStatus(
+      conversationEntity,
+      messageEntity,
+      z.proto.Confirmation.Type.READ,
+      moreMessageEntities,
+      sendToGroup
+    );
   }
 
   //##############################################################################
@@ -1829,19 +1832,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that content message was received in
    * @param {Message} messageEntity - Message for which to acknowledge receipt
    * @param {z.proto.Confirmation.Type} type - The type of confirmation to send
-   * @param {boolean} sendToGroup - If the confirmation should be sent to groups
+   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
+   * @param {boolean} [sendToGroup] - If the confirmation should be sent to groups
    * @returns {undefined} No return value
    */
-  sendConfirmationStatus(conversationEntity, messageEntity, type, sendToGroup = false) {
+  sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = [], sendToGroup = false) {
     const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || sendToGroup);
     const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
+    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
 
     const sendConfirmation = otherUserIn1To1 && withinThreshold && typeToConfirm;
     if (sendConfirmation) {
       const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id);
+      const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id, moreMessageIds);
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
 
       this.sending_queue.push(() => {

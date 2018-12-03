@@ -592,7 +592,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       if (this.conversation().is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
-      return null;
+      return () => {
+        this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
+      };
     }
 
     return () => {
@@ -601,7 +603,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           this.conversation_repository.checkMessageTimer(messageEntity);
         }
       };
-      return document.hasFocus() ? startTimer() : $(window).one('focus', startTimer);
+      if (document.hasFocus()) {
+        startTimer();
+        this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
+      } else {
+        $(window).one('focus', startTimer);
+      }
     };
   }
 
