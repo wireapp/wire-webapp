@@ -31,7 +31,7 @@ describe('ReadReceiptMiddleware', () => {
   });
 
   describe('processEvent', () => {
-    it('Ignores read receipt for which original message is not found', () => {
+    it('ignores read receipt for which original message is not found', () => {
       spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
       spyOn(eventService, 'replaceEvent');
 
@@ -49,7 +49,7 @@ describe('ReadReceiptMiddleware', () => {
       });
     });
 
-    it('Updates original message when read confirmation is received', () => {
+    it('updates original message when read confirmation is received', () => {
       const originalEvent = {};
       spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
       spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve(originalEvent));

@@ -36,7 +36,7 @@ export default class ReadReceiptMiddleware {
    * If the event does contain a quote, will also decorate the event with some metadata regarding the quoted message
    *
    * @param {Object} event - event in the DB format
-   * @returns {Object} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
+   * @returns {Promise<Object>} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
   processEvent(event) {
     switch (event.type) {
