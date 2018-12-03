@@ -18,7 +18,6 @@
  */
 
 const expressSitemapXml = require('express-sitemap-xml');
-
 import {CommonConfig} from '@wireapp/commons';
 import * as express from 'express';
 import * as hbs from 'hbs';
@@ -28,7 +27,7 @@ import * as path from 'path';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
-import GWebmasterRoute from './routes/gwebmaster/GWebmasterRoute';
+import GoogleWebmasterRoute from './routes/googlewebmaster/GoogleWebmasterRoute';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
 import {ServerConfig} from './ServerConfig';
@@ -62,7 +61,7 @@ class Server {
     this.app.use(Root(this.config));
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
-    this.app.use(GWebmasterRoute(this.config));
+    this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
