@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.properties = z.properties || {};
 
-z.properties.PropertiesService = class PropertiesService {
+class PropertiesService {
   static get CONFIG() {
     return {
       URL_PROPERTIES: '/properties',
@@ -102,4 +102,6 @@ z.properties.PropertiesService = class PropertiesService {
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
-};
+}
+
+export default PropertiesService;

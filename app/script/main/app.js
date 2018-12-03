@@ -19,6 +19,7 @@
 
 import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
+import PropertiesService from '../properties/PropertiesService';
 import DebugUtil from '../util/DebugUtil';
 
 /* eslint-disable no-unused-vars */
@@ -222,7 +223,7 @@ class App {
       lifecycle: new z.lifecycle.LifecycleService(),
       location: new z.location.LocationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: new z.properties.PropertiesService(this.backendClient),
+      properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
       self: new z.self.SelfService(this.backendClient),
       storage: storageService,
