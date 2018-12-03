@@ -3490,7 +3490,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation entity that will be renamed
    * @param {Object} eventJson - JSON data of 'conversation.receipt-mode-update' event
-   * @returns {Promise} Resolves when the event was handled
+   * @returns {Promise<{conversationEntity, messageEntity}>} Resolves when the event was handled
    */
   _onReceiptModeChanged(conversationEntity, eventJson) {
     return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
