@@ -211,7 +211,6 @@ import NotificationRepositoryGlobal from '../notification/NotificationRepository
 import PermissionRepositoryGlobal from '../permission/PermissionRepository.js';
 import PermissionStatusStateGlobal from '../permission/PermissionStatusState.js';
 import PermissionTypeGlobal from '../permission/PermissionType.js';
-import PropertiesEntityGlobal from '../properties/PropertiesEntity.js';
 import PropertiesRepositoryGlobal from '../properties/PropertiesRepository.js';
 import PropertiesServiceGlobal from '../properties/PropertiesService.js';
 import PropertiesTypeGlobal from '../properties/PropertiesType.js';

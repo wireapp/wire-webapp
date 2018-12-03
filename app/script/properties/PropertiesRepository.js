@@ -17,6 +17,8 @@
  *
  */
 
+import WebappProperties from './WebappProperties';
+
 class PropertiesRepository {
   static get CONFIG() {
     return {
@@ -37,7 +39,7 @@ class PropertiesRepository {
     this.propertiesService = propertiesService;
     this.logger = new z.util.Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
 
-    this.properties = new z.properties.PropertiesEntity();
+    this.properties = new WebappProperties();
     this.selfUser = ko.observable();
     this.enableReadReceipts = ko.observable(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
 
