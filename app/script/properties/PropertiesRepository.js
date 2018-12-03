@@ -205,10 +205,10 @@ class PropertiesRepository {
 
   // Map a property and set it into our state
   setProperty(key, value) {
+    this.logger.info(`Setting key "${key}" to value "${value}"...`);
     switch (key) {
       case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
         value = JSON.parse(value);
-        this.logger.info(`Setting key "${key}" to value "${value}".`);
         this.enableReadReceipts(value);
         break;
     }
