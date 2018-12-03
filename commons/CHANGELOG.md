@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.10.0...@wireapp/commons@0.10.1) (2018-12-03)
+
+
+### Bug Fixes
+
+* **commons:** Add edge to the list of supported browsers ([#1359](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1359)) ([8b17f1d](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/8b17f1d))
+
+
+
+
+
 # [0.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.9.17...@wireapp/commons@0.10.0) (2018-11-30)
 
 
