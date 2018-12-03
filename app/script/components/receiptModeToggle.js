@@ -20,21 +20,16 @@
 ko.components.register('read-receipt-toggle', {
   template: `
   <div data-bind="text: conversation.receiptMode() ? 'yes' : 'no'"></div>
-  <label><input type="checkbox" data-uie-name="do-toggle-receipt-mode" data-bind="checked: valueProxy"> receipt mode</label>
+  <label><input type="checkbox" data-uie-name="do-toggle-receipt-mode" data-bind="checked: conversation.receiptMode, event: {change: updateValue}"> receipt mode</label>
   `,
 
   viewModel: function(params) {
     this.conversation = params.conversation();
-    this.valueProxy = ko.observable(this.conversation.receiptMode());
 
-    const valueSubscription = this.valueProxy.subscribe(newValue => {
-      const intValue = newValue ? 1 : 0;
+    this.updateValue = (data, event) => {
+      const intValue = event.target.checked ? 1 : 0;
       this.conversation.receiptMode(intValue);
       params.onReceiptModeChanged(this.conversation, intValue);
-    });
-
-    this.dispose = () => {
-      valueSubscription.dispose();
     };
   },
 });
