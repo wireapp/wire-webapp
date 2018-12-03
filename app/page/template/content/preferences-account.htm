@@ -108,15 +108,14 @@
 
       <section class="preferences-section preferences-section-privacy">
         <hr class="preferences-separator">
-        <header class="preferences-header">TODO: PLACEHOLDER</header>
-        <!-- TODO: Make this a component -->
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountPrivacy"></header>
         <div class="preferences-option">
           <div class="preferences-option-icon checkbox text-theme" data-uie-name="status-preference-read-receipts">
             <input type="checkbox" id="read-receipts-checkbox" data-bind="checked: optionReadReceipts, click: clickReadReceiptsCheckbox">
-            <label class="preferences-options-checkbox-label" for="read-receipts-checkbox">TODO: PLACEHOLDER</label>
+            <label class="preferences-options-checkbox-label" for="read-receipts-checkbox" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsCheckbox"></label>
           </div>
         </div>
-        <div class="preferences-detail">TODO: PLACEHOLDER</div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsDetail"></div>
       </section>
 
       <!-- ko if: isActivatedAccount() -->

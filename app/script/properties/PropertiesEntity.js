@@ -32,7 +32,6 @@ z.properties.PropertiesEntity = class PropertiesEntity {
         send: true,
       },
       privacy: {
-        enable_read_receipts: false,
         improve_wire: undefined,
         report_errors: undefined,
       },
