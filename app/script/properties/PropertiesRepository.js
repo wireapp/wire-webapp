@@ -128,11 +128,10 @@ class PropertiesRepository {
         this.setProperty(property.key, value);
       })
       .catch(() => {
-        this.logger.warn(
-          `Property "${property.key}" doesn't exist for this account. Continuing with the default value of "${
-            property.defaultValue
-          }".`
-        );
+        const message = `Property "${
+          property.key
+        }" doesn't exist for this account. Continuing with the default value of "${property.defaultValue}".`;
+        this.logger.warn(message);
       });
   }
 
