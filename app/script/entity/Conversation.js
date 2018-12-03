@@ -205,7 +205,6 @@ z.entity.Conversation = class Conversation {
         allEvents: [],
         allMessages: [],
         calls: [],
-        confirmMessages: [],
         otherMessages: [],
         pings: [],
         selfMentions: [],
