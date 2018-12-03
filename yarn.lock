@@ -1261,10 +1261,10 @@
     "@types/node" "*"
     "@types/react" "*"
 
-"@types/react-intl@2.3.12":
-  version "2.3.12"
-  resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.12.tgz#38361a467277719d0a350bab8d7917000934a730"
-  integrity sha512-ic6K89pktpAETRkmseDR8KQyEUhdUW9PJaNXomeDu/tjxw18Xj8oPW0+18LXTLMPgHszI6vAULQUj/ueymeekg==
+"@types/react-intl@2.3.14":
+  version "2.3.14"
+  resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.14.tgz#dbb973c20908a8e7468974a329df35c256cb459d"
+  integrity sha512-NPj7mYJ6LjKZOxknobs9t3FKJto6btG9KSP9K7kSIzEhkWoA/2i+RAcHRqs3/6cMMflnt2FxajyIdmkl71B2VA==
 
 "@types/react-redux@6.0.9":
   version "6.0.9"
@@ -12002,10 +12002,10 @@ uuid@^3.1.0, uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
 
-uuidjs@4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.0.3.tgz#4b4113a98e70507643a9a55a0493ff95b1d2538d"
-  integrity sha512-xG2pb5orynGRMwR3MtiJDKrMQ7rl4+IVchTjKBlddBJy9sIDw336u3quWdWiu81XhM5ckgQuWtFzxdqXTec4uA==
+uuidjs@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.1.0.tgz#af5a4e097608283cc9f826652571f2b693f14e92"
+  integrity sha512-Q5FwVy77P7L4XMZyOuKP16o5hArVwhaUZLqzHICoWLd1CAFIe4PP+kssLNsS7WAtTtwqFOzdB0ZPVGBLWkss2w==
 
 v8-compile-cache@^2.0.2:
   version "2.0.2"
