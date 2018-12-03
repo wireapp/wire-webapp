@@ -385,7 +385,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   onReadReceiptsChange(viewModel, event) {
     const enableReadReceipts = event.target.checked;
     const receiptMode = enableReadReceipts ? 1 : 0;
-    this.propertiesRepository.saveReadReceipts(receiptMode);
+    this.propertiesRepository.saveReceiptMode(receiptMode);
     return true;
   }
 
