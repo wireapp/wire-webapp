@@ -20,9 +20,9 @@ import {Router} from 'express';
 import {ServerConfig} from '../../ServerConfig';
 
 const GoogleWebmasterRoute = (config: ServerConfig) => {
-  if (config.SERVER.G_WEBMASTER_ID) {
-    return Router().get(`/google${config.SERVER.G_WEBMASTER_ID}.html`, (req, res) => {
-      const responseBody = `google-site-verification: google${config.SERVER.G_WEBMASTER_ID}.html`;
+  if (config.SERVER.GOOGLE_WEBMASTER_ID) {
+    return Router().get(`/google${config.SERVER.GOOGLE_WEBMASTER_ID}.html`, (req, res) => {
+      const responseBody = `google-site-verification: google${config.SERVER.GOOGLE_WEBMASTER_ID}.html`;
       res.type('text/html; charset=utf-8').send(responseBody);
     });
   }
