@@ -24,8 +24,8 @@ class PropertiesRepository {
     return {
       // Value names are specified by the protocol but key names can be changed.
       ENABLE_READ_RECEIPTS: {
-        defaultValue: false,
-        key: 'WIRE_ENABLE_READ_RECEIPTS',
+        defaultValue: 0,
+        key: 'WIRE_RECEIPT_MODE',
       },
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
     };
@@ -217,12 +217,12 @@ class PropertiesRepository {
   }
 
   // Save read receipts preference on server to sync between clients
-  saveReadReceipts(enableReadReceipts) {
+  saveReadReceipts(receiptMode) {
     const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
-    if (enableReadReceipts) {
-      return this.propertiesService.putPropertiesByKey(property.key, enableReadReceipts);
+    if (receiptMode === 0) {
+      return this.propertiesService.deletePropertiesByKey(property.key);
     }
-    return this.propertiesService.deletePropertiesByKey(property.key);
+    return this.propertiesService.putPropertiesByKey(property.key, receiptMode);
   }
 
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
