@@ -589,9 +589,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   getInViewportCallback(messageEntity) {
     const conversationTimestamp = this.conversation().last_read_timestamp();
     const messageTimestamp = messageEntity.timestamp();
+    const isUnread = messageTimestamp > conversationTimestamp && !messageEntity.user().is_me;
 
     const sendReadReceipt = () => {
-      this.conversation().last_read_timestamp(messageTimestamp);
       this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
     };
 
@@ -601,7 +601,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
 
-      if (conversationTimestamp < messageTimestamp) {
+      if (isUnread) {
         return sendReadReceipt;
       }
 
@@ -615,7 +615,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
       };
       if (document.hasFocus()) {
-        if (conversationTimestamp < messageTimestamp) {
+        if (isUnread) {
           sendReadReceipt();
         }
         startTimer();

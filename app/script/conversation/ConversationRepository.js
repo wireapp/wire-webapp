@@ -1658,17 +1658,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = [], sendToGroup = false) {
-    const isUnread =
-      messageEntity.timestamp() > conversationEntity.last_read_timestamp() && !messageEntity.user().is_me;
-    if (isUnread) {
-      this.sendConfirmationStatus(
-        conversationEntity,
-        messageEntity,
-        z.proto.Confirmation.Type.READ,
-        moreMessageEntities,
-        sendToGroup
-      );
-    }
+    this.sendConfirmationStatus(
+      conversationEntity,
+      messageEntity,
+      z.proto.Confirmation.Type.READ,
+      moreMessageEntities,
+      sendToGroup
+    );
   }
 
   //##############################################################################
