@@ -321,6 +321,7 @@ import userProfileGlobal from '../components/userProfile.js';
 import userInputGlobal from '../components/userInput.js';
 import userListGlobal from '../components/userList.js';
 import guestModeToggleGlobal from '../components/guestModeToggle.js';
+import infoToggleGlobal from '../components/infoToggle.js';
 import iconsGlobal from '../components/icons.js';
 import logosGlobal from '../components/logos.js';
 import loadingBarGlobal from '../components/loadingBar.js';

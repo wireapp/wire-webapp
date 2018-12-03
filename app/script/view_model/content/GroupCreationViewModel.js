@@ -61,6 +61,8 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       }
     });
 
+    this.enableReadReceipts = ko.observable(true);
+
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
