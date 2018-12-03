@@ -32,6 +32,16 @@ z.user.UserRepository = class UserRepository {
     };
   }
 
+  /**
+   * Construct a new User repository.
+   * @class z.user.UserRepository
+   * @param {z.user.UserService} user_service - Backend REST API user service implementation
+   * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
+   * @param {z.self.SelfService} selfService - Backend REST API self service implementation
+   * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
+   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {PropertiesRepository} propertyRepository - Handles account level properties
+   */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
