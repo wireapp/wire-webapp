@@ -9,7 +9,7 @@
     "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/store-engine": "1.1.9",
     "bazinga64": "5.3.31",
-    "hash.js": "1.1.5",
+    "hash.js": "1.1.7",
     "logdown": "3.2.7",
     "protobufjs": "6.8.8",
     "pure-uuid": "1.5.5"
