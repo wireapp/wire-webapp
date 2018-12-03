@@ -111,7 +111,7 @@
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountPrivacy"></header>
         <div class="preferences-option">
           <div class="preferences-option-icon checkbox text-theme" data-uie-name="status-preference-read-receipts">
-            <input type="checkbox" id="read-receipts-checkbox" data-bind="checked: optionReadReceipts, click: clickReadReceiptsCheckbox">
+            <input type="checkbox" id="read-receipts-checkbox" data-bind="checked: optionReadReceipts, event: {change: onReadReceiptsChange}">
             <label class="preferences-options-checkbox-label" for="read-receipts-checkbox" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsCheckbox"></label>
           </div>
         </div>

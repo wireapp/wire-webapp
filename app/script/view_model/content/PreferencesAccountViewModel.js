@@ -382,8 +382,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.submittedUsername(null);
   }
 
-  clickReadReceiptsCheckbox() {
-    this.propertiesRepository.saveReadReceipts();
+  onReadReceiptsChange(viewModel, event) {
+    const enableReadReceipts = event.target.checked;
+    this.propertiesRepository.saveReadReceipts(enableReadReceipts);
     return true;
   }
 

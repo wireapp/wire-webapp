@@ -215,11 +215,10 @@ class PropertiesRepository {
   }
 
   // Save read receipts preference on server to sync between clients
-  saveReadReceipts() {
+  saveReadReceipts(enableReadReceipts) {
     const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
-    const value = this.enableReadReceipts();
-    if (value === true) {
-      return this.propertiesService.putPropertiesByKey(property.key, value);
+    if (enableReadReceipts) {
+      return this.propertiesService.putPropertiesByKey(property.key, enableReadReceipts);
     }
     return this.propertiesService.deletePropertiesByKey(property.key);
   }
