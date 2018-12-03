@@ -170,7 +170,7 @@
       "git add"
     ],
     "server/**/*.{ts,tsx}": [
-      "tslint --config server/tslint.json --project server/tsconfig.json",
+      "tslint --config server/tslint.json",
       "git add"
     ]
   },
