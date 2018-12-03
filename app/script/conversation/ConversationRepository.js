@@ -246,16 +246,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Create a group conversation.
    * @note Do not include the requestor among the users
    *
-   * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
+   * @param {Array<z.entity.User>} userEntities - Users (excluding the creator) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
    * @param {string} [accessState] - State for conversation access
+   * @param {Object} [options] - Additional conversation creation options (like "receipt_mode")
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName, accessState) {
+  createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
     const payload = {
       name: groupName,
       users: userIds,
+      ...options,
     };
 
     if (this.team().id) {
