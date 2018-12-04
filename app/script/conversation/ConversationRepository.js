@@ -1845,32 +1845,38 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Message} messageEntity - Message for which to acknowledge receipt
    * @param {z.proto.Confirmation.Type} type - The type of confirmation to send
    * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
-   * @param {boolean} [sendToGroup] - If the confirmation should be sent to groups
    * @returns {undefined} No return value
    */
   sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
-    const isReadReceipt = type === z.proto.Confirmation.Type.READ;
-    const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || isReadReceipt);
-    const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
-    const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
-    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
 
-    const sendConfirmation = otherUserIn1To1 && withinThreshold && typeToConfirm;
-    if (sendConfirmation) {
-      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id, moreMessageIds);
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
-
-      this.sending_queue.push(() => {
-        return this.create_recipients(conversationEntity.id, true, [messageEntity.user().id]).then(recipients => {
-          const options = {nativePush: false, precondition: [messageEntity.user().id], recipients};
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
-
-          return this._sendGenericMessage(eventInfoEntity);
-        });
-      });
+    if (messageEntity.user().is_me || !typeToConfirm) {
+      return;
     }
+
+    if (type === z.proto.Confirmation.Type.DELIVERED) {
+      const otherUserIn1To1 = conversationEntity.is1to1();
+      const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+      const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
+
+      if (!otherUserIn1To1 || !withinThreshold) {
+        return;
+      }
+    }
+
+    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
+    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+    const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id, moreMessageIds);
+    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
+
+    this.sending_queue.push(() => {
+      return this.create_recipients(conversationEntity.id, true, [messageEntity.user().id]).then(recipients => {
+        const options = {nativePush: false, precondition: [messageEntity.user().id], recipients};
+        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+
+        return this._sendGenericMessage(eventInfoEntity);
+      });
+    });
   }
 
   /**
