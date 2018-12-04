@@ -1656,17 +1656,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation to update
    * @param {Message} messageEntity - Message to send a read receipt for
    * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
-   * @param {boolean} sendToGroup - If the confirmation should be sent to groups
    * @returns {undefined} No return value
    */
-  sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = [], sendToGroup = false) {
-    this.sendConfirmationStatus(
-      conversationEntity,
-      messageEntity,
-      z.proto.Confirmation.Type.READ,
-      moreMessageEntities,
-      sendToGroup
-    );
+  sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = []) {
+    this.sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.READ, moreMessageEntities);
   }
 
   //##############################################################################
@@ -1855,7 +1848,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {boolean} [sendToGroup] - If the confirmation should be sent to groups
    * @returns {undefined} No return value
    */
-  sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = [], sendToGroup = false) {
+  sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
+    const sendToGroup = conversationEntity.expectsReadConfirmation();
     const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || sendToGroup);
     const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
@@ -2466,7 +2460,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _sendEncryptedMessage(eventInfoEntity, payload) {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.message_id;
-    const messageType = eventInfoEntity.getType();
+    let messageType = eventInfoEntity.getType();
+
+    if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+      const confirmationType = (() => {
+        switch (eventInfoEntity.genericMessage.confirmation.type) {
+          case z.proto.Confirmation.Type.DELIVERED:
+            return 'delivered';
+          case z.proto.Confirmation.Type.READ:
+            return 'seen';
+          default:
+            return 'unknown type';
+        }
+      })();
+      messageType += ` (${confirmationType})`;
+    }
 
     const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
     this.logger.info(logMessage, payload);
