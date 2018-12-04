@@ -56,7 +56,7 @@ describe('z.media.MediaDevicesHandler', () => {
     });
   });
 
-  describe('toggleNextCamera', () => {
+  xdescribe('toggleNextCamera', () => {
     it('returns second camera if the first is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
       devicesHandler.toggleNextCamera().then(() => {
