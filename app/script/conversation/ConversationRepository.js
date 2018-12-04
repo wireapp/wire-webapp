@@ -2463,17 +2463,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let messageType = eventInfoEntity.getType();
 
     if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
-      const confirmationType = (() => {
-        switch (eventInfoEntity.genericMessage.confirmation.type) {
-          case z.proto.Confirmation.Type.DELIVERED:
-            return 'delivered';
-          case z.proto.Confirmation.Type.READ:
-            return 'seen';
-          default:
-            return 'unknown type';
-        }
-      })();
-      messageType += ` (${confirmationType})`;
+      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
     }
 
     const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
