@@ -142,7 +142,8 @@ class App {
       repositories.links,
       repositories.serverTime,
       repositories.team,
-      repositories.user
+      repositories.user,
+      repositories.properties
     );
 
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
