@@ -246,16 +246,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Create a group conversation.
    * @note Do not include the requestor among the users
    *
-   * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
+   * @param {Array<z.entity.User>} userEntities - Users (excluding the creator) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
    * @param {string} [accessState] - State for conversation access
+   * @param {Object} [options] - Additional conversation creation options (like "receipt_mode")
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName, accessState) {
+  createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
     const payload = {
       name: groupName,
       users: userIds,
+      ...options,
     };
 
     if (this.team().id) {
@@ -2897,6 +2899,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.REACTION:
         return this._onReaction(conversationEntity, eventJson);
 
+      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE:
+        return this._onReceiptModeChanged(conversationEntity, eventJson);
+
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
@@ -3477,6 +3482,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onRename(conversationEntity, eventJson) {
     return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
       this.conversationMapper.updateProperties(conversationEntity, eventJson.data);
+      return {conversationEntity, messageEntity};
+    });
+  }
+
+  /**
+   * A conversation receipt mode was changed
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation entity that will be renamed
+   * @param {Object} eventJson - JSON data of 'conversation.receipt-mode-update' event
+   * @returns {Promise<{conversationEntity, messageEntity}>} Resolves when the event was handled
+   */
+  _onReceiptModeChanged(conversationEntity, eventJson) {
+    return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
+      this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data});
       return {conversationEntity, messageEntity};
     });
   }

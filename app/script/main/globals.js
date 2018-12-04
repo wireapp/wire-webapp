@@ -211,7 +211,6 @@ import NotificationRepositoryGlobal from '../notification/NotificationRepository
 import PermissionRepositoryGlobal from '../permission/PermissionRepository.js';
 import PermissionStatusStateGlobal from '../permission/PermissionStatusState.js';
 import PermissionTypeGlobal from '../permission/PermissionType.js';
-import PropertiesEntityGlobal from '../properties/PropertiesEntity.js';
 import PropertiesRepositoryGlobal from '../properties/PropertiesRepository.js';
 import PropertiesServiceGlobal from '../properties/PropertiesService.js';
 import PropertiesTypeGlobal from '../properties/PropertiesType.js';
@@ -322,6 +321,7 @@ import userProfileGlobal from '../components/userProfile.js';
 import userInputGlobal from '../components/userInput.js';
 import userListGlobal from '../components/userList.js';
 import guestModeToggleGlobal from '../components/guestModeToggle.js';
+import infoToggleGlobal from '../components/infoToggle.js';
 import iconsGlobal from '../components/icons.js';
 import logosGlobal from '../components/logos.js';
 import loadingBarGlobal from '../components/loadingBar.js';
