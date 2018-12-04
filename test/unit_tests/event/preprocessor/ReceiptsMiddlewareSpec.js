@@ -50,6 +50,27 @@ describe('ReceiptsMiddleware', () => {
       });
     });
 
+    it('ignores read receipt from user who already has read the message', () => {
+      const event = {
+        conversation: UUID.genV4(),
+        data: {
+          message_id: UUID.genV4(),
+          status: 4,
+        },
+        from: UUID.genV4().hexString,
+        type: z.event.Client.CONVERSATION.CONFIRMATION,
+      };
+
+      const originalEvent = {read_receipts: [{from: event.from, time: ''}]};
+      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
+      spyOn(eventService, 'replaceEvent');
+
+      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+        expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
+        expect(eventService.replaceEvent).not.toHaveBeenCalled();
+      });
+    });
+
     it('updates original message when read confirmation is received', () => {
       const originalEvent = {};
       spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
