@@ -1682,7 +1682,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const assetEntity = messageEntity.get_first_asset();
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
-          expectsReadConfirmation: this.shouldSendReadReceipt(),
+          expectsReadConfirmation: this.shouldSendReadReceipt(conversationEntity),
           retention,
         };
 
@@ -1797,7 +1797,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
-          expectsReadConfirmation: this.shouldSendReadReceipt(),
+          expectsReadConfirmation: this.shouldSendReadReceipt(conversationEntity),
           retention,
         };
 
@@ -1805,7 +1805,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const protoAsset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, this.shouldSendReadReceipt());
+          protoAsset.set(
+            z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+            this.shouldSendReadReceipt(conversationEntity)
+          );
 
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
@@ -1926,7 +1929,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_image_asset(conversationEntity, image) {
     const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
     const options = {
-      expectsReadConfirmation: this.shouldSendReadReceipt(),
+      expectsReadConfirmation: this.shouldSendReadReceipt(conversationEntity),
       retention,
     };
 
@@ -1956,7 +1959,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendKnock(conversationEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoKnock = new z.proto.Knock(false, this.shouldSendReadReceipt());
+    const protoKnock = new z.proto.Knock(false, this.shouldSendReadReceipt(conversationEntity));
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, protoKnock);
 
     if (conversationEntity.messageTimer()) {
@@ -1994,7 +1997,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             mentionEntities,
             undefined,
             [linkPreview],
-            this.shouldSendReadReceipt()
+            this.shouldSendReadReceipt(conversationEntity)
           );
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
@@ -2038,7 +2041,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendLocation(conversationEntity, longitude, latitude, name, zoom) {
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoLocation = new z.proto.Location(longitude, latitude, name, zoom, this.shouldSendReadReceipt());
+    const protoLocation = new z.proto.Location(
+      longitude,
+      latitude,
+      name,
+      zoom,
+      this.shouldSendReadReceipt(conversationEntity)
+    );
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, protoLocation);
 
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
@@ -2070,7 +2079,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       mentionEntities,
       undefined,
       undefined,
-      this.shouldSendReadReceipt()
+      this.shouldSendReadReceipt(conversationEntity)
     );
     const protoMessageEdit = new z.proto.MessageEdit(originalMessageEntity.id, protoText);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, protoMessageEdit);
@@ -2171,7 +2180,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       mentionEntities,
       quoteEntity,
       undefined,
-      this.shouldSendReadReceipt()
+      this.shouldSendReadReceipt(conversationEntity)
     );
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
@@ -3821,7 +3830,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
-    return this.shouldSendReadReceipt();
+    return conversationEntity.expectsReadConfirmation();
   }
 
   /**
