@@ -413,6 +413,10 @@ z.string.guestRoomConversationBadgeGuestAndService = 'Guests and services are pr
 z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
 z.string.guestRoomConversationButton = 'Invite people';
 
+// Read receipts toggle
+z.string.readReceiptsToogleName = 'Read receipts';
+z.string.readReceiptsToogleInfo = 'When this is on, people can see when their messages in this conversation are read.';
+
 // Collection
 z.string.collectionShowAll = 'Show all {{number}}';
 z.string.collectionSectionLinks = 'Links';
