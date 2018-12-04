@@ -1058,7 +1058,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadState().allEvents.length;
       if (isNotMarkedAsRead && !this.block_event_handling()) {
         this._updateLastReadTimestamp(conversationEntity);
-        this._sendReadReceipt(conversationEntity, true);
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
       }
     }
@@ -1654,17 +1653,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send a read receipt for the last message in a conversation.
    *
-   * @private
    * @param {Conversation} conversationEntity - Conversation to update
-   * @param {boolean} sendToGroup - If the confirmation should be sent to groups
+   * @param {Message} messageEntity - Message to send a read receipt for
+   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
    * @returns {undefined} No return value
    */
-  _sendReadReceipt(conversationEntity, sendToGroup = false) {
-    const lastMessage = conversationEntity.getLastMessage();
-
-    if (lastMessage) {
-      this.sendConfirmationStatus(conversationEntity, lastMessage, z.proto.Confirmation.Type.READ, sendToGroup);
-    }
+  sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = []) {
+    this.sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.READ, moreMessageEntities);
   }
 
   //##############################################################################
@@ -1849,30 +1844,39 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that content message was received in
    * @param {Message} messageEntity - Message for which to acknowledge receipt
    * @param {z.proto.Confirmation.Type} type - The type of confirmation to send
-   * @param {boolean} sendToGroup - If the confirmation should be sent to groups
+   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
    * @returns {undefined} No return value
    */
-  sendConfirmationStatus(conversationEntity, messageEntity, type, sendToGroup = false) {
-    const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || sendToGroup);
-    const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
-    const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
+  sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
-    const sendConfirmation = otherUserIn1To1 && withinThreshold && typeToConfirm;
-    if (sendConfirmation) {
-      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id);
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
-
-      this.sending_queue.push(() => {
-        return this.create_recipients(conversationEntity.id, true, [messageEntity.user().id]).then(recipients => {
-          const options = {nativePush: false, precondition: [messageEntity.user().id], recipients};
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
-
-          return this._sendGenericMessage(eventInfoEntity);
-        });
-      });
+    if (messageEntity.user().is_me || !typeToConfirm) {
+      return;
     }
+
+    if (type === z.proto.Confirmation.Type.DELIVERED) {
+      const otherUserIn1To1 = conversationEntity.is1to1();
+      const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+      const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
+
+      if (!otherUserIn1To1 || !withinThreshold) {
+        return;
+      }
+    }
+
+    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
+    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+    const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id, moreMessageIds);
+    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
+
+    this.sending_queue.push(() => {
+      return this.create_recipients(conversationEntity.id, true, [messageEntity.user().id]).then(recipients => {
+        const options = {nativePush: false, precondition: [messageEntity.user().id], recipients};
+        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+
+        return this._sendGenericMessage(eventInfoEntity);
+      });
+    });
   }
 
   /**
@@ -2462,7 +2466,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _sendEncryptedMessage(eventInfoEntity, payload) {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.message_id;
-    const messageType = eventInfoEntity.getType();
+    let messageType = eventInfoEntity.getType();
+
+    if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
+    }
 
     const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
     this.logger.info(logMessage, payload);

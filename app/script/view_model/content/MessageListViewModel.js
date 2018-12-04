@@ -584,24 +584,45 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Message appeared in viewport.
    * @param {z.entity.Message} messageEntity - Message to check
-   * @returns {boolean} Message is in viewport
+   * @returns {Function|null} Callback or null
    */
   getInViewportCallback(messageEntity) {
+    const conversationTimestamp = this.conversation().last_read_timestamp();
+    const messageTimestamp = messageEntity.timestamp();
+    const callbacks = [];
+
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
       if (this.conversation().is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
+    }
+
+    const sendReadReceipt = () => {
+      this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
+    };
+
+    const startTimer = () => {
+      if (messageEntity.conversation_id === this.conversation().id) {
+        this.conversation_repository.checkMessageTimer(messageEntity);
+      }
+    };
+
+    if (messageEntity.is_ephemeral()) {
+      callbacks.push(startTimer);
+    }
+
+    if (messageTimestamp > conversationTimestamp && !messageEntity.user().is_me) {
+      callbacks.push(sendReadReceipt);
+    }
+
+    if (!callbacks.length) {
       return null;
     }
 
     return () => {
-      const startTimer = () => {
-        if (messageEntity.conversation_id === this.conversation().id) {
-          this.conversation_repository.checkMessageTimer(messageEntity);
-        }
-      };
-      return document.hasFocus() ? startTimer() : $(window).one('focus', startTimer);
+      const trigger = () => callbacks.forEach(callback => callback());
+      return document.hasFocus() ? trigger() : $(window).one('focus', trigger);
     };
   }
 
