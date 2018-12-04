@@ -168,6 +168,12 @@ z.event.EventService = class EventService {
     return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
   }
 
+  addEventUpdatedListener(callback) {
+    this.storageService.db[this.EVENT_STORE_NAME].hook('updating', function() {
+      this.onsuccess = updatedEvent => window.setTimeout(() => callback(updatedEvent));
+    });
+  }
+
   /**
    * Update event as uploaded in database.
    *

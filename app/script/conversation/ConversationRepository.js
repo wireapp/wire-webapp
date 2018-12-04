@@ -223,6 +223,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
+
+    // FIXME find the right spot to connect the listener AFTER the DB is initiated
+    setTimeout(() => {
+      this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
+    }, 10000);
+  }
+
+  _updateLocalMessageEntity(updatedEvent) {
+    this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
+      this._addEventToConversation(conversationEntity, updatedEvent);
+    });
   }
 
   /**
@@ -2941,9 +2952,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.ASSET_ADD:
         return this._onAssetAdd(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.CONFIRMATION:
-        return this._on_confirmation(conversationEntity, eventJson);
-
       case z.event.Client.CONVERSATION.GROUP_CREATION:
         return this._onGroupCreation(conversationEntity, eventJson);
 
@@ -3128,37 +3136,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
-      });
-  }
-
-  /**
-   * Received confirmation of message.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation entity that a message was reacted upon in
-   * @param {Object} event_json - JSON data of 'conversation.confirmation' event
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _on_confirmation(conversation_et, event_json) {
-    const event_data = event_json.data;
-
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then(message_et => {
-        const was_updated = message_et.update_status(event_data.status);
-
-        if (was_updated) {
-          const changes = {status: message_et.status()};
-          return this.eventService.updateEvent(message_et.primary_key, changes);
-        }
-      })
-      .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.info(
-            `Failed to handle status update of a message in conversation '${conversation_et.id}'`,
-            error
-          );
-          throw error;
-        }
       });
   }
 

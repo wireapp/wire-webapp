@@ -17,6 +17,8 @@
  *
  */
 
+import StatusType from '../../message/StatusType';
+
 export default class ReadReceiptMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
@@ -51,13 +53,17 @@ export default class ReadReceiptMiddleware {
               return;
             }
             const currentReadReceipts = originalEvent.read_receipts || [];
-            if (currentReadReceipts.some(({from}) => event.from === from)) {
+            if (event.data.status === StatusType.SEEN && currentReadReceipts.some(({from}) => event.from === from)) {
               // if the user is already among the readers of the message, nothing more to do
               return;
             }
-            const updatedEvent = Object.assign({}, originalEvent, {
-              read_receipts: currentReadReceipts.concat([{time: event.time, userId: event.from}]),
-            });
+            const commonUpdates = {status: event.data.status};
+            const readReceiptUpdate =
+              event.data.status === StatusType.SEEN
+                ? {read_receipts: currentReadReceipts.concat([{time: event.time, userId: event.from}])}
+                : {};
+
+            const updatedEvent = Object.assign({}, originalEvent, commonUpdates, readReceiptUpdate);
 
             return this.eventService.replaceEvent(updatedEvent);
           })
