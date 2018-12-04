@@ -16,20 +16,17 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {Router} from 'express';
+import {ServerConfig} from '../../ServerConfig';
 
-ko.components.register('read-receipt-toggle', {
-  template: `
-  <div data-bind="text: conversation.receiptMode() ? 'yes' : 'no'"></div>
-  <label><input type="checkbox" data-uie-name="do-toggle-receipt-mode" data-bind="checked: conversation.receiptMode, event: {change: updateValue}"> receipt mode</label>
-  `,
+const GoogleWebmasterRoute = (config: ServerConfig) => {
+  if (config.SERVER.GOOGLE_WEBMASTER_ID) {
+    return Router().get(`/google${config.SERVER.GOOGLE_WEBMASTER_ID}.html`, (req, res) => {
+      const responseBody = `google-site-verification: google${config.SERVER.GOOGLE_WEBMASTER_ID}.html`;
+      res.type('text/html; charset=utf-8').send(responseBody);
+    });
+  }
+  return Router();
+};
 
-  viewModel: function(params) {
-    this.conversation = params.conversation();
-
-    this.updateValue = (data, event) => {
-      const intValue = event.target.checked ? 1 : 0;
-      this.conversation.receiptMode(intValue);
-      params.onReceiptModeChanged(this.conversation, intValue);
-    };
-  },
-});
+export default GoogleWebmasterRoute;

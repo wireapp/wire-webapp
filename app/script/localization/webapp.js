@@ -625,12 +625,15 @@ z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
 z.string.preferencesAccountMarketingConsentCheckbox = 'Receive newsletter';
 z.string.preferencesAccountMarketingConsentDetail = 'Receive news and product updates from Wire via email.';
+z.string.preferencesAccountPrivacy = 'Privacy';
+z.string.preferencesAccountReadReceiptsCheckbox = 'Read receipts';
+z.string.preferencesAccountReadReceiptsDetail = 'When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.';
 z.string.preferencesAccountResetPassword = 'Reset password';
 z.string.preferencesAccountTeam = 'in {{name}}';
-z.string.preferencesAccountUsernamePlaceholder = 'Your full name';
-z.string.preferencesAccountUsernameHint = 'At least 2 characters. a—z, 0—9 and _ only.';
 z.string.preferencesAccountUsernameAvailable = 'Available';
 z.string.preferencesAccountUsernameErrorTaken = 'Already taken';
+z.string.preferencesAccountUsernameHint = 'At least 2 characters. a—z, 0—9 and _ only.';
+z.string.preferencesAccountUsernamePlaceholder = 'Your full name';
 
 z.string.preferencesAVCamera = 'Camera';
 z.string.preferencesAVMicrophone = 'Microphone';

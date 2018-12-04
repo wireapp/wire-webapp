@@ -2901,6 +2901,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.REACTION:
         return this._onReaction(conversationEntity, eventJson);
 
+      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE:
+        return this._onReceiptModeChanged(conversationEntity, eventJson);
+
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
@@ -3481,6 +3484,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onRename(conversationEntity, eventJson) {
     return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
       this.conversationMapper.updateProperties(conversationEntity, eventJson.data);
+      return {conversationEntity, messageEntity};
+    });
+  }
+
+  /**
+   * A conversation receipt mode was changed
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation entity that will be renamed
+   * @param {Object} eventJson - JSON data of 'conversation.receipt-mode-update' event
+   * @returns {Promise<{conversationEntity, messageEntity}>} Resolves when the event was handled
+   */
+  _onReceiptModeChanged(conversationEntity, eventJson) {
+    return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
+      this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data});
       return {conversationEntity, messageEntity};
     });
   }
