@@ -12018,10 +12018,10 @@ uuid@^3.1.0, uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
 
-uuidjs@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.1.0.tgz#af5a4e097608283cc9f826652571f2b693f14e92"
-  integrity sha512-Q5FwVy77P7L4XMZyOuKP16o5hArVwhaUZLqzHICoWLd1CAFIe4PP+kssLNsS7WAtTtwqFOzdB0ZPVGBLWkss2w==
+uuidjs@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.0.tgz#cb33f458e43f939fb66d366dd71dc6cce2005ed0"
+  integrity sha512-r6dd6WLSjJmk+fQsCaQsxgAagzODi4F8YrpMkLYbWxYnH/CeQNFiqfj63DOhDs8opohfpaiA9vPJkud4WBEnGw==
 
 v8-compile-cache@^2.0.2:
   version "2.0.2"
