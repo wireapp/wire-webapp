@@ -60,17 +60,15 @@ ko.bindingHandlers.focus_on_keydown = {
 /**
  * Show timestamp when hovering over the element.
  */
-ko.bindingHandlers.show_all_timestamps = {
+ko.bindingHandlers.showAllTimestamps = {
   init(element) {
-    const $element = $(element);
+    const toggleShowTimeStamp = force => {
+      const times = document.querySelectorAll('.time');
+      times.forEach(time => time.classList.toggle('show-timestamp', force));
+    };
 
-    $element.on('mousemove mouseout', function(event) {
-      const rect = $(this)
-        .find('.messages')[0]
-        .getBoundingClientRect();
-      const show_timestamps = event.clientX > rect.right - 64 && event.clientX < rect.right;
-      $('.time').toggleClass('show-timestamp', show_timestamps);
-    });
+    element.addEventListener('mouseenter', () => toggleShowTimeStamp(true));
+    element.addEventListener('mouseleave', () => toggleShowTimeStamp(false));
   },
 };
 
