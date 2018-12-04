@@ -605,7 +605,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
 
       if (expectsReadConfirmation && isUnread) {
-        sendReadReceipt();
+        return sendReadReceipt();
       }
 
       return null;
@@ -621,10 +621,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         if (expectsReadConfirmation && isUnread) {
           sendReadReceipt();
         }
-        startTimer();
-      } else {
-        $(window).one('focus', startTimer);
+        return startTimer();
       }
+
+      $(window).one('focus', startTimer);
     };
   }
 
