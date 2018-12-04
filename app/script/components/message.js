@@ -261,6 +261,7 @@ const normalTemplate = `
       <!-- ko if: isLastDeliveredMessage -->
         <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
       <!-- /ko -->
+      <span class="message-status-read"><read-icon></read-icon><span class="message-status-read__count">99:99</span></span>
     </div>
 
   </div>
