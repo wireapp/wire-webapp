@@ -42,11 +42,11 @@ describe('PropertiesRepository', () => {
 
       propertiesRepository.setProperty(property.key, !defaultValue);
 
-      expect(propertiesRepository.enableReadReceipts()).not.toBe(defaultValue);
+      expect(propertiesRepository.receiptMode()).not.toBe(defaultValue);
 
       propertiesRepository.deleteProperty(property.key);
 
-      expect(propertiesRepository.enableReadReceipts()).toBe(defaultValue);
+      expect(propertiesRepository.receiptMode()).toBe(defaultValue);
     });
 
     it('ignores unknown properties', () => {

@@ -56,7 +56,7 @@ z.user.UserRepository = class UserRepository {
 
     this.self = ko.observable();
     this.self.subscribe(user => {
-      user.receiptMode = this.propertyRepository.enableReadReceipts;
+      user.receiptMode = this.propertyRepository.receiptMode;
     });
     this.users = ko.observableArray([]);
 

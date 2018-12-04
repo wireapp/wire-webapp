@@ -89,7 +89,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
-    this.optionReadReceipts = this.propertiesRepository.enableReadReceipts;
+    this.optionReadReceipts = this.propertiesRepository.receiptMode;
 
     this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;

@@ -41,7 +41,7 @@ class PropertiesRepository {
 
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();
-    this.enableReadReceipts = ko.observable(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
+    this.receiptMode = ko.observable(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
@@ -211,7 +211,7 @@ class PropertiesRepository {
     switch (key) {
       case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
         value = JSON.parse(value);
-        this.enableReadReceipts(value);
+        this.receiptMode(value);
         break;
     }
   }
