@@ -16,3 +16,4 @@ aws-keys.json
 npm-debug.log
 yarn-error.log
 CHANGELOG.md
+**/.DS_Store
