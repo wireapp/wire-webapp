@@ -29,7 +29,7 @@ class InfoToggle {
     this.isDisabled = params.isDisabled;
     this.name = params.name;
   }
-};
+}
 
 ko.components.register('info-toggle', {
   template: `
