@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
 import UUID from 'uuidjs';
 
-z.components.InfoToggle = class InfoToggle {
+class InfoToggle {
   constructor(params) {
     this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
     this.dataUieNameLabelText = `do-toggle-${params.dataUieName}`;
@@ -48,5 +45,5 @@ ko.components.register('info-toggle', {
     </div>
     <div class="info-toggle__details" data-bind="attr: {'data-uie-name': dataUieNameInfoText }, l10n_text: info"></div>
   `,
-  viewModel: z.components.InfoToggle,
+  viewModel: InfoToggle,
 });
