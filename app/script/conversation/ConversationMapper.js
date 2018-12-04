@@ -289,6 +289,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
       this.mapAccessState(conversationEntity, accessModes, accessRole);
     }
 
+    conversationEntity.receiptMode(conversationData.receipt_mode);
+
     return conversationEntity;
   }
 

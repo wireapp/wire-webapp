@@ -438,7 +438,7 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {ReceiptModeUpdateMessage} receipt mode update message entity
    */
   _mapEventReceiptModeUpdate({data: eventData}) {
-    return new ReceiptModeUpdateMessage(!!eventData);
+    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode);
   }
 
   /**

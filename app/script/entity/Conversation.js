@@ -176,6 +176,7 @@ z.entity.Conversation = class Conversation {
     this.globalMessageTimer = ko.observable(null);
 
     this.receiptMode = ko.observable(0);
+    this.expectsReadConfirmation = ko.pureComputed(() => !!this.receiptMode());
 
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
@@ -747,6 +748,7 @@ z.entity.Conversation = class Conversation {
       archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.localMessageTimer(),
+      expects_read_confirmation: this.expectsReadConfirmation(),
       global_message_timer: this.globalMessageTimer(),
       id: this.id,
       is_guest: this.isGuest(),
