@@ -380,7 +380,7 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {ContentMessage} Content message entity
    */
   _mapEventMessageAdd(event) {
-    const {data: eventData, edited_time: editedTime, readReceipts} = event;
+    const {data: eventData, edited_time: editedTime, read_receipts: readReceipts} = event;
     const messageEntity = new z.entity.ContentMessage();
 
     messageEntity.assets.push(this._mapAssetText(eventData));
