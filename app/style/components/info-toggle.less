@@ -17,11 +17,12 @@
  *
  */
 
-guest-mode-toggle {
+guest-mode-toggle,
+info-toggle {
   display: flex;
   flex-direction: column;
 
-  .guest-mode-toggle-row {
+  .info-toggle__row {
     display: flex;
     justify-content: space-between;
     padding-bottom: 12px;
@@ -30,8 +31,11 @@ guest-mode-toggle {
     line-height: 24px;
   }
 
-  .guest-mode-toggle-info {
+  .info-toggle__details {
     margin-top: 16px;
+    color: #8d989f;
+    font-size: 11px;
+    line-height: 16px;
   }
 
   .slider.disabled {
