@@ -18,7 +18,6 @@
  */
 
 const expressSitemapXml = require('express-sitemap-xml');
-
 import {CommonConfig} from '@wireapp/commons';
 import * as express from 'express';
 import * as hbs from 'hbs';
@@ -28,6 +27,7 @@ import * as path from 'path';
 import HealthCheckRoute from './routes/_health/HealthRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
+import GoogleWebmasterRoute from './routes/googlewebmaster/GoogleWebmasterRoute';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
 import {ServerConfig} from './ServerConfig';
@@ -61,6 +61,7 @@ class Server {
     this.app.use(Root(this.config));
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
+    this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
@@ -154,6 +155,9 @@ class Server {
     this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
 
     this.app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'static', 'favicon.ico')));
+    this.app.get('/apple-app-site-association.json', (req, res) =>
+      res.sendFile(path.join(__dirname, 'apple-app-site-association.json'))
+    );
     this.app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, 'static', 'sw.js')));
   }
 

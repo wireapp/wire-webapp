@@ -150,6 +150,7 @@ const config: ServerConfig = {
     DEVELOPMENT: nodeEnvironment === 'development',
     ENFORCE_HTTPS: process.env.ENFORCE_HTTPS == 'false' ? false : true,
     ENVIRONMENT: nodeEnvironment,
+    GOOGLE_WEBMASTER_ID: process.env.GOOGLE_WEBMASTER_ID,
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
