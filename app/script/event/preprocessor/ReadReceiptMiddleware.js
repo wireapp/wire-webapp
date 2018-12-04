@@ -38,7 +38,7 @@ export default class ReadReceiptMiddleware {
    */
   processEvent(event) {
     switch (event.type) {
-      case z.event.Client.CONVERSATION.CONFIRMATION:
+      case z.event.Client.CONVERSATION.CONFIRMATION: {
         this.logger.info(
           `Received confirmation of type '${event.data.status}' from '${event.from}' for message '${
             event.data.message_id
@@ -62,9 +62,11 @@ export default class ReadReceiptMiddleware {
             return this.eventService.replaceEvent(updatedEvent);
           })
           .then(() => event);
+      }
 
-      default:
+      default: {
         return Promise.resolve(event);
+      }
     }
   }
 }
