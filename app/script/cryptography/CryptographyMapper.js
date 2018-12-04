@@ -104,7 +104,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
-        specificContent = this._mapKnock();
+        specificContent = this._mapKnock(genericMessage.knock);
         break;
       }
 
@@ -147,8 +147,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapAsset(asset) {
-    const {original, preview, uploaded, not_uploaded: notUploaded} = asset;
-    let data = {};
+    const {expects_read_confirmation, original, preview, uploaded, not_uploaded: notUploaded} = asset;
+    let data = {
+      expects_read_confirmation,
+    };
 
     if (original) {
       data = {
@@ -361,6 +363,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data: {
         content_length: image.size,
         content_type: image.mime_type,
+        expects_read_confirmation: image.expects_read_confirmation,
         id: eventId,
         info: {
           height: image.height,
@@ -374,8 +377,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _mapKnock() {
-    return {type: z.event.Client.CONVERSATION.KNOCK};
+  _mapKnock(knock) {
+    return {
+      data: {
+        expects_read_confirmation: knock.expects_read_confirmation,
+      },
+      type: z.event.Client.CONVERSATION.KNOCK,
+    };
   }
 
   _mapLastRead(lastRead) {
@@ -391,6 +399,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   _mapLocation(location) {
     return {
       data: {
+        expects_read_confirmation: location.expects_read_confirmation,
         location: {
           latitude: location.latitude,
           longitude: location.longitude,
@@ -413,7 +422,12 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapText(text) {
-    const {link_preview: protoLinkPreviews, mentions: protoMentions, quote: protoQuote} = text;
+    const {
+      expects_read_confirmation,
+      link_preview: protoLinkPreviews,
+      mentions: protoMentions,
+      quote: protoQuote,
+    } = text;
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
@@ -423,6 +437,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         content: `${text.content}`,
+        expects_read_confirmation,
         mentions: protoMentions.map(protoMention => protoMention.encode64()),
         previews: protoLinkPreviews.map(protoLinkPreview => protoLinkPreview.encode64()),
         quote: protoQuote && protoQuote.encode64(),

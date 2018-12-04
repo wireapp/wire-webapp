@@ -1676,7 +1676,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => {
         const assetEntity = messageEntity.get_first_asset();
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-        const options = {retention};
+        const options = {
+          expectsReadConfirmation: conversationEntity.expectsReadConfirmation(),
+          retention,
+        };
 
         assetEntity.uploaded_on_this_client(true);
         return this.asset_service.uploadAsset(file, options, xhr => {
@@ -1745,6 +1748,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name);
         }
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
+        protoAsset.set(
+          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+          conversation_et.expectsReadConfirmation()
+        );
 
         return protoAsset;
       })
@@ -1784,12 +1791,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-        const options = {retention};
+        const options = {
+          expectsReadConfirmation: conversationEntity.expectsReadConfirmation(),
+          retention,
+        };
 
         return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
           const protoAsset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
+          protoAsset.set(
+            z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+            conversationEntity.expectsReadConfirmation()
+          );
 
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
@@ -1816,6 +1830,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const protoReason = wasCancelled ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
     const protoAsset = new z.proto.Asset();
     protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED, protoReason);
+    protoAsset.set(
+      z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+      conversation_et.expectsReadConfirmation()
+    );
 
     const generic_message = new z.proto.GenericMessage(messageId);
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
@@ -1905,7 +1923,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_image_asset(conversationEntity, image) {
     const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-    const options = {retention};
+    const options = {
+      expectsReadConfirmation: conversationEntity.expectsReadConfirmation(),
+      retention,
+    };
 
     return this.asset_service
       .uploadImageAsset(image, options)
@@ -1933,7 +1954,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendKnock(conversationEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoKnock = new z.proto.Knock(false);
+    const protoKnock = new z.proto.Knock(false, conversationEntity.expectsReadConfirmation());
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, protoKnock);
 
     if (conversationEntity.messageTimer()) {
@@ -1965,7 +1986,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .getLinkPreviewFromString(textMessage)
       .then(linkPreview => {
         if (linkPreview) {
-          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, undefined, [linkPreview]);
+          const protoText = this._createTextProto(
+            messageId,
+            textMessage,
+            mentionEntities,
+            undefined,
+            [linkPreview],
+            conversationEntity.expectsReadConfirmation()
+          );
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
@@ -2008,7 +2036,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendLocation(conversationEntity, longitude, latitude, name, zoom) {
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoLocation = new z.proto.Location(longitude, latitude, name, zoom);
+    const protoLocation = new z.proto.Location(
+      longitude,
+      latitude,
+      name,
+      zoom,
+      conversationEntity.expectsReadConfirmation()
+    );
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, protoLocation);
 
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
@@ -2034,7 +2068,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
+    const protoText = this._createTextProto(
+      genericMessage.message_id,
+      textMessage,
+      mentionEntities,
+      undefined,
+      undefined,
+      conversationEntity.expectsReadConfirmation()
+    );
     const protoMessageEdit = new z.proto.MessageEdit(originalMessageEntity.id, protoText);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, protoMessageEdit);
 
@@ -2128,7 +2169,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities, quoteEntity);
+    const protoText = this._createTextProto(
+      genericMessage.message_id,
+      textMessage,
+      mentionEntities,
+      quoteEntity,
+      undefined,
+      conversationEntity.expectsReadConfirmation()
+    );
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
     if (conversationEntity.messageTimer()) {
@@ -2162,7 +2210,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews) {
+  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews, expectsReadConfirmation) {
     const protoText = new z.proto.Text(textMessage);
 
     if (mentionEntities && mentionEntities.length) {
@@ -2194,6 +2242,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
       protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS, linkPreviews);
+    }
+
+    if (expectsReadConfirmation) {
+      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, expectsReadConfirmation);
     }
 
     return protoText;
