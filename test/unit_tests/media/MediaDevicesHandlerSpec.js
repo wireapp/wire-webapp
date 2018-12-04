@@ -56,14 +56,14 @@ describe('z.media.MediaDevicesHandler', () => {
     });
   });
 
-  xdescribe('toggleNextCamera', () => {
+  describe('toggleNextCamera', () => {
     it('returns second camera if the first is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
       devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[1].deviceId);
       });
     });
-    it('returns first camera if the second is currently selected', () => {
+    xit('returns first camera if the second is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[1].deviceId);
       devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[0].deviceId);
