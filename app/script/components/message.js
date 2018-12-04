@@ -17,6 +17,8 @@
  *
  */
 
+import moment from 'moment';
+
 class Message {
   constructor({
     message,
