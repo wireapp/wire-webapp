@@ -22,7 +22,7 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import DebugUtil from '../util/DebugUtil';
 
-import ReadReceiptMiddleware from '../event/preprocessor/ReadReceiptMiddleware';
+import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -150,7 +150,7 @@ class App {
       this.service.event,
       z.message.MessageHasher
     );
-    const readReceiptMiddleware = new ReadReceiptMiddleware(this.service.event);
+    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event);
 
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),
