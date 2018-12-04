@@ -30,6 +30,8 @@ z.storage.StorageService = class StorageService {
     this.db = undefined;
     this.dbName = undefined;
     this.userId = undefined;
+
+    this._afterDbInit = () => {};
   }
 
   //##############################################################################
@@ -60,6 +62,7 @@ z.storage.StorageService = class StorageService {
         .open()
         .then(() => {
           this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
+          this._afterDbInit();
           return this.dbName;
         })
         .catch(error => {
@@ -83,6 +86,21 @@ z.storage.StorageService = class StorageService {
       }
 
       this.db.version(version).stores(schema);
+    });
+  }
+
+  _setAfterDbInitCallback(callback) {
+    this._afterDbInit = callback;
+  }
+
+  // Hooks
+  addUpdatedListener(storeName, callback) {
+    if (!this.db) {
+      // waiting for the DB to be initialized
+      return this._setAfterDbInitCallback(() => this.addUpdatedListener(storeName, callback));
+    }
+    this.db[storeName].hook('updating', function() {
+      this.onsuccess = updatedEvent => window.setTimeout(() => callback(updatedEvent));
     });
   }
 
