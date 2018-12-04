@@ -224,10 +224,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
 
-    // FIXME find the right spot to connect the listener AFTER the DB is initiated
-    setTimeout(() => {
-      this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
-    }, 10000);
+    this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
   }
 
   _updateLocalMessageEntity(updatedEvent) {

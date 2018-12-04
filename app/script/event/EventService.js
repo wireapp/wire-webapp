@@ -169,6 +169,10 @@ z.event.EventService = class EventService {
   }
 
   addEventUpdatedListener(callback) {
+    if (!this.storageService.db) {
+      // waiting for the DB to be initialized
+      return setTimeout(() => this.addEventUpdatedListener(callback), 100);
+    }
     this.storageService.db[this.EVENT_STORE_NAME].hook('updating', function() {
       this.onsuccess = updatedEvent => window.setTimeout(() => callback(updatedEvent));
     });

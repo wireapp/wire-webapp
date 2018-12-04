@@ -50,7 +50,7 @@ z.storage.StorageService = class StorageService {
       this.userId = userId;
       this.dbName = `wire@${z.util.Environment.backend.current}@${userId}@${clientType}`;
 
-      this.db = new Dexie(this.dbName);
+      this.db = this.db || new Dexie(this.dbName);
 
       this.db.on('blocked', () => this.logger.error('Database is blocked'));
 
