@@ -66,6 +66,23 @@ class Message {
     this.showLikes = ko.observable(false);
 
     this.bindShowMore = this.bindShowMore.bind(this);
+
+    this.readReceiptTooltip = ko.pureComputed(() => {
+      const receipts = this.message.readReceipts();
+      if (!receipts.length || !this.conversation().is1to1()) {
+        return '';
+      }
+      return moment(receipts[0].time).format('DD.MM.YY · HH:mm');
+    });
+
+    this.readReceiptText = ko.pureComputed(() => {
+      const receipts = this.message.readReceipts();
+      if (!receipts.length) {
+        return '';
+      }
+      const is1to1 = this.conversation().is1to1();
+      return is1to1 ? moment(receipts[0].time).format('HH:mm') : receipts.length.toString(10);
+    });
   }
 
   getSystemMessageIconComponent(message) {
@@ -256,12 +273,17 @@ const normalTemplate = `
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
       <!-- /ko -->
       <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}"></time>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko if: isLastDeliveredMessage -->
+      <!-- ko if: isLastDeliveredMessage && readReceiptText === '' -->
         <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
       <!-- /ko -->
-      <span class="message-status-read"><read-icon></read-icon><span class="message-status-read__count">99:99</span></span>
+      <!-- ko if: readReceiptText -->
+        <span class="message-status-read" data-bind="css: {'message-status-read--visible': isLastDeliveredMessage, 'with-tooltip with-tooltip--receipt': readReceiptTooltip()}, attr: {'data-tooltip': readReceiptTooltip()}" data-uie-name="status-message-read-receipts">
+          <read-icon></read-icon>
+          <span class="message-status-read__count" data-bind="text: readReceiptText" data-uie-name="status-message-read-receipt-count"></span>
+        </span>
+      <!-- /ko -->
     </div>
 
   </div>

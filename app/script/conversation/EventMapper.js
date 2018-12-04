@@ -380,7 +380,7 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {ContentMessage} Content message entity
    */
   _mapEventMessageAdd(event) {
-    const {data: eventData, edited_time: editedTime} = event;
+    const {data: eventData, edited_time: editedTime, readReceipts} = event;
     const messageEntity = new z.entity.ContentMessage();
 
     messageEntity.assets.push(this._mapAssetText(eventData));
@@ -390,6 +390,10 @@ z.conversation.EventMapper = class EventMapper {
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
       messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+    }
+
+    if (readReceipts) {
+      messageEntity.readReceipts(readReceipts);
     }
 
     return messageEntity;
