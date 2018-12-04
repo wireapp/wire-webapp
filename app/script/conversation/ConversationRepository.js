@@ -57,6 +57,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
+   * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
    */
   constructor(
     conversation_service,
@@ -69,7 +70,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     link_repository,
     serverTimeRepository,
     team_repository,
-    user_repository
+    user_repository,
+    propertyRepository
   ) {
     this.eventRepository = eventRepository;
     this.eventService = eventRepository.eventService;
@@ -83,6 +85,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.serverTimeRepository = serverTimeRepository;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
+    this.propertyRepository = propertyRepository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversationMapper = new z.conversation.ConversationMapper();
@@ -3821,6 +3824,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
     }
+  }
+
+  shouldSendReadReceipt(conversationEntity) {
+    if (conversationEntity.is1to1()) {
+      return !!this.propertyRepository.receiptMode();
+    }
+    return conversationEntity.expectsReadConfirmation();
   }
 
   /**

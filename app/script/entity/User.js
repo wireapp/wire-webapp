@@ -115,7 +115,6 @@ z.entity.User = class User {
       {deferEvaluation: true}
     );
 
-    this.receiptMode = () => 0; // This is a placeholder. Only the self user has this property.
     this.email = ko.observable();
     this.phone = ko.observable();
 
