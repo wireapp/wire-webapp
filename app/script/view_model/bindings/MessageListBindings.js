@@ -67,8 +67,8 @@ ko.bindingHandlers.showAllTimestamps = {
       times.forEach(time => time.classList.toggle('show-timestamp', force));
     };
 
-    element.addEventListener('mousemove', () => toggleShowTimeStamp(true));
-    element.addEventListener('mouseout', () => toggleShowTimeStamp(false));
+    element.addEventListener('mouseenter', () => toggleShowTimeStamp(true));
+    element.addEventListener('mouseleave', () => toggleShowTimeStamp(false));
   },
 };
 
