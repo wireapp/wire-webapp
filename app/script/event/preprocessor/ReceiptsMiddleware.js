@@ -52,15 +52,17 @@ export default class ReadReceiptMiddleware {
             if (!originalEvent) {
               return;
             }
-            const currentReadReceipts = originalEvent.read_receipts || [];
-            if (event.data.status === StatusType.SEEN && currentReadReceipts.some(({from}) => event.from === from)) {
+            const status = event.data.status;
+            const currentReceipts = originalEvent.read_receipts || [];
+            const hasReadMessage = status === StatusType.SEEN && currentReceipts.some(({from}) => event.from === from);
+            if (hasReadMessage) {
               // if the user is already among the readers of the message, nothing more to do
               return;
             }
-            const commonUpdates = {status: event.data.status};
+            const commonUpdates = {status};
             const readReceiptUpdate =
-              event.data.status === StatusType.SEEN
-                ? {read_receipts: currentReadReceipts.concat([{time: event.time, userId: event.from}])}
+              status === StatusType.SEEN
+                ? {read_receipts: currentReceipts.concat([{time: event.time, userId: event.from}])}
                 : {};
 
             const updatedEvent = Object.assign({}, originalEvent, commonUpdates, readReceiptUpdate);

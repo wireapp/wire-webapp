@@ -89,19 +89,15 @@ z.storage.StorageService = class StorageService {
     });
   }
 
-  _setAfterDbInitCallback(callback) {
-    this._afterDbInit = callback;
-  }
-
   // Hooks
   addUpdatedListener(storeName, callback) {
     if (!this.db) {
       // waiting for the DB to be initialized
-      return this._setAfterDbInitCallback(() => this.addUpdatedListener(storeName, callback));
+      return (this._afterDbInit = () => this.addUpdatedListener(storeName, callback));
     }
-    this.db[storeName].hook('updating', function(modifications, primaryKey, obj, transation) {
+    this.db[storeName].hook('updating', function(modifications, primaryKey, obj, transaction) {
       // we need to wait for the transaction to be finished in order to be able to access the DB later on
-      this.onsuccess = updatedEvent => transation.on('complete', callback(updatedEvent));
+      this.onsuccess = updatedEvent => transaction.on('complete', callback(updatedEvent));
     });
   }
 
