@@ -17,18 +17,18 @@
  *
  */
 
-// KARMA_SPECS=event/preprocessor/QuotedMessageMiddleware yarn test:app
+// KARMA_SPECS=event/preprocessor/ReceiptsMiddleware yarn test:app
 
 import UUID from 'uuidjs';
-import ReadReceiptMiddleware from 'app/script/event/preprocessor/ReadReceiptMiddleware';
+import ReceiptsMiddleware from 'app/script/event/preprocessor/ReceiptsMiddleware';
 
-describe('ReadReceiptMiddleware', () => {
+describe('ReceiptsMiddleware', () => {
   const noop = () => {};
   let readReceiptMiddleware;
   const eventService = {loadEvent: noop, replaceEvent: noop};
 
   beforeEach(() => {
-    readReceiptMiddleware = new ReadReceiptMiddleware(eventService);
+    readReceiptMiddleware = new ReceiptsMiddleware(eventService);
   });
 
   describe('processEvent', () => {
@@ -59,6 +59,7 @@ describe('ReadReceiptMiddleware', () => {
         conversation: UUID.genV4(),
         data: {
           message_id: UUID.genV4(),
+          status: 4,
         },
         from: UUID.genV4(),
         time: '12-12-12',
@@ -69,6 +70,31 @@ describe('ReadReceiptMiddleware', () => {
         expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
         expect(eventService.replaceEvent).toHaveBeenCalledWith({
           read_receipts: [{time: event.time, userId: event.from}],
+          status: event.data.status,
+        });
+      });
+    });
+
+    it('updates original message when delivered confirmation is received', () => {
+      const originalEvent = {};
+      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
+      spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve(originalEvent));
+
+      const event = {
+        conversation: UUID.genV4(),
+        data: {
+          message_id: UUID.genV4(),
+          status: 3,
+        },
+        from: UUID.genV4(),
+        time: '12-12-12',
+        type: z.event.Client.CONVERSATION.CONFIRMATION,
+      };
+
+      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+        expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
+        expect(eventService.replaceEvent).toHaveBeenCalledWith({
+          status: event.data.status,
         });
       });
     });
