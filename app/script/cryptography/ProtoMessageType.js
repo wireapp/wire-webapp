@@ -26,6 +26,7 @@ z.cryptography.PROTO_MESSAGE_TYPE = {
   ASSET_PREVIEW: 'preview',
   ASSET_UPLOADED: 'uploaded',
   EPHEMERAL_EXPIRATION: 'expire_after_millis',
+  EXPECTS_READ_CONFIRMATION: 'expects_read_confirmation',
   LINK_PREVIEW_IMAGE: 'image',
   LINK_PREVIEW_TITLE: 'title',
   LINK_PREVIEWS: 'link_preview',
