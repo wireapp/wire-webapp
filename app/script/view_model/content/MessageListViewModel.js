@@ -604,7 +604,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
 
       if (isUnread) {
-        return sendReadReceipt();
+        return sendReadReceipt;
       }
 
       return null;
