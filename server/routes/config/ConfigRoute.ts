@@ -28,7 +28,7 @@ const ConfigRoute = (config: ServerConfig) =>
 
     res.type('application/javascript').send(`
       window.wire = window.wire || {};
-      window.wire.env = ${JSON.stringify(clientConfig)};
+      window.wire.env = ${JSON.stringify({...clientConfig, ENVIRONMENT: 'production'})};
     `);
   });
 
