@@ -592,7 +592,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     const messageTimestamp = messageEntity.timestamp();
 
     const isUnread = messageTimestamp > conversationTimestamp && !messageEntity.user().is_me;
-    const expectsReadConfirmation = conversationEntity.expectsReadConfirmation();
 
     const sendReadReceipt = () => {
       this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
@@ -604,7 +603,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
 
-      if (expectsReadConfirmation && isUnread) {
+      if (isUnread) {
         return sendReadReceipt();
       }
 
@@ -618,7 +617,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
       };
       if (document.hasFocus()) {
-        if (expectsReadConfirmation && isUnread) {
+        if (isUnread) {
           sendReadReceipt();
         }
         return startTimer();
