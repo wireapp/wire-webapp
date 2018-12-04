@@ -13,8 +13,8 @@
             <span class="message-unread-dot dot-md bg-theme"></span>
           </div>
           <div class="message-header-label">
-            <time data-timestamp-type="normal" class="label-xs" data-bind="relative_timestamp: message.timestamp(), attr: {'data-timestamp': message.timestamp}"></time>
-            <time data-timestamp-type="day" class="label-bold-xs" data-bind="relative_timestamp: message.timestamp(), relative_timestamp_day: true, attr: {'data-timestamp': message.timestamp}"></time>
+            <time data-timestamp-type="normal" class="label-xs" data-bind="relative_timestamp: message.timestamp(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+            <time data-timestamp-type="day" class="label-bold-xs" data-bind="relative_timestamp: message.timestamp(), relative_timestamp_day: true, attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
           </div>
         </div>
 

@@ -68,6 +68,16 @@
     pointer-events: auto;
   }
 
+  &.hover,
+  &:hover {
+    .message-status,
+    .message-status-read {
+      &::before {
+        content: '·';
+      }
+    }
+  }
+
   &.hover .time,
   &:hover .time,
   .show-timestamp.time {
@@ -142,7 +152,7 @@
   line-height: @avatar-diameter-xs;
 
   & > .message-body-actions {
-    top: 10px;
+    top: 6px;
   }
 
   + .message-services-warning {
@@ -455,8 +465,10 @@
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
   width: @conversation-message-timestamp-width;
   height: @line-height-lg;
+  align-items: center;
 
   // actions pill
   .action-pill-style() {
@@ -514,6 +526,10 @@
     pointer-events: none;
     user-select: none;
   }
+  .message-status,
+  .message-status-read--visible {
+    opacity: 1;
+  }
 }
 
 .time {
@@ -527,8 +543,10 @@
     width: 16px;
     align-items: center;
     justify-content: center;
-    content: '·';
+    content: '';
   }
+}
+.message-status::before {
 }
 
 .message-body-actions-large {
