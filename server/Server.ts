@@ -18,7 +18,6 @@
  */
 
 const expressSitemapXml = require('express-sitemap-xml');
-import {CommonConfig} from '@wireapp/commons';
 import * as express from 'express';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
@@ -180,28 +179,7 @@ class Server {
       }
 
       const userAgent = req.header('User-Agent');
-      const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
-
-      if (parsedUserAgent) {
-        const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
-
-        const supportedBrowser = (() => {
-          const browserName = parsedUserAgent.browser.name.toLowerCase();
-          const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
-          const supportedBrowserVersion = supportedBrowserVersionObject && supportedBrowserVersionObject.major;
-
-          try {
-            const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
-            const browserVersion = parseInt(browserVersionString, 10);
-            return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
-          } catch (err) {
-            return false;
-          }
-        })();
-        if (invalidBrowser || !supportedBrowser) {
-          return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
-        }
-      } else {
+      if (!BrowserUtil.isSupportedBrowser(userAgent)) {
         return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
       }
       return next();
