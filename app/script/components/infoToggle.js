@@ -25,7 +25,7 @@ import UUID from 'uuidjs';
 z.components.InfoToggle = class InfoToggle {
   constructor(params) {
     this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
-    this.dataUieNameLabelText = `do-allow-${params.dataUieName}`;
+    this.dataUieNameLabelText = `do-toggle-${params.dataUieName}`;
     this.info = params.info;
     this.inputId = UUID.genV4();
     this.isChecked = params.isChecked;
@@ -36,7 +36,7 @@ z.components.InfoToggle = class InfoToggle {
 
 ko.components.register('info-toggle', {
   template: `
-    <div class="guest-mode-toggle-row">
+    <div class="info-toggle__row">
       <div data-bind="l10n_text: name"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
         <input 
@@ -46,7 +46,7 @@ ko.components.register('info-toggle', {
         <label class="button-label" data-bind="attr: { for: inputId, 'data-uie-value': isChecked() ? 'checked': 'unchecked', 'data-uie-name': dataUieNameLabelText }"></label>
       </div>
     </div>
-    <div class="panel__info-text" data-bind="attr: {'data-uie-name': dataUieNameInfoText }, l10n_text: info"></div>
+    <div class="info-toggle__details" data-bind="attr: {'data-uie-name': dataUieNameInfoText }, l10n_text: info"></div>
   `,
   viewModel: z.components.InfoToggle,
 });
