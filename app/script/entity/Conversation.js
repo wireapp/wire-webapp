@@ -177,7 +177,7 @@ z.entity.Conversation = class Conversation {
 
     this.receiptMode = ko.observable(0);
     this.expectsReadConfirmation = ko.pureComputed(() => {
-      if (this.is1to1()) {
+      if (this.is1to1() && this.selfUser()) {
         return !!this.selfUser().receiptMode();
       }
       return !!this.receiptMode();
