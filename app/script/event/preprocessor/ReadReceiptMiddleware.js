@@ -51,7 +51,7 @@ export default class ReadReceiptMiddleware {
               return;
             }
             const currentReadReceipts = originalEvent.read_receipts || [];
-            if (currentReadReceipts.includes(event.from)) {
+            if (currentReadReceipts.some(({from}) => event.from === from)) {
               // if the user is already in the readers of the message, nothing more to do
               return;
             }
