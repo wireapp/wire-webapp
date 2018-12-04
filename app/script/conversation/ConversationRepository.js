@@ -1849,8 +1849,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
-    const sendToGroup = conversationEntity.expectsReadConfirmation();
-    const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || sendToGroup);
+    const isReadReceipt = type === z.proto.Confirmation.Type.READ;
+    const otherUserIn1To1 = !messageEntity.user().is_me && (conversationEntity.is1to1() || isReadReceipt);
     const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
     const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
