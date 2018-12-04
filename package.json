@@ -170,7 +170,7 @@
       "git add"
     ],
     "server/**/*.{ts,tsx}": [
-      "tslint --config server/tslint.json --project server/tsconfig.json",
+      "tslint --config server/tslint.json",
       "git add"
     ]
   },
@@ -197,10 +197,11 @@
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "build:style": "node ./bin/less.js",
-    "test": "yarn test:types && yarn lint && yarn test:auth && yarn test:app",
-    "test:types": "yarn tsc --noEmit",
-    "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
+    "test": "yarn test:types && yarn lint && yarn test:server && yarn test:auth && yarn test:app",
     "test:app": "karma start karma.conf.js",
+    "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
+    "test:server": "cd server && yarn test",
+    "test:types": "yarn tsc --noEmit",
     "translate": "yarn translate:upload && yarn translate:download",
     "translate:buildpot": "rip json2pot \"temp/i18n/**/*.json\" -o \"temp/i18n/webapp.pot\"",
     "translate:download": "node ./bin/translations_download.js && yarn translate:postprocess && yarn translate:extractpo && yarn fix:assets",
