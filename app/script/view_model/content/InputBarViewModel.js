@@ -704,7 +704,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           });
   }
 
-  sendMessage(messageText, replyMessageEntity, expectsReadConfirmation = false) {
+  sendMessage(messageText, replyMessageEntity) {
     if (messageText.length) {
       const mentionEntities = this.currentMentions.slice();
 
@@ -713,8 +713,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.conversationEntity(),
           messageText,
           mentionEntities,
-          quoteEntity,
-          expectsReadConfirmation
+          quoteEntity
         );
         this.cancelMessageReply();
       });
