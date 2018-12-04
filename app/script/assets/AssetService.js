@@ -93,10 +93,10 @@ z.assets.AssetService = class AssetService {
         const assetRemoteData = new z.proto.Asset.RemoteData(keyBytes, sha256, key, token);
 
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED, assetRemoteData);
-
-        if (options.expectsReadConfirmation) {
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, options.expectsReadConfirmation);
-        }
+        protoAsset.set(
+          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+          options.expectsReadConfirmation || false
+        );
 
         return protoAsset;
       });
@@ -124,10 +124,10 @@ z.assets.AssetService = class AssetService {
 
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED, assetRemoteData);
-
-        if (options.expectsReadConfirmation) {
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, options.expectsReadConfirmation);
-        }
+        protoAsset.set(
+          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+          options.expectsReadConfirmation || false
+        );
 
         return protoAsset;
       });
