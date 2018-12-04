@@ -68,7 +68,7 @@ describe('ReadReceiptMiddleware', () => {
       return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
         expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
         expect(eventService.replaceEvent).toHaveBeenCalledWith({
-          readReceipts: [{time: event.time, userId: event.from}],
+          read_receipts: [{time: event.time, userId: event.from}],
         });
       });
     });

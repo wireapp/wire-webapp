@@ -20,36 +20,43 @@
 export default class ReadReceiptMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
-   * This class is reponsible for parsing incoming text messages that contains quoted messages.
-   * It will handle validating the quote and adding metadata to the event.
+   * This class is reponsible for parsing incoming confirmation messages
+   * It will update original messages when a confirmation is received
    *
    * @param {z.event.EventService} eventService - Repository that handles events
-   * @param {z.message.MessageHasher} messageHasher - Handles hashing messages
    */
-  constructor(eventService, messageHasher) {
+  constructor(eventService) {
     this.eventService = eventService;
     this.logger = new z.util.Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   /**
-   * Handles validation of the event if it contains a quote.
-   * If the event does contain a quote, will also decorate the event with some metadata regarding the quoted message
+   * Handles incoming confirmation events
    *
    * @param {Object} event - event in the DB format
-   * @returns {Promise<Object>} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
+   * @returns {Promise<Object>} event - the original event
    */
   processEvent(event) {
     switch (event.type) {
       case z.event.Client.CONVERSATION.CONFIRMATION:
-        this.logger.info(`Received confirmation from '${event.from}' for message '${event.data.message_id}'`);
+        this.logger.info(
+          `Received confirmation of type '${event.data.status}' from '${event.from}' for message '${
+            event.data.message_id
+          }'`
+        );
         return this.eventService
           .loadEvent(event.conversation, event.data.message_id)
           .then(originalEvent => {
             if (!originalEvent) {
               return;
             }
+            const currentReadReceipts = originalEvent.read_receipts || [];
+            if (currentReadReceipts.includes(event.from)) {
+              // if the user is already in the readers of the message, nothing more to do
+              return;
+            }
             const updatedEvent = Object.assign({}, originalEvent, {
-              readReceipts: (originalEvent.readReceipts || []).concat([{time: event.time, userId: event.from}]),
+              read_receipts: currentReadReceipts.concat([{time: event.time, userId: event.from}]),
             });
 
             return this.eventService.replaceEvent(updatedEvent);
