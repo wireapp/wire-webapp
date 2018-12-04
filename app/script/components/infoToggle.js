@@ -22,7 +22,7 @@ window.z.components = z.components || {};
 
 import UUID from 'uuidjs';
 
-z.components.InfoToggle = class InfoToggle {
+class InfoToggle {
   constructor(params) {
     this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
     this.dataUieNameLabelText = `do-allow-${params.dataUieName}`;
