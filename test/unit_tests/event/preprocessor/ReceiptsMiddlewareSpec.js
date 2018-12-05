@@ -25,7 +25,7 @@ import ReceiptsMiddleware from 'app/script/event/preprocessor/ReceiptsMiddleware
 describe('ReceiptsMiddleware', () => {
   const noop = () => {};
   let readReceiptMiddleware;
-  const eventService = {loadEvent: noop, replaceEvent: noop};
+  const eventService = {loadEvents: noop, replaceEvent: noop};
 
   beforeEach(() => {
     readReceiptMiddleware = new ReceiptsMiddleware(eventService);
@@ -33,62 +33,39 @@ describe('ReceiptsMiddleware', () => {
 
   describe('processEvent', () => {
     it('ignores read receipt for which original message is not found', () => {
-      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
+      spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([]));
       spyOn(eventService, 'replaceEvent');
 
-      const event = {
-        conversation: UUID.genV4(),
-        data: {
-          message_id: UUID.genV4(),
-        },
-        type: z.event.Client.CONVERSATION.CONFIRMATION,
-      };
+      const event = createConfirmationEvent(3);
 
       return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
-        expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
+        expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).not.toHaveBeenCalled();
       });
     });
 
     it('ignores read receipt from user who already has read the message', () => {
-      const event = {
-        conversation: UUID.genV4(),
-        data: {
-          message_id: UUID.genV4(),
-          status: 4,
-        },
-        from: UUID.genV4().hexString,
-        type: z.event.Client.CONVERSATION.CONFIRMATION,
-      };
+      const event = createConfirmationEvent(4);
 
       const originalEvent = {read_receipts: [{from: event.from, time: ''}]};
-      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
+      spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originalEvent]));
       spyOn(eventService, 'replaceEvent');
 
       return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
-        expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
+        expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).not.toHaveBeenCalled();
       });
     });
 
     it('updates original message when read confirmation is received', () => {
       const originalEvent = {};
-      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
+      spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originalEvent]));
       spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve(originalEvent));
 
-      const event = {
-        conversation: UUID.genV4(),
-        data: {
-          message_id: UUID.genV4(),
-          status: 4,
-        },
-        from: UUID.genV4(),
-        time: '12-12-12',
-        type: z.event.Client.CONVERSATION.CONFIRMATION,
-      };
+      const event = createConfirmationEvent(4);
 
       return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
-        expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
+        expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).toHaveBeenCalledWith({
           read_receipts: [{time: event.time, userId: event.from}],
           status: event.data.status,
@@ -98,22 +75,13 @@ describe('ReceiptsMiddleware', () => {
 
     it('updates original message when delivered confirmation is received', () => {
       const originalEvent = {};
-      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalEvent));
+      spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originalEvent]));
       spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve(originalEvent));
 
-      const event = {
-        conversation: UUID.genV4(),
-        data: {
-          message_id: UUID.genV4(),
-          status: 3,
-        },
-        from: UUID.genV4(),
-        time: '12-12-12',
-        type: z.event.Client.CONVERSATION.CONFIRMATION,
-      };
+      const event = createConfirmationEvent(3);
 
       return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
-        expect(eventService.loadEvent).toHaveBeenCalledWith(event.conversation, event.data.message_id);
+        expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).toHaveBeenCalledWith({
           status: event.data.status,
         });
@@ -121,3 +89,17 @@ describe('ReceiptsMiddleware', () => {
     });
   });
 });
+
+function createConfirmationEvent(status, moreMessageIds = []) {
+  return {
+    conversation: UUID.genV4(),
+    data: {
+      message_id: UUID.genV4(),
+      more_message_ids: moreMessageIds,
+      status,
+    },
+    from: UUID.genV4(),
+    time: '12-12-12',
+    type: z.event.Client.CONVERSATION.CONFIRMATION,
+  };
+}

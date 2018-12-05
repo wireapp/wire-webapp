@@ -19,7 +19,7 @@
 
 import StatusType from '../../message/StatusType';
 
-export default class ReadReceiptMiddleware {
+export default class ReceiptsMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
    * This class is reponsible for parsing incoming confirmation messages
