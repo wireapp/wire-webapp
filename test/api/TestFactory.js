@@ -404,7 +404,8 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         undefined,
         TestFactory.serverTimeRepository,
         TestFactory.team_repository,
-        TestFactory.user_repository
+        TestFactory.user_repository,
+        TestFactory.propertyRepository
       );
 
       return TestFactory.conversation_repository;
