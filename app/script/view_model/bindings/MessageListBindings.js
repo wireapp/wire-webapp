@@ -19,6 +19,8 @@
 
 import moment from 'moment';
 
+import viewportObserver from '../../ui/viewportObserver';
+
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
  */
@@ -97,10 +99,10 @@ ko.bindingHandlers.background_image = {
         .catch(() => {});
     };
 
-    z.ui.ViewportObserver.addElement(element, loadImage);
+    viewportObserver.addElement(element, loadImage);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      z.ui.ViewportObserver.removeElement(element);
+      viewportObserver.removeElement(element);
       if (objectUrl) {
         window.URL.revokeObjectURL(objectUrl);
       }

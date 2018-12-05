@@ -376,10 +376,8 @@ import ConversationGlobal from '../entity/Conversation.js';
 import AvailabilityContextMenuGlobal from '../ui/AvailabilityContextMenu.js';
 import ContextMenuGlobal from '../ui/ContextMenu.js';
 import ModalGlobal from '../ui/Modal.js';
-import OverlayedObserverGlobal from '../ui/OverlayedObserver.js';
 import ShortcutTypeGlobal from '../ui/ShortcutType.js';
 import ShortcutGlobal from '../ui/Shortcut.js';
-import ViewportObserverGlobal from '../ui/ViewportObserver.js';
 import WindowHandlerGlobal from '../ui/WindowHandler.js';
 import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
