@@ -1112,9 +1112,9 @@ describe('ConversationRepository', () => {
       // Set a receipt mode on account-level
       const preferenceMode = 1;
       TestFactory.propertyRepository.receiptMode(preferenceMode);
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.ONE2ONE);
 
       // Set the opposite receipt mode on conversation-level
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.ONE2ONE);
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the account-level preference wins
@@ -1127,9 +1127,9 @@ describe('ConversationRepository', () => {
       // Set a receipt mode on account-level
       const preferenceMode = 1;
       TestFactory.propertyRepository.receiptMode(preferenceMode);
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
 
       // Set the opposite receipt mode on conversation-level
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the conversation-level preference wins
