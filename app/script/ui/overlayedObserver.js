@@ -17,9 +17,6 @@
  *
  */
 
-window.z = window.z || {};
-window.z.ui = z.ui || {};
-
 /**
  * Keeps track of elements that are overlayed by other elemenst (thus not visible on screen).
  *
