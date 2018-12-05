@@ -33,6 +33,33 @@ z.event.EventService = class EventService {
   }
 
   /**
+   * Load events from database.
+   *
+   * @param {string} conversationId - ID of conversation
+   * @param {string[]} eventIds - ID of events to retrieve
+   * @returns {Promise<Object[]>} Resolves with the stored records
+   */
+  loadEvents(conversationId, eventIds) {
+    if (!conversationId || !eventIds) {
+      this.logger.error(`Cannot get event '${eventIds}' in conversation '${conversationId}' without IDs`);
+      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
+    }
+
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('id')
+      .anyOf(eventIds)
+      .filter(record => record.conversation === conversationId)
+      .toArray()
+      .catch(error => {
+        const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
+          error.message
+        }`;
+        this.logger.error(logMessage, error);
+        throw error;
+      });
+  }
+
+  /**
    * Load event from database.
    *
    * @param {string} conversationId - ID of conversation

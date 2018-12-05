@@ -41,33 +41,15 @@ export default class ReadReceiptMiddleware {
   processEvent(event) {
     switch (event.type) {
       case z.event.Client.CONVERSATION.CONFIRMATION: {
-        this.logger.info(
-          `Received confirmation of type '${event.data.status}' from '${event.from}' for message '${
-            event.data.message_id
-          }'`
-        );
+        const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         return this.eventService
-          .loadEvent(event.conversation, event.data.message_id)
-          .then(originalEvent => {
-            if (!originalEvent) {
-              return;
-            }
-            const status = event.data.status;
-            const currentReceipts = originalEvent.read_receipts || [];
-            const hasReadMessage = status === StatusType.SEEN && currentReceipts.some(({from}) => event.from === from);
-            if (hasReadMessage) {
-              // if the user is already among the readers of the message, nothing more to do
-              return;
-            }
-            const commonUpdates = {status};
-            const readReceiptUpdate =
-              status === StatusType.SEEN
-                ? {read_receipts: currentReceipts.concat([{time: event.time, userId: event.from}])}
-                : {};
-
-            const updatedEvent = Object.assign({}, originalEvent, commonUpdates, readReceiptUpdate);
-
-            return this.eventService.replaceEvent(updatedEvent);
+          .loadEvents(event.conversation, messageIds)
+          .then(originalEvents => {
+            originalEvents.forEach(originalEvent => this._updateConfirmationStatus(originalEvent, event));
+            this.logger.info(
+              `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
+              originalEvents
+            );
           })
           .then(() => event);
       }
@@ -76,5 +58,25 @@ export default class ReadReceiptMiddleware {
         return Promise.resolve(event);
       }
     }
+  }
+
+  _updateConfirmationStatus(originalEvent, confirmationEvent) {
+    const status = confirmationEvent.data.status;
+    const currentReceipts = originalEvent.read_receipts || [];
+    const hasReadMessage =
+      status === StatusType.SEEN && currentReceipts.some(({from}) => confirmationEvent.from === from);
+    if (hasReadMessage) {
+      // if the user is already among the readers of the message, nothing more to do
+      return;
+    }
+    const commonUpdates = {status};
+    const readReceiptUpdate =
+      status === StatusType.SEEN
+        ? {read_receipts: currentReceipts.concat([{time: confirmationEvent.time, userId: confirmationEvent.from}])}
+        : {};
+
+    const updatedEvent = Object.assign({}, originalEvent, commonUpdates, readReceiptUpdate);
+
+    return this.eventService.replaceEvent(updatedEvent);
   }
 }

@@ -96,8 +96,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           });
           this.readMessagesBuffer.removeAll();
         }
-        // actually send the read receipt
-        //this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
       });
 
     // Store message subscription id
