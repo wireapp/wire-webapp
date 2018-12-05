@@ -1113,12 +1113,29 @@ describe('ConversationRepository', () => {
       const preferenceMode = 1;
       TestFactory.propertyRepository.receiptMode(preferenceMode);
       const conversationEntity = _generate_conversation(z.conversation.ConversationType.ONE2ONE);
+
       // Set the opposite receipt mode on conversation-level
       conversationEntity.receiptMode(!preferenceMode);
+
       // Verify that the account-level preference wins
       const shouldSend = TestFactory.conversation_repository.shouldSendReadReceipt(conversationEntity);
 
       expect(shouldSend).toBe(!!preferenceMode);
+    });
+
+    it('uses the conversation setting for group conversations', () => {
+      // Set a receipt mode on account-level
+      const preferenceMode = 1;
+      TestFactory.propertyRepository.receiptMode(preferenceMode);
+      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
+
+      // Set the opposite receipt mode on conversation-level
+      conversationEntity.receiptMode(!preferenceMode);
+
+      // Verify that the conversation-level preference wins
+      const shouldSend = TestFactory.conversation_repository.shouldSendReadReceipt(conversationEntity);
+
+      expect(shouldSend).toBe(!!conversationEntity.receiptMode());
     });
   });
 });
