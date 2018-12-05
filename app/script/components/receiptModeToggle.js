@@ -17,25 +17,19 @@
  *
  */
 
-guest-mode-toggle {
-  display: flex;
-  flex-direction: column;
+ko.components.register('read-receipt-toggle', {
+  template: `
+  <div data-bind="text: conversation.receiptMode() ? 'yes' : 'no'"></div>
+  <label><input type="checkbox" data-uie-name="do-toggle-receipt-mode" data-bind="checked: conversation.receiptMode, event: {change: updateValue}"> receipt mode</label>
+  `,
 
-  .guest-mode-toggle-row {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 12px;
-    border-bottom: 1px solid fade(@graphite-dark, 8%);
-    font-size: 16px;
-    line-height: 24px;
-  }
+  viewModel: function(params) {
+    this.conversation = params.conversation();
 
-  .guest-mode-toggle-info {
-    margin-top: 16px;
-  }
-
-  .slider.disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-}
+    this.updateValue = (data, event) => {
+      const intValue = event.target.checked ? 1 : 0;
+      this.conversation.receiptMode(intValue);
+      params.onReceiptModeChanged(this.conversation, intValue);
+    };
+  },
+});

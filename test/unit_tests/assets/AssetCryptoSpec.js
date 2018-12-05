@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 describe('AssetsCrypto', () => {
   it('should encrypt and decrypt arraybuffer', () => {
     const bytes = new Uint8Array(16);

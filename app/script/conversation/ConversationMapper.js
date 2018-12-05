@@ -19,8 +19,6 @@
 
 // @ts-check
 
-'use strict';
-
 /**
  * @typedef {object} ConversationBackendData
  * @property {string[]=} access
@@ -163,6 +161,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         last_read_timestamp,
         last_server_timestamp,
         muted_timestamp,
+        receipt_mode,
         status,
         verification_state,
       } = selfState;
@@ -182,6 +181,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       if (message_timer !== undefined) {
         conversationEntity.globalMessageTimer(message_timer);
+      }
+
+      if (receipt_mode !== undefined) {
+        conversationEntity.receiptMode(receipt_mode);
       }
 
       if (last_event_timestamp) {
@@ -285,6 +288,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     if (accessModes && accessRole) {
       this.mapAccessState(conversationEntity, accessModes, accessRole);
     }
+
+    conversationEntity.receiptMode(conversationData.receipt_mode);
 
     return conversationEntity;
   }

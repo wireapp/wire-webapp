@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=util/ObjectUtil yarn test:app
 
-'use strict';
-
 describe('z.util.ObjectUtil', () => {
   describe('escapeProperties', () => {
     it('escapes all properties of an object', () => {

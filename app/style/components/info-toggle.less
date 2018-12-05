@@ -17,32 +17,29 @@
  *
  */
 
-'use strict';
+guest-mode-toggle,
+info-toggle {
+  display: flex;
+  flex-direction: column;
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
-
-z.properties.PropertiesEntity = class PropertiesEntity {
-  constructor() {
-    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
-    this.settings = {
-      emoji: {
-        replace_inline: true,
-      },
-      notifications: z.notification.NotificationPreference.ON,
-      previews: {
-        send: true,
-      },
-      privacy: {
-        improve_wire: undefined,
-      },
-      sound: {
-        alerts: z.audio.AudioPreference.ALL,
-      },
-    };
-    this.contact_import = {
-      macos: undefined,
-    };
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+  .info-toggle__row {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
+    font-size: 16px;
+    line-height: 24px;
   }
-};
+
+  .info-toggle__details {
+    margin-top: 16px;
+    color: #8d989f;
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .slider.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}

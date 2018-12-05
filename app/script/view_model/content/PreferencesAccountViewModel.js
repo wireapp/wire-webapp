@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -90,6 +88,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.optionPrivacy.subscribe(privacyPreference => {
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
+
+    this.optionReadReceipts = this.propertiesRepository.receiptMode;
 
     this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
@@ -380,6 +380,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
+  }
+
+  onReadReceiptsChange(viewModel, event) {
+    const enableReadReceipts = event.target.checked;
+    const receiptMode = enableReadReceipts ? 1 : 0;
+    this.propertiesRepository.saveReceiptMode(receiptMode);
+    return true;
   }
 
   updateProperties(properties) {

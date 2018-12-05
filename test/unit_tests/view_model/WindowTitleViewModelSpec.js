@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=view_model/WindowTitleViewModel yarn test:app
 
 describe('z.viewModel.WindowTitleViewModel', () => {

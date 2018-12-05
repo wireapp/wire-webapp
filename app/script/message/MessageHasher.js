@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import Long from 'long';
 const crypto = window.crypto;
 

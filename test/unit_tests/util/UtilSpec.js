@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=util/Util yarn test:app
 
-'use strict';
-
 import ko from 'knockout';
 
 describe('z.util.renderMessage', () => {

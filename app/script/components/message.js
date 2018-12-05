@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import moment from 'moment';
 
 class Message {
   constructor({
@@ -68,6 +68,23 @@ class Message {
     this.showLikes = ko.observable(false);
 
     this.bindShowMore = this.bindShowMore.bind(this);
+
+    this.readReceiptTooltip = ko.pureComputed(() => {
+      const receipts = this.message.readReceipts();
+      if (!receipts.length || !this.conversation().is1to1()) {
+        return '';
+      }
+      return moment(receipts[0].time).format('DD.MM.YY · HH:mm');
+    });
+
+    this.readReceiptText = ko.pureComputed(() => {
+      const receipts = this.message.readReceipts();
+      if (!receipts.length) {
+        return '';
+      }
+      const is1to1 = this.conversation().is1to1();
+      return is1to1 ? moment(receipts[0].time).format('HH:mm') : receipts.length.toString(10);
+    });
   }
 
   getSystemMessageIconComponent(message) {
@@ -255,13 +272,19 @@ const normalTemplate = `
     <div class="message-body-actions">
       <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(message, event)"></span>
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
       <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}"></time>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko if: isLastDeliveredMessage -->
+      <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
         <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
+      <!-- /ko -->
+      <!-- ko if: readReceiptText() -->
+        <span class="message-status-read" data-bind="css: {'message-status-read--visible': isLastDeliveredMessage(), 'with-tooltip with-tooltip--receipt': readReceiptTooltip()}, attr: {'data-tooltip': readReceiptTooltip()}" data-uie-name="status-message-read-receipts">
+          <read-icon></read-icon>
+          <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
+        </span>
       <!-- /ko -->
     </div>
 
@@ -340,7 +363,7 @@ const systemTemplate = `
       <hr class="message-header-line" />
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
     </div>
   </div>
   <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
@@ -356,7 +379,7 @@ const pingTemplate = `
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
     </div>
   </div>
   `;
@@ -371,7 +394,7 @@ const deleteTemplate = `
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
-      <time class="time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-delete-timestamp"></time>
+      <time class="time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
     </div>
   </div>
   `;
@@ -425,7 +448,7 @@ const callTemplate = `
       <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
     </div>
   </div>
   `;
@@ -475,7 +498,7 @@ const memberTemplate = `
         </div>
         <!-- ko if: message.isMemberChange() -->
           <div class="message-body-actions">
-            <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+            <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
           </div>
         <!-- /ko -->
       </div>

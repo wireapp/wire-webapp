@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -62,6 +60,8 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         this.selectedContacts.remove(userEntity => !userEntity.isTeamMember());
       }
     });
+
+    this.enableReadReceipts = ko.observable(true);
 
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
@@ -162,9 +162,12 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.isCreatingConversation = true;
 
       const accessState = this.isTeam() ? this.accessState() : undefined;
+      const options = {
+        receipt_mode: this.enableReadReceipts() ? 1 : 0,
+      };
 
       this.conversationRepository
-        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState)
+        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState, options)
         .then(conversationEntity => {
           this._hideModal();
 

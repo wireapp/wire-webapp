@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // https://github.com/jsoverson/grunt-open
 
 module.exports = {

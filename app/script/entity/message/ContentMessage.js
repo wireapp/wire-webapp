@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import moment from 'moment';
 
 window.z = window.z || {};
@@ -42,6 +40,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
 
     this.quote = ko.observable();
+    this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
       return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));

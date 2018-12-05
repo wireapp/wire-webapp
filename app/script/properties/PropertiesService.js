@@ -17,12 +17,10 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.properties = z.properties || {};
 
-z.properties.PropertiesService = class PropertiesService {
+class PropertiesService {
   static get CONFIG() {
     return {
       URL_PROPERTIES: '/properties',
@@ -94,7 +92,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/setProperty
    *
    * @param {string} key - Key used to store user properties
-   * @param {Object} properties - Payload to be stored
+   * @param {Object|boolean} properties - Payload to be stored
    * @returns {Promise} Resolves when the property has been stored
    */
   putPropertiesByKey(key, properties) {
@@ -104,4 +102,6 @@ z.properties.PropertiesService = class PropertiesService {
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
-};
+}
+
+export default PropertiesService;

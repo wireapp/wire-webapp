@@ -21,8 +21,6 @@
 
 // KARMA_SPECS=location/LocationService yarn test:app
 
-'use strict';
-
 describe('z.location.LocationService', () => {
   describe('getLocation', () => {
     it('resolves a latitude & longitude via Google Maps API into a location name', () => {

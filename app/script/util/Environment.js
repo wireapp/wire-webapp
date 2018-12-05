@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 import platform from 'platform';
 
 window.z = window.z || {};

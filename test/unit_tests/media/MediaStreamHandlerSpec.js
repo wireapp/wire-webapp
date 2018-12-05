@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // KARMA_SPECS=calling/handler/MediaStreamHandler yarn test:app
 
 window.wire = window.wire || {};

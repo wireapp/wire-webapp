@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=entity/Conversation yarn test:app
 
-'use strict';
-
 describe('Conversation', () => {
   let conversation_et = null;
   let other_user = null;

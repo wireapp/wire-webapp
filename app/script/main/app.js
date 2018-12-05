@@ -19,6 +19,10 @@
 
 import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
+import PropertiesService from '../properties/PropertiesService';
+import DebugUtil from '../util/DebugUtil';
+
+import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -92,6 +96,7 @@ class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
+    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -106,7 +111,8 @@ class App {
       this.service.asset,
       this.service.self,
       repositories.client,
-      repositories.serverTime
+      repositories.serverTime,
+      repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
     repositories.event = new z.event.EventRepository(
@@ -118,7 +124,6 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
@@ -137,7 +142,8 @@ class App {
       repositories.links,
       repositories.serverTime,
       repositories.team,
-      repositories.user
+      repositories.user,
+      repositories.properties
     );
 
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
@@ -145,9 +151,12 @@ class App {
       this.service.event,
       z.message.MessageHasher
     );
+    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event);
+
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
+      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
@@ -220,7 +229,7 @@ class App {
       lifecycle: new z.lifecycle.LifecycleService(),
       location: new z.location.LocationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: new z.properties.PropertiesService(this.backendClient),
+      properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
       self: new z.self.SelfService(this.backendClient),
       storage: storageService,
@@ -235,7 +244,7 @@ class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new z.util.DebugUtil(this.repository)} : {};
+    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
   }
 
   /**

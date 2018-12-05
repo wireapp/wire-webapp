@@ -19,8 +19,6 @@
 
 // KARMA_SPECS=util/TimeUtil yarn test:app
 
-'use strict';
-
 describe('z.util.TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;
   const ONE_MINUTE_IN_MILLIS = 1000 * 60;

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -168,6 +166,10 @@ z.event.EventService = class EventService {
    */
   replaceEvent(event) {
     return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
+  }
+
+  addEventUpdatedListener(callback) {
+    this.storageService.addUpdatedListener(this.EVENT_STORE_NAME, callback);
   }
 
   /**

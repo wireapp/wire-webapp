@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -55,6 +53,8 @@ z.event.Backend = {
     CLIENT_REMOVE: 'user.client-remove',
     CONNECTION: 'user.connection',
     DELETE: 'user.delete',
+    PROPERTIES_DELETE: 'user.properties-delete',
+    PROPERTIES_SET: 'user.properties-set',
     UPDATE: 'user.update',
   },
 };

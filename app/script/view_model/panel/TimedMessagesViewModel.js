@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
@@ -27,25 +25,17 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
   constructor(params) {
     super(params);
 
-    const conversationRepository = params.repositories.conversation;
+    this.timedMessageChange = this.timedMessageChange.bind(this);
+
+    this.conversationRepository = params.repositories.conversation;
 
     this.currentMessageTimer = ko.observable(0);
-
-    const currentMessageTimerSubscription = this.currentMessageTimer.suspendableSubscribe(value => {
-      if (this.activeConversation()) {
-        const finalValue = value === 0 ? null : value;
-        this.activeConversation().globalMessageTimer(finalValue);
-        conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalValue);
-      }
-    });
 
     ko.pureComputed(() => {
       const hasGlobalMessageTimer = this.activeConversation() && this.activeConversation().hasGlobalMessageTimer();
       return hasGlobalMessageTimer ? this.activeConversation().messageTimer() : 0;
     }).subscribe(timer => {
-      currentMessageTimerSubscription.suspend();
       this.currentMessageTimer(timer);
-      currentMessageTimerSubscription.unsuspend();
     });
 
     const hasCustomTime = ko.pureComputed(() => {
@@ -78,6 +68,15 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.isRendered())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
+  }
+
+  timedMessageChange(viewModel, event) {
+    if (this.activeConversation()) {
+      const timer = parseInt(event.target.value, 10);
+      const finalTimer = timer === 0 ? null : timer;
+      this.activeConversation().globalMessageTimer(finalTimer);
+      this.conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalTimer);
+    }
   }
 
   getElementId() {
