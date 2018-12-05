@@ -563,9 +563,13 @@ ko.bindingHandlers.in_viewport = {
     if (!onElementVisible) {
       return;
     }
-    viewportObserver.addElement(element, () => {
-      return overlayedObserver.onElementVisible(element, onElementVisible);
-    });
+    viewportObserver.addElement(
+      element,
+      () => {
+        return overlayedObserver.onElementVisible(element, onElementVisible);
+      },
+      true
+    );
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       overlayedObserver.removeElement(element);

@@ -18,33 +18,31 @@
  */
 
 const observedElements = new Map();
-const intersectionObserver = (() => {
-  const onIntersect = entries => {
-    entries.forEach(({isIntersecting, target: element}) => {
-      if (isIntersecting) {
-        intersectionObserver.unobserve(element);
-
-        const onElementIntersects = observedElements.get(element);
-        if (onElementIntersects) {
-          onElementIntersects();
-          _removeElement(element);
-        }
+const onIntersect = entries => {
+  entries.forEach(({isIntersecting, target: element}) => {
+    if (isIntersecting) {
+      const onElementIntersects = observedElements.get(element);
+      _removeElement(element);
+      if (onElementIntersects) {
+        onElementIntersects();
       }
-    });
-  };
+    }
+  });
+};
 
-  const options = {root: null, rootMargin: '0px', threshold: 1.0};
-  return new IntersectionObserver(onIntersect, options);
-})();
+const options = {root: null, rootMargin: '0px', threshold: 0.0};
+const fullyInViewObserver = new IntersectionObserver(onIntersect, Object.assign({}, options, {threshold: 1.0}));
+const justAppearedObserver = new IntersectionObserver(onIntersect, options);
 
-const _addElement = (element, callback) => {
+const _addElement = (element, callback, fullyInView) => {
   observedElements.set(element, callback);
-  intersectionObserver.observe(element);
+  return fullyInView ? fullyInViewObserver.observe(element) : justAppearedObserver.observe(element);
 };
 
 const _removeElement = element => {
   observedElements.delete(element);
-  intersectionObserver.unobserve(element);
+  fullyInViewObserver.unobserve(element);
+  justAppearedObserver.unobserve(element);
 };
 
 const viewportObserver = {
