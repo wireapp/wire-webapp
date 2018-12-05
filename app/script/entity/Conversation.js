@@ -667,7 +667,7 @@ z.entity.Conversation = class Conversation {
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() === z.message.StatusType.DELIVERED;
+        const isDelivered = messageEntity.status() >= z.message.StatusType.DELIVERED;
         return isDelivered && messageEntity.user().is_me;
       });
   }
