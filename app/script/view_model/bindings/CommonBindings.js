@@ -25,6 +25,9 @@ import SimpleBar from 'simplebar';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
+import overlayedObserver from '../../ui/overlayedObserver';
+import viewportObserver from '../../ui/viewportObserver';
+
 /**
  * Use it on the drop area.
  */
@@ -560,13 +563,11 @@ ko.bindingHandlers.in_viewport = {
     if (!onElementVisible) {
       return;
     }
-    z.ui.ViewportObserver.addElement(element, () => {
-      return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
-    });
+    viewportObserver.addElement(element, () => overlayedObserver.onElementVisible(element, onElementVisible), true);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      z.ui.OverlayedObserver.removeElement(element);
-      z.ui.ViewportObserver.removeElement(element);
+      overlayedObserver.removeElement(element);
+      viewportObserver.removeElement(element);
     });
   },
 };

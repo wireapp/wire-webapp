@@ -17,9 +17,9 @@
  *
  */
 
-describe('OverlayObserver', () => {
-  const overlayObserver = z.ui.OverlayedObserver;
+import overlayedObserver from 'app/script/ui/overlayedObserver';
 
+describe('overlayedObserver', () => {
   describe('addElement', () => {
     it('calls the callback right away if the element is not overlayed', () => {
       const callbackSpy = {
@@ -31,7 +31,7 @@ describe('OverlayObserver', () => {
       element.style.height = '10px';
       document.body.appendChild(element);
 
-      overlayObserver.onElementVisible(element, callbackSpy.onVisible);
+      overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).toHaveBeenCalled();
     });
@@ -57,7 +57,7 @@ describe('OverlayObserver', () => {
       document.body.appendChild(element);
       document.body.appendChild(overlay);
 
-      overlayObserver.onElementVisible(element, callbackSpy.onVisible);
+      overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
     });
@@ -83,7 +83,7 @@ describe('OverlayObserver', () => {
       document.body.appendChild(element);
       document.body.appendChild(overlay);
 
-      overlayObserver.onElementVisible(element, callbackSpy.onVisible);
+      overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
 
