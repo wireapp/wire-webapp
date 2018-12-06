@@ -17,29 +17,29 @@
  *
  */
 
-export default class BasePanelViewModel {
-  constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot, repositories}) {
-    this.onClose = onClose;
-    this.onGoBack = onGoBack;
-    this.onGoToRoot = onGoToRoot;
-    this.navigateTo = navigateTo;
+.message-details {
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    color: fade(@graphite-dark, 32%);
+    font-size: 16px;
 
-    this.isVisible = isVisible;
+    &__icon {
+      svg {
+        width: 140px;
+        height: 140px;
+        fill: fade(@graphite-dark, 8%);
+      }
+    }
 
-    this.activeConversation = repositories.conversation.active_conversation;
-  }
-
-  initView() {}
-
-  getElementId() {
-    return 'conversation-details';
-  }
-
-  getEntityId() {
-    return this.activeConversation() ? this.activeConversation().id : false;
-  }
-
-  shouldSkipTransition() {
-    return false;
+    &__text {
+      width: 200px;
+      height: 60px;
+      margin-top: 16px;
+      text-align: center;
+    }
   }
 }

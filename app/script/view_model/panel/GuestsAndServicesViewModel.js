@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.GuestsAndServicesViewModel = class GuestsAndServicesViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
       CONFIRM_DURATION: 1500,
@@ -149,4 +146,4 @@ z.viewModel.panel.GuestsAndServicesViewModel = class GuestsAndServicesViewModel 
       this.stateHandler.getAccessCode(conversationEntity).then(() => this.requestOngoing(false));
     }
   }
-};
+}

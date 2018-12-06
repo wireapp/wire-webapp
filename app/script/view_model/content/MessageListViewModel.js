@@ -48,6 +48,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this._handleWindowResize = this._handleWindowResize.bind(this);
     this.focusMessage = this.focusMessage.bind(this);
     this.showParticipants = this.showParticipants.bind(this);
+    this.showMessageDetails = this.showMessageDetails.bind(this);
     this.show_detail = this.show_detail.bind(this);
 
     this.mainViewModel = mainViewModel;
@@ -648,5 +649,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   showParticipants(participants) {
     this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
+  }
+
+  showMessageDetails(message) {
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, message);
   }
 };

@@ -280,16 +280,6 @@ import PreferencesDevicesViewModelGlobal from '../view_model/content/Preferences
 import PreferencesOptionsViewModelGlobal from '../view_model/content/PreferencesOptionsViewModel.js';
 import TitleBarViewModelGlobal from '../view_model/content/TitleBarViewModel.js';
 import PanelViewModelGlobal from '../view_model/PanelViewModel.js';
-import BasePanelViewModelGlobal from '../view_model/panel/BasePanelViewModel.js';
-import AddParticipantsViewModelGlobal from '../view_model/panel/AddParticipantsViewModel.js';
-import ConversationDetailsViewModelGlobal from '../view_model/panel/ConversationDetailsViewModel.js';
-import ConversationParticipantsViewModelGlobal from '../view_model/panel/ConversationParticipantsViewModel.js';
-import GroupParticipantUserViewModelGlobal from '../view_model/panel/GroupParticipantUserViewModel.js';
-import GroupParticipantServiceViewModelGlobal from '../view_model/panel/GroupParticipantServiceViewModel.js';
-import GuestsAndServicesViewModelGlobal from '../view_model/panel/GuestsAndServicesViewModel.js';
-import NotificationsViewModelGlobal from '../view_model/panel/NotificationsViewModel.js';
-import TimedMessagesViewModelGlobal from '../view_model/panel/TimedMessagesViewModel.js';
-import ParticipantDevicesViewModelGlobal from '../view_model/panel/ParticipantDevicesViewModel.js';
 import ListViewModelGlobal from '../view_model/ListViewModel.js';
 import ArchiveViewModelGlobal from '../view_model/list/ArchiveViewModel.js';
 import ConversationListViewModelGlobal from '../view_model/list/ConversationListViewModel.js';

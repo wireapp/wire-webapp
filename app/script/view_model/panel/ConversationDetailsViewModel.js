@@ -17,16 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
-
 /* eslint-disable no-unused-vars */
 import receiptModeToggle from 'components/receiptModeToggle';
 /* eslint-enable no-unused-vars */
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 7,
@@ -324,4 +320,4 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   updateConversationReceiptMode(conversationEntity, receiptMode) {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
   }
-};
+}

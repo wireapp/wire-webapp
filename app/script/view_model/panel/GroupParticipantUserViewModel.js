@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -141,4 +138,4 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
       userEntity.checkGuestExpiration();
     }
   }
-};
+}

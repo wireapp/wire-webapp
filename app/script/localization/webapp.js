@@ -594,6 +594,16 @@ z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old ver
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';
 z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
 
+//Panel: Message details
+z.string.messageDetailsTitle = 'Details';
+z.string.messageDetailsTabReceipts = 'Read ({{count}})';
+z.string.messageDetailsTabLikes = 'Liked ({{count}})';
+z.string.messageDetailsSent = 'Sent: {{sent}}';
+z.string.messageDetailsEdited = 'Edited: {{edited}}';
+z.string.messageDetailsNoLikes = 'No one has liked this message yet.';
+z.string.messageDetailsReceiptsOff = 'Read receipts are turned off for this conversation.';
+z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
+
 // User profile actions
 z.string.userProfileButtonConnect = 'Connect';
 z.string.userProfileButtonIgnore = 'Ignore';

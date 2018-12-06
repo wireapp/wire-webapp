@@ -34,6 +34,7 @@ class Message {
     onClickMessage,
     onClickTimestamp,
     onClickParticipants,
+    onClickReceipts,
     onClickResetSession,
     onClickCancelRequest,
     onLike,
@@ -56,6 +57,7 @@ class Message {
     this.onClickMessage = onClickMessage;
     this.onClickTimestamp = onClickTimestamp;
     this.onClickParticipants = onClickParticipants;
+    this.onClickReceipts = onClickReceipts;
     this.onClickResetSession = onClickResetSession;
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
@@ -281,7 +283,14 @@ const normalTemplate = `
         <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
       <!-- /ko -->
       <!-- ko if: readReceiptText() -->
-        <span class="message-status-read" data-bind="css: {'message-status-read--visible': isLastDeliveredMessage(), 'with-tooltip with-tooltip--receipt': readReceiptTooltip()}, attr: {'data-tooltip': readReceiptTooltip()}" data-uie-name="status-message-read-receipts">
+        <span class="message-status-read" data-bind="
+            css: {'message-status-read--visible': isLastDeliveredMessage(), 
+              'with-tooltip with-tooltip--receipt': readReceiptTooltip(), 
+              'message-status-read--clickable': !conversation().is1to1()}, 
+            attr: {'data-tooltip': readReceiptTooltip()},
+            click: conversation().is1to1() ? null : onClickReceipts
+            " 
+            data-uie-name="status-message-read-receipts">
           <read-icon></read-icon>
           <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
         </span>

@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends z.viewModel.panel.BasePanelViewModel {
+export default class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -82,4 +80,4 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends 
   getElementId() {
     return 'timed-messages';
   }
-};
+}

@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends z.viewModel.panel.BasePanelViewModel {
+export default class NotificationsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -57,4 +55,4 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
   getElementId() {
     return 'notification-settings';
   }
-};
+}

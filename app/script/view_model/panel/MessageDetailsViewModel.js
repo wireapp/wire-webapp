@@ -17,45 +17,87 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
+import moment from 'moment';
 
-z.viewModel.panel.MessageDetailsViewModel = class MessageDetailsViewModel extends z.viewModel.panel.BasePanelViewModel {
+export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
+    this.isReceiptsOpen = ko.observable(true);
+    this.message = ko.observable();
+    this.conversation = ko.observable();
+    const userRepository = params.repositories.user;
 
-    const conversationRepository = params.repositories.conversation;
+    this.states = {
+      LIKES: 'likes',
+      NO_LIKES: 'no-likes',
+      NO_RECEIPTS: 'no-receipts',
+      RECEIPTS: 'receipts',
+      RECEIPTS_OFF: 'receipts-off',
+    };
 
-    this.settings = Object.values(z.conversation.NotificationSetting.STATE).map(status => ({
-      text: z.conversation.NotificationSetting.getText(status),
-      value: status,
-    }));
-
-    this.currentNotificationSetting = ko.observable();
-
-    const currentNotificationSettingSubscription = this.currentNotificationSetting.suspendableSubscribe(value => {
-      if (this.activeConversation()) {
-        conversationRepository.setNotificationState(this.activeConversation(), value);
+    this.state = ko.pureComputed(() => {
+      if (this.isReceiptsOpen()) {
+        if (!this.conversation().expectsReadConfirmation()) {
+          return this.states.RECEIPTS_OFF;
+        }
+        return this.receiptUsers().length ? this.states.RECEIPTS : this.states.NO_RECEIPTS;
       }
+      return this.likeUsers().length ? this.states.LIKES : this.states.NO_LIKES;
     });
 
-    ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().notificationState();
-    }).subscribe(setting => {
-      currentNotificationSettingSubscription.suspend();
-      this.currentNotificationSetting(setting);
-      currentNotificationSettingSubscription.unsuspend();
+    this.receiptUsers = ko.observableArray();
+    this.receiptTimes = ko.observableArray();
+
+    this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
+
+    this.receipts.subscribe(receipts => {
+      const userIds = receipts.map(({userId}) => userId);
+      userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users));
+      const receiptTimes = receipts.reduce(
+        (times, {userId, time}) => Object.assign(times, {[userId]: moment(time).format('DD.MM.YY, HH:MM')}),
+        {}
+      );
+      this.receiptTimes(receiptTimes);
     });
 
-    this.isRendered = ko.observable(false).extend({notify: 'always'});
+    this.likes = ko.pureComputed(() => {
+      return (this.message() && Object.keys(this.message().reactions())) || [];
+    });
 
-    this.shouldUpdateScrollbar = ko
-      .pureComputed(() => this.isRendered())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
+    this.likeUsers = ko.pureComputed(() => {
+      const users = this.conversation() ? this.conversation().participating_user_ets() : [];
+      return this.likes()
+        .map(userId => users.find(({id}) => id === userId))
+        .filter(user => user);
+    });
+
+    const formatTime = time => moment(time).format('DD.MM.YY, HH:MM');
+
+    this.sentFooter = ko.pureComputed(() => {
+      return this.message() && formatTime(this.message().timestamp());
+    });
+
+    this.editedFooter = ko.pureComputed(() => {
+      return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
+    });
+  }
+
+  clickOnReceipts() {
+    this.isReceiptsOpen(true);
+  }
+
+  clickOnLikes() {
+    this.isReceiptsOpen(false);
+  }
+
+  initView(messageView) {
+    this.isReceiptsOpen(true);
+    this.message(messageView.message);
+    this.conversation(messageView.conversation());
   }
 
   getElementId() {
-    return 'notification-settings';
+    return 'message-details';
   }
-};
+}
