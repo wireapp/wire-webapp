@@ -150,7 +150,6 @@ import ConversationVerificationStateGlobal from '../conversation/ConversationVer
 import ConversationVerificationStateHandlerGlobal from '../conversation/ConversationVerificationStateHandler.js';
 import EventBuilderGlobal from '../conversation/EventBuilder.js';
 import EventInfoEntityGlobal from '../conversation/EventInfoEntity.js';
-import EventMapperGlobal from '../conversation/EventMapper.js';
 import NotificationSettingGlobal from '../conversation/NotificationSetting.js';
 import CryptographyMapperGlobal from '../cryptography/CryptographyMapper.js';
 import CryptographyRepositoryGlobal from '../cryptography/CryptographyRepository.js';

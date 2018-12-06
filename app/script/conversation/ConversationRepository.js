@@ -19,6 +19,8 @@
 
 import poster from 'poster-image';
 
+import EventMapper from './EventMapper';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -89,7 +91,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversationMapper = new z.conversation.ConversationMapper();
-    this.event_mapper = new z.conversation.EventMapper();
+    this.event_mapper = new EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
       this.eventRepository,
