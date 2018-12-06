@@ -379,6 +379,7 @@ z.string.conversationContextMenuDownload = 'Download';
 z.string.conversationContextMenuLike = 'Like';
 z.string.conversationContextMenuReply = 'Reply';
 z.string.conversationContextMenuUnlike = 'Unlike';
+z.string.conversationContextMenuDetails = 'Details';
 z.string.conversationDeleteTimestamp = 'Deleted: {{date}}';
 z.string.conversationEditTimestamp = 'Edited: {{date}}';
 z.string.conversationLikesCaption = '{{number}} people';
@@ -596,12 +597,12 @@ z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
 
 //Panel: Message details
 z.string.messageDetailsTitle = 'Details';
-z.string.messageDetailsTabReceipts = 'Read ({{count}})';
-z.string.messageDetailsTabLikes = 'Liked ({{count}})';
+z.string.messageDetailsTitleLikes = 'Liked{{count}}';
+z.string.messageDetailsTitleReceipts = 'Read{{count}}';
 z.string.messageDetailsSent = 'Sent: {{sent}}';
 z.string.messageDetailsEdited = 'Edited: {{edited}}';
 z.string.messageDetailsNoLikes = 'No one has liked this message yet.';
-z.string.messageDetailsReceiptsOff = 'Read receipts are turned off for this conversation.';
+z.string.messageDetailsReceiptsOff = 'Read receipts were not on when this message was sent.';
 z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
 
 // User profile actions

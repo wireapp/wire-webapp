@@ -36,9 +36,13 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       RECEIPTS_OFF: 'receipts-off',
     };
 
+    const formatTime = time => moment(time).format('DD.MM.YY, HH:MM');
+
+    this.isMe = ko.pureComputed(() => this.message() && this.message().user().is_me);
+
     this.state = ko.pureComputed(() => {
-      if (this.isReceiptsOpen()) {
-        if (!this.conversation().expectsReadConfirmation()) {
+      if (this.isMe() && this.isReceiptsOpen()) {
+        if (!this.message().expectsReadConfirmation) {
           return this.states.RECEIPTS_OFF;
         }
         return this.receiptUsers().length ? this.states.RECEIPTS : this.states.NO_RECEIPTS;
@@ -55,7 +59,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       const userIds = receipts.map(({userId}) => userId);
       userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users));
       const receiptTimes = receipts.reduce(
-        (times, {userId, time}) => Object.assign(times, {[userId]: moment(time).format('DD.MM.YY, HH:MM')}),
+        (times, {userId, time}) => Object.assign(times, {[userId]: formatTime(time)}),
         {}
       );
       this.receiptTimes(receiptTimes);
@@ -72,15 +76,25 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
         .filter(user => user);
     });
 
-    const formatTime = time => moment(time).format('DD.MM.YY, HH:MM');
-
     this.sentFooter = ko.pureComputed(() => {
       return this.message() && formatTime(this.message().timestamp());
     });
 
+    this.receiptCount = ko.pureComputed(() => (this.receiptUsers().length ? ` (${this.receiptUsers().length})` : ''));
+    this.likeCount = ko.pureComputed(() => (this.likeUsers().length ? ` (${this.likeUsers().length})` : ''));
+
     this.editedFooter = ko.pureComputed(() => {
       return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
     });
+
+    this.shouldUpdateScrollbar = ko
+      .computed(() => {
+        this.receiptUsers();
+        this.likeUsers();
+        this.isReceiptsOpen();
+        this.isVisible();
+      })
+      .extend({notify: 'always', rateLimit: 100});
   }
 
   clickOnReceipts() {
@@ -91,7 +105,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.isReceiptsOpen(false);
   }
 
-  initView(messageView) {
+  getEntityId() {
+    return this.message().id;
+  }
+
+  initView({entity: messageView}) {
     this.isReceiptsOpen(true);
     this.message(messageView.message);
     this.conversation(messageView.conversation());

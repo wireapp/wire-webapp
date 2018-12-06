@@ -147,6 +147,13 @@ class Message {
       });
     }
 
+    if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => this.onClickReceipts(this),
+        label: z.l10n.text(z.string.conversationContextMenuDetails),
+      });
+    }
+
     if (messageEntity.is_deletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),

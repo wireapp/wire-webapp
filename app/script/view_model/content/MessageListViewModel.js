@@ -676,6 +676,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   showMessageDetails(message) {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, message);
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {entity: message});
   }
 };
