@@ -19,6 +19,7 @@
 
 import moment from 'moment';
 import $ from 'jquery';
+import {groupBy} from 'underscore';
 /* eslint-disable no-unused-vars */
 import mousewheel from 'jquery-mousewheel';
 /* eslint-enable no-unused-vars */
@@ -80,6 +81,23 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     // Can be used to prevent scroll handler from being executed (e.g. when using scrollTop())
     this.capture_scrolling_event = false;
+
+    // this buffer will collect all the read messages and send a read receipt in batch
+    this.readMessagesBuffer = ko.observableArray();
+
+    this.readMessagesBuffer
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 500}})
+      .subscribe(readMessages => {
+        if (readMessages.length) {
+          const groupedMessages = groupBy(readMessages, ({conversation, message}) => conversation.id + message.from);
+          Object.values(groupedMessages).forEach(readMessagesBatch => {
+            const {conversation, message: firstMessage} = readMessagesBatch.pop();
+            const otherMessages = readMessagesBatch.map(({message}) => message);
+            this.conversation_repository.sendReadReceipt(conversation, firstMessage, otherMessages);
+          });
+          this.readMessagesBuffer.removeAll();
+        }
+      });
 
     // Store message subscription id
     this.messagesChangeSubscription = undefined;
@@ -584,27 +602,29 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Message appeared in viewport.
+   * @param {z.entity.Conversation} conversationEntity - Conversation the message belongs to
    * @param {z.entity.Message} messageEntity - Message to check
    * @returns {Function|null} Callback or null
    */
-  getInViewportCallback(messageEntity) {
-    const conversationTimestamp = this.conversation().last_read_timestamp();
+  getInViewportCallback(conversationEntity, messageEntity) {
+    const conversationTimestamp = conversationEntity.last_read_timestamp();
     const messageTimestamp = messageEntity.timestamp();
     const callbacks = [];
 
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
-      if (this.conversation().is1to1() && isCreationMessage) {
+      if (conversationEntity.is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
     }
 
     const sendReadReceipt = () => {
-      this.conversation_repository.sendReadReceipt(this.conversation(), messageEntity, [], true);
+      // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
+      this.readMessagesBuffer.push({conversation: conversationEntity, message: messageEntity});
     };
 
     const startTimer = () => {
-      if (messageEntity.conversation_id === this.conversation().id) {
+      if (messageEntity.conversation_id === conversationEntity.id) {
         this.conversation_repository.checkMessageTimer(messageEntity);
       }
     };
@@ -613,7 +633,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       callbacks.push(startTimer);
     }
 
-    if (messageTimestamp > conversationTimestamp && !messageEntity.user().is_me) {
+    const isUnreadMessage = messageTimestamp > conversationTimestamp;
+    const isNotOwnMessage = !messageEntity.user().is_me;
+    const expectsConfirmation = messageEntity.expectsReadConfirmation;
+    const shouldSendReadReceipt = this.conversation_repository.shouldSendReadReceipt(conversationEntity);
+    if (isUnreadMessage && isNotOwnMessage && expectsConfirmation && shouldSendReadReceipt) {
       callbacks.push(sendReadReceipt);
     }
 
