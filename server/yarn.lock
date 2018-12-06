@@ -140,10 +140,10 @@
   dependencies:
     "@types/express" "*"
 
-"@types/jasmine@3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.3.0.tgz#6b0e4b0192367d77e438ff660ccc4487c9602e7b"
-  integrity sha512-0VU8WsYEOYmoxVtUuafB66/+9G8gMdGAC3dhCE/CMpjXgNIz9fwC6g41kRlNxFgpQI/uX/aWNLArNg7KmeFYvw==
+"@types/jasmine@3.3.1":
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.3.1.tgz#b6c4f356013364e98b583647c7b3b6de6fccd2cc"
+  integrity sha512-JnKB+cEIFuQZXizZP6N0zxma+JlvowkjefWuL61otVmXN7Ebbs4ka3IbDVIz1pc+TCiT00q925jANz3gQJ9qXw==
 
 "@types/mime@*":
   version "2.0.0"
@@ -829,10 +829,10 @@ dont-sniff-mimetype@1.0.0:
   resolved "https://registry.yarnpkg.com/dont-sniff-mimetype/-/dont-sniff-mimetype-1.0.0.tgz#5932890dc9f4e2f19e5eb02a20026e5e5efc8f58"
   integrity sha1-WTKJDcn04vGeXrAqIAJuXl78j1g=
 
-dotenv@6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.1.0.tgz#9853b6ca98292acb7dec67a95018fa40bccff42c"
-  integrity sha512-/veDn2ztgRlB7gKmE3i9f6CmDIyXAy6d5nBq+whO9SLX+Zs1sXEgFLPi+aSuWqUuusMfbi84fT8j34fs1HaYUw==
+dotenv@6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.2.0.tgz#941c0410535d942c8becf28d3f357dbd9d476064"
+  integrity sha512-HygQCKUBSFl8wKQZBSemMywRWcEDNidvNbjGVyZu3nbZ8qq9ubiPoGLMdRDpfSrpkkm9BXYFkpKxxFX38o/76w==
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -1607,10 +1607,10 @@ jasmine-core@~3.3.0:
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.3.0.tgz#dea1cdc634bc93c7e0d4ad27185df30fa971b10e"
   integrity sha512-3/xSmG/d35hf80BEN66Y6g9Ca5l/Isdeg/j6zvbTYlTzeKinzmaTM4p9am5kYqOmE05D7s1t8FGjzdSnbUbceA==
 
-jasmine@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.3.0.tgz#4f64e4aba2f9cbd30418957468c024c3b4c82551"
-  integrity sha512-haZzMvmoWSI2VCKfDgPqyEOPBQA7C1fgtIMgKNU4hVMcrVkWU5NPOWQqOTA6mVFyKcSUUrnkXu/ZEgY0bRnd6A==
+jasmine@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.3.1.tgz#d61bb1dd8888859bd11ea83074a78ee13d949905"
+  integrity sha512-/vU3/H7U56XsxIXHwgEuWpCgQ0bRi2iiZeUpx7Nqo8n1TpoDHfZhkPIc7CO8I4pnMzYsi3XaSZEiy8cnTfujng==
   dependencies:
     glob "^7.0.6"
     jasmine-core "~3.3.0"
