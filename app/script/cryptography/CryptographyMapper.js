@@ -265,6 +265,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         message_id: confirmation.first_message_id,
+        more_message_ids: confirmation.more_message_ids || [],
         status: (() => {
           switch (confirmation.type) {
             case z.proto.Confirmation.Type.DELIVERED:

@@ -1670,7 +1670,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = []) {
-    this.sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.READ, moreMessageEntities);
+    this._sendConfirmationStatus(
+      conversationEntity,
+      messageEntity,
+      z.proto.Confirmation.Type.READ,
+      moreMessageEntities
+    );
   }
 
   //##############################################################################
@@ -1858,7 +1863,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
    * @returns {undefined} No return value
    */
-  sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
+  _sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
     if (messageEntity.user().is_me || !typeToConfirm) {
@@ -1881,8 +1886,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
 
     this.sending_queue.push(() => {
-      return this.create_recipients(conversationEntity.id, true, [messageEntity.user().id]).then(recipients => {
-        const options = {nativePush: false, precondition: [messageEntity.user().id], recipients};
+      return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
 
         return this._sendGenericMessage(eventInfoEntity);
@@ -3022,7 +3027,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
-          this.sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.DELIVERED);
+          this._sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.DELIVERED);
         }
 
         if (!eventFromStream) {
