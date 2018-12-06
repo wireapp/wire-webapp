@@ -66,9 +66,7 @@ class Message {
     this.actionsViewModel = actionsViewModel;
 
     this.showLikes = ko.observable(false);
-    this.hasReadReceiptsTurnedOn =
-      this.conversationRepository.active_conversation() &&
-      this.conversationRepository.active_conversation().expectsReadConfirmation();
+    this.hasReadReceiptsTurnedOn = this.conversation().expectsReadConfirmation();
 
     this.bindShowMore = this.bindShowMore.bind(this);
 
