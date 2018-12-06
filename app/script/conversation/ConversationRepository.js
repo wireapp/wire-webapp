@@ -3538,7 +3538,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _onReceiptModeChanged(conversationEntity, eventJson) {
     return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
-      this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data});
+      this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
       return {conversationEntity, messageEntity};
     });
   }
