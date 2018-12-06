@@ -392,6 +392,10 @@ z.conversation.EventMapper = class EventMapper {
       messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
     }
 
+    if (eventData.expects_read_confirmation) {
+      messageEntity.expectsReadConfirmation = eventData.expects_read_confirmation;
+    }
+
     if (readReceipts) {
       messageEntity.readReceipts(readReceipts);
     }
