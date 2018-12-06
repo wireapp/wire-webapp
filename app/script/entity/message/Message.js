@@ -69,6 +69,7 @@ class Message {
     });
 
     this.conversation_id = '';
+    this.expectsReadConfirmation = false;
     this.from = '';
     this.primary_key = undefined;
     this.status = ko.observable(z.message.StatusType.UNSPECIFIED);
