@@ -2826,7 +2826,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
+    const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
     return this._pushToReceivingQueue(eventJson, eventSource);

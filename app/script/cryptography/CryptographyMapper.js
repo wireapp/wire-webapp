@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.CryptographyMapper = class CryptographyMapper {
+export default class CryptographyMapper {
   static get CONFIG() {
     return {
       MAX_MENTIONS_PER_MESSAGE: 500,
@@ -54,7 +51,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
     switch (genericMessage.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET: {
-        specificContent = this._mapAsset(genericMessage.asset);
+        specificContent = addExpectReadReceiptData(this._mapAsset(genericMessage.asset), genericMessage.asset);
         break;
       }
 
@@ -99,12 +96,15 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE: {
-        specificContent = this._mapImage(genericMessage.image, event.data.id);
+        specificContent = addExpectReadReceiptData(
+          this._mapImage(genericMessage.image, event.data.id),
+          genericMessage.image
+        );
         break;
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
-        specificContent = this._mapKnock(genericMessage.knock);
+        specificContent = addExpectReadReceiptData(this._mapKnock(genericMessage.knock), genericMessage.knock);
         break;
       }
 
@@ -114,7 +114,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION: {
-        specificContent = this._mapLocation(genericMessage.location);
+        specificContent = addExpectReadReceiptData(this._mapLocation(genericMessage.location), genericMessage.location);
         break;
       }
 
@@ -124,7 +124,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT: {
-        specificContent = this._mapText(genericMessage.text);
+        specificContent = addExpectReadReceiptData(this._mapText(genericMessage.text), genericMessage.text);
         break;
       }
 
@@ -147,10 +147,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapAsset(asset) {
-    const {expects_read_confirmation, original, preview, uploaded, not_uploaded: notUploaded} = asset;
-    let data = {
-      expects_read_confirmation,
-    };
+    const {original, preview, uploaded, not_uploaded: notUploaded} = asset;
+    let data = {};
 
     if (original) {
       data = {
@@ -364,7 +362,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data: {
         content_length: image.size,
         content_type: image.mime_type,
-        expects_read_confirmation: image.expects_read_confirmation,
         id: eventId,
         info: {
           height: image.height,
@@ -380,9 +377,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
   _mapKnock(knock) {
     return {
-      data: {
-        expects_read_confirmation: knock.expects_read_confirmation,
-      },
+      data: {},
       type: z.event.Client.CONVERSATION.KNOCK,
     };
   }
@@ -400,7 +395,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   _mapLocation(location) {
     return {
       data: {
-        expects_read_confirmation: location.expects_read_confirmation,
         location: {
           latitude: location.latitude,
           longitude: location.longitude,
@@ -423,12 +417,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapText(text) {
-    const {
-      expects_read_confirmation,
-      link_preview: protoLinkPreviews,
-      mentions: protoMentions,
-      quote: protoQuote,
-    } = text;
+    const {link_preview: protoLinkPreviews, mentions: protoMentions, quote: protoQuote} = text;
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
@@ -438,7 +427,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         content: `${text.content}`,
-        expects_read_confirmation,
         mentions: protoMentions.map(protoMention => protoMention.encode64()),
         previews: protoLinkPreviews.map(protoLinkPreview => protoLinkPreview.encode64()),
         quote: protoQuote && protoQuote.encode64(),
@@ -446,4 +434,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   }
-};
+}
+
+function addExpectReadReceiptData(mappedEvent, rawEvent) {
+  mappedEvent.data = Object.assign({}, mappedEvent.data, {
+    expects_read_confirmation: rawEvent.expects_read_confirmation,
+  });
+  return mappedEvent;
+}

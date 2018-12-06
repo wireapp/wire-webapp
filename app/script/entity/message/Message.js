@@ -68,6 +68,8 @@ class Message {
       return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
+    this.readReceipts = ko.observableArray([]);
+
     this.conversation_id = '';
     this.expectsReadConfirmation = false;
     this.from = '';
