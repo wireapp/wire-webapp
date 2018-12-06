@@ -21,44 +21,33 @@ import {APIClient} from '@wireapp/api-client';
 import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-import * as logdown from 'logdown';
 import NotificationBackendRepository from './NotificationBackendRepository';
 import NotificationDatabaseRepository from './NotificationDatabaseRepository';
 
 export default class NotificationService {
-  private readonly logger: logdown.Logger;
-
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
 
   constructor(private readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(this.storeEngine);
-    this.logger = logdown('@wireapp/core/notification/NotificationService', {
-      logger: console,
-      markdown: false,
-    });
   }
 
   public initializeNotificationStream(clientId: string): Promise<string> {
-    this.logger.log('initializeNotificationStream');
     return this.setLastEventDate(new Date(0))
       .then(() => this.backend.getLastNotification(clientId))
       .then(notification => this.setLastNotificationId(notification));
   }
 
   public hasHistory(): Promise<boolean> {
-    this.logger.log('hasHistory');
     return this.getNotificationEventList().then(notificationEvents => !!notificationEvents.length);
   }
 
   public getNotificationEventList(): Promise<NotificationEvent[]> {
-    this.logger.log('getNotificationEventList');
     return this.database.getNotificationEventList();
   }
 
   public setLastEventDate(eventDate: Date): Promise<Date> {
-    this.logger.log('setLastEventDate');
     return this.database
       .getLastEventDate()
       .then(databaseLastEventDate => {
@@ -76,10 +65,9 @@ export default class NotificationService {
   }
 
   public setLastNotificationId(lastNotification: Notification): Promise<string> {
-    this.logger.log('setLastNotificationId');
     return this.database
       .getLastNotificationId()
       .then(() => this.database.updateLastNotificationId(lastNotification))
-      .catch(error => this.database.createLastNotificationId(lastNotification));
+      .catch(() => this.database.createLastNotificationId(lastNotification));
   }
 }

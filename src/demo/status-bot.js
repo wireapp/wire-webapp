@@ -28,7 +28,7 @@ const {Account} = require('@wireapp/core');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 const {name, version} = require('../../package.json');
-const logger = logdown('@wireapp/core/StatusBot', {
+const logger = logdown('@wireapp/core/demo/StatusBot', {
   logger: console,
   markdown: false,
 });
