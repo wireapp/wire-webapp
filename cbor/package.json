@@ -34,5 +34,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "dist/index.d.ts",
-  "version": "3.0.107"
+  "version": "3.0.108"
 }
