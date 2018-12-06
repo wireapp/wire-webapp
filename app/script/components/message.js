@@ -66,6 +66,7 @@ class Message {
     this.actionsViewModel = actionsViewModel;
 
     this.showLikes = ko.observable(false);
+    this.hasReadReceiptsTurnedOn = this.conversation().expectsReadConfirmation();
 
     this.bindShowMore = this.bindShowMore.bind(this);
 
@@ -520,7 +521,7 @@ const memberTemplate = `
           <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
         </div>
       <!-- /ko -->
-      <!-- ko if: true -->
+      <!-- ko if: hasReadReceiptsTurnedOn -->
         <div class="message-header" data-uie-name="label-group-creation-receipts">
           <div class="message-header-icon message-header-icon--svg text-graphite">
             <read-icon></read-icon>
