@@ -12,7 +12,7 @@
     "@types/libsodium-wrappers-sumo": "0.7.0",
     "bower": "1.8.4",
     "chai": "4.2.0",
-    "jasmine": "3.3.0",
+    "jasmine": "3.3.1",
     "rimraf": "2.6.2",
     "typescript": "3.2.1",
     "webpack": "4.26.1",

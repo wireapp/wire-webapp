@@ -2,7 +2,7 @@
   "description": "Base64 encoding and decoding with ASCII string representation.",
   "devDependencies": {
     "cross-env": "5.2.0",
-    "jasmine": "3.3.0",
+    "jasmine": "3.3.1",
     "karma": "3.1.1",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.2",

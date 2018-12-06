@@ -25,7 +25,7 @@
     "gulp-eslint": "5.0.0",
     "gulp-util": "3.0.8",
     "gutil": "1.6.4",
-    "jasmine": "3.3.0",
+    "jasmine": "3.3.1",
     "karma": "3.1.1",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "2.0.1",
