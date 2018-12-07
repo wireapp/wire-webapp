@@ -10497,10 +10497,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-3.1.0.tgz#bf317eb5d49bcf59ca2daac5f779804eaa14e732"
-  integrity sha512-6/MjPqtboORov5MOkqYAyd5JLSgG/N4u6n+8f7hnDxPIz94M6ygnE2VMm3RnasneHMTEIkCpRuNNTNwurvJBww==
+simplebar@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-3.1.1.tgz#ddd9d854205baf45cb6e4a62a5e8952218a0a9fa"
+  integrity sha512-R3PUPtpLp8kCqFTQcwoeL9YYpA4laa4zZHmJ8kMN1XLOXeydTddJ63292qMOxWfCI3Ecnuqds/g2xMoZL7vqIA==
   dependencies:
     can-use-dom "^0.1.0"
     lodash.debounce "^4.0.8"
