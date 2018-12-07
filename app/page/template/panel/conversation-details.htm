@@ -116,9 +116,11 @@
                     </div>
                   </div>
                 <!-- /ko -->
-                <div class="conversation-details__read-receipts">
-                  <read-receipt-toggle params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"></read-receipt-toggle>
-                </div>
+                <!-- ko if: showOptionReadReceipts() -->
+                  <div class="conversation-details__read-receipts">
+                    <read-receipt-toggle params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"></read-receipt-toggle>
+                  </div>
+                <!-- /ko -->
               <!-- /ko -->
             </div>
           <!-- /ko -->
