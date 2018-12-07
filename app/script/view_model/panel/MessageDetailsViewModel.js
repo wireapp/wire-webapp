@@ -82,7 +82,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.receiptCountString = ko.pureComputed(() =>
       this.receiptUsers().length ? ` (${this.receiptUsers().length})` : ''
     );
-    this.likeCountString = ko.pureComputed(() => (this.likeUsers().length ? ` (${this.likeUsers().length})` : ''));
+
+    this.likeCountString = ko.pureComputed(() => {
+      const likeUsers = this.likeUsers().length;
+      return likeUsers ? ` (${likeUsers})` : '';
+     });
 
     this.editedFooter = ko.pureComputed(() => {
       return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
