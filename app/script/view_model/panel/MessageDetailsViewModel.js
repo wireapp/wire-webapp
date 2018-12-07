@@ -66,7 +66,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes = ko.pureComputed(() => {
-      return (this.message() && Object.keys(this.message().reactions())) || [];
+      const message = this.message();
+      return message ? Object.keys(message.reactions()) : [];
     });
 
     this.likes.subscribe(likes => {
