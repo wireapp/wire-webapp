@@ -176,7 +176,12 @@ z.entity.Conversation = class Conversation {
     this.globalMessageTimer = ko.observable(null);
 
     this.receiptMode = ko.observable(0);
-    this.expectsReadConfirmation = ko.pureComputed(() => !!this.receiptMode());
+    this.expectsReadConfirmation = ko.pureComputed(() => {
+      if (this.is1to1() || this.inTeam()) {
+        return !!this.receiptMode();
+      }
+      return false;
+    });
 
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
