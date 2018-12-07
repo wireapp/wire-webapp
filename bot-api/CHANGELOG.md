@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.0.6...@wireapp/bot-api@3.1.0) (2018-12-07)
+
+
+### Features
+
+* **core:** Add error emit ([#1371](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1371)) ([5e8c159](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/5e8c159))
+
+
+
+
+
 ## [3.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.0.5...@wireapp/bot-api@3.0.6) (2018-12-06)
 
 **Note:** Version bump only for package @wireapp/bot-api

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@4.0.52...@wireapp/cli-client@4.1.0) (2018-12-07)
+
+
+### Features
+
+* **core:** Add error emit ([#1371](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/1371)) ([5e8c159](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/5e8c159))
+
+
+
+
+
 ## [4.0.52](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@4.0.51...@wireapp/cli-client@4.0.52) (2018-12-06)
 
 **Note:** Version bump only for package @wireapp/cli-client
