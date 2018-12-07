@@ -675,7 +675,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
   }
 
-  showMessageDetails(message) {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {entity: message});
+  showMessageDetails(message, showLikes) {
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
+      entity: message,
+      showLikes,
+    });
   }
 };

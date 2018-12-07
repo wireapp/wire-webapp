@@ -37,6 +37,7 @@
             onClickResetSession: $parent.on_session_reset_click,
             onClickCancelRequest: $parent.click_on_cancel_request,
             onClickReceipts: $parent.showMessageDetails,
+            onClickLikes: view => $parent.showMessageDetails(view, true),
             onLike: $parent.click_on_like,
             actionsViewModel: $parent.actionsViewModel"
           data-bind="css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>
