@@ -5,7 +5,7 @@
 >
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <div class="panel__header__title" data-bind="l10n_text: isMe() ? z.string.messageDetailsTitle : {id: z.string.messageDetailsTitleLikes, substitute: likeCountReplacement()}"></div>
+      <div class="panel__header__title" data-bind="l10n_text: isMe() ? z.string.messageDetailsTitle : {id: z.string.messageDetailsTitleLikes, substitute: likeCountString()}"></div>
       <close-icon
         class="right-panel-close icon-button"
         data-bind="clickOrDrag: onClose"
@@ -17,12 +17,12 @@
         <div class="panel__tabs">
           <div
             class="panel__tab"
-            data-bind="css: {'panel__tab--active': isReceiptsOpen()}, click: clickOnReceipts, l10n_text: {id: z.string.messageDetailsTitleReceipts, substitute: receiptCountReplacement()}"
+            data-bind="css: {'panel__tab--active': isReceiptsOpen()}, click: clickOnReceipts, l10n_text: {id: z.string.messageDetailsTitleReceipts, substitute: receiptCountString()}"
             data-uie-name="message-details-read-tab"
             ></div>
           <div
             class="panel__tab"
-            data-bind="css: {'panel__tab--active': !isReceiptsOpen()}, click: clickOnLikes, l10n_text: {id: z.string.messageDetailsTitleLikes, substitute: likeCountReplacement()}"
+            data-bind="css: {'panel__tab--active': !isReceiptsOpen()}, click: clickOnLikes, l10n_text: {id: z.string.messageDetailsTitleLikes, substitute: likeCountString()}"
             data-uie-name="message-details-like-tab"
           ></div>
         </div>
