@@ -25,7 +25,6 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     super(params);
     this.isReceiptsOpen = ko.observable(true);
     this.message = ko.observable();
-    this.conversation = ko.observable();
     const userRepository = params.repositories.user;
 
     this.states = {
@@ -51,7 +50,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.receiptUsers = ko.observableArray();
-    this.receiptTimes = ko.observableArray();
+    this.receiptTimes = ko.observable({});
+    this.likeUsers = ko.observableArray();
 
     this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
 
@@ -69,19 +69,19 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       return (this.message() && Object.keys(this.message().reactions())) || [];
     });
 
-    this.likeUsers = ko.pureComputed(() => {
-      const users = this.conversation() ? this.conversation().participating_user_ets() : [];
-      return this.likes()
-        .map(userId => users.find(({id}) => id === userId))
-        .filter(user => user);
+    this.likes.subscribe(likes => {
+      const userIds = likes.map(({userId}) => userId);
+      userRepository.get_users_by_id(userIds).then(users => this.likeUsers(users));
     });
 
     this.sentFooter = ko.pureComputed(() => {
       return this.message() && formatTime(this.message().timestamp());
     });
 
-    this.receiptCount = ko.pureComputed(() => (this.receiptUsers().length ? ` (${this.receiptUsers().length})` : ''));
-    this.likeCount = ko.pureComputed(() => (this.likeUsers().length ? ` (${this.likeUsers().length})` : ''));
+    this.receiptCountReplacement = ko.pureComputed(() =>
+      this.receiptUsers().length ? ` (${this.receiptUsers().length})` : ''
+    );
+    this.likeCountReplacement = ko.pureComputed(() => (this.likeUsers().length ? ` (${this.likeUsers().length})` : ''));
 
     this.editedFooter = ko.pureComputed(() => {
       return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
@@ -112,7 +112,6 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
   initView({entity: messageView}) {
     this.isReceiptsOpen(true);
     this.message(messageView.message);
-    this.conversation(messageView.conversation());
   }
 
   getElementId() {
