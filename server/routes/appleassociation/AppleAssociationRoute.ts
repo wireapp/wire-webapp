@@ -22,21 +22,19 @@ import {ServerConfig} from '../../ServerConfig';
 
 const AppleAssociationRoute = (config: ServerConfig) =>
   Router().get('/apple-app-site-association', (req, res) => {
-    const response = `
-    {
-      "webcredentials": {
-        "apps": [
-          "EDF3JCE8BC.com.wearezeta.zclient.ios",
-          "W5KEQBF9B5.com.wearezeta.zclient-alpha",
-          "W5KEQBF9B5.com.wearezeta.zclient.ios-development",
-          "W5KEQBF9B5.com.wearezeta.zclient.ios-internal",
-          "W5KEQBF9B5.com.wearezeta.zclient.ios-release"
-        ]
-      }
-    }
-    `;
+    const response = {
+      webcredentials: {
+        apps: [
+          'EDF3JCE8BC.com.wearezeta.zclient.ios',
+          'W5KEQBF9B5.com.wearezeta.zclient-alpha',
+          'W5KEQBF9B5.com.wearezeta.zclient.ios-development',
+          'W5KEQBF9B5.com.wearezeta.zclient.ios-internal',
+          'W5KEQBF9B5.com.wearezeta.zclient.ios-release',
+        ],
+      },
+    };
 
-    res.type('application/json').send(response);
+    res.send(response);
   });
 
 export default AppleAssociationRoute;
