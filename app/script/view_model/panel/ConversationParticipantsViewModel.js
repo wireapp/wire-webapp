@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticipantsViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class ConversationParticipantsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
@@ -60,4 +57,4 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
     this.searchInput('');
     this.highlightedUsers(highlightedUsers);
   }
-};
+}

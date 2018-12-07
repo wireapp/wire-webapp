@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -183,4 +180,4 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
-};
+}

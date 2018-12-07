@@ -17,51 +17,42 @@
  *
  */
 
-.add-participants {
-  user-input {
-    margin: 8px;
-  }
-
-  &__content {
+.message-details {
+  &__empty {
+    position: absolute;
     display: flex;
+    width: 100%;
+    height: 100%;
     flex-direction: column;
     flex-grow: 1;
-  }
+    align-items: center;
+    justify-content: center;
+    color: fade(@graphite-dark, 32%);
+    font-size: 16px;
+    font-weight: @font-weight-bold;
 
-  &__list {
-    flex-grow: 1;
-    & > .panel__content__scroll {
-      flex-grow: 1;
+    &__icon {
+      svg {
+        width: 140px;
+        height: 140px;
+        fill: fade(@graphite-dark, 8%);
+      }
+    }
+
+    &__text {
+      width: 230px;
+      height: 60px;
+      margin-top: 16px;
+      text-align: center;
     }
   }
 
-  &__service-header {
+  .panel__footer {
     display: flex;
-    padding: 8px 16px;
-  }
-
-  &__service-details {
-    margin-left: 16px;
-  }
-
-  &__service-name {
-    font-size: 24px;
-    font-weight: @font-weight-regular;
-  }
-
-  &__service-provider {
-    color: fade(@graphite-dark, 40%);
-    font-size: 12px;
-    font-weight: @font-weight-regular;
-  }
-
-  &__service-description {
-    padding: 16px;
-    font-size: 14px;
-    font-weight: @font-weight-light;
-  }
-
-  &__footer {
-    padding: 8px;
+    height: @conversation-input-min-height;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #eee;
   }
 }

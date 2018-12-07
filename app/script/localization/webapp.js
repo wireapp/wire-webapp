@@ -379,6 +379,7 @@ z.string.conversationContextMenuDownload = 'Download';
 z.string.conversationContextMenuLike = 'Like';
 z.string.conversationContextMenuReply = 'Reply';
 z.string.conversationContextMenuUnlike = 'Unlike';
+z.string.conversationContextMenuDetails = 'Details';
 z.string.conversationDeleteTimestamp = 'Deleted: {{date}}';
 z.string.conversationEditTimestamp = 'Edited: {{date}}';
 z.string.conversationLikesCaption = '{{number}} people';
@@ -593,6 +594,16 @@ z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old ver
 
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';
 z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
+
+// Panel: Message details
+z.string.messageDetailsTitle = 'Details';
+z.string.messageDetailsTitleLikes = 'Liked{{count}}';
+z.string.messageDetailsTitleReceipts = 'Read{{count}}';
+z.string.messageDetailsSent = 'Sent: {{sent}}';
+z.string.messageDetailsEdited = 'Edited: {{edited}}';
+z.string.messageDetailsNoLikes = 'No one has liked this message yet.';
+z.string.messageDetailsReceiptsOff = 'Read receipts were not on when this message was sent.';
+z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
 
 // User profile actions
 z.string.userProfileButtonConnect = 'Connect';
