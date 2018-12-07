@@ -97,7 +97,7 @@ z.storage.StorageService = class StorageService {
     }
     this.db[storeName].hook('updating', function(modifications, primaryKey, obj, transaction) {
       // we need to wait for the transaction to be finished in order to be able to access the DB later on
-      this.onsuccess = updatedEvent => transaction.on('complete', callback(updatedEvent));
+      this.onsuccess = updatedRecord => transaction.on('complete', () => callback(updatedRecord));
     });
   }
 
