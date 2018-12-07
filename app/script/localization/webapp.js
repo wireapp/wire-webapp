@@ -595,7 +595,7 @@ z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old ver
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';
 z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
 
-//Panel: Message details
+// Panel: Message details
 z.string.messageDetailsTitle = 'Details';
 z.string.messageDetailsTitleLikes = 'Liked{{count}}';
 z.string.messageDetailsTitleReceipts = 'Read{{count}}';
