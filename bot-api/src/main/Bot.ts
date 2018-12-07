@@ -105,6 +105,7 @@ class Bot {
 
     await this.account.login(login);
     await this.account.listen();
+    this.account.on('error', error => this.logger.error(error));
 
     this.handlers.forEach(handler => (handler.account = this.account));
   }

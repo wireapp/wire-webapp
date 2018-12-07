@@ -83,6 +83,8 @@ class TravisBot {
     await account.login(this.loginData);
     await account.listen();
 
+    account.on('error', error => console.error(error));
+
     if (!conversationIds) {
       const allConversations = await client.conversation.api.getAllConversations();
       const groupConversations = allConversations.filter(conversation => conversation.type === 0);

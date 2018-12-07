@@ -68,6 +68,8 @@ storeEngine
       );
     });
 
+    account.on('error', error => console.error(error));
+
     return account
       .login(loginData)
       .then(() => account.listen())

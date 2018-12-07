@@ -568,7 +568,15 @@ class Account extends EventEmitter {
 
   private async handleNotification(notification: IncomingNotification): Promise<void> {
     for (const event of notification.payload) {
-      const data = await this.handleEvent(event);
+      let data;
+
+      try {
+        data = await this.handleEvent(event);
+      } catch (error) {
+        this.emit('error', error);
+        continue;
+      }
+
       if (data) {
         switch (data.type) {
           case PayloadBundleType.ASSET_IMAGE:
