@@ -38,7 +38,8 @@
     "typescript": "3.2.2"
   },
   "scripts": {
-    "build": "tsc -P tsconfig.json",
+    "build": "yarn clean && tsc -P tsconfig.json && node ./bin/copy_server_assets.js",
+    "clean": "rimraf ./dist/",
     "fix": "yarn fix:ts",
     "fix:ts": "yarn lint:ts --fix",
     "lint": "yarn lint:ts",
