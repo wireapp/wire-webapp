@@ -104,9 +104,6 @@
                     </div>
                   </div>
                 <!-- /ko -->
-                <div class="conversation-details__read-receipts">
-                  <read-receipt-toggle params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"></read-receipt-toggle>
-                </div>
                 <!-- ko if: showOptionGuests() -->
                   <div class="conversation-details__guest-options">
                     <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
@@ -119,6 +116,9 @@
                     </div>
                   </div>
                 <!-- /ko -->
+                <div class="conversation-details__read-receipts">
+                  <read-receipt-toggle params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"></read-receipt-toggle>
+                </div>
               <!-- /ko -->
             </div>
           <!-- /ko -->

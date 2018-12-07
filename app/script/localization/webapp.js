@@ -605,6 +605,11 @@ z.string.messageDetailsNoLikes = 'No one has liked this message yet.';
 z.string.messageDetailsReceiptsOff = 'Read receipts were not on when this message was sent.';
 z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
 
+// Read receipt toggle 
+z.string.receiptToggleLabel = 'Read receipts';
+z.string.receiptToggleInfo = 'When this is on, people can see when their messages in this conversation are read.';
+
+
 // User profile actions
 z.string.userProfileButtonConnect = 'Connect';
 z.string.userProfileButtonIgnore = 'Ignore';
