@@ -12,7 +12,7 @@
     "karma-spec-reporter": "0.0.32",
     "libsodium-wrappers": "0.7.3",
     "rimraf": "2.6.2",
-    "typescript": "3.2.1",
+    "typescript": "3.2.2",
     "webpack": "4.27.1"
   },
   "files": [
