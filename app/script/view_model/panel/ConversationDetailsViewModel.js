@@ -149,7 +149,10 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.showOptionReadReceipts = ko.pureComputed(() => {
-      return this.activeConversation().is1to1() || this.activeConversation().inTeam();
+      return (
+        (this.activeConversation().is1to1() && this.activeConversation().expectsReadConfirmation()) ||
+        this.activeConversation().inTeam()
+      );
     });
 
     this.hasAdvancedNotifications = ko.pureComputed(() => {
