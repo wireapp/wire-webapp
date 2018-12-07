@@ -187,6 +187,25 @@ class Message {
   }
 }
 
+const receiptStatusTemplate = `
+  <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
+    <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
+  <!-- /ko -->
+  <!-- ko if: readReceiptText() -->
+    <span class="message-status-read" data-bind="
+        css: {'message-status-read--visible': isLastDeliveredMessage(),
+          'with-tooltip with-tooltip--receipt': readReceiptTooltip(),
+          'message-status-read--clickable': !conversation().is1to1()},
+        attr: {'data-tooltip': readReceiptTooltip()},
+        click: conversation().is1to1() ? null : onClickReceipts
+        "
+        data-uie-name="status-message-read-receipts">
+      <read-icon></read-icon>
+      <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
+    </span>
+  <!-- /ko -->
+`;
+
 const normalTemplate = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
@@ -287,22 +306,7 @@ const normalTemplate = `
       <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
-        <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
-      <!-- /ko -->
-      <!-- ko if: readReceiptText() -->
-        <span class="message-status-read" data-bind="
-            css: {'message-status-read--visible': isLastDeliveredMessage(), 
-              'with-tooltip with-tooltip--receipt': readReceiptTooltip(), 
-              'message-status-read--clickable': !conversation().is1to1()}, 
-            attr: {'data-tooltip': readReceiptTooltip()},
-            click: conversation().is1to1() ? null : onClickReceipts
-            " 
-            data-uie-name="status-message-read-receipts">
-          <read-icon></read-icon>
-          <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
-        </span>
-      <!-- /ko -->
+      ${receiptStatusTemplate}
     </div>
 
   </div>
@@ -397,6 +401,7 @@ const pingTemplate = `
     </div>
     <div class="message-body-actions">
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+      ${receiptStatusTemplate}
     </div>
   </div>
   `;

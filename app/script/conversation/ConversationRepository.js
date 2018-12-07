@@ -19,6 +19,8 @@
 
 import poster from 'poster-image';
 
+import EventMapper from './EventMapper';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -89,7 +91,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversationMapper = new z.conversation.ConversationMapper();
-    this.event_mapper = new z.conversation.EventMapper();
+    this.event_mapper = new EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
       this.eventRepository,
@@ -2824,7 +2826,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
+    const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
     return this._pushToReceivingQueue(eventJson, eventSource);

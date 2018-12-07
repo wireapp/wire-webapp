@@ -19,6 +19,8 @@
 
 // KARMA_SPECS=conversation/EventBuilder yarn test:app
 
+import EventMapper from 'app/script/conversation/EventMapper';
+
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;
   let conversation_et = undefined;
@@ -31,7 +33,7 @@ describe('z.conversation.EventBuilder', () => {
     conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
     conversation_et.selfUser(self_user_et);
 
-    event_mapper = new z.conversation.EventMapper();
+    event_mapper = new EventMapper();
   });
 
   it('buildAllVerified', () => {

@@ -19,16 +19,13 @@
 
 import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Event Mapper to convert all server side JSON events into core entities.
-z.conversation.EventMapper = class EventMapper {
+export default class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
   constructor() {
-    this.logger = new z.util.Logger('z.conversation.EventMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('EventMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -123,7 +120,7 @@ z.conversation.EventMapper = class EventMapper {
       }
 
       case z.event.Client.CONVERSATION.ASSET_ADD: {
-        messageEntity = this._mapEventAssetAdd(event, createDummyImage);
+        messageEntity = addReadReceiptData(this._mapEventAssetAdd(event, createDummyImage), event);
         break;
       }
 
@@ -144,17 +141,17 @@ z.conversation.EventMapper = class EventMapper {
       }
 
       case z.event.Client.CONVERSATION.KNOCK: {
-        messageEntity = this._mapEventPing();
+        messageEntity = addReadReceiptData(this._mapEventPing(), event);
         break;
       }
 
       case z.event.Client.CONVERSATION.LOCATION: {
-        messageEntity = this._mapEventLocation(event);
+        messageEntity = addReadReceiptData(this._mapEventLocation(event), event);
         break;
       }
 
       case z.event.Client.CONVERSATION.MESSAGE_ADD: {
-        messageEntity = this._mapEventMessageAdd(event);
+        messageEntity = addReadReceiptData(this._mapEventMessageAdd(event), event);
         break;
       }
 
@@ -380,7 +377,7 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {ContentMessage} Content message entity
    */
   _mapEventMessageAdd(event) {
-    const {data: eventData, edited_time: editedTime, read_receipts: readReceipts} = event;
+    const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new z.entity.ContentMessage();
 
     messageEntity.assets.push(this._mapAssetText(eventData));
@@ -390,14 +387,6 @@ z.conversation.EventMapper = class EventMapper {
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
       messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
-    }
-
-    if (eventData.expects_read_confirmation) {
-      messageEntity.expectsReadConfirmation = eventData.expects_read_confirmation;
-    }
-
-    if (readReceipts) {
-      messageEntity.readReceipts(readReceipts);
     }
 
     return messageEntity;
@@ -725,4 +714,11 @@ z.conversation.EventMapper = class EventMapper {
 
     return assetEntity;
   }
-};
+}
+
+function addReadReceiptData(entity, event) {
+  const {data: eventData, read_receipts} = event;
+  entity.expectsReadConfirmation = eventData.expects_read_confirmation;
+  entity.readReceipts(read_receipts || []);
+  return entity;
+}
