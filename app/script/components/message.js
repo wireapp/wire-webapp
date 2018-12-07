@@ -77,7 +77,7 @@ class Message {
       if (!receipts.length || !this.conversation().is1to1()) {
         return '';
       }
-      return moment(receipts[0].time).format('DD.MM.YY · HH:mm');
+      return moment(receipts[0].time).format('DD.MM.YY');
     });
 
     this.readReceiptText = ko.pureComputed(() => {
