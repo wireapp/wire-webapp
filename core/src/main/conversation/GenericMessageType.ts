@@ -29,6 +29,7 @@ enum GenericMessageType {
   DELETED = 'deleted',
   EDITED = 'edited',
   EPHEMERAL = 'ephemeral',
+  EXTERNAL = 'external',
   HIDDEN = 'hidden',
   IMAGE = 'image',
   KNOCK = 'knock',
