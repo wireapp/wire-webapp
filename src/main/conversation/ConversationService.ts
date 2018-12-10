@@ -307,11 +307,7 @@ class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const payload = await AssetCryptography.encryptAsset(plainTextArray);
-
-    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles);
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
 
     return {
       ...payloadBundle,
@@ -353,11 +349,7 @@ class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const payload = await AssetCryptography.encryptAsset(plainTextArray);
-
-    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles);
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
 
     return {
       ...payloadBundle,
@@ -395,11 +387,7 @@ class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const payload = await AssetCryptography.encryptAsset(plainTextArray);
-
-    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles);
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
 
     return {
       ...payloadBundle,
@@ -457,11 +445,7 @@ class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const payload = await AssetCryptography.encryptAsset(plainTextArray);
-
-    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles);
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
 
     return {
       ...payloadBundle,
