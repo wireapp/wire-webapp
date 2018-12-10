@@ -27,7 +27,7 @@ ko.components.register('read-receipt-toggle', {
     <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" data-bind="checked: conversation.receiptMode, event: {change: updateValue}" data-uie-name="do-toggle-receipt-mode" id="receipt-toggle-input"></input>
     <label for="receipt-toggle-input"></label>
   </div>
-  <div class="panel__info-text panel__info-text--margin" data-bind="l10n_text: z.string.receiptToggleInfo"></div>
+  <div class="panel__info-text panel__info-text--margin" data-bind="l10n_text: z.string.receiptToggleInfo" data-uie-name="label-receipt-mode-info"></div>
   `,
 
   viewModel: function(params) {

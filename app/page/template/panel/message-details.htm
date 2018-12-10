@@ -30,10 +30,10 @@
       <div class="panel__content">
         <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
           <!-- ko if: state() === states.RECEIPTS -->
-            <user-list class="user-list-light" params="user: receiptUsers, infos: receiptTimes, altStyle: true"></user-list>
+            <user-list class="user-list-light" params="user: receiptUsers, infos: receiptTimes, altStyle: true" data-uie-name="read-list"></user-list>
           <!-- /ko -->
           <!-- ko if: state() === states.LIKES -->
-            <user-list class="user-list-light" params="user: likeUsers, altStyle: true"></user-list>
+            <user-list class="user-list-light" params="user: likeUsers, altStyle: true" data-uie-name="like-list"></user-list>
           <!-- /ko -->
           <!-- ko if: state() === states.NO_RECEIPTS -->
             <div class="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
