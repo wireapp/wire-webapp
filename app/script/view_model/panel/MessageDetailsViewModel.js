@@ -23,8 +23,9 @@ import moment from 'moment';
 export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
+
     this.isReceiptsOpen = ko.observable(true);
-    this.message = ko.observable();
+    this.messageId = ko.observable();
     const userRepository = params.repositories.user;
 
     this.states = {
@@ -36,6 +37,19 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     };
 
     const formatTime = time => moment(time).format('DD.MM.YY, HH:MM');
+
+    this.message = ko.pureComputed(() => {
+      if (!this.isVisible()) {
+        return;
+      }
+
+      const visibleMessage = this.activeConversation()
+        .messages_unordered()
+        .find(({id}) => id === this.messageId());
+      if (visibleMessage) {
+        return visibleMessage;
+      }
+    });
 
     this.isMe = ko.pureComputed(() => this.message() && this.message().user().is_me);
 
@@ -75,7 +89,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.sentFooter = ko.pureComputed(() => {
-      return this.message() && formatTime(this.message().timestamp());
+      return this.message() ? formatTime(this.message().timestamp()) : '';
     });
 
     this.receiptCountString = ko.pureComputed(() =>
@@ -115,7 +129,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
 
   initView({entity: messageView, showLikes}) {
     this.isReceiptsOpen(!showLikes);
-    this.message(messageView.message);
+    this.messageId(messageView.message.id);
   }
 
   getElementId() {
