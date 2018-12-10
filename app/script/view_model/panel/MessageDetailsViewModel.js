@@ -66,13 +66,12 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes = ko.pureComputed(() => {
-      const message = this.message();
-      return message ? Object.keys(message.reactions()) : [];
+      const reactions = this.message() && this.message().reactions();
+      return reactions ? Object.keys(reactions) : [];
     });
 
-    this.likes.subscribe(likes => {
-      const userIds = likes.map(({userId}) => userId);
-      userRepository.get_users_by_id(userIds).then(users => this.likeUsers(users));
+    this.likes.subscribe(likeIds => {
+      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users));
     });
 
     this.sentFooter = ko.pureComputed(() => {
@@ -114,8 +113,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     return this.message().id;
   }
 
-  initView({entity: messageView}) {
-    this.isReceiptsOpen(true);
+  initView({entity: messageView, showLikes}) {
+    this.isReceiptsOpen(!showLikes);
     this.message(messageView.message);
   }
 

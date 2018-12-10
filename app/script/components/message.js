@@ -31,6 +31,7 @@ class Message {
     onClickAvatar,
     onClickImage,
     onClickInvitePeople,
+    onClickLikes,
     onClickMessage,
     onClickTimestamp,
     onClickParticipants,
@@ -58,6 +59,7 @@ class Message {
     this.onClickTimestamp = onClickTimestamp;
     this.onClickParticipants = onClickParticipants;
     this.onClickReceipts = onClickReceipts;
+    this.onClickLikes = onClickLikes;
     this.onClickResetSession = onClickResetSession;
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
@@ -67,7 +69,6 @@ class Message {
 
     this.actionsViewModel = actionsViewModel;
 
-    this.showLikes = ko.observable(false);
     this.hasReadReceiptsTurnedOn = this.conversation().expectsReadConfirmation();
 
     this.bindShowMore = this.bindShowMore.bind(this);
@@ -318,20 +319,9 @@ const normalTemplate = `
           <span class="icon-liked-small"></span>
         </span>
       </div>
-      <div class="message-footer-label cursor-pointer" data-bind="click: () => showLikes(true)">
+      <div class="message-footer-label cursor-pointer" data-bind="click: onClickLikes">
         <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
-        <!-- ko if: !showLikes() && message.other_likes().length > 5 -->
-          <span class="icon-more font-size-xs"></span>
-        <!-- /ko -->
       </div>
-      <!-- ko if: showLikes() -->
-        <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
-          <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar params="participant: $data, click: $parent.onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
-          <!-- /ko -->
-          <span class="message-footer-close-button icon-close" data-bind="click: () => showLikes(false)"></span>
-        </div>
-      <!-- /ko -->
     </div>
   <!-- /ko -->
   `;

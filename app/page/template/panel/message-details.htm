@@ -28,7 +28,7 @@
         </div>
       <!-- /ko -->
       <div class="panel__content">
-        <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar()">
+        <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
           <!-- ko if: state() === states.RECEIPTS -->
             <user-list class="user-list-light" params="user: receiptUsers, infos: receiptTimes, altStyle: true"></user-list>
           <!-- /ko -->
