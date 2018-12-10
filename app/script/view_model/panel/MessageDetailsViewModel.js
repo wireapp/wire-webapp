@@ -23,7 +23,6 @@ import moment from 'moment';
 export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
-    this.conversationRepository = params.repositories.conversation;
 
     this.isReceiptsOpen = ko.observable(true);
     this.messageId = ko.observable();
