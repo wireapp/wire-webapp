@@ -36,7 +36,7 @@
             onClickParticipants: $parent.showParticipants,
             onClickResetSession: $parent.on_session_reset_click,
             onClickCancelRequest: $parent.click_on_cancel_request,
-            onClickReceipts: $parent.showMessageDetails,
+            onClickReceipts: view => $parent.showMessageDetails(view, false),
             onClickLikes: view => $parent.showMessageDetails(view, true),
             onLike: $parent.click_on_like,
             actionsViewModel: $parent.actionsViewModel"
