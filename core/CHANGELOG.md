@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.1.1...@wireapp/core@8.1.2) (2018-12-10)
+
+
+### Bug Fixes
+
+* **core:** Read expectsReadConfirmation flag ([#1370](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1370)) ([0dcc818](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0dcc818))
+
+
+
+
+
 ## [8.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.1.0...@wireapp/core@8.1.1) (2018-12-10)
 
 
