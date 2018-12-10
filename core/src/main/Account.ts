@@ -55,6 +55,7 @@ import {
   DeletedContent,
   EditedTextContent,
   HiddenContent,
+  KnockContent,
   LocationContent,
   ReactionContent,
   TextContent,
@@ -284,9 +285,11 @@ class Account extends EventEmitter {
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
-        const {content: text, linkPreview: linkPreviews, mentions, quote} = genericMessage[GenericMessageType.TEXT];
+        const {content: text, expectsReadConfirmation, linkPreview: linkPreviews, mentions, quote} = genericMessage[
+          GenericMessageType.TEXT
+        ];
 
-        const content: TextContent = {text};
+        const content: TextContent = {expectsReadConfirmation, text};
 
         if (linkPreviews && linkPreviews.length) {
           content.linkPreviews = linkPreviews;
@@ -359,11 +362,13 @@ class Account extends EventEmitter {
       }
       case GenericMessageType.EDITED: {
         const {
+          expectsReadConfirmation,
           text: {content: editedText, linkPreview: editedLinkPreviews, mentions: editedMentions, quote: editedQuote},
           replacingMessageId,
         } = genericMessage[GenericMessageType.EDITED];
 
         const content: EditedTextContent = {
+          expectsReadConfirmation,
           originalMessageId: replacingMessageId,
           text: editedText,
         };
@@ -411,7 +416,11 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.KNOCK: {
+        const {expectsReadConfirmation} = genericMessage[GenericMessageType.KNOCK];
+        const content: KnockContent = {expectsReadConfirmation};
+
         return {
+          content,
           conversation: event.conversation,
           from: event.from,
           id: genericMessage.messageId,
@@ -545,7 +554,7 @@ class Account extends EventEmitter {
   }
 
   private async handleEvent(event: IncomingEvent): Promise<PayloadBundleIncoming | void> {
-    this.logger.log(`Handling event of type "${event.type}"`);
+    this.logger.log(`Handling event of type "${event.type}"`, event);
     const ENCRYPTED_EVENTS = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
     const META_EVENTS = [
       CONVERSATION_EVENT.MEMBER_JOIN,
