@@ -21,6 +21,8 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const {execSync} = require('child_process');
 
 const distFolder = 'dist/';
-fs.outputFileSync(path.resolve(distFolder, 'commit'), process.env.TRAVIS_COMMIT);
+const commitSha = execSync('git rev-parse HEAD').toString();
+fs.outputFileSync(path.resolve(distFolder, 'commit'), commitSha);
