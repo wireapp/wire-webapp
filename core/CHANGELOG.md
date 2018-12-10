@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.1.0...@wireapp/core@8.1.1) (2018-12-10)
+
+
+### Bug Fixes
+
+* **core:** Don't use external messages for asset sending ([#1374](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1374)) ([afdf2bf](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/afdf2bf))
+
+
+
+
+
 # [8.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.0.6...@wireapp/core@8.1.0) (2018-12-07)
 
 
