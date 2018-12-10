@@ -65,13 +65,13 @@ const defaultCSP: HelmetCSP = {
     'https://1-ps.googleusercontent.com',
     'https://csi.gstatic.com',
   ],
-  manifestSrc: [],
+  manifestSrc: ["'self'"],
   mediaSrc: ["'self'", 'blob:', 'data:', '*'],
   objectSrc: ["'self'", 'https://*.youtube-nocookie.com', 'https://1-ps.googleusercontent.com'],
-  prefetchSrc: [],
+  prefetchSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
-  workerSrc: [],
+  workerSrc: ["'self'"],
 };
 const logger = logdown('config', {
   logger: console,
