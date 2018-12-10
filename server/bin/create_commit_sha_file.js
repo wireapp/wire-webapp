@@ -23,6 +23,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const {execSync} = require('child_process');
 
-const distFolder = 'dist/';
+const distFolder = 'dist';
 const commitSha = execSync('git rev-parse HEAD').toString();
 fs.outputFileSync(path.resolve(distFolder, 'commit'), commitSha);
