@@ -77,7 +77,7 @@ class TextContentBuilder {
     return this;
   }
 
-  public withReadConfirmation(expectsReadConfirmation = true): TextContentBuilder {
+  public withReadConfirmation(expectsReadConfirmation = false): TextContentBuilder {
     this.content.expectsReadConfirmation = expectsReadConfirmation;
 
     return this;

@@ -373,7 +373,7 @@ describe('ConversationService', () => {
 
       const replyMessage = account.service.conversation
         .createText(text)
-        .withReadConfirmation()
+        .withReadConfirmation(true)
         .build();
 
       expect(replyMessage.content.text).toEqual(text);
