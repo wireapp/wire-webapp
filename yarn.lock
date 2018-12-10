@@ -12062,10 +12062,10 @@ webpack@4.27.1:
     watchpack "^1.5.0"
     webpack-sources "^1.3.0"
 
-webrtc-adapter@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/webrtc-adapter/-/webrtc-adapter-7.0.0.tgz#2d51693976badc761fe62d76b86dbb12159eeb48"
-  integrity sha512-5eg888t3H3I1JRTPQyiMAitkgTt3T0WA6vG1T5226z37j/AFeZWoYy5OB5+2QAOlypLT4snDA3FxIzHv2UlnUw==
+webrtc-adapter@6.4.8:
+  version "6.4.8"
+  resolved "https://registry.yarnpkg.com/webrtc-adapter/-/webrtc-adapter-6.4.8.tgz#eeca3f0d5b40c0e629b865ef2a936a0b658274de"
+  integrity sha512-YM8yl545c/JhYcjGHgaCoA7jRK/KZuMwEDFeP2AcP0Auv5awEd+gZE0hXy9z7Ed3p9HvAXp8jdbe+4ESb1zxAw==
   dependencies:
     rtcpeerconnection-shim "^1.2.14"
     sdp "^2.9.0"
