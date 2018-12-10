@@ -3819,7 +3819,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
-    return conversationEntity.expectsReadConfirmation();
+    return true;
   }
 
   /**

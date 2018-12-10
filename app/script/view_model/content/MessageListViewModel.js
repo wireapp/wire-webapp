@@ -32,7 +32,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  * Message list rendering view model.
  *
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
- * @todo Remove all jquery selectors
+ * @todo Remove all jQuery selectors
  */
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {

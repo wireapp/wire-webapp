@@ -17,6 +17,7 @@
  *
  */
 
+import ReceiptMode from '../conversation/ReceiptMode';
 import WebappProperties from './WebappProperties';
 
 class PropertiesRepository {
@@ -218,7 +219,7 @@ class PropertiesRepository {
 
   saveReceiptMode(receiptMode) {
     const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
-    if (receiptMode === 0) {
+    if (receiptMode === ReceiptMode.DELIVERY) {
       return this.propertiesService.deletePropertiesByKey(property.key);
     }
     return this.propertiesService.putPropertiesByKey(property.key, receiptMode);

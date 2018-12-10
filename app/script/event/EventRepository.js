@@ -663,7 +663,7 @@ z.event.EventRepository = class EventRepository {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
-    //first check if a message that should be replaced exists in DB
+    // first check if a message that should be replaced exists in DB
     const findEventToReplacePromise = mappedData.replacing_message_id
       ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();

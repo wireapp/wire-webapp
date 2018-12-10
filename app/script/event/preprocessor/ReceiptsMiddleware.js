@@ -17,29 +17,42 @@
  *
  */
 
+import ReceiptMode from '../../conversation/ReceiptMode';
 import StatusType from '../../message/StatusType';
 
 export default class ReceiptsMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
-   * This class is reponsible for parsing incoming confirmation messages
+   * This class is responsible for parsing incoming confirmation messages
    * It will update original messages when a confirmation is received
    *
    * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {ConversationService} conversationService - Backend REST API conversation service implementation
    */
-  constructor(eventService) {
+  constructor(eventService, conversationService) {
     this.eventService = eventService;
-    this.logger = new z.util.Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
+    this.conversationService = conversationService;
+    this.logger = new z.util.Logger('ReceiptsMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   /**
-   * Handles incoming confirmation events
+   * Handles incoming confirmation events.
    *
    * @param {Object} event - event in the DB format
    * @returns {Promise<Object>} event - the original event
    */
   processEvent(event) {
     switch (event.type) {
+      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
+        return this.conversationService.loadConversation(event.conversation).then(conversation => {
+          const isGroupConversation = conversation.type === z.conversation.ConversationType.GROUP;
+          if (isGroupConversation) {
+            const expectsReadConfirmation = conversation.receipt_mode === ReceiptMode.DELIVERY_AND_READ;
+            event.data.expects_read_confirmation = !!expectsReadConfirmation;
+          }
+          return event;
+        });
+      }
       case z.event.Client.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         return this.eventService

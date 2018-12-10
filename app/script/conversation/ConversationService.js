@@ -405,6 +405,10 @@ z.conversation.ConversationService = class ConversationService {
     });
   }
 
+  loadConversation(conversationId) {
+    return this.storageService.load(this.CONVERSATION_STORE_NAME, conversationId);
+  }
+
   /**
    * Get active conversations from database.
    * @returns {Promise} Resolves with active conversations

@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import ReceiptMode from '../conversation/ReceiptMode';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -175,7 +176,7 @@ z.entity.Conversation = class Conversation {
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
 
-    this.receiptMode = ko.observable(0);
+    this.receiptMode = ko.observable(ReceiptMode.DELIVERY);
     this.expectsReadConfirmation = ko.pureComputed(() => {
       if (this.is1to1() || this.inTeam()) {
         return !!this.receiptMode();

@@ -17,6 +17,8 @@
  *
  */
 
+import ReceiptMode from '../../conversation/ReceiptMode';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -163,7 +165,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       const accessState = this.isTeam() ? this.accessState() : undefined;
       const options = {
-        receipt_mode: this.enableReadReceipts() ? 1 : 0,
+        receipt_mode: this.enableReadReceipts() ? ReceiptMode.DELIVERY_AND_READ : ReceiptMode.DELIVERY,
       };
 
       this.conversationRepository
