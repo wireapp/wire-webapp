@@ -151,7 +151,7 @@ class App {
       this.service.event,
       z.message.MessageHasher
     );
-    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event);
+    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.user);
 
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),

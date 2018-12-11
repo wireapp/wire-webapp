@@ -717,11 +717,6 @@ export default class EventMapper {
 }
 
 function addReadReceiptData(entity, event) {
-  const isFromMe = entity.user && entity.user().is_me;
-  if (!isFromMe) {
-    return entity;
-  }
-
   const {data: eventData, read_receipts} = event;
   entity.expectsReadConfirmation = eventData.expects_read_confirmation;
   entity.readReceipts(read_receipts || []);
