@@ -63,7 +63,7 @@ describe('ReceiptsMiddleware', () => {
       });
     });
 
-    it('ignore read receipts for messages that are not mine', () => {
+    it('ignores read receipts for messages that are not mine', () => {
       const event = createConfirmationEvent(4);
       const originaleEvent = {from: UUID.genV4()};
       spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originaleEvent]));
