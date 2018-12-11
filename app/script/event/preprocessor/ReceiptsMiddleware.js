@@ -26,9 +26,11 @@ export default class ReceiptsMiddleware {
    * It will update original messages when a confirmation is received
    *
    * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {z.user.UserRepository} userRepository - Repository that handles users
    */
-  constructor(eventService) {
+  constructor(eventService, userRepository) {
     this.eventService = eventService;
+    this.userRepository = userRepository;
     this.logger = new z.util.Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
   }
 
@@ -63,6 +65,13 @@ export default class ReceiptsMiddleware {
   _updateConfirmationStatus(originalEvent, confirmationEvent) {
     const status = confirmationEvent.data.status;
     const currentReceipts = originalEvent.read_receipts || [];
+
+    const isMyMessage = this.userRepository.self() && this.userRepository.self().id === originalEvent.from;
+    // I shouldn't receive this read receipt
+    if (!isMyMessage) {
+      return;
+    }
+
     const hasReadMessage =
       status === StatusType.SEEN && currentReceipts.some(({userId}) => confirmationEvent.from === userId);
     if (hasReadMessage) {
