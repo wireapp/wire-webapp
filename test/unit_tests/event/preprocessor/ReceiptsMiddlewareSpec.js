@@ -47,7 +47,7 @@ describe('ReceiptsMiddleware', () => {
     it('ignores read receipt from user who already has read the message', () => {
       const event = createConfirmationEvent(4);
 
-      const originalEvent = {read_receipts: [{from: event.from, time: ''}]};
+      const originalEvent = {read_receipts: [{time: '', userId: event.from}]};
       spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originalEvent]));
       spyOn(eventService, 'replaceEvent');
 
