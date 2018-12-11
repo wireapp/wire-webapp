@@ -790,6 +790,9 @@ z.event.EventRepository = class EventRepository {
 
   _getUpdatesForMessageEdit(originalEvent, newEvent) {
     return Object.assign({}, newEvent, {
+      data: Object.assign({}, newEvent.data, {
+        expects_read_confirmation: originalEvent.data.expects_read_confirmation,
+      }),
       edited_time: newEvent.time,
       time: originalEvent.time,
       version: 1,

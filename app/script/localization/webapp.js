@@ -540,6 +540,10 @@ z.string.conversationDetailsParticipantsUsersOne = 'Person';
 z.string.conversationDetailsParticipantsUsersMany = 'People';
 z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
+z.string.conversationDetails1to1ReceiptsHeadEnabled = 'You have enabled read receipts';
+z.string.conversationDetails1to1ReceiptsHeadDisabled = 'You have disabled read receipts';
+z.string.conversationDetails1to1ReceiptsFirst = 'If both sides turn on read receipts, you can see when messages are read.';
+z.string.conversationDetails1to1ReceiptsSecond = 'You can change this option in your account settings.';
 
 // Panel: Conversation participants
 z.string.conversationParticipantsTitle = 'People';
