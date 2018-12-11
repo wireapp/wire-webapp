@@ -32,6 +32,8 @@ z.storage.StorageService = class StorageService {
     this.userId = undefined;
 
     this._afterDbInit = () => {};
+
+    this.updateListeners = [];
   }
 
   //##############################################################################
@@ -91,14 +93,24 @@ z.storage.StorageService = class StorageService {
 
   // Hooks
   addUpdatedListener(storeName, callback) {
+    this.updateListeners.push(callback);
+    const initHook = () => {
+      if (this.updateListeners.length > 1) {
+        const updateListeners = this.updateListeners;
+        this.db[storeName].hook('updating', function(modifications, primaryKey, previousRecord, transaction) {
+          // we need to wait for the transaction to be finished in order to be able to access the DB later on
+          this.onsuccess = updatedRecord =>
+            transaction.on('complete', () =>
+              updateListeners.forEach(callbackFn => callbackFn(updatedRecord, previousRecord))
+            );
+        });
+      }
+    };
     if (!this.db) {
       // waiting for the DB to be initialized
-      return (this._afterDbInit = () => this.addUpdatedListener(storeName, callback));
+      return (this._afterDbInit = initHook);
     }
-    this.db[storeName].hook('updating', function(modifications, primaryKey, previousRecord, transaction) {
-      // we need to wait for the transaction to be finished in order to be able to access the DB later on
-      this.onsuccess = updatedRecord => transaction.on('complete', () => callback(updatedRecord, previousRecord));
-    });
+    initHook();
   }
 
   //##############################################################################
