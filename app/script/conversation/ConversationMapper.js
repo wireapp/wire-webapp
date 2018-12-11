@@ -325,7 +325,17 @@ z.conversation.ConversationMapper = class ConversationMapper {
       const conversationId = remoteConversationData.id;
       const localConversationData = localConversations.find(({id}) => id === conversationId) || {id: conversationId};
 
-      const {access, access_role, creator, members, message_timer, name, team, type} = remoteConversationData;
+      const {
+        access,
+        access_role,
+        creator,
+        members,
+        message_timer,
+        name,
+        receipt_mode,
+        team,
+        type,
+      } = remoteConversationData;
       const {others: othersStates, self: selfState} = members;
 
       const updates = {
@@ -334,6 +344,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         creator,
         message_timer,
         name,
+        receipt_mode,
         status: selfState.status,
         team_id: team,
         type,
