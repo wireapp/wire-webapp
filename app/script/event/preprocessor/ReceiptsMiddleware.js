@@ -64,7 +64,7 @@ export default class ReceiptsMiddleware {
     const status = confirmationEvent.data.status;
     const currentReceipts = originalEvent.read_receipts || [];
     const hasReadMessage =
-      status === StatusType.SEEN && currentReceipts.some(({from}) => confirmationEvent.from === from);
+      status === StatusType.SEEN && currentReceipts.some(({userId}) => confirmationEvent.from === userId);
     if (hasReadMessage) {
       // if the user is already among the readers of the message, nothing more to do
       return;
