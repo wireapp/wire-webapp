@@ -128,7 +128,7 @@
     "react-hot-loader": "4.3.12",
     "redux-devtools-extension": "2.13.7",
     "redux-mock-store": "1.5.3",
-    "sinon": "7.1.1",
+    "sinon": "7.2.0",
     "stylelint": "9.9.0",
     "stylelint-config-idiomatic-order": "6.2.0",
     "stylelint-config-prettier": "4.0.0",
