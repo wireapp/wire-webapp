@@ -24,6 +24,14 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
+    params.repositories.event.eventService.addEventUpdatedListener((updatedEvent, oldEvent) => {
+      // listen for any changes in the DB to the event being viewed.
+      // if the event's id has changed, we replace the local event id with the new one
+      if (oldEvent.id === this.messageId()) {
+        this.messageId(updatedEvent.id);
+      }
+    });
+
     this.isReceiptsOpen = ko.observable(true);
     this.messageId = ko.observable();
     const userRepository = params.repositories.user;
@@ -127,9 +135,9 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     return this.message().id;
   }
 
-  initView({entity: messageView, showLikes}) {
+  initView({entity: messageId, showLikes}) {
     this.isReceiptsOpen(!showLikes);
-    this.messageId(messageView.message.id);
+    this.messageId(messageId);
   }
 
   getElementId() {
