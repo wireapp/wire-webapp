@@ -636,7 +636,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     const isUnreadMessage = messageTimestamp > conversationTimestamp;
     const isNotOwnMessage = !messageEntity.user().is_me;
     const expectsConfirmation = messageEntity.expectsReadConfirmation;
-    const shouldSendReadReceipt = this.conversation_repository.shouldSendReadReceipt(conversationEntity);
+    const shouldSendReadReceipt = this.conversation_repository.expectReadReceipt(conversationEntity);
     if (isUnreadMessage && isNotOwnMessage && expectsConfirmation && shouldSendReadReceipt) {
       callbacks.push(sendReadReceipt);
     }

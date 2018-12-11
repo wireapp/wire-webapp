@@ -1118,7 +1118,7 @@ describe('ConversationRepository', () => {
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the account-level preference wins
-      const shouldSend = TestFactory.conversation_repository.shouldSendReadReceipt(conversationEntity);
+      const shouldSend = TestFactory.conversation_repository.expectReadReceipt(conversationEntity);
 
       expect(shouldSend).toBe(!!preferenceMode);
     });
@@ -1133,7 +1133,7 @@ describe('ConversationRepository', () => {
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the conversation-level preference wins
-      const shouldSend = TestFactory.conversation_repository.shouldSendReadReceipt(conversationEntity);
+      const shouldSend = TestFactory.conversation_repository.expectReadReceipt(conversationEntity);
 
       expect(shouldSend).toBe(!!conversationEntity.receiptMode());
     });

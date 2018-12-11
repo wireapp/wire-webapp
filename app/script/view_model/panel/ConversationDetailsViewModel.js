@@ -151,7 +151,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     this.showOptionReadReceipts = ko.pureComputed(() => this.activeConversation().inTeam());
 
     this.hasReceiptsEnabled = ko.pureComputed(() => {
-      return this.conversationRepository.shouldSendReadReceipt(this.activeConversation());
+      return this.conversationRepository.expectReadReceipt(this.activeConversation());
     });
 
     this.hasAdvancedNotifications = ko.pureComputed(() => {
