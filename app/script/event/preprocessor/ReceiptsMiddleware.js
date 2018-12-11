@@ -27,11 +27,11 @@ export default class ReceiptsMiddleware {
    * It will update original messages when a confirmation is received
    *
    * @param {z.event.EventService} eventService - Repository that handles events
-   * @param {ConversationService} conversationService - Backend REST API conversation service implementation
+   * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    */
-  constructor(eventService, conversationService) {
+  constructor(eventService, conversationRepository) {
     this.eventService = eventService;
-    this.conversationService = conversationService;
+    this.conversationRepository = conversationRepository;
     this.logger = new z.util.Logger('ReceiptsMiddleware', z.config.LOGGER.OPTIONS);
   }
 
@@ -44,10 +44,10 @@ export default class ReceiptsMiddleware {
   processEvent(event) {
     switch (event.type) {
       case z.event.Client.CONVERSATION.MESSAGE_ADD: {
-        return this.conversationService.loadConversation(event.conversation).then(conversation => {
-          const isGroupConversation = conversation.type === z.conversation.ConversationType.GROUP;
+        return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
+          const isGroupConversation = conversation.type() === z.conversation.ConversationType.GROUP;
           if (isGroupConversation) {
-            const expectsReadConfirmation = conversation.receipt_mode === ReceiptMode.DELIVERY_AND_READ;
+            const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
             event.data.expects_read_confirmation = !!expectsReadConfirmation;
           }
           return event;
