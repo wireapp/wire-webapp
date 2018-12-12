@@ -49,7 +49,7 @@ z.components.Image = class Image {
   }
 
   dispose() {
-    z.ui.ViewportObserver.removeElement(this.element);
+    viewportObserver.removeElement(this.element);
     if (this.assetSrc()) {
       window.URL.revokeObjectURL(this.assetSrc());
     }
