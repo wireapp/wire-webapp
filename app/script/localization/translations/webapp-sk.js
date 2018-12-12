@@ -488,10 +488,10 @@ z.string.sk.warningNotFoundMicrophone = 'Nemôžete volať, pretože Váš poč�
 z.string.sk.warningPermissionDeniedCamera = 'Nemôžete volať, pretože Váš prehliadač nemá prístup ku kamere.';
 z.string.sk.warningPermissionDeniedMicrophone = 'Nemôžete volať, pretože Váš prehliadač nemá prístup k mikrofónu.';
 z.string.sk.warningPermissionDeniedScreen = 'Váš prehliadač potrebuje povolenie pre zdieľanie obrazovky.';
-z.string.sk.warningPermissionRequestCamera = '{{icon}} Povoliť prístup ku kamere';
-z.string.sk.warningPermissionRequestMicrophone = '{{icon}} Povoliť prístup k mikrofónu';
-z.string.sk.warningPermissionRequestNotification = '{{icon}} Povoliť oznámenia';
-z.string.sk.warningPermissionRequestScreen = '{{icon}} Povoliť prístup k obrazovke';
+z.string.sk.warningPermissionRequestCamera = '[icon] Povoliť prístup ku kamere';
+z.string.sk.warningPermissionRequestMicrophone = '[icon] Povoliť prístup k mikrofónu';
+z.string.sk.warningPermissionRequestNotification = '[icon] Povoliť oznámenia';
+z.string.sk.warningPermissionRequestScreen = '[icon] Povoliť prístup k obrazovke';
 
 z.string.sk.userAvailabilityAvailable = 'Dostupné';
 z.string.sk.userAvailabilityNone = 'Žiadne';

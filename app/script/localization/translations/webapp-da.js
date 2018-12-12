@@ -634,10 +634,10 @@ z.string.da.warningNotFoundMicrophone = 'Du kan ikke ringe, fordi din computer h
 z.string.da.warningPermissionDeniedCamera = 'Du kan ikke ringe, fordi din browser ikke har adgang til kameraet.';
 z.string.da.warningPermissionDeniedMicrophone = 'Du kan ikke ringe, fordi din browser ikke har adgang til mikrofonen.';
 z.string.da.warningPermissionDeniedScreen = 'Din browser skal have tilladelse til at dele din skærm.';
-z.string.da.warningPermissionRequestCamera = '{{icon}} Tillad adgang til kamera';
-z.string.da.warningPermissionRequestMicrophone = '{{icon}} Tillad adgang til mikrofon';
-z.string.da.warningPermissionRequestNotification = '{{icon}} Tillad meddelelser';
-z.string.da.warningPermissionRequestScreen = '{{icon}} Tillad adgang til skærm';
+z.string.da.warningPermissionRequestCamera = '[icon] Tillad adgang til kamera';
+z.string.da.warningPermissionRequestMicrophone = '[icon] Tillad adgang til mikrofon';
+z.string.da.warningPermissionRequestNotification = '[icon] Tillad meddelelser';
+z.string.da.warningPermissionRequestScreen = '[icon] Tillad adgang til skærm';
 
 z.string.da.userAvailabilityAvailable = 'Ledig';
 z.string.da.userAvailabilityAway = 'Ikke til stede';

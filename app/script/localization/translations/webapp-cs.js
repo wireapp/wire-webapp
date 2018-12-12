@@ -487,10 +487,10 @@ z.string.cs.warningNotFoundMicrophone = 'Nelze volat, protože tento počítač 
 z.string.cs.warningPermissionDeniedCamera = 'Nelze volat, protože prohlížeč nemá přístup ke kameře.';
 z.string.cs.warningPermissionDeniedMicrophone = 'Nelze volat, protože prohlížeč nemá přístup k mikrofonu.';
 z.string.cs.warningPermissionDeniedScreen = 'Prohlížeč potřebuje oprávnění ke sdílení obrazovku.';
-z.string.cs.warningPermissionRequestCamera = '{{icon}} Povolit přístup ke kameře';
-z.string.cs.warningPermissionRequestMicrophone = '{{icon}} Povolit přístup k mikrofonu';
-z.string.cs.warningPermissionRequestNotification = '{{icon}} Povolit upozornění';
-z.string.cs.warningPermissionRequestScreen = '{{icon}} Povolit přístup k obrazovce';
+z.string.cs.warningPermissionRequestCamera = '[icon] Povolit přístup ke kameře';
+z.string.cs.warningPermissionRequestMicrophone = '[icon] Povolit přístup k mikrofonu';
+z.string.cs.warningPermissionRequestNotification = '[icon] Povolit upozornění';
+z.string.cs.warningPermissionRequestScreen = '[icon] Povolit přístup k obrazovce';
 
 z.string.cs.userAvailabilityAvailable = 'Dostupný';
 z.string.cs.userAvailabilityNone = 'Žádné';
