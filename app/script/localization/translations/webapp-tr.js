@@ -492,10 +492,10 @@ z.string.tr.warningNotFoundMicrophone = 'Arama yapamıyorsunuz çünkü bilgisay
 z.string.tr.warningPermissionDeniedCamera = 'Arama yapamıyorsunuz çünkü tarayıcınızın kameraya erişim izni bulunmamaktadır.';
 z.string.tr.warningPermissionDeniedMicrophone = 'Arama yapamıyorsunuz çünkü tarayıcınızın mikrofona erişim izni bulunmamaktadır.';
 z.string.tr.warningPermissionDeniedScreen = 'Tarayıcınız ekranınızı paylaşmak için gerekli izinleri sağlamalıdır.';
-z.string.tr.warningPermissionRequestCamera = '{{icon}} Kameraya erişime izin ver';
-z.string.tr.warningPermissionRequestMicrophone = '{{icon}} Mikrofona erişime izin ver';
-z.string.tr.warningPermissionRequestNotification = '{{icon}} Bildirimlere izin ver';
-z.string.tr.warningPermissionRequestScreen = '{{icon}} Ekrana erişime izin ver';
+z.string.tr.warningPermissionRequestCamera = '[icon] Kameraya erişime izin ver';
+z.string.tr.warningPermissionRequestMicrophone = '[icon] Mikrofona erişime izin ver';
+z.string.tr.warningPermissionRequestNotification = '[icon] Bildirimlere izin ver';
+z.string.tr.warningPermissionRequestScreen = '[icon] Ekrana erişime izin ver';
 
 z.string.tr.userAvailabilityAvailable = 'Alınabilir';
 z.string.tr.userAvailabilityAway = 'Uzakta';

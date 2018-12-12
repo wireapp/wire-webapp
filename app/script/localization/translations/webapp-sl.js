@@ -480,10 +480,10 @@ z.string.sl.warningNotFoundMicrophone = 'Ne morete klicati, ker vaš računalnik
 z.string.sl.warningPermissionDeniedCamera = 'Ne morete klicati, ker vaš brskalnik nima dostopa do kamere.';
 z.string.sl.warningPermissionDeniedMicrophone = 'Klicati ni mogoče, ker vaš brskalnik nima dostopa do mikrofona.';
 z.string.sl.warningPermissionDeniedScreen = 'Vaš brskalnik potrebuje dovoljenje za deljenje vašega zaslona.';
-z.string.sl.warningPermissionRequestCamera = '{{icon}} Dovoli dostop do kamere';
-z.string.sl.warningPermissionRequestMicrophone = '{{icon}} Dovoli dostop do mikrofona';
-z.string.sl.warningPermissionRequestNotification = '{{icon}} Dovoli obvestila';
-z.string.sl.warningPermissionRequestScreen = '{{icon}} Dovoli dostop do zaslona';
+z.string.sl.warningPermissionRequestCamera = '[icon] Dovoli dostop do kamere';
+z.string.sl.warningPermissionRequestMicrophone = '[icon] Dovoli dostop do mikrofona';
+z.string.sl.warningPermissionRequestNotification = '[icon] Dovoli obvestila';
+z.string.sl.warningPermissionRequestScreen = '[icon] Dovoli dostop do zaslona';
 
 z.string.sl.userAvailabilityAvailable = 'Na voljo';
 z.string.sl.userAvailabilityNone = 'Nič';
