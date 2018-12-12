@@ -129,6 +129,7 @@ const config: ServerConfig = {
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
+      ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION == 'false' ? false : true,
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true' ? true : false,
