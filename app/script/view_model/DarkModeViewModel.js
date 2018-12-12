@@ -20,25 +20,14 @@
 class DarkModeViewModel {
   constructor(mainViewModel, repositories) {
     this.propertiesRepository = repositories.properties;
-
     this.isDarkMode = ko.observable(undefined);
-    this.isTransitioning = ko.observable(undefined);
-    this.setTheme = this.setTheme.bind(this);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, this.setTheme);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, this.isDarkMode);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
-      this.setTheme(properties.settings.appearance.dark);
+      this.isDarkMode(properties.settings.appearance.dark);
     });
 
     ko.applyBindings(this, document.getElementsByTagName('head')[0]);
-  }
-
-  setTheme(newPreference) {
-    this.isTransitioning(true);
-    this.isDarkMode(newPreference);
-
-    const ANIMATION_DURATION = 250;
-    setTimeout(() => this.isTransitioning(false), ANIMATION_DURATION);
   }
 }
 
