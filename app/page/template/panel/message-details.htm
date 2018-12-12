@@ -5,7 +5,7 @@
 >
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <div class="panel__header__title" data-bind="l10n_text: isMe() ? z.string.messageDetailsTitle : {id: z.string.messageDetailsTitleLikes, substitute: likeCountString()}"></div>
+      <div class="panel__header__title" data-bind="l10n_text: isMe() ? z.string.messageDetailsTitle : {id: z.string.messageDetailsTitleLikes, substitute: likeCountString()}" data-uie-name="message-details-title"></div>
       <close-icon
         class="right-panel-close icon-button"
         data-bind="clickOrDrag: onClose"
