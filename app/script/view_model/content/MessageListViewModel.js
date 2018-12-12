@@ -32,7 +32,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  * Message list rendering view model.
  *
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
- * @todo Remove all jquery selectors
+ * @todo Remove all jQuery selectors
  */
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
@@ -635,9 +635,18 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     const isUnreadMessage = messageTimestamp > conversationTimestamp;
     const isNotOwnMessage = !messageEntity.user().is_me;
-    const expectsConfirmation = messageEntity.expectsReadConfirmation;
-    const shouldSendReadReceipt = this.conversation_repository.shouldSendReadReceipt(conversationEntity);
-    if (isUnreadMessage && isNotOwnMessage && expectsConfirmation && shouldSendReadReceipt) {
+
+    let shouldSendReadReceipt = false;
+
+    if (messageEntity.expectsReadConfirmation) {
+      if (conversationEntity.is1to1()) {
+        shouldSendReadReceipt = this.conversation_repository.expectReadReceipt(conversationEntity);
+      } else if (conversationEntity.isGroup()) {
+        shouldSendReadReceipt = true;
+      }
+    }
+
+    if (isUnreadMessage && isNotOwnMessage && shouldSendReadReceipt) {
       callbacks.push(sendReadReceipt);
     }
 

@@ -69,7 +69,7 @@ class Message {
 
     this.actionsViewModel = actionsViewModel;
 
-    this.hasReadReceiptsTurnedOn = this.conversation().expectsReadConfirmation();
+    this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
 
     this.bindShowMore = this.bindShowMore.bind(this);
 

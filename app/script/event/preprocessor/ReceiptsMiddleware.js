@@ -17,31 +17,44 @@
  *
  */
 
+import ReceiptMode from '../../conversation/ReceiptMode';
 import StatusType from '../../message/StatusType';
 
 export default class ReceiptsMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
-   * This class is reponsible for parsing incoming confirmation messages
+   * This class is responsible for parsing incoming confirmation messages
    * It will update original messages when a confirmation is received
    *
    * @param {z.event.EventService} eventService - Repository that handles events
    * @param {z.user.UserRepository} userRepository - Repository that handles users
+   * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    */
-  constructor(eventService, userRepository) {
+  constructor(eventService, userRepository, conversationRepository) {
     this.eventService = eventService;
     this.userRepository = userRepository;
+    this.conversationRepository = conversationRepository;
     this.logger = new z.util.Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   /**
-   * Handles incoming confirmation events
+   * Handles incoming confirmation events.
    *
    * @param {Object} event - event in the DB format
    * @returns {Promise<Object>} event - the original event
    */
   processEvent(event) {
     switch (event.type) {
+      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
+        return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
+          const isGroupConversation = conversation.type() === z.conversation.ConversationType.GROUP;
+          if (isGroupConversation) {
+            const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
+            event.data.expects_read_confirmation = !!expectsReadConfirmation;
+          }
+          return event;
+        });
+      }
       case z.event.Client.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         return this.eventService
