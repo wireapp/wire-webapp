@@ -181,8 +181,9 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalAccountReadReceiptsChanged(newValue) {
-    const readReceiptsOnTitle = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.read-receipts-on');
-    const readReceiptsOffTitle = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.read-receipts-off');
+    const modal = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED);
+    const readReceiptsOnTitle = modal.find('.read-receipts-on');
+    const readReceiptsOffTitle = modal.find('.read-receipts-off');
 
     if (newValue) {
       readReceiptsOffTitle.hide();
