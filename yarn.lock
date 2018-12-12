@@ -9512,10 +9512,10 @@ raw-body@~1.1.0:
     bytes "1"
     string_decoder "0.10"
 
-raygun4js@2.13.3:
-  version "2.13.3"
-  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.13.3.tgz#e3817c341656cc302c5825f3e17683dc3bb2da6d"
-  integrity sha512-Un4mMuKKsoSdjeGf9/c4+p33XJunpMniAd5EkOacTs6ts7Q7zjxI9IQuUuhpKFTDaP8xKqtecCR9cFRb95MI1A==
+raygun4js@2.13.4:
+  version "2.13.4"
+  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.13.4.tgz#6cdddeeee642f311a4424c85ff76912a1b36bb8a"
+  integrity sha512-JjDGl/OR53mZJgoPVSHqpuTRa1NDx1d+RPfBIMNkU+UYjTn+Tfn3pV/36fNtNuVszWft2jNB3lv2pphD12fiww==
 
 rc@^1.1.6:
   version "1.2.2"
