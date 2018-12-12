@@ -120,8 +120,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   onUserEvent(event) {
     if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key) {
+        const defaultValue = !!PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue;
         this.notifications.push({
-          data: !!event.value,
+          data: event.value === undefined ? defaultValue : !!event.value,
           type: PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
         });
       }
