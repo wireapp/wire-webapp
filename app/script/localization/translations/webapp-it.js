@@ -482,10 +482,10 @@ z.string.it.warningNotFoundMicrophone = 'Non puoi chiamare perchè il tuo comput
 z.string.it.warningPermissionDeniedCamera = 'Non puoi chiamare perchè il tuo browser non ha accesso alla webcam.';
 z.string.it.warningPermissionDeniedMicrophone = 'Non puoi chiamare perchè il tuo browser non ha accesso al microfono.';
 z.string.it.warningPermissionDeniedScreen = 'Il browser richiede l’autorizzazione per condividere il tuo schermo.';
-z.string.it.warningPermissionRequestCamera = '{{icon}} Consenti accesso alla webcam';
-z.string.it.warningPermissionRequestMicrophone = '{{icon}} Consenti accesso al microfono';
-z.string.it.warningPermissionRequestNotification = '{{icon}} Consenti notifiche';
-z.string.it.warningPermissionRequestScreen = '{{icon}} Consenti accesso allo schermo';
+z.string.it.warningPermissionRequestCamera = '[icon] Consenti accesso alla webcam';
+z.string.it.warningPermissionRequestMicrophone = '[icon] Consenti accesso al microfono';
+z.string.it.warningPermissionRequestNotification = '[icon] Consenti notifiche';
+z.string.it.warningPermissionRequestScreen = '[icon] Consenti accesso allo schermo';
 
 z.string.it.userAvailabilityAvailable = 'Disponibile';
 z.string.it.userAvailabilityNone = 'Nessuno';

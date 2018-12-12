@@ -489,10 +489,10 @@ z.string.fi.warningNotFoundMicrophone = 'Et voi soittaa puhelua koska tietokonee
 z.string.fi.warningPermissionDeniedCamera = 'Et voi soittaa puhelua koska selaimellasi ei ole oikeutta käyttä kameraa.';
 z.string.fi.warningPermissionDeniedMicrophone = 'Et voi soittaa puhelua koska selaimellasi ei ole oikeuta käyttää mikrofonia.';
 z.string.fi.warningPermissionDeniedScreen = 'Selaimesi tarvitsee luvan jakaa näyttösi.';
-z.string.fi.warningPermissionRequestCamera = '{{icon}} Anna käyttöoikeus kameraan';
-z.string.fi.warningPermissionRequestMicrophone = '{{icon}} Anna käyttöoikeus mikrofoniin';
-z.string.fi.warningPermissionRequestNotification = '{{icon}} Salli ilmoitukset';
-z.string.fi.warningPermissionRequestScreen = '{{icon}} Salli näytön käyttö';
+z.string.fi.warningPermissionRequestCamera = '[icon] Anna käyttöoikeus kameraan';
+z.string.fi.warningPermissionRequestMicrophone = '[icon] Anna käyttöoikeus mikrofoniin';
+z.string.fi.warningPermissionRequestNotification = '[icon] Salli ilmoitukset';
+z.string.fi.warningPermissionRequestScreen = '[icon] Salli näytön käyttö';
 
 z.string.fi.userAvailabilityAvailable = 'Saatavilla';
 z.string.fi.userAvailabilityNone = 'Ei mitään';

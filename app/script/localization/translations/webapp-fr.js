@@ -730,10 +730,10 @@ z.string.fr.warningNotFoundMicrophone = 'Vous ne pouvez pas appeler car votre or
 z.string.fr.warningPermissionDeniedCamera = 'Vous ne pouvez pas appeler car votre navigateur n’a pas accès à votre webcam.';
 z.string.fr.warningPermissionDeniedMicrophone = 'Vous ne pouvez pas appeler car votre navigateur n’a pas accès à votre micro.';
 z.string.fr.warningPermissionDeniedScreen = 'Votre navigateur a besoin de votre permission pour partager votre écran.';
-z.string.fr.warningPermissionRequestCamera = '{{icon}} Autoriser l’accès à la webcam';
-z.string.fr.warningPermissionRequestMicrophone = '{{icon}} Autoriser l’accès au micro';
-z.string.fr.warningPermissionRequestNotification = '{{icon}} Autoriser les notifications';
-z.string.fr.warningPermissionRequestScreen = '{{icon}} Autoriser l’accès à l’écran';
+z.string.fr.warningPermissionRequestCamera = '[icon] Autoriser l’accès à la webcam';
+z.string.fr.warningPermissionRequestMicrophone = '[icon] Autoriser l’accès au micro';
+z.string.fr.warningPermissionRequestNotification = '[icon] Autoriser les notifications';
+z.string.fr.warningPermissionRequestScreen = '[icon] Autoriser l’accès à l’écran';
 
 z.string.fr.userAvailabilityAvailable = 'Disponible';
 z.string.fr.userAvailabilityAway = 'Absent(e)';
