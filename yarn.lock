@@ -1308,10 +1308,10 @@
     "@types/react" "*"
     "@types/react-router" "*"
 
-"@types/react-router@*", "@types/react-router@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-4.4.1.tgz#c875dfd0b6fe00efa463eb8e5de8b5f74644b3f5"
-  integrity sha512-CtQfdcXyMye3vflnQQ2sHU832iDJRoAr4P+7f964KlLYupXU1I5crP1+d/WnCMo6mmtjBjqQvxrtbAbodqerMA==
+"@types/react-router@*", "@types/react-router@4.4.2":
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-4.4.2.tgz#3436c8f825908be26137c9340f8690ef673dbb09"
+  integrity sha512-EkRC1pDzrDwZ0WRCtjuAAmBGuoKyPcnO5r7mzDnMB8E+R05VkDanAF25ONaCLd3TyM13F0bHOpKcQPWYs+gzhg==
   dependencies:
     "@types/history" "*"
     "@types/react" "*"
