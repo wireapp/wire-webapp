@@ -1815,10 +1815,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const protoAsset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
-          protoAsset.set(
-            z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
-            this.expectReadReceipt(conversationEntity)
-          );
+          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, options.expectsReadConfirmation);
 
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
