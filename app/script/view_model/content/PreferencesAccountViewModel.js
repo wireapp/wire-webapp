@@ -236,7 +236,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       case PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
           close: closeAction,
-          data: aggregatedNotifications.unshift().data,
+          data: aggregatedNotifications.pop().data,
           preventClose: true,
         });
         break;

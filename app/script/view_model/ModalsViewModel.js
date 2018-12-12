@@ -181,17 +181,12 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalAccountReadReceiptsChanged(newValue) {
-    const modal = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED);
-    const readReceiptsOnTitle = modal.find('.read-receipts-on');
-    const readReceiptsOffTitle = modal.find('.read-receipts-off');
+    const titleContainer = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.modal-title');
+    const title = newValue
+      ? z.string.modalAccountReadReceiptsChangedOnHeadline
+      : z.string.modalAccountReadReceiptsChangedOffHeadline;
 
-    if (newValue) {
-      readReceiptsOffTitle.hide();
-      readReceiptsOnTitle.show();
-    } else {
-      readReceiptsOffTitle.show();
-      readReceiptsOnTitle.hide();
-    }
+    titleContainer.text(title);
   }
 
   _showModalAccountNewDevices(devices) {
