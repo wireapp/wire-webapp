@@ -86,14 +86,16 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
               <Route path={ROUTE.LOGIN} component={Login} />
               <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-              {FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <>
-                  <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
-                  <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
-                  <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
-                  <Route path={ROUTE.VERIFY} component={Verify} />
-                </>
-              )}
+              <Route path={ROUTE.CREATE_TEAM} component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
+              <Route
+                path={ROUTE.CREATE_ACCOUNT}
+                component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
+              />
+              <Route
+                path={ROUTE.CREATE_TEAM_ACCOUNT}
+                component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
+              />
+              <Route path={ROUTE.VERIFY} component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
               <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
               <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />
