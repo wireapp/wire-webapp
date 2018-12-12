@@ -45,6 +45,9 @@ export default class ReceiptsMiddleware {
    */
   processEvent(event) {
     switch (event.type) {
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+      case z.event.Client.CONVERSATION.KNOCK:
+      case z.event.Client.CONVERSATION.LOCATION:
       case z.event.Client.CONVERSATION.MESSAGE_ADD: {
         return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
           const isGroupConversation = conversation.type() === z.conversation.ConversationType.GROUP;

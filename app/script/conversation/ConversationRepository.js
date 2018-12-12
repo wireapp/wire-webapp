@@ -3815,9 +3815,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   expectReadReceipt(conversationEntity) {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
-    } else if (conversationEntity.inTeam() && conversationEntity.isGroup()) {
+    }
+
+    if (conversationEntity.inTeam() && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
+
     return false;
   }
 
