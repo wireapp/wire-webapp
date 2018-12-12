@@ -147,6 +147,11 @@ z.string.modalAccountNewDevicesHeadline = 'Your account was used on:';
 z.string.modalAccountNewDevicesFrom = 'From:';
 z.string.modalAccountNewDevicesMessage = 'If you didn’t do this, remove the device and reset your password.';
 
+z.string.modalAccountReadReceiptsChangedSecondary = 'Manage devices';
+z.string.modalAccountReadReceiptsChangedOnHeadline = 'You have enabled read receipts';
+z.string.modalAccountReadReceiptsChangedOffHeadline = 'You have disabled read receipts';
+z.string.modalAccountReadReceiptsChangedMessage = 'You can change this option in your account settings.';
+
 z.string.modalAccountRemoveDeviceAction = 'Remove device';
 z.string.modalAccountRemoveDeviceHeadline = 'Remove "{{device}}"';
 z.string.modalAccountRemoveDeviceMessage = 'Your password is required to remove the device.';
@@ -609,7 +614,7 @@ z.string.messageDetailsNoLikes = 'No one has liked this message yet.';
 z.string.messageDetailsReceiptsOff = 'Read receipts were not on when this message was sent.';
 z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
 
-// Read receipt toggle 
+// Read receipt toggle
 z.string.receiptToggleLabel = 'Read receipts';
 z.string.receiptToggleInfo = 'When this is on, people can see when their messages in this conversation are read.';
 

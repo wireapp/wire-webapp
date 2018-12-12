@@ -58,3 +58,5 @@ z.event.Backend = {
     UPDATE: 'user.update',
   },
 };
+
+export default z.event.Backend;
