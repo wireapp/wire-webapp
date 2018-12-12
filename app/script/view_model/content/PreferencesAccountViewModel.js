@@ -121,7 +121,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key) {
         this.notifications.push({
-          data: event.value === undefined ? false : !!event.value,
+          data: !!event.value,
           type: PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
         });
       }
