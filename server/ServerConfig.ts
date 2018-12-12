@@ -16,6 +16,7 @@ export interface ServerConfig {
     };
     FEATURE: {
       CHECK_CONSENT: boolean;
+      ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_SSO: boolean;
       SHOW_LOADING_INFORMATION: boolean;

@@ -37,6 +37,7 @@ declare global {
         VERSION: string;
         FEATURE: {
           CHECK_CONSENT: boolean;
+          ENABLE_ACCOUNT_REGISTRATION: boolean;
           ENABLE_DEBUG: boolean;
           ENABLE_SSO: boolean;
           SHOW_LOADING_INFORMATION: boolean;
@@ -60,7 +61,9 @@ export const URL = window.wire.env.URL || {
 export const VERSION = window.wire.env.VERSION || '0.0.0';
 export const FEATURE = window.wire.env.FEATURE || {
   CHECK_CONSENT: true,
+  ENABLE_ACCOUNT_REGISTRATION: true,
   ENABLE_DEBUG: false,
   ENABLE_SSO: false,
+  SHOW_LOADING_INFORMATION: false,
 };
 export const APP_INSTANCE_ID = UUID();

@@ -520,10 +520,10 @@ z.string.pl.warningNotFoundMicrophone = 'Nie możesz zadzwonić ponieważ Twój 
 z.string.pl.warningPermissionDeniedCamera = 'Nie możesz zadzwonić ponieważ przeglądarka nie ma dostępu do kamery.';
 z.string.pl.warningPermissionDeniedMicrophone = 'Nie możesz zadzwonić ponieważ przeglądarka nie ma dostępu do mikrofonu.';
 z.string.pl.warningPermissionDeniedScreen = 'Twoja przeglądarka potrzebuje pozwolenia aby pokazać pulpit.';
-z.string.pl.warningPermissionRequestCamera = '{{icon}} Zezwól na dostęp do aparatu';
-z.string.pl.warningPermissionRequestMicrophone = '{{icon}} Zezwól na dostęp do mikrofonu';
-z.string.pl.warningPermissionRequestNotification = '{{icon}} Zezwól na powiadomienia';
-z.string.pl.warningPermissionRequestScreen = '{{icon}} zezwól na dostęp do ekranu';
+z.string.pl.warningPermissionRequestCamera = '[icon] Zezwól na dostęp do aparatu';
+z.string.pl.warningPermissionRequestMicrophone = '[icon] Zezwól na dostęp do mikrofonu';
+z.string.pl.warningPermissionRequestNotification = '[icon] Zezwól na powiadomienia';
+z.string.pl.warningPermissionRequestScreen = '[icon] zezwól na dostęp do ekranu';
 
 z.string.pl.userAvailabilityAvailable = '&Dostępny(a)';
 z.string.pl.userAvailabilityNone = 'Żaden';

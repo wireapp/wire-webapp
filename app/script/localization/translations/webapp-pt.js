@@ -490,10 +490,10 @@ z.string.pt.warningNotFoundMicrophone = 'Não pode telefonar porque o seu comput
 z.string.pt.warningPermissionDeniedCamera = 'Não pode telefonar porque o seu navegador não tem acesso à câmara.';
 z.string.pt.warningPermissionDeniedMicrophone = 'Não pode telefonar porque o seu navegador não tem acesso ao microfone.';
 z.string.pt.warningPermissionDeniedScreen = 'O seu navegador precisa de permissão para partilhar o ecrã.';
-z.string.pt.warningPermissionRequestCamera = '{{icon}} Permitir o acesso a câmara';
-z.string.pt.warningPermissionRequestMicrophone = '{{icon}} Permitir o acesso ao microfone';
-z.string.pt.warningPermissionRequestNotification = '{{icon}} Permitir notificações';
-z.string.pt.warningPermissionRequestScreen = '{{icon}} Permitir o acesso ao ecrã';
+z.string.pt.warningPermissionRequestCamera = '[icon] Permitir o acesso a câmara';
+z.string.pt.warningPermissionRequestMicrophone = '[icon] Permitir o acesso ao microfone';
+z.string.pt.warningPermissionRequestNotification = '[icon] Permitir notificações';
+z.string.pt.warningPermissionRequestScreen = '[icon] Permitir o acesso ao ecrã';
 
 z.string.pt.userAvailabilityAvailable = 'Disponível';
 z.string.pt.userAvailabilityAway = 'Ausente';

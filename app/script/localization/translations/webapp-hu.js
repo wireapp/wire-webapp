@@ -17,8 +17,6 @@
  *
  */
 
-'use=szigorú';
-
 z.string.hu.wire = 'Wire';
 z.string.hu.wireMacos = 'Wire MacOS-hez';
 z.string.hu.wireWindows = 'Wire Windowshoz';
@@ -562,7 +560,7 @@ z.string.hu.preferencesOptionsContactsMacos = 'Importálás Névjegyek-ből';
 z.string.hu.preferencesOptionsContactsDetail = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
 z.string.hu.preferencesOptionsPopular = 'Közkívánatra';
 z.string.hu.preferencesOptionsEmojiReplaceCheckbox = 'Cserélje ki a begépelt hangulatjeleket emojikra';
-z.string.hu.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
+z.string.hu.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.hu.preferencesOptionsPreviewsSendCheckbox = 'Előnézet készítése az elküldött hivatkozásokról';
 z.string.hu.preferencesOptionsPreviewsSendDetail = 'A más partnerektől kapott hivatkozások előnézete továbbra is látható lesz.';
 z.string.hu.preferencesOptionsNotifications = 'Értesítések';
@@ -665,10 +663,10 @@ z.string.hu.warningNotFoundMicrophone = 'Nem kezdeményezhetsz hívást, mert ni
 z.string.hu.warningPermissionDeniedCamera = 'Nem kezdeményezhetsz hívást, mert böngésződ nem férhet hozzá a kamerádhoz.';
 z.string.hu.warningPermissionDeniedMicrophone = 'Nem kezdeményezhetsz hívást, mert böngésződ nem férhet hozzá a mikrofonodhoz.';
 z.string.hu.warningPermissionDeniedScreen = 'A képernyőmegosztást engedélyezned kell a böngészőben.';
-z.string.hu.warningPermissionRequestCamera = '{{icon}} Kamera hozzáférés engedélyezése';
-z.string.hu.warningPermissionRequestMicrophone = '{{icon}} Mikrofon hozzáférés engedélyezése';
-z.string.hu.warningPermissionRequestNotification = '{{icon}} Értesítések engedélyezése';
-z.string.hu.warningPermissionRequestScreen = '{{icon}} Képernyőmegosztás engedélyezése';
+z.string.hu.warningPermissionRequestCamera = '[icon] Kamera hozzáférés engedélyezése';
+z.string.hu.warningPermissionRequestMicrophone = '[icon] Mikrofon hozzáférés engedélyezése';
+z.string.hu.warningPermissionRequestNotification = '[icon] Értesítések engedélyezése';
+z.string.hu.warningPermissionRequestScreen = '[icon] Képernyőmegosztás engedélyezése';
 
 z.string.hu.userAvailabilityAvailable = 'Elérhető';
 z.string.hu.userAvailabilityAway = 'Nincs a gépnél';
