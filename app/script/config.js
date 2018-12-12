@@ -99,7 +99,7 @@ window.z.config = {
     SUPPORT: 'https://support.wire.com',
     TEAM_SETTINGS: {
       PRODUCTION: (window.wire.env.URL && window.wire.env.URL.TEAMS_BASE) || 'https://teams.wire.com',
-      STAGING: 'https://wire-admin-staging.zinfra.io',
+      STAGING: 'https://wire-teams-staging.zinfra.io',
     },
     WEBAPP: {
       INTERNAL: 'https://wire-webapp-staging.wire.com',
