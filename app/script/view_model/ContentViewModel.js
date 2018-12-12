@@ -98,7 +98,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           this.titleBar.addedToView();
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
-          this.preferencesAccount.checkNewClients();
+          this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
           this.preferencesAV.initiateDevices();

@@ -24,6 +24,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   static get TYPE() {
     return {
       ACCOUNT_NEW_DEVICES: '.modal-account-new-devices',
+      ACCOUNT_READ_RECEIPTS_CHANGED: '.modal-account-read-receipts-changed',
       ACKNOWLEDGE: '.modal-template-acknowledge',
       CONFIRM: '.modal-template-confirm',
       INPUT: '.modal-template-input',
@@ -62,6 +63,9 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     switch (type) {
       case ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES:
         this._showModalAccountNewDevices(options.data);
+        break;
+      case ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED:
+        this._showModalAccountReadReceiptsChanged(options.data);
         break;
       case ModalsViewModel.TYPE.ACKNOWLEDGE:
         this._showModalAcknowledge(options, titleElement, messageElement, actionElement);
@@ -173,6 +177,19 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
     if (options.warning !== false) {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+    }
+  }
+
+  _showModalAccountReadReceiptsChanged(newValue) {
+    const readReceiptsOnTitle = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.read-receipts-on');
+    const readReceiptsOffTitle = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.read-receipts-off');
+
+    if (newValue) {
+      readReceiptsOffTitle.hide();
+      readReceiptsOnTitle.show();
+    } else {
+      readReceiptsOffTitle.show();
+      readReceiptsOnTitle.hide();
     }
   }
 
