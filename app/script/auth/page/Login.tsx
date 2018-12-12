@@ -311,7 +311,7 @@ class Login extends React.Component<CombinedProps, State> {
           <Columns>
             <IsMobile not>
               <Column style={{display: 'flex'}}>
-                <div style={{margin: 'auto'}}>{backArrow}</div>
+                {config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
               </Column>
             </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
