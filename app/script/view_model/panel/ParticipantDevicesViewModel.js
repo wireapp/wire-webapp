@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
     return {
       FOUND: 'ParticipantDevicesViewModel.MODE.FOUND',
@@ -188,4 +185,4 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     }
     this.userEntity(userEntity);
   }
-};
+}

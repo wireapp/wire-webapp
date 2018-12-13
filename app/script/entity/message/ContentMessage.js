@@ -40,6 +40,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
 
     this.quote = ko.observable();
+    this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
       return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
@@ -94,16 +95,22 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
   }
 
   update_reactions({data: event_data, from}) {
-    const reactions = this.reactions();
+    const reaction = event_data && event_data.reaction;
+    const hasUser = this.reactions()[from];
+    const shouldAdd = reaction && !hasUser;
+    const shouldDelete = !reaction && hasUser;
 
-    if (event_data.reaction) {
-      reactions[from] = event_data.reaction;
-    } else {
-      delete reactions[from];
+    if (shouldAdd) {
+      this.reactions(Object.assign({[from]: reaction}, this.reactions()));
     }
 
-    if (reactions !== this.reactions) {
+    if (shouldDelete) {
+      const reactions = Object.assign({}, this.reactions());
+      delete reactions[from];
       this.reactions(reactions);
+    }
+
+    if (shouldAdd || shouldDelete) {
       this.version += 1;
       return {reactions: this.reactions(), version: this.version};
     }

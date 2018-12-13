@@ -20,6 +20,8 @@
 /* eslint no-undef: "off" */
 
 import ko from 'knockout';
+import PropertiesRepository from 'app/script/properties/PropertiesRepository';
+import PropertiesService from 'app/script/properties/PropertiesService';
 
 /**
  * @param {function} [logger_level] - A function returning the logger level.
@@ -274,13 +276,15 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
       TestFactory.self_service = new z.self.SelfService(this.backendClient);
       TestFactory.user_service = new z.user.UserService(this.backendClient);
+      TestFactory.propertyRepository = new PropertiesRepository(new PropertiesService(this.backendClient));
 
       TestFactory.user_repository = new z.user.UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.self_service,
         TestFactory.client_repository,
-        TestFactory.serverTimeRepository
+        TestFactory.serverTimeRepository,
+        TestFactory.propertyRepository
       );
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
@@ -400,7 +404,8 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         undefined,
         TestFactory.serverTimeRepository,
         TestFactory.team_repository,
-        TestFactory.user_repository
+        TestFactory.user_repository,
+        TestFactory.propertyRepository
       );
 
       return TestFactory.conversation_repository;

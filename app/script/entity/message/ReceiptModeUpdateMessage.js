@@ -17,25 +17,23 @@
  *
  */
 
-guest-mode-toggle {
-  display: flex;
-  flex-direction: column;
+import SystemMessage from './SystemMessage';
 
-  .guest-mode-toggle-row {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 12px;
-    border-bottom: 1px solid fade(@graphite-dark, 8%);
-    font-size: 16px;
-    line-height: 24px;
-  }
+export default class ReceiptModeUpdateMessage extends SystemMessage {
+  constructor(isReceiptEnabled) {
+    super();
 
-  .guest-mode-toggle-info {
-    margin-top: 16px;
-  }
+    this.type = z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE;
+    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-  .slider.disabled {
-    opacity: 0.4;
-    pointer-events: none;
+    this.caption = ko.pureComputed(() => {
+      let stringId;
+      if (isReceiptEnabled) {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOnYou : z.string.conversationReceiptsOn;
+      } else {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOffYou : z.string.conversationReceiptsOff;
+      }
+      return z.l10n.text(stringId);
+    });
   }
 }

@@ -663,7 +663,7 @@ z.event.EventRepository = class EventRepository {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
-    //first check if a message that should be replaced exists in DB
+    // first check if a message that should be replaced exists in DB
     const findEventToReplacePromise = mappedData.replacing_message_id
       ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();
@@ -790,6 +790,9 @@ z.event.EventRepository = class EventRepository {
 
   _getUpdatesForMessageEdit(originalEvent, newEvent) {
     return Object.assign({}, newEvent, {
+      data: Object.assign({}, newEvent.data, {
+        expects_read_confirmation: originalEvent.data.expects_read_confirmation,
+      }),
       edited_time: newEvent.time,
       time: originalEvent.time,
       version: 1,

@@ -25,6 +25,9 @@ import SimpleBar from 'simplebar';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
+import overlayedObserver from '../../ui/overlayedObserver';
+import viewportObserver from '../../ui/viewportObserver';
+
 /**
  * Use it on the drop area.
  */
@@ -364,33 +367,6 @@ ko.subscribable.fn.subscribeChanged = function(handler) {
 };
 
 /**
- * Returns a suspendable subscription
- * https://github.com/knockout/knockout/issues/270#issuecomment-11360312
- * @param {function} handler - Handler
- * @param {ko.observable} owner - Subscription owner
- * @param {string} eventName - Event name
- * @returns {ko.subscription} knockout subscription with suspend and unsuspend methods
- */
-ko.subscribable.fn.suspendableSubscribe = function(handler, owner, eventName) {
-  let isSuspended = false;
-  return ko.utils.extend(
-    this.subscribe(
-      value => {
-        if (!isSuspended) {
-          handler(value);
-        }
-      },
-      owner,
-      eventName
-    ),
-    {
-      suspend: () => (isSuspended = true),
-      unsuspend: () => (isSuspended = false),
-    }
-  );
-};
-
-/**
  * Render antiscroll scrollbar.
  */
 ko.bindingHandlers.antiscroll = {
@@ -587,13 +563,11 @@ ko.bindingHandlers.in_viewport = {
     if (!onElementVisible) {
       return;
     }
-    z.ui.ViewportObserver.addElement(element, () => {
-      return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
-    });
+    viewportObserver.addElement(element, () => overlayedObserver.onElementVisible(element, onElementVisible), true);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      z.ui.OverlayedObserver.removeElement(element);
-      z.ui.ViewportObserver.removeElement(element);
+      overlayedObserver.removeElement(element);
+      viewportObserver.removeElement(element);
     });
   },
 };

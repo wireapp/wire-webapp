@@ -24,7 +24,7 @@ window.z.message = z.message || {};
  * Enum for different confirmation types.
  * @type {z.message.StatusType} Enum of status types
  */
-z.message.StatusType = {
+const StatusType = {
   DELIVERED: 3,
   FAILED: 0,
   SEEN: 4,
@@ -32,3 +32,6 @@ z.message.StatusType = {
   SENT: 2,
   UNSPECIFIED: -1,
 };
+
+z.message.StatusType = StatusType;
+export default StatusType;

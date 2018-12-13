@@ -17,11 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
-
-z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
+export default class BasePanelViewModel {
   constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot, repositories}) {
     this.onClose = onClose;
     this.onGoBack = onGoBack;
@@ -46,4 +42,4 @@ z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
   shouldSkipTransition() {
     return false;
   }
-};
+}
