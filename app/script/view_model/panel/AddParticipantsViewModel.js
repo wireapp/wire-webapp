@@ -100,7 +100,12 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => (this.contacts() || this.searchInput()) && this.isVisible())
+      .pureComputed(() => {
+        if (this.isVisible()) {
+          this.contacts();
+          this.searchInput();
+        }
+      })
       .extend({notify: 'always', rateLimit: 500});
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
