@@ -27,18 +27,18 @@
 
   .left-column {
     position: relative;
-    width: @left-width;
+    width: @conversation-list-width;
     flex: 0 0 auto;
-    color: @left-color;
-    fill: @left-color;
+    color: @conversation-list-color;
+    fill: @conversation-list-color;
 
     &--light-theme {
-      color: @graphite-negative;
-      fill: @graphite-negative;
+      color: @secondary;
+      fill: @secondary;
     }
 
     .team-mode & {
-      width: @left-width + @teams-width;
+      width: @conversation-list-width + @teams-width;
     }
   }
 

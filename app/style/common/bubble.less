@@ -31,23 +31,23 @@
     .label-bold-xs;
 
     height: 40px;
-    color: @graphite-negative;
+    color: @secondary;
     cursor: pointer;
     line-height: 40px;
     user-select: none;
 
     &.hover,
     &:hover {
-      background-color: fade(@graphite, 8%);
+      background-color: fade(@primary, 8%);
     }
 
     &.active,
     &:active {
-      background-color: fade(@graphite, 16%);
+      background-color: fade(@primary, 16%);
     }
   }
 
   > li + li {
-    border-top: 1px solid fade(@graphite, 16%);
+    border-top: 1px solid fade(@primary, 16%);
   }
 }

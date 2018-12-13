@@ -17,8 +17,8 @@
  *
  */
 
-@device-toggle-graphite-negative: #323639;
-@device-toggle-graphite: #8d989f;
+@device-toggle-secondary: #323639;
+@device-toggle-primary: #8d989f;
 
 device-toggle-button {
   display: inline-flex;
@@ -29,10 +29,10 @@ device-toggle-button {
 }
 
 .device-toggle-button-dark {
-  color: @device-toggle-graphite-negative;
+  color: @device-toggle-secondary;
 
   .device-toggle-button-indicator-dot {
-    color: @device-toggle-graphite-negative;
+    color: @device-toggle-secondary;
   }
 }
 
@@ -44,7 +44,7 @@ device-toggle-button {
 .device-toggle-button-indicator-dot {
   .dot-md;
 
-  background-color: fade(@device-toggle-graphite, 24%);
+  background-color: fade(@device-toggle-primary, 24%);
 
   &:not(:last-child) {
     margin-right: 8px;

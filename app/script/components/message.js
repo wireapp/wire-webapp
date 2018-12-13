@@ -220,7 +220,7 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render($parent.selfId()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render($parent.selfId()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-primary': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></link-preview-asset>
@@ -272,7 +272,7 @@ const normalTemplate = `
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: () => showLikes(true)">
-        <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
+        <span class="font-size-xs text-primary" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
         <!-- ko if: !showLikes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
@@ -328,7 +328,7 @@ const unableToDecryptTemplate = `
 
 const systemTemplate = `
   <div class="message-header">
-    <div class="message-header-icon message-header-icon--svg text-graphite">
+    <div class="message-header-icon message-header-icon--svg text-primary">
       <span data-bind="component: getSystemMessageIconComponent(message)"></span>
     </div>
     <div class="message-header-label">
@@ -461,7 +461,7 @@ const memberTemplate = `
 
     <!-- ko if: message.hasUsers() -->
       <div class="message-header" data-bind="template: {afterRender: bindShowMore}">
-        <div class="message-header-icon message-header-icon--svg text-graphite">
+        <div class="message-header-icon message-header-icon--svg text-primary">
           <message-icon data-bind="visible: message.isGroupCreation()"></message-icon>
           <span class="icon-minus" data-bind="visible: message.isMemberRemoval()"></span>
           <span class="icon-plus" data-bind="visible: message.isMemberJoin()"></span>

@@ -46,7 +46,7 @@ participant-item {
   }
 
   guest-icon {
-    fill: @graphite-negative;
+    fill: @secondary;
     opacity: 0.48;
   }
 
@@ -68,7 +68,7 @@ participant-item {
 
   &.highlighted {
     animation: fadeInUserHighlighting 1s @ease-out-quart;
-    background-color: fade(@graphite-negative, 8%);
+    background-color: fade(@secondary, 8%);
   }
 
   .participant-item {
@@ -132,10 +132,10 @@ participant-item {
 @keyframes fadeInUserHighlighting {
   0%,
   50% {
-    background-color: fade(@graphite-negative, 0%);
+    background-color: fade(@secondary, 0%);
   }
   100% {
-    background-color: fade(@graphite-negative, 8%);
+    background-color: fade(@secondary, 8%);
   }
 }
 

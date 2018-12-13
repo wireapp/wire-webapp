@@ -27,8 +27,8 @@
 
   position: relative;
   display: inline-block;
-  border: 1px solid fade(@graphite-negative, 40%);
-  color: @graphite-negative;
+  border: 1px solid fade(@secondary, 40%);
+  color: @secondary;
   cursor: pointer;
   line-height: @button-round-size - 2px;
   text-align: center;
@@ -48,24 +48,24 @@
 
   &.hover,
   &:hover {
-    background: fade(@graphite-negative, 16%);
+    background: fade(@secondary, 16%);
   }
 
   &.active,
   &:active {
-    background: fade(@graphite-negative, 40%);
+    background: fade(@secondary, 40%);
   }
 
   &.toggled {
     border-color: transparent;
-    background: fade(@graphite-negative, 72%);
+    background: fade(@secondary, 72%);
     color: #fff;
   }
 
   &.disabled {
-    border: 1px solid fade(@graphite-negative, 40%);
+    border: 1px solid fade(@secondary, 40%);
     background: transparent;
-    color: fade(@graphite-negative, 72%);
+    color: fade(@secondary, 72%);
     cursor: default;
   }
 }
@@ -155,7 +155,7 @@
   &.toggled {
     border-color: transparent;
     background: #fff;
-    color: @graphite-negative;
+    color: @secondary;
   }
 
   &.disabled {
@@ -191,7 +191,7 @@
 
     height: 28px;
     margin-left: 10px;
-    color: @graphite-negative;
+    color: @secondary;
     line-height: 28px;
   }
 }

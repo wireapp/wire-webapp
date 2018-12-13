@@ -60,7 +60,7 @@
     .label-xs;
 
     padding-left: 8px;
-    color: fade(@graphite, 48%);
+    color: fade(@primary, 48%);
   }
 
   &--accent::placeholder {
@@ -70,7 +70,7 @@
 
 @supports (caret-color: #000) {
   .conversation-input-bar-text {
-    caret-color: @graphite-negative;
+    caret-color: @secondary;
     color: transparent;
   }
 }
@@ -131,7 +131,7 @@
   line-height: 0;
 
   svg path {
-    fill: @graphite-negative;
+    fill: @secondary;
   }
 }
 
@@ -162,7 +162,7 @@
   }
 
   svg path {
-    fill: @graphite;
+    fill: @primary;
   }
 }
 
@@ -193,7 +193,7 @@
 
 .conversation-input-bar-paste-cancel {
   margin-right: 32px;
-  fill: @graphite;
+  fill: @primary;
   line-height: 0;
 }
 
@@ -201,7 +201,7 @@
   position: fixed;
   z-index: @z-index-context;
   display: block;
-  border: 0.5px solid fade(@graphite-negative, 12%);
+  border: 0.5px solid fade(@secondary, 12%);
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
@@ -221,7 +221,7 @@
     }
 
     &.selected {
-      background-color: fade(@graphite, 16%);
+      background-color: fade(@primary, 16%);
     }
 
     .symbol {
@@ -256,7 +256,7 @@
   close-icon {
     margin-top: 4px;
     cursor: pointer;
-    fill: @graphite-negative;
+    fill: @secondary;
   }
 
   &__body {
@@ -291,7 +291,7 @@
       svg {
         width: 8px;
         height: 8px;
-        fill: fade(@graphite-negative, 40%);
+        fill: fade(@secondary, 40%);
       }
     }
   }
@@ -328,7 +328,7 @@
       &:not([src]) {
         width: 40px;
         height: 40px;
-        background-color: @graphite;
+        background-color: @primary;
       }
     }
   }
