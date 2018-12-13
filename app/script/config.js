@@ -107,7 +107,7 @@ window.z.config = {
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },
     WEBSITE: {
-      PRODUCTION: (window.wire.env.URL && window.wire.env.URL.WEBSITE_BASE) || 'https://wire.com',
+      PRODUCTION: window.wire.env.URL && window.wire.env.URL.WEBSITE_BASE,
       STAGING: 'https://wire-website-staging.zinfra.io',
     },
   },

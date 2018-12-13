@@ -11,7 +11,9 @@
         <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
         <a class="preferences-link" data-bind="click: clickOnToU, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
         <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsitePrivacy}, l10n_text: z.string.preferencesAboutPrivacyPolicy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
-        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsiteRoot}, l10n_text: z.string.preferencesAboutWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
+        <!-- ko if: hasWebsiteUrl() -->
+          <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsiteRoot}, l10n_text: z.string.preferencesAboutWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
+        <!-- /ko -->
       </section>
       <section class="preferences-section">
         <header class="preferences-header"><hr class="preferences-separator"></header>

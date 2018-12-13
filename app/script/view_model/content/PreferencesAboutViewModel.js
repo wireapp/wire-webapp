@@ -33,4 +33,8 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
     const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().inTeam() ? 'teams' : 'personal'}/`;
     z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
+
+  hasWebsiteUrl() {
+    return !!z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE);
+  }
 };
