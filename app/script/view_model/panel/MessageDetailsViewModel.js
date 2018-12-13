@@ -77,9 +77,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
 
+    const sortUsers = (userA, userB) => (userA.name() > userB.name() ? 1 : -1);
+
     this.receipts.subscribe(receipts => {
       const userIds = receipts.map(({userId}) => userId);
-      userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users));
+      userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users.sort(sortUsers)));
       const receiptTimes = receipts.reduce(
         (times, {userId, time}) => Object.assign(times, {[userId]: formatTime(time)}),
         {}
@@ -93,7 +95,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes.subscribe(likeIds => {
-      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users));
+      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
     });
 
     this.sentFooter = ko.pureComputed(() => {
