@@ -264,16 +264,13 @@
   &.start-ui-service-bubble.bubble-left-top,
   &.start-ui-service-bubble.bubble-left {
     &::before {
-      background-color: @app-bg-secondary;
+      background-color: @app-bg;
     }
     &::after {
-      background: linear-gradient(
-        -45deg,
-        @app-bg-secondary 0%,
-        @app-bg-secondary 50%,
-        transparent 50%,
-        transparent 100%
-      );
+      left: -11px;
+      border-right: @modal-border-color;
+      border-bottom: @modal-border-color;
+      background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
     }
   }
 }
@@ -326,6 +323,7 @@
   justify-content: center;
 
   &__icon {
+    fill: @graphite-negative;
     opacity: 0.24;
     svg {
       width: 48px;

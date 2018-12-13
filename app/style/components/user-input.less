@@ -63,11 +63,11 @@ user-input {
     position: absolute;
     top: 11px;
     right: 7px;
-    background-color: fade(#fff, 40%);
+    background-color: fade(@graphite, 40%);
     content: '';
 
     .user-list-light & {
-      background-color: fade(#222, 40%);
+      background-color: fade(@graphite-negative, 40%);
     }
   }
 
@@ -93,12 +93,12 @@ user-input {
 
   &::placeholder {
     &:invalid {
-      color: fade(#fff, 40%);
+      color: fade(@graphite, 40%);
     }
     .label-xs;
 
     padding-left: 8px;
-    color: fade(#fff, 40%);
+    color: fade(@graphite, 40%);
   }
 
   // hack for chrome to fix line height issue
