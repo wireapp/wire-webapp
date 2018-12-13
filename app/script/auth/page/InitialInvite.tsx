@@ -41,6 +41,7 @@ import {RouteComponentProps} from 'react-router';
 import {inviteStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
+import BackendError from '../module/action/BackendError';
 import ValidationError from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as InviteSelector from '../module/selector/InviteSelector';
@@ -106,7 +107,26 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
     if (!this.emailInput.checkValidity()) {
       this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
     } else {
-      this.props.invite({email: this.emailInput.value});
+      this.props.invite({email: this.emailInput.value}).catch(error => {
+        if (error.label) {
+          switch (error.label) {
+            case BackendError.LABEL.EMAIL_EXISTS:
+            case BackendError.LABEL.ALREADY_INVITED: {
+              return;
+            }
+            default: {
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                error.label.endsWith(errorType)
+              );
+              if (!isValidationError) {
+                throw error;
+              }
+            }
+          }
+        } else {
+          throw error;
+        }
+      });
       this.setState({enteredEmail: ''});
       this.emailInput.value = '';
     }
