@@ -257,11 +257,17 @@ class Login extends React.Component<CombinedProps, State> {
             this.props.resetAuthError();
             return this.props.history.push(ROUTE.CLIENTS);
           }
+          case BackendError.LABEL.INVALID_CREDENTIALS:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             return;
           }
           default: {
-            throw error;
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType)
+            );
+            if (!isValidationError) {
+              throw error;
+            }
           }
         }
       });
