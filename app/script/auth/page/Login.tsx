@@ -262,7 +262,12 @@ class Login extends React.Component<CombinedProps, State> {
             return;
           }
           default: {
-            throw error;
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType)
+            );
+            if (!isValidationError) {
+              throw error;
+            }
           }
         }
       });

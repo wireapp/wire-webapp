@@ -172,7 +172,18 @@ class ClientItem extends React.Component<CombinedProps, State> {
       })
       .then(() => this.props.onClientRemoval(this.state.password))
       .catch(error => {
-        if (!error.label) {
+        if (error.label) {
+          switch (error.label) {
+            default: {
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                error.label.endsWith(errorType)
+              );
+              if (!isValidationError) {
+                throw error;
+              }
+            }
+          }
+        } else {
           throw error;
         }
       });
