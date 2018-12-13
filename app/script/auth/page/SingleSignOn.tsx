@@ -298,7 +298,12 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
           }
           default: {
             this.setState({ssoError: error});
-            throw error;
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType)
+            );
+            if (!isValidationError) {
+              throw error;
+            }
           }
         }
       });

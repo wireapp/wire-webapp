@@ -196,7 +196,24 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.routeToApp())
-        .catch(error => this.props.doLogout());
+        .catch(error => {
+          if (error.label) {
+            switch (error.label) {
+              default: {
+                const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                  error.label.endsWith(errorType)
+                );
+                if (!isValidationError) {
+                  this.props.doLogout();
+                  throw error;
+                }
+              }
+            }
+          } else {
+            this.props.doLogout();
+            throw error;
+          }
+        });
     }
     this.nameInput.focus();
   };
