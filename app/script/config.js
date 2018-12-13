@@ -96,20 +96,20 @@ window.z.config = {
       PRODUCTION: (window.wire.env.URL && window.wire.env.URL.ACCOUNT_BASE) || 'https://account.wire.com',
       STAGING: 'https://wire-account-staging.zinfra.io',
     },
+    PRIVACY_POLICY: window.wire.env.URL && window.wire.env.URL.PRIVACY_POLICY,
     SUPPORT: 'https://support.wire.com',
     TEAM_SETTINGS: {
       PRODUCTION: (window.wire.env.URL && window.wire.env.URL.TEAMS_BASE) || 'https://teams.wire.com',
       STAGING: 'https://wire-teams-staging.zinfra.io',
     },
+    TERMS_OF_USE_PERSONAL: window.wire.env.URL && window.wire.env.URL.TERMS_OF_USE_PERSONAL,
+    TERMS_OF_USE_TEAMS: window.wire.env.URL && window.wire.env.URL.TERMS_OF_USE_TEAMS,
     WEBAPP: {
       INTERNAL: 'https://wire-webapp-staging.wire.com',
       PRODUCTION: window.wire.env.APP_BASE || 'https://app.wire.com',
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },
-    WEBSITE: {
-      PRODUCTION: window.wire.env.URL && window.wire.env.URL.WEBSITE_BASE,
-      STAGING: 'https://wire-website-staging.zinfra.io',
-    },
+    WEBSITE: window.wire.env.URL && window.wire.env.URL.WEBSITE_BASE,
   },
 
   URL_PATH: {

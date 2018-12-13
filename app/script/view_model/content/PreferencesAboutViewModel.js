@@ -29,12 +29,23 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
     this.selfUser = this.userRepository.self;
   }
 
-  clickOnToU() {
-    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().inTeam() ? 'teams' : 'personal'}/`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+  getTermsOfUseUrl() {
+    return this.selfUser().inTeam() ? z.config.URL.TERMS_OF_USE_TEAMS : z.config.URL.TERMS_OF_USE_PERSONAL;
   }
 
-  hasWebsiteUrl() {
-    return !!z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE);
+  getWebsiteUrl() {
+    return z.config.URL.WEBSITE;
+  }
+
+  getPrivacyPolicyUrl() {
+    return z.config.URL.PRIVACY_POLICY;
+  }
+
+  getSupportUrl() {
+    return z.config.URL.SUPPORT;
+  }
+
+  getSupportContactUrl() {
+    return `${z.config.URL.SUPPORT}/hc/en-us/requests/new`;
   }
 };
