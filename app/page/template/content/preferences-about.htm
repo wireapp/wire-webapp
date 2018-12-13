@@ -2,14 +2,14 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesAbout"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko if: !!getSupportUrl() -->
+      <!-- ko if: showSupportSection() -->
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAboutSupport"></header>
         <a class="preferences-link" data-bind="attr: {href: getSupportUrl()}, l10n_text: z.string.preferencesAboutSupportWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
         <a class="preferences-link" data-bind="attr: {href: getSupportContactUrl()}, l10n_text: z.string.preferencesAboutSupportContact" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
       </section>
       <!-- /ko -->
-      <!-- ko if: !!getTermsOfUseUrl() || !!getPrivacyPolicyUrl() || !!getWebsiteUrl() -->
+      <!-- ko if: showWireSection() -->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
           <!-- ko if: !!getTermsOfUseUrl() -->

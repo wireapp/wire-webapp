@@ -41,11 +41,19 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
     return z.config.URL.PRIVACY_POLICY;
   }
 
+  showWireSection() {
+    return !!this.getTermsOfUseUrl() || !!this.getWebsiteUrl() || !!this.getPrivacyPolicyUrl();
+  }
+
   getSupportUrl() {
     return z.config.URL.SUPPORT;
   }
 
   getSupportContactUrl() {
-    return `${z.config.URL.SUPPORT}/hc/en-us/requests/new`;
+    return !!this.getSupportUrl() ? `${this.getSupportUrl()}/hc/en-us/requests/new` : undefined;
+  }
+
+  showSupportSection() {
+    return !!this.getSupportUrl() || !!this.getSupportContactUrl();
   }
 };
