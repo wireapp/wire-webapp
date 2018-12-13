@@ -50,8 +50,7 @@ export default class ReceiptsMiddleware {
       case z.event.Client.CONVERSATION.LOCATION:
       case z.event.Client.CONVERSATION.MESSAGE_ADD: {
         return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
-          const isGroupConversation = conversation.type() === z.conversation.ConversationType.GROUP;
-          if (isGroupConversation) {
+          if (conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
             event.data.expects_read_confirmation = !!expectsReadConfirmation;
           }
