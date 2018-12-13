@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -103,7 +100,12 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => (this.contacts() || this.searchInput()) && this.isVisible())
+      .pureComputed(() => {
+        if (this.isVisible()) {
+          this.contacts();
+          this.searchInput();
+        }
+      })
       .extend({notify: 'always', rateLimit: 500});
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
@@ -183,4 +185,4 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
-};
+}

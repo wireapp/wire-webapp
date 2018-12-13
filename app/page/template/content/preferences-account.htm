@@ -84,7 +84,7 @@
         <!-- /ko -->
       </section>
 
-      <section class="preferences-section preferences-section-privacy">
+      <section class="preferences-section preferences-section-data-usage">
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountData"></header>
         <div class="preferences-option">
@@ -104,6 +104,18 @@
           </div>
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentDetail"></div>
         <!-- /ko -->
+      </section>
+
+      <section class="preferences-section preferences-section-privacy">
+        <hr class="preferences-separator">
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountPrivacy"></header>
+        <div class="preferences-option">
+          <div class="preferences-option-icon checkbox text-theme" data-uie-name="status-preference-read-receipts">
+            <input type="checkbox" id="read-receipts-checkbox" data-bind="checked: optionReadReceipts, event: {change: onReadReceiptsChange}">
+            <label class="preferences-options-checkbox-label" for="read-receipts-checkbox" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsCheckbox"></label>
+          </div>
+        </div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsDetail"></div>
       </section>
 
       <!-- ko if: isActivatedAccount() -->

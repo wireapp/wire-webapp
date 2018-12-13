@@ -147,6 +147,11 @@ z.string.modalAccountNewDevicesHeadline = 'Your account was used on:';
 z.string.modalAccountNewDevicesFrom = 'From:';
 z.string.modalAccountNewDevicesMessage = 'If you didn’t do this, remove the device and reset your password.';
 
+z.string.modalAccountReadReceiptsChangedSecondary = 'Manage devices';
+z.string.modalAccountReadReceiptsChangedOnHeadline = 'You have enabled read receipts';
+z.string.modalAccountReadReceiptsChangedOffHeadline = 'You have disabled read receipts';
+z.string.modalAccountReadReceiptsChangedMessage = 'You can change this option in your account settings.';
+
 z.string.modalAccountRemoveDeviceAction = 'Remove device';
 z.string.modalAccountRemoveDeviceHeadline = 'Remove "{{device}}"';
 z.string.modalAccountRemoveDeviceMessage = 'Your password is required to remove the device.';
@@ -331,6 +336,7 @@ z.string.conversationCreateWithMore = 'with {{users}}, and [showmore]{{count}} m
 z.string.conversationCreateTeam = 'with [showmore]all team members[/showmore]';
 z.string.conversationCreateTeamGuest = 'with [showmore]all team members and one guest[/showmore]';
 z.string.conversationCreateTeamGuests = 'with [showmore]all team members and {{count}} guests[/showmore]';
+z.string.conversationCreateReceiptsEnabled = 'Read receipts are on';
 z.string.conversationMemberJoined = '[bold]{{name}}[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedYou = '[bold]You[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedMore = '[bold]{{name}}[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
@@ -343,6 +349,10 @@ z.string.conversationMemberRemoved = '[bold]{{name}}[/bold] removed {{users}}';
 z.string.conversationMemberRemovedYou = '[bold]You[/bold] removed {{users}}';
 z.string.conversationTeamLeft = '[bold]{{name}}[/bold] was removed from the team';
 z.string.conversationMessageDelivered = 'Delivered';
+z.string.conversationReceiptsOn = ' turned on read receipts for everyone';
+z.string.conversationReceiptsOnYou = ' turned on read receipts for everyone';
+z.string.conversationReceiptsOff = ' turned off read receipts for everyone';
+z.string.conversationReceiptsOffYou = ' turned off read receipts for everyone';
 z.string.conversationRename = ' renamed the conversation';
 z.string.conversationRenameYou = ' renamed the conversation';
 z.string.conversationUpdatedTimer = ' set the message timer to {{time}}';
@@ -374,6 +384,7 @@ z.string.conversationContextMenuDownload = 'Download';
 z.string.conversationContextMenuLike = 'Like';
 z.string.conversationContextMenuReply = 'Reply';
 z.string.conversationContextMenuUnlike = 'Unlike';
+z.string.conversationContextMenuDetails = 'Details';
 z.string.conversationDeleteTimestamp = 'Deleted: {{date}}';
 z.string.conversationEditTimestamp = 'Edited: {{date}}';
 z.string.conversationLikesCaption = '{{number}} people';
@@ -407,6 +418,10 @@ z.string.guestRoomConversationBadgeGuestAndService = 'Guests and services are pr
 
 z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
 z.string.guestRoomConversationButton = 'Invite people';
+
+// Read receipts toggle
+z.string.readReceiptsToogleName = 'Read receipts';
+z.string.readReceiptsToogleInfo = 'When this is on, people can see when their messages in this conversation are read.';
 
 // Collection
 z.string.collectionShowAll = 'Show all {{number}}';
@@ -530,6 +545,10 @@ z.string.conversationDetailsParticipantsUsersOne = 'Person';
 z.string.conversationDetailsParticipantsUsersMany = 'People';
 z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
+z.string.conversationDetails1to1ReceiptsHeadEnabled = 'You have enabled read receipts';
+z.string.conversationDetails1to1ReceiptsHeadDisabled = 'You have disabled read receipts';
+z.string.conversationDetails1to1ReceiptsFirst = 'If both sides turn on read receipts, you can see when messages are read.';
+z.string.conversationDetails1to1ReceiptsSecond = 'You can change this option in your account settings.';
 
 // Panel: Conversation participants
 z.string.conversationParticipantsTitle = 'People';
@@ -585,6 +604,21 @@ z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old ver
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';
 z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
 
+// Panel: Message details
+z.string.messageDetailsTitle = 'Details';
+z.string.messageDetailsTitleLikes = 'Liked{{count}}';
+z.string.messageDetailsTitleReceipts = 'Read{{count}}';
+z.string.messageDetailsSent = 'Sent: {{sent}}';
+z.string.messageDetailsEdited = 'Edited: {{edited}}';
+z.string.messageDetailsNoLikes = 'No one has liked this message yet.';
+z.string.messageDetailsReceiptsOff = 'Read receipts were not on when this message was sent.';
+z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
+
+// Read receipt toggle
+z.string.receiptToggleLabel = 'Read receipts';
+z.string.receiptToggleInfo = 'When this is on, people can see when their messages in this conversation are read.';
+
+
 // User profile actions
 z.string.userProfileButtonConnect = 'Connect';
 z.string.userProfileButtonIgnore = 'Ignore';
@@ -620,12 +654,15 @@ z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
 z.string.preferencesAccountMarketingConsentCheckbox = 'Receive newsletter';
 z.string.preferencesAccountMarketingConsentDetail = 'Receive news and product updates from Wire via email.';
+z.string.preferencesAccountPrivacy = 'Privacy';
+z.string.preferencesAccountReadReceiptsCheckbox = 'Read receipts';
+z.string.preferencesAccountReadReceiptsDetail = 'When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.';
 z.string.preferencesAccountResetPassword = 'Reset password';
 z.string.preferencesAccountTeam = 'in {{name}}';
-z.string.preferencesAccountUsernamePlaceholder = 'Your full name';
-z.string.preferencesAccountUsernameHint = 'At least 2 characters. a—z, 0—9 and _ only.';
 z.string.preferencesAccountUsernameAvailable = 'Available';
 z.string.preferencesAccountUsernameErrorTaken = 'Already taken';
+z.string.preferencesAccountUsernameHint = 'At least 2 characters. a—z, 0—9 and _ only.';
+z.string.preferencesAccountUsernamePlaceholder = 'Your full name';
 
 z.string.preferencesAVCamera = 'Camera';
 z.string.preferencesAVMicrophone = 'Microphone';

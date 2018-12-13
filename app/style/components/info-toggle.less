@@ -17,22 +17,29 @@
  *
  */
 
-import Message from './Message';
+guest-mode-toggle,
+info-toggle {
+  display: flex;
+  flex-direction: column;
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-class SystemMessage extends Message {
-  constructor() {
-    super();
-    this.super_type = z.message.SuperType.SYSTEM;
-    this.system_message_type = z.message.SystemMessageType.NORMAL;
+  .info-toggle__row {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid fade(@secondary, 8%);
+    font-size: 16px;
+    line-height: 24px;
   }
 
-  is_conversation_rename() {
-    return this.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME;
+  .info-toggle__details {
+    margin-top: 16px;
+    color: #8d989f;
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .slider.disabled {
+    opacity: 0.4;
+    pointer-events: none;
   }
 }
-
-export default SystemMessage;
-z.entity.SystemMessage = SystemMessage;

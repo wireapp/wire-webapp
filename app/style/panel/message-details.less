@@ -17,25 +17,42 @@
  *
  */
 
-guest-mode-toggle {
-  display: flex;
-  flex-direction: column;
-
-  .guest-mode-toggle-row {
+.message-details {
+  &__empty {
+    position: absolute;
     display: flex;
-    justify-content: space-between;
-    padding-bottom: 12px;
-    border-bottom: 1px solid fade(@secondary, 8%);
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    color: fade(@graphite-dark, 32%);
     font-size: 16px;
-    line-height: 24px;
+    font-weight: @font-weight-bold;
+
+    &__icon {
+      svg {
+        width: 140px;
+        height: 140px;
+        fill: fade(@graphite-dark, 8%);
+      }
+    }
+
+    &__text {
+      width: 230px;
+      height: 60px;
+      margin-top: 16px;
+      text-align: center;
+    }
   }
 
-  .guest-mode-toggle-info {
-    margin-top: 16px;
-  }
-
-  .slider.disabled {
-    opacity: 0.4;
-    pointer-events: none;
+  .panel__footer {
+    display: flex;
+    height: @conversation-input-min-height;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #eee;
   }
 }

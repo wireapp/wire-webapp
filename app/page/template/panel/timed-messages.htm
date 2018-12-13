@@ -8,13 +8,13 @@
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
         <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
-          <input type="radio" name="timed-message-settings" data-bind="checked: currentMessageTimer, value: 0"/>
+          <input type="radio" name="timed-message-settings" data-bind="checked: currentMessageTimer, value: 0, event: {change: timedMessageChange}"/>
           <span data-bind="l10n_text: z.string.ephemeralUnitsNone"></span>
         </label>
 
         <!-- ko foreach: {data: messageTimes, afterRender: () => isRendered(true)} -->
           <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
-            <input type="radio" name="timed-message-settings" data-bind="checked: $parent.currentMessageTimer, value: value, disabled: isCustom"/>
+            <input type="radio" name="timed-message-settings" data-bind="checked: $parent.currentMessageTimer, value: value, disabled: isCustom, event: {change: $parent.timedMessageChange}"/>
             <span data-bind="text: text"></span>
           </label>
         <!-- /ko -->

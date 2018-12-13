@@ -19,6 +19,8 @@
 
 // KARMA_SPECS=conversation/EventMapper yarn test:app
 
+import EventMapper from 'app/script/conversation/EventMapper';
+
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
   let conversation_et = null;
@@ -39,7 +41,7 @@ describe('Event Mapper', () => {
 
   beforeEach(() => {
     conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
-    event_mapper = new z.conversation.EventMapper();
+    event_mapper = new EventMapper();
   });
 
   describe('mapJsonEvent', () => {

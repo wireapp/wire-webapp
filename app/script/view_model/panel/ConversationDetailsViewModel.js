@@ -17,12 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
+/* eslint-disable no-unused-vars */
+import receiptModeToggle from 'components/receiptModeToggle';
+/* eslint-enable no-unused-vars */
+import BasePanelViewModel from './BasePanelViewModel';
 
-z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 7,
@@ -34,6 +34,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
+    this.updateConversationReceiptMode = this.updateConversationReceiptMode.bind(this);
 
     const {mainViewModel, repositories} = params;
 
@@ -145,6 +146,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showOptionGuests = ko.pureComputed(() => {
       return this.isActiveGroupParticipant() && this.activeConversation().inTeam();
+    });
+
+    this.showOptionReadReceipts = ko.pureComputed(() => this.activeConversation().inTeam());
+
+    this.hasReceiptsEnabled = ko.pureComputed(() => {
+      return this.conversationRepository.expectReadReceipt(this.activeConversation());
     });
 
     this.hasAdvancedNotifications = ko.pureComputed(() => {
@@ -315,4 +322,8 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     }
   }
-};
+
+  updateConversationReceiptMode(conversationEntity, receiptMode) {
+    this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
+  }
+}

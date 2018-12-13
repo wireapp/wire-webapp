@@ -19,8 +19,10 @@
 
 // KARMA_SPECS=cryptography/CryptographyMapper yarn test:app
 
-describe('z.cryptography.CryptographyMapper', () => {
-  const mapper = new z.cryptography.CryptographyMapper();
+import CryptographyMapper from 'app/script/cryptography/CryptographyMapper';
+
+describe('CryptographyMapper', () => {
+  const mapper = new CryptographyMapper();
 
   let event = undefined;
 

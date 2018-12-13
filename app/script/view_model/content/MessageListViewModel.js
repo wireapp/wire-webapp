@@ -19,6 +19,7 @@
 
 import moment from 'moment';
 import $ from 'jquery';
+import {groupBy} from 'underscore';
 /* eslint-disable no-unused-vars */
 import mousewheel from 'jquery-mousewheel';
 /* eslint-enable no-unused-vars */
@@ -31,7 +32,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  * Message list rendering view model.
  *
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
- * @todo Remove all jquery selectors
+ * @todo Remove all jQuery selectors
  */
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
@@ -48,6 +49,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this._handleWindowResize = this._handleWindowResize.bind(this);
     this.focusMessage = this.focusMessage.bind(this);
     this.showParticipants = this.showParticipants.bind(this);
+    this.showMessageDetails = this.showMessageDetails.bind(this);
     this.show_detail = this.show_detail.bind(this);
 
     this.mainViewModel = mainViewModel;
@@ -79,6 +81,23 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     // Can be used to prevent scroll handler from being executed (e.g. when using scrollTop())
     this.capture_scrolling_event = false;
+
+    // this buffer will collect all the read messages and send a read receipt in batch
+    this.readMessagesBuffer = ko.observableArray();
+
+    this.readMessagesBuffer
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 500}})
+      .subscribe(readMessages => {
+        if (readMessages.length) {
+          const groupedMessages = groupBy(readMessages, ({conversation, message}) => conversation.id + message.from);
+          Object.values(groupedMessages).forEach(readMessagesBatch => {
+            const {conversation, message: firstMessage} = readMessagesBatch.pop();
+            const otherMessages = readMessagesBatch.map(({message}) => message);
+            this.conversation_repository.sendReadReceipt(conversation, firstMessage, otherMessages);
+          });
+          this.readMessagesBuffer.removeAll();
+        }
+      });
 
     // Store message subscription id
     this.messagesChangeSubscription = undefined;
@@ -583,25 +602,61 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Message appeared in viewport.
+   * @param {z.entity.Conversation} conversationEntity - Conversation the message belongs to
    * @param {z.entity.Message} messageEntity - Message to check
-   * @returns {boolean} Message is in viewport
+   * @returns {Function|null} Callback or null
    */
-  getInViewportCallback(messageEntity) {
+  getInViewportCallback(conversationEntity, messageEntity) {
+    const conversationTimestamp = conversationEntity.last_read_timestamp();
+    const messageTimestamp = messageEntity.timestamp();
+    const callbacks = [];
+
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
-      if (this.conversation().is1to1() && isCreationMessage) {
+      if (conversationEntity.is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
+    }
+
+    const sendReadReceipt = () => {
+      // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
+      this.readMessagesBuffer.push({conversation: conversationEntity, message: messageEntity});
+    };
+
+    const startTimer = () => {
+      if (messageEntity.conversation_id === conversationEntity.id) {
+        this.conversation_repository.checkMessageTimer(messageEntity);
+      }
+    };
+
+    if (messageEntity.is_ephemeral()) {
+      callbacks.push(startTimer);
+    }
+
+    const isUnreadMessage = messageTimestamp > conversationTimestamp;
+    const isNotOwnMessage = !messageEntity.user().is_me;
+
+    let shouldSendReadReceipt = false;
+
+    if (messageEntity.expectsReadConfirmation) {
+      if (conversationEntity.is1to1()) {
+        shouldSendReadReceipt = this.conversation_repository.expectReadReceipt(conversationEntity);
+      } else if (conversationEntity.isGroup() && conversationEntity.inTeam()) {
+        shouldSendReadReceipt = true;
+      }
+    }
+
+    if (isUnreadMessage && isNotOwnMessage && shouldSendReadReceipt) {
+      callbacks.push(sendReadReceipt);
+    }
+
+    if (!callbacks.length) {
       return null;
     }
 
     return () => {
-      const startTimer = () => {
-        if (messageEntity.conversation_id === this.conversation().id) {
-          this.conversation_repository.checkMessageTimer(messageEntity);
-        }
-      };
-      return document.hasFocus() ? startTimer() : $(window).one('focus', startTimer);
+      const trigger = () => callbacks.forEach(callback => callback());
+      return document.hasFocus() ? trigger() : $(window).one('focus', trigger);
     };
   }
 
@@ -627,5 +682,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   showParticipants(participants) {
     this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
+  }
+
+  showMessageDetails(view, showLikes) {
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
+      entity: view.message.id,
+      showLikes,
+    });
   }
 };

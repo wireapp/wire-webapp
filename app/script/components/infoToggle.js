@@ -17,28 +17,33 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
+import UUID from 'uuidjs';
 
-z.components.GuestModeToggle = class GuestModeToggle {
+class InfoToggle {
   constructor(params) {
+    this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
+    this.dataUieNameLabelText = `do-toggle-${params.dataUieName}`;
+    this.info = params.info;
+    this.inputId = UUID.genV4();
     this.isChecked = params.isChecked;
-    this.onToggle = params.onToggle;
     this.isDisabled = params.isDisabled;
-    this.infoText = params.extendedInfo ? z.string.guestRoomToggleInfoExtended : z.string.guestRoomToggleInfo;
+    this.name = params.name;
   }
-};
+}
 
-ko.components.register('guest-mode-toggle', {
+ko.components.register('info-toggle', {
   template: `
     <div class="info-toggle__row">
-      <div data-bind="text: z.string.guestRoomToggleName"></div>
+      <div data-bind="l10n_text: name"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
-        <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isChecked">
-        <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked() ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>
+        <input 
+          class="slider-input" 
+          data-bind="attr: { id: inputId, name: inputId }, checked: isChecked" 
+          type="checkbox">
+        <label class="button-label" data-bind="attr: { for: inputId, 'data-uie-value': isChecked() ? 'checked': 'unchecked', 'data-uie-name': dataUieNameLabelText }"></label>
       </div>
     </div>
-    <div class="info-toggle__details" data-bind="text: infoText" data-uie-name="status-guest-toggle"></div>
+    <div class="info-toggle__details" data-bind="attr: {'data-uie-name': dataUieNameInfoText }, l10n_text: info"></div>
   `,
-  viewModel: z.components.GuestModeToggle,
+  viewModel: InfoToggle,
 });

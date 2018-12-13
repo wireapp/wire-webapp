@@ -18,23 +18,35 @@
  */
 
 window.z = window.z || {};
-window.z.message = z.message || {};
+window.z.properties = z.properties || {};
 
-/**
- * Enum for different system message types.
- * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "z.message.SuperType".
- * @type {z.message.SystemMessageType} Enum of system message types
- */
-z.message.SystemMessageType = {
-  CONNECTION_ACCEPTED: 'created-one-to-one',
-  CONNECTION_CONNECTED: 'connected',
-  CONNECTION_REQUEST: 'connecting',
-  CONVERSATION_CREATE: 'created-group',
-  CONVERSATION_MESSAGE_TIMER_UPDATE: 'message-timer-update',
-  CONVERSATION_RECEIPT_MODE_UPDATE: 'receipt-mode-update',
-  CONVERSATION_RENAME: 'rename',
-  CONVERSATION_RESUME: 'resume',
-  MEMBER_JOIN: 'join',
-  MEMBER_LEAVE: 'leave',
-  NORMAL: 'normal',
-};
+class WebappProperties {
+  constructor() {
+    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
+    this.settings = {
+      appearance: {
+        dark: false,
+      },
+      emoji: {
+        replace_inline: true,
+      },
+      notifications: z.notification.NotificationPreference.ON,
+      previews: {
+        send: true,
+      },
+      privacy: {
+        improve_wire: undefined,
+        report_errors: undefined,
+      },
+      sound: {
+        alerts: z.audio.AudioPreference.ALL,
+      },
+    };
+    this.contact_import = {
+      macos: undefined,
+    };
+    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+  }
+}
+
+export default WebappProperties;

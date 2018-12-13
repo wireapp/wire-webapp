@@ -21,6 +21,8 @@ import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 
+import CryptographyMapper from './CryptographyMapper';
+
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
@@ -45,7 +47,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     this.storageRepository = storageRepository;
     this.logger = new z.util.Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
 
-    this.cryptographyMapper = new z.cryptography.CryptographyMapper();
+    this.cryptographyMapper = new CryptographyMapper();
 
     this.currentClient = undefined;
     this.cryptobox = undefined;

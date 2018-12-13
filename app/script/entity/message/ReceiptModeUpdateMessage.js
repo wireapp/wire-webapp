@@ -17,33 +17,23 @@
  *
  */
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
+import SystemMessage from './SystemMessage';
 
-z.properties.PropertiesEntity = class PropertiesEntity {
-  constructor() {
-    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
-    this.settings = {
-      appearance: {
-        dark: false,
-      },
-      emoji: {
-        replace_inline: true,
-      },
-      notifications: z.notification.NotificationPreference.ON,
-      previews: {
-        send: true,
-      },
-      privacy: {
-        improve_wire: undefined,
-      },
-      sound: {
-        alerts: z.audio.AudioPreference.ALL,
-      },
-    };
-    this.contact_import = {
-      macos: undefined,
-    };
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+export default class ReceiptModeUpdateMessage extends SystemMessage {
+  constructor(isReceiptEnabled) {
+    super();
+
+    this.type = z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE;
+    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
+
+    this.caption = ko.pureComputed(() => {
+      let stringId;
+      if (isReceiptEnabled) {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOnYou : z.string.conversationReceiptsOn;
+      } else {
+        stringId = this.user().is_me ? z.string.conversationReceiptsOffYou : z.string.conversationReceiptsOff;
+      }
+      return z.l10n.text(stringId);
+    });
   }
-};
+}
