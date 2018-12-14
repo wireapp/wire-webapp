@@ -703,11 +703,14 @@ z.event.EventRepository = class EventRepository {
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
-    let updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
+    const commonUpdates = this._getCommonMessageUpdates(originalEvent, newEvent);
 
-    if (isLinkPreviewEdit) {
-      updates = Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), updates);
-    }
+    const specificUpdates = isLinkPreviewEdit
+      ? this._getUpdatesForLinkPreview(originalEvent, newEvent)
+      : this._getUpdatesForEditMessage(originalEvent, newEvent);
+
+    const updates = Object.assign({}, specificUpdates, commonUpdates);
+
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
     return this.eventService.replaceEvent(identifiedUpdates);
   }
@@ -788,7 +791,7 @@ z.event.EventRepository = class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  _getUpdatesForMessageEdit(originalEvent, newEvent) {
+  _getCommonMessageUpdates(originalEvent, newEvent) {
     return Object.assign({}, newEvent, {
       data: Object.assign({}, newEvent.data, {
         expects_read_confirmation: originalEvent.data.expects_read_confirmation,
@@ -796,6 +799,12 @@ z.event.EventRepository = class EventRepository {
       edited_time: newEvent.time,
       time: originalEvent.time,
       version: 1,
+    });
+  }
+
+  _getUpdatesForEditMessage(originalEvent, newEvent) {
+    return Object.assign({}, newEvent, {
+      reactions: [],
     });
   }
 
