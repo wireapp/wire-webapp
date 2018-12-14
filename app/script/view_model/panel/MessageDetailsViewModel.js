@@ -154,9 +154,9 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     return this.message().id;
   }
 
-  initView({entity: messageId, showLikes}) {
+  initView({entity: {id}, showLikes}) {
     this.isReceiptsOpen(!showLikes);
-    this.messageId(messageId);
+    this.messageId(id);
   }
 
   getElementId() {
