@@ -705,9 +705,11 @@ z.event.EventRepository = class EventRepository {
 
     const commonUpdates = this._getCommonMessageUpdates(originalEvent, newEvent);
 
-    const updates = isLinkPreviewEdit
-      ? Object.assign({}, this._getUpdatesForLinkPreview(originalEvent, newEvent), commonUpdates)
-      : Object.assign({}, this._getUpdatesForEditMessage(originalEvent, newEvent), commonUpdates);
+    const specificUpdates = isLinkPreviewEdit
+      ? this._getUpdatesForLinkPreview(originalEvent, newEvent)
+      : this._getUpdatesForEditMessage(originalEvent, newEvent);
+
+    const updates = Object.assign({}, specificUpdates, commonUpdates);
 
     const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
     return this.eventService.replaceEvent(identifiedUpdates);
