@@ -22,7 +22,11 @@ class DarkModeViewModel {
     this.propertiesRepository = repositories.properties;
     this.isDarkMode = ko.observable(undefined);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, this.isDarkMode);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, isDarkMode => {
+      this.isDarkMode(isDarkMode);
+      jQuery('body').toggleClass('theme-dark', !!isDarkMode);
+    });
+
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
       this.isDarkMode(properties.settings.appearance.dark);
     });

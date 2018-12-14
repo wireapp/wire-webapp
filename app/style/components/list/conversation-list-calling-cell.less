@@ -43,10 +43,10 @@
 
     &--active {
       background-color: @secondary;
-      color: @app-bg-secondary;
+      color: var(--app-bg-secondary);
 
       svg > path {
-        fill: @app-bg-secondary;
+        fill: var(--app-bg-secondary);
       }
     }
 
@@ -196,11 +196,11 @@ conversation-list-calling-cell {
   flex-shrink: 0;
   margin: 0 16px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
-  background-color: @app-bg-secondary;
+  background-color: var(--app-bg-secondary);
   border-radius: 8px;
 
   &.dark-bg {
-    color: @app-bg-secondary;
+    color: var(--app-bg-secondary);
 
     &::before {
       background-color: fade(@secondary, 80%);
