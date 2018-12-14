@@ -219,7 +219,7 @@ describe('Conversation', () => {
         textMessage.from = senderId;
         textMessage.readReceipts([
           {
-            time: '2018-12-14T13:13:00.960Z',
+            time: new Date().toISOString(),
             userId: z.util.createRandomUuid(),
           },
         ]);
