@@ -401,6 +401,11 @@ z.entity.Conversation = class Conversation {
         if (replaceDuplicate) {
           if (messageEntity.is_content()) {
             messageEntity.quote(entityToReplace.quote());
+
+            const existingReceipts = entityToReplace.readReceipts();
+            if (existingReceipts.length) {
+              messageEntity.readReceipts(existingReceipts);
+            }
           }
           const duplicateIndex = this.messages_unordered.indexOf(entityToReplace);
           this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
