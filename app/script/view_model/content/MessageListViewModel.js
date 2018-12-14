@@ -641,7 +641,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
         shouldSendReadReceipt = this.conversation_repository.expectReadReceipt(conversationEntity);
-      } else if (conversationEntity.isGroup() && conversationEntity.inTeam()) {
+      } else if (conversationEntity.isGroup() && (conversationEntity.inTeam() || conversationEntity.isGuestRoom())) {
         shouldSendReadReceipt = true;
       }
     }
