@@ -402,8 +402,7 @@ z.entity.Conversation = class Conversation {
           if (messageEntity.is_content()) {
             messageEntity.quote(entityToReplace.quote());
           }
-          const duplicateIndex = this.messages_unordered.indexOf(entityToReplace);
-          this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
+          this.replaceMessage(entityToReplace, messageEntity);
         }
         // The duplicated message has been treated (either replaced or ignored). Our job here is done.
         return entityToReplace;
@@ -411,6 +410,11 @@ z.entity.Conversation = class Conversation {
       this.messages_unordered.push(messageEntity);
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
     }
+  }
+
+  replaceMessage(originalMessage, newMessage) {
+    const originalIndex = this.messages_unordered.indexOf(originalMessage);
+    this.messages_unordered.splice(originalIndex, 1, newMessage);
   }
 
   /**
