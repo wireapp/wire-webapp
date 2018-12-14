@@ -116,7 +116,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
     });
 
-    this.showTabs = ko.pureComputed(() => this.isProAccount() && this.isMe() && !this.isPing());
+    this.showTabs = ko.pureComputed(() => {
+      const supportsReceipts = this.isProAccount() && this.isMe();
+      const supportsLikes = !this.isPing();
+      return supportsReceipts && supportsLikes;
+    });
 
     this.editedFooter = ko.pureComputed(() => {
       return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
