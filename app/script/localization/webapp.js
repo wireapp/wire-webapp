@@ -786,7 +786,7 @@ z.string.temporaryGuestTimeRemaining = ' left in this guest room';
 z.string.temporaryGuestJoinMessage = 'This conversation will be available to you for 24 hours.';
 z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you will lose access.';
 
-z.string.temporaryGuestLeaveMessage = ' are no longer part of this conversation.';
+z.string.temporaryGuestLeaveMessage = 'You are no longer part of this conversation.';
 z.string.temporaryGuestLeaveDescription = 'If you close or refresh this page, you will lose access to the conversation history.';
 
 // URLs & Warnings: Permission requests & permission callbacks
