@@ -19,6 +19,8 @@
 
 window.z = window.z || {};
 
+const env = window.wire.env;
+
 window.z.config = {
   ACCENT_ID: {
     BLUE: 1,
@@ -28,6 +30,15 @@ window.z.config = {
     PURPLE: 7,
     RED: 4,
     YELLOW: 3,
+  },
+
+  FEATURE: {
+    CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
+    ENABLE_ACCOUNT_REGISTRATION: env.FEATURE && env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
+    ENABLE_DEBUG: env.FEATURE && env.FEATURE.ENABLE_DEBUG,
+    ENABLE_PHONE_LOGIN: env.FEATURE && env.FEATURE.ENABLE_PHONE_LOGIN,
+    ENABLE_SSO: env.FEATURE && env.FEATURE.ENABLE_SSO,
+    SHOW_LOADING_INFORMATION: env.FEATURE && env.FEATURE.SHOW_LOADING_INFORMATION,
   },
 
   LOGGER: {
@@ -93,23 +104,23 @@ window.z.config = {
 
   URL: {
     ACCOUNT: {
-      PRODUCTION: (window.wire.env.URL && window.wire.env.URL.ACCOUNT_BASE) || 'https://account.wire.com',
+      PRODUCTION: (env.URL && env.URL.ACCOUNT_BASE) || 'https://account.wire.com',
       STAGING: 'https://wire-account-staging.zinfra.io',
     },
-    PRIVACY_POLICY: window.wire.env.URL && window.wire.env.URL.PRIVACY_POLICY,
+    PRIVACY_POLICY: env.URL && env.URL.PRIVACY_POLICY,
     SUPPORT: 'https://support.wire.com',
     TEAM_SETTINGS: {
-      PRODUCTION: (window.wire.env.URL && window.wire.env.URL.TEAMS_BASE) || 'https://teams.wire.com',
+      PRODUCTION: (env.URL && env.URL.TEAMS_BASE) || 'https://teams.wire.com',
       STAGING: 'https://wire-teams-staging.zinfra.io',
     },
-    TERMS_OF_USE_PERSONAL: window.wire.env.URL && window.wire.env.URL.TERMS_OF_USE_PERSONAL,
-    TERMS_OF_USE_TEAMS: window.wire.env.URL && window.wire.env.URL.TERMS_OF_USE_TEAMS,
+    TERMS_OF_USE_PERSONAL: env.URL && env.URL.TERMS_OF_USE_PERSONAL,
+    TERMS_OF_USE_TEAMS: env.URL && env.URL.TERMS_OF_USE_TEAMS,
     WEBAPP: {
       INTERNAL: 'https://wire-webapp-staging.wire.com',
-      PRODUCTION: window.wire.env.APP_BASE || 'https://app.wire.com',
+      PRODUCTION: env.APP_BASE || 'https://app.wire.com',
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },
-    WEBSITE: window.wire.env.URL && window.wire.env.URL.WEBSITE_BASE,
+    WEBSITE: env.URL && env.URL.WEBSITE_BASE,
   },
 
   URL_PATH: {

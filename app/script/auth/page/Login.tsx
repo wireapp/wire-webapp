@@ -421,14 +421,16 @@ class Login extends React.Component<CombinedProps, State> {
                           {_(loginStrings.ssoLogin)}
                         </Link>
                       </Column>
-                      <Column>
-                        <Link
-                          href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search}
-                          data-uie-name="go-sign-in-phone"
-                        >
-                          {_(loginStrings.phoneLogin)}
-                        </Link>
-                      </Column>
+                      {config.FEATURE.ENABLE_PHONE_LOGIN && (
+                        <Column>
+                          <Link
+                            href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
+                            data-uie-name="go-sign-in-phone"
+                          >
+                            {_(loginStrings.phoneLogin)}
+                          </Link>
+                        </Column>
+                      )}
                     </Columns>
                   </div>
                 ) : (
@@ -438,11 +440,16 @@ class Login extends React.Component<CombinedProps, State> {
                         {_(loginStrings.forgotPassword)}
                       </Link>
                     </Column>
-                    <Column>
-                      <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
-                        {_(loginStrings.phoneLogin)}
-                      </Link>
-                    </Column>
+                    {config.FEATURE.ENABLE_PHONE_LOGIN && (
+                      <Column>
+                        <Link
+                          href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
+                          data-uie-name="go-sign-in-phone"
+                        >
+                          {_(loginStrings.phoneLogin)}
+                        </Link>
+                      </Column>
+                    )}
                   </Columns>
                 )}
               </ContainerXS>

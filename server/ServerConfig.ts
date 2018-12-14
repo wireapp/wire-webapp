@@ -21,6 +21,7 @@ export interface ServerConfig {
       CHECK_CONSENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_DEBUG: boolean;
+      ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
