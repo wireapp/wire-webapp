@@ -75,6 +75,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.receiptTimes = ko.observable({});
     this.likeUsers = ko.observableArray();
 
+    this.isPing = ko.pureComputed(() => this.message() && this.message().super_type === z.message.SuperType.PING);
+
     this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
 
     const sortUsers = (userA, userB) => (userA.name() > userB.name() ? 1 : -1);
@@ -90,7 +92,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes = ko.pureComputed(() => {
-      const reactions = this.message() && this.message().reactions();
+      const reactions = this.message() && !this.isPing() && this.message().reactions();
       return reactions ? Object.keys(reactions) : [];
     });
 
@@ -102,17 +104,28 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       return this.message() ? formatTime(this.message().timestamp()) : '';
     });
 
-    this.receiptCountString = ko.pureComputed(() =>
-      this.receiptUsers().length ? ` (${this.receiptUsers().length})` : ''
-    );
+    const formatUserCount = users => (users.length ? ` (${users.length})` : '');
 
-    this.likeCountString = ko.pureComputed(() => {
-      const likeUsers = this.likeUsers().length;
-      return likeUsers ? ` (${likeUsers})` : '';
+    this.receiptsTitle = ko.pureComputed(() => {
+      return z.l10n.text(z.string.messageDetailsTitleReceipts, formatUserCount(this.receiptUsers()));
+    });
+
+    this.likesTitle = ko.pureComputed(() => {
+      return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
     });
 
     this.editedFooter = ko.pureComputed(() => {
       return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
+    });
+
+    this.panelTitle = ko.pureComputed(() => {
+      if (!this.isMe()) {
+        return this.likesTitle();
+      }
+      if (this.isPing()) {
+        return this.receiptsTitle();
+      }
+      return z.l10n.text(z.string.messageDetailsTitle);
     });
 
     this.shouldUpdateScrollbar = ko
