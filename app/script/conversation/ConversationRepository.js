@@ -366,6 +366,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsPromise])
       .then(([localConversations, remoteConversations]) => {
+        // REMOVE DUPLICATES
+        // https://gist.github.com/telekosmos/3b62a31a5c43f40849bb#gistcomment-2137855
+        const localIds = localConversations.map(c => c.id);
+        const remoteIds = remoteConversations.map(c => c.id);
+        remoteIds.forEach(id => {
+          if (localIds.includes(id)) {
+            remoteConversations = remoteConversations.filter(item => {
+              return item.id !== id;
+            });
+          }
+        });
+
         if (!remoteConversations.length) {
           return localConversations;
         }
