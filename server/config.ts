@@ -133,6 +133,7 @@ const config: ServerConfig = {
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN == 'false' ? false : true,
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
+      ENABLE_USERNAME_LOGIN: process.env.FEATURE_ENABLE_USERNAME_LOGIN == 'false' ? false : true,
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true' ? true : false,
     },
     RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,

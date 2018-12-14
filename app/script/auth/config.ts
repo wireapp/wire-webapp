@@ -41,6 +41,7 @@ declare global {
           ENABLE_DEBUG: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
+          ENABLE_USERNAME_LOGIN: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };
       };
@@ -66,6 +67,7 @@ export const FEATURE = window.wire.env.FEATURE || {
   ENABLE_DEBUG: false,
   ENABLE_PHONE_LOGIN: true,
   ENABLE_SSO: false,
+  ENABLE_USERNAME_LOGIN: true,
   SHOW_LOADING_INFORMATION: false,
 };
 export const APP_INSTANCE_ID = UUID();

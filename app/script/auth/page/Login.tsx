@@ -224,9 +224,9 @@ class Login extends React.Component<CombinedProps, State> {
 
         if (this.isValidEmail(email)) {
           login.email = email;
-        } else if (this.isValidUsername(email)) {
+        } else if (config.FEATURE.ENABLE_USERNAME_LOGIN && this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (this.isValidPhoneNumber(email)) {
+        } else if (config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
           login.phone = email;
         }
 

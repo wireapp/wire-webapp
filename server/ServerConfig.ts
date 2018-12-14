@@ -23,6 +23,7 @@ export interface ServerConfig {
       ENABLE_DEBUG: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
+      ENABLE_USERNAME_LOGIN: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
     VERSION: string;
