@@ -797,7 +797,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   getMarketingConsent() {
-    if (!window.wire.env.FEATURE.CHECK_CONSENT) {
+    if (!z.config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
       return Promise.resolve();
     }

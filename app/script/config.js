@@ -30,6 +30,15 @@ window.z.config = {
     YELLOW: 3,
   },
 
+  FEATURE: {
+    CHECK_CONSENT: window.wire.env.FEATURE && window.wire.env.FEATURE.CHECK_CONSENT,
+    ENABLE_ACCOUNT_REGISTRATION: window.wire.env.FEATURE && window.wire.env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
+    ENABLE_DEBUG: window.wire.env.FEATURE && window.wire.env.FEATURE.ENABLE_DEBUG,
+    ENABLE_PHONE_LOGIN: window.wire.env.FEATURE && window.wire.env.FEATURE.ENABLE_PHONE_LOGIN,
+    ENABLE_SSO: window.wire.env.FEATURE && window.wire.env.FEATURE.ENABLE_SSO,
+    SHOW_LOADING_INFORMATION: window.wire.env.FEATURE && window.wire.env.FEATURE.SHOW_LOADING_INFORMATION,
+  },
+
   LOGGER: {
     OPTIONS: {
       domains: {

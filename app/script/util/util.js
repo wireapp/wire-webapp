@@ -457,7 +457,7 @@ z.util.isValidEmail = email => {
  * @returns {boolean} True, if the input a phone number
  */
 z.util.isValidPhoneNumber = phoneNumber => {
-  const allowDebugPhoneNumbers = window.wire.env.FEATURE.ENABLE_DEBUG;
+  const allowDebugPhoneNumbers = z.config.FEATURE.ENABLE_DEBUG;
   const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
   return regularExpression.test(phoneNumber);
