@@ -39,6 +39,7 @@ declare global {
           CHECK_CONSENT: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;
           ENABLE_DEBUG: boolean;
+          ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };
@@ -63,6 +64,7 @@ export const FEATURE = window.wire.env.FEATURE || {
   CHECK_CONSENT: true,
   ENABLE_ACCOUNT_REGISTRATION: true,
   ENABLE_DEBUG: false,
+  ENABLE_PHONE_LOGIN: true,
   ENABLE_SSO: false,
   SHOW_LOADING_INFORMATION: false,
 };

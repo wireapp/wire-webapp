@@ -101,7 +101,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     const shouldDelete = !reaction && hasUser;
 
     if (shouldAdd) {
-      this.reactions(Object.assign({[from]: reaction}, this.reactions()));
+      this.reactions(Object.assign({}, this.reactions(), {[from]: reaction}));
     }
 
     if (shouldDelete) {

@@ -470,7 +470,7 @@ z.string.conversationsSecondaryLinePeopleAdded = '{{user}} people were added';
 z.string.conversationsSecondaryLinePersonAdded = '{{user}} was added';
 z.string.conversationsSecondaryLinePersonAddedSelf = '{{user}} joined';
 z.string.conversationsSecondaryLinePersonAddedYou = '{{user}} added you';
-z.string.conversationsSecondaryLineRenamed = '{{user}} renamed conversation';
+z.string.conversationsSecondaryLineRenamed = '{{user}} renamed the conversation';
 z.string.conversationsSecondaryLineSummaryMessage = '{{number}} message';
 z.string.conversationsSecondaryLineSummaryMessages = '{{number}} messages';
 z.string.conversationsSecondaryLineSummaryMention = '{{number}} mention';
@@ -787,7 +787,7 @@ z.string.temporaryGuestTimeRemaining = ' left in this guest room';
 z.string.temporaryGuestJoinMessage = 'This conversation will be available to you for 24 hours.';
 z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you will lose access.';
 
-z.string.temporaryGuestLeaveMessage = ' are no longer part of this conversation.';
+z.string.temporaryGuestLeaveMessage = 'You are no longer part of this conversation.';
 z.string.temporaryGuestLeaveDescription = 'If you close or refresh this page, you will lose access to the conversation history.';
 
 // URLs & Warnings: Permission requests & permission callbacks

@@ -641,7 +641,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
         shouldSendReadReceipt = this.conversation_repository.expectReadReceipt(conversationEntity);
-      } else if (conversationEntity.isGroup() && conversationEntity.inTeam()) {
+      } else if (conversationEntity.isGroup() && (conversationEntity.inTeam() || conversationEntity.isGuestRoom())) {
         shouldSendReadReceipt = true;
       }
     }
@@ -685,9 +685,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   showMessageDetails(view, showLikes) {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
-      entity: view.message.id,
-      showLikes,
-    });
+    if (!this.conversation().is1to1()) {
+      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
+        entity: {id: view.message.id},
+        showLikes,
+      });
+    }
   }
 };

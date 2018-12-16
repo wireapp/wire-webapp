@@ -207,6 +207,36 @@ describe('Conversation', () => {
 
         expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
       });
+
+      it('keeps the amount of read receipts if an edit message comes in', () => {
+        const conversationId = z.util.createRandomUuid();
+        const messageId = z.util.createRandomUuid();
+        const senderId = z.util.createRandomUuid();
+
+        const textMessage = new z.entity.ContentMessage(messageId);
+        textMessage.add_asset(new z.entity.Text());
+        textMessage.conversation_id = conversationId;
+        textMessage.from = senderId;
+        textMessage.readReceipts([
+          {
+            time: new Date().toISOString(),
+            userId: z.util.createRandomUuid(),
+          },
+        ]);
+
+        const editMessage = new z.entity.ContentMessage(z.util.createRandomUuid());
+        editMessage.conversation_id = conversationId;
+        editMessage.from = senderId;
+        editMessage.replacing_message_id = messageId;
+
+        conversation_et.id = conversationId;
+        conversation_et.add_message(textMessage, false);
+
+        expect(editMessage.readReceipts().length).toBe(0);
+        conversation_et.add_message(editMessage, true);
+
+        expect(editMessage.readReceipts().length).toBe(1);
+      });
     });
 
     describe('affects last_read_timestamp', () => {

@@ -249,7 +249,7 @@ class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
+    return z.config.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
   }
 
   /**

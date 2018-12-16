@@ -131,6 +131,7 @@ const config: ServerConfig = {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
       ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION == 'false' ? false : true,
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
+      ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN == 'false' ? false : true,
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true' ? true : false,
     },
@@ -138,7 +139,10 @@ const config: ServerConfig = {
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
+      PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY,
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
+      TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
+      TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),

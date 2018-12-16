@@ -232,9 +232,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
   }
 
-  _updateLocalMessageEntity(updatedEvent) {
+  _updateLocalMessageEntity(updatedEvent, oldEvent) {
     this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
-      this._addEventToConversation(conversationEntity, updatedEvent);
+      this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
     });
   }
 
@@ -3563,6 +3563,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Private
   //##############################################################################
 
+  _initMessageEntity(conversationEntity, eventJson) {
+    return this.event_mapper
+      .mapJsonEvent(eventJson, conversationEntity, true)
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
+      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity));
+  }
+
+  _replaceMessageInConversation(conversationEntity, eventId, newData) {
+    const originalMessage = conversationEntity.getMessage(eventId);
+    if (!originalMessage) {
+      return Promise.resolve();
+    }
+    return this._initMessageEntity(conversationEntity, newData).then(messageEntity =>
+      conversationEntity.replaceMessage(originalMessage, messageEntity)
+    );
+  }
+
   /**
    * Convert a JSON event into an entity and add it to a given conversation.
    *
@@ -3572,33 +3589,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
   _addEventToConversation(conversationEntity, eventJson) {
-    return this.event_mapper
-      .mapJsonEvent(eventJson, conversationEntity, true)
-      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
-      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
-      .then(messageEntity => {
-        if (conversationEntity && messageEntity) {
-          const replacedEntity = conversationEntity.add_message(messageEntity, true);
-          if (replacedEntity) {
-            const messages = conversationEntity.messages_unordered();
+    return this._initMessageEntity(conversationEntity, eventJson).then(messageEntity => {
+      if (conversationEntity && messageEntity) {
+        const replacedEntity = conversationEntity.add_message(messageEntity, true);
+        if (replacedEntity) {
+          const messages = conversationEntity.messages_unordered();
 
-            const updatedMessages = messages.map(message => {
-              const hasEditedQuote =
-                message.quote && message.quote() && message.quote().messageId === replacedEntity.id;
-              if (hasEditedQuote) {
-                const {error, userId} = message.quote();
-                const newQuote = new z.message.QuoteEntity({error, messageId: messageEntity.id, userId});
-                message.quote(newQuote);
-              }
-              return message;
-            });
+          const updatedMessages = messages.map(message => {
+            const hasEditedQuote = message.quote && message.quote() && message.quote().messageId === replacedEntity.id;
+            if (hasEditedQuote) {
+              const {error, userId} = message.quote();
+              const newQuote = new z.message.QuoteEntity({error, messageId: messageEntity.id, userId});
+              message.quote(newQuote);
+            }
+            return message;
+          });
 
-            conversationEntity.messages_unordered(updatedMessages);
-            amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
-          }
+          conversationEntity.messages_unordered(updatedMessages);
+          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
         }
-        return {conversationEntity, messageEntity};
-      });
+      }
+      return {conversationEntity, messageEntity};
+    });
   }
 
   /**

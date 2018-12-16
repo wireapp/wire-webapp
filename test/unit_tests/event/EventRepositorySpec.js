@@ -523,6 +523,7 @@ describe('Event Repository', () => {
 
     it('updates edited messages', () => {
       const originalMessage = JSON.parse(JSON.stringify(event));
+      originalMessage.reactions = ['user-id'];
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
       spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(updates => updates);
 
@@ -539,6 +540,7 @@ describe('Event Repository', () => {
         expect(updatedEvent.time).not.toEqual(changed_time);
         expect(updatedEvent.data.content).toEqual('new content');
         expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
+        expect(updatedEvent.reactions).toEqual([]);
         expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });
