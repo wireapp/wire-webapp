@@ -1054,17 +1054,6 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@pwnsdx/css-diff-reducer@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@pwnsdx/css-diff-reducer/-/css-diff-reducer-0.0.1.tgz#78dcb98fdde7a4983c7f212538b0c8da84c0f415"
-  integrity sha512-RnrsoBuaqLxUaO3bMYIktVq/nlq6F6dGxOPmBJ1zElYskCW24yjD0nl2T06gBH/6vpW144zDwmSJ4HptHTwc1g==
-  dependencies:
-    css "^2.2.4"
-    deep-diff "^1.0.2"
-    deep-filter "^1.0.2"
-    object-path "^0.11.4"
-    tslib "~1.9.3"
-
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"

@@ -33,8 +33,8 @@
     fill: @conversation-list-color;
 
     &--light-theme {
-      color: @secondary;
-      fill: @secondary;
+      color: var(--secondary);
+      fill: var(--secondary);
     }
 
     .team-mode & {
@@ -69,13 +69,13 @@
     height: 100vh;
     max-height: 100%;
     background-color: var(--app-bg-secondary);
-    box-shadow: 0 0 24px @sidebar-box-shadow-lg;
+    box-shadow: 0 0 24px var(--sidebar-box-shadow-lg);
     transform: scale(1, 1);
   }
 
   @media (min-width: 1000px) {
     .right-column {
-      box-shadow: -1px 0 0 @sidebar-box-shadow;
+      box-shadow: -1px 0 0 var(--sidebar-box-shadow);
     }
   }
 

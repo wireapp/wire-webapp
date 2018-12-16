@@ -1,9 +1,115 @@
-:root {
-  --app-bg: #fafafa;
-  --app-bg-secondary: #feffff;
+.applyTheme() {
+  .colorFade (@name, @index, @fadeOver) when (@index > 0) {
+    --@{name}-fade-@{index}: fade(@fadeOver, @index);
+    .colorFade(@name, @index - 8, @fadeOver);
+  }
+  .setVariables(@list) {
+    .iter(length(@list));
+    .iter(@i) when (@i > 0) {
+      .iter(@i - 1);
+      @pair: extract(@list, @i);
+      @key: extract(@pair, 1);
+      --@{key}: ~'@{@{key}}';
+    }
+  }
+
+  .setVariables(primary secondary);
+  .colorFade(primary, 96, @primary);
+  .colorFade(secondary, 96, @secondary);
+  .setVariables(app-bg app-bg-secondary conversation-list-bg-opacity sidebar-box-shadow sidebar-box-shadow-lg);
+  .setVariables(modal-bg modal-border-color);
+  .setVariables(preference-account-input-bg);
+  .setVariables(text-input-editing);
+  .setVariables(message-quote-bg);
+  .setVariables(group-creation-modal-teamname-input-bg);
 }
 
-.theme-dark {
-  --app-bg: #17181a;
-  --app-bg-secondary: #202123;
+body {
+  // ----------------------------------------------------------------------------
+  // Common Colors
+  // ----------------------------------------------------------------------------
+  @primary: #8d989f;
+  @secondary: #323639;
+
+  // ----------------------------------------------------------------------------
+  // Framework
+  // ----------------------------------------------------------------------------
+  @app-bg: #fafafa;
+  @app-bg-secondary: #feffff;
+  @conversation-list-bg-opacity: fade(#000, 64%);
+  @sidebar-box-shadow: #eee;
+  @sidebar-box-shadow-lg: rgba(255, 255, 255, 0.08);
+
+  // ----------------------------------------------------------------------------
+  // Modal
+  // ----------------------------------------------------------------------------
+  @modal-bg: #fafafa;
+  @modal-border-color: 1px solid transparent;
+
+  // ----------------------------------------------------------------------------
+  // Preferences Input
+  // ----------------------------------------------------------------------------
+  @preference-account-input-bg: #fff;
+
+  // ----------------------------------------------------------------------------
+  // Editing Input
+  // ----------------------------------------------------------------------------
+  @text-input-editing: mix(@w-yellow, #fff, 16%);
+
+  // ----------------------------------------------------------------------------
+  // Message Quote Vertical Bar
+  // ----------------------------------------------------------------------------
+  @message-quote-bg: #cfcfcf;
+
+  // ----------------------------------------------------------------------------
+  // Group Creation Modal
+  // ----------------------------------------------------------------------------
+  @group-creation-modal-teamname-input-bg: #fff;
+
+  .applyTheme();
+}
+
+body.theme-dark {
+  // ----------------------------------------------------------------------------
+  // Common Colors
+  // ----------------------------------------------------------------------------
+  @primary: #737476;
+  @secondary: #feffff;
+
+  // ----------------------------------------------------------------------------
+  // Framework
+  // ----------------------------------------------------------------------------
+  @app-bg: #17181a;
+  @app-bg-secondary: #202123;
+  @conversation-list-bg-opacity: fade(#000, 78%);
+  @sidebar-box-shadow: #1c1d1f;
+  @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
+
+  // ----------------------------------------------------------------------------
+  // Modal
+  // ----------------------------------------------------------------------------
+  @modal-bg: #33373a;
+  @modal-border-color: 1px solid rgba(255, 255, 255, 0.12);
+
+  // ----------------------------------------------------------------------------
+  // Preferences Input
+  // ----------------------------------------------------------------------------
+  @preference-account-input-bg: fade(@secondary, 5%);
+
+  // ----------------------------------------------------------------------------
+  // Editing Input
+  // ----------------------------------------------------------------------------
+  @text-input-editing: #42391c;
+
+  // ----------------------------------------------------------------------------
+  // Message Quote Vertical Bar
+  // ----------------------------------------------------------------------------
+  @message-quote-bg: #303030;
+
+  // ----------------------------------------------------------------------------
+  // Group Creation Modal
+  // ----------------------------------------------------------------------------
+  @group-creation-modal-teamname-input-bg: fade(@primary, 10%);
+
+  .applyTheme();
 }
