@@ -1,29 +1,3 @@
-.applyTheme() {
-  .colorFade (@name, @index, @fadeOver) when (@index > 0) {
-    --@{name}-fade-@{index}: fade(@fadeOver, @index);
-    .colorFade(@name, @index - 8, @fadeOver);
-  }
-  .setVariables(@list) {
-    .iter(length(@list));
-    .iter(@i) when (@i > 0) {
-      .iter(@i - 1);
-      @pair: extract(@list, @i);
-      @key: extract(@pair, 1);
-      --@{key}: ~'@{@{key}}';
-    }
-  }
-
-  .setVariables(primary secondary);
-  .colorFade(primary, 96, @primary);
-  .colorFade(secondary, 96, @secondary);
-  .setVariables(app-bg app-bg-secondary conversation-list-bg-opacity sidebar-box-shadow sidebar-box-shadow-lg);
-  .setVariables(modal-bg modal-border-color);
-  .setVariables(preference-account-input-bg);
-  .setVariables(text-input-editing);
-  .setVariables(message-quote-bg);
-  .setVariables(group-creation-modal-teamname-input-bg);
-}
-
 body,
 body.theme-default {
   // ----------------------------------------------------------------------------
