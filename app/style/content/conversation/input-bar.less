@@ -28,10 +28,10 @@
   &__input {
     z-index: 10;
     display: flex;
-    background-color: @app-bg-secondary;
+    background-color: var(--app-bg-secondary);
 
     &--editing {
-      background-color: @text-input-editing;
+      background-color: var(--text-input-editing);
       transition: background-color @animation-timing-faster @ease-in-quad;
     }
   }
@@ -60,7 +60,7 @@
     .label-xs;
 
     padding-left: 8px;
-    color: fade(@primary, 48%);
+    color: var(--primary-fade-48);
   }
 
   &--accent::placeholder {
@@ -70,7 +70,7 @@
 
 @supports (caret-color: #000) {
   .conversation-input-bar-text {
-    caret-color: @secondary;
+    caret-color: var(--secondary);
     color: transparent;
   }
 }
@@ -131,7 +131,7 @@
   line-height: 0;
 
   svg path {
-    fill: @secondary;
+    fill: var(--secondary);
   }
 }
 
@@ -150,7 +150,7 @@
   animation-fill-mode: forwards;
   animation-name: paste-fade-in;
   animation-timing-function: @ease-out-expo;
-  background-color: @app-bg-secondary;
+  background-color: var(--app-bg-secondary);
   opacity: 0;
 }
 
@@ -162,7 +162,7 @@
   }
 
   svg path {
-    fill: @primary;
+    fill: var(--primary);
   }
 }
 
@@ -193,7 +193,7 @@
 
 .conversation-input-bar-paste-cancel {
   margin-right: 32px;
-  fill: @primary;
+  fill: var(--primary);
   line-height: 0;
 }
 
@@ -201,7 +201,7 @@
   position: fixed;
   z-index: @z-index-context;
   display: block;
-  border: 0.5px solid fade(@secondary, 12%);
+  border: 0.5px solid var(--secondary-fade-12);
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
@@ -221,7 +221,7 @@
     }
 
     &.selected {
-      background-color: fade(@primary, 16%);
+      background-color: var(--primary-fade-16);
     }
 
     .symbol {
@@ -251,12 +251,12 @@
   width: 100%;
   padding: 12px 16px 0 30px;
   animation: reply-box 0.15s ease-out;
-  background-color: @app-bg-secondary;
+  background-color: var(--app-bg-secondary);
 
   close-icon {
     margin-top: 4px;
     cursor: pointer;
-    fill: @secondary;
+    fill: var(--secondary);
   }
 
   &__body {
@@ -271,7 +271,7 @@
     width: 4px;
     height: 100%;
     margin-right: 12px;
-    background-color: @message-quote-bg;
+    background-color: var(--message-quote-bg);
     border-radius: 2px;
   }
 
@@ -291,7 +291,7 @@
       svg {
         width: 8px;
         height: 8px;
-        fill: fade(@secondary, 40%);
+        fill: var(--secondary-fade-40);
       }
     }
   }
@@ -328,7 +328,7 @@
       &:not([src]) {
         width: 40px;
         height: 40px;
-        background-color: @primary;
+        background-color: var(--primary);
       }
     }
   }

@@ -202,9 +202,9 @@
 
     position: relative;
     margin: -@bubble-border-radius;
-    background: @app-bg-secondary;
+    background: var(--app-bg-secondary);
     border-radius: 4px;
-    color: @secondary;
+    color: var(--secondary);
   }
 
   .start-ui-service-body {
@@ -213,7 +213,7 @@
     flex-direction: column;
     flex-grow: 1;
     padding: 16px;
-    background-color: @app-bg;
+    background-color: var(--app-bg);
     border-radius: 4px;
   }
 
@@ -264,13 +264,13 @@
   &.start-ui-service-bubble.bubble-left-top,
   &.start-ui-service-bubble.bubble-left {
     &::before {
-      background-color: @app-bg;
+      background-color: var(--app-bg);
     }
     &::after {
       left: -11px;
-      border-right: @modal-border-color;
-      border-bottom: @modal-border-color;
-      background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
+      border-right: var(--modal-border-color);
+      border-bottom: var(--modal-border-color);
+      background: linear-gradient(-45deg, var(--app-bg) 0%, var(--app-bg) 50%, transparent 50%, transparent 100%);
     }
   }
 }
@@ -306,7 +306,7 @@
   border: 1px solid rgba(141, 152, 159, 0.16);
   background-color: #fff;
   border-radius: 4px;
-  color: @secondary;
+  color: var(--secondary);
 }
 
 .start-ui-import-detail {
@@ -323,7 +323,7 @@
   justify-content: center;
 
   &__icon {
-    fill: @secondary;
+    fill: var(--secondary);
     opacity: 0.24;
     svg {
       width: 48px;

@@ -23,7 +23,7 @@
 
   display: flex;
   min-width: @screen-md-min;
-  background-color: @app-bg;
+  background-color: var(--app-bg);
 
   .left-column {
     position: relative;
@@ -33,8 +33,8 @@
     fill: @conversation-list-color;
 
     &--light-theme {
-      color: @secondary;
-      fill: @secondary;
+      color: var(--secondary);
+      fill: var(--secondary);
     }
 
     .team-mode & {
@@ -68,14 +68,14 @@
     width: 0;
     height: 100vh;
     max-height: 100%;
-    background-color: @app-bg-secondary;
-    box-shadow: 0 0 24px @sidebar-box-shadow-lg;
+    background-color: var(--app-bg-secondary);
+    box-shadow: 0 0 24px var(--sidebar-box-shadow-lg);
     transform: scale(1, 1);
   }
 
   @media (min-width: 1000px) {
     .right-column {
-      box-shadow: -1px 0 0 @sidebar-box-shadow;
+      box-shadow: -1px 0 0 var(--sidebar-box-shadow);
     }
   }
 

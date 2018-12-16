@@ -33,9 +33,9 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid fade(@primary, 12%);
-  background-color: @app-bg;
-  color: @secondary;
+  border-bottom: 1px solid var(--primary-fade-8);
+  background-color: var(--app-bg);
+  color: var(--secondary);
 }
 
 .preferences-content-wrapper {
@@ -49,11 +49,11 @@
   min-width: 560px;
   height: 100%;
   padding: 32px 32px 32px 72px;
-  color: @secondary;
+  color: var(--secondary);
   overflow-x: hidden;
 
   input {
-    color: @secondary;
+    color: var(--secondary);
   }
 }
 
@@ -63,7 +63,7 @@
 
 .preferences-detail {
   width: 380px;
-  color: @primary;
+  color: var(--primary);
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
@@ -78,16 +78,16 @@
   .label-bold-xs;
 
   margin-bottom: 16px;
-  color: @secondary;
+  color: var(--secondary);
   line-height: @line-height-sm;
 }
 
 .preferences-hint {
-  color: @primary;
+  color: var(--primary);
 }
 
 .preferences-label {
-  color: @secondary;
+  color: var(--secondary);
 }
 
 .preferences-info {

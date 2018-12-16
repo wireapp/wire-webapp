@@ -19,10 +19,10 @@
 
 .preferences-options-checkbox-label {
   padding-left: 32px !important;
-  color: @secondary;
+  color: var(--secondary);
 
   &:after {
-    color: @secondary;
+    color: var(--secondary);
   }
 }
 
@@ -54,14 +54,14 @@
   label::before {
     width: 16px;
     height: 16px;
-    border: 2px solid @primary;
+    border: 2px solid var(--primary);
     transition: all 0.15s;
   }
 
   input[type='radio']:checked + label::before {
     border-width: 6px;
-    border-color: @secondary;
-    background-color: @app-bg-secondary;
+    border-color: var(--secondary);
+    background-color: var(--app-bg-secondary);
   }
 }
 

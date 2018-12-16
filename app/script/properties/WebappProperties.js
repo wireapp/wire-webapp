@@ -24,11 +24,11 @@ class WebappProperties {
   constructor() {
     this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
-      appearance: {
-        dark: false,
-      },
       emoji: {
         replace_inline: true,
+      },
+      interface: {
+        theme: 'default',
       },
       notifications: z.notification.NotificationPreference.ON,
       previews: {

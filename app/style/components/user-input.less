@@ -26,7 +26,7 @@ user-input {
 
   &.user-list-light {
     background: fade(@w-gray, 16%);
-    color: @secondary;
+    color: var(--secondary);
   }
 }
 
@@ -63,11 +63,11 @@ user-input {
     position: absolute;
     top: 11px;
     right: 7px;
-    background-color: fade(@primary, 40%);
+    background-color: var(--primary-fade-40);
     content: '';
 
     .user-list-light & {
-      background-color: fade(@secondary, 40%);
+      background-color: var(--secondary-fade-40);
     }
   }
 
@@ -93,12 +93,12 @@ user-input {
 
   &::placeholder {
     &:invalid {
-      color: fade(@primary, 40%);
+      color: var(--primary-fade-40);
     }
     .label-xs;
 
     padding-left: 8px;
-    color: fade(@primary, 40%);
+    color: var(--primary-fade-40);
   }
 
   // hack for chrome to fix line height issue
@@ -108,7 +108,7 @@ user-input {
 
   .user-list-light & {
     &::placeholder {
-      color: fade(@secondary, 40%);
+      color: var(--secondary-fade-40);
     }
   }
 }
