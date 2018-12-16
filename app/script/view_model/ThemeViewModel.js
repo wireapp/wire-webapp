@@ -17,23 +17,40 @@
  *
  */
 
-class DarkModeViewModel {
+const THEMES_CLASS_PREFIX = 'theme-';
+const THEMES = {
+  DARK: 'dark',
+  DEFAULT: 'default',
+};
+
+class ThemeViewModel {
   constructor(mainViewModel, repositories) {
     this.propertiesRepository = repositories.properties;
+    this.setTheme = this.setTheme.bind(this);
 
     this.isDarkMode = ko.observable(undefined);
-    this.isDarkMode.subscribe(isDarkMode => {
-      jQuery('body').toggleClass('theme-dark', !!isDarkMode);
+    this.isDarkMode.subscribe(useDarkMode => {
+      if (useDarkMode) {
+        this.setTheme(THEMES.DARK);
+      } else {
+        this.setTheme(THEMES.DEFAULT);
+      }
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.APPEARANCE.DARK, isDarkMode => {
-      this.isDarkMode(isDarkMode);
-    });
-
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.THEME, this.isDarkMode);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
-      this.isDarkMode(properties.settings.appearance.dark);
+      this.isDarkMode(properties.settings.interface.theme);
     });
+  }
+
+  setTheme(newTheme) {
+    const classesWithoutTheme = document.body.className
+      .split(' ')
+      .filter(elementClass => !elementClass.startsWith(THEMES_CLASS_PREFIX))
+      .join(' ');
+    const theme = `${THEMES_CLASS_PREFIX}${newTheme}`;
+    document.body.className = `${classesWithoutTheme} ${theme}`;
   }
 }
 
-export default DarkModeViewModel;
+export default ThemeViewModel;

@@ -170,13 +170,13 @@ z.event.WebApp = {
   },
   PROPERTIES: {
     UPDATE: {
-      APPEARANCE: {
-        DARK: 'wire.webapp.properties.update.appearance.dark',
-        SYSTEM_CHANGED: 'wire.webapp.properties.update.appearance.system_changed',
-      },
       CONTACTS: 'wire.webapp.properties.update.contacts',
       EMOJI: {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
+      },
+      INTERFACE: {
+        THEME: 'wire.webapp.properties.update.interface.theme',
+        USE_DARK_MODE: 'wire.webapp.properties.update.interface.use_dark_mode',
       },
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {

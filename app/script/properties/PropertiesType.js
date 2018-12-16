@@ -21,9 +21,6 @@ window.z = window.z || {};
 window.z.properties = z.properties || {};
 
 z.properties.PROPERTIES_TYPE = {
-  APPEARANCE: {
-    DARK: 'settings.appearance.dark',
-  },
   CONTACT_IMPORT: {
     MACOS: 'contact_import.macos',
   },
@@ -31,6 +28,9 @@ z.properties.PROPERTIES_TYPE = {
     REPLACE_INLINE: 'settings.emoji.replace_inline',
   },
   ENABLE_DEBUGGING: 'enable_debugging',
+  INTERFACE: {
+    THEME: 'settings.interface.theme',
+  },
   NOTIFICATIONS: 'settings.notifications',
   PREVIEWS: {
     SEND: 'settings.previews.send',
