@@ -111,9 +111,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   getCreateTeamUrl() {
-    return z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && z.config.URL.WEBSITE
-      ? `${z.config.URL.WEBSITE}/create-team/?pk_campaign=client&pk_kwd=desktop`
-      : undefined;
+    const createTeamUrl = `${z.config.URL.WEBSITE}/create-team/?pk_campaign=client&pk_kwd=desktop`;
+    return z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && z.config.URL.WEBSITE ? createTeamUrl : undefined;
   }
 
   _initSubscriptions() {
