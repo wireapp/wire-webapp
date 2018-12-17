@@ -140,6 +140,7 @@ const config: ServerConfig = {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
       PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY,
+      SUPPORT_BASE: process.env.URL_SUPPORT_BASE,
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
       TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
       TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,

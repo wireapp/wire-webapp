@@ -12,6 +12,7 @@ export interface ServerConfig {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
       PRIVACY_POLICY: string;
+      SUPPORT_BASE: string;
       TEAMS_BASE: string;
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
