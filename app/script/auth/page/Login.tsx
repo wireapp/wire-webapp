@@ -410,7 +410,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {isSSOCapable ? (
+                {config.FEATURE.ENABLE_SSO && isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
