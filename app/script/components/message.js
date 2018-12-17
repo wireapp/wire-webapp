@@ -320,7 +320,7 @@ const normalTemplate = `
         </span>
       </div>
       <div class="message-footer-label " data-bind="css: {'cursor-pointer': !conversation().is1to1()}, click: !conversation().is1to1() ? onClickLikes : null ">
-        <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
+        <span class="font-size-xs text-primary" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
       </div>
     </div>
   <!-- /ko -->
@@ -534,7 +534,7 @@ const memberTemplate = `
       <!-- /ko -->
       <!-- ko if: hasReadReceiptsTurnedOn -->
         <div class="message-header" data-uie-name="label-group-creation-receipts">
-          <div class="message-header-icon message-header-icon--svg text-graphite">
+          <div class="message-header-icon message-header-icon--svg text-primary">
             <read-icon></read-icon>
           </div>
           <div class="message-header-label">
