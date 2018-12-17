@@ -307,10 +307,18 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.clientRepository.logoutClient();
   }
 
+  getManageTeamUrl() {
+    const teamSettingsManageUrl = `${z.config.URL.TEAM_SETTINGS}${
+      z.config.URL_PATH.MANAGE_TEAM
+    }?utm_source=client_settings&utm_term=desktop`;
+    return z.config.URL.TEAM_SETTINGS ? teamSettingsManageUrl : undefined;
+  }
+
   clickOpenManageTeam() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.getManageTeamUrl()) {
+      z.util.SanitizationUtil.safeWindowOpen(this.getManageTeamUrl());
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOnResetPassword() {

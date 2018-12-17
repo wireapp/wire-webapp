@@ -228,18 +228,32 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
+  getManageTeamUrl() {
+    const teamSettingsManageUrl = `${z.config.URL.TEAM_SETTINGS}${
+      z.config.URL_PATH.MANAGE_TEAM
+    }?utm_source=client_landing&utm_term=desktop`;
+    return z.config.URL.TEAM_SETTINGS ? teamSettingsManageUrl : undefined;
+  }
+
+  getManageServicesUrl() {
+    const teamSettingsServicesUrl = `${z.config.URL.TEAM_SETTINGS}${
+      z.config.URL_PATH.MANAGE_SERVICES
+    }?utm_source=client_landing&utm_term=desktop`;
+    return z.config.URL.TEAM_SETTINGS ? teamSettingsServicesUrl : undefined;
+  }
+
   clickOpenManageTeam() {
-    this._openTeamSettings(z.config.URL_PATH.MANAGE_TEAM);
+    if (this.getManageTeamUrl()) {
+      z.util.SanitizationUtil.safeWindowOpen(this.getManageTeamUrl());
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOpenManageServices() {
-    this._openTeamSettings(z.config.URL_PATH.MANAGE_SERVICES);
-  }
-
-  _openTeamSettings(pagePath) {
-    const path = `${pagePath}?utm_source=client_landing&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.getManageServicesUrl()) {
+      z.util.SanitizationUtil.safeWindowOpen(this.getManageServicesUrl());
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOnOther(participantEntity, event) {

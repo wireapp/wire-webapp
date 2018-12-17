@@ -138,10 +138,18 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
+  getManageServicesUrl() {
+    const teamSettingsServicesUrl = `${z.config.URL.TEAM_SETTINGS}${
+      z.config.URL_PATH.MANAGE_SERVICES
+    }?utm_source=client_landing&utm_term=desktop`;
+    return z.config.URL.TEAM_SETTINGS ? teamSettingsServicesUrl : undefined;
+  }
+
   clickOpenManageServices() {
-    const path = `${z.config.URL_PATH.MANAGE_SERVICES}?utm_source=client_landing&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.getManageServicesUrl()) {
+      z.util.SanitizationUtil.safeWindowOpen(this.getManageServicesUrl());
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   initView() {
