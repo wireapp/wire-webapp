@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.10.3...@wireapp/commons@0.10.4) (2018-12-17)
+
+
+### Bug Fixes
+
+* Improved isUUIDv4 check ([#1391](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1391)) ([f515e8b](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/f515e8b))
+
+
+
+
+
 ## [0.10.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.10.2...@wireapp/commons@0.10.3) (2018-12-07)
 
 **Note:** Version bump only for package @wireapp/commons
