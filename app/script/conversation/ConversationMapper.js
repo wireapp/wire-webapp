@@ -350,7 +350,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         type,
       };
 
-      if (typeof localConversationData.receipt_mode === 'boolean') {
+      if (typeof localConversationData.receipt_mode === 'number') {
         updates.receipt_mode = localConversationData.receipt_mode;
       }
 
