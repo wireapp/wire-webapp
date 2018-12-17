@@ -319,7 +319,7 @@ const normalTemplate = `
           <span class="icon-liked-small"></span>
         </span>
       </div>
-      <div class="message-footer-label " data-bind="css: {'cursor-pointer': !conversation().is1to1()}, click: conversation().is1to1() ? onClickLikes : null ">
+      <div class="message-footer-label " data-bind="css: {'cursor-pointer': !conversation().is1to1()}, click: !conversation().is1to1() ? onClickLikes : null ">
         <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
       </div>
     </div>

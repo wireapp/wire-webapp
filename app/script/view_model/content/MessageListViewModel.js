@@ -687,7 +687,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   showMessageDetails(view, showLikes) {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
-        entity: view.message.id,
+        entity: {id: view.message.id},
         showLikes,
       });
     }

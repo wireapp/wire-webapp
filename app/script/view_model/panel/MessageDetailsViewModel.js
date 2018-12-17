@@ -34,6 +34,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.isReceiptsOpen = ko.observable(true);
     this.messageId = ko.observable();
+    this.isProAccount = params.repositories.team.isTeam;
+
     const userRepository = params.repositories.user;
 
     this.states = {
@@ -62,7 +64,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.isMe = ko.pureComputed(() => this.message() && this.message().user().is_me);
 
     this.state = ko.pureComputed(() => {
-      if (this.isMe() && this.isReceiptsOpen()) {
+      if (this.isProAccount() && this.isMe() && this.isReceiptsOpen()) {
         if (!this.message().expectsReadConfirmation) {
           return this.states.RECEIPTS_OFF;
         }
@@ -114,6 +116,12 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
     });
 
+    this.showTabs = ko.pureComputed(() => {
+      const supportsReceipts = this.isProAccount() && this.isMe();
+      const supportsLikes = !this.isPing();
+      return supportsReceipts && supportsLikes;
+    });
+
     this.editedFooter = ko.pureComputed(() => {
       return this.message() && !isNaN(this.message().edited_timestamp) && formatTime(this.message().edited_timestamp);
     });
@@ -150,9 +158,9 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     return this.message().id;
   }
 
-  initView({entity: messageId, showLikes}) {
+  initView({entity: {id}, showLikes}) {
     this.isReceiptsOpen(!showLikes);
-    this.messageId(messageId);
+    this.messageId(id);
   }
 
   getElementId() {
