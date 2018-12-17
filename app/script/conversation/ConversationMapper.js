@@ -349,6 +349,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
         team_id: team,
         type,
       };
+
+      if (typeof localConversationData.receipt_mode === 'boolean') {
+        updates.receipt_mode = localConversationData.receipt_mode;
+      }
+
       const mergedConversation = Object.assign({}, localConversationData, updates);
 
       const isGroup = type === z.conversation.ConversationType.GROUP;
