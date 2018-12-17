@@ -133,14 +133,19 @@ describe('Conversation', () => {
       expect(conversation_et.messages().length).toBe(1);
     });
 
-    it('should replace existing message with new message', () => {
+    it('updates existing message values with new message', () => {
       const initialLength = conversation_et.messages().length;
       const newMessageEntity = new z.entity.Message(z.util.createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
+      newMessageEntity.status = 3;
+      newMessageEntity.version = 3;
+      newMessageEntity.readReceipts([{userId: 'user-id'}]);
       conversation_et.add_message(newMessageEntity, true);
 
       expect(conversation_et.messages().length).toBe(initialLength);
-      expect(conversation_et.messages()[0]).toBe(newMessageEntity);
+      expect(conversation_et.messages()[0].readReceipts()).toEqual(newMessageEntity.readReceipts());
+      expect(conversation_et.messages()[0].status).toEqual(newMessageEntity.status);
+      expect(conversation_et.messages()[0].version).toEqual(newMessageEntity.version);
     });
 
     it('should add message with a newer timestamp', () => {
