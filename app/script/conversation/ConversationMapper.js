@@ -344,11 +344,16 @@ z.conversation.ConversationMapper = class ConversationMapper {
         creator,
         message_timer,
         name,
-        receipt_mode: localConversationData.receipt_mode || receipt_mode,
+        receipt_mode,
         status: selfState.status,
         team_id: team,
         type,
       };
+
+      if (typeof localConversationData.receipt_mode === 'boolean') {
+        updates.receipt_mode = localConversationData.receipt_mode;
+      }
+
       const mergedConversation = Object.assign({}, localConversationData, updates);
 
       const isGroup = type === z.conversation.ConversationType.GROUP;
