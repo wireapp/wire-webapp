@@ -107,6 +107,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
 
+    this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
+
     this._initSubscriptions();
   }
 
