@@ -26,6 +26,7 @@
     --@{name}-fade-@{index}: fade(@fadeOver, @index);
     .colorFade(@name, @index - 8, @fadeOver);
   }
+
   .setVariables(@list) {
     .iter(length(@list));
     .iter(@i) when (@i > 0) {

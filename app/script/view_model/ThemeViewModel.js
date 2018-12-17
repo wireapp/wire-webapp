@@ -18,7 +18,7 @@
  */
 
 const THEMES_CLASS_PREFIX = 'theme-';
-const THEMES = {
+export const THEMES = {
   DARK: 'dark',
   DEFAULT: 'default',
 };

@@ -21,6 +21,8 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
+import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
+
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
     return {
@@ -97,7 +99,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   updateProperties(properties) {
     this.optionAudio(properties.settings.sound.alerts);
     this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
-    this.optionDarkMode(properties.settings.interface.theme);
+    this.optionDarkMode(properties.settings.interface.theme === ThemeViewModelThemes.DARK);
     this.optionSendPreviews(properties.settings.previews.send);
     this.optionNotifications(properties.settings.notifications);
   }
