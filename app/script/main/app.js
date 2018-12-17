@@ -314,10 +314,7 @@ class App {
 
         this.repository.event.connectWebSocket();
 
-        const promises = [
-          this.repository.conversation.getConversations(true),
-          this.repository.connection.getConnections(),
-        ];
+        const promises = [this.repository.conversation.getConversations(), this.repository.connection.getConnections()];
         return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {

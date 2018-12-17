@@ -358,7 +358,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  getConversations(skipKnown = false) {
+  getConversations() {
     const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return [];
@@ -366,11 +366,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remoteConversationsPromise])
       .then(([localConversations, remoteConversations]) => {
-        if (skipKnown) {
-          const localIds = localConversations.map(conversation => conversation.id);
-          remoteConversations = remoteConversations.filter(conversation => !localIds.includes(conversation.id));
-        }
-
         if (!remoteConversations.length) {
           return localConversations;
         }

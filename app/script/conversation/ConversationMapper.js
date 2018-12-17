@@ -344,7 +344,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         creator,
         message_timer,
         name,
-        receipt_mode,
+        receipt_mode: localConversationData.receipt_mode || receipt_mode,
         status: selfState.status,
         team_id: team,
         type,
