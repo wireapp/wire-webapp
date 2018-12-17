@@ -29,6 +29,10 @@ describe('Root', () => {
     beforeEach(() => {
       const state = {
         authState: {},
+        clientState: {
+          hasHistory: false,
+        },
+        cookieState: {},
         languageState: {
           language: 'en',
         },
@@ -37,6 +41,7 @@ describe('Root', () => {
           hasIndexedDbSupport: true,
           isSupportedBrowser: true,
         },
+        selfState: {},
       };
 
       store = mockStore(state, {actions: {cookieAction: {}}});
