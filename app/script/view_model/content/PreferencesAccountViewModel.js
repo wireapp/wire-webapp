@@ -110,6 +110,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this._initSubscriptions();
   }
 
+  getCreateTeamUrl() {
+    return z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && z.config.URL.WEBSITE
+      ? `${z.config.URL.WEBSITE}/create-team/?pk_campaign=client&pk_kwd=desktop`
+      : undefined;
+  }
+
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
@@ -270,11 +276,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
       amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, file);
     }
-  }
-
-  clickOpenCreateTeam() {
-    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   clickOnDeleteAccount() {

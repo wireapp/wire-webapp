@@ -109,10 +109,7 @@ window.z.config = {
     },
     PRIVACY_POLICY: env.URL && env.URL.PRIVACY_POLICY,
     SUPPORT: 'https://support.wire.com',
-    TEAM_SETTINGS: {
-      PRODUCTION: (env.URL && env.URL.TEAMS_BASE) || 'https://teams.wire.com',
-      STAGING: 'https://wire-teams-staging.zinfra.io',
-    },
+    TEAM_SETTINGS: env.URL && env.URL.TEAMS_BASE,
     TERMS_OF_USE_PERSONAL: env.URL && env.URL.TERMS_OF_USE_PERSONAL,
     TERMS_OF_USE_TEAMS: env.URL && env.URL.TERMS_OF_USE_TEAMS,
     WEBAPP: {
