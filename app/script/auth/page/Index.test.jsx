@@ -38,15 +38,37 @@ describe('when visiting the index page', () => {
     },
   };
 
-  const loginForm = () => wrapper.find('[data-uie-name="redirect-login"]').first();
-
   describe('and the account registration is disabled', () => {
     it('redirects to the login page', () => {
       config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
       wrapper = mountWithIntl(<Index />, mockStore(initialState));
       config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
 
-      expect(loginForm().exists()).toBe(true);
+      expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
     });
+  });
+
+  it('shows the Wire logo', () => {
+    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+
+    expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
+  });
+
+  it('shows an option to create a private account', () => {
+    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+
+    expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
+  });
+
+  it('shows an option to create a team', () => {
+    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+
+    expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
+  });
+
+  it('shows an option to login', () => {
+    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+
+    expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
   });
 });
