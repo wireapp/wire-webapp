@@ -30,6 +30,8 @@ describe('ValidationUtil', () => {
     it('recognizes incorrect UUIDv4 strings', () => {
       expect(ValidationUtil.isUUIDv4('d76259eb-25e1-46d-b170-bfcee91a2733')).toBe(false);
       expect(ValidationUtil.isUUIDv4('d76259eb')).toBe(false);
+      expect(ValidationUtil.isUUIDv4('test D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(false);
+      expect(ValidationUtil.isUUIDv4('0000-D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(false);
     });
   });
 });
