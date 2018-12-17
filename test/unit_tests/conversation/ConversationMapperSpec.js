@@ -528,6 +528,7 @@ describe('Conversation Mapper', () => {
     it('uses the remote receipt mode when there is no local receipt mode', () => {
       const remoteReceiptMode = 0;
       const [localData, remoteData] = getDataWithReadReceiptMode(null, remoteReceiptMode);
+
       const [mergedConversation] = conversation_mapper.mergeConversation([localData], [remoteData]);
 
       expect(mergedConversation.receipt_mode).toBe(remoteReceiptMode);
