@@ -140,8 +140,8 @@
             <div class="preferences-link text-theme" data-bind="click: clickOpenManageTeam, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
           <!-- /ko -->
 
-          <!-- ko ifnot: isMacOsWrapper -->
-            <div class="preferences-link text-theme" data-bind="click: clickOpenCreateTeam, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
+          <!-- ko if: !isMacOsWrapper && !!getCreateTeamUrl() -->
+            <a class="preferences-link text-theme" data-bind="attr: {href: getCreateTeamUrl()}, l10n_text: z.string.preferencesAccountCreateTeam" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
           <!-- /ko -->
 
           <!-- ko ifnot: selfUser().isSingleSignOn -->
