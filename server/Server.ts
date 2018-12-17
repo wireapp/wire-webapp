@@ -179,7 +179,7 @@ class Server {
 
       const userAgent = req.header('User-Agent');
       if (!BrowserUtil.isSupportedBrowser(userAgent)) {
-        return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
+        return res.redirect(STATUS_CODE_FOUND, '/auth/');
       }
       return next();
     });
