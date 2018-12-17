@@ -22,7 +22,7 @@
 // ----------------------------------------------------------------------------
 
 .applyTheme() {
-  .colorFade (@name, @index, @fadeOver) when (@index > 0) {
+  .colorFade (@name, @index, @fadeOver, @eachNumber) when (@index > -8) {
     --@{name}-fade-@{index}: fade(@fadeOver, @index);
     .colorFade(@name, @index - 8, @fadeOver);
   }
