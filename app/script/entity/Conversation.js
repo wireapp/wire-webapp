@@ -23,7 +23,7 @@ import ReceiptMode from '../conversation/ReceiptMode';
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.Conversation = class Conversation {
+class Conversation {
   static get TIMESTAMP_TYPE() {
     return {
       ARCHIVED: 'archivedTimestamp',
@@ -37,13 +37,13 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Constructs a new conversation entity.
-   * @class z.entity.Conversation
+   * @class Conversation
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
     this.id = conversation_id;
 
-    this.logger = new z.util.Logger(`z.entity.Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
 
     this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
     this.accessCode = ko.observable();
@@ -596,7 +596,7 @@ z.entity.Conversation = class Conversation {
       const timestamp = new Date(time).getTime();
 
       if (!_.isNaN(timestamp)) {
-        this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
     }
   }
@@ -614,11 +614,11 @@ z.entity.Conversation = class Conversation {
 
       if (timestamp <= this.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_EVENT);
+          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
           const from_self = message_et.user() && message_et.user().is_me;
           if (from_self) {
-            this.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
+            this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
         }
       }
@@ -784,4 +784,7 @@ z.entity.Conversation = class Conversation {
       verification_state: this.verification_state(),
     };
   }
-};
+}
+
+export default Conversation;
+z.entity.Conversation = Conversation;

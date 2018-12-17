@@ -82,14 +82,17 @@
  * @property {string} provider
  */
 
+import ko from 'knockout';
+import Conversation from '../entity/Conversation';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
-z.conversation.ConversationMapper = class ConversationMapper {
+class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
-    this.logger = new z.util.Logger('z.conversation.ConversationMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('ConversationMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -167,12 +170,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
       } = selfState;
 
       if (archived_timestamp) {
-        conversationEntity.setTimestamp(archived_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
+        conversationEntity.setTimestamp(archived_timestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
         conversationEntity.archivedState(selfState.archived_state);
       }
 
       if (cleared_timestamp !== undefined) {
-        conversationEntity.setTimestamp(cleared_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED, true);
+        conversationEntity.setTimestamp(cleared_timestamp, Conversation.TIMESTAMP_TYPE.CLEARED, true);
       }
 
       if (ephemeral_timer !== undefined) {
@@ -188,19 +191,19 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       if (last_event_timestamp) {
-        conversationEntity.setTimestamp(last_event_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_EVENT);
+        conversationEntity.setTimestamp(last_event_timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
       }
 
       if (last_read_timestamp) {
-        conversationEntity.setTimestamp(last_read_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ);
+        conversationEntity.setTimestamp(last_read_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
       }
 
       if (last_server_timestamp) {
-        conversationEntity.setTimestamp(last_server_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        conversationEntity.setTimestamp(last_server_timestamp, Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
 
       if (muted_timestamp) {
-        conversationEntity.setTimestamp(muted_timestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
+        conversationEntity.setTimestamp(muted_timestamp, Conversation.TIMESTAMP_TYPE.MUTED);
         conversationEntity.mutedState(selfState.muted_state);
       }
 
@@ -217,13 +220,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       if (otr_archived !== undefined) {
         const archivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
-        conversationEntity.setTimestamp(archivedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.ARCHIVED);
+        conversationEntity.setTimestamp(archivedTimestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
         conversationEntity.archivedState(otr_archived);
       }
 
       if (otr_muted !== undefined) {
         const mutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
-        conversationEntity.setTimestamp(mutedTimestamp, z.entity.Conversation.TIMESTAMP_TYPE.MUTED);
+        conversationEntity.setTimestamp(mutedTimestamp, Conversation.TIMESTAMP_TYPE.MUTED);
 
         const mutedState = this.getMutedState(otr_muted, selfState.otr_muted_status);
         conversationEntity.mutedState(mutedState);
@@ -254,7 +257,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     const {creator, id, members, name, others, type} = conversationData;
-    let conversationEntity = new z.entity.Conversation(id);
+    let conversationEntity = new Conversation(id);
 
     conversationEntity.creator = creator;
     conversationEntity.type(type);
@@ -444,4 +447,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       : z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE;
     return conversationEntity.accessState(personalAccessState);
   }
-};
+}
+
+export default ConversationMapper;
+z.conversation.ConversationMapper = ConversationMapper;

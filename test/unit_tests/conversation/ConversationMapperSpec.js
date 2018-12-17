@@ -19,10 +19,13 @@
 
 // KARMA_SPECS=conversation/ConversationMapper yarn test:app
 
+import Conversation from 'app/script/entity/Conversation';
+import ConversationMapper from 'app/script/conversation/ConversationMapper';
+
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
 
-  beforeEach(() => (conversation_mapper = new z.conversation.ConversationMapper()));
+  beforeEach(() => (conversation_mapper = new ConversationMapper()));
 
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
@@ -141,7 +144,7 @@ describe('Conversation Mapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(z.util.createRandomUuid());
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
