@@ -418,16 +418,17 @@ z.entity.Conversation = class Conversation {
   }
 
   replaceMessage(originalMessage, newMessage) {
-    Object.keys(newMessage).forEach(property => {
-      const accessor = newMessage[property];
-      const isRawObservable = ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
-      const isRawValue = typeof accessor !== 'function';
-      if (isRawObservable) {
-        originalMessage[property](ko.unwrap(accessor));
-      } else if (isRawValue) {
-        originalMessage[property] = accessor;
-      }
+    const properties = Object.entries(newMessage);
+    const rawValues = properties.filter(([_, accessor]) => {
+      return typeof accessor !== 'function';
     });
+    const observableValues = properties.filter(([_, accessor]) => {
+      return ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
+    });
+
+    // update raw values first (in order to have them up to date when observables are updated)
+    rawValues.forEach(([property, value]) => (originalMessage[property] = value));
+    observableValues.forEach(([property, value]) => originalMessage[property](ko.unwrap(value)));
   }
 
   /**
