@@ -418,8 +418,16 @@ z.entity.Conversation = class Conversation {
   }
 
   replaceMessage(originalMessage, newMessage) {
-    const originalIndex = this.messages_unordered.indexOf(originalMessage);
-    this.messages_unordered.splice(originalIndex, 1, newMessage);
+    Object.keys(newMessage).forEach(property => {
+      const accessor = newMessage[property];
+      const isRawObservable = ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
+      const isRawValue = typeof accessor !== 'function';
+      if (isRawObservable) {
+        originalMessage[property](ko.unwrap(accessor));
+      } else if (isRawValue) {
+        originalMessage[property] = accessor;
+      }
+    });
   }
 
   /**
