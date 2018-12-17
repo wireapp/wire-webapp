@@ -22,9 +22,10 @@
 // ----------------------------------------------------------------------------
 
 .applyTheme() {
-  .setColorFade (@name, @fadeOver, @index: 0) when (@index < 96 + 8) {
+  @iterateIndexEach: 8;
+  .setColorFade (@name, @fadeOver, @index: 0) when (@index < 96 + @iterateIndexEach) {
     --@{name}-fade-@{index}: fade(@fadeOver, @index);
-    .setColorFade(@name, @fadeOver, @index + 8);
+    .setColorFade(@name, @fadeOver, @index + @iterateIndexEach);
   }
 
   .setVariables(@list) {
