@@ -22,9 +22,9 @@
 // ----------------------------------------------------------------------------
 
 .applyTheme() {
-  .colorFade (@name, @index, @fadeOver) when (@index > -8) {
+  .setColorFade (@name, @fadeOver, @index: 0) when (@index < 96 + 8) {
     --@{name}-fade-@{index}: fade(@fadeOver, @index);
-    .colorFade(@name, @index - 8, @fadeOver);
+    .setColorFade(@name, @fadeOver, @index + 8);
   }
 
   .setVariables(@list) {
@@ -38,8 +38,8 @@
   }
 
   .setVariables(primary secondary);
-  .colorFade(primary, 96, @primary);
-  .colorFade(secondary, 96, @secondary);
+  .setColorFade(primary, @primary);
+  .setColorFade(secondary, @secondary);
   .setVariables(app-bg app-bg-secondary conversation-list-bg-opacity sidebar-box-shadow sidebar-box-shadow-lg);
   .setVariables(modal-bg modal-border-color);
   .setVariables(preference-account-input-bg);
