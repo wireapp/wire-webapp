@@ -18,11 +18,14 @@
  */
 
 import moment from 'moment';
+import ko from 'knockout';
+
+import Message from './Message';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
+class ContentMessage extends Message {
   constructor(id) {
     super(id);
 
@@ -180,4 +183,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     return file_name;
   }
-};
+}
+
+export default ContentMessage;
+z.entity.ContentMessage = ContentMessage;
