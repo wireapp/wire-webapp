@@ -517,7 +517,7 @@ z.string.fr.conversationDetailsPeople = 'Personnes';
 z.string.fr.conversationDetailsServices = 'Services';
 z.string.fr.conversationDetails1to1ReceiptsHeadEnabled = 'Vous avez activé les accusés de lecture';
 z.string.fr.conversationDetails1to1ReceiptsHeadDisabled = 'Vous avez désactivé les accusés de lecture';
-z.string.fr.conversationDetails1to1ReceiptsFirst = 'Quand les deux participants ont activé les accusés de lecture, vous pouvez voir quand les messages sont lus.';
+z.string.fr.conversationDetails1to1ReceiptsFirst = 'Si les deux participants ont activé les accusés de lecture, vous pouvez voir quand les messages sont lus.';
 z.string.fr.conversationDetails1to1ReceiptsSecond = 'Vous pouvez changer cette option dans les paramètres de votre compte.';
 
 z.string.fr.conversationParticipantsTitle = 'Personnes';
