@@ -48,26 +48,38 @@ export const URL_PATH = {
   PASSWORD_RESET: '/forgot/',
   PRIVACY_HOW: '/privacy/how/',
   PRIVACY_WHY: '/privacy/why/',
+  SUPPORT_CONTACT: '/hc/en-us/requests/new',
   SUPPORT_USERNAME: '/support/username/',
-  TERMS_OF_USE: '/legal/terms/',
 };
 
-const getTeamSettingsUrl = (path, utmSource) => {
+const getTeamSettingsUrl = (path = '', utmSource) => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAM_SETTINGS}${path}${query}`;
   return URL.TEAM_SETTINGS ? teamSettingsUrl : undefined;
 };
 
-const getWebsiteUrl = (path, pkCampaign) => {
+export const getWebsiteUrl = (path = '', pkCampaign) => {
   const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
   const websiteUrl = `${URL.WEBSITE}${path}${query}`;
-  return z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && URL.WEBSITE ? websiteUrl : undefined;
+  return URL.WEBSITE ? websiteUrl : undefined;
 };
+
+export const getSupportUrl = (path = '') => {
+  const supportUrl = `${URL.SUPPORT}${path}`;
+  return URL.SUPPORT ? supportUrl : undefined;
+};
+
+export const getPrivacyPolicyUrl = () => (URL.PRIVACY_POLICY ? URL.PRIVACY_POLICY : undefined);
+export const getTermsOfUsePersonalUrl = () => (URL.TERMS_OF_USE_PERSONAL ? URL.TERMS_OF_USE_PERSONAL : undefined);
+export const getTermsOfUseTeamUrl = () => (URL.TERMS_OF_USE_TEAMS ? URL.TERMS_OF_USE_TEAMS : undefined);
 
 export const getManageServicesUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
 export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
-export const getCreateTeamUrl = pkCampaign => getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
+export const getCreateTeamUrl = pkCampaign =>
+  z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
 export const getPrivacyHowUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
 export const getSupportUsernameUrl = () => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
+
+export const getSupportContactUrl = () => getSupportUrl(URL_PATH.SUPPORT_CONTACT);

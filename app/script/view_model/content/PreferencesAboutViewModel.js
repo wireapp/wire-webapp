@@ -17,7 +17,14 @@
  *
  */
 
-import {URL} from '../../externalRoute';
+import {
+  getSupportContactUrl,
+  getWebsiteUrl,
+  getSupportUrl,
+  getPrivacyPolicyUrl,
+  getTermsOfUseTeamUrl,
+  getTermsOfUsePersonalUrl,
+} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -29,33 +36,22 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;
+
+    this.supportUrl = getSupportUrl();
+    this.supportContactUrl = getSupportContactUrl();
+    this.websiteUrl = getWebsiteUrl();
+    this.privacyPolicyUrl = getPrivacyPolicyUrl();
   }
 
   getTermsOfUseUrl() {
-    return this.selfUser().inTeam() ? URL.TERMS_OF_USE_TEAMS : URL.TERMS_OF_USE_PERSONAL;
-  }
-
-  getWebsiteUrl() {
-    return URL.WEBSITE;
-  }
-
-  getPrivacyPolicyUrl() {
-    return URL.PRIVACY_POLICY;
+    return this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
   }
 
   showWireSection() {
-    return !!this.getTermsOfUseUrl() || !!this.getWebsiteUrl() || !!this.getPrivacyPolicyUrl();
-  }
-
-  getSupportUrl() {
-    return URL.SUPPORT;
-  }
-
-  getSupportContactUrl() {
-    return !!this.getSupportUrl() ? `${this.getSupportUrl()}/hc/en-us/requests/new` : undefined;
+    return this.getTermsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl;
   }
 
   showSupportSection() {
-    return !!this.getSupportUrl() || !!this.getSupportContactUrl();
+    return this.supportUrl || this.supportContactUrl;
   }
 };
