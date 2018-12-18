@@ -109,7 +109,7 @@
 
     &.self-mention {
       background-color: fade(@w-yellow, 48%);
-      color: var(--secondary);
+      color: var(--background);
     }
 
     &:not(.self-mention) {
@@ -165,13 +165,13 @@
 
   width: @conversation-message-sender-width;
   max-height: @avatar-diameter-xs;
-  color: var(--secondary);
+  color: var(--background);
 
   &--svg {
     line-height: 0;
 
     svg path {
-      fill: var(--primary);
+      fill: var(--foreground);
     }
   }
 }
@@ -243,7 +243,7 @@
     height: 12px;
 
     path {
-      fill: var(--secondary-fade-40);
+      fill: var(--background-fade-40);
     }
   }
 }
@@ -521,7 +521,7 @@
   .message-status-read {
     .action-pill-style;
     position: absolute;
-    color: var(--secondary-fade-40);
+    color: var(--background-fade-40);
     font-size: @font-size-xs;
     pointer-events: none;
     user-select: none;
@@ -584,7 +584,7 @@
 .message-connected-contacts,
 .message-connected-provider-name,
 .message-connected-username {
-  color: var(--primary);
+  color: var(--foreground);
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
@@ -634,7 +634,7 @@
 
 .message-member-footer-description {
   margin-top: 8px;
-  color: var(--secondary-fade-40);
+  color: var(--background-fade-40);
   font-weight: @font-weight-regular;
   line-height: 16px;
 }
@@ -724,7 +724,7 @@
 .message-header-decrypt-error-label {
   .label-xs;
 
-  color: var(--primary);
+  color: var(--foreground);
 }
 
 .message-header-decrypt-reset-session {

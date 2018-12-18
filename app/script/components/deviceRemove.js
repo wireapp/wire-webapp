@@ -77,7 +77,7 @@ ko.components.register('device-remove', {
                 data-bind="attr: {'data-uie-value': model}, l10n_text: z.string.preferencesDevicesRemove"
                 data-uie-name="do-remove-device"
                 type="submit"></button>
-        <button class="device-remove-button text-primary text-underline"
+        <button class="device-remove-button text-foreground text-underline"
                 data-bind="click: click_on_cancel, l10n_text: z.string.preferencesDevicesRemoveCancel"
                 data-uie-name="remove-device-cancel"></button>
       </form>

@@ -27,8 +27,8 @@
 
   position: relative;
   display: inline-block;
-  border: 1px solid var(--secondary-fade-40);
-  color: var(--secondary);
+  border: 1px solid var(--background-fade-40);
+  color: var(--background);
   cursor: pointer;
   line-height: @button-round-size - 2px;
   text-align: center;
@@ -48,24 +48,24 @@
 
   &.hover,
   &:hover {
-    background: var(--secondary-fade-16);
+    background: var(--background-fade-16);
   }
 
   &.active,
   &:active {
-    background: var(--secondary-fade-40);
+    background: var(--background-fade-40);
   }
 
   &.toggled {
     border-color: transparent;
-    background: var(--secondary-fade-72);
+    background: var(--background-fade-72);
     color: #fff;
   }
 
   &.disabled {
-    border: 1px solid var(--secondary-fade-40);
+    border: 1px solid var(--background-fade-40);
     background: transparent;
-    color: var(--secondary-fade-72);
+    color: var(--background-fade-72);
     cursor: default;
   }
 }
@@ -155,7 +155,7 @@
   &.toggled {
     border-color: transparent;
     background: #fff;
-    color: var(--secondary);
+    color: var(--background);
   }
 
   &.disabled {
@@ -191,7 +191,7 @@
 
     height: 28px;
     margin-left: 10px;
-    color: var(--secondary);
+    color: var(--background);
     line-height: 28px;
   }
 }

@@ -78,14 +78,14 @@ ko.components.register('link-preview-asset', {
         <!-- ko if: preview -->
           <!-- ko if: isTweet -->
             <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
-            <div class="link-preview-info-link text-primary" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
+            <div class="link-preview-info-link text-foreground" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
               <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
               <span data-bind="l10n_text: z.string.conversationTweetAuthor"></span>
             </div>
           <!-- /ko -->
           <!-- ko ifnot: isTweet -->
             <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
-            <div class="link-preview-info-link text-primary ellipsis" data-bind="text: z.util.URLUtil.getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
+            <div class="link-preview-info-link text-foreground ellipsis" data-bind="text: z.util.URLUtil.getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
           <!-- /ko -->
         <!-- /ko -->
       </div>

@@ -31,23 +31,23 @@
     .label-bold-xs;
 
     height: 40px;
-    color: var(--secondary);
+    color: var(--background);
     cursor: pointer;
     line-height: 40px;
     user-select: none;
 
     &.hover,
     &:hover {
-      background-color: var(--primary-fade-8);
+      background-color: var(--foreground-fade-8);
     }
 
     &.active,
     &:active {
-      background-color: var(--primary-fade-16);
+      background-color: var(--foreground-fade-16);
     }
   }
 
   > li + li {
-    border-top: 1px solid var(--primary-fade-16);
+    border-top: 1px solid var(--foreground-fade-16);
   }
 }

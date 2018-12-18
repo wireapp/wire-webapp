@@ -25,9 +25,9 @@
     align-items: center;
     justify-content: center;
     animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
-    background-color: var(--secondary-fade-8);
+    background-color: var(--background-fade-8);
     border-radius: 12px;
-    color: var(--secondary);
+    color: var(--background);
     cursor: pointer;
     font-size: 12px;
     line-height: 24px;
@@ -38,11 +38,11 @@
     }
 
     svg > path {
-      fill: var(--secondary);
+      fill: var(--background);
     }
 
     &--active {
-      background-color: var(--secondary);
+      background-color: var(--background);
       color: var(--app-bg-secondary);
 
       svg > path {
@@ -118,12 +118,12 @@
     &__wrapper {
       overflow: hidden;
       max-height: 0;
-      color: var(--secondary);
+      color: var(--background);
 
       &::before {
         display: block;
         margin: 0 16px;
-        border-top: 1px solid var(--secondary-fade-8);
+        border-top: 1px solid var(--background-fade-8);
         content: '';
       }
 
@@ -135,7 +135,7 @@
     .participant-item {
       height: 40px;
       cursor: default;
-      fill: var(--secondary);
+      fill: var(--background);
       pointer-events: none;
 
       .participant-item-image {
@@ -168,10 +168,10 @@
   }
 
   &__avatar {
-    border: 1px solid var(--secondary-fade-8);
+    border: 1px solid var(--background-fade-8);
 
     .group-avatar-box-wrapper {
-      background: var(--secondary-fade-16);
+      background: var(--background-fade-16);
     }
   }
 }
@@ -203,17 +203,17 @@ conversation-list-calling-cell {
     color: var(--app-bg-secondary);
 
     &::before {
-      background-color: var(--secondary-fade-80);
+      background-color: var(--background-fade-80);
     }
   }
 
   .conversation-list-cell-name {
-    color: var(--secondary);
+    color: var(--background);
   }
 
   .conversation-list-cell-description {
     margin-top: 0;
-    color: var(--secondary-fade-40);
+    color: var(--background-fade-40);
     font-size: 11px;
     opacity: 1;
   }

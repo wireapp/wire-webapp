@@ -115,7 +115,7 @@
   }
 
   &__info-text {
-    color: var(--primary);
+    color: var(--foreground);
     font-size: 12px;
     line-height: @line-height-sm;
 
@@ -139,7 +139,7 @@
     align-items: center;
     margin: 0 16px;
     cursor: pointer;
-    fill: var(--primary);
+    fill: var(--foreground);
     font-weight: @font-weight-regular;
     user-select: none;
 
@@ -159,7 +159,7 @@
             height: 16px;
             box-sizing: border-box;
             margin-right: 16px;
-            border: 2px solid var(--primary);
+            border: 2px solid var(--foreground);
             border-radius: 50%;
             content: '';
             cursor: pointer;
@@ -172,7 +172,7 @@
         }
 
         &:disabled {
-          color: var(--primary);
+          color: var(--foreground);
           cursor: default;
 
           & + span::before {
@@ -223,7 +223,7 @@
       width: 40px;
       margin-left: 4px;
       path {
-        fill: var(--secondary);
+        fill: var(--background);
       }
     }
 
@@ -250,7 +250,7 @@
       display: flex;
       margin-left: 12px;
       path {
-        fill: var(--secondary-fade-40);
+        fill: var(--background-fade-40);
       }
     }
 
@@ -280,7 +280,7 @@
     }
 
     path {
-      fill: var(--secondary);
+      fill: var(--background);
     }
 
     &__title {
@@ -312,7 +312,7 @@
 
     &__info {
       margin: 2px 0;
-      color: var(--secondary-fade-40);
+      color: var(--background-fade-40);
       font-size: 12px;
       font-weight: @font-weight-regular;
       text-align: center;
@@ -325,7 +325,7 @@
     min-height: 44px;
     padding: 0 8px;
     margin-bottom: 0;
-    border-bottom: 1px solid var(--primary-fade-32);
+    border-bottom: 1px solid var(--foreground-fade-32);
   }
 
   &__tab {
@@ -334,7 +334,7 @@
     flex-grow: 1;
     margin-bottom: -1px;
     border-bottom: 1px solid transparent;
-    color: var(--secondary);
+    color: var(--background);
     cursor: pointer;
     font-size: 11px;
     font-weight: 600;
@@ -342,7 +342,7 @@
     text-transform: uppercase;
 
     &--active {
-      border-bottom-color: var(--secondary-fade-32);
+      border-bottom-color: var(--background-fade-32);
       cursor: default;
       opacity: 1;
     }

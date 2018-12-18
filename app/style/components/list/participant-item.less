@@ -46,7 +46,7 @@ participant-item {
   }
 
   guest-icon {
-    fill: var(--secondary);
+    fill: var(--background);
     opacity: 0.48;
   }
 
@@ -68,7 +68,7 @@ participant-item {
 
   &.highlighted {
     animation: fadeInUserHighlighting 1s @ease-out-quart;
-    background-color: var(--secondary-fade-8);
+    background-color: var(--background-fade-8);
   }
 
   .participant-item {
@@ -132,10 +132,10 @@ participant-item {
 @keyframes fadeInUserHighlighting {
   0%,
   50% {
-    background-color: var(--secondary-fade-0);
+    background-color: var(--background-fade-0);
   }
   100% {
-    background-color: var(--secondary-fade-8);
+    background-color: var(--background-fade-8);
   }
 }
 
