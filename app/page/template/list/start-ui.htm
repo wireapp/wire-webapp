@@ -35,7 +35,7 @@
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
-            <!-- ko if: showInviteMember() && !!getManageTeamUrl() -->
+            <!-- ko if: showInviteMember() && !!manageTeamUrl -->
               <ul class="start-ui-invite-people left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
                   <div class="left-column-icon icon-envelope"></div>
@@ -106,7 +106,7 @@
 
         <!-- ko ifnot: peopleTabActive() -->
           <!-- ko if: services().length -->
-            <!-- ko if: isTeamManager() && !!getManageServicesUrl() -->
+            <!-- ko if: isTeamManager() && !!manageServicesUrl -->
               <ul class="start-ui-manage-services left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOpenManageServices" data-uie-name="go-manage-services">
                   <service-icon class="left-column-icon"></service-icon>
@@ -119,7 +119,7 @@
           <!-- ko if: !services().length && !isInitialServiceSearch() -->
             <div class="search__no-services">
               <service-icon class="search__no-services__icon"></service-icon>
-              <!-- ko if: isTeamManager() && !!getManageServicesUrl() -->
+              <!-- ko if: isTeamManager() && !!manageServicesUrl -->
                 <div class="search__no-services__info" data-bind="l10n_text: z.string.searchNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
                 <div class="search__no-services__manage-button" data-bind="click: clickOpenManageServices, l10n_text: z.string.searchManageServicesNoResults" data-uie-name="go-enable-services"></div>
               <!-- /ko -->

@@ -20,6 +20,7 @@
 import Cookies from 'js-cookie';
 
 import App from '../main/app';
+import {URL_PATH} from '../externalRoute';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';
@@ -679,7 +680,7 @@ class AuthViewModel {
   }
 
   clicked_on_password() {
-    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET);
+    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, URL_PATH.PASSWORD_RESET);
     z.util.SanitizationUtil.safeWindowOpen(url);
   }
 
