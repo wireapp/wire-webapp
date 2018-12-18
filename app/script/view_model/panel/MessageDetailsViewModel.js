@@ -97,8 +97,10 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.supportsReceipts = ko.pureComputed(() => {
       const isMe = this.message() && this.message().user().is_me;
       const isProAccount = params.repositories.team.isTeam();
-      const isTemporaryGuest = params.repositories.conversation.selfUser().isTemporaryGuest();
-      return isMe && (isProAccount || isTemporaryGuest);
+      const selfUser = params.repositories.conversation.selfUser();
+      const isGuest = selfUser.isGuest();
+      const isTemporaryGuest = selfUser.isTemporaryGuest();
+      return isMe && (isProAccount || isGuest || isTemporaryGuest);
     });
 
     this.supportsLikes = ko.pureComputed(() => {
