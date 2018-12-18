@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 

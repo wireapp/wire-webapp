@@ -18,6 +18,7 @@
  */
 
 // KARMA_SPECS=conversation/ConversationRepository yarn test:app
+import Conversation from 'app/script/entity/Conversation';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -44,7 +45,7 @@ describe('ConversationRepository', () => {
     conversation_type = z.conversation.ConversationType.GROUP,
     connection_status = z.connection.ConnectionStatus.ACCEPTED
   ) => {
-    const conversation = new z.entity.Conversation(z.util.createRandomUuid());
+    const conversation = new Conversation(z.util.createRandomUuid());
     conversation.type(conversation_type);
 
     const connectionEntity = new z.connection.ConnectionEntity();
@@ -293,12 +294,12 @@ describe('ConversationRepository', () => {
       const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
-      group_cleared.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
+      group_cleared.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
 
       const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
-      group_removed.setTimestamp(Date.now(), z.entity.Conversation.TIMESTAMP_TYPE.CLEARED);
+      group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
       group_removed.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       return Promise.all([
@@ -375,7 +376,7 @@ describe('ConversationRepository', () => {
     it('gets messages which are not broken by design', () => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
 
-      conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
+      conversation_et = new Conversation(z.util.createRandomUuid());
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const bad_message = {"conversation":`${conversation_et.id}`,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"};
