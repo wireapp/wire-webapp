@@ -17,6 +17,8 @@
  *
  */
 
+import {isObject} from 'underscore';
+
 /**
  * Creates an object copy and applies a mapping functions to all properties of that object.
  *
@@ -46,7 +48,7 @@ const mapRecursive = (object, mappingFunction) => {
 export const escapeProperties = object => mapRecursive(object, _.escape);
 
 /**
- * Deep merged two high end entities together (containing observables)
+ * Deep merges two high end entities together (containing observables)
  * This will allow fine grained change detection on the observable level.
  *
  * @param {Entity} destination - the object that will receive the properties from the source object
@@ -54,15 +56,23 @@ export const escapeProperties = object => mapRecursive(object, _.escape);
  * @returns {Entity} mergedEntity
  */
 export const mergeEntities = (destination, source) => {
+  if (!isObject(destination)) {
+    return source;
+  }
+
   const properties = Object.entries(source);
   const rawValues = properties.filter(([_, accessor]) => {
     return typeof accessor !== 'function';
   });
+
   const observableValues = properties.filter(([_, accessor]) => {
     return ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
   });
 
   // update raw values first (in order to have them up to date when observables are updated)
-  rawValues.forEach(([property, value]) => (destination[property] = value));
-  observableValues.forEach(([property, value]) => destination[property](ko.unwrap(value)));
+  rawValues.forEach(([property, value]) => (destination[property] = mergeEntities(destination[property], value)));
+  observableValues.forEach(([property, value]) =>
+    destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)))
+  );
+  return destination;
 };

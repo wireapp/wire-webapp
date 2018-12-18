@@ -19,7 +19,8 @@
 
 // KARMA_SPECS=util/ObjectUtil yarn test:app
 
-import {escapeProperties} from 'app/script/util/objectUtil';
+import {escapeProperties, mergeEntities} from 'app/script/util/objectUtil';
+import ko from 'knockout';
 
 describe('objectUtil', () => {
   describe('escapeProperties', () => {
@@ -37,6 +38,92 @@ describe('objectUtil', () => {
       expect(escaped_object.age).toBe('&lt;b&gt;25&lt;/b&gt;');
       expect(escaped_object.favorite.place).toBe('&lt;b&gt;Berlin&lt;/b&gt;');
       expect(escaped_object.name).toBe('Lara');
+    });
+  });
+
+  describe('mergeEntities', () => {
+    it('merges raw values', () => {
+      const destination = {
+        value: 1,
+      };
+      const source = {
+        value: 2,
+      };
+
+      mergeEntities(destination, source);
+
+      expect(destination.value).toEqual(source.value);
+    });
+
+    it('does not replace observables but push new value instead', () => {
+      const originalValue = ko.observable(1);
+
+      const destination = {
+        value: originalValue,
+      };
+      const source = {
+        value: ko.observable(2),
+      };
+
+      mergeEntities(destination, source);
+
+      expect(destination.value).toBe(originalValue);
+      expect(destination.value()).toBe(source.value());
+    });
+
+    it('deeply merges nested data structures', () => {
+      const originalValue = {
+        value: 11,
+      };
+
+      const destination = {
+        value: originalValue,
+      };
+      const source = {
+        value: {value: 12},
+      };
+
+      mergeEntities(destination, source);
+
+      expect(destination.value).toBe(originalValue);
+      expect(destination.value.value).toBe(source.value.value);
+    });
+
+    it('deeply merges nested data structures containing observables', () => {
+      const originalValue = {
+        value: ko.observable(11),
+      };
+
+      const destination = {
+        value: originalValue,
+      };
+      const source = {
+        value: {value: ko.observable(12)},
+      };
+
+      mergeEntities(destination, source);
+
+      expect(destination.value).toBe(originalValue);
+      expect(destination.value.value()).toBe(source.value.value());
+    });
+
+    it('deeply merges observables containing objects', () => {
+      const originalValue = ko.observable({
+        value: 11,
+      });
+
+      const destination = {
+        value: originalValue,
+      };
+      const source = {
+        value: ko.observable({value: 12}),
+      };
+
+      mergeEntities(destination, source);
+
+      expect(destination.value).toBe(originalValue);
+      expect(destination.value()).toBe(originalValue());
+      expect(destination.value().value).toBe(source.value().value);
     });
   });
 });
