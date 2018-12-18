@@ -17,7 +17,14 @@
  *
  */
 
-import {URL} from '../../externalRoute';
+import {
+  getPrivacyPolicyUrl,
+  getSupportContactUrl,
+  getSupportUrl,
+  getTermsOfUsePersonalUrl,
+  getTermsOfUseTeamUrl,
+  getWebsiteUrl,
+} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -29,33 +36,19 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;
-  }
 
-  getTermsOfUseUrl() {
-    return this.selfUser().inTeam() ? URL.TERMS_OF_USE_TEAMS : URL.TERMS_OF_USE_PERSONAL;
-  }
-
-  getWebsiteUrl() {
-    return URL.WEBSITE;
-  }
-
-  getPrivacyPolicyUrl() {
-    return URL.PRIVACY_POLICY;
+    this.supportUrl = getSupportUrl();
+    this.supportContactUrl = getSupportContactUrl();
+    this.websiteUrl = getWebsiteUrl();
+    this.privacyPolicyUrl = getPrivacyPolicyUrl();
+    this.termsOfUseUrl = this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
   }
 
   showWireSection() {
-    return !!this.getTermsOfUseUrl() || !!this.getWebsiteUrl() || !!this.getPrivacyPolicyUrl();
-  }
-
-  getSupportUrl() {
-    return URL.SUPPORT;
-  }
-
-  getSupportContactUrl() {
-    return !!this.getSupportUrl() ? `${this.getSupportUrl()}/hc/en-us/requests/new` : undefined;
+    return this.termsOfUseUrl || this.websiteUrl || this.privacyPolicyUrl;
   }
 
   showSupportSection() {
-    return !!this.getSupportUrl() || !!this.getSupportContactUrl();
+    return this.supportUrl || this.supportContactUrl;
   }
 };

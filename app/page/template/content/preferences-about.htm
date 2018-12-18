@@ -5,21 +5,21 @@
       <!-- ko if: showSupportSection() -->
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAboutSupport"></header>
-        <a class="preferences-link" data-bind="attr: {href: getSupportUrl()}, l10n_text: z.string.preferencesAboutSupportWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
-        <a class="preferences-link" data-bind="attr: {href: getSupportContactUrl()}, l10n_text: z.string.preferencesAboutSupportContact" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
+        <a class="preferences-link" data-bind="attr: {href: supportUrl}, l10n_text: z.string.preferencesAboutSupportWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
+        <a class="preferences-link" data-bind="attr: {href: supportContactUrl}, l10n_text: z.string.preferencesAboutSupportContact" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
       </section>
       <!-- /ko -->
       <!-- ko if: showWireSection() -->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
-          <!-- ko if: !!getTermsOfUseUrl() -->
-            <a class="preferences-link" data-bind="attr: {href: getTermsOfUseUrl()}, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
+          <!-- ko if: termsOfUseUrl -->
+            <a class="preferences-link" data-bind="attr: {href: termsOfUseUrl}, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
           <!-- /ko -->
-          <!-- ko if: !!getPrivacyPolicyUrl() -->
-            <a class="preferences-link" data-bind="attr: {href: getPrivacyPolicyUrl()}, l10n_text: z.string.preferencesAboutPrivacyPolicy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
+          <!-- ko if: privacyPolicyUrl -->
+            <a class="preferences-link" data-bind="attr: {href: privacyPolicyUrl}, l10n_text: z.string.preferencesAboutPrivacyPolicy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
           <!-- /ko -->
-          <!-- ko if: !!getWebsiteUrl() -->
-            <a class="preferences-link" data-bind="attr: {href: getWebsiteUrl()}, l10n_text: z.string.preferencesAboutWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
+          <!-- ko if: websiteUrl -->
+            <a class="preferences-link" data-bind="attr: {href: websiteUrl}, l10n_text: z.string.preferencesAboutWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
           <!-- /ko -->
         </section>
       <!-- /ko -->
