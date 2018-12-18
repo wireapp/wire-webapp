@@ -70,3 +70,4 @@ export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_
 export const getCreateTeamUrl = pkCampaign => getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
 export const getPrivacyHowUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
+export const getSupportUsernameUrl = () => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);

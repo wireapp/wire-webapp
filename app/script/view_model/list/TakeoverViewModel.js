@@ -17,6 +17,8 @@
  *
  */
 
+import {getSupportUsernameUrl} from '../../externalRoute';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};
@@ -39,6 +41,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
 
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
     this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
+    this.supportUsernameUrl = getSupportUsernameUrl();
   }
 
   chooseUsername() {
