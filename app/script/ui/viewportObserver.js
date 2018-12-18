@@ -20,7 +20,7 @@
 const observedElements = new Map();
 const tolerance = 0.8;
 const onIntersect = entries => {
-  entries.forEach(({isIntersecting, intersectionRatio, target: element}) => {
+  entries.forEach(({intersectionRatio, isIntersecting, target: element}) => {
     if (isIntersecting) {
       const {callback, fullyInView, container} = observedElements.get(element);
       if (!callback) {
@@ -42,9 +42,10 @@ const onIntersect = entries => {
   });
 };
 
-const percentages = Array.from({length: 101}, (_, index) => index / 100);
+const stepCount = 100;
+const thresholdSteps = Array.from({length: stepCount + 1}, (_, index) => index / stepCount);
 
-const options = {root: null, rootMargin: '0px', threshold: percentages};
+const options = {root: null, rootMargin: '0px', threshold: thresholdSteps};
 const observer = new IntersectionObserver(onIntersect, options);
 
 const _addElement = (element, callback, fullyInView, container) => {
