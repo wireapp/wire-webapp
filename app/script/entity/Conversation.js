@@ -420,7 +420,9 @@ class Conversation {
   }
 
   replaceMessage(originalMessage, newMessage) {
-    return mergeEntities(originalMessage, newMessage);
+    // we don't want to change the `user` observable of message as they are entities shared by other parts of the app
+    const propertiesToIgnore = ['user'];
+    return mergeEntities(originalMessage, newMessage, propertiesToIgnore);
   }
 
   /**

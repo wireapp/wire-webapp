@@ -53,14 +53,15 @@ export const escapeProperties = object => mapRecursive(object, _.escape);
  *
  * @param {Entity} destination - the object that will receive the properties from the source object
  * @param {Entity} source - the entity containing the data that will be fed to the destination
+ * @param {string[]} ignoredProperties - list of properties that should be left untouched from the destination entity
  * @returns {Entity} mergedEntity
  */
-export const mergeEntities = (destination, source) => {
+export const mergeEntities = (destination, source, ignoredProperties = []) => {
   if (!isObject(destination)) {
     return source;
   }
 
-  const properties = Object.entries(source);
+  const properties = Object.entries(source).filter(([property]) => !ignoredProperties.includes(property));
   const rawValues = properties.filter(([_, accessor]) => {
     return typeof accessor !== 'function';
   });
@@ -71,8 +72,8 @@ export const mergeEntities = (destination, source) => {
 
   // update raw values first (in order to have them up to date when observables are updated)
   rawValues.forEach(([property, value]) => (destination[property] = mergeEntities(destination[property], value)));
-  observableValues.forEach(([property, value]) =>
-    destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)))
-  );
+  observableValues.forEach(([property, value]) => {
+    destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)));
+  });
   return destination;
 };

@@ -50,9 +50,9 @@ describe('objectUtil', () => {
         value: 2,
       };
 
-      mergeEntities(destination, source);
+      const merged = mergeEntities(destination, source);
 
-      expect(destination.value).toEqual(source.value);
+      expect(merged.value).toEqual(source.value);
     });
 
     it('does not replace observables but push new value instead', () => {
@@ -65,65 +65,58 @@ describe('objectUtil', () => {
         value: ko.observable(2),
       };
 
-      mergeEntities(destination, source);
+      const merged = mergeEntities(destination, source);
 
-      expect(destination.value).toBe(originalValue);
-      expect(destination.value()).toBe(source.value());
+      expect(merged.value).toBe(originalValue);
+      expect(merged.value()).toBe(source.value());
     });
 
     it('deeply merges nested data structures', () => {
-      const originalValue = {
-        value: 11,
-      };
+      const originalValue = {value: 11};
 
-      const destination = {
-        value: originalValue,
-      };
-      const source = {
-        value: {value: 12},
-      };
+      const destination = {value: originalValue};
+      const source = {value: {value: 12}};
 
-      mergeEntities(destination, source);
+      const merged = mergeEntities(destination, source);
 
-      expect(destination.value).toBe(originalValue);
-      expect(destination.value.value).toBe(source.value.value);
+      expect(merged.value).toBe(originalValue);
+      expect(merged.value.value).toBe(source.value.value);
     });
 
     it('deeply merges nested data structures containing observables', () => {
-      const originalValue = {
-        value: ko.observable(11),
-      };
+      const originalValue = {value: ko.observable(11)};
 
-      const destination = {
-        value: originalValue,
-      };
-      const source = {
-        value: {value: ko.observable(12)},
-      };
+      const destination = {value: originalValue};
+      const source = {value: {value: ko.observable(12)}};
 
-      mergeEntities(destination, source);
+      const merged = mergeEntities(destination, source);
 
-      expect(destination.value).toBe(originalValue);
-      expect(destination.value.value()).toBe(source.value.value());
+      expect(merged.value).toBe(originalValue);
+      expect(merged.value.value()).toBe(source.value.value());
     });
 
     it('deeply merges observables containing objects', () => {
-      const originalValue = ko.observable({
-        value: 11,
-      });
+      const originalValue = ko.observable({value: 11});
 
-      const destination = {
-        value: originalValue,
-      };
-      const source = {
-        value: ko.observable({value: 12}),
-      };
+      const destination = {value: originalValue};
+      const source = {value: ko.observable({value: 12})};
 
-      mergeEntities(destination, source);
+      const merged = mergeEntities(destination, source);
 
-      expect(destination.value).toBe(originalValue);
-      expect(destination.value()).toBe(originalValue());
-      expect(destination.value().value).toBe(source.value().value);
+      expect(merged.value).toBe(originalValue);
+      expect(merged.value()).toBe(originalValue());
+      expect(merged.value().value).toBe(source.value().value);
+    });
+
+    it('leaves ignored property to their initial value', () => {
+      const originalName = 'felix';
+      const destination = {name: originalName, value: 11};
+      const source = {name: 'other', value: 12};
+
+      const merged = mergeEntities(destination, source, ['name']);
+
+      expect(merged.value).toBe(source.value);
+      expect(merged.name).toBe(originalName);
     });
   });
 });
