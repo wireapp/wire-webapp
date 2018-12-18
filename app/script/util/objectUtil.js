@@ -44,3 +44,25 @@ const mapRecursive = (object, mappingFunction) => {
  * @returns {Object} Object copy with escaped properties
  */
 export const escapeProperties = object => mapRecursive(object, _.escape);
+
+/**
+ * Deep merged two high end entities together (containing observables)
+ * This will allow fine grained change detection on the observable level.
+ *
+ * @param {Entity} destination - the object that will receive the properties from the source object
+ * @param {Entity} source - the entity containing the data that will be fed to the destination
+ * @returns {Entity} mergedEntity
+ */
+export const mergeEntities = (destination, source) => {
+  const properties = Object.entries(source);
+  const rawValues = properties.filter(([_, accessor]) => {
+    return typeof accessor !== 'function';
+  });
+  const observableValues = properties.filter(([_, accessor]) => {
+    return ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
+  });
+
+  // update raw values first (in order to have them up to date when observables are updated)
+  rawValues.forEach(([property, value]) => (destination[property] = value));
+  observableValues.forEach(([property, value]) => destination[property](ko.unwrap(value)));
+};

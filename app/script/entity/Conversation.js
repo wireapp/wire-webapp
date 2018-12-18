@@ -20,6 +20,8 @@
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 
+import {mergeEntities} from '../util/objectUtil';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -418,17 +420,7 @@ class Conversation {
   }
 
   replaceMessage(originalMessage, newMessage) {
-    const properties = Object.entries(newMessage);
-    const rawValues = properties.filter(([_, accessor]) => {
-      return typeof accessor !== 'function';
-    });
-    const observableValues = properties.filter(([_, accessor]) => {
-      return ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
-    });
-
-    // update raw values first (in order to have them up to date when observables are updated)
-    rawValues.forEach(([property, value]) => (originalMessage[property] = value));
-    observableValues.forEach(([property, value]) => originalMessage[property](ko.unwrap(value)));
+    return mergeEntities(originalMessage, newMessage);
   }
 
   /**
