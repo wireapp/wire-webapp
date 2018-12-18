@@ -54,13 +54,9 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
-  children,
-  hasCookieSupport,
-  hasIndexedDbSupport,
-  isCheckingSupport,
-  isSupportedBrowser,
-}) => {
+export const UnsupportedBrowser: React.StatelessComponent<
+  Props & DispatchProps & ConnectedProps & InjectedIntlProps
+> = ({children, hasCookieSupport, hasIndexedDbSupport, isCheckingSupport, isSupportedBrowser}) => {
   if (!isSupportedBrowser) {
     return (
       <WirelessContainer>
@@ -99,21 +95,17 @@ export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntl
     );
   }
 
-  return <React.Fragment>{children}</React.Fragment>;
+  return <>{children}</>;
 };
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
-        hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
-        isCheckingSupport: RuntimeSelector.isChecking(state),
-        isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {};
-    }
+    (state: RootState) => ({
+      hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+      hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+      isCheckingSupport: RuntimeSelector.isChecking(state),
+      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({})
   )(UnsupportedBrowser)
 );
