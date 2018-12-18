@@ -62,7 +62,7 @@
   "conversationJoin.subheadExistentAccount": "",
   "conversationJoin.fullConversationHeadline": "",
   "conversationJoin.fullConversationSubhead": "",
-  "conversationJoin.invalidCreateAccountLink": "",
+  "conversationJoin.invalidCreateAccountLink": "Opret en konto",
   "conversationJoin.invalidCreateAccountText": "",
   "conversationJoin.invalidHeadline": "",
   "conversationJoin.invalidSubhead": "",

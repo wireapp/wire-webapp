@@ -123,6 +123,8 @@ z.string.pl.modalAccountNewDevicesHeadline = 'Twoje konto było ostatnio użyte:
 z.string.pl.modalAccountNewDevicesFrom = 'Z:';
 z.string.pl.modalAccountNewDevicesMessage = 'Jeżeli nie rozpoznajesz tego, usuń urządzenie z listy i zmień swoje hasło.';
 
+z.string.pl.modalAccountReadReceiptsChangedSecondary = 'Zarządzaj urządzeniami';
+
 z.string.pl.modalAccountRemoveDeviceAction = 'Usuń urządzenie';
 z.string.pl.modalAccountRemoveDeviceHeadline = 'Usuń {{device}}';
 z.string.pl.modalAccountRemoveDeviceMessage = 'Aby usunąć to urządzenie wymagane jest hasło.';
@@ -403,6 +405,7 @@ z.string.pl.participantDevicesOutdatedClientMessage = '{{user}} używa starszej 
 z.string.pl.participantDevicesSelfAllDevices = 'Pokaż wszystkie moje urządzenia';
 z.string.pl.participantDevicesSelfFingerprint = 'Odcisk palca urządzenia';
 
+
 z.string.pl.userProfileButtonConnect = 'Połącz';
 z.string.pl.userProfileButtonIgnore = 'Ignoruj';
 z.string.pl.userProfileButtonUnblock = 'Odblokuj';
@@ -428,12 +431,13 @@ z.string.pl.preferencesAccountCreateTeam = 'Utwórz nowy zespół';
 z.string.pl.preferencesAccountDelete = 'Usuń konto';
 z.string.pl.preferencesAccountLogOut = 'Wyloguj się';
 z.string.pl.preferencesAccountManageTeam = 'Zarządzaj zespołem';
+z.string.pl.preferencesAccountPrivacy = 'Prywatność';
 z.string.pl.preferencesAccountResetPassword = 'Zresetuj hasło';
 z.string.pl.preferencesAccountTeam = 'w {{name}}';
-z.string.pl.preferencesAccountUsernamePlaceholder = 'Twoje pełne imię i nazwisko';
-z.string.pl.preferencesAccountUsernameHint = 'Co najmniej 2 znaki. Tylko a-z, 0-9, _.';
 z.string.pl.preferencesAccountUsernameAvailable = '&Dostępny(a)';
 z.string.pl.preferencesAccountUsernameErrorTaken = 'Jest już w użyciu';
+z.string.pl.preferencesAccountUsernameHint = 'Co najmniej 2 znaki. Tylko a-z, 0-9, _.';
+z.string.pl.preferencesAccountUsernamePlaceholder = 'Twoje pełne imię i nazwisko';
 
 z.string.pl.preferencesAVCamera = 'Aparat';
 z.string.pl.preferencesAVMicrophone = 'Mikrofon';

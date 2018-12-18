@@ -134,6 +134,11 @@ z.string.de.modalAccountNewDevicesHeadline = 'Dein Benutzerkonto wurde verwendet
 z.string.de.modalAccountNewDevicesFrom = 'Mit:';
 z.string.de.modalAccountNewDevicesMessage = 'Falls du dieses Gerät nicht hinzugefügt hast, entferne es und setze dein Passwort zurück.';
 
+z.string.de.modalAccountReadReceiptsChangedSecondary = 'Geräte verwalten';
+z.string.de.modalAccountReadReceiptsChangedOnHeadline = 'Lesebestätigungen sind aktiviert';
+z.string.de.modalAccountReadReceiptsChangedOffHeadline = 'Lesebestätigungen sind deaktiviert';
+z.string.de.modalAccountReadReceiptsChangedMessage = 'Diese Option kann in den Kontoeinstellungen geändert werden.';
+
 z.string.de.modalAccountRemoveDeviceAction = 'Gerät entfernen';
 z.string.de.modalAccountRemoveDeviceHeadline = 'Entferne "{{device}}"';
 z.string.de.modalAccountRemoveDeviceMessage = 'Dein Passwort wird zum Entfernen des Gerätes benötigt.';
@@ -315,6 +320,7 @@ z.string.de.conversationCreateWithMore = 'mit {{users}} und [showmore]{{count}} 
 z.string.de.conversationCreateTeam = 'mit [showmore]allen Team-Mitgliedern[/showmore]';
 z.string.de.conversationCreateTeamGuest = 'mit [showmore]allen Team-Mitgliedern und einem Gast[/showmore]';
 z.string.de.conversationCreateTeamGuests = 'mit [showmore]allen Team-Mitgliedern und {{count}} Gästen[/showmore]';
+z.string.de.conversationCreateReceiptsEnabled = 'Lesebestätigungen aktiv';
 z.string.de.conversationMemberJoined = '[bold]{{name}}[/bold] hat {{users}} hinzugefügt';
 z.string.de.conversationMemberJoinedYou = '[bold]Du[/bold] hast {{users}} hinzugefügt';
 z.string.de.conversationMemberJoinedMore = '[bold]{{name}}[/bold] hat {{users}} und [showmore]{{count}} andere[/showmore] hinzugefügt';
@@ -327,6 +333,10 @@ z.string.de.conversationMemberRemoved = '[bold]{{name}}[/bold] hat {{users}} ent
 z.string.de.conversationMemberRemovedYou = '[bold]Du[/bold] hast {{users}} entfernt';
 z.string.de.conversationTeamLeft = '[bold]{{name}}[/bold] wurde aus dem Team entfernt';
 z.string.de.conversationMessageDelivered = 'Zugestellt';
+z.string.de.conversationReceiptsOn = ' hat Lesebestätigungen für alle aktiviert';
+z.string.de.conversationReceiptsOnYou = ' hat Lesebestätigungen für alle aktiviert';
+z.string.de.conversationReceiptsOff = ' hat Lesebestätigungen für alle deaktiviert';
+z.string.de.conversationReceiptsOffYou = ' hat Lesebestätigungen für alle deaktiviert';
 z.string.de.conversationRename = ' hat die Unterhaltung umbenannt';
 z.string.de.conversationRenameYou = ' hast die Unterhaltung umbenannt';
 z.string.de.conversationUpdatedTimer = ' hat temporäre Nachrichten auf {{time}} gestellt';
@@ -358,6 +368,7 @@ z.string.de.conversationContextMenuDownload = 'Herunterladen';
 z.string.de.conversationContextMenuLike = 'Gefällt mir';
 z.string.de.conversationContextMenuReply = 'Antworten';
 z.string.de.conversationContextMenuUnlike = 'Gefällt mir nicht mehr';
+z.string.de.conversationContextMenuDetails = 'Details';
 z.string.de.conversationDeleteTimestamp = 'Gelöscht: {{date}}';
 z.string.de.conversationEditTimestamp = 'Editiert: {{date}}';
 z.string.de.conversationLikesCaption = '{{number}} Personen';
@@ -389,6 +400,9 @@ z.string.de.guestRoomConversationBadgeGuestAndService = 'Gäste und Dienste anwe
 
 z.string.de.guestRoomConversationHead = 'Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.';
 z.string.de.guestRoomConversationButton = 'Personen einladen';
+
+z.string.de.readReceiptsToogleName = 'Lesebestätigungen';
+z.string.de.readReceiptsToogleInfo = 'Wenn diese Option aktiviert ist, können Sender sehen, wenn ihre Nachrichten gelesen werden.';
 
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';
 z.string.de.collectionSectionLinks = 'Links';
@@ -500,6 +514,10 @@ z.string.de.conversationDetailsParticipantsUsersOne = 'Person';
 z.string.de.conversationDetailsParticipantsUsersMany = 'Personen';
 z.string.de.conversationDetailsPeople = 'Personen';
 z.string.de.conversationDetailsServices = 'Dienste';
+z.string.de.conversationDetails1to1ReceiptsHeadEnabled = 'Lesebestätigungen sind aktiviert';
+z.string.de.conversationDetails1to1ReceiptsHeadDisabled = 'Lesebestätigungen sind deaktiviert';
+z.string.de.conversationDetails1to1ReceiptsFirst = 'Wenn beide Seiten Lesebestätigungen aktivieren, können alle sehen, wenn Nachrichten gelesen werden.';
+z.string.de.conversationDetails1to1ReceiptsSecond = 'Diese Option kann in den Kontoeinstellungen geändert werden.';
 
 z.string.de.conversationParticipantsTitle = 'Unterhaltungsübersicht';
 z.string.de.conversationParticipantsSearchPlaceholder = 'Nach Namen suchen';
@@ -549,6 +567,18 @@ z.string.de.participantDevicesOutdatedClientMessage = '{{user}} benutzt eine äl
 z.string.de.participantDevicesSelfAllDevices = 'Alle meine Geräte anzeigen';
 z.string.de.participantDevicesSelfFingerprint = 'Fingerabdruck des Geräts';
 
+z.string.de.messageDetailsTitle = 'Details';
+z.string.de.messageDetailsTitleLikes = 'Gefällt{{count}}';
+z.string.de.messageDetailsTitleReceipts = 'Gelesen{{count}}';
+z.string.de.messageDetailsSent = 'Gesendet: {{sent}}';
+z.string.de.messageDetailsEdited = 'Bearbeitet: {{edited}}';
+z.string.de.messageDetailsNoLikes = 'Niemand hat diese Nachricht bisher mit Gefällt mir markiert.';
+z.string.de.messageDetailsReceiptsOff = 'Lesebestätigungen waren beim Senden dieser Nachricht nicht aktiviert.';
+z.string.de.messageDetailsNoReceipts = 'Niemand hat diese Nachricht bisher gelesen.';
+
+z.string.de.receiptToggleLabel = 'Lesebestätigungen';
+z.string.de.receiptToggleInfo = 'Wenn diese Option aktiviert ist, können Sender sehen, wenn ihre Nachrichten gelesen werden.';
+
 z.string.de.userProfileButtonConnect = 'Kontakt hinzufügen';
 z.string.de.userProfileButtonIgnore = 'Ignorieren';
 z.string.de.userProfileButtonUnblock = 'Freigeben';
@@ -582,12 +612,15 @@ z.string.de.preferencesAccountLogOut = 'Abmelden';
 z.string.de.preferencesAccountManageTeam = 'Team verwalten';
 z.string.de.preferencesAccountMarketingConsentCheckbox = 'Newsletter abonnieren';
 z.string.de.preferencesAccountMarketingConsentDetail = 'Neuigkeiten und Informationen zu Produktaktualisierungen von Wire per E-Mail erhalten.';
+z.string.de.preferencesAccountPrivacy = 'Privatsphäre';
+z.string.de.preferencesAccountReadReceiptsCheckbox = 'Lesebestätigungen';
+z.string.de.preferencesAccountReadReceiptsDetail = 'Wenn diese Option deaktiviert ist, sieht man keine Lesebestätigungen von anderen.\nGilt nicht für Gruppen.';
 z.string.de.preferencesAccountResetPassword = 'Passwort zurücksetzen';
 z.string.de.preferencesAccountTeam = 'in {{name}}';
-z.string.de.preferencesAccountUsernamePlaceholder = 'Dein vollständiger Name';
-z.string.de.preferencesAccountUsernameHint = 'Mindestens zwei Zeichen. a—z, 0—9, und _.';
 z.string.de.preferencesAccountUsernameAvailable = 'Verfügbar';
 z.string.de.preferencesAccountUsernameErrorTaken = 'Bereits vergeben';
+z.string.de.preferencesAccountUsernameHint = 'Mindestens zwei Zeichen. a—z, 0—9, und _.';
+z.string.de.preferencesAccountUsernamePlaceholder = 'Dein vollständiger Name';
 
 z.string.de.preferencesAVCamera = 'Kamera';
 z.string.de.preferencesAVMicrophone = 'Mikrofon';
@@ -707,7 +740,7 @@ z.string.de.temporaryGuestTimeRemaining = ' verbleibend in diesem Gästebereich'
 z.string.de.temporaryGuestJoinMessage = 'Diese Unterhaltung steht für dich 24 Stunden lang zur Verfügung.';
 z.string.de.temporaryGuestJoinDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff.';
 
-z.string.de.temporaryGuestLeaveMessage = ' bist nicht länger Teil dieser Unterhaltung.';
+z.string.de.temporaryGuestLeaveMessage = 'Du bist nicht länger Teil dieser Unterhaltung.';
 z.string.de.temporaryGuestLeaveDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff auf den Unterhaltungsverlauf.';
 
 z.string.de.urlSupportRoot = '/hc/de/';

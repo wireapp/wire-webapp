@@ -120,6 +120,8 @@ z.string.nl.modalAccountNewDevicesHeadline = 'Je account werd gebruikt op:';
 z.string.nl.modalAccountNewDevicesFrom = 'Van:';
 z.string.nl.modalAccountNewDevicesMessage = 'Als je dit niet zelf was, verwijder dan het apparaat en stel je wachtwoord opnieuw in.';
 
+z.string.nl.modalAccountReadReceiptsChangedSecondary = 'Beheer apparaten';
+
 z.string.nl.modalAccountRemoveDeviceAction = 'Verwijder apparaat';
 z.string.nl.modalAccountRemoveDeviceHeadline = 'Verwijder "{{device}}"';
 z.string.nl.modalAccountRemoveDeviceMessage = 'Je wachtwoord is nodig om dit apparaat te verwijderen.';
@@ -391,6 +393,7 @@ z.string.nl.participantDevicesOutdatedClientMessage = '{{user}} gebruikt een oud
 z.string.nl.participantDevicesSelfAllDevices = 'Toon al mijn apparaten';
 z.string.nl.participantDevicesSelfFingerprint = 'Digitale vingerafdruk';
 
+
 z.string.nl.userProfileButtonConnect = 'Verbind';
 z.string.nl.userProfileButtonIgnore = 'Negeer';
 z.string.nl.userProfileButtonUnblock = 'Deblokkeer';
@@ -417,12 +420,13 @@ z.string.nl.preferencesAccountCreateTeam = 'Maak een team';
 z.string.nl.preferencesAccountDelete = 'Verwijder account';
 z.string.nl.preferencesAccountLogOut = 'Uitloggen';
 z.string.nl.preferencesAccountManageTeam = 'Beheer team';
+z.string.nl.preferencesAccountPrivacy = 'Privacy';
 z.string.nl.preferencesAccountResetPassword = 'Reset wachtwoord';
 z.string.nl.preferencesAccountTeam = 'in {{name}}';
-z.string.nl.preferencesAccountUsernamePlaceholder = 'Je volledige naam';
-z.string.nl.preferencesAccountUsernameHint = 'Ten minste 2 tekens. a—z, 0—9, en _ alleen.';
 z.string.nl.preferencesAccountUsernameAvailable = 'Beschikbaar';
 z.string.nl.preferencesAccountUsernameErrorTaken = 'Al in gebruik';
+z.string.nl.preferencesAccountUsernameHint = 'Ten minste 2 tekens. a—z, 0—9, en _ alleen.';
+z.string.nl.preferencesAccountUsernamePlaceholder = 'Je volledige naam';
 
 z.string.nl.preferencesAVCamera = 'Camera';
 z.string.nl.preferencesAVMicrophone = 'Microfoon';
