@@ -19,7 +19,9 @@
 
 // KARMA_SPECS=util/ObjectUtil yarn test:app
 
-describe('z.util.ObjectUtil', () => {
+import {escapeProperties} from 'app/script/util/objectUtil';
+
+describe('objectUtil', () => {
   describe('escapeProperties', () => {
     it('escapes all properties of an object', () => {
       const object = {
@@ -30,7 +32,7 @@ describe('z.util.ObjectUtil', () => {
         name: 'Lara',
       };
 
-      const escaped_object = z.util.ObjectUtil.escapeProperties(object);
+      const escaped_object = escapeProperties(object);
 
       expect(escaped_object.age).toBe('&lt;b&gt;25&lt;/b&gt;');
       expect(escaped_object.favorite.place).toBe('&lt;b&gt;Berlin&lt;/b&gt;');
