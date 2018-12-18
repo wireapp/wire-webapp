@@ -85,9 +85,6 @@
 import ko from 'knockout';
 import Conversation from '../entity/Conversation';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
 class ConversationMapper {
   // Construct a new Conversation Mapper.
@@ -450,4 +447,3 @@ class ConversationMapper {
 }
 
 export default ConversationMapper;
-z.conversation.ConversationMapper = ConversationMapper;
