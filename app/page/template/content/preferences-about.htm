@@ -12,8 +12,8 @@
       <!-- ko if: showWireSection() -->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
-          <!-- ko if: termsOfUseUrl -->
-            <a class="preferences-link" data-bind="attr: {href: termsOfUseUrl}, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
+          <!-- ko if: termsOfUseUrl() -->
+            <a class="preferences-link" data-bind="attr: {href: termsOfUseUrl()}, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
           <!-- /ko -->
           <!-- ko if: privacyPolicyUrl -->
             <a class="preferences-link" data-bind="attr: {href: privacyPolicyUrl}, l10n_text: z.string.preferencesAboutPrivacyPolicy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>

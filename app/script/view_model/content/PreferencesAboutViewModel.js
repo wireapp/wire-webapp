@@ -41,11 +41,15 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
     this.supportContactUrl = getSupportContactUrl();
     this.websiteUrl = getWebsiteUrl();
     this.privacyPolicyUrl = getPrivacyPolicyUrl();
-    this.termsOfUseUrl = this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
+    this.termsOfUseUrl = ko.pureComputed(() => {
+      if (this.selfUser()) {
+        return this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
+      }
+    });
   }
 
   showWireSection() {
-    return this.termsOfUseUrl || this.websiteUrl || this.privacyPolicyUrl;
+    return this.termsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl;
   }
 
   showSupportSection() {
