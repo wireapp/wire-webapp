@@ -61,10 +61,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       }
     });
 
-    this.isMe = ko.pureComputed(() => this.message() && this.message().user().is_me);
-
     this.state = ko.pureComputed(() => {
-      if (this.isProAccount() && this.isMe() && this.isReceiptsOpen()) {
+      if (this.supportsReceipts() && this.isReceiptsOpen()) {
         if (!this.message().expectsReadConfirmation) {
           return this.states.RECEIPTS_OFF;
         }
@@ -116,7 +114,12 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
     });
 
-    this.supportsReceipts = ko.pureComputed(() => this.isProAccount() && this.isMe());
+    this.supportsReceipts = ko.pureComputed(() => {
+      const isMe = this.message() && this.message().user().is_me;
+      const isProAccount = params.repositories.team.isTeam();
+      const isTemporaryGuest = params.repositories.conversation.selfUser().isTemporaryGuest();
+      return isMe && (isProAccount || isTemporaryGuest);
+    });
 
     this.supportsLikes = ko.pureComputed(() => !this.isPing());
 
