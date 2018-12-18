@@ -18,7 +18,7 @@
  */
 
 const observedElements = new Map();
-const tolerance = 0.9;
+const tolerance = 0.8;
 const onIntersect = entries => {
   entries.forEach(({isIntersecting, intersectionRatio, target: element}) => {
     if (isIntersecting) {
@@ -32,9 +32,9 @@ const onIntersect = entries => {
         return callback();
       }
 
-      const minRatio = container ? Math.min(1, container.scrollHeight / element.scrollHeight) : 1;
+      const minRatio = container ? Math.min(1, container.clientHeight / element.clientHeight) : 1;
 
-      if (intersectionRatio > minRatio * tolerance) {
+      if (intersectionRatio >= minRatio * tolerance) {
         _removeElement(element);
         return callback();
       }
