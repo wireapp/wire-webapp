@@ -41,14 +41,11 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
     this.supportContactUrl = getSupportContactUrl();
     this.websiteUrl = getWebsiteUrl();
     this.privacyPolicyUrl = getPrivacyPolicyUrl();
-  }
-
-  getTermsOfUseUrl() {
-    return this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
+    this.termsOfUseUrl = this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
   }
 
   showWireSection() {
-    return this.getTermsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl;
+    return this.termsOfUseUrl || this.websiteUrl || this.privacyPolicyUrl;
   }
 
   showSupportSection() {
