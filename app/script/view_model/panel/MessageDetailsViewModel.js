@@ -34,7 +34,6 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.isReceiptsOpen = ko.observable(true);
     this.messageId = ko.observable();
-    this.isProAccount = params.repositories.team.isTeam;
 
     const userRepository = params.repositories.user;
 
