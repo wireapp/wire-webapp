@@ -11,7 +11,6 @@ import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
 import logger from '../../ext/js/webapp-module-logger/Logger.js';
 
 import configGlobal from '../config.js';
-import externalRouteConfig from '../externalRoute';
 import envGlobal from '../util/Environment.js';
 import ArrayUtilGlobal from '../util/ArrayUtil.js';
 import ClipboardUtilGlobal from '../util/ClipboardUtil.js';

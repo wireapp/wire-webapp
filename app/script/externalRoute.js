@@ -68,6 +68,5 @@ export const getManageServicesUrl = utmSource => getTeamSettingsUrl(URL_PATH.MAN
 export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
 export const getCreateTeamUrl = pkCampaign => getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
-
-window.z = window.z || {};
-window.z.externalRoute = {URL_PATH};
+export const getPrivacyHowUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
+export const getPrivacyWhyUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
