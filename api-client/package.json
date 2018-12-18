@@ -18,7 +18,7 @@
     "tough-cookie": "2.5.0"
   },
   "devDependencies": {
-    "@babel/core": "7.2.0",
+    "@babel/core": "7.2.2",
     "@babel/preset-react": "7.0.0",
     "@wireapp/react-ui-kit": "4.3.33",
     "babel-loader": "8.0.4",
