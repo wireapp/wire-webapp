@@ -20,6 +20,7 @@
 import poster from 'poster-image';
 
 import EventMapper from './EventMapper';
+import ConversationMapper from './ConversationMapper';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -90,7 +91,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.propertyRepository = propertyRepository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
-    this.conversationMapper = new z.conversation.ConversationMapper();
+    this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
@@ -234,7 +235,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _updateLocalMessageEntity(updatedEvent, oldEvent) {
     this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
-      this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+      this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent).then(messageEntity => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+      });
     });
   }
 
@@ -3575,9 +3578,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (!originalMessage) {
       return Promise.resolve();
     }
-    return this._initMessageEntity(conversationEntity, newData).then(messageEntity =>
-      conversationEntity.replaceMessage(originalMessage, messageEntity)
-    );
+    return this._initMessageEntity(conversationEntity, newData).then(messageEntity => {
+      conversationEntity.replaceMessage(originalMessage, messageEntity);
+      return messageEntity;
+    });
   }
 
   /**
@@ -3606,7 +3610,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
 
           conversationEntity.messages_unordered(updatedMessages);
-          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
         }
       }
       return {conversationEntity, messageEntity};

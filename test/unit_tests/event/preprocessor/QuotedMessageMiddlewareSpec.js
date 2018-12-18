@@ -180,10 +180,15 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
+      jasmine.clock().install();
+
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+        jasmine.clock().tick();
+
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})})
         );
+        jasmine.clock().uninstall();
       });
     });
 

@@ -20,6 +20,7 @@
 // KARMA_SPECS=util/Util yarn test:app
 
 import ko from 'knockout';
+import Conversation from 'app/script/entity/Conversation';
 
 describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {
@@ -4124,11 +4125,11 @@ describe('z.util.isIsoString', () => {
 
 describe('z.util.sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
-    const groupA = new z.entity.Conversation();
+    const groupA = new Conversation();
     groupA.name('Latest');
     groupA.last_event_timestamp(1414505857975);
 
-    const groupB = new z.entity.Conversation();
+    const groupB = new Conversation();
     groupB.name('Older');
     groupB.last_event_timestamp(1414505766449);
 
@@ -4140,11 +4141,11 @@ describe('z.util.sortGroupsByLastEvent', () => {
   });
 
   it('finds out that Group B is more recent than Group A', () => {
-    const groupA = new z.entity.Conversation();
+    const groupA = new Conversation();
     groupA.name('Older');
     groupA.last_event_timestamp(1414505766449);
 
-    const groupB = new z.entity.Conversation();
+    const groupB = new Conversation();
     groupB.name('Latest');
     groupB.last_event_timestamp(1414505857975);
 
@@ -4156,12 +4157,12 @@ describe('z.util.sortGroupsByLastEvent', () => {
   });
 
   it('finds out if two groups are equally recent', () => {
-    const groupA = new z.entity.Conversation();
+    const groupA = new Conversation();
     const timestamp = 1414505857975;
     groupA.name('Group A');
     groupA.last_event_timestamp(timestamp);
 
-    const groupB = new z.entity.Conversation();
+    const groupB = new Conversation();
     groupB.name('Group B');
     groupB.last_event_timestamp(timestamp);
 

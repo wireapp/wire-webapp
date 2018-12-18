@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "0.10.3",
+    "@wireapp/commons": "0.10.4",
     "dotenv": "6.2.0",
     "express": "4.16.4",
     "express-sitemap-xml": "1.0.2",
@@ -14,7 +14,7 @@
     "hbs": "4.0.1",
     "helmet": "3.15.0",
     "logdown": "3.2.7",
-    "maxmind": "2.11.0",
+    "maxmind": "2.11.1",
     "opn": "5.4.0",
     "pm2": "3.2.3"
   },
@@ -26,7 +26,7 @@
     "@types/fs-extra": "5.0.4",
     "@types/hbs": "4.0.0",
     "@types/helmet": "0.0.42",
-    "@types/jasmine": "3.3.1",
+    "@types/jasmine": "3.3.2",
     "@types/node": "10.12.15",
     "jasmine": "3.3.1",
     "rimraf": "2.6.2",

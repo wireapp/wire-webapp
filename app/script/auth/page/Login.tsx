@@ -226,7 +226,7 @@ class Login extends React.Component<CombinedProps, State> {
           login.email = email;
         } else if (this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (this.isValidPhoneNumber(email)) {
+        } else if (config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
           login.phone = email;
         }
 
@@ -410,7 +410,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {isSSOCapable ? (
+                {config.FEATURE.ENABLE_SSO && isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}

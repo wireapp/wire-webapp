@@ -99,40 +99,4 @@ window.z.config = {
       SCREEN_ACCESS_DENIED: 202935412,
     },
   },
-
-  UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
-
-  URL: {
-    ACCOUNT: {
-      PRODUCTION: (env.URL && env.URL.ACCOUNT_BASE) || 'https://account.wire.com',
-      STAGING: 'https://wire-account-staging.zinfra.io',
-    },
-    PRIVACY_POLICY: env.URL && env.URL.PRIVACY_POLICY,
-    SUPPORT: 'https://support.wire.com',
-    TEAM_SETTINGS: {
-      PRODUCTION: (env.URL && env.URL.TEAMS_BASE) || 'https://teams.wire.com',
-      STAGING: 'https://wire-teams-staging.zinfra.io',
-    },
-    TERMS_OF_USE_PERSONAL: env.URL && env.URL.TERMS_OF_USE_PERSONAL,
-    TERMS_OF_USE_TEAMS: env.URL && env.URL.TERMS_OF_USE_TEAMS,
-    WEBAPP: {
-      INTERNAL: 'https://wire-webapp-staging.wire.com',
-      PRODUCTION: env.APP_BASE || 'https://app.wire.com',
-      STAGING: 'https://wire-webapp-staging.zinfra.io',
-    },
-    WEBSITE: env.URL && env.URL.WEBSITE_BASE,
-  },
-
-  URL_PATH: {
-    CREATE_TEAM: '/create-team/',
-    DECRYPT_ERROR_1: '/privacy/error-1/',
-    DECRYPT_ERROR_2: '/privacy/error-2/',
-    MANAGE_SERVICES: '/services/',
-    MANAGE_TEAM: '/login/',
-    PASSWORD_RESET: '/forgot/',
-    PRIVACY_HOW: '/privacy/how/',
-    PRIVACY_WHY: '/privacy/why/',
-    SUPPORT_USERNAME: '/support/username/',
-    TERMS_OF_USE: '/legal/terms/',
-  },
 };

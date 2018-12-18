@@ -18,6 +18,7 @@
  */
 
 import BasePanelViewModel from './BasePanelViewModel';
+import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
 
 export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
@@ -124,6 +125,9 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.shouldUpdateScrollbar = ko
       .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
+
+    this.privacyHowUrl = getPrivacyHowUrl();
+    this.privacyWhyUrl = getPrivacyWhyUrl();
   }
 
   getElementId() {

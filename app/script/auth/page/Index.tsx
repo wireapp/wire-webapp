@@ -73,7 +73,9 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
     const isMacOsWrapper = isDesktopApp() && isMacOS();
     return (
       <Page>
-        {!FEATURE.ENABLE_ACCOUNT_REGISTRATION && <Redirect to={pathWithParams(ROUTE.LOGIN)} />}
+        {!FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+          <Redirect to={pathWithParams(ROUTE.LOGIN)} data-uie-name="redirect-login" />
+        )}
         <ContainerXS centerText verticalCenter>
           <Logo scale={1.68} data-uie-name="ui-wire-logo" />
           <Columns style={{margin: '70px auto'}}>
