@@ -311,9 +311,10 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   getManageTeamUrl() {
-    const teamSettingsManageUrl = `${z.config.URL.TEAM_SETTINGS}${
-      z.config.URL_PATH.MANAGE_TEAM
-    }?utm_source=client_settings&utm_term=desktop`;
+    const teamSettingsManageUrl = z.util.URLUtil.buildUrl(
+      z.util.URLUtil.TYPE.TEAM_SETTINGS,
+      `${z.config.URL_PATH.MANAGE_SERVICES}?utm_source=client_settings&utm_term=desktop`
+    );
     return z.config.URL.TEAM_SETTINGS ? teamSettingsManageUrl : undefined;
   }
 
