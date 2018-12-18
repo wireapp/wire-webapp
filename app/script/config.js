@@ -108,7 +108,7 @@ window.z.config = {
       STAGING: 'https://wire-account-staging.zinfra.io',
     },
     PRIVACY_POLICY: env.URL && env.URL.PRIVACY_POLICY,
-    SUPPORT: 'https://support.wire.com',
+    SUPPORT: env.URL && env.URL.URL_SUPPORT_BASE,
     TEAM_SETTINGS: env.URL && env.URL.TEAMS_BASE,
     TERMS_OF_USE_PERSONAL: env.URL && env.URL.TERMS_OF_USE_PERSONAL,
     TERMS_OF_USE_TEAMS: env.URL && env.URL.TERMS_OF_USE_TEAMS,
