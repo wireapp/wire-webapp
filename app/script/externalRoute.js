@@ -69,9 +69,9 @@ export const getSupportUrl = (path = '') => {
   return URL.SUPPORT ? supportUrl : undefined;
 };
 
-export const getPrivacyPolicyUrl = () => (URL.PRIVACY_POLICY ? URL.PRIVACY_POLICY : undefined);
-export const getTermsOfUsePersonalUrl = () => (URL.TERMS_OF_USE_PERSONAL ? URL.TERMS_OF_USE_PERSONAL : undefined);
-export const getTermsOfUseTeamUrl = () => (URL.TERMS_OF_USE_TEAMS ? URL.TERMS_OF_USE_TEAMS : undefined);
+export const getPrivacyPolicyUrl = () => URL.PRIVACY_POLICY || undefined;
+export const getTermsOfUsePersonalUrl = () => URL.TERMS_OF_USE_PERSONAL || undefined;
+export const getTermsOfUseTeamUrl = () => URL.TERMS_OF_USE_TEAMS || undefined;
 
 export const getManageServicesUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
 export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
