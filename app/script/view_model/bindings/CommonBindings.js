@@ -559,11 +559,11 @@ ko.bindingHandlers.removed_from_view = {
  */
 ko.bindingHandlers.in_viewport = {
   init(element, valueAccessor) {
-    const onElementVisible = valueAccessor();
-    if (!onElementVisible) {
+    const {onVisible = valueAccessor(), container} = valueAccessor();
+    if (!onVisible) {
       return;
     }
-    viewportObserver.addElement(element, () => overlayedObserver.onElementVisible(element, onElementVisible), true);
+    viewportObserver.addElement(element, () => overlayedObserver.onElementVisible(element, onVisible), true, container);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       overlayedObserver.removeElement(element);

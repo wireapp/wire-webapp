@@ -198,7 +198,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   _shouldStickToBottom() {
-    const messagesContainer = this._getMessagesContainer();
+    const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop());
     const scrollEnd = Math.ceil(messagesContainer.scrollEnd());
     return scrollPosition > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
@@ -206,7 +206,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   _handleWindowResize() {
     if (this._shouldStickToBottom()) {
-      this._getMessagesContainer().scrollToBottom();
+      this.getMessagesContainer().scrollToBottom();
     }
   }
 
@@ -217,9 +217,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     if (inputSizeDiff) {
-      this._getMessagesContainer().scrollBy(inputSizeDiff);
+      this.getMessagesContainer().scrollBy(inputSizeDiff);
     } else if (this._shouldStickToBottom()) {
-      this._getMessagesContainer().scrollToBottom();
+      this.getMessagesContainer().scrollToBottom();
     }
   }
 
@@ -274,7 +274,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     return !isLastConversationEvent && lastMessageEntity.timestamp();
   }
 
-  _getMessagesContainer() {
+  getMessagesContainer() {
     if (!this.messagesContainer) {
       this.messagesContainer = $('.messages-wrap');
     }
@@ -288,7 +288,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {Promise} Resolves when conversation was rendered
    */
   _renderConversation(conversationEntity, messageEntity) {
-    const messages_container = this._getMessagesContainer();
+    const messages_container = this.getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
     if (!is_current_conversation) {
@@ -353,7 +353,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _scrollAddedMessagesIntoView(changedMessages, shouldStickToBottom) {
-    const messages_container = this._getMessagesContainer();
+    const messages_container = this.getMessagesContainer();
     const lastAddedItem = changedMessages
       .slice()
       .reverse()
@@ -400,7 +400,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    */
   _loadPrecedingMessages() {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
-    const [messagesContainer] = this._getMessagesContainer().children();
+    const [messagesContainer] = this.getMessagesContainer().children();
 
     if (shouldPullMessages && messagesContainer) {
       const initialListHeight = messagesContainer.scrollHeight;
@@ -409,7 +409,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         if (messagesContainer) {
           const newListHeight = messagesContainer.scrollHeight;
-          this._getMessagesContainer().scrollTop(newListHeight - initialListHeight);
+          this.getMessagesContainer().scrollTop(newListHeight - initialListHeight);
           this.capture_scrolling_event = true;
         }
       });
@@ -457,7 +457,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     loadMessagePromise.then(() => {
       z.util.afterRender(() => {
-        const messagesContainer = this._getMessagesContainer();
+        const messagesContainer = this.getMessagesContainer();
         const messageElement = messagesContainer.find(`.message[data-uie-uid="${messageId}"]`);
 
         if (messageElement.length) {

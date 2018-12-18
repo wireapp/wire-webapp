@@ -18,31 +18,43 @@
  */
 
 const observedElements = new Map();
+const tolerance = 0.9;
 const onIntersect = entries => {
-  entries.forEach(({isIntersecting, target: element}) => {
+  entries.forEach(({isIntersecting, intersectionRatio, target: element}) => {
     if (isIntersecting) {
-      const onElementIntersects = observedElements.get(element);
-      _removeElement(element);
-      if (onElementIntersects) {
-        onElementIntersects();
+      const {callback, fullyInView, container} = observedElements.get(element);
+      if (!callback) {
+        return _removeElement(element);
+      }
+
+      if (!fullyInView && isIntersecting) {
+        _removeElement(element);
+        return callback();
+      }
+
+      const minRatio = container ? Math.min(1, container.scrollHeight / element.scrollHeight) : 1;
+
+      if (intersectionRatio > minRatio * tolerance) {
+        _removeElement(element);
+        return callback();
       }
     }
   });
 };
 
-const options = {root: null, rootMargin: '0px', threshold: 0.0};
-const fullyInViewObserver = new IntersectionObserver(onIntersect, Object.assign({}, options, {threshold: 1.0}));
-const justAppearedObserver = new IntersectionObserver(onIntersect, options);
+const percentages = Array.from({length: 101}, (_, index) => index / 100);
 
-const _addElement = (element, callback, fullyInView) => {
-  observedElements.set(element, callback);
-  return fullyInView ? fullyInViewObserver.observe(element) : justAppearedObserver.observe(element);
+const options = {root: null, rootMargin: '0px', threshold: percentages};
+const observer = new IntersectionObserver(onIntersect, options);
+
+const _addElement = (element, callback, fullyInView, container) => {
+  observedElements.set(element, {callback, container, fullyInView});
+  return observer.observe(element);
 };
 
 const _removeElement = element => {
   observedElements.delete(element);
-  fullyInViewObserver.unobserve(element);
-  justAppearedObserver.unobserve(element);
+  observer.unobserve(element);
 };
 
 const viewportObserver = {
