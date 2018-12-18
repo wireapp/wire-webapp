@@ -18,12 +18,12 @@
  */
 
 import {
-  getSupportContactUrl,
-  getWebsiteUrl,
-  getSupportUrl,
   getPrivacyPolicyUrl,
-  getTermsOfUseTeamUrl,
+  getSupportContactUrl,
+  getSupportUrl,
   getTermsOfUsePersonalUrl,
+  getTermsOfUseTeamUrl,
+  getWebsiteUrl,
 } from '../../externalRoute';
 
 window.z = window.z || {};
