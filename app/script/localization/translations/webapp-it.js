@@ -22,6 +22,7 @@ z.string.it.wireWindows = 'Wire per Windows';
 z.string.it.wireLinux = 'Wire per Linux';
 z.string.it.nonexistentUser = 'Elimina utente';
 z.string.it.and = 'e';
+z.string.it.enumerationAnd = ', e ';
 
 z.string.it.authAccountCountryCode = 'Codice del paese';
 z.string.it.authAccountPasswordForgot = 'Ho dimenticato la password';
@@ -29,6 +30,7 @@ z.string.it.authAccountPublicComputer = 'Questo computer è pubblico';
 z.string.it.authAccountSignIn = 'Accedi';
 z.string.it.authAccountSignInPhone = 'Telefono';
 
+z.string.it.authBlockedCookies = 'Abilita i cookie per eseguire il login su Wire.';
 z.string.it.authBlockedDatabase = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
 z.string.it.authBlockedTabs = 'Wire è già aperto in un’altra scheda.';
 
@@ -76,6 +78,7 @@ z.string.it.authErrorNameShort = 'Inserisci un nome con almeno 2 caratteri';
 z.string.it.authErrorOffline = 'Nessuna connessione internet';
 z.string.it.authErrorPasswordShort = 'Scegli una password con almeno 8 caratteri.';
 z.string.it.authErrorPasswordWrong = 'Password errata. Riprova.';
+z.string.it.authErrorPending = 'Account non ancora verificato';
 z.string.it.authErrorPhoneNumberBudget = 'Hai eseguito l’accesso troppo spesso. Riprova più tardi.';
 z.string.it.authErrorPhoneNumberForbidden = 'Spiacenti. Questo numero di telefono è vietato.';
 z.string.it.authErrorPhoneNumberInvalid = 'Numero di telefono non valido';
@@ -86,6 +89,7 @@ z.string.it.authErrorSignIn = 'Verifica i tuoi dati e riprova.';
 z.string.it.callStateOutgoing = 'Sta squillando…';
 z.string.it.callStateConnecting = 'Connessione in corso…';
 z.string.it.callStateIncoming = 'Chiamata in corso…';
+z.string.it.callStateIncomingGroup = '{{user}} sta chiamando';
 z.string.it.callDecline = 'Rifiuta';
 z.string.it.callAccept = 'Accetta';
 z.string.it.callJoin = 'Entra';
@@ -115,6 +119,8 @@ z.string.it.modalAccountNewDevicesSecondary = 'Gestione dei dispositivi';
 z.string.it.modalAccountNewDevicesHeadline = 'Il tuo account è stato utilizzato su:';
 z.string.it.modalAccountNewDevicesFrom = 'Da:';
 z.string.it.modalAccountNewDevicesMessage = 'Se non sei stato tu, riuovi il dispositivo e reimposta la password.';
+
+z.string.it.modalAccountReadReceiptsChangedSecondary = 'Gestione dei dispositivi';
 
 z.string.it.modalAccountRemoveDeviceAction = 'Rimuovi dispositivo';
 z.string.it.modalAccountRemoveDeviceHeadline = 'Rimuovi "{{device}}"';
@@ -298,6 +304,7 @@ z.string.it.conversationsPopoverSilence = 'Silenzia';
 z.string.it.conversationsPopoverUnarchive = 'Disarchivia';
 
 z.string.it.conversationsSecondaryLineEphemeralMessage = 'Ti ha inviato un messaggio';
+z.string.it.conversationsSecondaryLineIncomingCall = '{{user}} sta chiamando';
 z.string.it.conversationsSecondaryLinePeopleLeft = '{{number}} utenti hanno abbandonato';
 z.string.it.conversationsSecondaryLinePersonLeft = '{{user}} ha abbandonato';
 z.string.it.conversationsSecondaryLinePersonRemoved = '{{user}} è stato rimosso';
@@ -368,6 +375,7 @@ z.string.it.participantDevicesOutdatedClientMessage = '{{user}} sta utilizzando 
 z.string.it.participantDevicesSelfAllDevices = 'Mostra tutti i miei dispositivi';
 z.string.it.participantDevicesSelfFingerprint = 'Impronta digitale dispositivo';
 
+
 z.string.it.userProfileButtonConnect = 'Connetti';
 z.string.it.userProfileButtonIgnore = 'Ignora';
 z.string.it.userProfileButtonUnblock = 'Sblocca';
@@ -392,12 +400,13 @@ z.string.it.preferencesAccountCreateTeam = 'Crea un team';
 z.string.it.preferencesAccountDelete = 'Elimina account';
 z.string.it.preferencesAccountLogOut = 'Logout';
 z.string.it.preferencesAccountManageTeam = 'Gestione Team';
+z.string.it.preferencesAccountPrivacy = 'Sulla privacy';
 z.string.it.preferencesAccountResetPassword = 'Reimposta la password';
 z.string.it.preferencesAccountTeam = 'in {{name}}';
-z.string.it.preferencesAccountUsernamePlaceholder = 'Il tuo nome e cognome';
-z.string.it.preferencesAccountUsernameHint = 'Almeno 2 caratteri. a-z, 0-9 e solo _.';
 z.string.it.preferencesAccountUsernameAvailable = 'Disponibile';
 z.string.it.preferencesAccountUsernameErrorTaken = 'E’ già stato scelto';
+z.string.it.preferencesAccountUsernameHint = 'Almeno 2 caratteri. a-z, 0-9 e solo _.';
+z.string.it.preferencesAccountUsernamePlaceholder = 'Il tuo nome e cognome';
 
 z.string.it.preferencesAVCamera = 'Fotocamera';
 z.string.it.preferencesAVMicrophone = 'Microfono';

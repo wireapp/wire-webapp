@@ -84,7 +84,7 @@ export const teamNameStrings = defineMessages({
     id: 'teamName.teamNamePlaceholder',
   },
   whatIsWireTeamsLink: {
-    defaultMessage: 'What is Wire for teams?',
+    defaultMessage: 'What is Wire Pro?',
     id: 'teamName.whatIsWireTeamsLink',
   },
 });
