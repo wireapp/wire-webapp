@@ -308,9 +308,7 @@ class Login extends React.Component<CombinedProps, State> {
     const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
       <Page>
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
+        <IsMobile>{config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 16}}>{backArrow}</div>}</IsMobile>
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
           <AppAlreadyOpen />
