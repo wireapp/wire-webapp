@@ -149,7 +149,11 @@ class Message {
       });
     }
 
-    if (!this.conversation().is1to1() && !this.conversation().removed_from_conversation()) {
+    if (
+      !this.conversation().is1to1() &&
+      !messageEntity.is_ephemeral() &&
+      !this.conversation().removed_from_conversation()
+    ) {
       entries.push({
         click: () => this.onClickReceipts(this),
         label: z.l10n.text(z.string.conversationContextMenuDetails),
