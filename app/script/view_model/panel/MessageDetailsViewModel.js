@@ -74,8 +74,6 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.receiptTimes = ko.observable({});
     this.likeUsers = ko.observableArray();
 
-    this.isPing = ko.pureComputed(() => this.message() && this.message().super_type === z.message.SuperType.PING);
-
     this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
 
     const sortUsers = (userA, userB) => (userA.name() > userB.name() ? 1 : -1);
@@ -90,28 +88,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       this.receiptTimes(receiptTimes);
     });
 
-    this.likes = ko.pureComputed(() => {
-      const reactions = this.message() && !this.isPing() && this.message().reactions();
-      return reactions ? Object.keys(reactions) : [];
-    });
-
-    this.likes.subscribe(likeIds => {
-      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
-    });
-
     this.sentFooter = ko.pureComputed(() => {
       return this.message() ? formatTime(this.message().timestamp()) : '';
     });
 
     const formatUserCount = users => (users.length ? ` (${users.length})` : '');
-
-    this.receiptsTitle = ko.pureComputed(() => {
-      return z.l10n.text(z.string.messageDetailsTitleReceipts, formatUserCount(this.receiptUsers()));
-    });
-
-    this.likesTitle = ko.pureComputed(() => {
-      return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
-    });
 
     this.supportsReceipts = ko.pureComputed(() => {
       const isMe = this.message() && this.message().user().is_me;
@@ -120,7 +101,31 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       return isMe && (isProAccount || isTemporaryGuest);
     });
 
-    this.supportsLikes = ko.pureComputed(() => !this.isPing());
+    this.supportsLikes = ko.pureComputed(() => {
+      if (!this.message()) {
+        return false;
+      }
+      const isPing = this.message().super_type === z.message.SuperType.PING;
+      const isEphemeral = this.message().is_ephemeral();
+      return !isPing && !isEphemeral;
+    });
+
+    this.likes = ko.pureComputed(() => {
+      const reactions = this.supportsLikes() && this.message().reactions();
+      return reactions ? Object.keys(reactions) : [];
+    });
+
+    this.likes.subscribe(likeIds => {
+      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
+    });
+
+    this.receiptsTitle = ko.pureComputed(() => {
+      return z.l10n.text(z.string.messageDetailsTitleReceipts, formatUserCount(this.receiptUsers()));
+    });
+
+    this.likesTitle = ko.pureComputed(() => {
+      return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
+    });
 
     this.showTabs = ko.pureComputed(() => this.supportsReceipts() && this.supportsLikes());
 
