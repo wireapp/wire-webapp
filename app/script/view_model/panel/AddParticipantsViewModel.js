@@ -18,6 +18,7 @@
  */
 
 import BasePanelViewModel from './BasePanelViewModel';
+import {getManageServicesUrl} from '../../externalRoute';
 
 export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -110,6 +111,8 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
+
+    this.manageServicesUrl = getManageServicesUrl('client_landing');
   }
 
   getElementId() {
@@ -139,9 +142,10 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
   }
 
   clickOpenManageServices() {
-    const path = `${z.config.URL_PATH.MANAGE_SERVICES}?utm_source=client_landing&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.manageServicesUrl) {
+      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   initView() {

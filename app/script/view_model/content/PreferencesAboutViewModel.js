@@ -17,6 +17,8 @@
  *
  */
 
+import {URL} from '../../externalRoute';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -30,15 +32,15 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
   }
 
   getTermsOfUseUrl() {
-    return this.selfUser().inTeam() ? z.config.URL.TERMS_OF_USE_TEAMS : z.config.URL.TERMS_OF_USE_PERSONAL;
+    return this.selfUser().inTeam() ? URL.TERMS_OF_USE_TEAMS : URL.TERMS_OF_USE_PERSONAL;
   }
 
   getWebsiteUrl() {
-    return z.config.URL.WEBSITE;
+    return URL.WEBSITE;
   }
 
   getPrivacyPolicyUrl() {
-    return z.config.URL.PRIVACY_POLICY;
+    return URL.PRIVACY_POLICY;
   }
 
   showWireSection() {
@@ -46,7 +48,7 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
   }
 
   getSupportUrl() {
-    return z.config.URL.SUPPORT;
+    return URL.SUPPORT;
   }
 
   getSupportContactUrl() {

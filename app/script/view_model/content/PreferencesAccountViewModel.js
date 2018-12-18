@@ -21,6 +21,7 @@ import {groupBy} from 'underscore';
 
 import backendEvent from '../../event/Backend';
 import PropertiesRepository from '../../properties/PropertiesRepository';
+import {getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -106,15 +107,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    this.manageTeamUrl = getManageTeamUrl('client_settings');
+    this.createTeamUrl = getCreateTeamUrl('client');
 
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
 
     this._initSubscriptions();
-  }
-
-  getCreateTeamUrl() {
-    const createTeamUrl = `${z.config.URL.WEBSITE}/create-team/?pk_campaign=client&pk_kwd=desktop`;
-    return z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && z.config.URL.WEBSITE ? createTeamUrl : undefined;
   }
 
   _initSubscriptions() {
@@ -308,13 +306,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOpenManageTeam() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.manageTeamUrl) {
+      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOnResetPassword() {
-    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET);
+    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, URL_PATH.PASSWORD_RESET);
     z.util.SanitizationUtil.safeWindowOpen(url);
   }
 
