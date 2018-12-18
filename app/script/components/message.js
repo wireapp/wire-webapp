@@ -248,7 +248,7 @@ const normalTemplate = `
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-            background_image: asset.resource,
+            background_image: asset.resource(),
             click: (data, event) => $parent.onClickImage(message, event),
             css: {'bg-color-ephemeral': message.isObfuscated()},
             " data-uie-name="go-image-detail">
