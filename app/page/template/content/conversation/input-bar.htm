@@ -19,13 +19,13 @@
             <!-- /ko -->
 
             <!-- ko if: replyAsset().is_image()-->
-              <div class="input-bar__reply__message input-bar__reply__message__image" data-bind="background_image: replyAsset().resource" data-uie-name="media-picture-reply-box">
+              <div class="input-bar__reply__message input-bar__reply__message__image" data-bind="background_image: replyAsset().resource()" data-uie-name="media-picture-reply-box">
                 <img/>
               </div>
             <!-- /ko -->
 
             <!-- ko if: replyAsset().is_video() -->
-              <div class="input-bar__reply__message input-bar__reply__message__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource" data-uie-name="media-video-reply-box">
+              <div class="input-bar__reply__message input-bar__reply__message__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource()" data-uie-name="media-video-reply-box">
                 <img/>
                 <camera-icon></camera-icon>
               </div>
