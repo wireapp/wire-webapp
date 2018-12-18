@@ -139,9 +139,10 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
   }
 
   getManageServicesUrl() {
-    const teamSettingsServicesUrl = `${z.config.URL.TEAM_SETTINGS}${
-      z.config.URL_PATH.MANAGE_SERVICES
-    }?utm_source=client_landing&utm_term=desktop`;
+    const teamSettingsServicesUrl = z.util.URLUtil.buildUrl(
+      z.util.URLUtil.TYPE.TEAM_SETTINGS,
+      `${z.config.URL_PATH.MANAGE_SERVICES}?utm_source=client_landing&utm_term=desktop`
+    );
     return z.config.URL.TEAM_SETTINGS ? teamSettingsServicesUrl : undefined;
   }
 
