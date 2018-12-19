@@ -27,7 +27,7 @@
     "@types/hbs": "4.0.0",
     "@types/helmet": "0.0.42",
     "@types/jasmine": "3.3.2",
-    "@types/node": "10.12.15",
+    "@types/node": "10.12.17",
     "jasmine": "3.3.1",
     "rimraf": "2.6.2",
     "ts-node": "7.0.1",
