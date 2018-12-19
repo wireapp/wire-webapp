@@ -66,7 +66,7 @@ export const mergeEntities = (destination, source, ignoredProperties = []) => {
     return typeof accessor !== 'function';
   });
 
-  const deletedValues = Object.entries(destination).filter(([property]) => source[property] === undefined);
+  const deletedProperties = Object.keys(destination).filter(property => !source.hasOwnProperty(property));
 
   const observableValues = properties.filter(([_, accessor]) => {
     return ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
@@ -74,7 +74,7 @@ export const mergeEntities = (destination, source, ignoredProperties = []) => {
 
   // update raw values first (in order to have them up to date when observables are updated)
   rawValues.forEach(([property, value]) => (destination[property] = mergeEntities(destination[property], value)));
-  deletedValues.forEach(([property]) => delete destination[property]);
+  deletedProperties.forEach(property => delete destination[property]);
   observableValues.forEach(([property, value]) => {
     destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)));
   });
