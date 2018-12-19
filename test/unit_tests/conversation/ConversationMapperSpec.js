@@ -19,6 +19,7 @@
 
 // KARMA_SPECS=conversation/ConversationMapper yarn test:app
 
+import UUID from 'uuidjs';
 import Conversation from 'app/script/entity/Conversation';
 import ConversationMapper from 'app/script/conversation/ConversationMapper';
 
@@ -281,6 +282,75 @@ describe('Conversation Mapper', () => {
   });
 
   describe('mergeConversation', () => {
+    function getDataWithReadReceiptMode(localReceiptMode, remoteReceiptMode) {
+      const conversationCreatorId = UUID.genV4().hexString;
+      const conversationId = UUID.genV4().hexString;
+      const conversationName = 'Hello, World!';
+      const selfUserId = UUID.genV4().hexString;
+      const teamId = UUID.genV4().hexString;
+
+      const localData = {
+        archived_state: false,
+        archived_timestamp: 0,
+        cleared_timestamp: 0,
+        ephemeral_timer: null,
+        global_message_timer: null,
+        id: conversationId,
+        is_guest: false,
+        is_managed: false,
+        last_event_timestamp: 1545058511982,
+        last_read_timestamp: 1545058511982,
+        last_server_timestamp: 1545058511982,
+        muted_state: 0,
+        muted_timestamp: 0,
+        name: conversationName,
+        others: [conversationCreatorId],
+        receipt_mode: localReceiptMode,
+        status: 0,
+        team_id: teamId,
+        type: 0,
+        verification_state: 0,
+      };
+
+      const remoteData = {
+        access: ['invite', 'code'],
+        access_role: 'non_activated',
+        creator: conversationCreatorId,
+        id: conversationId,
+        last_event: '0.0',
+        last_event_time: '1970-01-01T00:00:00.000Z',
+        members: {
+          others: [
+            {
+              id: conversationCreatorId,
+              status: 0,
+            },
+          ],
+          self: {
+            hidden: false,
+            hidden_ref: null,
+            id: selfUserId,
+            otr_archived: false,
+            otr_archived_ref: null,
+            otr_muted: false,
+            otr_muted_ref: null,
+            otr_muted_status: null,
+            service: null,
+            status: 0,
+            status_ref: '0.0',
+            status_time: '1970-01-01T00:00:00.000Z',
+          },
+        },
+        message_timer: null,
+        name: conversationName,
+        receipt_mode: remoteReceiptMode,
+        team: teamId,
+        type: 0,
+      };
+
+      return [localData, remoteData];
+    }
+
     // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const  remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "service": null, "otr_muted_ref": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z"}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "team": "5316fe03-24ee-4b19-b789-6d026bd3ce5f", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
@@ -447,6 +517,23 @@ describe('Conversation Mapper', () => {
 
       expect(merged_conversation.last_event_timestamp).toBe(local_data.last_event_timestamp);
       expect(merged_conversation.last_server_timestamp).toBe(local_data.last_event_timestamp);
+    });
+
+    it('prefers local data over remote data when mapping the read receipts value', () => {
+      const localReceiptMode = 0;
+      const [localData, remoteData] = getDataWithReadReceiptMode(localReceiptMode, 1);
+      const [mergedConversation] = conversation_mapper.mergeConversation([localData], [remoteData]);
+
+      expect(mergedConversation.receipt_mode).toBe(localReceiptMode);
+    });
+
+    it('uses the remote receipt mode when there is no local receipt mode', () => {
+      const remoteReceiptMode = 0;
+      const [localData, remoteData] = getDataWithReadReceiptMode(null, remoteReceiptMode);
+
+      const [mergedConversation] = conversation_mapper.mergeConversation([localData], [remoteData]);
+
+      expect(mergedConversation.receipt_mode).toBe(remoteReceiptMode);
     });
   });
 
