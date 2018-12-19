@@ -64,7 +64,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @returns {z.assets.AssetRemoteData} V3 asset remote data
    */
   static v3(assetKey, otrKey, sha256, assetToken, forceCaching = false) {
-    return new z.assets.AssetRemoteData(otrKey, sha256, `${assetKey}`, {
+     return new z.assets.AssetRemoteData(otrKey, sha256, assetKey, {
       assetKey,
       assetToken,
       forceCaching,
