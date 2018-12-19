@@ -32,7 +32,7 @@ z.client.ClientService = class ClientService {
   /**
    * Construct a new client service.
    * @param {BackendClient} backendClient - Client for the API calls
-   * @param {z.storage.StorageService} storageService - Service for all storage interactions
+   * @param {StorageService} storageService - Service for all storage interactions
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;

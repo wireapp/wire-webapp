@@ -66,7 +66,6 @@ import QueueStateGlobal from '../service/QueueState.js';
 import StorageKeyGlobal from '../storage/StorageKey.js';
 import StorageRepositoryGlobal from '../storage/StorageRepository.js';
 import StorageSchemataGlobal from '../storage/StorageSchemata.js';
-import StorageServiceGlobal from '../storage/StorageService.js';
 import LocalizerGlobal from '../localization/Localizer.js';
 import TrackConversationTypeGlobal from '../tracking/attribute/ConversationType.js';
 import DeleteTypeGlobal from '../tracking/attribute/DeleteType.js';
