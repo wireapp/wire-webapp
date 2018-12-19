@@ -63,7 +63,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       }
     });
 
-    this.enableReadReceipts = ko.observable(true);
+    this.enableReadReceipts = ko.observable(false);
 
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
@@ -124,6 +124,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   showCreateGroup(method, userEntity) {
     this.method = method;
+    this.enableReadReceipts(this.isTeam());
 
     if (!this.modal) {
       this.modal = new z.ui.Modal('#group-creation-modal', this._afterHideModal.bind(this));
