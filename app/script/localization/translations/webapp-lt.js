@@ -135,6 +135,8 @@ z.string.lt.modalAccountNewDevicesHeadline = 'Jūsų paskyra buvo naudota:';
 z.string.lt.modalAccountNewDevicesFrom = 'Iš:';
 z.string.lt.modalAccountNewDevicesMessage = 'Jeigu jūs to nedarėte, pašalinkite įrenginį ir atstatykite savo slaptažodį.';
 
+z.string.lt.modalAccountReadReceiptsChangedSecondary = 'Tvarkyti įrenginius';
+
 z.string.lt.modalAccountRemoveDeviceAction = 'Šalinti įrenginį';
 z.string.lt.modalAccountRemoveDeviceHeadline = 'Šalinti "{{device}}"';
 z.string.lt.modalAccountRemoveDeviceMessage = 'Norint pašalinti įrenginį, reikalingas jūsų slaptažodis.';
@@ -358,6 +360,7 @@ z.string.lt.conversationContextMenuDeleteEveryone = 'Ištrinti visiems';
 z.string.lt.conversationContextMenuDownload = 'Atsisiųsti';
 z.string.lt.conversationContextMenuLike = 'Patinka';
 z.string.lt.conversationContextMenuUnlike = 'Nebepatinka';
+z.string.lt.conversationContextMenuDetails = 'Išsamiau';
 z.string.lt.conversationDeleteTimestamp = 'Ištrinta: {{date}}';
 z.string.lt.conversationEditTimestamp = 'Taisyta: {{date}}';
 z.string.lt.conversationLikesCaption = '{{number}} žmonėms';
@@ -529,6 +532,8 @@ z.string.lt.participantDevicesOutdatedClientMessage = '{{user}} naudoja seną Wi
 z.string.lt.participantDevicesSelfAllDevices = 'Rodyti visus mano įrenginius';
 z.string.lt.participantDevicesSelfFingerprint = 'Įrenginio kontrolinis kodas';
 
+z.string.lt.messageDetailsTitle = 'Išsamiau';
+
 z.string.lt.userProfileButtonConnect = 'Užmegzti kontaktą';
 z.string.lt.userProfileButtonIgnore = 'Nepaisyti';
 z.string.lt.userProfileButtonUnblock = 'Atblokuoti';
@@ -562,12 +567,13 @@ z.string.lt.preferencesAccountLogOut = 'Atsijungti';
 z.string.lt.preferencesAccountManageTeam = 'Tvarkyti komandą';
 z.string.lt.preferencesAccountMarketingConsentCheckbox = 'Gaukite naujienlaiškį';
 z.string.lt.preferencesAccountMarketingConsentDetail = 'Gaukite naujienas ir produktų pakeitimo informaciją iš „Wire“ el. paštu.';
+z.string.lt.preferencesAccountPrivacy = 'Privatumas';
 z.string.lt.preferencesAccountResetPassword = 'Atstatyti slaptažodį';
 z.string.lt.preferencesAccountTeam = 'komandoje {{name}}';
-z.string.lt.preferencesAccountUsernamePlaceholder = 'Jūsų vardas ir pavardė';
-z.string.lt.preferencesAccountUsernameHint = 'Bent 2 simboliai. Tik a—z, 0—9 ir _.';
 z.string.lt.preferencesAccountUsernameAvailable = 'Prieinamas';
 z.string.lt.preferencesAccountUsernameErrorTaken = 'Jau užimtas';
+z.string.lt.preferencesAccountUsernameHint = 'Bent 2 simboliai. Tik a—z, 0—9 ir _.';
+z.string.lt.preferencesAccountUsernamePlaceholder = 'Jūsų vardas ir pavardė';
 
 z.string.lt.preferencesAVCamera = 'Kamera';
 z.string.lt.preferencesAVMicrophone = 'Mikrofonas';

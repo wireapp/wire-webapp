@@ -605,17 +605,21 @@ export default class EventMapper {
       assetEntity.height = height;
     }
 
-    const {key, otr_key, sha256, token} = eventData;
-
-    const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
-      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
-    assetEntity.resource(remoteData);
-
     if (createDummyImage) {
       assetEntity.dummy_url = this._createDummyImage(assetEntity.width, assetEntity.height);
     }
 
+    const {key, otr_key, sha256, token} = eventData;
+
+    if (!otr_key || !sha256) {
+      return assetEntity;
+    }
+
+    const remoteData = key
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+
+    assetEntity.resource(remoteData);
     return assetEntity;
   }
 

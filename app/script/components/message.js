@@ -149,7 +149,11 @@ class Message {
       });
     }
 
-    if (!this.conversation().is1to1() && !this.conversation().removed_from_conversation()) {
+    if (
+      !this.conversation().is1to1() &&
+      !messageEntity.is_ephemeral() &&
+      !this.conversation().removed_from_conversation()
+    ) {
       entries.push({
         click: () => this.onClickReceipts(this),
         label: z.l10n.text(z.string.conversationContextMenuDetails),
@@ -248,7 +252,7 @@ const normalTemplate = `
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-            background_image: asset.resource,
+            background_image: asset.resource(),
             click: (data, event) => $parent.onClickImage(message, event),
             css: {'bg-color-ephemeral': message.isObfuscated()},
             " data-uie-name="go-image-detail">

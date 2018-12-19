@@ -19,6 +19,10 @@
 
 // KARMA_SPECS=conversation/ConversationVerificationStateHandler yarn test:app
 
+import ClientEntity from 'app/script/client/ClientEntity';
+import Conversation from 'app/script/entity/Conversation';
+import User from 'app/script/entity/User';
+
 describe('z.conversation.ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();
   let state_handler = undefined;
@@ -41,21 +45,21 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       conversation_repository = _conversation_repository;
       state_handler = conversation_repository.verification_state_handler;
 
-      conversation_ab = new z.entity.Conversation(z.util.createRandomUuid());
-      conversation_b = new z.entity.Conversation(z.util.createRandomUuid());
-      conversation_c = new z.entity.Conversation(z.util.createRandomUuid());
+      conversation_ab = new Conversation(z.util.createRandomUuid());
+      conversation_b = new Conversation(z.util.createRandomUuid());
+      conversation_c = new Conversation(z.util.createRandomUuid());
 
       selfUserEntity = conversation_repository.selfUser();
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-      user_a = new z.entity.User(z.util.createRandomUuid());
-      user_b = new z.entity.User(z.util.createRandomUuid());
+      user_a = new User(z.util.createRandomUuid());
+      user_b = new User(z.util.createRandomUuid());
 
-      client_a = new z.client.ClientEntity();
+      client_a = new ClientEntity();
       client_a.meta.isVerified(true);
       user_a.devices.push(client_a);
 
-      client_b = new z.client.ClientEntity();
+      client_b = new ClientEntity();
       client_b.meta.isVerified(true);
       user_b.devices.push(client_b);
 
@@ -88,10 +92,9 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_ab.is_verified()).toBeDefined();
       expect(conversation_ab.is_verified()).toBeTruthy();
 
-      const new_client_b = new z.client.ClientEntity();
+      const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(false);
       user_b.devices.push(new_client_b);
 
@@ -113,7 +116,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(conversation_ab.is_verified()).toBeDefined();
       expect(conversation_ab.is_verified()).toBeTruthy();
 
-      const new_client_b = new z.client.ClientEntity();
+      const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(true);
       user_b.devices.push(new_client_b);
 
@@ -139,7 +142,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
 
-      const new_client = new z.client.ClientEntity();
+      const new_client = new ClientEntity();
       new_client.meta.isVerified(false);
       selfUserEntity.devices.push(new_client);
 
@@ -169,7 +172,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
       spyOn(z.conversation.EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
 
-      const new_client = new z.client.ClientEntity();
+      const new_client = new ClientEntity();
       new_client.meta.isVerified(false);
       selfUserEntity.devices.push(new_client);
 
@@ -197,8 +200,8 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       const degradedEvent = {type: 'degraded'};
       spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
-      const new_user = new z.entity.User(z.util.createRandomUuid());
-      const new_client_b = new z.client.ClientEntity();
+      const new_user = new User(z.util.createRandomUuid());
+      const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
 
@@ -216,8 +219,8 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     it('should not change state if new user with verified client was added to conversation', () => {
       spyOn(z.conversation.EventBuilder, 'buildDegraded');
 
-      const new_user = new z.entity.User(z.util.createRandomUuid());
-      const new_client_b = new z.client.ClientEntity();
+      const new_user = new User(z.util.createRandomUuid());
+      const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);
 

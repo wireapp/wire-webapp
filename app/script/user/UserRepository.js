@@ -17,6 +17,8 @@
  *
  */
 
+import {UNSPLASH_URL} from '../externalRoute';
+
 window.z = window.z || {};
 window.z.user = z.user || {};
 
@@ -782,7 +784,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.loadUrlBlob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return z.util.loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()) {

@@ -152,7 +152,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       .catch(error => {
         const isValidationUtilError = error instanceof z.util.ValidationUtilError;
         const message = isValidationUtilError
-          ? `Failed to validate an asset URL (_load_buffer): ${error.message}`
+          ? `Failed to validate an asset URL (_loadBuffer): ${error.message}`
           : `Failed to load asset: ${error.message || error}`;
 
         this.logger.error(message);

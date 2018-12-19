@@ -117,6 +117,8 @@ z.string.fi.modalAccountNewDevicesHeadline = 'Tiliäsi käytettiin:';
 z.string.fi.modalAccountNewDevicesFrom = 'Laite:';
 z.string.fi.modalAccountNewDevicesMessage = 'Jos et tehnyt tätä, poista laite ja vaihda salasanasi.';
 
+z.string.fi.modalAccountReadReceiptsChangedSecondary = 'Hallitse laitteita';
+
 z.string.fi.modalAccountRemoveDeviceAction = 'Poista laite';
 z.string.fi.modalAccountRemoveDeviceHeadline = 'Poista "{{device}}"';
 z.string.fi.modalAccountRemoveDeviceMessage = 'Sinun täytyy kirjoittaa salasanasi poistaaksesi laitteen.';
@@ -374,6 +376,7 @@ z.string.fi.participantDevicesOutdatedClientMessage = '{{user}} käyttää vanha
 z.string.fi.participantDevicesSelfAllDevices = 'Näytä kaikki laitteeni';
 z.string.fi.participantDevicesSelfFingerprint = 'Laitteen sormenjälki';
 
+
 z.string.fi.userProfileButtonConnect = 'Yhdistä';
 z.string.fi.userProfileButtonIgnore = 'Hylkää';
 z.string.fi.userProfileButtonUnblock = 'Poista esto';
@@ -399,12 +402,13 @@ z.string.fi.preferencesAccountCreateTeam = 'Luo tiimi';
 z.string.fi.preferencesAccountDelete = 'Poista tili';
 z.string.fi.preferencesAccountLogOut = 'Kirjaudu ulos';
 z.string.fi.preferencesAccountManageTeam = 'Hallinnoi tiimiä';
+z.string.fi.preferencesAccountPrivacy = 'Tietosuoja';
 z.string.fi.preferencesAccountResetPassword = 'Vaihda salasana';
 z.string.fi.preferencesAccountTeam = 'tiimissä {{name}}';
-z.string.fi.preferencesAccountUsernamePlaceholder = 'Koko nimesi';
-z.string.fi.preferencesAccountUsernameHint = 'Vähintään 2 merkkiä, vain a - z, 0 - 9 ja _.';
 z.string.fi.preferencesAccountUsernameAvailable = 'Saatavilla';
 z.string.fi.preferencesAccountUsernameErrorTaken = 'On jo käytössä';
+z.string.fi.preferencesAccountUsernameHint = 'Vähintään 2 merkkiä, vain a - z, 0 - 9 ja _.';
+z.string.fi.preferencesAccountUsernamePlaceholder = 'Koko nimesi';
 
 z.string.fi.preferencesAVCamera = 'Kamera';
 z.string.fi.preferencesAVMicrophone = 'Mikrofoni';

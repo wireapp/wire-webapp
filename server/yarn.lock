@@ -155,11 +155,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.15.tgz#20e85651b62fd86656e57c9c9bc771ab1570bc59"
   integrity sha512-9kROxduaN98QghwwHmxXO2Xz3MaWf+I1sLVAA6KJDF5xix+IyXVhds0MAfdNwtcpSrzhaTsNB0/jnL86fgUhqA==
 
-"@types/node@10.12.12":
-  version "10.12.12"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.12.tgz#e15a9d034d9210f00320ef718a50c4a799417c47"
-  integrity sha512-Pr+6JRiKkfsFvmU/LK68oBRCQeEg36TyAbPhc2xpez24OOZZCuoIhWGTd39VZy6nGafSbxzGouFPTFD/rR1A0A==
-
 "@types/platform@1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.1.tgz#5a66616693e39f311b3f2c64c77cf2249e3d8325"
@@ -178,12 +173,12 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@0.10.3":
-  version "0.10.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-0.10.3.tgz#364ea2c2af73d71792c980463a03bfc115cf59d3"
-  integrity sha512-rALlpbp9YWg7l3yXxe+FCia290JBB55zpKANa12rqGyNtaDd9683A39Y5i3cTHuhnuYw9Xc5bkCtATfZdNO4mw==
+"@wireapp/commons@0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-0.10.4.tgz#8c7bf8d3c773f48b58d9ddf7ed6e79c6eec22419"
+  integrity sha512-i8fgfEF7cMcrTXKqcsDmjdRTRwfUA8EnP3xTpXG+KD+SzQiUh/kDTXLB+RvPwuSUU+tIGMid17QSV3fkeeLIFg==
   dependencies:
-    "@types/node" "10.12.12"
+    "@types/node" "10.12.15"
     "@types/platform" "1.3.1"
     platform "1.3.5"
 
@@ -1779,13 +1774,13 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.11.0.tgz#e744650406ac0a9be295becb98a15ea832c58c1d"
-  integrity sha512-ke0huy9eNbsOX+VMDCgbf48FRrm4ZXrD7/5alYll9maDReAAt/0lNUG69eGaCzKVD+MQ5aCWZ8pxjJBjM8yFrA==
+maxmind@2.11.1:
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.11.1.tgz#9552e2b514e2f32ece544af7d9eed712f360948c"
+  integrity sha512-DMSpHYuhV2Uz6WBRRlcLj9EWRNbM75wuhr3Xy8/6Av3NPHEMcgKWI/GfdgUxdfHbEGwy663Gr7/3Xhg2gWcH/A==
   dependencies:
     big-integer "^1.6.31"
-    tiny-lru "^1.6.1"
+    tiny-lru "^5.0.3"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -2782,10 +2777,10 @@ thunkify@^2.1.2:
   resolved "https://registry.yarnpkg.com/thunkify/-/thunkify-2.1.2.tgz#faa0e9d230c51acc95ca13a361ac05ca7e04553d"
   integrity sha1-+qDp0jDFGsyVyhOjYawFyn4EVT0=
 
-tiny-lru@^1.6.1:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-1.6.4.tgz#ee5226a29a7b734ef8aee47673dd5079bf987441"
-  integrity sha512-Et+J3Css66XPSLWjLF9wmgbECsGiExlEL+jxsFerTQF6N6dpxswDTPAfIrAbQKO5c1uhgq2xvo5zMk1W+kBDNA==
+tiny-lru@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-5.0.3.tgz#a375bef3c1efdce03f5a32af66dc9a05570cfe10"
+  integrity sha512-t5laEjOXP6Df3LHYhicS8y1OfkEsI8QYHh0/wc+zsR+hfxORx950UcL7WWLPHZE7hFOArXpKyL0CB7FStFxpUQ==
 
 to-object-path@^0.3.0:
   version "0.3.0"

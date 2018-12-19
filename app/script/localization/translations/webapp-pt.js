@@ -118,6 +118,8 @@ z.string.pt.modalAccountNewDevicesHeadline = 'A sua conta foi usada em:';
 z.string.pt.modalAccountNewDevicesFrom = 'De:';
 z.string.pt.modalAccountNewDevicesMessage = 'Se não fez isto, remova o dispositivo da conta e altere a sua palavra-passe.';
 
+z.string.pt.modalAccountReadReceiptsChangedSecondary = 'Gerir dispositivos';
+
 z.string.pt.modalAccountRemoveDeviceAction = 'Remover o dispositivo';
 z.string.pt.modalAccountRemoveDeviceHeadline = 'Remover "{{device}}"';
 z.string.pt.modalAccountRemoveDeviceMessage = 'A palavra-passe é necessária para remover o dispositivo.';
@@ -375,6 +377,7 @@ z.string.pt.participantDevicesOutdatedClientMessage = '{{user}} está a usar uma
 z.string.pt.participantDevicesSelfAllDevices = 'Mostrar todos os meus dispositivos';
 z.string.pt.participantDevicesSelfFingerprint = 'Impressão digital do dispositivo';
 
+
 z.string.pt.userProfileButtonConnect = 'Ligar';
 z.string.pt.userProfileButtonIgnore = 'Ignorar';
 z.string.pt.userProfileButtonUnblock = 'Desbloquear';
@@ -400,12 +403,13 @@ z.string.pt.preferencesAccountCreateTeam = 'Criar uma equipa';
 z.string.pt.preferencesAccountDelete = 'Eliminar conta';
 z.string.pt.preferencesAccountLogOut = 'Terminar sessão';
 z.string.pt.preferencesAccountManageTeam = 'Gerir equipa';
+z.string.pt.preferencesAccountPrivacy = 'Privacidade';
 z.string.pt.preferencesAccountResetPassword = 'Alterar a palavra-passe';
 z.string.pt.preferencesAccountTeam = 'em {{name}}';
-z.string.pt.preferencesAccountUsernamePlaceholder = 'O seu nome completo';
-z.string.pt.preferencesAccountUsernameHint = 'Pelo menos 2 caracteres. a-z, 0-9 e _ apenas.';
 z.string.pt.preferencesAccountUsernameAvailable = 'Disponível';
 z.string.pt.preferencesAccountUsernameErrorTaken = 'Já está ocupado';
+z.string.pt.preferencesAccountUsernameHint = 'Pelo menos 2 caracteres. a-z, 0-9 e _ apenas.';
+z.string.pt.preferencesAccountUsernamePlaceholder = 'O seu nome completo';
 
 z.string.pt.preferencesAVCamera = 'Câmera';
 z.string.pt.preferencesAVMicrophone = 'Microfone';

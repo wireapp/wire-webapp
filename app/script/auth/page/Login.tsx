@@ -308,9 +308,11 @@ class Login extends React.Component<CombinedProps, State> {
     const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
       <Page>
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
+        {config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+          <IsMobile>
+            <div style={{margin: 16}}>{backArrow}</div>
+          </IsMobile>
+        )}
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
           <AppAlreadyOpen />
@@ -410,7 +412,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {isSSOCapable ? (
+                {config.FEATURE.ENABLE_SSO && isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
