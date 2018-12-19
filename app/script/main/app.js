@@ -28,6 +28,7 @@ import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
 /* eslint-disable no-unused-vars */
 import globals from './globals';
 import auth from './auth';
+import {getWebsiteUrl} from '../externalRoute';
 /* eslint-enable no-unused-vars */
 
 class App {
@@ -777,7 +778,7 @@ class App {
         const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
         if (isLeavingGuestRoom) {
           const path = z.l10n.text(z.string.urlWebsiteRoot);
-          const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
+          const url = getWebsiteUrl(path);
           return window.location.replace(url);
         }
 

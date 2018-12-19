@@ -18,7 +18,7 @@
  */
 
 import {errors as ProteusErrors} from '@wireapp/proteus';
-import {URL_PATH} from '../../externalRoute';
+import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -55,7 +55,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
     this.link = ko.pureComputed(() => {
       const path = this.is_remote_identity_changed() ? URL_PATH.DECRYPT_ERROR_2 : URL_PATH.DECRYPT_ERROR_1;
-      return z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
+      return getWebsiteUrl(path);
     });
 
     this.is_recoverable = ko.pureComputed(() => {

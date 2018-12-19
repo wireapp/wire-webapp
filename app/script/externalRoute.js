@@ -22,10 +22,7 @@ const env = window.wire.env;
 export const UNSPLASH_URL = 'https://source.unsplash.com/1200x1200/?landscape';
 
 export const URL = {
-  ACCOUNT: {
-    PRODUCTION: (env.URL && env.URL.ACCOUNT_BASE) || 'https://account.wire.com',
-    STAGING: 'https://wire-account-staging.zinfra.io',
-  },
+  ACCOUNT: env.URL && env.URL.ACCOUNT_BASE,
   PRIVACY_POLICY: env.URL && env.URL.PRIVACY_POLICY,
   SUPPORT: env.URL && env.URL.SUPPORT_BASE,
   TEAM_SETTINGS: env.URL && env.URL.TEAMS_BASE,
@@ -62,6 +59,11 @@ export const getWebsiteUrl = (path = '', pkCampaign) => {
   const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
   const websiteUrl = `${URL.WEBSITE}${path}${query}`;
   return URL.WEBSITE ? websiteUrl : undefined;
+};
+
+export const getAccountPagesUrl = (path = '') => {
+  const accountPagesUrl = `${URL.ACCOUNT}${path}`;
+  return URL.ACCOUNT ? accountPagesUrl : undefined;
 };
 
 export const getSupportUrl = (path = '') => {
