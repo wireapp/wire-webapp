@@ -19,13 +19,10 @@
 
 import Dexie from 'dexie';
 
-window.z = window.z || {};
-window.z.storage = z.storage || {};
-
-z.storage.StorageService = class StorageService {
+class StorageService {
   // Construct an new StorageService.
   constructor() {
-    this.logger = new z.util.Logger('z.storage.StorageService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('StorageService', z.config.LOGGER.OPTIONS);
 
     this.db = undefined;
     this.dbName = undefined;
@@ -281,4 +278,6 @@ z.storage.StorageService = class StorageService {
         throw error;
       });
   }
-};
+}
+
+export default StorageService;
