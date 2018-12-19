@@ -118,5 +118,23 @@ describe('objectUtil', () => {
       expect(merged.value).toBe(source.value);
       expect(merged.name).toBe(originalName);
     });
+
+    it('reset properties of the destination object', () => {
+      const destination = {value: {value: 1}};
+      const source = {value: {}};
+
+      const merged = mergeEntities(destination, source);
+
+      expect(merged.value.value).toBe(undefined);
+    });
+
+    it('overwrite object with primitive values', () => {
+      const destination = {value: {value: 1}};
+      const source = {value: undefined};
+
+      const merged = mergeEntities(destination, source);
+
+      expect(merged.value).toBe(source.value);
+    });
   });
 });
