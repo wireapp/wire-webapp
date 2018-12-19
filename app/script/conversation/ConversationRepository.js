@@ -3832,7 +3832,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.isGroup()) {
+    if (conversationEntity.team_id && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 
