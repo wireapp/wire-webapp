@@ -41,8 +41,8 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {conversationJoinStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
+import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import * as Environment from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
@@ -368,14 +368,14 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
 
   render() {
     return (
-      <UnsupportedBrowser>
+      <WirelessUnsupportedBrowser>
         <WirelessContainer
           showCookiePolicyBanner={this.state.showCookiePolicyBanner}
           onCookiePolicyBannerClose={() => this.setState({...this.state, showCookiePolicyBanner: false})}
         >
           {this.renderJoin()}
         </WirelessContainer>
-      </UnsupportedBrowser>
+      </WirelessUnsupportedBrowser>
     );
   }
 }
