@@ -48,7 +48,7 @@ class ContentMessage extends Message {
     this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
-      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
+      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp()).format('HH:mm'));
     };
 
     this.is_liked_provisional = ko.observable();
