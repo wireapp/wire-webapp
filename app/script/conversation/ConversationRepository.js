@@ -3569,8 +3569,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _initMessageEntity(conversationEntity, eventJson) {
     return this.event_mapper
       .mapJsonEvent(eventJson, conversationEntity, true)
-      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
-      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity));
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity));
   }
 
   _replaceMessageInConversation(conversationEntity, eventId, newData) {
@@ -3579,8 +3578,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve();
     }
     return this._initMessageEntity(conversationEntity, newData).then(messageEntity => {
-      conversationEntity.replaceMessage(originalMessage, messageEntity);
-      return messageEntity;
+      const replacedMessageEntity = conversationEntity.replaceMessage(originalMessage, messageEntity);
+      this.ephemeralHandler.validateMessage(replacedMessageEntity);
+      return replacedMessageEntity;
     });
   }
 
@@ -3612,6 +3612,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.messages_unordered(updatedMessages);
         }
       }
+      this.ephemeralHandler.validateMessage(messageEntity);
       return {conversationEntity, messageEntity};
     });
   }
