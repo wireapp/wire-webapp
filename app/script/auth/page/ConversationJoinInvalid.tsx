@@ -21,8 +21,8 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {conversationJoinStrings} from '../../strings';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
+import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
@@ -44,7 +44,7 @@ class ConversationJoinInvalid extends React.PureComponent<
       intl: {formatMessage: _},
     } = this.props;
     return (
-      <UnsupportedBrowser>
+      <WirelessUnsupportedBrowser>
         <WirelessContainer>
           <ContainerXS style={{margin: 'auto 0'}}>
             <H2
@@ -59,7 +59,7 @@ class ConversationJoinInvalid extends React.PureComponent<
             </Text>
           </ContainerXS>
         </WirelessContainer>
-      </UnsupportedBrowser>
+      </WirelessUnsupportedBrowser>
     );
   }
 }
