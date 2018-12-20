@@ -18,6 +18,7 @@ yarn-error.log
 CHANGELOG.md
 
 # Configuration imported from https://github.com/wireapp/wire-web-config-default/
+app/ext/audio
 app/image/icon
 app/image/logo
 app/image/favicon-badge.ico
