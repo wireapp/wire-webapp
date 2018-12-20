@@ -16,3 +16,9 @@ aws-keys.json
 npm-debug.log
 yarn-error.log
 CHANGELOG.md
+
+# Configuration imported from https://github.com/wireapp/wire-web-config-default/
+app/image/icon
+app/image/logo
+app/image/favicon-badge.ico
+app/image/favicon.ico
