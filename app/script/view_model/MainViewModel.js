@@ -148,12 +148,7 @@ z.viewModel.MainViewModel = class MainViewModel {
             overlay.addEventListener('click', this.closePanelOnClick);
           }
 
-          if (!isNarrowScreen) {
-            // In case we are not on a narrow screen, opening a panel will resize a bunch of elements
-            // we need to warn them by triggering a window resize event.
-            // When the screen is narrow, the panel just goes on top, no elements are resized
-            window.dispatchEvent(new Event('resize'));
-          }
+          window.dispatchEvent(new Event('resize'));
 
           resolve();
         }
