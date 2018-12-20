@@ -199,6 +199,10 @@ z.event.EventService = class EventService {
     this.storageService.addUpdatedListener(this.EVENT_STORE_NAME, callback);
   }
 
+  addEventDeletedListener(callback) {
+    this.storageService.addDeletedListener(this.EVENT_STORE_NAME, callback);
+  }
+
   /**
    * Update event as uploaded in database.
    *
