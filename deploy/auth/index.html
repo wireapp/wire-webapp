@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- Wire, Copyright (C) 2018 Wire Swiss GmbH -->
+<!-- {{@config.VERSION}} -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="geoip" country="{{country}}">
+<meta property="wire:version" version="{{@config.VERSION}}">
+
+<link href="/image/favicon.ico" type="image/x-icon" rel="shortcut icon" sizes="48x48">
+<link href="/image/icon/wire-icon-256.png" rel="icon" sizes="256x256" type="image/png">
+<link href="/image/icon/wire-icon-128.png" rel="icon" sizes="128x128" type="image/png">
+<link href="/image/icon/wire-icon-64.png" rel="icon" sizes="64x64" type="image/png">
+
+    <meta property="og:title" content="Wire · The most secure collaboration platform">
+<meta property="og:description" name="description" content="Business chats, one-click conference calls and shared documents – all protected with end-to-end encryption. Also available for personal use.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://app.wire.com">
+<meta property="og:image" content="https://wire-docs.wire.com/kalina/wire-icon.png">
+
+    <title>Wire</title>
+  </head>
+
+  <body>
+    <div id="main"></div>
+    <script src="/config.js?{{@config.VERSION}}"></script>
+    <script src="/min/runtime.js?{{@config.VERSION}}"></script>
+    <script src="/min/dexie.js?{{@config.VERSION}}"></script>
+    <script src="/min/vendor.js?{{@config.VERSION}}"></script>
+    <script src="/min/script.js?{{@config.VERSION}}"></script>
+  </body>
+</html>

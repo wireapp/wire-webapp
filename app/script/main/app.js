@@ -20,6 +20,7 @@
 import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
+import StorageService from '../storage/StorageService';
 import DebugUtil from '../util/DebugUtil';
 
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
@@ -208,7 +209,7 @@ class App {
    * @returns {Object} All services
    */
   _setupServices(authComponent) {
-    const storageService = new z.storage.StorageService();
+    const storageService = new StorageService();
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);

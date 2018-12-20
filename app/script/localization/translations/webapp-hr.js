@@ -133,6 +133,8 @@ z.string.hr.modalAccountNewDevicesHeadline = 'Vaš račun je korišten na:';
 z.string.hr.modalAccountNewDevicesFrom = 'Šalje:';
 z.string.hr.modalAccountNewDevicesMessage = 'Ako niste to učinili, uklonite uređaj i ponovno postavite lozinku.';
 
+z.string.hr.modalAccountReadReceiptsChangedSecondary = 'Upravljanje uređajima';
+
 z.string.hr.modalAccountRemoveDeviceAction = 'Uklanjanje uređaja';
 z.string.hr.modalAccountRemoveDeviceHeadline = 'Uklanjanje "{{device}}"';
 z.string.hr.modalAccountRemoveDeviceMessage = 'Lozinka potrebna za uklanjanje uređaja.';
@@ -548,6 +550,7 @@ z.string.hr.participantDevicesOutdatedClientMessage = '{{user}} koristi staru ve
 z.string.hr.participantDevicesSelfAllDevices = 'Pokaži sve uređaje';
 z.string.hr.participantDevicesSelfFingerprint = 'Otisak uređaja';
 
+
 z.string.hr.userProfileButtonConnect = 'Poveži se';
 z.string.hr.userProfileButtonIgnore = 'Ignoriraj';
 z.string.hr.userProfileButtonUnblock = 'Odblokiraj';
@@ -581,12 +584,13 @@ z.string.hr.preferencesAccountLogOut = 'Odjava';
 z.string.hr.preferencesAccountManageTeam = 'Upravljanje timom';
 z.string.hr.preferencesAccountMarketingConsentCheckbox = 'Primanje biltena';
 z.string.hr.preferencesAccountMarketingConsentDetail = 'Primaj vijesti i ažuriranja o proizvodima od Wire-a putem e-maila.';
+z.string.hr.preferencesAccountPrivacy = 'Privatnost';
 z.string.hr.preferencesAccountResetPassword = 'Resetiraj lozinku';
 z.string.hr.preferencesAccountTeam = 'u {{name}}';
-z.string.hr.preferencesAccountUsernamePlaceholder = 'Vaše puno ime';
-z.string.hr.preferencesAccountUsernameHint = 'Najmanje 2 znaka. Samo a-z, 0-9, i _.';
 z.string.hr.preferencesAccountUsernameAvailable = 'Dostupno';
 z.string.hr.preferencesAccountUsernameErrorTaken = 'Već uzeto';
+z.string.hr.preferencesAccountUsernameHint = 'Najmanje 2 znaka. Samo a-z, 0-9, i _.';
+z.string.hr.preferencesAccountUsernamePlaceholder = 'Vaše puno ime';
 
 z.string.hr.preferencesAVCamera = 'Kamera';
 z.string.hr.preferencesAVMicrophone = 'Mikrofon';

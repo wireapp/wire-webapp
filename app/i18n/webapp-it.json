@@ -49,7 +49,7 @@
   "unsupported.headlineCookies": "",
   "unsupported.headlineIndexedDb": "",
   "unsupported.subheadBrowser": "",
-  "unsupported.subheadCookies": "",
+  "unsupported.subheadCookies": "Abilita i cookie per eseguire il login su Wire.",
   "unsupported.subheadIndexedDb": "Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.",
   "conversationJoin.unsupportedJoinHeadline": "",
   "conversationJoin.headline": "",

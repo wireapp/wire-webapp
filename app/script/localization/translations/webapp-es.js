@@ -133,6 +133,8 @@ z.string.es.modalAccountNewDevicesHeadline = 'Tu cuenta fue usada en:';
 z.string.es.modalAccountNewDevicesFrom = 'Desde:';
 z.string.es.modalAccountNewDevicesMessage = 'Si usted no hizo esto, retire el dispositivo y restablecer la contraseña.';
 
+z.string.es.modalAccountReadReceiptsChangedSecondary = 'Administrar dispositivos';
+
 z.string.es.modalAccountRemoveDeviceAction = 'Eliminar dispositivo';
 z.string.es.modalAccountRemoveDeviceHeadline = 'Eliminar "{{device}}"';
 z.string.es.modalAccountRemoveDeviceMessage = 'Se requiere tu contraseña para eliminar el dispositivo.';
@@ -548,6 +550,7 @@ z.string.es.participantDevicesOutdatedClientMessage = '{{user}} está utilizando
 z.string.es.participantDevicesSelfAllDevices = 'Mostrar todos mis dispositivos';
 z.string.es.participantDevicesSelfFingerprint = 'Huella digital de tu dispositivo';
 
+
 z.string.es.userProfileButtonConnect = 'Conectar';
 z.string.es.userProfileButtonIgnore = 'Ignorar';
 z.string.es.userProfileButtonUnblock = 'Desbloquear';
@@ -581,12 +584,13 @@ z.string.es.preferencesAccountLogOut = 'Cerrar sesión';
 z.string.es.preferencesAccountManageTeam = 'Administrar equipo';
 z.string.es.preferencesAccountMarketingConsentCheckbox = 'Recibir boletín de noticias';
 z.string.es.preferencesAccountMarketingConsentDetail = 'Reciba noticias y actualizaciones de productos de Wire por correo electrónico.';
+z.string.es.preferencesAccountPrivacy = 'Privacidad';
 z.string.es.preferencesAccountResetPassword = 'Restablecer contraseña';
 z.string.es.preferencesAccountTeam = 'en {{name}}';
-z.string.es.preferencesAccountUsernamePlaceholder = 'Tu nombre completo';
-z.string.es.preferencesAccountUsernameHint = 'Al menos 2 caracteres. Sólo a–z, 0–9 y _.';
 z.string.es.preferencesAccountUsernameAvailable = 'Disponible';
 z.string.es.preferencesAccountUsernameErrorTaken = 'No disponible';
+z.string.es.preferencesAccountUsernameHint = 'Al menos 2 caracteres. Sólo a–z, 0–9 y _.';
+z.string.es.preferencesAccountUsernamePlaceholder = 'Tu nombre completo';
 
 z.string.es.preferencesAVCamera = 'Cámara';
 z.string.es.preferencesAVMicrophone = 'Micrófono';

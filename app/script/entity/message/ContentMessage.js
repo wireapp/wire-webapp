@@ -32,7 +32,9 @@ class ContentMessage extends Message {
     this.assets = ko.observableArray([]);
     this.super_type = z.message.SuperType.CONTENT;
     this.replacing_message_id = null;
-    this.edited_timestamp = null;
+    this.edited_timestamp = ko.observable(null);
+
+    this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
 
     this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
@@ -46,7 +48,7 @@ class ContentMessage extends Message {
     this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
-      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
+      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp()).format('HH:mm'));
     };
 
     this.is_liked_provisional = ko.observable();
@@ -143,14 +145,6 @@ class ContentMessage extends Message {
    */
   isUserTargeted(userId) {
     return this.isUserMentioned(userId) || this.isUserQuoted(userId);
-  }
-
-  /**
-   * Check whether the message was edited.
-   * @returns {boolean} True, if message has been edited.
-   */
-  was_edited() {
-    return this.replacing_message_id != null;
   }
 
   /**

@@ -142,7 +142,7 @@ describe('Conversation', () => {
       const initialLength = conversation_et.messages().length;
       const newMessageEntity = new Message(z.util.createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
-      newMessageEntity.status = 3;
+      newMessageEntity.status(3);
       newMessageEntity.version = 3;
       newMessageEntity.readReceipts([{userId: 'user-id'}]);
 
@@ -150,7 +150,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.messages().length).toBe(initialLength);
       expect(conversation_et.messages()[0].readReceipts()).toEqual(newMessageEntity.readReceipts());
-      expect(conversation_et.messages()[0].status).toEqual(newMessageEntity.status);
+      expect(conversation_et.messages()[0].status()).toEqual(newMessageEntity.status());
       expect(conversation_et.messages()[0].version).toEqual(newMessageEntity.version);
     });
 

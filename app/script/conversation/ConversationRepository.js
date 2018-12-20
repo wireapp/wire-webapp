@@ -270,11 +270,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
-    const payload = {
-      name: groupName,
-      users: userIds,
-      ...options,
-    };
+    const payload = Object.assign(
+      {},
+      {
+        name: groupName,
+        users: userIds,
+      },
+      options
+    );
 
     if (this.team().id) {
       payload.team = {
@@ -3569,8 +3572,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _initMessageEntity(conversationEntity, eventJson) {
     return this.event_mapper
       .mapJsonEvent(eventJson, conversationEntity, true)
-      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
-      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity));
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity));
   }
 
   _replaceMessageInConversation(conversationEntity, eventId, newData) {
@@ -3579,8 +3581,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve();
     }
     return this._initMessageEntity(conversationEntity, newData).then(messageEntity => {
-      conversationEntity.replaceMessage(originalMessage, messageEntity);
-      return messageEntity;
+      const replacedMessageEntity = conversationEntity.replaceMessage(originalMessage, messageEntity);
+      this.ephemeralHandler.validateMessage(replacedMessageEntity);
+      return replacedMessageEntity;
     });
   }
 
@@ -3612,6 +3615,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.messages_unordered(updatedMessages);
         }
       }
+      this.ephemeralHandler.validateMessage(messageEntity);
       return {conversationEntity, messageEntity};
     });
   }
@@ -3832,7 +3836,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.inTeam() && conversationEntity.isGroup()) {
+    if (conversationEntity.team_id && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 

@@ -125,6 +125,8 @@ z.string.da.modalAccountNewDevicesHeadline = 'Din konto blev brugt på:';
 z.string.da.modalAccountNewDevicesFrom = 'Fra:';
 z.string.da.modalAccountNewDevicesMessage = 'Hvis du ikke gjorde dette, slet enheden og nulstil din adgangskode.';
 
+z.string.da.modalAccountReadReceiptsChangedSecondary = 'Administrér enheder';
+
 z.string.da.modalAccountRemoveDeviceAction = 'Fjern enhed';
 z.string.da.modalAccountRemoveDeviceHeadline = 'Fjern "{{device}}"';
 z.string.da.modalAccountRemoveDeviceMessage = 'Din adgangskode er krævet for at fjerne denne enhed.';
@@ -472,6 +474,7 @@ z.string.da.participantDevicesOutdatedClientMessage = '{{user}} bruger en gammel
 z.string.da.participantDevicesSelfAllDevices = 'Vis alle mine enheder';
 z.string.da.participantDevicesSelfFingerprint = 'Enheds fingeraftryk';
 
+
 z.string.da.userProfileButtonConnect = 'Forbind';
 z.string.da.userProfileButtonIgnore = 'Ignorér';
 z.string.da.userProfileButtonUnblock = 'Fjern Blokering';
@@ -500,12 +503,13 @@ z.string.da.preferencesAccountLeaveGuestRoom = 'Forlad gæsterummet';
 z.string.da.preferencesAccountLeaveGuestRoomDescription = 'Du vil ikke længere have mulighed for at få adgang til beskederne i denne samtale.';
 z.string.da.preferencesAccountLogOut = 'Log ud';
 z.string.da.preferencesAccountManageTeam = 'Administrer arbejdsgrupper';
+z.string.da.preferencesAccountPrivacy = 'Privatliv';
 z.string.da.preferencesAccountResetPassword = 'Nulstil adgangskode';
 z.string.da.preferencesAccountTeam = 'i {{name}}';
-z.string.da.preferencesAccountUsernamePlaceholder = 'Dit fulde navn';
-z.string.da.preferencesAccountUsernameHint = 'Mindst to tegn. Kun a-z, 0-9 og _.';
 z.string.da.preferencesAccountUsernameAvailable = 'Ledig';
 z.string.da.preferencesAccountUsernameErrorTaken = 'Allerede i brug';
+z.string.da.preferencesAccountUsernameHint = 'Mindst to tegn. Kun a-z, 0-9 og _.';
+z.string.da.preferencesAccountUsernamePlaceholder = 'Dit fulde navn';
 
 z.string.da.preferencesAVCamera = 'Kamera';
 z.string.da.preferencesAVMicrophone = 'Mikrofon';

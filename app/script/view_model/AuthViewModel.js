@@ -21,6 +21,7 @@ import Cookies from 'js-cookie';
 
 import App from '../main/app';
 import {URL_PATH} from '../externalRoute';
+import StorageService from '../storage/StorageService';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';
@@ -58,7 +59,7 @@ class AuthViewModel {
     // Cryptography
     this.asset_service = new z.assets.AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
-    this.storageService = new z.storage.StorageService();
+    this.storageService = new StorageService();
     this.storage_repository = new z.storage.StorageRepository(this.storageService);
 
     const locationService = new z.location.LocationService(backendClient);

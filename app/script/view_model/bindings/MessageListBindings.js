@@ -89,7 +89,7 @@ ko.bindingHandlers.background_image = {
     let objectUrl;
 
     const loadImage = () => {
-      assetLoader()
+      assetLoader
         .load()
         .then(blob => {
           $(element).removeClass('image-loading');

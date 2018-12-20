@@ -382,7 +382,7 @@ export default class EventMapper {
 
     messageEntity.assets.push(this._mapAssetText(eventData));
     messageEntity.replacing_message_id = eventData.replacing_message_id;
-    messageEntity.edited_timestamp = new Date(editedTime || eventData.edited_time).getTime();
+    messageEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
 
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
@@ -605,17 +605,21 @@ export default class EventMapper {
       assetEntity.height = height;
     }
 
-    const {key, otr_key, sha256, token} = eventData;
-
-    const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
-      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
-    assetEntity.resource(remoteData);
-
     if (createDummyImage) {
       assetEntity.dummy_url = this._createDummyImage(assetEntity.width, assetEntity.height);
     }
 
+    const {key, otr_key, sha256, token} = eventData;
+
+    if (!otr_key || !sha256) {
+      return assetEntity;
+    }
+
+    const remoteData = key
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+
+    assetEntity.resource(remoteData);
     return assetEntity;
   }
 
