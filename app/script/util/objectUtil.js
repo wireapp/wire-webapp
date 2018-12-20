@@ -17,7 +17,7 @@
  *
  */
 
-import {isObject} from 'underscore';
+import {isObject, isArray} from 'underscore';
 
 /**
  * Creates an object copy and applies a mapping functions to all properties of that object.
@@ -57,7 +57,7 @@ export const escapeProperties = object => mapRecursive(object, _.escape);
  * @returns {Entity} mergedEntity
  */
 export const mergeEntities = (destination, source, ignoredProperties = []) => {
-  if (!isObject(source) || !isObject(destination)) {
+  if (!isObject(source) || !isObject(destination) || isArray(source)) {
     return source;
   }
 
@@ -78,5 +78,6 @@ export const mergeEntities = (destination, source, ignoredProperties = []) => {
   observableValues.forEach(([property, value]) => {
     destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)));
   });
+
   return destination;
 };
