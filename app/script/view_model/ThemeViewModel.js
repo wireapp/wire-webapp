@@ -39,12 +39,11 @@ class ThemeViewModel {
   }
 
   setTheme(newTheme) {
-    const classesWithoutTheme = document.body.className
+    const classes = document.body.className
       .split(' ')
       .filter(elementClass => !elementClass.startsWith(THEMES_CLASS_PREFIX))
-      .join(' ');
-    const theme = `${THEMES_CLASS_PREFIX}${newTheme}`;
-    document.body.className = `${classesWithoutTheme} ${theme}`;
+      .concat(`${THEMES_CLASS_PREFIX}${newTheme}`);
+    document.body.className = classes.join(' ');
   }
 }
 
