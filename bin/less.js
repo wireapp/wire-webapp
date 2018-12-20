@@ -23,8 +23,8 @@ const fs = require('fs-extra');
 const less = require('less');
 const path = require('path');
 
-const src = path.resolve(__dirname, '../app/style');
 const dist = path.resolve(__dirname, '../server/dist/static/style');
+const src = path.resolve(__dirname, '../app/style');
 
 const read = pathToFile => {
   return new Promise((resolve, reject) => {
