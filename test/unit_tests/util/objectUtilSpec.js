@@ -136,5 +136,15 @@ describe('objectUtil', () => {
 
       expect(merged.value).toBe(source.value);
     });
+
+    it('replaces array with the value from the source', () => {
+      const destination = {value: [1, 2, 3]};
+      const source = {value: []};
+
+      const merged = mergeEntities(destination, source);
+
+      expect(merged.value.length).toBe(source.value.length);
+      expect(merged.value).toBe(source.value);
+    });
   });
 });
