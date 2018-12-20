@@ -28,7 +28,7 @@ class ThemeViewModel {
     this.propertiesRepository = repositories.properties;
     this.setTheme = this.setTheme.bind(this);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, useDarkMode => {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE_TOGGLE, useDarkMode => {
       const newTheme = useDarkMode ? THEMES.DARK : THEMES.DEFAULT;
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     });
