@@ -397,23 +397,12 @@ class Conversation {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
-      const entityToReplace = messageWithLinkPreview() || editedMessage();
-      this.update_timestamps(messageEntity);
-      if (entityToReplace) {
-        if (replaceDuplicate) {
-          if (messageEntity.is_content()) {
-            messageEntity.quote(entityToReplace.quote());
-
-            const existingReceipts = entityToReplace.readReceipts();
-            if (existingReceipts.length) {
-              messageEntity.readReceipts(existingReceipts);
-            }
-          }
-          this.replaceMessage(entityToReplace, messageEntity);
-        }
-        // The duplicated message has been treated (either replaced or ignored). Our job here is done.
-        return entityToReplace;
+      const alreadyAdded = messageWithLinkPreview() || editedMessage();
+      if (alreadyAdded) {
+        return;
       }
+
+      this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
     }
