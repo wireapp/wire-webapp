@@ -17,14 +17,10 @@
  *
  */
 
-'use strict';
+import BasePanelViewModel from './BasePanelViewModel';
+import {getManageServicesUrl} from '../../externalRoute';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
-
-z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -105,11 +101,18 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => (this.contacts() || this.searchInput()) && this.isVisible())
+      .pureComputed(() => {
+        if (this.isVisible()) {
+          this.contacts();
+          this.searchInput();
+        }
+      })
       .extend({notify: 'always', rateLimit: 500});
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
+
+    this.manageServicesUrl = getManageServicesUrl('client_landing');
   }
 
   getElementId() {
@@ -139,9 +142,10 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
   }
 
   clickOpenManageServices() {
-    const path = `${z.config.URL_PATH.MANAGE_SERVICES}?utm_source=client_landing&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.manageServicesUrl) {
+      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   initView() {
@@ -185,4 +189,4 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
-};
+}

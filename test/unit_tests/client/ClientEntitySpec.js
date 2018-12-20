@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:client/Client
-
-'use strict';
+// KARMA_SPECS=client/Client yarn test:app
 
 describe('z.client.ClientEntity', () => {
   describe('dismantleUserClientId', () => {

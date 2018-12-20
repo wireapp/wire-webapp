@@ -17,20 +17,18 @@
  *
  */
 
-'use strict';
+export function isToday(momentDate) {
+  return momentDate.isSame(new Date(), 'd');
+}
 
-moment.fn.isToday = function() {
-  return this.isSame(new Date(), 'd');
-};
+export function isCurrentYear(momentDate) {
+  return momentDate.isSame(new Date(), 'y');
+}
 
-moment.fn.isCurrentYear = function() {
-  return this.isSame(new Date(), 'y');
-};
+export function isSameDay(momentDate, otherDate) {
+  return momentDate.isSame(otherDate, 'd');
+}
 
-moment.fn.isSameDay = function(date) {
-  return this.isSame(date, 'd');
-};
-
-moment.fn.isSameMonth = function(date) {
-  return this.isSame(date, 'M');
-};
+export function isSameMonth(momentDate, otherDate) {
+  return momentDate.isSame(otherDate, 'M');
+}

@@ -17,14 +17,9 @@
  *
  */
 
-'use strict';
+import BasePanelViewModel from './BasePanelViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
-
-z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServiceViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class GroupParticipantServiceViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -99,4 +94,4 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
       this.integrationRepository.addProviderNameToParticipant(serviceEntity);
     });
   }
-};
+}

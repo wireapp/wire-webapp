@@ -17,9 +17,9 @@
  *
  */
 
-// grunt test_run:util/ValidationUtil
+// KARMA_SPECS=util/ValidationUtil yarn test:app
 
-'use strict';
+import UUID from 'uuidjs';
 
 describe('z.util.ValidationUtil', () => {
   describe('"asset.legacy"', () => {

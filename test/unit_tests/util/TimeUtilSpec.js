@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/TimeUtil
-
-'use strict';
+// KARMA_SPECS=util/TimeUtil yarn test:app
 
 describe('z.util.TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;

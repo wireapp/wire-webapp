@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 module.exports = {
   aws_deploy: {
     command:
@@ -27,7 +25,7 @@ module.exports = {
       stdout: true,
     },
   },
-  aws_pack: {
+  dist_bundle: {
     command: 'yarn && yarn bundle:prod',
     options: {
       stdout: true,

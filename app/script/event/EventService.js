@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -32,6 +30,33 @@ z.event.EventService = class EventService {
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.EventService', z.config.LOGGER.OPTIONS);
     this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+  }
+
+  /**
+   * Load events from database.
+   *
+   * @param {string} conversationId - ID of conversation
+   * @param {string[]} eventIds - ID of events to retrieve
+   * @returns {Promise<Object[]>} Resolves with the stored records
+   */
+  loadEvents(conversationId, eventIds) {
+    if (!conversationId || !eventIds) {
+      this.logger.error(`Cannot get event '${eventIds}' in conversation '${conversationId}' without IDs`);
+      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
+    }
+
+    return this.storageService.db[this.EVENT_STORE_NAME]
+      .where('id')
+      .anyOf(eventIds)
+      .filter(record => record.conversation === conversationId)
+      .toArray()
+      .catch(error => {
+        const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
+          error.message
+        }`;
+        this.logger.error(logMessage, error);
+        throw error;
+      });
   }
 
   /**
@@ -168,6 +193,10 @@ z.event.EventService = class EventService {
    */
   replaceEvent(event) {
     return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
+  }
+
+  addEventUpdatedListener(callback) {
+    this.storageService.addUpdatedListener(this.EVENT_STORE_NAME, callback);
   }
 
   /**

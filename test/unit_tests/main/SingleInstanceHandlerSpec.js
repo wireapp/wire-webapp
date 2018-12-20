@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:main/SingleInstanceHandler
+// KARMA_SPECS=main/SingleInstanceHandler yarn test:app
 
 describe('z.main.SingleInstanceHandler', () => {
   describe('registerInstance', () => {

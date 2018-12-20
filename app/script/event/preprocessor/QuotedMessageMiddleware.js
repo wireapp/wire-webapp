@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 window.z.event.preprocessor = z.event.preprocessor || {};
@@ -84,7 +82,8 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
 
       replies.forEach(reply => {
         reply.data.quote.message_id = event.id;
-        this.eventService.replaceEvent(reply);
+        // we want to update the messages quoting the original message later, thus the timeout
+        setTimeout(() => this.eventService.replaceEvent(reply));
       });
 
       const decoratedData = Object.assign({}, event.data, {quote: originalEvent.data.quote});

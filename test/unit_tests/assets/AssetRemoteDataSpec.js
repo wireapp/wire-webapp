@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 describe('z.assets.AssetRemoteData', () => {
   describe('load unencrypted v1 asset', () => {
     let remote_data = null;

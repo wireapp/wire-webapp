@@ -135,6 +135,8 @@ z.string.uk.modalAccountNewDevicesHeadline = 'Ваш акаунт викорис
 z.string.uk.modalAccountNewDevicesFrom = 'Від:';
 z.string.uk.modalAccountNewDevicesMessage = 'Якщо ви не робили цього, видаліть пристрій і змініть пароль.';
 
+z.string.uk.modalAccountReadReceiptsChangedSecondary = 'Керування пристроями';
+
 z.string.uk.modalAccountRemoveDeviceAction = 'Видалити пристрій';
 z.string.uk.modalAccountRemoveDeviceHeadline = 'Видалити "{{device}}"';
 z.string.uk.modalAccountRemoveDeviceMessage = 'Для видалення пристрою необхідно ввести ваш пароль.';
@@ -550,6 +552,7 @@ z.string.uk.participantDevicesOutdatedClientMessage = '{{user}} використ
 z.string.uk.participantDevicesSelfAllDevices = 'Показати всі мої пристрої';
 z.string.uk.participantDevicesSelfFingerprint = 'Ідентифікатор пристрою';
 
+
 z.string.uk.userProfileButtonConnect = 'Додати до контактів';
 z.string.uk.userProfileButtonIgnore = 'Ігнорувати';
 z.string.uk.userProfileButtonUnblock = 'Розблокувати';
@@ -583,12 +586,13 @@ z.string.uk.preferencesAccountLogOut = 'Вийти';
 z.string.uk.preferencesAccountManageTeam = 'Керування командою';
 z.string.uk.preferencesAccountMarketingConsentCheckbox = 'Отримувати новини';
 z.string.uk.preferencesAccountMarketingConsentDetail = 'Отримувати новини та інформацію про оновлення Wire по електронній пошті.';
+z.string.uk.preferencesAccountPrivacy = 'Політики конфіденційності';
 z.string.uk.preferencesAccountResetPassword = 'Виконати скидання паролю';
 z.string.uk.preferencesAccountTeam = 'в {{name}}';
-z.string.uk.preferencesAccountUsernamePlaceholder = 'Ваше повне ім’я';
-z.string.uk.preferencesAccountUsernameHint = 'Мінімум 2 символи з множини a—z, 0—9, та _.';
 z.string.uk.preferencesAccountUsernameAvailable = 'Доступний';
 z.string.uk.preferencesAccountUsernameErrorTaken = 'Уже зарезервований';
+z.string.uk.preferencesAccountUsernameHint = 'Мінімум 2 символи з множини a—z, 0—9, та _.';
+z.string.uk.preferencesAccountUsernamePlaceholder = 'Ваше повне ім’я';
 
 z.string.uk.preferencesAVCamera = 'Камера';
 z.string.uk.preferencesAVMicrophone = 'Мікрофон';
@@ -626,7 +630,7 @@ z.string.uk.preferencesOptionsContactsMacos = 'Імпорт з Контакті�
 z.string.uk.preferencesOptionsContactsDetail = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
 z.string.uk.preferencesOptionsPopular = 'У відповідь на численні прохання';
 z.string.uk.preferencesOptionsEmojiReplaceCheckbox = 'Замінювати текстові смайлики іконками';
-z.string.uk.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
+z.string.uk.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.uk.preferencesOptionsPreviewsSendCheckbox = 'Генерувати попередній перегляд для надісланих лінків';
 z.string.uk.preferencesOptionsPreviewsSendDetail = 'Дана опція не впливає на попередній перегляд лінків від інших людей.';
 z.string.uk.preferencesOptionsNotifications = 'Сповіщення';

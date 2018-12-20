@@ -19,8 +19,6 @@
 
 //@ts-check
 
-'use strict';
-
 window.z = window.z || {};
 window.z.main = z.main || {};
 

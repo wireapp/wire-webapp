@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -54,7 +52,7 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
 
         case z.string.initDecryption:
         case z.string.initEvents: {
-          if (!window.wire.env.FEATURE.SHOW_LOADING_INFORMATION) {
+          if (!z.config.FEATURE.SHOW_LOADING_INFORMATION) {
             updatedLoadingMessage = z.l10n.text(messageLocator);
             break;
           }

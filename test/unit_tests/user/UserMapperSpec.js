@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:user/UserMapper
+// KARMA_SPECS=user/UserMapper yarn test:app
 
 describe('User Mapper', () => {
   const mapper = new z.user.UserMapper(new z.time.ServerTimeRepository());

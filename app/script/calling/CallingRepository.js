@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import adapter from 'webrtc-adapter';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -1663,11 +1663,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _enableDebugging() {
-    if (window.adapter) {
-      window.adapter.disableLog = false;
-    } else {
-      this.callLogger.warn('WebRTC Adapter not found while trying to enable logging');
-    }
+    adapter.disableLog = false;
   }
 
   /**

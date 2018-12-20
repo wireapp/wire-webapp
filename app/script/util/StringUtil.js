@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import getSlug from 'speakingurl';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -60,7 +60,7 @@ z.util.StringUtil = {
 
   computeTransliteration: (string, excludedChars = {}) => {
     const options = {custom: excludedChars, uric: true};
-    return window.getSlug(string, options);
+    return getSlug(string, options);
   },
 
   cutLastChars: (string, length) => string.substring(0, string.length - length),

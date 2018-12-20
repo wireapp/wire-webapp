@@ -21,11 +21,16 @@ const commonConfig = require('./webpack.config.common');
 const path = require('path');
 const webpack = require('webpack');
 
-const srcScript = 'app/script/auth/';
+const srcScript = 'app/script/';
 
 module.exports = Object.assign(commonConfig, {
   entry: Object.assign(commonConfig.entry, {
-    script: ['webpack-hot-middleware/client', 'react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.tsx')],
+    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/app.js')],
+    auth: [
+      'webpack-hot-middleware/client',
+      'react-hot-loader/patch',
+      path.resolve(__dirname, srcScript, 'auth', 'main.tsx'),
+    ],
   }),
   mode: 'development',
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],

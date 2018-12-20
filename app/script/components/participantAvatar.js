@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import viewportObserver from '../ui/viewportObserver';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -185,14 +185,14 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
+    viewportObserver.addElement(componentInfo.element, _onInViewport);
 
     this.pictureSubscription = this.participant().mediumPictureResource.subscribe(_loadAvatarPictureIfVisible);
     this.participantSubscription = this.participant.subscribe(_loadAvatarPictureIfVisible);
   }
 
   dispose() {
-    z.ui.ViewportObserver.removeElement(this.element[0]);
+    viewportObserver.removeElement(this.element[0]);
     this.participantSubscription.dispose();
     this.pictureSubscription.dispose();
   }

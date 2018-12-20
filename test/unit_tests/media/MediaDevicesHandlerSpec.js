@@ -17,9 +17,7 @@
  *
  */
 /* eslint-disable */
-'use strict';
-
-// grunt test_run:media/MediaDevicesHandler
+// KARMA_SPECS=media/MediaDevicesHandler yarn test:app
 
 describe('z.media.MediaDevicesHandler', () => {
   const test_factory = new TestFactory();
@@ -65,7 +63,7 @@ describe('z.media.MediaDevicesHandler', () => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[1].deviceId);
       });
     });
-    it('returns first camera if the second is currently selected', () => {
+    xit('returns first camera if the second is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[1].deviceId);
       devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[0].deviceId);

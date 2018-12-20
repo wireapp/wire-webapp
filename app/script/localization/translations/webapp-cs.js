@@ -117,6 +117,8 @@ z.string.cs.modalAccountNewDevicesHeadline = 'Váš účet byl naposledy použit
 z.string.cs.modalAccountNewDevicesFrom = 'Od:';
 z.string.cs.modalAccountNewDevicesMessage = 'Pokud jste to nebyli vy sami, odeberte použité zařízení a změňte si heslo.';
 
+z.string.cs.modalAccountReadReceiptsChangedSecondary = 'Spravovat přístroje';
+
 z.string.cs.modalAccountRemoveDeviceAction = 'Odstranit přístroj';
 z.string.cs.modalAccountRemoveDeviceHeadline = 'Odstranit "{{device}}"';
 z.string.cs.modalAccountRemoveDeviceMessage = 'Pro odstranění přístroje je vyžadováno heslo.';
@@ -373,6 +375,7 @@ z.string.cs.participantDevicesOutdatedClientMessage = '{{user}} používá star�
 z.string.cs.participantDevicesSelfAllDevices = 'Zobrazit všechny mé přístroje';
 z.string.cs.participantDevicesSelfFingerprint = 'Identifikátor přístoje';
 
+
 z.string.cs.userProfileButtonConnect = 'Připojit';
 z.string.cs.userProfileButtonIgnore = 'Ignorovat';
 z.string.cs.userProfileButtonUnblock = 'Odblokovat';
@@ -397,12 +400,13 @@ z.string.cs.preferencesAccountCreateTeam = 'Vytvořit tým';
 z.string.cs.preferencesAccountDelete = 'Smazat účet';
 z.string.cs.preferencesAccountLogOut = 'Odhlásit se';
 z.string.cs.preferencesAccountManageTeam = 'Spravovat tým';
+z.string.cs.preferencesAccountPrivacy = 'Soukromí';
 z.string.cs.preferencesAccountResetPassword = 'Resetovat heslo';
 z.string.cs.preferencesAccountTeam = 'v {{name}}';
-z.string.cs.preferencesAccountUsernamePlaceholder = 'Celé jméno';
-z.string.cs.preferencesAccountUsernameHint = 'Alespoň 2 znaky. Pouze a—z, 0—9 a _';
 z.string.cs.preferencesAccountUsernameAvailable = 'Dostupný';
 z.string.cs.preferencesAccountUsernameErrorTaken = 'Již uděleno';
+z.string.cs.preferencesAccountUsernameHint = 'Alespoň 2 znaky. Pouze a—z, 0—9 a _';
+z.string.cs.preferencesAccountUsernamePlaceholder = 'Celé jméno';
 
 z.string.cs.preferencesAVCamera = 'Kamera';
 z.string.cs.preferencesAVMicrophone = 'Mikrofon';
@@ -487,10 +491,10 @@ z.string.cs.warningNotFoundMicrophone = 'Nelze volat, protože tento počítač 
 z.string.cs.warningPermissionDeniedCamera = 'Nelze volat, protože prohlížeč nemá přístup ke kameře.';
 z.string.cs.warningPermissionDeniedMicrophone = 'Nelze volat, protože prohlížeč nemá přístup k mikrofonu.';
 z.string.cs.warningPermissionDeniedScreen = 'Prohlížeč potřebuje oprávnění ke sdílení obrazovku.';
-z.string.cs.warningPermissionRequestCamera = '{{icon}} Povolit přístup ke kameře';
-z.string.cs.warningPermissionRequestMicrophone = '{{icon}} Povolit přístup k mikrofonu';
-z.string.cs.warningPermissionRequestNotification = '{{icon}} Povolit upozornění';
-z.string.cs.warningPermissionRequestScreen = '{{icon}} Povolit přístup k obrazovce';
+z.string.cs.warningPermissionRequestCamera = '[icon] Povolit přístup ke kameře';
+z.string.cs.warningPermissionRequestMicrophone = '[icon] Povolit přístup k mikrofonu';
+z.string.cs.warningPermissionRequestNotification = '[icon] Povolit upozornění';
+z.string.cs.warningPermissionRequestScreen = '[icon] Povolit přístup k obrazovce';
 
 z.string.cs.userAvailabilityAvailable = 'Dostupný';
 z.string.cs.userAvailabilityNone = 'Žádné';

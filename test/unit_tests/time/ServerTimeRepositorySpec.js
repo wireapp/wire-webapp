@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:time/ServerTimeRepository
-
-'use strict';
+// KARMA_SPECS=time/ServerTimeRepository yarn test:app
 
 describe('z.time.ServerTimeRepository', () => {
   let serverTimeRepository;

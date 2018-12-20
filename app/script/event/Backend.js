@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -35,6 +33,7 @@ z.event.Backend = {
     MEMBER_UPDATE: 'conversation.member-update',
     MESSAGE_TIMER_UPDATE: 'conversation.message-timer-update',
     OTR_MESSAGE_ADD: 'conversation.otr-message-add',
+    RECEIPT_MODE_UPDATE: 'conversation.receipt-mode-update',
     RENAME: 'conversation.rename',
     TYPING: 'conversation.typing',
   },
@@ -54,6 +53,10 @@ z.event.Backend = {
     CLIENT_REMOVE: 'user.client-remove',
     CONNECTION: 'user.connection',
     DELETE: 'user.delete',
+    PROPERTIES_DELETE: 'user.properties-delete',
+    PROPERTIES_SET: 'user.properties-set',
     UPDATE: 'user.update',
   },
 };
+
+export default z.event.Backend;

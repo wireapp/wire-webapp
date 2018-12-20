@@ -17,13 +17,13 @@
  *
  */
 
-'use strict';
+import ko from 'knockout';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 // Please note: The own user has a "locale"
-z.entity.User = class User {
+class User {
   static get ACCENT_COLOR() {
     return {
       BLUE: '#2391d3',
@@ -303,4 +303,7 @@ z.entity.User = class User {
     this.expirationIsUrgent(remainingMinutes < 120);
     this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
-};
+}
+
+export default User;
+z.entity.User = User;

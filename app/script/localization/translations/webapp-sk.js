@@ -118,6 +118,8 @@ z.string.sk.modalAccountNewDevicesHeadline = 'Váš účet bol použitý:';
 z.string.sk.modalAccountNewDevicesFrom = 'Od:';
 z.string.sk.modalAccountNewDevicesMessage = 'Ak ste to neboli Vy, odpojte zariadenie a zmeňte si heslo.';
 
+z.string.sk.modalAccountReadReceiptsChangedSecondary = 'Správa zariadení';
+
 z.string.sk.modalAccountRemoveDeviceAction = 'Odstrániť zariadenie';
 z.string.sk.modalAccountRemoveDeviceHeadline = 'Odstrániť "{{device}}"';
 z.string.sk.modalAccountRemoveDeviceMessage = 'Na odstránenie zariadenia je potrebné Vaše heslo.';
@@ -373,6 +375,7 @@ z.string.sk.participantDevicesOutdatedClientMessage = '{{user}} používa starš
 z.string.sk.participantDevicesSelfAllDevices = 'Zobraziť všetky moje zariadenia';
 z.string.sk.participantDevicesSelfFingerprint = 'Identifikátor zaradenia';
 
+
 z.string.sk.userProfileButtonConnect = 'Pripojiť';
 z.string.sk.userProfileButtonIgnore = 'Ignorovať';
 z.string.sk.userProfileButtonUnblock = 'Odblokovať';
@@ -398,12 +401,13 @@ z.string.sk.preferencesAccountCreateTeam = 'Vytvoriť tím';
 z.string.sk.preferencesAccountDelete = 'Vymazať účet';
 z.string.sk.preferencesAccountLogOut = 'Odhlásenie';
 z.string.sk.preferencesAccountManageTeam = 'Správa tímu';
+z.string.sk.preferencesAccountPrivacy = 'Súkromie';
 z.string.sk.preferencesAccountResetPassword = 'Reset hesla';
 z.string.sk.preferencesAccountTeam = 'v {{name}}';
-z.string.sk.preferencesAccountUsernamePlaceholder = 'Vaše celé meno';
-z.string.sk.preferencesAccountUsernameHint = 'Aspoň 2 znaky. A výhradne a-z, 0-9.';
 z.string.sk.preferencesAccountUsernameAvailable = 'Dostupné';
 z.string.sk.preferencesAccountUsernameErrorTaken = 'Už obsadené';
+z.string.sk.preferencesAccountUsernameHint = 'Aspoň 2 znaky. A výhradne a-z, 0-9.';
+z.string.sk.preferencesAccountUsernamePlaceholder = 'Vaše celé meno';
 
 z.string.sk.preferencesAVCamera = 'Kamera';
 z.string.sk.preferencesAVMicrophone = 'Mikrofón';
@@ -488,9 +492,9 @@ z.string.sk.warningNotFoundMicrophone = 'Nemôžete volať, pretože Váš poč�
 z.string.sk.warningPermissionDeniedCamera = 'Nemôžete volať, pretože Váš prehliadač nemá prístup ku kamere.';
 z.string.sk.warningPermissionDeniedMicrophone = 'Nemôžete volať, pretože Váš prehliadač nemá prístup k mikrofónu.';
 z.string.sk.warningPermissionDeniedScreen = 'Váš prehliadač potrebuje povolenie pre zdieľanie obrazovky.';
-z.string.sk.warningPermissionRequestCamera = '{{icon}} Povoliť prístup ku kamere';
-z.string.sk.warningPermissionRequestMicrophone = '{{icon}} Povoliť prístup k mikrofónu';
-z.string.sk.warningPermissionRequestNotification = '{{icon}} Povoliť oznámenia';
+z.string.sk.warningPermissionRequestCamera = '[icon] Povoliť prístup ku kamere';
+z.string.sk.warningPermissionRequestMicrophone = '[icon] Povoliť prístup k mikrofónu';
+z.string.sk.warningPermissionRequestNotification = '[icon] Povoliť oznámenia';
 z.string.sk.warningPermissionRequestScreen = '{{icon}} Povoliť prístup k obrazovke';
 
 z.string.sk.userAvailabilityAvailable = 'Dostupné';

@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/EmojiUtil
-
-'use strict';
+// KARMA_SPECS=util/EmojiUtil yarn test:app
 
 describe('z.util.emoji', () => {
   describe('includes_only_emojies', () => {

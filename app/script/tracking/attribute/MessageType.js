@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 window.z.tracking.attribute = z.tracking.attribute || {};

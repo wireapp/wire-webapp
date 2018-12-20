@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
@@ -27,18 +25,32 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3 to initialize.
    * @param {Uint8Array} otrKey - Encryption key
    * @param {Uint8Array} sha256 - Checksum
+   * @param {string} identifier - The asset's idenfifier
+   * @param {Object} urlData - Data needed to generate the url to fetch the asset
    */
-  constructor(otrKey, sha256) {
+  constructor(otrKey, sha256, identifier, urlData) {
     this.otrKey = otrKey;
     this.sha256 = sha256;
     this.downloadProgress = ko.observable();
     this.cancelDownload = undefined;
-    this.generateUrl = undefined;
-    this.identifier = undefined;
+    this.urlData = urlData;
+    this.identifier = identifier;
 
     this.loadPromise = undefined;
 
     this.logger = new z.util.Logger('z.assets.AssetRemoteData', z.config.LOGGER.OPTIONS);
+  }
+
+  generateUrl() {
+    const {version, assetId, conversationId, forceCaching, assetKey, assetToken} = this.urlData;
+    switch (version) {
+      case 3:
+        return wire.app.service.asset.generateAssetUrlV3(assetKey, assetToken, forceCaching);
+      case 2:
+        return wire.app.service.asset.generateAssetUrlV2(assetId, conversationId, forceCaching);
+      case 1:
+        return wire.app.service.asset.generateAssetUrl(assetId, conversationId, forceCaching);
+    }
   }
 
   /**
@@ -52,10 +64,12 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @returns {z.assets.AssetRemoteData} V3 asset remote data
    */
   static v3(assetKey, otrKey, sha256, assetToken, forceCaching = false) {
-    const remoteData = new z.assets.AssetRemoteData(otrKey, sha256);
-    remoteData.generateUrl = () => wire.app.service.asset.generateAssetUrlV3(assetKey, assetToken, forceCaching);
-    remoteData.identifier = `${assetKey}`;
-    return remoteData;
+    return new z.assets.AssetRemoteData(otrKey, sha256, assetKey, {
+      assetKey,
+      assetToken,
+      forceCaching,
+      version: 3,
+    });
   }
 
   /**
@@ -69,10 +83,12 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @returns {z.assets.AssetRemoteData} V2 asset remote data
    */
   static v2(conversationId, assetId, otrKey, sha256, forceCaching = false) {
-    const remoteData = new z.assets.AssetRemoteData(otrKey, sha256);
-    remoteData.generateUrl = () => wire.app.service.asset.generateAssetUrlV2(assetId, conversationId, forceCaching);
-    remoteData.identifier = `${conversationId}${assetId}`;
-    return remoteData;
+    return new z.assets.AssetRemoteData(otrKey, sha256, `${conversationId}${assetId}`, {
+      assetId,
+      conversationId,
+      forceCaching,
+      version: 2,
+    });
   }
 
   /**
@@ -85,10 +101,12 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @returns {z.assets.AssetRemoteData} V1 asset remote data
    */
   static v1(conversationId, assetId, forceCaching = false) {
-    const remoteData = new z.assets.AssetRemoteData();
-    remoteData.generateUrl = () => wire.app.service.asset.generateAssetUrl(assetId, conversationId, forceCaching);
-    remoteData.identifier = `${conversationId}${assetId}`;
-    return remoteData;
+    return new z.assets.AssetRemoteData(undefined, undefined, `${conversationId}${assetId}`, {
+      assetId,
+      conversationId,
+      forceCaching,
+      version: 1,
+    });
   }
 
   /**
@@ -154,7 +172,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       .catch(error => {
         const isValidationUtilError = error instanceof z.util.ValidationUtilError;
         const message = isValidationUtilError
-          ? `Failed to validate an asset URL (_load_buffer): ${error.message}`
+          ? `Failed to validate an asset URL (_loadBuffer): ${error.message}`
           : `Failed to load asset: ${error.message || error}`;
 
         this.logger.error(message);

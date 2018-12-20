@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:cache/CacheRepository
-
-'use strict';
+// KARMA_SPECS=cache/CacheRepository yarn test:app
 
 describe('z.cache.CacheRepository', () => {
   const cache_repository = new z.cache.CacheRepository();

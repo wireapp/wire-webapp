@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:links/LinkPreviewHelpers
+// KARMA_SPECS=links/LinkPreviewHelpers yarn test:app
 
 describe('containsOnlyLink', () => {
   it('should return true if text only contains a bare url', () => {

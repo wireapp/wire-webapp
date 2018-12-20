@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 const processors = [
   require('autoprefixer')({
     browsers: ['Chrome >= 51', 'Edge >= 14', 'Firefox >= 52', 'Opera >= 40'],
@@ -27,10 +25,10 @@ const processors = [
 ];
 
 module.exports = {
-  deploy: {
-    options: {
-      processors,
-    },
-    src: '<%= dir.deploy %>/**/*.css',
+  dist: {
+    src: '<%= dir.dist.static %>/**/*.css',
+  },
+  options: {
+    processors,
   },
 };

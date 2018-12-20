@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:service/BackendClient
-
-'use strict';
+// KARMA_SPECS=service/BackendClient yarn test:app
 
 describe('z.service.BackendClient', () => {
   let backend_client = null;
@@ -214,7 +212,6 @@ describe('z.service.BackendClient', () => {
         expect(config.callback).toBe(original_config.callback);
         expect(config.contentType).toBe('application/json; charset=utf-8');
         expect(config.headers['X-TEST-HEADER']).toBe(original_config.headers['X-TEST-HEADER']);
-        expect(config.headers['Content-Encoding']).toBe('gzip');
         expect(config.data).toBeDefined();
         expect(config.processData).toBe(original_config.processData);
         expect(config.timeout).toBe(original_config.timeout);

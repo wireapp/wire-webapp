@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.storage = z.storage || {};
 
@@ -37,7 +35,7 @@ z.storage.StorageRepository = class StorageRepository {
 
   /**
    * Construct an new Storage Repository.
-   * @param {z.storage.StorageService} storageService - Service for all storage related interactions
+   * @param {StorageService} storageService - Service for all storage related interactions
    */
   constructor(storageService) {
     this.storageService = storageService;

@@ -17,19 +17,24 @@
  *
  */
 
-'use strict';
+import moment from 'moment';
+import ko from 'knockout';
+
+import Message from './Message';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
+class ContentMessage extends Message {
   constructor(id) {
     super(id);
 
     this.assets = ko.observableArray([]);
     this.super_type = z.message.SuperType.CONTENT;
     this.replacing_message_id = null;
-    this.edited_timestamp = null;
+    this.edited_timestamp = ko.observable(null);
+
+    this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
 
     this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
@@ -40,9 +45,10 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
 
     this.quote = ko.observable();
+    this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
-      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
+      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp()).format('HH:mm'));
     };
 
     this.is_liked_provisional = ko.observable();
@@ -94,16 +100,22 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
   }
 
   update_reactions({data: event_data, from}) {
-    const reactions = this.reactions();
+    const reaction = event_data && event_data.reaction;
+    const hasUser = this.reactions()[from];
+    const shouldAdd = reaction && !hasUser;
+    const shouldDelete = !reaction && hasUser;
 
-    if (event_data.reaction) {
-      reactions[from] = event_data.reaction;
-    } else {
-      delete reactions[from];
+    if (shouldAdd) {
+      this.reactions(Object.assign({}, this.reactions(), {[from]: reaction}));
     }
 
-    if (reactions !== this.reactions) {
+    if (shouldDelete) {
+      const reactions = Object.assign({}, this.reactions());
+      delete reactions[from];
       this.reactions(reactions);
+    }
+
+    if (shouldAdd || shouldDelete) {
       this.version += 1;
       return {reactions: this.reactions(), version: this.version};
     }
@@ -136,14 +148,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
   }
 
   /**
-   * Check whether the message was edited.
-   * @returns {boolean} True, if message has been edited.
-   */
-  was_edited() {
-    return this.replacing_message_id != null;
-  }
-
-  /**
    * Download message content.
    * @returns {undefined} No return value
    */
@@ -173,4 +177,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     return file_name;
   }
-};
+}
+
+export default ContentMessage;
+z.entity.ContentMessage = ContentMessage;

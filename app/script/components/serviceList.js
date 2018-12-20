@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -35,7 +33,8 @@ z.components.ServiceList = class ServiceList {
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
     this.onClick = params.click;
     this.services = params.services;
-    this.altStyle = params.altStyle;
+    this.noUnderline = params.noUnderline;
+    this.arrow = params.arrow;
 
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
@@ -51,7 +50,7 @@ z.components.ServiceList = class ServiceList {
 ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: services">
-      <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
+      <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'no-underline': $parent.noUnderline, 'show-arrow': $parent.arrow}"></participant-item>
     </div>
     <!-- ko if: isSearching() && !services().length -->
       <div class="no-results" data-bind="l10n_text: z.string.searchListNoMatches"></div>

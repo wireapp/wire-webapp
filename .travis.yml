@@ -36,18 +36,17 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 after_success:
-  - echo -e "$TRAVIS_COMMIT" > ./aws/commit
-  - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn deploy-travis; fi
-  - if [ "$TRAVIS_BRANCH" == "edge" ]; then yarn deploy-travis; fi
-  - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn deploy-travis; fi
-  - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn deploy-travis || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
+  - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn build:prod; fi
+  - if [ "$TRAVIS_BRANCH" == "edge" ]; then yarn build:prod; fi
+  - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn build:prod; fi
+  - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn build:prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
 
 # https://github.com/travis-ci/dpl#elastic-beanstalk
 deploy:
   # https://wire-webapp-edge.zinfra.io/
   - provider: elasticbeanstalk
     skip_cleanup: true
-    zip-file: 'aws/s3/ebs.zip'
+    zip-file: 'server/dist/s3/ebs.zip'
     access-key-id:
       secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
     secret-access-key:
@@ -63,7 +62,7 @@ deploy:
   # https://wire-webapp-dev.zinfra.io/
   - provider: elasticbeanstalk
     skip_cleanup: true
-    zip-file: 'aws/s3/ebs.zip'
+    zip-file: 'server/dist/s3/ebs.zip'
     access-key-id:
       secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
     secret-access-key:
@@ -79,7 +78,7 @@ deploy:
   # https://wire-webapp-rc.zinfra.io/
   - provider: elasticbeanstalk
     skip_cleanup: true
-    zip-file: 'aws/s3/ebs.zip'
+    zip-file: 'server/dist/s3/ebs.zip'
     access-key-id:
       secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
     secret-access-key:
@@ -95,7 +94,7 @@ deploy:
   # https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
     skip_cleanup: true
-    zip-file: 'aws/s3/ebs.zip'
+    zip-file: 'server/dist/s3/ebs.zip'
     access-key-id:
       secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
     secret-access-key:
@@ -111,7 +110,7 @@ deploy:
   # https://wire-webapp-prod.wire.com/
   - provider: elasticbeanstalk
     skip_cleanup: true
-    zip-file: 'aws/s3/ebs.zip'
+    zip-file: 'server/dist/s3/ebs.zip'
     access-key-id:
       secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
     secret-access-key:

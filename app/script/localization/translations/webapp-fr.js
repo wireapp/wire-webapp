@@ -135,6 +135,11 @@ z.string.fr.modalAccountNewDevicesHeadline = 'Votre compte a été utilisé le :
 z.string.fr.modalAccountNewDevicesFrom = 'Depuis :';
 z.string.fr.modalAccountNewDevicesMessage = 'Si ce n’était pas vous, supprimez l’appareil et changez votre mot de passe.';
 
+z.string.fr.modalAccountReadReceiptsChangedSecondary = 'Gérer les appareils';
+z.string.fr.modalAccountReadReceiptsChangedOnHeadline = 'Vous avez activé les accusés de lecture';
+z.string.fr.modalAccountReadReceiptsChangedOffHeadline = 'Vous avez désactivé les accusés de lecture';
+z.string.fr.modalAccountReadReceiptsChangedMessage = 'Vous pouvez changer cette option dans les paramètres de votre compte.';
+
 z.string.fr.modalAccountRemoveDeviceAction = 'Supprimer l’appareil';
 z.string.fr.modalAccountRemoveDeviceHeadline = 'Supprimer "{{device}}"';
 z.string.fr.modalAccountRemoveDeviceMessage = 'Votre mot de passe est nécessaire pour supprimer l’appareil.';
@@ -316,6 +321,7 @@ z.string.fr.conversationCreateWithMore = 'avec {{users}}, et [showmore]{{count}}
 z.string.fr.conversationCreateTeam = 'avec [showmore]tous les membres de l’équipe[/showmore]';
 z.string.fr.conversationCreateTeamGuest = 'avec [showmore]tous les membres de l’équipe et un invité[/showmore]';
 z.string.fr.conversationCreateTeamGuests = 'avec [showmore]tous les membres de l’équipe et {{count}} invités[/showmore]';
+z.string.fr.conversationCreateReceiptsEnabled = 'Les accusés de lecture son activés';
 z.string.fr.conversationMemberJoined = '[bold]{{name}}[/bold] a ajouté {{users}} à la conversation';
 z.string.fr.conversationMemberJoinedYou = '[bold]Vous[/bold] avez ajouté {{users}} à la conversation';
 z.string.fr.conversationMemberJoinedMore = '[bold]{{name}}[/bold] a ajouté {{users}}, et [showmore]{{count}} autres[/showmore] à la conversation';
@@ -328,6 +334,10 @@ z.string.fr.conversationMemberRemoved = '[bold]{{name}}[/bold] a exclu {{users}}
 z.string.fr.conversationMemberRemovedYou = '[bold]Vous[/bold] avez exclu {{users}}';
 z.string.fr.conversationTeamLeft = '[bold]{{name}}[/bold] a été retiré de l’équipe';
 z.string.fr.conversationMessageDelivered = 'Distribué';
+z.string.fr.conversationReceiptsOn = ' a activé les accusés de lecture pour tout le monde';
+z.string.fr.conversationReceiptsOnYou = ' avez activé les accusés de lecture pour tout le monde';
+z.string.fr.conversationReceiptsOff = ' a désactivé les accusés de lecture pour tout le monde';
+z.string.fr.conversationReceiptsOffYou = ' avez désactivé les accusés de lecture pour tout le monde';
 z.string.fr.conversationRename = ' a renommé la conversation';
 z.string.fr.conversationRenameYou = ' a renommé la conversation';
 z.string.fr.conversationUpdatedTimer = ' a défini les messages éphémère à {{time}}';
@@ -359,6 +369,7 @@ z.string.fr.conversationContextMenuDownload = 'Télécharger';
 z.string.fr.conversationContextMenuLike = 'J’aime';
 z.string.fr.conversationContextMenuReply = 'Répondre';
 z.string.fr.conversationContextMenuUnlike = 'Je n’aime plus';
+z.string.fr.conversationContextMenuDetails = 'Détails';
 z.string.fr.conversationDeleteTimestamp = 'Supprimé : {{date}}';
 z.string.fr.conversationEditTimestamp = 'Modifié : {{date}}';
 z.string.fr.conversationLikesCaption = '{{number}} personnes';
@@ -390,6 +401,9 @@ z.string.fr.guestRoomConversationBadgeGuestAndService = 'Des invités et des ser
 
 z.string.fr.guestRoomConversationHead = 'Des personnes étrangères à votre équipe peuvent rejoindre la conversation.';
 z.string.fr.guestRoomConversationButton = 'Inviter des personnes';
+
+z.string.fr.readReceiptsToogleName = 'Accusés de lecture';
+z.string.fr.readReceiptsToogleInfo = 'Quand cette option est activée, les participants peuvent voir quand leurs messages ont été lus dans cette conversation.';
 
 z.string.fr.collectionShowAll = 'Tout afficher ({{number}})';
 z.string.fr.collectionSectionLinks = 'Liens';
@@ -501,6 +515,10 @@ z.string.fr.conversationDetailsParticipantsUsersOne = 'Personne';
 z.string.fr.conversationDetailsParticipantsUsersMany = 'Personnes';
 z.string.fr.conversationDetailsPeople = 'Personnes';
 z.string.fr.conversationDetailsServices = 'Services';
+z.string.fr.conversationDetails1to1ReceiptsHeadEnabled = 'Vous avez activé les accusés de lecture';
+z.string.fr.conversationDetails1to1ReceiptsHeadDisabled = 'Vous avez désactivé les accusés de lecture';
+z.string.fr.conversationDetails1to1ReceiptsFirst = 'Si les deux participants ont activé les accusés de lecture, vous pouvez voir quand les messages sont lus.';
+z.string.fr.conversationDetails1to1ReceiptsSecond = 'Vous pouvez changer cette option dans les paramètres de votre compte.';
 
 z.string.fr.conversationParticipantsTitle = 'Personnes';
 z.string.fr.conversationParticipantsSearchPlaceholder = 'Rechercher par nom';
@@ -550,6 +568,18 @@ z.string.fr.participantDevicesOutdatedClientMessage = '{{user}} utilise une anci
 z.string.fr.participantDevicesSelfAllDevices = 'Afficher tous mes appareils';
 z.string.fr.participantDevicesSelfFingerprint = 'Empreinte de l’appareil';
 
+z.string.fr.messageDetailsTitle = 'Détails';
+z.string.fr.messageDetailsTitleLikes = 'Aimé{{count}}';
+z.string.fr.messageDetailsTitleReceipts = 'Lu{{count}}';
+z.string.fr.messageDetailsSent = 'Envoyé : {{sent}}';
+z.string.fr.messageDetailsEdited = 'Édité : {{edited}}';
+z.string.fr.messageDetailsNoLikes = 'Personne n’a encore aimé ce message.';
+z.string.fr.messageDetailsReceiptsOff = 'Les accusés de lecture n’étaient pas activés quand ce message a été envoyé.';
+z.string.fr.messageDetailsNoReceipts = 'Personne n’a encore lu ce message.';
+
+z.string.fr.receiptToggleLabel = 'Accusés de lecture';
+z.string.fr.receiptToggleInfo = 'Quand cette option est activée, les participants peuvent voir quand leurs messages ont été lus dans cette conversation.';
+
 z.string.fr.userProfileButtonConnect = 'Se connecter';
 z.string.fr.userProfileButtonIgnore = 'Ignorer';
 z.string.fr.userProfileButtonUnblock = 'Débloquer';
@@ -583,12 +613,15 @@ z.string.fr.preferencesAccountLogOut = 'Se déconnecter';
 z.string.fr.preferencesAccountManageTeam = 'Gérer l’équipe';
 z.string.fr.preferencesAccountMarketingConsentCheckbox = 'Recevoir notre newsletter';
 z.string.fr.preferencesAccountMarketingConsentDetail = 'Recevoir des e-mails sur les nouveautés de Wire.';
+z.string.fr.preferencesAccountPrivacy = 'Politique de confidentialité';
+z.string.fr.preferencesAccountReadReceiptsCheckbox = 'Accusés de lecture';
+z.string.fr.preferencesAccountReadReceiptsDetail = 'Si cette option est désactivée, vous ne pourrez pas voir les accusés de lecture d’autres destinataires.\nCette option ne s’applique pas aux conversations de groupe.';
 z.string.fr.preferencesAccountResetPassword = 'Réinitialiser le mot de passe';
 z.string.fr.preferencesAccountTeam = 'dans {{name}}';
-z.string.fr.preferencesAccountUsernamePlaceholder = 'Votre nom complet';
-z.string.fr.preferencesAccountUsernameHint = 'Au moins 2 caractères. Uniquement a–z, 0–9 et _.';
 z.string.fr.preferencesAccountUsernameAvailable = 'Disponible';
 z.string.fr.preferencesAccountUsernameErrorTaken = 'Déjà pris';
+z.string.fr.preferencesAccountUsernameHint = 'Au moins 2 caractères. Uniquement a–z, 0–9 et _.';
+z.string.fr.preferencesAccountUsernamePlaceholder = 'Votre nom complet';
 
 z.string.fr.preferencesAVCamera = 'Webcam';
 z.string.fr.preferencesAVMicrophone = 'Microphone';
@@ -626,7 +659,7 @@ z.string.fr.preferencesOptionsContactsMacos = 'Importer depuis Contacts';
 z.string.fr.preferencesOptionsContactsDetail = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
 z.string.fr.preferencesOptionsPopular = 'À la demande générale';
 z.string.fr.preferencesOptionsEmojiReplaceCheckbox = 'Remplace les émoticônes typographiques par des emojis';
-z.string.fr.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
+z.string.fr.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.fr.preferencesOptionsPreviewsSendCheckbox = 'Crée des aperçus pour les liens que vous envoyez';
 z.string.fr.preferencesOptionsPreviewsSendDetail = 'Les aperçus pourront toujours s’afficher pour les liens d’autres personnes.';
 z.string.fr.preferencesOptionsNotifications = 'Notifications';
@@ -708,7 +741,7 @@ z.string.fr.temporaryGuestTimeRemaining = ' restants dans cet espace pour invit�
 z.string.fr.temporaryGuestJoinMessage = 'Cette conversation vous sera accessible pendant 24 heures.';
 z.string.fr.temporaryGuestJoinDescription = 'Si vous fermez ou rafraîchissez cette page, votre accès sera perdu.';
 
-z.string.fr.temporaryGuestLeaveMessage = ' ne font plus partie de cette conversation.';
+z.string.fr.temporaryGuestLeaveMessage = 'Vous ne faites plus partie de cette conversation.';
 z.string.fr.temporaryGuestLeaveDescription = 'Si vous fermez ou rafraîchissez cette page, votre n’aurez plus accès à l’historique de cette conversation.';
 
 z.string.fr.urlSupportRoot = '/';
@@ -730,10 +763,10 @@ z.string.fr.warningNotFoundMicrophone = 'Vous ne pouvez pas appeler car votre or
 z.string.fr.warningPermissionDeniedCamera = 'Vous ne pouvez pas appeler car votre navigateur n’a pas accès à votre webcam.';
 z.string.fr.warningPermissionDeniedMicrophone = 'Vous ne pouvez pas appeler car votre navigateur n’a pas accès à votre micro.';
 z.string.fr.warningPermissionDeniedScreen = 'Votre navigateur a besoin de votre permission pour partager votre écran.';
-z.string.fr.warningPermissionRequestCamera = '{{icon}} Autoriser l’accès à la webcam';
-z.string.fr.warningPermissionRequestMicrophone = '{{icon}} Autoriser l’accès au micro';
-z.string.fr.warningPermissionRequestNotification = '{{icon}} Autoriser les notifications';
-z.string.fr.warningPermissionRequestScreen = '{{icon}} Autoriser l’accès à l’écran';
+z.string.fr.warningPermissionRequestCamera = '[icon] Autoriser l’accès à la webcam';
+z.string.fr.warningPermissionRequestMicrophone = '[icon] Autoriser l’accès au micro';
+z.string.fr.warningPermissionRequestNotification = '[icon] Autoriser les notifications';
+z.string.fr.warningPermissionRequestScreen = '[icon] Autoriser l’accès à l’écran';
 
 z.string.fr.userAvailabilityAvailable = 'Disponible';
 z.string.fr.userAvailabilityAway = 'Absent(e)';

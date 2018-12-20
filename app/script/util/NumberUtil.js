@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.util.NumberUtil = {
   capToByte: value => {
     const MAX_VALUE = 255;

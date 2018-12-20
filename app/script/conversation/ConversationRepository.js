@@ -17,7 +17,10 @@
  *
  */
 
-'use strict';
+import poster from 'poster-image';
+
+import EventMapper from './EventMapper';
+import ConversationMapper from './ConversationMapper';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -57,6 +60,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
+   * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
    */
   constructor(
     conversation_service,
@@ -69,7 +73,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     link_repository,
     serverTimeRepository,
     team_repository,
-    user_repository
+    user_repository,
+    propertyRepository
   ) {
     this.eventRepository = eventRepository;
     this.eventService = eventRepository.eventService;
@@ -83,10 +88,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.serverTimeRepository = serverTimeRepository;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
+    this.propertyRepository = propertyRepository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
-    this.conversationMapper = new z.conversation.ConversationMapper();
-    this.event_mapper = new z.conversation.EventMapper();
+    this.conversationMapper = new ConversationMapper();
+    this.event_mapper = new EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
       this.eventRepository,
@@ -223,6 +229,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
+
+    this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
+  }
+
+  _updateLocalMessageEntity(updatedEvent, oldEvent) {
+    this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
+      this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent).then(messageEntity => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+      });
+    });
   }
 
   /**
@@ -246,16 +262,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Create a group conversation.
    * @note Do not include the requestor among the users
    *
-   * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
+   * @param {Array<z.entity.User>} userEntities - Users (excluding the creator) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
    * @param {string} [accessState] - State for conversation access
+   * @param {Object} [options] - Additional conversation creation options (like "receipt_mode")
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName, accessState) {
+  createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
     const payload = {
       name: groupName,
       users: userIds,
+      ...options,
     };
 
     if (this.team().id) {
@@ -1355,6 +1373,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  updateConversationReceiptMode(conversationEntity, receiptMode) {
+    return this.conversation_service
+      .updateConversationReceiptMode(conversationEntity.id, receiptMode)
+      .then(response => {
+        if (response) {
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return response;
+        }
+      });
+  }
+
   reset_session(user_id, client_id, conversation_id) {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
@@ -1637,6 +1666,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
+  /**
+   * Send a read receipt for the last message in a conversation.
+   *
+   * @param {Conversation} conversationEntity - Conversation to update
+   * @param {Message} messageEntity - Message to send a read receipt for
+   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
+   * @returns {undefined} No return value
+   */
+  sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = []) {
+    this._sendConfirmationStatus(
+      conversationEntity,
+      messageEntity,
+      z.proto.Confirmation.Type.READ,
+      moreMessageEntities
+    );
+  }
+
   //##############################################################################
   // Send encrypted events
   //##############################################################################
@@ -1648,7 +1694,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => {
         const assetEntity = messageEntity.get_first_asset();
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-        const options = {retention};
+        const options = {
+          expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+          retention,
+        };
 
         assetEntity.uploaded_on_this_client(true);
         return this.asset_service.uploadAsset(file, options, xhr => {
@@ -1717,6 +1766,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name);
         }
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
+        protoAsset.set(
+          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+          this.expectReadReceipt(conversation_et)
+        );
 
         return protoAsset;
       })
@@ -1756,12 +1809,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-        const options = {retention};
+        const options = {
+          expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+          retention,
+        };
 
         return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
           const protoAsset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
+          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, options.expectsReadConfirmation);
 
           const genericMessage = new z.proto.GenericMessage(messageId);
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
@@ -1788,6 +1845,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const protoReason = wasCancelled ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
     const protoAsset = new z.proto.Asset();
     protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED, protoReason);
+    protoAsset.set(
+      z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+      this.expectReadReceipt(conversation_et)
+    );
 
     const generic_message = new z.proto.GenericMessage(messageId);
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
@@ -1800,29 +1861,40 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that content message was received in
    * @param {Message} messageEntity - Message for which to acknowledge receipt
+   * @param {z.proto.Confirmation.Type} type - The type of confirmation to send
+   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
    * @returns {undefined} No return value
    */
-  sendConfirmationStatus(conversationEntity, messageEntity) {
-    const otherUserIn1To1 = !messageEntity.user().is_me && conversationEntity.is1to1();
-    const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
-    const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
+  _sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
     const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
-    const sendConfirmation = otherUserIn1To1 && withinThreshold && typeToConfirm;
-    if (sendConfirmation) {
-      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      const protoConfirmation = new z.proto.Confirmation(z.proto.Confirmation.Type.DELIVERED, messageEntity.id);
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
-
-      this.sending_queue.push(() => {
-        return this.create_recipients(conversationEntity.id, true, [messageEntity.user().id]).then(recipients => {
-          const options = {nativePush: false, precondition: [messageEntity.user().id], recipients};
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
-
-          return this._sendGenericMessage(eventInfoEntity);
-        });
-      });
+    if (messageEntity.user().is_me || !typeToConfirm) {
+      return;
     }
+
+    if (type === z.proto.Confirmation.Type.DELIVERED) {
+      const otherUserIn1To1 = conversationEntity.is1to1();
+      const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+      const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
+
+      if (!otherUserIn1To1 || !withinThreshold) {
+        return;
+      }
+    }
+
+    const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
+    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+    const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id, moreMessageIds);
+    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
+
+    this.sending_queue.push(() => {
+      return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
+        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+
+        return this._sendGenericMessage(eventInfoEntity);
+      });
+    });
   }
 
   /**
@@ -1875,7 +1947,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_image_asset(conversationEntity, image) {
     const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-    const options = {retention};
+    const options = {
+      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+      retention,
+    };
 
     return this.asset_service
       .uploadImageAsset(image, options)
@@ -1903,7 +1978,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendKnock(conversationEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoKnock = new z.proto.Knock(false);
+    const protoKnock = new z.proto.Knock(false, this.expectReadReceipt(conversationEntity));
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, protoKnock);
 
     if (conversationEntity.messageTimer()) {
@@ -1935,7 +2010,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .getLinkPreviewFromString(textMessage)
       .then(linkPreview => {
         if (linkPreview) {
-          const protoText = this._createTextProto(messageId, textMessage, mentionEntities, undefined, [linkPreview]);
+          const protoText = this._createTextProto(
+            messageId,
+            textMessage,
+            mentionEntities,
+            undefined,
+            [linkPreview],
+            this.expectReadReceipt(conversationEntity)
+          );
           genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
@@ -1978,7 +2060,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendLocation(conversationEntity, longitude, latitude, name, zoom) {
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoLocation = new z.proto.Location(longitude, latitude, name, zoom);
+    const protoLocation = new z.proto.Location(
+      longitude,
+      latitude,
+      name,
+      zoom,
+      this.expectReadReceipt(conversationEntity)
+    );
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, protoLocation);
 
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
@@ -2004,7 +2092,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities);
+    const protoText = this._createTextProto(
+      genericMessage.message_id,
+      textMessage,
+      mentionEntities,
+      undefined,
+      undefined,
+      this.expectReadReceipt(conversationEntity)
+    );
     const protoMessageEdit = new z.proto.MessageEdit(originalMessageEntity.id, protoText);
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, protoMessageEdit);
 
@@ -2098,7 +2193,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
     let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoText = this._createTextProto(genericMessage.message_id, textMessage, mentionEntities, quoteEntity);
+    const protoText = this._createTextProto(
+      genericMessage.message_id,
+      textMessage,
+      mentionEntities,
+      quoteEntity,
+      undefined,
+      this.expectReadReceipt(conversationEntity)
+    );
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
 
     if (conversationEntity.messageTimer()) {
@@ -2132,7 +2234,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews) {
+  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews, expectsReadConfirmation) {
     const protoText = new z.proto.Text(textMessage);
 
     if (mentionEntities && mentionEntities.length) {
@@ -2164,6 +2266,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
       protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS, linkPreviews);
+    }
+
+    if (expectsReadConfirmation) {
+      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, expectsReadConfirmation);
     }
 
     return protoText;
@@ -2378,7 +2484,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _sendEncryptedMessage(eventInfoEntity, payload) {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.message_id;
-    const messageType = eventInfoEntity.getType();
+    let messageType = eventInfoEntity.getType();
+
+    if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
+    }
 
     const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
     this.logger.info(logMessage, payload);
@@ -2716,7 +2826,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
+    const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
     return this._pushToReceivingQueue(eventJson, eventSource);
@@ -2849,9 +2959,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.ASSET_ADD:
         return this._onAssetAdd(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.CONFIRMATION:
-        return this._on_confirmation(conversationEntity, eventJson);
-
       case z.event.Client.CONVERSATION.GROUP_CREATION:
         return this._onGroupCreation(conversationEntity, eventJson);
 
@@ -2866,6 +2973,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case z.event.Client.CONVERSATION.REACTION:
         return this._onReaction(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE:
+        return this._onReceiptModeChanged(conversationEntity, eventJson);
 
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
@@ -2919,7 +3029,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
-          this.sendConfirmationStatus(conversationEntity, messageEntity);
+          this._sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.DELIVERED);
         }
 
         if (!eventFromStream) {
@@ -3033,37 +3143,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
-      });
-  }
-
-  /**
-   * Received confirmation of message.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation entity that a message was reacted upon in
-   * @param {Object} event_json - JSON data of 'conversation.confirmation' event
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _on_confirmation(conversation_et, event_json) {
-    const event_data = event_json.data;
-
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then(message_et => {
-        const was_updated = message_et.update_status(event_data.status);
-
-        if (was_updated) {
-          const changes = {status: message_et.status()};
-          return this.eventService.updateEvent(message_et.primary_key, changes);
-        }
-      })
-      .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.info(
-            `Failed to handle status update of a message in conversation '${conversation_et.id}'`,
-            error
-          );
-          throw error;
-        }
       });
   }
 
@@ -3451,6 +3530,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
+  /**
+   * A conversation receipt mode was changed
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation entity that will be renamed
+   * @param {Object} eventJson - JSON data of 'conversation.receipt-mode-update' event
+   * @returns {Promise<{conversationEntity, messageEntity}>} Resolves when the event was handled
+   */
+  _onReceiptModeChanged(conversationEntity, eventJson) {
+    return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
+      this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
+      return {conversationEntity, messageEntity};
+    });
+  }
+
   handleMessageExpiration(messageEntity) {
     amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
     const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
@@ -3472,6 +3566,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Private
   //##############################################################################
 
+  _initMessageEntity(conversationEntity, eventJson) {
+    return this.event_mapper
+      .mapJsonEvent(eventJson, conversationEntity, true)
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity));
+  }
+
+  _replaceMessageInConversation(conversationEntity, eventId, newData) {
+    const originalMessage = conversationEntity.getMessage(eventId);
+    if (!originalMessage) {
+      return Promise.resolve();
+    }
+    return this._initMessageEntity(conversationEntity, newData).then(messageEntity => {
+      const replacedMessageEntity = conversationEntity.replaceMessage(originalMessage, messageEntity);
+      this.ephemeralHandler.validateMessage(replacedMessageEntity);
+      return replacedMessageEntity;
+    });
+  }
+
   /**
    * Convert a JSON event into an entity and add it to a given conversation.
    *
@@ -3481,33 +3593,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
   _addEventToConversation(conversationEntity, eventJson) {
-    return this.event_mapper
-      .mapJsonEvent(eventJson, conversationEntity, true)
-      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
-      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
-      .then(messageEntity => {
-        if (conversationEntity && messageEntity) {
-          const replacedEntity = conversationEntity.add_message(messageEntity, true);
-          if (replacedEntity) {
-            const messages = conversationEntity.messages_unordered();
+    return this._initMessageEntity(conversationEntity, eventJson).then(messageEntity => {
+      if (conversationEntity && messageEntity) {
+        const replacedEntity = conversationEntity.add_message(messageEntity, true);
+        if (replacedEntity) {
+          const messages = conversationEntity.messages_unordered();
 
-            const updatedMessages = messages.map(message => {
-              const hasEditedQuote =
-                message.quote && message.quote() && message.quote().messageId === replacedEntity.id;
-              if (hasEditedQuote) {
-                const {error, userId} = message.quote();
-                const newQuote = new z.message.QuoteEntity({error, messageId: messageEntity.id, userId});
-                message.quote(newQuote);
-              }
-              return message;
-            });
+          const updatedMessages = messages.map(message => {
+            const hasEditedQuote = message.quote && message.quote() && message.quote().messageId === replacedEntity.id;
+            if (hasEditedQuote) {
+              const {error, userId} = message.quote();
+              const newQuote = new z.message.QuoteEntity({error, messageId: messageEntity.id, userId});
+              message.quote(newQuote);
+            }
+            return message;
+          });
 
-            conversationEntity.messages_unordered(updatedMessages);
-            amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, replacedEntity.id, messageEntity);
-          }
+          conversationEntity.messages_unordered(updatedMessages);
         }
-        return {conversationEntity, messageEntity};
-      });
+      }
+      this.ephemeralHandler.validateMessage(messageEntity);
+      return {conversationEntity, messageEntity};
+    });
   }
 
   /**
@@ -3719,6 +3826,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
     }
+  }
+
+  expectReadReceipt(conversationEntity) {
+    if (conversationEntity.is1to1()) {
+      return !!this.propertyRepository.receiptMode();
+    }
+
+    if (conversationEntity.team_id && conversationEntity.isGroup()) {
+      return !!conversationEntity.receiptMode();
+    }
+
+    return false;
   }
 
   /**

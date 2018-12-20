@@ -38,6 +38,13 @@
         <!-- ko if: isTeam -->
           <div class="group-size-info" data-bind="l10n_text: {id: z.string.groupSizeInfo, substitute: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE}" data-uie-name="status-group-size-info"></div>
           <guest-mode-toggle params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
+          <info-toggle params="
+            dataUieName: 'read-receipts',
+            info: z.string.readReceiptsToogleInfo,
+            isChecked: enableReadReceipts,
+            isDisabled: false,
+            name: z.string.readReceiptsToogleName
+          "></info-toggle>
         <!-- /ko -->
       <!-- /ko -->
     </div>

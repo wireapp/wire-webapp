@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ConversationService
-
-'use strict';
+// KARMA_SPECS=conversation/ConversationService yarn test:app
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {

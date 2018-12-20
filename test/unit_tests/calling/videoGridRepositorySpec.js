@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:calling/videoGridRepository
+// KARMA_SPECS=calling/videoGridRepository yarn test:app
 
 describe('z.calling.VideoGridRepository', () => {
   let groupVideoGrid;

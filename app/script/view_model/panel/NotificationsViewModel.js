@@ -17,17 +17,15 @@
  *
  */
 
-'use strict';
+import BasePanelViewModel from './BasePanelViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
-
-z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends z.viewModel.panel.BasePanelViewModel {
+export default class NotificationsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
-    const conversationRepository = params.repositories.conversation;
+    this.notificationChanged = this.notificationChanged.bind(this);
+
+    this.conversationRepository = params.repositories.conversation;
 
     this.settings = Object.values(z.conversation.NotificationSetting.STATE).map(status => ({
       text: z.conversation.NotificationSetting.getText(status),
@@ -36,18 +34,10 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
 
     this.currentNotificationSetting = ko.observable();
 
-    const currentNotificationSettingSubscription = this.currentNotificationSetting.suspendableSubscribe(value => {
-      if (this.activeConversation()) {
-        conversationRepository.setNotificationState(this.activeConversation(), value);
-      }
-    });
-
     ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().notificationState();
     }).subscribe(setting => {
-      currentNotificationSettingSubscription.suspend();
       this.currentNotificationSetting(setting);
-      currentNotificationSettingSubscription.unsuspend();
     });
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
@@ -57,7 +47,12 @@ z.viewModel.panel.NotificationsViewModel = class NotificationsViewModel extends 
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
+  notificationChanged(viewModel, event) {
+    const notificationState = parseInt(event.target.value, 10);
+    this.conversationRepository.setNotificationState(this.activeConversation(), notificationState);
+  }
+
   getElementId() {
     return 'notification-settings';
   }
-};
+}

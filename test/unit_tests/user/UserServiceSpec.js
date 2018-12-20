@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:user/UserService
-
-'use strict';
+// KARMA_SPECS=user/UserService yarn test:app
 
 describe('User Service', () => {
   let server = null;

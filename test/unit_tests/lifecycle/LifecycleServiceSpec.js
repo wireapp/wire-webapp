@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:lifecycle/LifecycleService
-
-'use strict';
+// KARMA_SPECS=lifecycle/LifecycleService yarn test:app
 
 describe('z.lifecycle.LifecycleService', () => {
   let mock_response = undefined;

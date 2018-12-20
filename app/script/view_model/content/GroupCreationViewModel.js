@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import ReceiptMode from '../../conversation/ReceiptMode';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -62,6 +62,8 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         this.selectedContacts.remove(userEntity => !userEntity.isTeamMember());
       }
     });
+
+    this.enableReadReceipts = ko.observable(false);
 
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
@@ -122,6 +124,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   showCreateGroup(method, userEntity) {
     this.method = method;
+    this.enableReadReceipts(this.isTeam());
 
     if (!this.modal) {
       this.modal = new z.ui.Modal('#group-creation-modal', this._afterHideModal.bind(this));
@@ -162,9 +165,12 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.isCreatingConversation = true;
 
       const accessState = this.isTeam() ? this.accessState() : undefined;
+      const options = {
+        receipt_mode: this.enableReadReceipts() ? ReceiptMode.DELIVERY_AND_READ : ReceiptMode.DELIVERY,
+      };
 
       this.conversationRepository
-        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState)
+        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState, options)
         .then(conversationEntity => {
           this._hideModal();
 

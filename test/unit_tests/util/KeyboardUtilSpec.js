@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/KeyboardUtil
-
-'use strict';
+// KARMA_SPECS=util/KeyboardUtil yarn test:app
 
 describe('z.util.KeyboardUtil.KEY', () => {
   describe('isArrowKey', () => {

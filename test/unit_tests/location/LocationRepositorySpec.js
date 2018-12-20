@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:location/LocationRepository
-
-'use strict';
+// KARMA_SPECS=location/LocationRepository yarn test:app
 
 describe('z.location.LocationRepository', () => {
   describe('getMapsUrl', () => {

@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:tracking/EventTrackingRepository
+// KARMA_SPECS=tracking/EventTrackingRepository yarn test:app
 
 describe('z.tracking.helpers', () => {
   describe('getConversationType', () => {

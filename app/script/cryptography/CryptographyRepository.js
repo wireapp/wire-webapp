@@ -17,7 +17,11 @@
  *
  */
 
-'use strict';
+import StoreEngine from '@wireapp/store-engine';
+import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
+import {errors as ProteusErrors} from '@wireapp/proteus';
+
+import CryptographyMapper from './CryptographyMapper';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -43,7 +47,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     this.storageRepository = storageRepository;
     this.logger = new z.util.Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
 
-    this.cryptographyMapper = new z.cryptography.CryptographyMapper();
+    this.cryptographyMapper = new CryptographyMapper();
 
     this.currentClient = undefined;
     this.cryptobox = undefined;
@@ -94,9 +98,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
       const storeEngine = new StoreEngine.IndexedDBEngine();
       storeEngine.initWithDb(database);
-      this.cryptobox = new cryptobox.Cryptobox(storeEngine, 10);
+      this.cryptobox = new Cryptobox(storeEngine, 10);
 
-      this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
+      this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
         const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
 
         this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
@@ -105,7 +109,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         });
       });
 
-      this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, sessionId => {
+      this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
         const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
         amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId}, true);
       });
@@ -289,17 +293,14 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const isExternal = typeof eventData.data === 'string';
     const externalMessageIsTooBig = isExternal && eventData.data.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
-      const error = new Proteus.errors.DecryptError.InvalidMessage('The received message was too big.', 300);
+      const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
       return Promise.resolve(errorEvent);
     }
 
     const failedEncryption = eventData.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE;
     if (failedEncryption) {
-      const decryptionError = new Proteus.errors.DecryptError.InvalidMessage(
-        'Sender failed to encrypt a message.',
-        213
-      );
+      const decryptionError = new ProteusErrors.DecryptError.InvalidMessage('Sender failed to encrypt a message.', 213);
       return Promise.resolve(this._handleDecryptionFailure(decryptionError, event));
     }
 
@@ -465,8 +466,8 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
 
-    const isDuplicateMessage = error instanceof Proteus.errors.DecryptError.DuplicateMessage;
-    const isOutdatedMessage = error instanceof Proteus.errors.DecryptError.OutdatedMessage;
+    const isDuplicateMessage = error instanceof ProteusErrors.DecryptError.DuplicateMessage;
+    const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
     // We don't need to show these message errors to the user
     if (isDuplicateMessage || isOutdatedMessage) {
       throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
@@ -479,9 +480,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     const remoteClientId = eventData.sender;
 
-    const isInvalidMessage = error instanceof Proteus.errors.DecryptError.InvalidMessage;
-    const isInvalidSignature = error instanceof Proteus.errors.DecryptError.InvalidSignature;
-    const isRemoteIdentityChanged = error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged;
+    const isInvalidMessage = error instanceof ProteusErrors.DecryptError.InvalidMessage;
+    const isInvalidSignature = error instanceof ProteusErrors.DecryptError.InvalidSignature;
+    const isRemoteIdentityChanged = error instanceof ProteusErrors.DecryptError.RemoteIdentityChanged;
     // Session is broken, let's see what's really causing it...
     if (isInvalidMessage || isInvalidSignature) {
       this.logger.error(
@@ -520,7 +521,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const customData = {
       clientLocalClass: this.currentClient().class,
       clientLocalType: this.currentClient().type,
-      cryptoboxVersion: cryptobox.version,
+      cryptoboxVersion,
       errorCode: error.code,
       eventType: eventType,
     };

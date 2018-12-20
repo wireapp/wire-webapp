@@ -17,16 +17,18 @@
  *
  */
 
-// grunt test_run:cryptography/CryptographyRepository
+// KARMA_SPECS=cryptography/CryptographyRepository yarn test:app
 
-'use strict';
+import StoreEngine from '@wireapp/store-engine';
+import {Cryptobox} from '@wireapp/cryptobox';
+import * as Proteus from '@wireapp/proteus';
 
 describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
   beforeAll(() => {
     return z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
       .then(() => test_factory.exposeCryptographyActors(false));
   });
 
@@ -98,7 +100,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       TestFactory.storage_repository.clearStores();
     });
 
-    it('detects duplicated messages', async done => {
+    it('detects duplicated messages', async () => {
       const database = TestFactory.storage_service.db;
       const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
       const alice = TestFactory.cryptography_repository.cryptobox.identity;
@@ -107,10 +109,10 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
 
-      const bobEngine = new window.StoreEngine.MemoryEngine();
+      const bobEngine = new StoreEngine.MemoryEngine();
       await bobEngine.init('bob');
 
-      const bob = new window.cryptobox.Cryptobox(bobEngine, 1);
+      const bob = new Cryptobox(bobEngine, 1);
       await bob.create();
 
       const plainText = 'Hello, Alice!';
@@ -142,8 +144,6 @@ describe('z.cryptography.CryptographyRepository', () => {
       } catch (error) {
         expect(error.type).toBe(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
       }
-
-      done();
     });
 
     it('detects a session reset request', () => {

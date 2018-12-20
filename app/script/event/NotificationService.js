@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -37,7 +35,7 @@ z.event.NotificationService = class NotificationService {
    * Construct a new Notification Service.
    *
    * @param {z.service.BackendClient} backendClient - Client for the API calls
-   * @param {z.storage.StorageService} storageService - Service for all storage related tasks
+   * @param {StorageService} storageService - Service for all storage related tasks
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;

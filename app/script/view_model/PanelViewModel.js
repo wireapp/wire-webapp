@@ -17,7 +17,16 @@
  *
  */
 
-'use strict';
+import AddParticipantsViewModel from './panel/AddParticipantsViewModel';
+import ConversationDetailsViewModel from './panel/ConversationDetailsViewModel';
+import ConversationParticipantsViewModel from './panel/ConversationParticipantsViewModel';
+import GroupParticipantServiceViewModel from './panel/GroupParticipantServiceViewModel';
+import GroupParticipantUserViewModel from './panel/GroupParticipantUserViewModel';
+import GuestsAndServicesViewModel from './panel/GuestsAndServicesViewModel';
+import MessageDetailsViewModel from './panel/MessageDetailsViewModel';
+import NotificationsViewModel from './panel/NotificationsViewModel';
+import ParticipantDevicesViewModel from './panel/ParticipantDevicesViewModel';
+import TimedMessagesViewModel from './panel/TimedMessagesViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -31,6 +40,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       GROUP_PARTICIPANT_SERVICE: 'PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE',
       GROUP_PARTICIPANT_USER: 'PanelViewModel.STATE.GROUP_PARTICIPANT_USER',
       GUEST_OPTIONS: 'PanelViewModel.STATE.GUEST_OPTIONS',
+      MESSAGE_DETAILS: 'PanelViewModel.STATE.MESSAGE_DETAILS',
       NOTIFICATIONS: 'PanelViewModel.STATE.NOTIFICATIONS',
       PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
       TIMED_MESSAGES: 'PanelViewModel.STATE.TIMED_MESSAGES',
@@ -39,15 +49,16 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   buildSubViews() {
     const viewModels = {
-      [PanelViewModel.STATE.ADD_PARTICIPANTS]: z.viewModel.panel.AddParticipantsViewModel,
-      [PanelViewModel.STATE.CONVERSATION_DETAILS]: z.viewModel.panel.ConversationDetailsViewModel,
-      [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: z.viewModel.panel.ConversationParticipantsViewModel,
-      [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: z.viewModel.panel.GroupParticipantServiceViewModel,
-      [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: z.viewModel.panel.GroupParticipantUserViewModel,
-      [PanelViewModel.STATE.GUEST_OPTIONS]: z.viewModel.panel.GuestsAndServicesViewModel,
-      [PanelViewModel.STATE.NOTIFICATIONS]: z.viewModel.panel.NotificationsViewModel,
-      [PanelViewModel.STATE.PARTICIPANT_DEVICES]: z.viewModel.panel.ParticipantDevicesViewModel,
-      [PanelViewModel.STATE.TIMED_MESSAGES]: z.viewModel.panel.TimedMessagesViewModel,
+      [PanelViewModel.STATE.ADD_PARTICIPANTS]: AddParticipantsViewModel,
+      [PanelViewModel.STATE.CONVERSATION_DETAILS]: ConversationDetailsViewModel,
+      [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: ConversationParticipantsViewModel,
+      [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: GroupParticipantServiceViewModel,
+      [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: GroupParticipantUserViewModel,
+      [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
+      [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
+      [PanelViewModel.STATE.NOTIFICATIONS]: NotificationsViewModel,
+      [PanelViewModel.STATE.PARTICIPANT_DEVICES]: ParticipantDevicesViewModel,
+      [PanelViewModel.STATE.TIMED_MESSAGES]: TimedMessagesViewModel,
     };
 
     return Object.entries(viewModels).reduce((subViews, [state, viewModel]) => {

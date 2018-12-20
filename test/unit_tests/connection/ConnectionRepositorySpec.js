@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:connection/ConnectionRepository
-
-'use strict';
+// KARMA_SPECS=connection/ConnectionRepository yarn test:app
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;

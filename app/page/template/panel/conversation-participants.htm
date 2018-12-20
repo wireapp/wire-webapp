@@ -9,7 +9,7 @@
             <user-input class="user-list-light" params="input: searchInput, placeholder: z.string.conversationParticipantsSearchPlaceholder, focusDelay: z.motion.MotionDuration.LONG" spellcheck="false"></user-input>
             <div class="conversation-participants__list panel__content">
                 <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
-                    <user-list class="user-list-light" params="user: participants, click: clickOnShowUser, filter: searchInput, altStyle: true, highlightedUsers: highlightedUsers, searchRepository: searchRepository" data-uie-name="list-conversation-participants"></user-list>
+                    <user-list class="user-list-light" params="user: participants, click: clickOnShowUser, filter: searchInput, noUnderline: true, arrow: true, highlightedUsers: highlightedUsers, searchRepository: searchRepository" data-uie-name="list-conversation-participants"></user-list>
                 </div>
             </div>
         </div>

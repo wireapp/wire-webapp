@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:search/SearchRepository
-
-'use strict';
+// KARMA_SPECS=search/SearchRepository yarn test:app
 
 describe('z.search.SearchRepository', () => {
   const test_factory = new TestFactory();

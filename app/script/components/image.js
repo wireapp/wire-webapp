@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import viewportObserver from '../ui/viewportObserver';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -45,11 +45,11 @@ z.components.Image = class Image {
       });
     };
 
-    z.ui.ViewportObserver.addElement(this.element, _onInViewport);
+    viewportObserver.addElement(this.element, _onInViewport);
   }
 
   dispose() {
-    z.ui.ViewportObserver.removeElement(this.element);
+    viewportObserver.removeElement(this.element);
     if (this.assetSrc()) {
       window.URL.revokeObjectURL(this.assetSrc());
     }

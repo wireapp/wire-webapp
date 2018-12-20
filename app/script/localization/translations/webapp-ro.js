@@ -126,6 +126,8 @@ z.string.ro.modalAccountNewDevicesHeadline = 'Contul tău a fost folosit în dat
 z.string.ro.modalAccountNewDevicesFrom = 'De la:';
 z.string.ro.modalAccountNewDevicesMessage = 'Dacă nu ai făcut asta, elimină dispozitivul și resetează parola.';
 
+z.string.ro.modalAccountReadReceiptsChangedSecondary = 'Gestionare dispozitive';
+
 z.string.ro.modalAccountRemoveDeviceAction = 'Scoate dispozitivul';
 z.string.ro.modalAccountRemoveDeviceHeadline = 'Scoate „{{device}}”';
 z.string.ro.modalAccountRemoveDeviceMessage = 'Este necesară parola pentru a elimina acest dispozitiv.';
@@ -399,6 +401,7 @@ z.string.ro.participantDevicesOutdatedClientMessage = '{{user}} folosește o ver
 z.string.ro.participantDevicesSelfAllDevices = 'Arată toate dispozitivele mele';
 z.string.ro.participantDevicesSelfFingerprint = 'Amprentă dispozitiv';
 
+
 z.string.ro.userProfileButtonConnect = 'Conectare';
 z.string.ro.userProfileButtonIgnore = 'Ignoră';
 z.string.ro.userProfileButtonUnblock = 'Deblochează';
@@ -425,12 +428,13 @@ z.string.ro.preferencesAccountCreateTeam = 'Creează o echipă';
 z.string.ro.preferencesAccountDelete = 'Șterge contul';
 z.string.ro.preferencesAccountLogOut = 'Deconectare';
 z.string.ro.preferencesAccountManageTeam = 'Gestionează o echipă';
+z.string.ro.preferencesAccountPrivacy = 'Confidențialitate';
 z.string.ro.preferencesAccountResetPassword = 'Resetează parola';
 z.string.ro.preferencesAccountTeam = 'în {{name}}';
-z.string.ro.preferencesAccountUsernamePlaceholder = 'Numele tău complet';
-z.string.ro.preferencesAccountUsernameHint = 'Cel puțin două caractere. Doar a—z, 0—9 și _ sunt permise.';
 z.string.ro.preferencesAccountUsernameAvailable = 'Disponibil';
 z.string.ro.preferencesAccountUsernameErrorTaken = 'Deja folosit';
+z.string.ro.preferencesAccountUsernameHint = 'Cel puțin două caractere. Doar a—z, 0—9 și _ sunt permise.';
+z.string.ro.preferencesAccountUsernamePlaceholder = 'Numele tău complet';
 
 z.string.ro.preferencesAVCamera = 'Cameră';
 z.string.ro.preferencesAVMicrophone = 'Microfon';
@@ -519,10 +523,10 @@ z.string.ro.warningNotFoundMicrophone = 'Nu poți suna pentru că acest dispozit
 z.string.ro.warningPermissionDeniedCamera = 'Nu poți suna pentru că browserul tău nu are acces la cameră.';
 z.string.ro.warningPermissionDeniedMicrophone = 'Nu poți suna pentru că browserul tău nu are acces la microfon.';
 z.string.ro.warningPermissionDeniedScreen = 'Browserul tău are nevoie de permisiuni pentru a partaja ecranul.';
-z.string.ro.warningPermissionRequestCamera = '{{icon}} permite accesul la cameră';
-z.string.ro.warningPermissionRequestMicrophone = '{{icon}} permit accesul la microfon';
-z.string.ro.warningPermissionRequestNotification = '{{icon}} permite notificările';
-z.string.ro.warningPermissionRequestScreen = '{{icon}} permite accesul la ecran';
+z.string.ro.warningPermissionRequestCamera = '[icon] permite accesul la cameră';
+z.string.ro.warningPermissionRequestMicrophone = '[icon] permit accesul la microfon';
+z.string.ro.warningPermissionRequestNotification = '[icon] permite notificările';
+z.string.ro.warningPermissionRequestScreen = '[icon] permite accesul la ecran';
 
 z.string.ro.userAvailabilityAvailable = 'Disponibil';
 z.string.ro.userAvailabilityAway = 'Departe';

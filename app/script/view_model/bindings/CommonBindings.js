@@ -17,7 +17,16 @@
  *
  */
 
-'use strict';
+import ko from 'knockout';
+import $ from 'jquery';
+import moment from 'moment';
+import SimpleBar from 'simplebar';
+/* eslint-disable no-unused-vars */
+import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
+/* eslint-enable no-unused-vars */
+
+import overlayedObserver from '../../ui/overlayedObserver';
+import viewportObserver from '../../ui/viewportObserver';
 
 /**
  * Use it on the drop area.
@@ -358,33 +367,6 @@ ko.subscribable.fn.subscribeChanged = function(handler) {
 };
 
 /**
- * Returns a suspendable subscription
- * https://github.com/knockout/knockout/issues/270#issuecomment-11360312
- * @param {function} handler - Handler
- * @param {ko.observable} owner - Subscription owner
- * @param {string} eventName - Event name
- * @returns {ko.subscription} knockout subscription with suspend and unsuspend methods
- */
-ko.subscribable.fn.suspendableSubscribe = function(handler, owner, eventName) {
-  let isSuspended = false;
-  return ko.utils.extend(
-    this.subscribe(
-      value => {
-        if (!isSuspended) {
-          handler(value);
-        }
-      },
-      owner,
-      eventName
-    ),
-    {
-      suspend: () => (isSuspended = true),
-      unsuspend: () => (isSuspended = false),
-    }
-  );
-};
-
-/**
  * Render antiscroll scrollbar.
  */
 ko.bindingHandlers.antiscroll = {
@@ -430,7 +412,7 @@ ko.bindingHandlers.antiscroll = {
 ko.bindingHandlers.simplebar = {
   init(element, valueAccessor) {
     const {trigger = valueAccessor(), onInit} = valueAccessor();
-    const simpleBar = new window.SimpleBar(element, {autoHide: false});
+    const simpleBar = new SimpleBar(element, {autoHide: false});
     if (ko.isObservable(trigger)) {
       const triggerSubscription = trigger.subscribe(() => simpleBar.recalculate());
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => triggerSubscription.dispose());
@@ -577,17 +559,15 @@ ko.bindingHandlers.removed_from_view = {
  */
 ko.bindingHandlers.in_viewport = {
   init(element, valueAccessor) {
-    const onElementVisible = valueAccessor();
-    if (!onElementVisible) {
+    const {onVisible = valueAccessor(), container} = valueAccessor();
+    if (!onVisible) {
       return;
     }
-    z.ui.ViewportObserver.addElement(element, () => {
-      return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
-    });
+    viewportObserver.addElement(element, () => overlayedObserver.onElementVisible(element, onVisible), true, container);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      z.ui.OverlayedObserver.removeElement(element);
-      z.ui.ViewportObserver.removeElement(element);
+      overlayedObserver.removeElement(element);
+      viewportObserver.removeElement(element);
     });
   },
 };

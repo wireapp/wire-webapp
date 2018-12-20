@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // https://github.com/MathieuLoutre/grunt-aws-s3
 
 module.exports = {
@@ -26,7 +24,7 @@ module.exports = {
     files: [
       {
         dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip',
-        src: '<%= dir.aws.s3 %>/ebs.zip',
+        src: '<%= dir.dist.s3 %>/ebs.zip',
         stream: true,
       },
     ],

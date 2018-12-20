@@ -17,150 +17,201 @@
  *
  */
 
-'use strict';
+import moment from 'moment';
 
-(() => {
-  class Message {
-    constructor({
-      message,
-      conversation,
-      selfId,
-      isSelfTemporaryGuest,
-      isLastDeliveredMessage,
-      shouldShowAvatar,
-      shouldShowInvitePeople,
-      onClickAvatar,
-      onClickImage,
-      onClickInvitePeople,
-      onClickMessage,
-      onClickTimestamp,
-      onClickParticipants,
-      onClickResetSession,
-      onClickCancelRequest,
-      onLike,
-      conversationRepository,
-      locationRepository,
-      actionsViewModel,
-    }) {
-      this.message = message;
-      this.conversation = conversation;
+class Message {
+  constructor({
+    message,
+    conversation,
+    selfId,
+    isSelfTemporaryGuest,
+    isLastDeliveredMessage,
+    shouldShowAvatar,
+    shouldShowInvitePeople,
+    onClickAvatar,
+    onClickImage,
+    onClickInvitePeople,
+    onClickLikes,
+    onClickMessage,
+    onClickTimestamp,
+    onClickParticipants,
+    onClickReceipts,
+    onClickResetSession,
+    onClickCancelRequest,
+    onLike,
+    conversationRepository,
+    locationRepository,
+    actionsViewModel,
+  }) {
+    this.message = message;
+    this.conversation = conversation;
 
-      this.shouldShowAvatar = shouldShowAvatar;
-      this.shouldShowInvitePeople = shouldShowInvitePeople;
-      this.selfId = selfId;
-      this.isSelfTemporaryGuest = isSelfTemporaryGuest;
-      this.isLastDeliveredMessage = isLastDeliveredMessage;
+    this.shouldShowAvatar = shouldShowAvatar;
+    this.shouldShowInvitePeople = shouldShowInvitePeople;
+    this.selfId = selfId;
+    this.isSelfTemporaryGuest = isSelfTemporaryGuest;
+    this.isLastDeliveredMessage = isLastDeliveredMessage;
 
-      this.onClickImage = onClickImage;
-      this.onClickInvitePeople = onClickInvitePeople;
-      this.onClickAvatar = onClickAvatar;
-      this.onClickMessage = onClickMessage;
-      this.onClickTimestamp = onClickTimestamp;
-      this.onClickParticipants = onClickParticipants;
-      this.onClickResetSession = onClickResetSession;
-      this.onClickCancelRequest = onClickCancelRequest;
-      this.onLike = onLike;
+    this.onClickImage = onClickImage;
+    this.onClickInvitePeople = onClickInvitePeople;
+    this.onClickAvatar = onClickAvatar;
+    this.onClickMessage = onClickMessage;
+    this.onClickTimestamp = onClickTimestamp;
+    this.onClickParticipants = onClickParticipants;
+    this.onClickReceipts = onClickReceipts;
+    this.onClickLikes = onClickLikes;
+    this.onClickResetSession = onClickResetSession;
+    this.onClickCancelRequest = onClickCancelRequest;
+    this.onLike = onLike;
 
-      this.conversationRepository = conversationRepository;
-      this.locationRepository = locationRepository;
+    this.conversationRepository = conversationRepository;
+    this.locationRepository = locationRepository;
 
-      this.actionsViewModel = actionsViewModel;
+    this.actionsViewModel = actionsViewModel;
 
-      this.showLikes = ko.observable(false);
+    this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
 
-      this.bindShowMore = this.bindShowMore.bind(this);
-    }
+    this.bindShowMore = this.bindShowMore.bind(this);
 
-    getSystemMessageIconComponent(message) {
-      const iconComponents = {
-        [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-        [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
-      };
-      return iconComponents[message.system_message_type];
-    }
-
-    showDevice(messageEntity) {
-      const topic = messageEntity.isSelfClient()
-        ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
-        : z.event.WebApp.SHORTCUT.PEOPLE;
-      amplify.publish(topic);
-    }
-
-    showContextMenu(messageEntity, event) {
-      const entries = [];
-
-      if (messageEntity.is_downloadable()) {
-        entries.push({
-          click: () => messageEntity.download(),
-          label: z.l10n.text(z.string.conversationContextMenuDownload),
-        });
+    this.readReceiptTooltip = ko.pureComputed(() => {
+      const receipts = this.message.readReceipts();
+      if (!receipts.length || !this.conversation().is1to1()) {
+        return '';
       }
+      return moment(receipts[0].time).format('DD.MM.YY');
+    });
 
-      if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
-        const stringId = messageEntity.is_liked()
-          ? z.string.conversationContextMenuUnlike
-          : z.string.conversationContextMenuLike;
-
-        entries.push({
-          click: () => this.onLike(messageEntity, false),
-          label: z.l10n.text(stringId),
-        });
+    this.readReceiptText = ko.pureComputed(() => {
+      const receipts = this.message.readReceipts();
+      if (!receipts.length) {
+        return '';
       }
-
-      if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
-        entries.push({
-          click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuEdit),
-        });
-      }
-
-      if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
-        entries.push({
-          click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuReply),
-        });
-      }
-
-      if (messageEntity.isCopyable()) {
-        entries.push({
-          click: () => messageEntity.copy(),
-          label: z.l10n.text(z.string.conversationContextMenuCopy),
-        });
-      }
-
-      if (messageEntity.is_deletable()) {
-        entries.push({
-          click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuDelete),
-        });
-      }
-
-      const isSendingMessage = messageEntity.status() === z.message.StatusType.SENDING;
-      const canDelete =
-        messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
-      if (canDelete) {
-        entries.push({
-          click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
-          label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
-        });
-      }
-
-      z.ui.Context.from(event, entries, 'message-options-menu');
-    }
-
-    bindShowMore(elements, scope) {
-      const label = elements.find(element => element.className === 'message-header-label');
-      if (!label) {
-        return;
-      }
-      const link = label.querySelector('.message-header-show-more');
-      if (link) {
-        link.addEventListener('click', () => this.onClickParticipants(scope.message.highlightedUsers()));
-      }
-    }
+      const is1to1 = this.conversation().is1to1();
+      return is1to1 ? moment(receipts[0].time).format('HH:mm') : receipts.length.toString(10);
+    });
   }
 
-  const normalTemplate = `
+  getSystemMessageIconComponent(message) {
+    const iconComponents = {
+      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+      [z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
+    };
+    return iconComponents[message.system_message_type];
+  }
+
+  showDevice(messageEntity) {
+    const topic = messageEntity.isSelfClient()
+      ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
+      : z.event.WebApp.SHORTCUT.PEOPLE;
+    amplify.publish(topic);
+  }
+
+  showContextMenu(messageEntity, event) {
+    const entries = [];
+
+    if (messageEntity.is_downloadable()) {
+      entries.push({
+        click: () => messageEntity.download(),
+        label: z.l10n.text(z.string.conversationContextMenuDownload),
+      });
+    }
+
+    if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
+      const stringId = messageEntity.is_liked()
+        ? z.string.conversationContextMenuUnlike
+        : z.string.conversationContextMenuLike;
+
+      entries.push({
+        click: () => this.onLike(messageEntity, false),
+        label: z.l10n.text(stringId),
+      });
+    }
+
+    if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuEdit),
+      });
+    }
+
+    if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
+      entries.push({
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuReply),
+      });
+    }
+
+    if (messageEntity.isCopyable()) {
+      entries.push({
+        click: () => messageEntity.copy(),
+        label: z.l10n.text(z.string.conversationContextMenuCopy),
+      });
+    }
+
+    if (
+      !this.conversation().is1to1() &&
+      !messageEntity.is_ephemeral() &&
+      !this.conversation().removed_from_conversation()
+    ) {
+      entries.push({
+        click: () => this.onClickReceipts(this),
+        label: z.l10n.text(z.string.conversationContextMenuDetails),
+      });
+    }
+
+    if (messageEntity.is_deletable()) {
+      entries.push({
+        click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuDelete),
+      });
+    }
+
+    const isSendingMessage = messageEntity.status() === z.message.StatusType.SENDING;
+    const canDelete =
+      messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
+    if (canDelete) {
+      entries.push({
+        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
+        label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
+      });
+    }
+
+    z.ui.Context.from(event, entries, 'message-options-menu');
+  }
+
+  bindShowMore(elements, scope) {
+    const label = elements.find(element => element.className === 'message-header-label');
+    if (!label) {
+      return;
+    }
+    const link = label.querySelector('.message-header-show-more');
+    if (link) {
+      link.addEventListener('click', () => this.onClickParticipants(scope.message.highlightedUsers()));
+    }
+  }
+}
+
+const receiptStatusTemplate = `
+  <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
+    <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
+  <!-- /ko -->
+  <!-- ko if: readReceiptText() -->
+    <span class="message-status-read" data-bind="
+        css: {'message-status-read--visible': isLastDeliveredMessage(),
+          'with-tooltip with-tooltip--receipt': readReceiptTooltip(),
+          'message-status-read--clickable': !conversation().is1to1()},
+        attr: {'data-tooltip': readReceiptTooltip()},
+        click: conversation().is1to1() ? null : onClickReceipts
+        "
+        data-uie-name="status-message-read-receipts">
+      <read-icon></read-icon>
+      <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
+    </span>
+  <!-- /ko -->
+`;
+
+const normalTemplate = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
@@ -201,7 +252,7 @@
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-            background_image: asset.resource,
+            background_image: asset.resource(),
             click: (data, event) => $parent.onClickImage(message, event),
             css: {'bg-color-ephemeral': message.isObfuscated()},
             " data-uie-name="go-image-detail">
@@ -255,14 +306,12 @@
     <div class="message-body-actions">
       <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(message, event)"></span>
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
       <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}"></time>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko if: isLastDeliveredMessage -->
-        <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
-      <!-- /ko -->
+      ${receiptStatusTemplate}
     </div>
 
   </div>
@@ -274,25 +323,14 @@
           <span class="icon-liked-small"></span>
         </span>
       </div>
-      <div class="message-footer-label cursor-pointer" data-bind="click: () => showLikes(true)">
+      <div class="message-footer-label " data-bind="css: {'cursor-pointer': !conversation().is1to1()}, click: !conversation().is1to1() ? onClickLikes : null ">
         <span class="font-size-xs text-graphite" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
-        <!-- ko if: !showLikes() && message.other_likes().length > 5 -->
-          <span class="icon-more font-size-xs"></span>
-        <!-- /ko -->
       </div>
-      <!-- ko if: showLikes() -->
-        <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
-          <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar params="participant: $data, click: $parent.onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
-          <!-- /ko -->
-          <span class="message-footer-close-button icon-close" data-bind="click: () => showLikes(false)"></span>
-        </div>
-      <!-- /ko -->
     </div>
   <!-- /ko -->
   `;
 
-  const missedTemplate = `
+const missedTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -301,7 +339,7 @@
   </div>
   `;
 
-  const unableToDecryptTemplate = `
+const unableToDecryptTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -325,12 +363,11 @@
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
               data-bind="click: () => onClickResetSession(message), l10n_text: z.string.conversationUnableToDecryptResetSession, style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
-      <!-- /ko -->
-    </div>
+    <!-- /ko -->
   </div>
   `;
 
-  const systemTemplate = `
+const systemTemplate = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg text-graphite">
       <span data-bind="component: getSystemMessageIconComponent(message)"></span>
@@ -341,13 +378,13 @@
       <hr class="message-header-line" />
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
     </div>
   </div>
   <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
   `;
 
-  const pingTemplate = `
+const pingTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
@@ -357,12 +394,13 @@
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+      ${receiptStatusTemplate}
     </div>
   </div>
   `;
 
-  const deleteTemplate = `
+const deleteTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
@@ -372,12 +410,12 @@
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
-      <time class="time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-delete-timestamp"></time>
+      <time class="time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
     </div>
   </div>
   `;
 
-  const verificationTemplate = `
+const verificationTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
       <!-- ko if: message.isTypeVerified() -->
@@ -411,7 +449,7 @@
   </div>
   `;
 
-  const callTemplate = `
+const callTemplate = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
       <!-- ko if: message.was_completed() -->
@@ -426,12 +464,12 @@
       <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
     </div>
   </div>
   `;
 
-  const memberTemplate = `
+const memberTemplate = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: message.otherUser().name()'></span>
@@ -476,7 +514,7 @@
         </div>
         <!-- ko if: message.isMemberChange() -->
           <div class="message-body-actions">
-            <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+            <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
           </div>
         <!-- /ko -->
       </div>
@@ -498,6 +536,17 @@
           <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
         </div>
       <!-- /ko -->
+      <!-- ko if: hasReadReceiptsTurnedOn -->
+        <div class="message-header" data-uie-name="label-group-creation-receipts">
+          <div class="message-header-icon message-header-icon--svg text-graphite">
+            <read-icon></read-icon>
+          </div>
+          <div class="message-header-label">
+            <span class="ellipsis" data-bind="l10n_text: z.string.conversationCreateReceiptsEnabled"></span>
+            <hr class="message-header-line" />
+          </div>
+        </div>
+      <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if: message.isMemberLeave() && message.user().is_me && isSelfTemporaryGuest -->
@@ -507,8 +556,8 @@
     <!-- /ko -->
   <!-- /ko -->  `;
 
-  ko.components.register('message', {
-    template: `
+ko.components.register('message', {
+  template: `
     <!-- ko if: message.super_type === 'normal' -->
       ${normalTemplate}
     <!-- /ko -->
@@ -537,6 +586,5 @@
       ${pingTemplate}
     <!-- /ko -->
     `,
-    viewModel: Message,
-  });
-})();
+  viewModel: Message,
+});

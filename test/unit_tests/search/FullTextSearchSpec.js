@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:search/FullTextSearch
+// KARMA_SPECS=search/FullTextSearch yarn test:app
 
 describe('z.search.FullTextSearch', () => {
   describe('search', () => {

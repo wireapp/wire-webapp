@@ -19,14 +19,18 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const dist = 'aws/static/';
+const dist = 'server/dist/static/';
 const srcScript = 'app/script/auth/';
+const appSrc = 'app/script/';
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    script: path.resolve(__dirname, srcScript, 'main.tsx'),
+    app: path.resolve(__dirname, appSrc, 'main/app.js'),
+    auth: path.resolve(__dirname, srcScript, 'main.tsx'),
+    login: path.resolve(__dirname, appSrc, 'main/login.js'),
   },
   externals: {
     'fs-extra': '{}',
@@ -36,6 +40,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
+        include: path.resolve(__dirname, srcScript),
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },
@@ -45,6 +50,7 @@ module.exports = {
     fs: 'empty',
     path: 'empty',
   },
+
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
@@ -58,9 +64,9 @@ module.exports = {
         },
         vendor: {
           chunks: 'initial',
+          minChunks: 2,
           name: 'vendor',
           priority: 1,
-          test: /node_modules/,
         },
       },
     },
@@ -70,8 +76,22 @@ module.exports = {
     path: path.resolve(__dirname, dist),
     publicPath: '/',
   },
-  plugins: [new webpack.IgnorePlugin(/^.\/locale$/, /moment$/)],
+  plugins: [
+    new webpack.IgnorePlugin(/^.\/locale$/, /moment$/),
+    new CopyWebpackPlugin([{from: './node_modules/@wireapp/protocol-messaging/proto/messages.proto', to: 'proto'}]),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      _: 'underscore',
+      jQuery: 'jquery',
+      ko: 'knockout',
+    }),
+  ],
   resolve: {
+    alias: {
+      components: path.resolve(__dirname, `${appSrc}/components/`),
+      // override phoneformat export, because the 'main' file is not exporting anything
+      'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
+    },
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     modules: [path.resolve(srcScript), 'node_modules'],
   },

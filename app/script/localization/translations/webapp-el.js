@@ -120,6 +120,8 @@ z.string.el.modalAccountNewDevicesHeadline = 'Ο λογαριασμός σας �
 z.string.el.modalAccountNewDevicesFrom = 'Από:';
 z.string.el.modalAccountNewDevicesMessage = 'Εάν δεν το κάνατε αυτό, αφαιρέστε την συσκευή κι επαναφέρετε τον κωδικό σας.';
 
+z.string.el.modalAccountReadReceiptsChangedSecondary = 'Διαχείριση συσκευών';
+
 z.string.el.modalAccountRemoveDeviceAction = 'Αφαίρεση συσκευής';
 z.string.el.modalAccountRemoveDeviceHeadline = 'Αφαίρεση "{{device}}"';
 z.string.el.modalAccountRemoveDeviceMessage = 'Απαιτείται ο κωδικός πρόσβασης σας για να αφαιρέσετε την συσκευή.';
@@ -402,6 +404,7 @@ z.string.el.participantDevicesOutdatedClientMessage = '{{user}} χρησιμοπ
 z.string.el.participantDevicesSelfAllDevices = 'Εμφάνιση όλων των συσκευών μου';
 z.string.el.participantDevicesSelfFingerprint = 'Αποτυπώματα συσκευής';
 
+
 z.string.el.userProfileButtonConnect = 'Σύνδεση';
 z.string.el.userProfileButtonIgnore = 'Αγνόηση';
 z.string.el.userProfileButtonUnblock = 'Άρση αποκλεισμού';
@@ -426,12 +429,13 @@ z.string.el.preferencesAccountCreateTeam = 'Δημιουργήστε μια ομ
 z.string.el.preferencesAccountDelete = 'Διαγραφή λογαριασμού';
 z.string.el.preferencesAccountLogOut = 'Αποσύνδεση';
 z.string.el.preferencesAccountManageTeam = 'Διαχείριση ομάδων';
+z.string.el.preferencesAccountPrivacy = 'Προστασία Προσωπικών Δεδομένων';
 z.string.el.preferencesAccountResetPassword = 'Επαναφορά κωδικού πρόσβασης';
 z.string.el.preferencesAccountTeam = 'στο {{name}}';
-z.string.el.preferencesAccountUsernamePlaceholder = 'Ονοματεπώνυμο';
-z.string.el.preferencesAccountUsernameHint = 'Τουλάχιστον 2 χαρακτήρες. a—z, 0—9 και _ μόνο.';
 z.string.el.preferencesAccountUsernameAvailable = 'Διαθέσιμο';
 z.string.el.preferencesAccountUsernameErrorTaken = 'Χρησιμοποιείται ήδη';
+z.string.el.preferencesAccountUsernameHint = 'Τουλάχιστον 2 χαρακτήρες. a—z, 0—9 και _ μόνο.';
+z.string.el.preferencesAccountUsernamePlaceholder = 'Ονοματεπώνυμο';
 
 z.string.el.preferencesAVCamera = 'Κάμερα';
 z.string.el.preferencesAVMicrophone = 'Μικρόφωνο';
@@ -518,10 +522,10 @@ z.string.el.warningNotFoundMicrophone = 'Δεν μπορείτε να καλέσ
 z.string.el.warningPermissionDeniedCamera = 'Δεν μπορείτε να καλέσετε, επειδή το πρόγραμμα περιήγησής σας δεν έχει πρόσβαση σε κάμερα.';
 z.string.el.warningPermissionDeniedMicrophone = 'Δεν μπορείτε να καλέσετε, επειδή το πρόγραμμα περιήγησής σας δεν έχει πρόσβαση στο μικρόφωνο.';
 z.string.el.warningPermissionDeniedScreen = 'Το πρόγραμμα περιήγησής σας χρειάζεται άδεια για να μοιραστείτε την οθόνη σας.';
-z.string.el.warningPermissionRequestCamera = '{{icon}} Να επιτρέπεται η πρόσβαση στην κάμερα';
-z.string.el.warningPermissionRequestMicrophone = '{{icon}} Να επιτρέπεται η πρόσβαση στο μικρόφωνο';
-z.string.el.warningPermissionRequestNotification = '{{icon}} Να επιτρέπονται οι ειδοποιήσεις';
-z.string.el.warningPermissionRequestScreen = '{{icon}} Να επιτρέπεται η πρόσβαση στην οθόνη';
+z.string.el.warningPermissionRequestCamera = '[icon] Να επιτρέπεται η πρόσβαση στην κάμερα';
+z.string.el.warningPermissionRequestMicrophone = '[icon] Να επιτρέπεται η πρόσβαση στο μικρόφωνο';
+z.string.el.warningPermissionRequestNotification = '[icon] Να επιτρέπονται οι ειδοποιήσεις';
+z.string.el.warningPermissionRequestScreen = '[icon] Να επιτρέπεται η πρόσβαση στην οθόνη';
 
 z.string.el.userAvailabilityAvailable = 'Διαθέσιμο';
 z.string.el.userAvailabilityNone = 'Καθόλου';

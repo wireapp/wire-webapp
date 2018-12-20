@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
@@ -82,6 +80,7 @@ z.assets.AssetService = class AssetService {
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
    * @param {Function} xhrAccessorFunction - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
@@ -94,6 +93,11 @@ z.assets.AssetService = class AssetService {
         const assetRemoteData = new z.proto.Asset.RemoteData(keyBytes, sha256, key, token);
 
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED, assetRemoteData);
+        protoAsset.set(
+          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+          options.expectsReadConfirmation || false
+        );
+
         return protoAsset;
       });
   }
@@ -106,6 +110,7 @@ z.assets.AssetService = class AssetService {
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
    * @returns {Promise} Resolves when asset has been uploaded
    */
   uploadImageAsset(image, options) {
@@ -119,6 +124,11 @@ z.assets.AssetService = class AssetService {
 
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
         protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED, assetRemoteData);
+        protoAsset.set(
+          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+          options.expectsReadConfirmation || false
+        );
+
         return protoAsset;
       });
     });

@@ -17,19 +17,22 @@
  *
  */
 
-// grunt test_run:event/EventRepository
+// KARMA_SPECS=event/EventRepository yarn test:app
 
 'use strict';
+import {MemoryEngine} from '@wireapp/store-engine';
+import {Cryptobox} from '@wireapp/cryptobox';
+import * as Proteus from '@wireapp/proteus';
 
 async function createEncodedCiphertext(
   preKey,
   text = 'Hello, World!',
   receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity
 ) {
-  const bobEngine = new window.StoreEngine.MemoryEngine();
+  const bobEngine = new MemoryEngine();
   await bobEngine.init('bob');
 
-  const sender = new window.cryptobox.Cryptobox(bobEngine, 1);
+  const sender = new Cryptobox(bobEngine, 1);
   await sender.create();
 
   const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
@@ -63,7 +66,7 @@ describe('Event Repository', () => {
 
   beforeAll(() => {
     return z.util.protobuf
-      .loadProtos('ext/proto/@wireapp/protocol-messaging/messages.proto')
+      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
       .then(() => test_factory.exposeClientActors());
   });
 
@@ -520,6 +523,7 @@ describe('Event Repository', () => {
 
     it('updates edited messages', () => {
       const originalMessage = JSON.parse(JSON.stringify(event));
+      originalMessage.reactions = ['user-id'];
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
       spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(updates => updates);
 
@@ -536,6 +540,7 @@ describe('Event Repository', () => {
         expect(updatedEvent.time).not.toEqual(changed_time);
         expect(updatedEvent.data.content).toEqual('new content');
         expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
+        expect(updatedEvent.reactions).toEqual([]);
         expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });

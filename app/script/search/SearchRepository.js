@@ -17,12 +17,10 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.search = z.search || {};
 
-z.search.SearchRepository = class SearchRepository {
+class SearchRepository {
   static get CONFIG() {
     return {
       MAX_DIRECTORY_RESULTS: 30,
@@ -108,9 +106,9 @@ z.search.SearchRepository = class SearchRepository {
       const isEmoji = z.util.EmojiUtil.UNICODE_RANGES.includes(char);
       return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
     }, {});
-    const value = ko.unwrap(userEntity[property]) || '';
+    const value = typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property];
 
-    const isStrictMatch = value.toLowerCase().startsWith(term.toLowerCase());
+    const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
       return 100;
@@ -190,4 +188,7 @@ z.search.SearchRepository = class SearchRepository {
           .slice(0, maxResults);
       });
   }
-};
+}
+
+export default SearchRepository;
+z.search.SearchRepository = SearchRepository;

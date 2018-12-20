@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:view_model/InputBarViewModel
+// KARMA_SPECS=view_model/InputBarViewModel yarn test:app
 
 describe('z.viewModel.content.InputBarViewModel', () => {
   const testFactory = new TestFactory();

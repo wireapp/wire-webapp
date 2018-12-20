@@ -226,7 +226,7 @@ class Login extends React.Component<CombinedProps, State> {
           login.email = email;
         } else if (this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (this.isValidPhoneNumber(email)) {
+        } else if (config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
           login.phone = email;
         }
 
@@ -257,11 +257,17 @@ class Login extends React.Component<CombinedProps, State> {
             this.props.resetAuthError();
             return this.props.history.push(ROUTE.CLIENTS);
           }
+          case BackendError.LABEL.INVALID_CREDENTIALS:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             return;
           }
           default: {
-            throw error;
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType)
+            );
+            if (!isValidationError) {
+              throw error;
+            }
           }
         }
       });
@@ -302,16 +308,18 @@ class Login extends React.Component<CombinedProps, State> {
     const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
       <Page>
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
+        {config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+          <IsMobile>
+            <div style={{margin: 16}}>{backArrow}</div>
+          </IsMobile>
+        )}
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
           <AppAlreadyOpen />
           <Columns>
             <IsMobile not>
               <Column style={{display: 'flex'}}>
-                <div style={{margin: 'auto'}}>{backArrow}</div>
+                {config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
               </Column>
             </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -404,7 +412,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {isSSOCapable ? (
+                {config.FEATURE.ENABLE_SSO && isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
@@ -415,14 +423,16 @@ class Login extends React.Component<CombinedProps, State> {
                           {_(loginStrings.ssoLogin)}
                         </Link>
                       </Column>
-                      <Column>
-                        <Link
-                          href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search}
-                          data-uie-name="go-sign-in-phone"
-                        >
-                          {_(loginStrings.phoneLogin)}
-                        </Link>
-                      </Column>
+                      {config.FEATURE.ENABLE_PHONE_LOGIN && (
+                        <Column>
+                          <Link
+                            href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
+                            data-uie-name="go-sign-in-phone"
+                          >
+                            {_(loginStrings.phoneLogin)}
+                          </Link>
+                        </Column>
+                      )}
                     </Columns>
                   </div>
                 ) : (
@@ -432,11 +442,16 @@ class Login extends React.Component<CombinedProps, State> {
                         {_(loginStrings.forgotPassword)}
                       </Link>
                     </Column>
-                    <Column>
-                      <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
-                        {_(loginStrings.phoneLogin)}
-                      </Link>
-                    </Column>
+                    {config.FEATURE.ENABLE_PHONE_LOGIN && (
+                      <Column>
+                        <Link
+                          href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
+                          data-uie-name="go-sign-in-phone"
+                        >
+                          {_(loginStrings.phoneLogin)}
+                        </Link>
+                      </Column>
+                    )}
                   </Columns>
                 )}
               </ContainerXS>

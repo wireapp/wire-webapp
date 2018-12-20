@@ -17,9 +17,9 @@
  *
  */
 
-'use strict';
+// KARMA_SPECS=telemetry/calling/CallLogger yarn test:app
 
-// grunt test_run:telemetry/calling/CallLogger
+import sdpTransform from 'sdp-transform';
 
 describe('z.telemetry.calling.CallLogger', () => {
   const callLogger = new z.telemetry.calling.CallLogger('test', null, {}, 'test');
@@ -181,7 +181,7 @@ a=ice-options:trickle
 a=sctpmap:5000 webrtc-datachannel 1024`;
 
     expect(callLogger.safeGuard(callLogger.obfuscateSdp(originalSdp)).trim()).toBe(
-      window.sdpTransform.write(window.sdpTransform.parse(obfuscatedSdp)).trim()
+      sdpTransform.write(sdpTransform.parse(obfuscatedSdp)).trim()
     );
   });
 });

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 navigator.__defineGetter__('language', () => {
   return 'en';
 });

@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:user/UserHandleGenerator
-
-'use strict';
+// KARMA_SPECS=user/UserHandleGenerator yarn test:app
 
 describe('UserHandleGenerator', () => {
   describe('generate_handle_variations', () => {

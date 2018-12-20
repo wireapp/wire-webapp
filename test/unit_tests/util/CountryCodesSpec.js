@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/CountryCodes
-
-'use strict';
+// KARMA_SPECS=util/CountryCodes yarn test:app
 
 describe('z.util.CountryCodes', () => {
   describe('getCountryCode', () => {

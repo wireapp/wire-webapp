@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -160,6 +158,24 @@ z.conversation.ConversationService = class ConversationService {
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`,
     });
   }
+
+  /**
+   * Update the conversation message timer value.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
+   *
+   * @param {string} conversationId - ID of conversation to rename
+   * @param {number} receiptMode - new receipt mode
+   * @returns {Promise} Resolves with the server response
+   */
+  updateConversationReceiptMode(conversationId, receiptMode) {
+    return this.backendClient.sendJson({
+      data: {receipt_mode: receiptMode},
+      type: 'PUT',
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/receipt-mode`,
+    });
+  }
+
   /**
    * Update self membership properties.
    *
@@ -387,6 +403,10 @@ z.conversation.ConversationService = class ConversationService {
       this.logger.info(`State of conversation '${primary_key}' was deleted`);
       return primary_key;
     });
+  }
+
+  loadConversation(conversationId) {
+    return this.storageService.load(this.CONVERSATION_STORE_NAME, conversationId);
   }
 
   /**

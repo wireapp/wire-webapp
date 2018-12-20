@@ -61,9 +61,21 @@
   &:hover .time,
   &.hover .context-menu,
   &:hover .context-menu,
+  &.hover .message-status-read,
+  &:hover .message-status-read,
   .show-timestamp.time {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  &.hover,
+  &:hover {
+    .message-status,
+    .message-status-read {
+      &::before {
+        content: '·';
+      }
+    }
   }
 
   &.hover .time,
@@ -242,7 +254,7 @@
   flex: 1;
   margin-left: 16px;
   border: none;
-  background: @seperator-color;
+  background: @separator-color;
 }
 
 // MESSAGE - TIMESTAMP
@@ -250,7 +262,7 @@
   height: 48px;
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
   margin-bottom: 16px;
-  border-bottom: 1px solid @seperator-color;
+  border-bottom: 1px solid @separator-color;
   line-height: 40px;
   user-select: none;
 
@@ -273,7 +285,7 @@
     border: 0;
 
     .message-header-label {
-      border-bottom: 1px dotted @seperator-color;
+      border-bottom: 1px dotted @separator-color;
     }
   }
 
@@ -453,13 +465,17 @@
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
   width: @conversation-message-timestamp-width;
   height: @line-height-lg;
+  align-items: center;
 
   // actions pill
   .action-pill-style() {
     z-index: 1;
-    line-height: 18px;
+    display: flex;
+    height: 16px;
+    align-items: center;
     opacity: 0;
     text-decoration: none;
     transition: opacity, 0.3s;
@@ -467,13 +483,11 @@
 
   // CONTEXT MENU
   .context-menu {
-    .square(18px);
+    .square(16px);
     .action-pill-style;
 
     position: absolute;
-    top: 4px;
-    right: 72px;
-    display: flex;
+    left: 8px;
     justify-content: center;
 
     &:focus {
@@ -482,23 +496,59 @@
     }
   }
 
-  .show-timestamp.time + .message-status {
-    opacity: 0;
+  .message-status-read {
+    read-icon {
+      display: flex;
+      width: 16px;
+      height: 16px;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        max-width: 12px;
+        max-height: 12px;
+        fill: currentColor;
+      }
+    }
+
+    &__count {
+      margin-left: 4px;
+    }
   }
 
   .time,
-  .message-status {
+  .message-status,
+  .message-status-read {
     .action-pill-style;
-
     position: absolute;
-    top: 3px;
-    right: 24px;
-    padding-right: 6px;
-    padding-left: 6px;
     color: fade(#000, 40%);
     font-size: @font-size-xs;
     pointer-events: none;
     user-select: none;
+
+    &--clickable {
+      cursor: pointer;
+      pointer-events: all;
+    }
+  }
+  .message-status,
+  .message-status-read--visible {
+    opacity: 1;
+  }
+}
+
+.time {
+  left: 32px;
+}
+.message-status,
+.message-status-read {
+  left: 60px;
+  &::before {
+    display: flex;
+    width: 16px;
+    align-items: center;
+    justify-content: center;
+    content: '';
   }
 }
 
@@ -569,7 +619,7 @@
   display: inline-block;
   padding: 4px 16px;
   margin-top: 16px;
-  background-color: @seperator-color;
+  background-color: @separator-color;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;

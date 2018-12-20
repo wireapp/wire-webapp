@@ -17,12 +17,7 @@
  *
  */
 
-'use strict';
-
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.CryptographyMapper = class CryptographyMapper {
+export default class CryptographyMapper {
   static get CONFIG() {
     return {
       MAX_MENTIONS_PER_MESSAGE: 500,
@@ -56,7 +51,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
     switch (genericMessage.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET: {
-        specificContent = this._mapAsset(genericMessage.asset);
+        specificContent = addExpectReadReceiptData(this._mapAsset(genericMessage.asset), genericMessage.asset);
         break;
       }
 
@@ -101,12 +96,15 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE: {
-        specificContent = this._mapImage(genericMessage.image, event.data.id);
+        specificContent = addExpectReadReceiptData(
+          this._mapImage(genericMessage.image, event.data.id),
+          genericMessage.image
+        );
         break;
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
-        specificContent = this._mapKnock();
+        specificContent = addExpectReadReceiptData(this._mapKnock(genericMessage.knock), genericMessage.knock);
         break;
       }
 
@@ -116,7 +114,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION: {
-        specificContent = this._mapLocation(genericMessage.location);
+        specificContent = addExpectReadReceiptData(this._mapLocation(genericMessage.location), genericMessage.location);
         break;
       }
 
@@ -126,7 +124,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT: {
-        specificContent = this._mapText(genericMessage.text);
+        specificContent = addExpectReadReceiptData(this._mapText(genericMessage.text), genericMessage.text);
         break;
       }
 
@@ -265,6 +263,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         message_id: confirmation.first_message_id,
+        more_message_ids: confirmation.more_message_ids || [],
         status: (() => {
           switch (confirmation.type) {
             case z.proto.Confirmation.Type.DELIVERED:
@@ -376,8 +375,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _mapKnock() {
-    return {type: z.event.Client.CONVERSATION.KNOCK};
+  _mapKnock(knock) {
+    return {
+      data: {},
+      type: z.event.Client.CONVERSATION.KNOCK,
+    };
   }
 
   _mapLastRead(lastRead) {
@@ -432,4 +434,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   }
-};
+}
+
+function addExpectReadReceiptData(mappedEvent, rawEvent) {
+  mappedEvent.data = Object.assign({}, mappedEvent.data, {
+    expects_read_confirmation: rawEvent.expects_read_confirmation,
+  });
+  return mappedEvent;
+}

@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:entity/message/MessageEntities
+// KARMA_SPECS=entity/message/MessageEntities yarn test:app
 
 describe('Message Entities', () => {
   let message_et = null;

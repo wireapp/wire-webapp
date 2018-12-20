@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import {escapeProperties} from '../util/objectUtil';
 
 window.z = window.z || {};
 window.z.location = window.z.location || {};
@@ -55,7 +55,7 @@ z.location.LocationService = (() => {
     locationResult.place = locality || naturalFeature || areaLevel3 || areaLevel2 || areaLevel1;
 
     delete locationResult.political;
-    return z.util.ObjectUtil.escapeProperties(locationResult);
+    return escapeProperties(locationResult);
   };
 
   return class LocationService {

@@ -2,20 +2,30 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesAbout"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
+      <!-- ko if: showSupportSection() -->
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAboutSupport"></header>
-        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.SUPPORT, path: z.string.urlSupportRoot}, l10n_text: z.string.preferencesAboutSupportWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
-        <a class="preferences-link" data-bind="l10n_href: {support: z.config.SUPPORT.FORM.CONTACT}, l10n_text: z.string.preferencesAboutSupportContact" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
+        <a class="preferences-link" data-bind="attr: {href: supportUrl}, l10n_text: z.string.preferencesAboutSupportWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
+        <a class="preferences-link" data-bind="attr: {href: supportContactUrl}, l10n_text: z.string.preferencesAboutSupportContact" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
       </section>
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
-        <a class="preferences-link" data-bind="click: clickOnToU, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
-        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsitePrivacy}, l10n_text: z.string.preferencesAboutPrivacyPolicy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
-        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsiteRoot}, l10n_text: z.string.preferencesAboutWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
-      </section>
+      <!-- /ko -->
+      <!-- ko if: showWireSection() -->
+        <section class="preferences-section">
+          <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
+          <!-- ko if: termsOfUseUrl() -->
+            <a class="preferences-link" data-bind="attr: {href: termsOfUseUrl()}, l10n_text: z.string.preferencesAboutTermsOfUse" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
+          <!-- /ko -->
+          <!-- ko if: privacyPolicyUrl -->
+            <a class="preferences-link" data-bind="attr: {href: privacyPolicyUrl}, l10n_text: z.string.preferencesAboutPrivacyPolicy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
+          <!-- /ko -->
+          <!-- ko if: websiteUrl -->
+            <a class="preferences-link" data-bind="attr: {href: websiteUrl}, l10n_text: z.string.preferencesAboutWebsite" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
+          <!-- /ko -->
+        </section>
+      <!-- /ko -->
       <section class="preferences-section">
         <header class="preferences-header"><hr class="preferences-separator"></header>
-        <div class="preferences-detail" data-bind="l10n_text: {id: z.string.preferencesAboutVersion, substitute: '{{config.CURRENT_VERSION_DATE}}'}"></div>
+        <div class="preferences-detail" data-bind="l10n_text: {id: z.string.preferencesAboutVersion, substitute: '{{@config.VERSION}}'}"></div>
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAboutCopyright"></div>
       </section>
     </div>

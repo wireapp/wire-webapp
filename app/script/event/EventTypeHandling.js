@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -34,6 +32,7 @@ z.event.EventTypeHandling = {
     z.event.Backend.CONVERSATION.MEMBER_JOIN,
     z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE,
+    z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE,
     z.event.Backend.CONVERSATION.RENAME,
     z.event.Client.CONVERSATION.ASSET_ADD,
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE,

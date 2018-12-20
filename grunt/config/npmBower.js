@@ -17,14 +17,11 @@
  *
  */
 
-'use strict';
-
 // https://github.com/wireapp/grunt-npm-bower
 
 module.exports = {
   options: {
     cleanTargetDir: true,
     targetDir: '<%= dir.app.ext %>',
-    verbose: true,
   },
 };

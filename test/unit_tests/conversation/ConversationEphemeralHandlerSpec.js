@@ -17,10 +17,10 @@
  *
  */
 
-'use strict';
+import ConversationMapper from 'app/script/conversation/ConversationMapper';
 
 const buildConversationEphemeralHandler = () => {
-  const conversationMapper = new z.conversation.ConversationMapper();
+  const conversationMapper = new ConversationMapper();
   const eventService = new z.event.EventService(null, null);
   return new z.conversation.ConversationEphemeralHandler(conversationMapper, eventService, () => {});
 };

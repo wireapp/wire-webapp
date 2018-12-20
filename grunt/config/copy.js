@@ -17,88 +17,27 @@
  *
  */
 
-'use strict';
-
 // https://github.com/gruntjs/grunt-contrib-copy
 
 module.exports = {
-  //##############################################################################
-  // Amazon Web Services related
-  //##############################################################################
-  aws: {
-    cwd: '<%= dir.deploy %>',
-    dest: '<%= dir.aws.static %>',
-    expand: true,
-    src: '**/*',
-  },
-  //##############################################################################
-  // Prod/Staging/Edge deployment related
-  //##############################################################################
-  deploy: {
+  dist: {
     cwd: '<%= dir.app_ %>',
-    dest: '<%= dir.deploy %>',
+    dest: '<%= dir.dist.static %>',
     expand: true,
-    src: [
-      'ext/image/**/*',
-      'ext/js/**/*',
-      'ext/proto/**/*',
-      'audio/**/*',
-      'image/**/*',
-      'font/**/*',
-      'script/**/*.js',
-      'worker/*',
-      '*.js',
-    ],
+    src: ['audio/**/*', 'image/**/*', 'font/**/*', 'worker/*', 'sw.js'],
   },
 
-  deploy_audio: {
+  dist_audio: {
     cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files',
-    dest: '<%= dir.deploy %>/audio',
+    dest: '<%= dir.dist.static %>/audio',
     expand: true,
     src: '*',
   },
 
-  deploy_favicon: {
-    cwd: '<%= dir.deploy %>/image',
-    dest: '<%= dir.deploy %>',
+  dist_favicon: {
+    cwd: '<%= dir.dist.static %>/image',
+    dest: '<%= dir.dist.static %>',
     expand: true,
     src: 'favicon.ico',
-  },
-  //##############################################################################
-  // Local deployment related
-  //##############################################################################
-  frontend: {
-    files: [
-      {
-        cwd: 'node_modules',
-        dest: '<%= dir.app.ext %>/js/',
-        expand: true,
-        src: [
-          '@wireapp/cbor/dist/cbor.bundle.js',
-          '@wireapp/cbor/dist/cbor.bundle.js.map',
-          '@wireapp/cryptobox/dist/cryptobox.bundle.js',
-          '@wireapp/cryptobox/dist/cryptobox.bundle.js.map',
-          '@wireapp/lru-cache/dist/lru-cache.bundle.js',
-          '@wireapp/lru-cache/dist/lru-cache.bundle.js.map',
-          '@wireapp/priority-queue/dist/priority-queue.bundle.js',
-          '@wireapp/priority-queue/dist/priority-queue.bundle.js.map',
-          '@wireapp/proteus/dist/proteus.bundle.js',
-          '@wireapp/proteus/dist/proteus.bundle.js.map',
-          '@wireapp/store-engine/dist/store-engine.bundle.js',
-          '@wireapp/store-engine/dist/store-engine.bundle.js.map',
-          'dexie-batch/dist/dexie-batch.js',
-          'dexie-batch/dist/dexie-batch.js.map',
-          'jszip/dist/jszip.js',
-          'long/dist/long.js',
-          'simplebar/dist/simplebar.min.js',
-        ],
-      },
-      {
-        cwd: 'node_modules',
-        dest: '<%= dir.app.ext %>/css/',
-        expand: true,
-        src: ['simplebar/dist/simplebar.min.css'],
-      },
-    ],
   },
 };
