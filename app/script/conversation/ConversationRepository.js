@@ -270,11 +270,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
-    const payload = {
+    const payload = Object.assign({}, options, {
       name: groupName,
       users: userIds,
-      ...options,
-    };
+    });
 
     if (this.team().id) {
       payload.team = {
