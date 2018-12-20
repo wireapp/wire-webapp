@@ -62,7 +62,7 @@
         data-bind="l10n_text: {id: z.string.messageDetailsSent, substitute: sentFooter()}"
         data-uie-name="status-message-details-sent"
       ></div>
-      <!-- ko if: editedFooter -->
+      <!-- ko if: editedFooter() -->
         <div
           class="panel__footer__info"
           data-bind="l10n_text: {id: z.string.messageDetailsEdited, substitute: editedFooter()}"
