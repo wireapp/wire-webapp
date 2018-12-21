@@ -57,10 +57,16 @@ export const escapeProperties = object => mapRecursive(object, _.escape);
  * @returns {Entity} mergedEntity
  */
 export const mergeEntities = (destination, source, ignoredProperties = []) => {
-  if (!isObject(source) || !isObject(destination) || isArray(source)) {
+  if (!isObject(source) || !isObject(destination)) {
     return source;
   }
-
+  if (isArray(source)) {
+    destination.length = source.length;
+    source.forEach((value, index) => {
+      destination[index] = mergeEntities(destination[index], value, ignoredProperties);
+    });
+    return destination;
+  }
   const properties = Object.entries(source).filter(([property]) => !ignoredProperties.includes(property));
   const rawValues = properties.filter(([_, accessor]) => {
     return typeof accessor !== 'function';
@@ -73,10 +79,12 @@ export const mergeEntities = (destination, source, ignoredProperties = []) => {
   });
 
   // update raw values first (in order to have them up to date when observables are updated)
-  rawValues.forEach(([property, value]) => (destination[property] = mergeEntities(destination[property], value)));
+  rawValues.forEach(
+    ([property, value]) => (destination[property] = mergeEntities(destination[property], value, ignoredProperties))
+  );
   deletedProperties.forEach(property => delete destination[property]);
   observableValues.forEach(([property, value]) => {
-    destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)));
+    destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value), ignoredProperties));
   });
 
   return destination;
