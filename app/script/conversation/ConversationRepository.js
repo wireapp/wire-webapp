@@ -3595,8 +3595,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _addEventToConversation(conversationEntity, eventJson) {
     return this._initMessageEntity(conversationEntity, eventJson).then(messageEntity => {
       if (conversationEntity && messageEntity) {
-        conversationEntity.add_message(messageEntity);
-        this.ephemeralHandler.validateMessage(messageEntity);
+        const wasAdded = conversationEntity.add_message(messageEntity);
+        if (wasAdded) {
+          this.ephemeralHandler.validateMessage(messageEntity);
+        }
       }
       return {conversationEntity, messageEntity};
     });

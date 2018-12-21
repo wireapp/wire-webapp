@@ -399,12 +399,13 @@ class Conversation {
       const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
       const alreadyAdded = messageWithLinkPreview() || editedMessage();
       if (alreadyAdded) {
-        return;
+        return false;
       }
 
       this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
+      return true;
     }
   }
 
