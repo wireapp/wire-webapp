@@ -18,16 +18,46 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+/* eslint-disable no-console */
 
 const fs = require('fs-extra');
 const {execSync} = require('child_process');
-const {resolve} = require('path');
+const {resolve, join} = require('path');
+const pkg = require('../package');
+
+console.log(`Loading configuration for project "${pkg.name}"`);
 
 const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default';
 const gitConfigurationUrl = process.env.WIRE_CONFIGURATION_REPOSITORY || defaultGitConfigurationUrl;
-const configDir = 'config';
+const configDirName = 'config';
+const configDir = resolve(configDirName);
+const src = resolve(configDir, pkg.name, 'content');
+const dest = '../../../resource/';
+const ignoreList = ['.DS_Store'];
 
-fs.removeSync(resolve(configDir));
-execSync(`git clone ${gitConfigurationUrl} ${configDir}`, {stdio: [0, 1]});
-execSync(`cd ${configDir} && yarn && yarn merge:wire-webapp`, {stdio: [0, 1]});
-fs.removeSync(resolve(configDir));
+console.log(`Cleaning config directory "${configDir}"`);
+fs.removeSync(configDir);
+execSync(`git clone ${gitConfigurationUrl} ${configDirName}`, {stdio: [0, 1]});
+
+process.chdir(src);
+
+const walkSync = (dir, fileList = []) =>
+  fs.readdirSync(dir).reduce((fileListAccumulator, file) => {
+    const isDirectory = fs.statSync(join(dir, file)).isDirectory();
+    return isDirectory ? walkSync(join(dir, file), fileListAccumulator) : fileListAccumulator.concat([[dir, file]]);
+  }, fileList);
+
+const files = walkSync('./').filter(file => ignoreList.some(ignore => !file.includes(ignore)));
+
+files.forEach(([dir, file]) => {
+  const source = resolve(dir, file);
+  const destination = resolve(dest, dir, file);
+
+  console.log(`Copy file "${source}" -> "${destination}"`);
+
+  fs.mkdirpSync(resolve(dir));
+  fs.copySync(source, destination);
+});
+
+console.log(`Cleaning config directory "${configDir}"`);
+fs.removeSync(configDir);

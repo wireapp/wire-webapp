@@ -41,6 +41,7 @@ module.exports = grunt => {
       api: 'docs/api',
       coverage: 'docs/coverage',
     },
+    resource: 'resource',
     test_: 'test',
     test: {
       api: 'test/api',
@@ -73,8 +74,8 @@ module.exports = grunt => {
     'clean:dist_s3',
     'set_version',
     'build_style',
-    'copy:dist',
-    'copy:dist_audio',
+    'copy:dist_serviceworker',
+    'copy:dist_resource',
     'build_markup',
   ]);
 
