@@ -22,15 +22,15 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const dist = 'server/dist/static/';
-const srcScript = 'app/script/auth/';
-const appSrc = 'app/script/';
+const srcScript = 'src/script/auth/';
+const src = 'src/script/';
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    app: path.resolve(__dirname, appSrc, 'main/app.js'),
+    app: path.resolve(__dirname, src, 'main/app.js'),
     auth: path.resolve(__dirname, srcScript, 'main.tsx'),
-    login: path.resolve(__dirname, appSrc, 'main/login.js'),
+    login: path.resolve(__dirname, src, 'main/login.js'),
   },
   externals: {
     'fs-extra': '{}',
@@ -88,7 +88,7 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      components: path.resolve(__dirname, `${appSrc}/components/`),
+      components: path.resolve(__dirname, `${src}/components/`),
       // override phoneformat export, because the 'main' file is not exporting anything
       'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
     },

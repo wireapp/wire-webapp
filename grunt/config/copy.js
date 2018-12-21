@@ -27,7 +27,7 @@ module.exports = {
     src: ['audio/**/*', 'image/**/*', 'font/**/*'],
   },
   dist_serviceworker: {
-    cwd: '<%= dir.app_ %>',
+    cwd: '<%= dir.src_ %>',
     dest: '<%= dir.dist.static %>',
     expand: true,
     src: ['worker/*', 'sw.js'],

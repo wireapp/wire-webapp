@@ -22,9 +22,10 @@
 const less = require('less');
 const path = require('path');
 const fs = require('fs-extra');
+const {SRC_PATH, DIST_PATH} = require('../locations');
 
-const src = path.resolve(__dirname, '../app/style');
-const dist = path.resolve(__dirname, '../server/dist/static/style');
+const src = path.resolve(SRC_PATH, 'style');
+const dist = path.resolve(DIST_PATH, 'static/style');
 
 process.chdir(src);
 fs.mkdirpSync(dist);
