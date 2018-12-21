@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.10.5...@wireapp/commons@0.11.0) (2018-12-21)
+
+
+### Features
+
+* **commons:** Add factory for loggers ([#1395](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1395)) ([a604a8c](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/a604a8c))
+
+
+
+
+
 ## [0.10.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.10.4...@wireapp/commons@0.10.5) (2018-12-20)
 
 **Note:** Version bump only for package @wireapp/commons
