@@ -25,9 +25,9 @@
     align-items: center;
     justify-content: center;
     animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
-    background-color: fade(@graphite-dark, 8%);
+    background-color: var(--background-fade-8);
     border-radius: 12px;
-    color: @graphite-dark;
+    color: var(--background);
     cursor: pointer;
     font-size: 12px;
     line-height: 24px;
@@ -38,15 +38,15 @@
     }
 
     svg > path {
-      fill: @graphite-dark;
+      fill: var(--background);
     }
 
     &--active {
-      background-color: @graphite-dark;
-      color: #fff;
+      background-color: var(--background);
+      color: var(--app-bg-secondary);
 
       svg > path {
-        fill: #fff;
+        fill: var(--app-bg-secondary);
       }
     }
 
@@ -99,11 +99,11 @@
     }
 
     &--green {
-      background-color: @w-green;
+      background-color: @w-green !important;
     }
 
     &--red {
-      background-color: @w-red;
+      background-color: @w-red !important;
     }
 
     & + & {
@@ -118,12 +118,12 @@
     &__wrapper {
       overflow: hidden;
       max-height: 0;
-      color: @graphite-dark;
+      color: var(--background);
 
       &::before {
         display: block;
         margin: 0 16px;
-        border-top: 1px solid fade(@graphite-dark, 4%);
+        border-top: 1px solid var(--background-fade-8);
         content: '';
       }
 
@@ -135,7 +135,7 @@
     .participant-item {
       height: 40px;
       cursor: default;
-      fill: @graphite-dark;
+      fill: var(--background);
       pointer-events: none;
 
       .participant-item-image {
@@ -168,10 +168,10 @@
   }
 
   &__avatar {
-    border: 1px solid fade(@graphite-dark, 8%);
+    border: 1px solid var(--background-fade-8);
 
     .group-avatar-box-wrapper {
-      background: fade(@graphite-dark, 16%);
+      background: var(--background-fade-16);
     }
   }
 }
@@ -196,24 +196,24 @@ conversation-list-calling-cell {
   flex-shrink: 0;
   margin: 0 16px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
-  background-color: #fff;
+  background-color: var(--app-bg-secondary);
   border-radius: 8px;
 
   &.dark-bg {
-    color: #fff;
+    color: var(--app-bg-secondary);
 
     &::before {
-      background-color: fade(@graphite-dark, 80%);
+      background-color: var(--background-fade-80);
     }
   }
 
   .conversation-list-cell-name {
-    color: @graphite-dark;
+    color: var(--background);
   }
 
   .conversation-list-cell-description {
     margin-top: 0;
-    color: fade(@graphite-dark, 40%);
+    color: var(--background-fade-40);
     font-size: 11px;
     opacity: 1;
   }

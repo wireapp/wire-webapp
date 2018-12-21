@@ -33,7 +33,7 @@ input-element {
     padding-right: @input-element-indent;
     padding-left: @input-element-indent;
     margin-left: -@input-element-indent;
-    background-color: fade(#fff, 24%);
+    background-color: var(--foreground-fade-24);
     border-radius: 2px;
 
     &:focus {
@@ -43,7 +43,7 @@ input-element {
     &::placeholder {
       .label-xs;
 
-      color: fade(#fff, 56%);
+      color: var(--foreground-fade-56);
     }
   }
 

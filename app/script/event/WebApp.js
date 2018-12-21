@@ -174,6 +174,11 @@ z.event.WebApp = {
       EMOJI: {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
       },
+      INTERFACE: {
+        THEME: 'wire.webapp.properties.update.interface.theme',
+        USE_DARK_MODE: 'wire.webapp.properties.update.interface.use_dark_mode',
+        USE_DARK_MODE_TOGGLE: 'wire.webapp.properties.update.interface.use_dark_mode_toggle',
+      },
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {
         SEND: 'wire.webapp.properties.update.previews.send',

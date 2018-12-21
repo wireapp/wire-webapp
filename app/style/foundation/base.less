@@ -24,7 +24,7 @@
 }
 
 body {
-  color: @graphite-dark;
+  color: var(--background);
   font-family: @font-family-base;
   font-size: @font-size-sm;
   font-weight: 300;
@@ -60,6 +60,21 @@ pre {
     display: block;
     overflow: auto;
   }
+}
+
+// Set the right background color for bubbles
+.bubble {
+  &:after {
+    background: linear-gradient(
+      -45deg,
+      var(--app-bg-secondary),
+      var(--app-bg-secondary) 50%,
+      transparent 0,
+      transparent
+    );
+  }
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: transparent;
 }
 
 b,

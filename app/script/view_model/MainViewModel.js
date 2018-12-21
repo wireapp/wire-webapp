@@ -20,6 +20,8 @@
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
+import ThemeViewModel from '../view_model/ThemeViewModel';
+
 z.viewModel.MainViewModel = class MainViewModel {
   static get CONFIG() {
     return {
@@ -73,6 +75,7 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
+    this.theme = new ThemeViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();

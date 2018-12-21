@@ -23,7 +23,7 @@
   width: 168px;
   padding: @bubble-border-radius;
   margin: -@bubble-border-radius;
-  background-color: #fff;
+  background-color: var(--app-bg-secondary);
   border-radius: @bubble-border-radius;
   text-align: center;
 
@@ -31,23 +31,23 @@
     .label-bold-xs;
 
     height: 40px;
-    color: @graphite-dark;
+    color: var(--background);
     cursor: pointer;
     line-height: 40px;
     user-select: none;
 
     &.hover,
     &:hover {
-      background-color: fade(@graphite, 8%);
+      background-color: var(--foreground-fade-8);
     }
 
     &.active,
     &:active {
-      background-color: fade(@graphite, 16%);
+      background-color: var(--foreground-fade-16);
     }
   }
 
   > li + li {
-    border-top: 1px solid fade(@graphite, 16%);
+    border-top: 1px solid var(--foreground-fade-16);
   }
 }

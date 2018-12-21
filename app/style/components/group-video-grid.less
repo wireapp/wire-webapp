@@ -32,8 +32,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: fade(@graphite, 16%);
-      color: @graphite-dark;
+      background-color: var(--foreground-fade-16);
+      color: var(--background);
       font-size: 12px;
       font-weight: 600;
       text-align: center;
@@ -49,7 +49,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: fade(@graphite-dark, 40%);
+      background-color: var(--background-fade-40);
       border-radius: 8px;
       cursor: pointer;
       opacity: 0;
@@ -148,7 +148,7 @@
       height: 100%;
       align-items: center;
       justify-content: center;
-      background-color: fade(@graphite-dark, 16%);
+      background-color: var(--background-fade-16);
       transform: translateZ(0);
 
       svg path {

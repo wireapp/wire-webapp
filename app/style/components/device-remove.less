@@ -21,7 +21,7 @@
 .device-remove-placeholder() {
   .label-xs;
 
-  color: @graphite;
+  color: var(--foreground);
 }
 
 device-remove {
@@ -43,7 +43,7 @@ device-remove {
   border: none;
   background-color: fade(#8d989f, 24%);
   border-radius: @button-border-radius;
-  color: @graphite;
+  color: var(--foreground);
   line-height: @button-medium-sm-height;
   outline: 0;
 
@@ -57,7 +57,7 @@ device-remove {
   &.device-remove-input-error {
     border: 2px solid @w-yellow;
     background-color: #fff;
-    color: @graphite-dark;
+    color: var(--background);
   }
 }
 

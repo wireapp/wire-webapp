@@ -17,32 +17,12 @@
  *
  */
 
-@strokewidth: 4;
-@strokelength: @strokewidth * pi();
+.loading-screen {
+  .flex-center;
 
-.ephemeral-timer {
-  &__background {
-    fill: var(--foreground-fade-16);
-    stroke: var(--foreground);
-    stroke-width: 1px;
-  }
-
-  &__dial {
-    animation-name: dial-animation;
-    animation-timing-function: steps(40);
-    fill: none;
-    stroke: var(--foreground);
-    stroke-dasharray: @strokelength;
-    stroke-dashoffset: @strokelength;
-    stroke-width: @strokewidth;
-  }
-}
-
-@keyframes dial-animation {
-  0% {
-    stroke-dashoffset: @strokelength * 2;
-  }
-  100% {
-    stroke-dashoffset: @strokelength;
-  }
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: var(--app-bg);
+  color: var(--foreground);
 }

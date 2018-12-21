@@ -18,6 +18,38 @@
  */
 
 // ----------------------------------------------------------------------------
+// THEMES
+// ----------------------------------------------------------------------------
+
+.applyTheme() {
+  @iterateIndexEach: 8;
+  .setColorFade (@name, @fadeOver, @index: 0) when (@index < 96 + @iterateIndexEach) {
+    --@{name}-fade-@{index}: fade(@fadeOver, @index);
+    .setColorFade(@name, @fadeOver, @index + @iterateIndexEach);
+  }
+
+  .setVariables(@list) {
+    .iter(length(@list));
+    .iter(@i) when (@i > 0) {
+      .iter(@i - 1);
+      @pair: extract(@list, @i);
+      @key: extract(@pair, 1);
+      --@{key}: ~'@{@{key}}';
+    }
+  }
+
+  .setVariables(foreground background);
+  .setColorFade(foreground, @foreground);
+  .setColorFade(background, @background);
+  .setVariables(app-bg app-bg-secondary conversation-list-bg-opacity sidebar-box-shadow sidebar-box-shadow-lg);
+  .setVariables(modal-bg modal-border-color);
+  .setVariables(preference-account-input-bg);
+  .setVariables(text-input-editing);
+  .setVariables(message-quote-bg);
+  .setVariables(group-creation-modal-teamname-input-bg);
+}
+
+// ----------------------------------------------------------------------------
 // TEXT
 // ----------------------------------------------------------------------------
 

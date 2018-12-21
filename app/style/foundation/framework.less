@@ -23,22 +23,22 @@
 
   display: flex;
   min-width: @screen-md-min;
-  background-color: @app-bg;
+  background-color: var(--app-bg);
 
   .left-column {
     position: relative;
-    width: @left-width;
+    width: @conversation-list-width;
     flex: 0 0 auto;
-    color: @left-color;
-    fill: @left-color;
+    color: @conversation-list-color;
+    fill: @conversation-list-color;
 
     &--light-theme {
-      color: @graphite-dark;
-      fill: @graphite-dark;
+      color: var(--background);
+      fill: var(--background);
     }
 
     .team-mode & {
-      width: @left-width + @teams-width;
+      width: @conversation-list-width + @teams-width;
     }
   }
 
@@ -68,14 +68,14 @@
     width: 0;
     height: 100vh;
     max-height: 100%;
-    background-color: #fff;
-    box-shadow: 0 0 24px rgba(0, 0, 0, 0.08);
+    background-color: var(--app-bg-secondary);
+    box-shadow: 0 0 24px var(--sidebar-box-shadow-lg);
     transform: scale(1, 1);
   }
 
   @media (min-width: 1000px) {
     .right-column {
-      box-shadow: -1px 0 0 #eee;
+      box-shadow: -1px 0 0 var(--sidebar-box-shadow);
     }
   }
 
