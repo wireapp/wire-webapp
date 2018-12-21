@@ -52,8 +52,8 @@ module.exports = function(config) {
         pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
         served: true,
       },
-      {included: false, nocache: false, pattern: 'app/ext/audio/*.mp3', served: true},
-      {included: false, nocache: true, pattern: 'app/worker/*.js', served: true},
+      {included: false, nocache: false, pattern: 'src/ext/audio/*.mp3', served: true},
+      {included: false, nocache: true, pattern: 'src/worker/*.js', served: true},
 
       'node_modules/jasmine-ajax/lib/mock-ajax.js',
       'node_modules/sinon/pkg/sinon.js',
@@ -61,7 +61,7 @@ module.exports = function(config) {
       'test/api/payloads.js',
       'test/api/SDP_payloads.js',
       'test/config.test.js',
-      'app/script/main/globals.js',
+      'src/script/main/globals.js',
       'test/api/OpenGraphMocks.js',
       'test/js/calling/CallRequestResponseMock.js',
       'test/api/TestFactory.js',
@@ -78,8 +78,8 @@ module.exports = function(config) {
     preprocessors: {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
-      'app/script/main/globals.js': ['webpack', 'sourcemap'],
-      // FIXME fails because of import statements 'app/script/**/*.js': ['coverage'],
+      'src/script/main/globals.js': ['webpack', 'sourcemap'],
+      // FIXME fails because of import statements 'src/script/**/*.js': ['coverage'],
     },
 
     webpack: {

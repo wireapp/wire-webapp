@@ -24,7 +24,7 @@ const fs = require('fs');
 if (process.argv.length !== 4) {
   // eslint-disable-next-line no-console
   console.info(
-    'Normalize translation files.\n\nUsage:\nnode normalize_translations.js [file with normal string identifiers] [file to normalize]\n\nExample:\nnode bin/normalize_translations.js app/script/localization/webapp.js app/script/localization/translations/webapp-de.js'
+    'Normalize translation files.\n\nUsage:\nnode normalize_translations.js [file with normal string identifiers] [file to normalize]\n\nExample:\nnode bin/normalize_translations.js src/script/localization/webapp.js src/script/localization/translations/webapp-de.js'
   );
   return;
 }

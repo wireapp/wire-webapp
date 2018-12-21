@@ -19,7 +19,7 @@
 
 // KARMA_SPECS=conversation/EventMapper yarn test:app
 
-import EventMapper from 'app/script/conversation/EventMapper';
+import EventMapper from 'src/script/conversation/EventMapper';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();

@@ -19,7 +19,7 @@
 
 // KARMA_SPECS=util/ObjectUtil yarn test:app
 
-import {escapeProperties, mergeEntities} from 'app/script/util/objectUtil';
+import {escapeProperties, mergeEntities} from 'src/script/util/objectUtil';
 import ko from 'knockout';
 
 describe('objectUtil', () => {

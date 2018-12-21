@@ -5,12 +5,12 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.grunt" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
-      <excludeFolder url="file://$MODULE_DIR$/app/ext/audio" />
-      <excludeFolder url="file://$MODULE_DIR$/app/ext/css" />
-      <excludeFolder url="file://$MODULE_DIR$/app/ext/font" />
-      <excludeFolder url="file://$MODULE_DIR$/app/ext/image" />
-      <excludeFolder url="file://$MODULE_DIR$/app/ext/less" />
-      <excludeFolder url="file://$MODULE_DIR$/app/ext/swf" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ext/audio" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ext/css" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ext/font" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ext/image" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ext/less" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ext/swf" />
       <excludeFolder url="file://$MODULE_DIR$/aws/s3" />
       <excludeFolder url="file://$MODULE_DIR$/aws/static" />
       <excludeFolder url="file://$MODULE_DIR$/deploy" />

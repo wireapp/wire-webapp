@@ -19,9 +19,9 @@
 
 // KARMA_SPECS=conversation/ConversationVerificationStateHandler yarn test:app
 
-import ClientEntity from 'app/script/client/ClientEntity';
-import Conversation from 'app/script/entity/Conversation';
-import User from 'app/script/entity/User';
+import ClientEntity from 'src/script/client/ClientEntity';
+import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
 
 describe('z.conversation.ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();
