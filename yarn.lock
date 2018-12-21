@@ -959,10 +959,6 @@
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
 
-"@bower_components/wire-audio-files@wireapp/wire-audio-files#v1.1.2":
-  version "1.1.2"
-  resolved "https://codeload.github.com/wireapp/wire-audio-files/tar.gz/417fc4ff23fd6c6959b845e1a804ac17f1833730"
-
 "@bower_components/wire-theme@wireapp/wire-theme#v1.0.6":
   version "1.0.6"
   resolved "https://codeload.github.com/wireapp/wire-theme/tar.gz/8fb3b63a55a0cf96be9ac4718df6225784d5577a"

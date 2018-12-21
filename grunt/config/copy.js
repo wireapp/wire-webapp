@@ -28,16 +28,9 @@ module.exports = {
   },
 
   dist_audio: {
-    cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files',
+    cwd: '<%= dir.app_ %>/audio/wire-audio-files',
     dest: '<%= dir.dist.static %>/audio',
     expand: true,
     src: '*',
-  },
-
-  dist_favicon: {
-    cwd: '<%= dir.dist.static %>/image',
-    dest: '<%= dir.dist.static %>',
-    expand: true,
-    src: 'favicon.ico',
   },
 };

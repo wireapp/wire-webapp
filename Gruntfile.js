@@ -75,7 +75,6 @@ module.exports = grunt => {
     'build_style',
     'copy:dist',
     'copy:dist_audio',
-    'copy:dist_favicon',
     'build_markup',
   ]);
 
