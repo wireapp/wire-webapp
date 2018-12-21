@@ -3598,24 +3598,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _addEventToConversation(conversationEntity, eventJson) {
     return this._initMessageEntity(conversationEntity, eventJson).then(messageEntity => {
       if (conversationEntity && messageEntity) {
-        const replacedEntity = conversationEntity.add_message(messageEntity, true);
-        if (replacedEntity) {
-          const messages = conversationEntity.messages_unordered();
-
-          const updatedMessages = messages.map(message => {
-            const hasEditedQuote = message.quote && message.quote() && message.quote().messageId === replacedEntity.id;
-            if (hasEditedQuote) {
-              const {error, userId} = message.quote();
-              const newQuote = new z.message.QuoteEntity({error, messageId: messageEntity.id, userId});
-              message.quote(newQuote);
-            }
-            return message;
-          });
-
-          conversationEntity.messages_unordered(updatedMessages);
+        const wasAdded = conversationEntity.add_message(messageEntity);
+        if (wasAdded) {
+          this.ephemeralHandler.validateMessage(messageEntity);
         }
       }
-      this.ephemeralHandler.validateMessage(messageEntity);
       return {conversationEntity, messageEntity};
     });
   }
