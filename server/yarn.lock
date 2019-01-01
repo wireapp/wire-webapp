@@ -1774,10 +1774,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@2.11.1:
-  version "2.11.1"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.11.1.tgz#9552e2b514e2f32ece544af7d9eed712f360948c"
-  integrity sha512-DMSpHYuhV2Uz6WBRRlcLj9EWRNbM75wuhr3Xy8/6Av3NPHEMcgKWI/GfdgUxdfHbEGwy663Gr7/3Xhg2gWcH/A==
+maxmind@2.11.2:
+  version "2.11.2"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.11.2.tgz#57864a64d031ab92aaaf1ee89e1d534571a7a706"
+  integrity sha512-HtAjJ/imB1czSQ6Vx58J/PkWH7EROTqwOC5xNsxeEHKyKpPkQ7KXTFB7NeT5js1+z6N5rB5TzLcw2DbY7c4crg==
   dependencies:
     big-integer "^1.6.31"
     tiny-lru "^5.0.3"
