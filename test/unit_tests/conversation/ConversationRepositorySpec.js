@@ -17,7 +17,6 @@
  *
  */
 
-// KARMA_SPECS=conversation/ConversationRepository yarn test:app
 import Conversation from 'app/script/entity/Conversation';
 
 describe('ConversationRepository', () => {

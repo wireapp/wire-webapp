@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=tracking/EventTrackingRepository yarn test:app
-
 describe('z.tracking.helpers', () => {
   describe('getConversationType', () => {
     it('returns correct type for one on one conversation', () => {

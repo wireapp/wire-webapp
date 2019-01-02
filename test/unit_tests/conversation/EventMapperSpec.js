@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=conversation/EventMapper yarn test:app
-
 import EventMapper from 'app/script/conversation/EventMapper';
 
 describe('Event Mapper', () => {

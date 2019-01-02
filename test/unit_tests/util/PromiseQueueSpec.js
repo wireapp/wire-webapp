@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=util/PromiseQueue yarn test:app
-
 describe('PromiseQueue', () => {
   describe('push', () => {
     it('should process promises', () => {
