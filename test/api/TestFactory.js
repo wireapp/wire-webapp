@@ -109,7 +109,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
   return Promise.resolve()
     .then(() => {
       TestFactory.storage_service = singleton(StorageService);
-      return TestFactory.storage_service.init(entities.user.john_doe.id);
+      return TestFactory.storage_service.init(entities.user.john_doe.id, false);
     })
     .then(() => {
       TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);
