@@ -1604,8 +1604,9 @@ z.calling.CallingRepository = class CallingRepository {
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 
-        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}'`;
-        this.callLogger.info(logMessage, callingConfig);
+        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}':
+${JSON.stringify(callingConfig)}`;
+        this.callLogger.info(logMessage);
         this.callingConfig = callingConfig;
 
         this.callingConfigTimeout = window.setTimeout(() => {
