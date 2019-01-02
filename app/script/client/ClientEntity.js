@@ -17,12 +17,12 @@
  *
  */
 
-'use strict';
+import ko from 'knockout';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
 
-z.client.ClientEntity = class ClientEntity {
+class ClientEntity {
   static get CONFIG() {
     return {
       DEFAULT_VALUE: '?',
@@ -127,4 +127,7 @@ z.client.ClientEntity = class ClientEntity {
       }
     }
   }
-};
+}
+
+export default ClientEntity;
+z.client.ClientEntity = ClientEntity;

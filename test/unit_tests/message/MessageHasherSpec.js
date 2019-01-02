@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:message/MessageHasher
-
-'use strict';
+// KARMA_SPECS=message/MessageHasher yarn test:app
 
 describe('z.message.MessageHasher', () => {
   describe('hashEvent', () => {

@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import getSlug from 'speakingurl';
 
 window.z = window.z || {};
 window.z.user = z.user || {};
@@ -313,8 +313,7 @@ window.z.user = z.user || {};
    * @returns {string} User handle
    */
   function normalize_name(name) {
-    return window
-      .getSlug(name)
+    return getSlug(name)
       .toLowerCase()
       .replace(new RegExp(/[^a-z0-9_]/, 'g'), '')
       .substring(0, MAX_HANDLE_LENGTH);

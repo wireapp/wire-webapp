@@ -5,7 +5,7 @@
   </div>
   <div class="takeover-actions">
     <span class="takeover-actions-sub" data-bind="l10n_text: z.string.takeoverSub"></span>
-    <a class="takeover-actions-link text-white" data-bind="attr: {href: z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.SUPPORT_USERNAME)}, l10n_text: z.string.takeoverLink" rel="nofollow noopener noreferrer" target="_blank"></a>
+    <a class="takeover-actions-link text-white" data-bind="attr: {href: supportUsernameUrl}, l10n_text: z.string.takeoverLink" rel="nofollow noopener noreferrer" target="_blank"></a>
     <button class="button button-fluid" data-bind="click: chooseUsername, l10n_text: z.string.takeoverButtonChoose" data-uie-name="do-takeover-choose"></button>
     <button class="button button-fluid button-inverted text-white" data-bind="click: keepUsername, l10n_text: z.string.takeoverButtonKeep" data-uie-name="do-takeover-keep"></button>
   </div>

@@ -17,9 +17,9 @@
  *
  */
 
-'use strict';
+// KARMA_SPECS=tracking/EventTrackingRepository yarn test:app
 
-// grunt test_run:tracking/EventTrackingRepository
+import WebappProperties from 'app/script/properties/WebappProperties';
 
 describe('z.tracking.EventTrackingRepository', () => {
   const test_factory = new TestFactory();
@@ -38,7 +38,7 @@ describe('z.tracking.EventTrackingRepository', () => {
       spyOn(TestFactory.tracking_repository, '_enableAnalytics').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_subscribeToAnalyticsEvents').and.callThrough();
 
-      const properties = new z.properties.PropertiesEntity();
+      const properties = new WebappProperties();
       const privacyPreference = properties.settings.privacy.improve_wire;
 
       expect(privacyPreference).toBeFalsy();

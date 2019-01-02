@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:client/ClientRepository
-
-'use strict';
+// KARMA_SPECS=client/ClientRepository yarn test:app
 
 describe('z.client.ClientRepository', () => {
   const testFactory = new TestFactory();

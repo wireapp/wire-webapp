@@ -24,7 +24,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const src = path.resolve(__dirname, '../app/style');
-const dist = path.resolve(__dirname, '../deploy/style');
+const dist = path.resolve(__dirname, '../server/dist/static/style');
 
 process.chdir(src);
 fs.mkdirpSync(dist);

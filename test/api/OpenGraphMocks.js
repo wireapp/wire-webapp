@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.OpenGraphMocks = {
   getHeiseMock: function() {
     return {

@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/Environment
-
-'use strict';
+// KARMA_SPECS=util/Environment yarn test:app
 
 describe('EnvironmentSpec', () => {
   describe('z.util.Environment.electronVersion', () => {

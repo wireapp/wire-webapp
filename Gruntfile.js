@@ -17,22 +17,10 @@
  *
  */
 
-'use strict';
-
-const webpack = require('webpack');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+const path = require('path');
 
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
-
-  const config = {
-    aws: {
-      port: 5000,
-    },
-    server: {
-      port: 8888,
-    },
-  };
 
   /* eslint-disable sort-keys */
   const dir = {
@@ -41,23 +29,18 @@ module.exports = grunt => {
       demo: 'app/demo',
       ext: 'app/ext',
       page: 'app/page',
-      script: 'app/script',
       style: 'app/style',
-      templateDist: 'app/page/template/_dist',
     },
-    aws_: 'aws',
-    aws: {
-      s3: 'aws/s3',
-      static: 'aws/static',
-      templates: 'aws/templates',
+    dist: {
+      s3: 'server/dist/s3',
+      static: 'server/dist/static',
+      templates: 'server/dist/templates',
     },
-    deploy: 'deploy',
-    dist: 'dist',
+    dist_: 'server/dist',
     docs: {
       api: 'docs/api',
       coverage: 'docs/coverage',
     },
-    temp: 'temp',
     test_: 'test',
     test: {
       api: 'test/api',
@@ -68,134 +51,69 @@ module.exports = grunt => {
   };
 
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    config: config,
     dir: dir,
     aws_s3: require('./grunt/config/aws_s3'),
-    npmBower: require('./grunt/config/npmBower'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
-    concat: require('./grunt/config/concat'),
-    connect: require('./grunt/config/connect'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
-    karma: require('./grunt/config/karma'),
+    npmBower: require('./grunt/config/npmBower'),
     open: require('./grunt/config/open'),
-    path: require('path'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
-    todo: require('./grunt/config/todo'),
-    uglify: require('./grunt/config/uglify'),
     watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys */
 
-  // Tasks
-  grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack', 'scripts']);
+  grunt.registerTask('init', 'npmBower');
 
-  // Deploy to different environments
-  grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
-  grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);
-  grunt.registerTask('app_deploy_prod', ['gitinfo', 'set_version:prod', 'aws_deploy']);
+  grunt.registerTask('build', [
+    'clean:dist',
+    'clean:dist_app',
+    'clean:dist_s3',
+    'set_version',
+    'build_style',
+    'copy:dist',
+    'copy:dist_audio',
+    'copy:dist_favicon',
+    'build_markup',
+  ]);
 
-  grunt.registerTask('app_deploy_travis', () => {
-    grunt.task.run('set_version', 'init', 'prepare', 'aws_prepare');
-  });
+  grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
-  grunt.registerTask('build_dev', () => {
-    grunt.task.run(
-      'clean:temp',
-      'clean:deploy',
-      'clean:deploy_app',
-      'clean:deploy_script',
-      'clean:aws',
-      'clean:aws_app',
-      'clean:aws_s3',
-      'set_version:staging',
-      'aws_version_file',
-      'copy:frontend',
-      'scripts',
-      'shell:less',
-      'postcss:deploy',
-      'copy:deploy',
-      'copy:deploy_audio',
-      'copy:deploy_favicon',
-      'includereplace:prod_index',
-      'includereplace:prod_auth',
-      'includereplace:prod_login',
-      'includereplace:deploy_demo',
-      'concat:dev',
-      'copy:aws'
-    );
-  });
+  grunt.registerTask('build_markup', [
+    'includereplace:prod_index',
+    'includereplace:prod_auth',
+    'includereplace:prod_login',
+  ]);
 
-  grunt.registerTask('build_dev_script', () => {
-    grunt.task.run('scripts', 'copy:deploy', 'concat:dev', 'copy:aws');
-  });
+  grunt.registerTask('build_prod', ['build', 'shell:dist_bundle', 'compress']);
 
-  grunt.registerTask('build_dev_style', () => {
-    grunt.task.run(
-      'scripts',
-      'shell:less',
-      'postcss:deploy',
-      'includereplace:prod_index',
-      'includereplace:prod_auth',
-      'includereplace:prod_login',
-      'includereplace:deploy_demo',
-      'copy:aws'
-    );
-  });
+  grunt.registerTask('set_version', () => {
+    grunt.task.run('gitinfo');
+    const target = grunt.config('gitinfo.local.branch.current.name');
+    grunt.log.ok(`Version target set to ${target}`);
 
-  grunt.registerTask('build_dev_markup', () => {
-    grunt.task.run('includereplace:prod_index', 'includereplace:prod_auth', 'includereplace:prod_login', 'copy:aws');
-  });
+    let user = grunt.config('gitinfo.local.branch.current.currentUser');
+    if (user) {
+      user = user.substr(0, user.indexOf(' ')).toLowerCase();
+    }
 
-  // Test Related
-  grunt.registerTask('test', () =>
-    grunt.task.run(['clean:docs_coverage', 'scripts', 'build_dev', 'test_prepare', 'karma:test'])
-  );
+    const date = new Date();
+    const month = `0${date.getMonth() + 1}`.slice(-2);
+    const day = `0${date.getDate()}`.slice(-2);
+    const hour = `0${date.getHours()}`.slice(-2);
+    const minute = `0${date.getMinutes()}`.slice(-2);
 
-  grunt.registerTask('npmWebpack', function() {
-    const done = this.async();
+    let version = `${date.getFullYear()}-${month}-${day}-${hour}-${minute}`;
+    if (user) {
+      version = `${version}-${user}`;
+    }
+    if (target) {
+      version = `${version}-${target}`;
+    }
 
-    const compiler = webpack(require('./webpack.config.npm.js'));
-    const progress = new ProgressPlugin((percentage, message) => grunt.log.ok(`${~~(percentage * 100)}%`, message));
-
-    compiler.apply(progress);
-
-    compiler.run(error => {
-      if (error) {
-        grunt.log.error(`Plugin failed: ${error.message}`);
-        throw error;
-      }
-
-      done();
-    });
-  });
-
-  grunt.registerTask('test_prepare', testName => {
-    const scripts = grunt.config('scripts');
-    const scriptsMinified = grunt.config('scripts_minified');
-
-    const prepareFileNames = fileNames => fileNames.map(name => name.replace('deploy/', ''));
-
-    const helperFiles = grunt.config.get('karma.options.files');
-    const appFiles = prepareFileNames(scriptsMinified.app.concat(scripts.app));
-    const componentFiles = prepareFileNames(scriptsMinified.component.concat(scripts.component));
-    const vendorFiles = prepareFileNames(scriptsMinified.vendor.concat(scripts.vendor));
-    const testFiles = testName ? [`../test/unit_tests/${testName}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
-
-    const files = [].concat(helperFiles, vendorFiles, componentFiles, appFiles, testFiles);
-
-    grunt.config('karma.options.files', files);
-  });
-
-  grunt.registerTask('test_run', testName => {
-    grunt.config('karma.options.reporters', ['spec']);
-    grunt.config('karma.options.specReporter', {
-      showSpecTiming: true,
-    });
-    grunt.task.run(['scripts', 'build_dev_script', `test_prepare:${testName}`, 'karma:test']);
+    grunt.log.ok(`Version set to ${version}`);
+    grunt.file.write(path.join('server', 'dist', 'version'), version);
   });
 };

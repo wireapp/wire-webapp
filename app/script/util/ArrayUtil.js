@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import _ from 'underscore';
 
 window.z = window.z || {};
 window.z.util = z.util || {};

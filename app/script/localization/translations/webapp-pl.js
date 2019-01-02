@@ -123,6 +123,8 @@ z.string.pl.modalAccountNewDevicesHeadline = 'Twoje konto było ostatnio użyte:
 z.string.pl.modalAccountNewDevicesFrom = 'Z:';
 z.string.pl.modalAccountNewDevicesMessage = 'Jeżeli nie rozpoznajesz tego, usuń urządzenie z listy i zmień swoje hasło.';
 
+z.string.pl.modalAccountReadReceiptsChangedSecondary = 'Zarządzaj urządzeniami';
+
 z.string.pl.modalAccountRemoveDeviceAction = 'Usuń urządzenie';
 z.string.pl.modalAccountRemoveDeviceHeadline = 'Usuń {{device}}';
 z.string.pl.modalAccountRemoveDeviceMessage = 'Aby usunąć to urządzenie wymagane jest hasło.';
@@ -403,6 +405,7 @@ z.string.pl.participantDevicesOutdatedClientMessage = '{{user}} używa starszej 
 z.string.pl.participantDevicesSelfAllDevices = 'Pokaż wszystkie moje urządzenia';
 z.string.pl.participantDevicesSelfFingerprint = 'Odcisk palca urządzenia';
 
+
 z.string.pl.userProfileButtonConnect = 'Połącz';
 z.string.pl.userProfileButtonIgnore = 'Ignoruj';
 z.string.pl.userProfileButtonUnblock = 'Odblokuj';
@@ -428,12 +431,13 @@ z.string.pl.preferencesAccountCreateTeam = 'Utwórz nowy zespół';
 z.string.pl.preferencesAccountDelete = 'Usuń konto';
 z.string.pl.preferencesAccountLogOut = 'Wyloguj się';
 z.string.pl.preferencesAccountManageTeam = 'Zarządzaj zespołem';
+z.string.pl.preferencesAccountPrivacy = 'Prywatność';
 z.string.pl.preferencesAccountResetPassword = 'Zresetuj hasło';
 z.string.pl.preferencesAccountTeam = 'w {{name}}';
-z.string.pl.preferencesAccountUsernamePlaceholder = 'Twoje pełne imię i nazwisko';
-z.string.pl.preferencesAccountUsernameHint = 'Co najmniej 2 znaki. Tylko a-z, 0-9, _.';
 z.string.pl.preferencesAccountUsernameAvailable = '&Dostępny(a)';
 z.string.pl.preferencesAccountUsernameErrorTaken = 'Jest już w użyciu';
+z.string.pl.preferencesAccountUsernameHint = 'Co najmniej 2 znaki. Tylko a-z, 0-9, _.';
+z.string.pl.preferencesAccountUsernamePlaceholder = 'Twoje pełne imię i nazwisko';
 
 z.string.pl.preferencesAVCamera = 'Aparat';
 z.string.pl.preferencesAVMicrophone = 'Mikrofon';
@@ -520,10 +524,10 @@ z.string.pl.warningNotFoundMicrophone = 'Nie możesz zadzwonić ponieważ Twój 
 z.string.pl.warningPermissionDeniedCamera = 'Nie możesz zadzwonić ponieważ przeglądarka nie ma dostępu do kamery.';
 z.string.pl.warningPermissionDeniedMicrophone = 'Nie możesz zadzwonić ponieważ przeglądarka nie ma dostępu do mikrofonu.';
 z.string.pl.warningPermissionDeniedScreen = 'Twoja przeglądarka potrzebuje pozwolenia aby pokazać pulpit.';
-z.string.pl.warningPermissionRequestCamera = '{{icon}} Zezwól na dostęp do aparatu';
-z.string.pl.warningPermissionRequestMicrophone = '{{icon}} Zezwól na dostęp do mikrofonu';
-z.string.pl.warningPermissionRequestNotification = '{{icon}} Zezwól na powiadomienia';
-z.string.pl.warningPermissionRequestScreen = '{{icon}} zezwól na dostęp do ekranu';
+z.string.pl.warningPermissionRequestCamera = '[icon] Zezwól na dostęp do aparatu';
+z.string.pl.warningPermissionRequestMicrophone = '[icon] Zezwól na dostęp do mikrofonu';
+z.string.pl.warningPermissionRequestNotification = '[icon] Zezwól na powiadomienia';
+z.string.pl.warningPermissionRequestScreen = '[icon] zezwól na dostęp do ekranu';
 
 z.string.pl.userAvailabilityAvailable = '&Dostępny(a)';
 z.string.pl.userAvailabilityNone = 'Żaden';

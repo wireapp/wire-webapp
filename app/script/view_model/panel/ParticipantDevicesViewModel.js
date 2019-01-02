@@ -17,14 +17,10 @@
  *
  */
 
-'use strict';
+import BasePanelViewModel from './BasePanelViewModel';
+import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.panel = z.viewModel.panel || {};
-
-z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewModel extends z.viewModel.panel
-  .BasePanelViewModel {
+export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
     return {
       FOUND: 'ParticipantDevicesViewModel.MODE.FOUND',
@@ -129,6 +125,9 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     this.shouldUpdateScrollbar = ko
       .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
+
+    this.privacyHowUrl = getPrivacyHowUrl();
+    this.privacyWhyUrl = getPrivacyWhyUrl();
   }
 
   getElementId() {
@@ -190,4 +189,4 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     }
     this.userEntity(userEntity);
   }
-};
+}

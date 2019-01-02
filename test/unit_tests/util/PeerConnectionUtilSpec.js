@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/NumberUtil
-
-'use strict';
+// KARMA_SPECS=util/NumberUtil yarn test:app
 
 describe('z.util.PeerConnectionUtil', () => {
   const hostIceCandidates = [

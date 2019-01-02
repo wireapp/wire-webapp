@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -192,6 +192,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.userBubble = undefined;
     this.userBubbleLastId = undefined;
 
+    this.manageTeamUrl = getManageTeamUrl('client_landing');
+    this.manageServicesUrl = getManageServicesUrl('client_landing');
+
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
@@ -231,17 +234,17 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOpenManageTeam() {
-    this._openTeamSettings(z.config.URL_PATH.MANAGE_TEAM);
+    if (this.manageTeamUrl) {
+      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOpenManageServices() {
-    this._openTeamSettings(z.config.URL_PATH.MANAGE_SERVICES);
-  }
-
-  _openTeamSettings(pagePath) {
-    const path = `${pagePath}?utm_source=client_landing&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.manageServicesUrl) {
+      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOnOther(participantEntity, event) {

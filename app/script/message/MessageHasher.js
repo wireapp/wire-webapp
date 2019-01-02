@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-const Long = window.dcodeIO.Long;
+import Long from 'long';
 const crypto = window.crypto;
 
 window.z = window.z || {};

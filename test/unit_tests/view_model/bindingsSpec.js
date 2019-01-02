@@ -17,9 +17,13 @@
  *
  */
 
-// grunt test_run:view_model/bindings
+// KARMA_SPECS=view_model/bindings yarn test:app
 
-'use strict';
+import ko from 'knockout';
+import $ from 'jquery';
+/* eslint-disable no-unused-vars */
+import bindingHandlersGlobal from '../../../app/script/view_model/bindings/CommonBindings';
+/* eslint-enable no-unused-vars */
 
 describe('ko.bindingHandlers', () => {
   describe('ko.bindingHandlers.enter', () => {
@@ -30,9 +34,7 @@ describe('ko.bindingHandlers', () => {
     beforeEach(() => {
       element = document.createElement('div');
 
-      handler = {
-        on_enter: () => 'yay',
-      };
+      handler = {on_enter: () => 'yay'};
 
       // we need the callFake since the spyOn will overwrite the on_enter property
       spyOn(handler, 'on_enter').and.callFake(() => () => 'yay');
@@ -41,7 +43,8 @@ describe('ko.bindingHandlers', () => {
     });
 
     it('can execute callback when enter is pressed', () => {
-      $(element).trigger($.Event('keypress', {key: 'Enter'}));
+      const keyboardEvent = new KeyboardEvent('keypress', {key: 'Enter'});
+      element.dispatchEvent(keyboardEvent);
 
       expect(handler.on_enter).toHaveBeenCalled();
     });

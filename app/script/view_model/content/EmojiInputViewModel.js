@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -313,7 +311,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
     input.value = `${textBeforeCursor}${textAfterCursor}`;
     input.setSelectionRange(textBeforeCursor.length, textBeforeCursor.length);
-    $(input).change();
+    ko.utils.triggerEvent(input, 'change');
     $(input).focus();
   }
 
@@ -420,7 +418,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     input.value = `${textBeforeEmoji}${emojiIcon}${textAfterEmoji}`;
     input.setSelectionRange(newCursorPosition, newCursorPosition);
     this.removeEmojiPopup();
-    $(input).change();
+    ko.utils.triggerEvent(input, 'change');
     $(input).focus();
   }
 

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -33,14 +31,14 @@ z.components.GuestModeToggle = class GuestModeToggle {
 
 ko.components.register('guest-mode-toggle', {
   template: `
-    <div class="guest-mode-toggle-row">
+    <div class="info-toggle__row">
       <div data-bind="text: z.string.guestRoomToggleName"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
         <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isChecked">
         <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked() ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>
       </div>
     </div>
-    <div class="panel__info-text guest-mode-toggle-info" data-bind="text: infoText" data-uie-name="status-guest-toggle"></div>
+    <div class="info-toggle__details" data-bind="text: infoText" data-uie-name="status-guest-toggle"></div>
   `,
   viewModel: z.components.GuestModeToggle,
 });

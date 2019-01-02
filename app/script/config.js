@@ -17,9 +17,9 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
+
+const env = window.wire.env;
 
 window.z.config = {
   ACCENT_ID: {
@@ -30,6 +30,15 @@ window.z.config = {
     PURPLE: 7,
     RED: 4,
     YELLOW: 3,
+  },
+
+  FEATURE: {
+    CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
+    ENABLE_ACCOUNT_REGISTRATION: env.FEATURE && env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
+    ENABLE_DEBUG: env.FEATURE && env.FEATURE.ENABLE_DEBUG,
+    ENABLE_PHONE_LOGIN: env.FEATURE && env.FEATURE.ENABLE_PHONE_LOGIN,
+    ENABLE_SSO: env.FEATURE && env.FEATURE.ENABLE_SSO,
+    SHOW_LOADING_INFORMATION: env.FEATURE && env.FEATURE.SHOW_LOADING_INFORMATION,
   },
 
   LOGGER: {
@@ -89,41 +98,5 @@ window.z.config = {
       MICROPHONE_ACCESS_DENIED: 202590081,
       SCREEN_ACCESS_DENIED: 202935412,
     },
-  },
-
-  UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
-
-  URL: {
-    ACCOUNT: {
-      PRODUCTION: (window.wire.env.URL && window.wire.env.URL.ACCOUNT_BASE) || 'https://account.wire.com',
-      STAGING: 'https://wire-account-staging.zinfra.io',
-    },
-    SUPPORT: 'https://support.wire.com',
-    TEAM_SETTINGS: {
-      PRODUCTION: (window.wire.env.URL && window.wire.env.URL.TEAMS_BASE) || 'https://teams.wire.com',
-      STAGING: 'https://wire-admin-staging.zinfra.io',
-    },
-    WEBAPP: {
-      INTERNAL: 'https://wire-webapp-staging.wire.com',
-      PRODUCTION: window.wire.env.APP_BASE || 'https://app.wire.com',
-      STAGING: 'https://wire-webapp-staging.zinfra.io',
-    },
-    WEBSITE: {
-      PRODUCTION: (window.wire.env.URL && window.wire.env.URL.WEBSITE_BASE) || 'https://wire.com',
-      STAGING: 'https://wire-website-staging.zinfra.io',
-    },
-  },
-
-  URL_PATH: {
-    CREATE_TEAM: '/create-team/',
-    DECRYPT_ERROR_1: '/privacy/error-1/',
-    DECRYPT_ERROR_2: '/privacy/error-2/',
-    MANAGE_SERVICES: '/services/',
-    MANAGE_TEAM: '/login/',
-    PASSWORD_RESET: '/forgot/',
-    PRIVACY_HOW: '/privacy/how/',
-    PRIVACY_WHY: '/privacy/why/',
-    SUPPORT_USERNAME: '/support/username/',
-    TERMS_OF_USE: '/legal/terms/',
   },
 };

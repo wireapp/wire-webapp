@@ -18,7 +18,7 @@
  */
 
 const jQuery = require('jquery');
-import {amplify} from '@bower_components/amplify';
+import {amplify} from 'amplify';
 import * as bazinga64 from 'bazinga64';
 import * as platform from 'platform';
 import '../config';

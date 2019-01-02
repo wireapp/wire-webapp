@@ -17,14 +17,12 @@
  *
  */
 
-'use strict';
-
 ko.components.register('panel-service-details', {
   template: `
     <div class="panel-participant">
       <div class="panel-participant__name" data-bind="text: service().name" data-uie-name="status-service-name"></div>
       <div class="panel-participant__provider-name" data-bind="text: service().providerName()" data-uie-name="status-service-provider"></div>
-      <participant-avatar params="participant: service, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>    
+      <participant-avatar params="participant: service, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
       <div class="panel-participant__service-description" data-bind="text: service().description" data-uie-name="status-service-description"></div>
     </div>
   `,

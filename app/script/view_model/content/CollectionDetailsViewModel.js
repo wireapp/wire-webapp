@@ -17,7 +17,8 @@
  *
  */
 
-'use strict';
+import moment from 'moment';
+import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -123,16 +124,16 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
 
     // We passed today
-    const isSameDay = moment(messageEntity.timestamp()).isSameDay(this.lastMessageTimestamp);
-    const wasToday = moment(this.lastMessageTimestamp).isToday();
-    if (!isSameDay && wasToday) {
+    const sameDay = isSameDay(moment(messageEntity.timestamp()), this.lastMessageTimestamp);
+    const wasToday = isToday(moment(this.lastMessageTimestamp));
+    if (!sameDay && wasToday) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
 
     // We passed the month
-    const isSameMonth = moment(messageEntity.timestamp()).isSameMonth(this.lastMessageTimestamp);
-    if (!isSameMonth) {
+    const sameMonth = isSameMonth(moment(messageEntity.timestamp()), this.lastMessageTimestamp);
+    if (!sameMonth) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
@@ -140,10 +141,10 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
 
   getTitleForHeader(messageEntity) {
     const messageDate = moment(messageEntity.timestamp());
-    if (messageDate.isToday()) {
+    if (isToday(messageDate)) {
       return z.l10n.text(z.string.conversationToday);
     }
 
-    return messageDate.isCurrentYear() ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
+    return isCurrentYear(messageDate) ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
   }
 };

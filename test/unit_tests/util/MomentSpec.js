@@ -17,48 +17,51 @@
  *
  */
 
-// grunt test_run:util/Moment
+// KARMA_SPECS=util/Moment yarn test:app
 
-'use strict';
+import moment from 'moment';
+/* eslint-disable no-unused-vars */
+import {isSameDay, isSameMonth, isCurrentYear, isToday} from '../../../app/script/util/moment';
+/* eslint-enable no-unused-vars */
 
 describe('z.util.moment', () => {
   describe('isToday', () => {
     it('should return true if date is today', () => {
-      expect(moment().isToday()).toBeTruthy();
+      expect(isToday(moment())).toBeTruthy();
     });
 
     it('should return false if date is not today', () => {
-      expect(moment('2011-10-05T14:48:00.000').isToday()).toBeFalsy();
+      expect(isToday(moment('2011-10-05T14:48:00.000'))).toBeFalsy();
     });
   });
 
   describe('isCurrentYear', () => {
     it('should return true if date is current year', () => {
-      expect(moment().isCurrentYear()).toBeTruthy();
+      expect(isCurrentYear(moment())).toBeTruthy();
     });
 
     it('should return false if date is current year', () => {
-      expect(moment('2011-10-05T14:48:00.000').isCurrentYear()).toBeFalsy();
+      expect(isCurrentYear(moment('2011-10-05T14:48:00.000'))).toBeFalsy();
     });
   });
 
   describe('isSameDay', () => {
     it('should return true if two dates are from the same day', () => {
-      expect(moment('2011-10-05T14:48:00.000').isSameDay('2011-10-05T12:48:00.000')).toBeTruthy();
+      expect(isSameDay(moment('2011-10-05T14:48:00.000'), '2011-10-05T12:48:00.000')).toBeTruthy();
     });
 
     it('should return false if two dates are not from the same day', () => {
-      expect(moment('2011-10-05T14:48:00.000').isSameDay('2011-10-04T12:48:00.000')).toBeFalsy();
+      expect(isSameDay(moment('2011-10-05T14:48:00.000'), '2011-10-04T12:48:00.000')).toBeFalsy();
     });
   });
 
   describe('isSameMonth', () => {
     it('should return true if two dates are from the same month', () => {
-      expect(moment('2011-10-06T14:48:00.000').isSameMonth('2011-10-05T12:48:00.000')).toBeTruthy();
+      expect(isSameMonth(moment('2011-10-06T14:48:00.000'), '2011-10-05T12:48:00.000')).toBeTruthy();
     });
 
-    it('should return false if two dates are not from the same day', () => {
-      expect(moment('2011-11-05T14:48:00.000').isSameMonth('2011-10-05T12:48:00.000')).toBeFalsy();
+    it('should return false if two dates are not from the same month', () => {
+      expect(isSameMonth(moment('2011-11-05T14:48:00.000'), '2011-10-05T12:48:00.000')).toBeFalsy();
     });
   });
 });

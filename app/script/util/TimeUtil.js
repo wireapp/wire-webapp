@@ -19,7 +19,7 @@
 
 //@ts-check
 
-'use strict';
+import moment from 'moment';
 
 /**
  * @typedef {object} DiscreteTimeUnit

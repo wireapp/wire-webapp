@@ -18,16 +18,16 @@
  */
 
 const expressSitemapXml = require('express-sitemap-xml');
-
-import {CommonConfig} from '@wireapp/commons';
 import * as express from 'express';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
 import HealthCheckRoute from './routes/_health/HealthRoute';
+import AppleAssociationRoute from './routes/appleassociation/AppleAssociationRoute';
 import ConfigRoute from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
+import GoogleWebmasterRoute from './routes/googlewebmaster/GoogleWebmasterRoute';
 import RedirectRoutes from './routes/RedirectRoutes';
 import Root from './routes/Root';
 import {ServerConfig} from './ServerConfig';
@@ -61,13 +61,15 @@ class Server {
     this.app.use(Root(this.config));
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
+    this.app.use(GoogleWebmasterRoute(this.config));
+    this.app.use(AppleAssociationRoute(this.config));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
 
   private initWebpack() {
     if (this.config.SERVER.DEVELOPMENT) {
-      const webpackCompiler = require('webpack')(require('../webpack.config.dev'));
+      const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
       const webpackDevMiddleware = require('webpack-dev-middleware');
       const webpackHotMiddleware = require('webpack-hot-middleware');
 
@@ -149,6 +151,7 @@ class Server {
     this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
     this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
     this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
+    this.app.use('/proto', express.static(path.join(__dirname, 'static', 'proto')));
     this.app.use('/style', express.static(path.join(__dirname, 'static', 'style')));
     this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
 
@@ -175,29 +178,8 @@ class Server {
       }
 
       const userAgent = req.header('User-Agent');
-      const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
-
-      if (parsedUserAgent) {
-        const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
-
-        const supportedBrowser = (() => {
-          const browserName = parsedUserAgent.browser.name.toLowerCase();
-          const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
-          const supportedBrowserVersion = supportedBrowserVersionObject && supportedBrowserVersionObject.major;
-
-          try {
-            const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
-            const browserVersion = parseInt(browserVersionString, 10);
-            return supportedBrowserVersion && browserVersion >= supportedBrowserVersion;
-          } catch (err) {
-            return false;
-          }
-        })();
-        if (invalidBrowser || !supportedBrowser) {
-          return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
-        }
-      } else {
-        return res.redirect(STATUS_CODE_FOUND, `${this.config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
+      if (!BrowserUtil.isSupportedBrowser(userAgent)) {
+        return res.redirect(STATUS_CODE_FOUND, '/auth/');
       }
       return next();
     });

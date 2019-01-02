@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:client/ClientMapper
-
-'use strict';
+// KARMA_SPECS=client/ClientMapper yarn test:app
 
 describe('z.client.ClientMapper', () => {
   const mapper = new z.client.ClientMapper();

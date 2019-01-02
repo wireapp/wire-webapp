@@ -17,12 +17,20 @@
  *
  */
 
-'use strict';
+import platform from 'platform';
+import PropertiesRepository from '../properties/PropertiesRepository';
+import PropertiesService from '../properties/PropertiesService';
+import StorageService from '../storage/StorageService';
+import DebugUtil from '../util/DebugUtil';
 
-window.z = window.z || {};
-window.z.main = z.main || {};
+import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
 
-z.main.App = class App {
+/* eslint-disable no-unused-vars */
+import globals from './globals';
+import auth from './auth';
+/* eslint-enable no-unused-vars */
+
+class App {
   static get CONFIG() {
     return {
       COOKIES_CHECK: {
@@ -67,7 +75,6 @@ z.main.App = class App {
 
     this._subscribeToEvents();
 
-    this.initDebugging();
     this.initApp();
     this.initServiceWorker();
   }
@@ -90,6 +97,7 @@ z.main.App = class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
+    repositories.properties = new PropertiesRepository(this.service.properties);
     repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -104,7 +112,8 @@ z.main.App = class App {
       this.service.asset,
       this.service.self,
       repositories.client,
-      repositories.serverTime
+      repositories.serverTime,
+      repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
     repositories.event = new z.event.EventRepository(
@@ -116,7 +125,6 @@ z.main.App = class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
@@ -135,7 +143,8 @@ z.main.App = class App {
       repositories.links,
       repositories.serverTime,
       repositories.team,
-      repositories.user
+      repositories.user,
+      repositories.properties
     );
 
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
@@ -143,9 +152,17 @@ z.main.App = class App {
       this.service.event,
       z.message.MessageHasher
     );
+
+    const readReceiptMiddleware = new ReceiptsMiddleware(
+      this.service.event,
+      repositories.user,
+      repositories.conversation
+    );
+
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
+      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
       this.service.backup,
@@ -192,7 +209,7 @@ z.main.App = class App {
    * @returns {Object} All services
    */
   _setupServices(authComponent) {
-    const storageService = new z.storage.StorageService();
+    const storageService = new StorageService();
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
@@ -218,7 +235,7 @@ z.main.App = class App {
       lifecycle: new z.lifecycle.LifecycleService(),
       location: new z.location.LocationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: new z.properties.PropertiesService(this.backendClient),
+      properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
       self: new z.self.SelfService(this.backendClient),
       storage: storageService,
@@ -233,7 +250,7 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return window.wire.env.FEATURE.ENABLE_DEBUG ? {debug: new z.util.DebugUtil(this.repository)} : {};
+    return z.config.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
   }
 
   /**
@@ -277,7 +294,7 @@ z.main.App = class App {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-        const protoFile = `ext/proto/@wireapp/protocol-messaging/messages.proto?${z.util.Environment.version(false)}`;
+        const protoFile = `/proto/messages.proto?${z.util.Environment.version(false)}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
@@ -802,16 +819,6 @@ z.main.App = class App {
   }
 
   /**
-   * Initialize debugging features.
-   * @returns {undefined} No return value
-   */
-  initDebugging() {
-    if (z.util.Environment.frontend.isLocalhost()) {
-      this._attachLiveReload();
-    }
-  }
-
-  /**
    * Report call telemetry to Raygun for analysis.
    * @returns {undefined} No return value
    */
@@ -819,22 +826,10 @@ z.main.App = class App {
     this.repository.calling.reportCall();
   }
 
-  /**
-   * Attach live reload on localhost.
-   * @returns {undefined} No return value
-   */
-  _attachLiveReload() {
-    const liveReload = document.createElement('script');
-    liveReload.id = 'liveReload';
-    liveReload.src = 'http://localhost:32123/livereload.js';
-    document.body.appendChild(liveReload);
-    $('html').addClass('development');
-  }
-
   _onExtraInstanceStarted() {
     return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
   }
-};
+}
 
 //##############################################################################
 // Setting up the App
@@ -842,6 +837,8 @@ z.main.App = class App {
 
 $(() => {
   if ($('#wire-main-app').length !== 0) {
-    wire.app = new z.main.App(wire.auth);
+    wire.app = new App(wire.auth);
   }
 });
+
+export default App;

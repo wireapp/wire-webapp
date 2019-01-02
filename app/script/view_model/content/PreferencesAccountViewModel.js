@@ -17,7 +17,11 @@
  *
  */
 
-'use strict';
+import {groupBy} from 'underscore';
+
+import backendEvent from '../../event/Backend';
+import PropertiesRepository from '../../properties/PropertiesRepository';
+import {getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -26,6 +30,10 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get CONFIG() {
     return {
+      NOTIFICATION_TYPES: {
+        NEW_CLIENT: 'new-client',
+        READ_RECEIPTS_CHANGED: 'read-receipt-changed',
+      },
       PROFILE_IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
@@ -42,7 +50,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   constructor(mainViewModel, contentViewModel, repositories) {
     this.changeAccentColor = this.changeAccentColor.bind(this);
-    this.checkNewClients = this.checkNewClients.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
 
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
@@ -58,7 +65,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
 
-    this.newClients = ko.observableArray([]);
+    this.notifications = ko.observableArray([]);
+    this.notifications.subscribe(notifications => {
+      const event = notifications.length > 0 ? z.event.WebApp.SEARCH.BADGE.SHOW : z.event.WebApp.SEARCH.BADGE.HIDE;
+      amplify.publish(event);
+    });
+
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
@@ -91,8 +103,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
+    this.optionReadReceipts = this.propertiesRepository.receiptMode;
+
     this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    this.manageTeamUrl = getManageTeamUrl('client_settings');
+    this.createTeamUrl = getCreateTeamUrl('client');
+
+    this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
 
     this._initSubscriptions();
   }
@@ -101,6 +119,19 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+  }
+
+  onUserEvent(event) {
+    if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
+      if (event.key === PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key) {
+        const defaultValue = !!PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue;
+        this.notifications.push({
+          data: event.value === undefined ? defaultValue : !!event.value,
+          type: PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+        });
+      }
+    }
   }
 
   changeAccentColor(id) {
@@ -176,18 +207,45 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return z.user.UserHandleGenerator.validate_character(inputChar.toLowerCase());
   }
 
-  checkNewClients() {
-    if (this.newClients().length) {
-      amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
+  popNotification() {
+    if (!this.notifications().length) {
+      return;
+    }
+    const notificationPriorities = [
+      PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+      PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+    ];
+    const groupedNotifications = groupBy(this.notifications(), notification => notification.type);
+    for (const type of notificationPriorities) {
+      if (groupedNotifications[type]) {
+        this.notifications.remove(notification => notification.type === type);
+        return this._showNotification(type, groupedNotifications[type], this.popNotification.bind(this));
+      }
+    }
+  }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-        close: () => this.newClients.removeAll(),
-        data: this.newClients(),
-        preventClose: true,
-        secondary: () => {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
-        },
-      });
+  _showNotification(type, aggregatedNotifications, closeAction) {
+    switch (type) {
+      case PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
+          close: closeAction,
+          data: aggregatedNotifications.map(notification => notification.data),
+          preventClose: true,
+          secondary: () => {
+            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+          },
+        });
+        break;
+      }
+
+      case PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
+          close: closeAction,
+          data: aggregatedNotifications.pop().data,
+          preventClose: true,
+        });
+        break;
+      }
     }
   }
 
@@ -219,11 +277,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
   }
 
-  clickOpenCreateTeam() {
-    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
-  }
-
   clickOnDeleteAccount() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
@@ -253,35 +306,34 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOpenManageTeam() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    if (this.manageTeamUrl) {
+      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+    }
   }
 
   clickOnResetPassword() {
-    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET);
+    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, URL_PATH.PASSWORD_RESET);
     z.util.SanitizationUtil.safeWindowOpen(url);
   }
 
   onClientAdd(userId, clientEntity) {
     const isSelfUser = userId === this.selfUser().id;
     if (isSelfUser) {
-      amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
-      this.newClients.push(clientEntity);
+      this.notifications.push({
+        data: clientEntity,
+        type: PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+      });
     }
   }
 
   onClientRemove(userId, clientId) {
     const isSelfUser = userId === this.selfUser().id;
     if (isSelfUser) {
-      this.newClients.remove(clientEntity => {
+      this.notifications.remove(({data: clientEntity}) => {
         const isExpectedId = clientEntity.id === clientId;
         return isExpectedId && clientEntity.isPermanent();
       });
-
-      if (!this.newClients().length) {
-        amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
-      }
     }
     return true;
   }
@@ -380,6 +432,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
+  }
+
+  onReadReceiptsChange(viewModel, event) {
+    const enableReadReceipts = event.target.checked;
+    const receiptMode = enableReadReceipts ? 1 : 0;
+    this.propertiesRepository.saveReceiptMode(receiptMode);
+    return true;
   }
 
   updateProperties(properties) {

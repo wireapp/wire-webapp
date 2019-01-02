@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 z.string = z.string || {};
 z.string.da = z.string.da || {};

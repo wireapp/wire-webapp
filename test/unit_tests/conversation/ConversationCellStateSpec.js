@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:conversation/ConversationCellState
-
-'use strict';
+// KARMA_SPECS=conversation/ConversationCellState yarn test:app
 
 describe('z.conversation.ConversationCellState', () => {
   const conversationCellState = z.conversation.ConversationCellState;

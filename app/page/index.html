@@ -6,7 +6,7 @@
     #include('meta.htm')
     #include('graph.htm')
     <title>Wire</title>
-    #include('#dest/style.htm')
+    <style>#include('../../../server/dist/static/style/main.css')</style>
   </head>
 
   <body>
@@ -14,10 +14,11 @@
     #include('wire-main.htm')
     #include('loading.htm')
 
-    #include('#dest/config.htm')
-    #include('#dest/vendor.htm')
-    #include('#dest/component.htm')
-    #include('#dest/app.htm')
+    <script src="/config.js?{{@config.VERSION}}"></script>
+    <script src="/min/dexie.js?{{@config.VERSION}}"></script>
+    <script src="/min/vendor.js?{{@config.VERSION}}"></script>
+    <script src="/min/runtime.js?{{@config.VERSION}}"></script>
+    <script src="/min/app.js?{{@config.VERSION}}"></script>
 
     #include('partials/template-user-profile.htm')
   </body>

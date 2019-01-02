@@ -25,7 +25,7 @@ z.string.ru.nonexistentUser = 'Удаленный пользователь';
 z.string.ru.and = 'и';
 z.string.ru.enumerationAnd = ', и ';
 
-//=Загрузка приложения
+//=Ответы
 z.string.ru.authAccountCountryCode = 'Код страны';
 z.string.ru.authAccountPasswordForgot = 'Восстановление пароля';
 z.string.ru.authAccountPublicComputer = 'Это общедоступный компьютер';
@@ -134,6 +134,8 @@ z.string.ru.modalAccountNewDevicesSecondary = 'Управление';
 z.string.ru.modalAccountNewDevicesHeadline = 'Ваш аккаунт использовался:';
 z.string.ru.modalAccountNewDevicesFrom = 'На:';
 z.string.ru.modalAccountNewDevicesMessage = 'Если вы этого не делали, удалите это устройство и измените пароль.';
+
+z.string.ru.modalAccountReadReceiptsChangedSecondary = 'Управление';
 
 z.string.ru.modalAccountRemoveDeviceAction = 'Удалить устройство';
 z.string.ru.modalAccountRemoveDeviceHeadline = 'Удалить "{{device}}"';
@@ -359,6 +361,7 @@ z.string.ru.conversationContextMenuDownload = 'Загрузить';
 z.string.ru.conversationContextMenuLike = 'Нравится';
 z.string.ru.conversationContextMenuReply = 'Ответить';
 z.string.ru.conversationContextMenuUnlike = 'Не нравится';
+z.string.ru.conversationContextMenuDetails = 'Детали';
 z.string.ru.conversationDeleteTimestamp = 'Удалено: {{date}}';
 z.string.ru.conversationEditTimestamp = 'Изменено: {{date}}';
 z.string.ru.conversationLikesCaption = '{{number}} участникам';
@@ -433,7 +436,7 @@ z.string.ru.conversationsSecondaryLinePeopleAdded = '{{user}} участнико
 z.string.ru.conversationsSecondaryLinePersonAdded = '{{user}} был(а) добавлен(а)';
 z.string.ru.conversationsSecondaryLinePersonAddedSelf = '{{user}} присоединился';
 z.string.ru.conversationsSecondaryLinePersonAddedYou = '{{user}} добавил вас';
-z.string.ru.conversationsSecondaryLineRenamed = '{{user}} переименовал разговор';
+z.string.ru.conversationsSecondaryLineRenamed = '{{user}} переименовал этот разговор';
 z.string.ru.conversationsSecondaryLineSummaryMessage = '{{number}} сообщение';
 z.string.ru.conversationsSecondaryLineSummaryMessages = '{{number}} сообщений';
 z.string.ru.conversationsSecondaryLineSummaryMention = '{{number}} упоминание';
@@ -550,6 +553,8 @@ z.string.ru.participantDevicesOutdatedClientMessage = '{{user}} использу
 z.string.ru.participantDevicesSelfAllDevices = 'Показать все мои устройства';
 z.string.ru.participantDevicesSelfFingerprint = 'Отпечаток устройства';
 
+z.string.ru.messageDetailsTitle = 'Детали';
+
 z.string.ru.userProfileButtonConnect = 'Связаться';
 z.string.ru.userProfileButtonIgnore = 'Игнорировать';
 z.string.ru.userProfileButtonUnblock = 'Разблокировать';
@@ -583,12 +588,13 @@ z.string.ru.preferencesAccountLogOut = 'Выйти';
 z.string.ru.preferencesAccountManageTeam = 'Управлять командой';
 z.string.ru.preferencesAccountMarketingConsentCheckbox = 'Получать рассылку';
 z.string.ru.preferencesAccountMarketingConsentDetail = 'Получать новости и обновления продуктов от Wire по электронной почте.';
+z.string.ru.preferencesAccountPrivacy = 'Конфиденциальность';
 z.string.ru.preferencesAccountResetPassword = 'Сбросить пароль';
 z.string.ru.preferencesAccountTeam = 'в {{name}}';
-z.string.ru.preferencesAccountUsernamePlaceholder = 'Ваше полное имя';
-z.string.ru.preferencesAccountUsernameHint = 'Не менее 2 символов. Только a—z, 0—9 и _';
 z.string.ru.preferencesAccountUsernameAvailable = 'Доступно';
 z.string.ru.preferencesAccountUsernameErrorTaken = 'Уже занято';
+z.string.ru.preferencesAccountUsernameHint = 'Не менее 2 символов. Только a—z, 0—9 и _';
+z.string.ru.preferencesAccountUsernamePlaceholder = 'Ваше полное имя';
 
 z.string.ru.preferencesAVCamera = 'Камера';
 z.string.ru.preferencesAVMicrophone = 'Микрофон';
@@ -708,7 +714,7 @@ z.string.ru.temporaryGuestTimeRemaining = ' осталось в этой гос�
 z.string.ru.temporaryGuestJoinMessage = 'Этот разговор будет вам доступен в течение 24 часов.';
 z.string.ru.temporaryGuestJoinDescription = 'Если вы закроете или обновите эту страницу, то потеряете доступ.';
 
-z.string.ru.temporaryGuestLeaveMessage = ' больше не участвуете в этом разговоре.';
+z.string.ru.temporaryGuestLeaveMessage = 'Вы больше не участвуете в этом разговоре.';
 z.string.ru.temporaryGuestLeaveDescription = 'Если вы закроете или обновите эту страницу, то потеряете доступ к истории разговоров.';
 
 z.string.ru.urlSupportRoot = '/';

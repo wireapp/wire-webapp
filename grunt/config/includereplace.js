@@ -17,85 +17,12 @@
  *
  */
 
-'use strict';
-
 // https://github.com/alanshaw/grunt-include-replace
 
 module.exports = {
-  //##############################################################################
-  // Edge/Staging deployment related
-  //##############################################################################
-  deploy_auth: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_deploy',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index.html`;
-    },
-    src: 'auth.html',
-  },
-
-  deploy_demo: {
-    cwd: '<%= dir.app.demo %>',
-    dest: '<%= dir.deploy %>/demo',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_deploy',
-      },
-      includesDir: '<%= dir.app.demo %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index.html`;
-    },
-    src: 'demo.html',
-  },
-
-  deploy_index: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_deploy',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    src: 'index.html',
-  },
-
-  deploy_login: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/login',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_deploy',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index.html`;
-    },
-    src: 'login.html',
-  },
-
-  //##############################################################################
-  // Production deployment related
-  //##############################################################################
   prod_auth: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
+    dest: '<%= dir.dist.static %>/auth',
     expand: true,
     options: {
       globals: {
@@ -112,7 +39,7 @@ module.exports = {
 
   prod_demo: {
     cwd: '<%= dir.app.demo %>',
-    dest: '<%= dir.deploy %>/demo',
+    dest: '<%= dir.dist.static %>/demo',
     expand: true,
     options: {
       globals: {
@@ -129,7 +56,7 @@ module.exports = {
 
   prod_index: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>',
+    dest: '<%= dir.dist.static %>',
     expand: true,
     options: {
       globals: {
@@ -143,7 +70,7 @@ module.exports = {
 
   prod_login: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/login',
+    dest: '<%= dir.dist.static %>/login',
     expand: true,
     options: {
       globals: {

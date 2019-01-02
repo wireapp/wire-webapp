@@ -22,43 +22,6 @@
     margin: 8px;
   }
 
-  &__tabs {
-    display: flex;
-    height: 44px;
-    min-height: 44px;
-    padding: 0 8px;
-    margin-bottom: 0;
-    border-bottom: 1px solid #eee;
-  }
-
-  &__tab {
-    .flex-center;
-
-    flex-grow: 1;
-    margin-bottom: -1px;
-    border-bottom: 1px solid transparent;
-    color: @graphite-dark;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    opacity: 0.56;
-    text-transform: uppercase;
-
-    &--active {
-      border-bottom-color: fade(@graphite-dark, 40%);
-      cursor: default;
-      opacity: 1;
-    }
-
-    &:first-child {
-      margin-left: 8px;
-    }
-
-    &:last-child {
-      margin-right: 8px;
-    }
-  }
-
   &__content {
     display: flex;
     flex-direction: column;

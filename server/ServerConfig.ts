@@ -11,12 +11,18 @@ export interface ServerConfig {
     URL: {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
+      PRIVACY_POLICY: string;
+      SUPPORT_BASE: string;
       TEAMS_BASE: string;
+      TERMS_OF_USE_PERSONAL: string;
+      TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;
     };
     FEATURE: {
       CHECK_CONSENT: boolean;
+      ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_DEBUG: boolean;
+      ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
@@ -30,6 +36,7 @@ export interface ServerConfig {
     DEVELOPMENT?: boolean;
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;
+    GOOGLE_WEBMASTER_ID: string;
     PORT_HTTP: number;
     ROBOTS: {
       ALLOWED_HOSTS: string[];

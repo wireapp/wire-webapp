@@ -33,12 +33,14 @@ import {
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps} from 'react-router';
+import {Redirect, RouteComponentProps} from 'react-router';
 import {indexStrings} from '../../strings';
+import {FEATURE} from '../config';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
+import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLAttributes<Index>, RouteComponentProps {}
@@ -71,6 +73,9 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
     const isMacOsWrapper = isDesktopApp() && isMacOS();
     return (
       <Page>
+        {!FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+          <Redirect to={pathWithParams(ROUTE.LOGIN)} data-uie-name="redirect-login" />
+        )}
         <ContainerXS centerText verticalCenter>
           <Logo scale={1.68} data-uie-name="ui-wire-logo" />
           <Columns style={{margin: '70px auto'}}>

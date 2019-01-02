@@ -17,7 +17,7 @@
  *
  */
 
-'use strict';
+import {UNSPLASH_URL} from '../externalRoute';
 
 window.z = window.z || {};
 window.z.user = z.user || {};
@@ -42,13 +42,16 @@ z.user.UserRepository = class UserRepository {
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
-  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository) {
-    this.user_service = user_service;
-    this.asset_service = asset_service;
-    this.selfService = selfService;
-    this.client_repository = client_repository;
+  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
+
+    this.asset_service = asset_service;
+    this.client_repository = client_repository;
+    this.propertyRepository = propertyRepository;
+    this.selfService = selfService;
+    this.user_service = user_service;
 
     this.user_mapper = new z.user.UserMapper(serverTimeRepository);
     this.should_set_username = false;
@@ -119,7 +122,18 @@ z.user.UserRepository = class UserRepository {
       case z.event.Client.USER.AVAILABILITY:
         this.onUserAvailability(event_json);
         break;
-      default:
+    }
+
+    // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
+    if (source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
+      switch (type) {
+        case z.event.Backend.USER.PROPERTIES_DELETE:
+          this.propertyRepository.deleteProperty(event_json.key);
+          break;
+        case z.event.Backend.USER.PROPERTIES_SET:
+          this.propertyRepository.setProperty(event_json.key, event_json.value);
+          break;
+      }
     }
   }
 
@@ -770,7 +784,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.loadUrlBlob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return z.util.loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()) {
@@ -785,7 +799,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   getMarketingConsent() {
-    if (!window.wire.env.FEATURE.CHECK_CONSENT) {
+    if (!z.config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
       return Promise.resolve();
     }

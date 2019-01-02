@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:audio/AudioRepository
-
-'use strict';
+// KARMA_SPECS=audio/AudioRepository yarn test:app
 
 describe('z.audio.AudioRepository', () => {
   const test_factory = new TestFactory();

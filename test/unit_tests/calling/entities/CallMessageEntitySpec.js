@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:calling/entities/CallMessageEntity
-
-'use strict';
+// KARMA_SPECS=calling/entities/CallMessageEntity yarn test:app
 
 describe('z.calling.entities.CallMessageEntity', () => {
   describe('_create_session_id', () => {

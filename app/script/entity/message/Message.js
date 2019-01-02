@@ -17,12 +17,12 @@
  *
  */
 
-'use strict';
+import ko from 'knockout';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.Message = class Message {
+class Message {
   /**
    * Sort messages by timestamp
    * @param {Array<z.entity.Message>} message_ets - Message entities
@@ -70,7 +70,10 @@ z.entity.Message = class Message {
       return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
+    this.readReceipts = ko.observableArray([]);
+
     this.conversation_id = '';
+    this.expectsReadConfirmation = false;
     this.from = '';
     this.primary_key = undefined;
     this.status = ko.observable(z.message.StatusType.UNSPECIFIED);
@@ -350,4 +353,7 @@ z.entity.Message = class Message {
     }
     return false;
   }
-};
+}
+
+export default Message;
+z.entity.Message = Message;

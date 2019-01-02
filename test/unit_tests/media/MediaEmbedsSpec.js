@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:media/MediaEmbeds
+// KARMA_SPECS=media/MediaEmbeds yarn test:app
 
 describe('MediaEmbeds', () => {
   // Will test all common link variations

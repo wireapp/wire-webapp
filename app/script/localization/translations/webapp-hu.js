@@ -17,8 +17,6 @@
  *
  */
 
-'use=szigorú';
-
 z.string.hu.wire = 'Wire';
 z.string.hu.wireMacos = 'Wire MacOS-hez';
 z.string.hu.wireWindows = 'Wire Windowshoz';
@@ -133,6 +131,8 @@ z.string.hu.modalAccountNewDevicesSecondary = 'Eszközök kezelése';
 z.string.hu.modalAccountNewDevicesHeadline = 'Fiókod legutóbbi használata:';
 z.string.hu.modalAccountNewDevicesFrom = 'Eszköz:';
 z.string.hu.modalAccountNewDevicesMessage = 'Ha ezt nem te voltál, akkor töröld az eszközt, és állítsd alaphelyzetbe jelszavad.';
+
+z.string.hu.modalAccountReadReceiptsChangedSecondary = 'Eszközök kezelése';
 
 z.string.hu.modalAccountRemoveDeviceAction = 'Eszköz eltávolítása';
 z.string.hu.modalAccountRemoveDeviceHeadline = '"{{device}}" eltávolítása';
@@ -488,6 +488,7 @@ z.string.hu.participantDevicesOutdatedClientMessage = '{{user}} a Wire régi ver
 z.string.hu.participantDevicesSelfAllDevices = 'Összes saját eszköz mutatása';
 z.string.hu.participantDevicesSelfFingerprint = 'Eszköz ujjlenyomata';
 
+
 z.string.hu.userProfileButtonConnect = 'Csatlakozás';
 z.string.hu.userProfileButtonIgnore = 'Figyelmen kívül hagyás';
 z.string.hu.userProfileButtonUnblock = 'Tiltás feloldása';
@@ -521,12 +522,13 @@ z.string.hu.preferencesAccountLogOut = 'Kijelentkezés';
 z.string.hu.preferencesAccountManageTeam = 'Csapat kezelése';
 z.string.hu.preferencesAccountMarketingConsentCheckbox = 'Feliratkozás hírlevélre';
 z.string.hu.preferencesAccountMarketingConsentDetail = 'Hírek és termékinformációk fogadása e-mailben a Wire-től.';
+z.string.hu.preferencesAccountPrivacy = 'Adatvédelem';
 z.string.hu.preferencesAccountResetPassword = 'Jelszó visszaállítása';
 z.string.hu.preferencesAccountTeam = 'innen: {{name}}';
-z.string.hu.preferencesAccountUsernamePlaceholder = 'Teljes neved';
-z.string.hu.preferencesAccountUsernameHint = 'Legalább 2 karakter, és kizárólag a—z, 0—9 és _ karakterek.';
 z.string.hu.preferencesAccountUsernameAvailable = 'Elérhető';
 z.string.hu.preferencesAccountUsernameErrorTaken = 'Már foglalt';
+z.string.hu.preferencesAccountUsernameHint = 'Legalább 2 karakter, és kizárólag a—z, 0—9 és _ karakterek.';
+z.string.hu.preferencesAccountUsernamePlaceholder = 'Teljes neved';
 
 z.string.hu.preferencesAVCamera = 'Kamera';
 z.string.hu.preferencesAVMicrophone = 'Mikrofon';
@@ -562,7 +564,7 @@ z.string.hu.preferencesOptionsContactsMacos = 'Importálás Névjegyek-ből';
 z.string.hu.preferencesOptionsContactsDetail = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
 z.string.hu.preferencesOptionsPopular = 'Közkívánatra';
 z.string.hu.preferencesOptionsEmojiReplaceCheckbox = 'Cserélje ki a begépelt hangulatjeleket emojikra';
-z.string.hu.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
+z.string.hu.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.hu.preferencesOptionsPreviewsSendCheckbox = 'Előnézet készítése az elküldött hivatkozásokról';
 z.string.hu.preferencesOptionsPreviewsSendDetail = 'A más partnerektől kapott hivatkozások előnézete továbbra is látható lesz.';
 z.string.hu.preferencesOptionsNotifications = 'Értesítések';
@@ -665,10 +667,10 @@ z.string.hu.warningNotFoundMicrophone = 'Nem kezdeményezhetsz hívást, mert ni
 z.string.hu.warningPermissionDeniedCamera = 'Nem kezdeményezhetsz hívást, mert böngésződ nem férhet hozzá a kamerádhoz.';
 z.string.hu.warningPermissionDeniedMicrophone = 'Nem kezdeményezhetsz hívást, mert böngésződ nem férhet hozzá a mikrofonodhoz.';
 z.string.hu.warningPermissionDeniedScreen = 'A képernyőmegosztást engedélyezned kell a böngészőben.';
-z.string.hu.warningPermissionRequestCamera = '{{icon}} Kamera hozzáférés engedélyezése';
-z.string.hu.warningPermissionRequestMicrophone = '{{icon}} Mikrofon hozzáférés engedélyezése';
-z.string.hu.warningPermissionRequestNotification = '{{icon}} Értesítések engedélyezése';
-z.string.hu.warningPermissionRequestScreen = '{{icon}} Képernyőmegosztás engedélyezése';
+z.string.hu.warningPermissionRequestCamera = '[icon] Kamera hozzáférés engedélyezése';
+z.string.hu.warningPermissionRequestMicrophone = '[icon] Mikrofon hozzáférés engedélyezése';
+z.string.hu.warningPermissionRequestNotification = '[icon] Értesítések engedélyezése';
+z.string.hu.warningPermissionRequestScreen = '[icon] Képernyőmegosztás engedélyezése';
 
 z.string.hu.userAvailabilityAvailable = 'Elérhető';
 z.string.hu.userAvailabilityAway = 'Nincs a gépnél';

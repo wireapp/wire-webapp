@@ -17,12 +17,12 @@
  *
  */
 
-'use strict';
+import Message from './Message';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.SystemMessage = class SystemMessage extends z.entity.Message {
+class SystemMessage extends Message {
   constructor() {
     super();
     this.super_type = z.message.SuperType.SYSTEM;
@@ -32,4 +32,7 @@ z.entity.SystemMessage = class SystemMessage extends z.entity.Message {
   is_conversation_rename() {
     return this.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME;
   }
-};
+}
+
+export default SystemMessage;
+z.entity.SystemMessage = SystemMessage;

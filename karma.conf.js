@@ -19,13 +19,21 @@
 
 /* eslint-disable sort-keys */
 
-'use strict';
+const webpack = require('webpack');
+const path = require('path');
+
+const rootWebpackConfig = require('./webpack.config.common.js');
+
+function getSpecs(specList) {
+  if (specList) {
+    return specList.split(',').map(specPath => `test/unit_tests/${specPath}Spec.js`);
+  }
+  return ['test/unit_tests/**/*.js'];
+}
 
 module.exports = function(config) {
   config.set({
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: 'deploy',
-
+    basePath: './',
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
@@ -38,18 +46,69 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      // Do not write files or patterns here. Put them in grunt/config/karma.js
-    ],
+      {
+        included: false,
+        nocache: true,
+        pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
+        served: true,
+      },
+      {included: false, nocache: false, pattern: 'app/ext/audio/*.mp3', served: true},
+      {included: false, nocache: true, pattern: 'app/worker/*.js', served: true},
 
-    proxies: {},
+      'node_modules/jasmine-ajax/lib/mock-ajax.js',
+      'node_modules/sinon/pkg/sinon.js',
+      'test/api/environment.js',
+      'test/api/payloads.js',
+      'test/api/SDP_payloads.js',
+      'test/config.test.js',
+      'app/script/main/globals.js',
+      'test/api/OpenGraphMocks.js',
+      'test/js/calling/CallRequestResponseMock.js',
+      'test/api/TestFactory.js',
+    ].concat(getSpecs(process.env.KARMA_SPECS)),
 
-    // list of files to exclude
-    exclude: [],
+    proxies: {
+      '/audio/': '/base/audio/',
+      '/ext/js': '/base/node_modules/',
+      '/worker/': '/base/worker/',
+    },
 
     // pre-process matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../deploy/script/**/*.js': ['coverage'],
+      'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
+      'test/api/TestFactory.js': ['webpack', 'sourcemap'],
+      'app/script/main/globals.js': ['webpack', 'sourcemap'],
+      // FIXME fails because of import statements 'app/script/**/*.js': ['coverage'],
+    },
+
+    webpack: {
+      mode: 'development',
+      node: {
+        fs: 'empty',
+        path: 'empty',
+      },
+      externals: {
+        'fs-extra': '{}',
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+          _: 'underscore',
+          ko: 'knockout',
+        }),
+      ],
+      resolve: {
+        alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
+          app: path.resolve(__dirname, 'app'),
+        }),
+      },
+    },
+
+    webpackMiddleware: {
+      logLevel: 'error',
+      stats: 'errors-only',
     },
 
     // test results reporter to use
@@ -92,11 +151,11 @@ module.exports = function(config) {
     coverageReporter: {
       reporters: [
         {
-          dir: '../docs/coverage',
+          dir: 'docs/coverage',
           type: 'html',
         },
         {
-          dir: '../docs/coverage',
+          dir: 'docs/coverage',
           file: 'coverage-summary.txt',
           type: 'text-summary',
         },

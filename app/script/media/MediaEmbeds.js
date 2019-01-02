@@ -17,7 +17,9 @@
  *
  */
 
-'use strict';
+/* eslint-disable no-unused-vars */
+import urlSearchParamPolyfill from 'url-search-params-polyfill';
+/* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.media = z.media || {};

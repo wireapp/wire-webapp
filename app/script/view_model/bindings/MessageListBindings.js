@@ -17,7 +17,9 @@
  *
  */
 
-'use strict';
+import moment from 'moment';
+
+import viewportObserver from '../../ui/viewportObserver';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
@@ -60,17 +62,15 @@ ko.bindingHandlers.focus_on_keydown = {
 /**
  * Show timestamp when hovering over the element.
  */
-ko.bindingHandlers.show_all_timestamps = {
+ko.bindingHandlers.showAllTimestamps = {
   init(element) {
-    const $element = $(element);
+    const toggleShowTimeStamp = force => {
+      const times = document.querySelectorAll('.time');
+      times.forEach(time => time.classList.toggle('show-timestamp', force));
+    };
 
-    $element.on('mousemove mouseout', function(event) {
-      const rect = $(this)
-        .find('.messages')[0]
-        .getBoundingClientRect();
-      const show_timestamps = event.clientX > rect.right - 64 && event.clientX < rect.right;
-      $('.time').toggleClass('show-timestamp', show_timestamps);
-    });
+    element.addEventListener('mouseenter', () => toggleShowTimeStamp(true));
+    element.addEventListener('mouseleave', () => toggleShowTimeStamp(false));
   },
 };
 
@@ -89,7 +89,7 @@ ko.bindingHandlers.background_image = {
     let objectUrl;
 
     const loadImage = () => {
-      assetLoader()
+      assetLoader
         .load()
         .then(blob => {
           $(element).removeClass('image-loading');
@@ -99,10 +99,10 @@ ko.bindingHandlers.background_image = {
         .catch(() => {});
     };
 
-    z.ui.ViewportObserver.addElement(element, loadImage);
+    viewportObserver.addElement(element, loadImage);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      z.ui.ViewportObserver.removeElement(element);
+      viewportObserver.removeElement(element);
       if (objectUrl) {
         window.URL.revokeObjectURL(objectUrl);
       }

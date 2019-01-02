@@ -17,7 +17,14 @@
  *
  */
 
-'use strict';
+import {
+  getPrivacyPolicyUrl,
+  getSupportContactUrl,
+  getSupportUrl,
+  getTermsOfUsePersonalUrl,
+  getTermsOfUseTeamUrl,
+  getWebsiteUrl,
+} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -29,10 +36,23 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;
+
+    this.supportUrl = getSupportUrl();
+    this.supportContactUrl = getSupportContactUrl();
+    this.websiteUrl = getWebsiteUrl();
+    this.privacyPolicyUrl = getPrivacyPolicyUrl();
+    this.termsOfUseUrl = ko.pureComputed(() => {
+      if (this.selfUser()) {
+        return this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
+      }
+    });
   }
 
-  clickOnToU() {
-    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().inTeam() ? 'teams' : 'personal'}/`;
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+  showWireSection() {
+    return this.termsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl;
+  }
+
+  showSupportSection() {
+    return this.supportUrl || this.supportContactUrl;
   }
 };

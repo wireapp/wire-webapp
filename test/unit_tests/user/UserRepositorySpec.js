@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:user/UserRepository
-
-'use strict';
+// KARMA_SPECS=user/UserRepository yarn test:app
 
 describe('z.user.UserRepository', () => {
   let server = null;

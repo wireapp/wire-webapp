@@ -116,6 +116,11 @@
                     </div>
                   </div>
                 <!-- /ko -->
+                <!-- ko if: showOptionReadReceipts() -->
+                  <div class="conversation-details__read-receipts">
+                    <read-receipt-toggle params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"></read-receipt-toggle>
+                  </div>
+                <!-- /ko -->
               <!-- /ko -->
             </div>
           <!-- /ko -->
@@ -123,7 +128,7 @@
             <!-- ko if: activeConversation() && activeConversation().isGroup() -->
               <!-- ko if: userParticipants().length -->
                 <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsPeople"></div>
-                <user-list params="user: userParticipants, click: clickOnShowUser, altStyle: true, searchRepository: searchRepository" data-uie-name="list-users"></user-list>
+                <user-list params="user: userParticipants, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository" data-uie-name="list-users"></user-list>
                 <!-- ko if: showAllUsersCount() > 0 -->
                   <div class="panel__action-item panel__action-item--no-border" data-bind="click: clickOnShowAll" data-uie-name="go-conversation-participants">
                     <people-icon class="panel__action-item__icon"></people-icon>
@@ -135,7 +140,7 @@
 
               <!-- ko if: serviceParticipants().length -->
                 <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsServices"></div>
-                <service-list params="services: serviceParticipants, click: clickOnShowService, altStyle: true" data-uie-name="list-services"></service-list>
+                <service-list params="services: serviceParticipants, click: clickOnShowService, noUnderline: true, arrow: true" data-uie-name="list-services"></service-list>
               <!-- /ko -->
             <!-- /ko -->
           </div>
@@ -152,6 +157,14 @@
                   </div>
                   <disclose-icon></disclose-icon>
                 </div>
+              </div>
+            <!-- /ko -->
+
+            <!-- ko if: isSingleUserMode() -->
+              <div class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
+                <div class="panel__info-text panel__info-text--head panel__info-text--margin-bottom" data-bind="l10n_text: hasReceiptsEnabled() ? z.string.conversationDetails1to1ReceiptsHeadEnabled : z.string.conversationDetails1to1ReceiptsHeadDisabled"></div>
+                <div class="panel__info-text panel__info-text--margin-bottom" data-bind="l10n_text: z.string.conversationDetails1to1ReceiptsFirst"></div>
+                <div class="panel__info-text panel__info-text--margin" data-bind="l10n_text: z.string.conversationDetails1to1ReceiptsSecond"></div>
               </div>
             <!-- /ko -->
             <!-- ko if: showActionCreateGroup() -->

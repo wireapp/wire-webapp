@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.enum = z.calling.enum || {};

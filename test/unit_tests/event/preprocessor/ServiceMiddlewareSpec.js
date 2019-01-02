@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_run:event/preprocessor/ServiceMiddleware
+// KARMA_SPECS=event/preprocessor/ServiceMiddleware yarn test:app
 
 describe('z.event.preprocessor.ServiceMiddleware', () => {
   const testFactory = new TestFactory();

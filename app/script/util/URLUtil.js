@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.util = z.util || {};
 
@@ -50,19 +48,17 @@ z.util.URLUtil = (() => {
   };
 
   const _getDomain = urlType => {
-    const isProduction = _isProductionBackend();
-
     switch (urlType) {
       case TYPE.ACCOUNT:
-        return isProduction ? window.wire.env.URL.ACCOUNT_BASE : z.config.URL.ACCOUNT.STAGING;
+        return window.wire.env.URL.ACCOUNT_BASE;
       case TYPE.SUPPORT:
-        return z.config.URL.SUPPORT;
+        return window.wire.env.URL.SUPPORT_BASE;
       case TYPE.TEAM_SETTINGS:
-        return isProduction ? window.wire.env.URL.TEAMS_BASE : z.config.URL.TEAM_SETTINGS.STAGING;
+        return window.wire.env.URL.TEAMS_BASE;
       case TYPE.WEBAPP:
-        return isProduction ? window.wire.env.APP_BASE : z.config.URL.WEBAPP.STAGING;
+        return window.wire.env.APP_BASE;
       case TYPE.WEBSITE:
-        return isProduction ? window.wire.env.URL.WEBSITE_BASE : z.config.URL.WEBSITE.STAGING;
+        return window.wire.env.URL.WEBSITE_BASE;
       default:
         throw new Error('Unknown URL type');
     }
@@ -122,8 +118,6 @@ z.util.URLUtil = (() => {
     const hasLinks = links && links.length;
     return hasLinks ? links.map(element => $(element)[0]) : [];
   };
-
-  const _isProductionBackend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
 
   /**
    * Prepends http to given url if protocol missing

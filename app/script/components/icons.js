@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 ko.components.register('add-participants-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -219,6 +217,14 @@ ko.components.register('leave-icon', {
   `,
 });
 
+ko.components.register('like-icon', {
+  template: `
+  <svg width="16" height="14" viewBox="0 0 16 14">
+    <path d="M8.2 11.6c.9-.5 1.7-1.1 2.5-1.8 2.1-1.7 3.3-3.5 3.3-5 0-1-.2-1.7-.7-2.1-.9-1-2.4-1-3.3 0l-2 2-2-2c-1-1-2.4-1-3.3 0-.5.4-.7 1-.7 2.1 0 1.5 1.2 3.3 3.3 5a21.7 21.7 0 0 0 2.7 2l.2-.2zM8 1.9l.6-.6a4.4 4.4 0 0 1 6.1 0c.9.8 1.3 2 1.3 3.5C16 10 8 14 8 14s-8-4-8-9.2c0-1.5.4-2.7 1.3-3.5a4.4 4.4 0 0 1 6 0l.7.6z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('location-icon', {
   template: `
   <svg width="12" height="16" viewBox="0 0 12 16">
@@ -335,6 +341,14 @@ ko.components.register('profile-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('read-icon', {
+  template: `
+  <svg width="16" height="12" viewBox="0 0 16 12">
+    <path d="M16 6a8.5 8.5 0 0 1-8 6 8.5 8.5 0 0 1-8-6c1.2-3.5 4.3-6 8-6s6.8 2.5 8 6zM8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
   </svg>
   `,
 });

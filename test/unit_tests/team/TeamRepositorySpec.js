@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:team/TeamRepository
-
-'use strict';
+// KARMA_SPECS=team/TeamRepository yarn test:app
 
 describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();

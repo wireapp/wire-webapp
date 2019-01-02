@@ -118,6 +118,8 @@ z.string.tr.modalAccountNewDevicesHeadline = 'Hesabınız şurada kullanılmış
 z.string.tr.modalAccountNewDevicesFrom = 'Cihaz:';
 z.string.tr.modalAccountNewDevicesMessage = 'Eğer bunu yapan siz değilseniz, cihazı kaldırın ben şifrenizi sıfırlayın.';
 
+z.string.tr.modalAccountReadReceiptsChangedSecondary = 'Cihazları yönet';
+
 z.string.tr.modalAccountRemoveDeviceAction = 'Cihazı kaldır';
 z.string.tr.modalAccountRemoveDeviceHeadline = '"{{device}}" cihazını kaldır';
 z.string.tr.modalAccountRemoveDeviceMessage = 'Cihazı kaldırmak için şifreniz gereklidir.';
@@ -375,6 +377,7 @@ z.string.tr.participantDevicesOutdatedClientMessage = '{{user}}, Wire’ın eski
 z.string.tr.participantDevicesSelfAllDevices = 'Tüm cihazlarımı göster';
 z.string.tr.participantDevicesSelfFingerprint = 'Cihaz parmak izi';
 
+
 z.string.tr.userProfileButtonConnect = 'Bağlan';
 z.string.tr.userProfileButtonIgnore = 'Görmezden gel';
 z.string.tr.userProfileButtonUnblock = 'Engeli kaldır';
@@ -401,12 +404,13 @@ z.string.tr.preferencesAccountCreateTeam = 'Bir takım oluştur';
 z.string.tr.preferencesAccountDelete = 'Hesabı Sil';
 z.string.tr.preferencesAccountLogOut = 'Çıkış yap';
 z.string.tr.preferencesAccountManageTeam = 'Takım yönet';
+z.string.tr.preferencesAccountPrivacy = 'Gizlilik';
 z.string.tr.preferencesAccountResetPassword = 'Şifreni sıfırla';
 z.string.tr.preferencesAccountTeam = '{{name}}’de';
-z.string.tr.preferencesAccountUsernamePlaceholder = 'Tam adınız';
-z.string.tr.preferencesAccountUsernameHint = 'En az 2 karakter. a—z, 0—9, ve yalnızca _.';
 z.string.tr.preferencesAccountUsernameAvailable = 'Alınabilir';
 z.string.tr.preferencesAccountUsernameErrorTaken = 'Çoktan alınmış';
+z.string.tr.preferencesAccountUsernameHint = 'En az 2 karakter. a—z, 0—9, ve yalnızca _.';
+z.string.tr.preferencesAccountUsernamePlaceholder = 'Tam adınız';
 
 z.string.tr.preferencesAVCamera = 'Kamera';
 z.string.tr.preferencesAVMicrophone = 'Mikrofon';
@@ -492,10 +496,10 @@ z.string.tr.warningNotFoundMicrophone = 'Arama yapamıyorsunuz çünkü bilgisay
 z.string.tr.warningPermissionDeniedCamera = 'Arama yapamıyorsunuz çünkü tarayıcınızın kameraya erişim izni bulunmamaktadır.';
 z.string.tr.warningPermissionDeniedMicrophone = 'Arama yapamıyorsunuz çünkü tarayıcınızın mikrofona erişim izni bulunmamaktadır.';
 z.string.tr.warningPermissionDeniedScreen = 'Tarayıcınız ekranınızı paylaşmak için gerekli izinleri sağlamalıdır.';
-z.string.tr.warningPermissionRequestCamera = '{{icon}} Kameraya erişime izin ver';
-z.string.tr.warningPermissionRequestMicrophone = '{{icon}} Mikrofona erişime izin ver';
-z.string.tr.warningPermissionRequestNotification = '{{icon}} Bildirimlere izin ver';
-z.string.tr.warningPermissionRequestScreen = '{{icon}} Ekrana erişime izin ver';
+z.string.tr.warningPermissionRequestCamera = '[icon] Kameraya erişime izin ver';
+z.string.tr.warningPermissionRequestMicrophone = '[icon] Mikrofona erişime izin ver';
+z.string.tr.warningPermissionRequestNotification = '[icon] Bildirimlere izin ver';
+z.string.tr.warningPermissionRequestScreen = '[icon] Ekrana erişime izin ver';
 
 z.string.tr.userAvailabilityAvailable = 'Alınabilir';
 z.string.tr.userAvailabilityAway = 'Uzakta';

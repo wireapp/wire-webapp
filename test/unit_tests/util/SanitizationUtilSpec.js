@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/SanitizationUtil
-
-'use strict';
+// KARMA_SPECS=util/SanitizationUtil yarn test:app
 
 describe('z.util.SanitizationUtil', () => {
   describe('escapeRegex', () => {

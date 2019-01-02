@@ -17,12 +17,12 @@
  *
  */
 
-'use strict';
+import moment from 'moment';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.AssetHeader = class AssetHeader {
+class AssetHeader {
   /**
    * Construct a new asset header.
    * @param {Object} params - Component parameters
@@ -30,13 +30,14 @@ z.components.AssetHeader = class AssetHeader {
    */
   constructor(params) {
     this.message_et = params.message;
+    this.moment = moment;
   }
-};
+}
 
 ko.components.register('asset-header', {
   template: `
     <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
     <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('D.M H:mm')"></span>
   `,
-  viewModel: z.components.AssetHeader,
+  viewModel: AssetHeader,
 });

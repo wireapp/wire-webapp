@@ -19,7 +19,10 @@
 
 /* eslint no-undef: "off" */
 
-'use strict';
+import ko from 'knockout';
+import PropertiesRepository from 'app/script/properties/PropertiesRepository';
+import PropertiesService from 'app/script/properties/PropertiesService';
+import StorageService from 'app/script/storage/StorageService';
 
 /**
  * @param {function} [logger_level] - A function returning the logger level.
@@ -105,7 +108,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
   this.logger.info('- exposeStorageActors');
   return Promise.resolve()
     .then(() => {
-      TestFactory.storage_service = singleton(z.storage.StorageService);
+      TestFactory.storage_service = singleton(StorageService);
       return TestFactory.storage_service.init(entities.user.john_doe.id);
     })
     .then(() => {
@@ -274,13 +277,15 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
       TestFactory.self_service = new z.self.SelfService(this.backendClient);
       TestFactory.user_service = new z.user.UserService(this.backendClient);
+      TestFactory.propertyRepository = new PropertiesRepository(new PropertiesService(this.backendClient));
 
       TestFactory.user_repository = new z.user.UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.self_service,
         TestFactory.client_repository,
-        TestFactory.serverTimeRepository
+        TestFactory.serverTimeRepository,
+        TestFactory.propertyRepository
       );
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
@@ -400,7 +405,8 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         undefined,
         TestFactory.serverTimeRepository,
         TestFactory.team_repository,
-        TestFactory.user_repository
+        TestFactory.user_repository,
+        TestFactory.propertyRepository
       );
 
       return TestFactory.conversation_repository;

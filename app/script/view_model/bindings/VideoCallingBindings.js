@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 // http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
 ko.bindingHandlers.muteMediaElement = {
   update(element, valueAccessor) {

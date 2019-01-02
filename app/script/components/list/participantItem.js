@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -37,8 +35,11 @@ z.components.ParticipantItem = class ParticipantItem {
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;
     this.showCamera = params.showCamera;
+    this.hasCustomInfo = !!params.customInfo;
 
-    if (params.hideInfo) {
+    if (this.hasCustomInfo) {
+      this.contentInfo = params.customInfo;
+    } else if (params.hideInfo) {
       this.contentInfo = null;
     } else if (this.isService) {
       this.contentInfo = this.participant.summary;
@@ -69,7 +70,7 @@ ko.components.register('participant-item', {
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
-            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser && !isTemporaryGuest}" data-uie-name="status-username"></span>
+            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser && !isTemporaryGuest && !hasCustomInfo}" data-uie-name="status-username"></span>
           <!-- /ko -->
         </div>
       </div>

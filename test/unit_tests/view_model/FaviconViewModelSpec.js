@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:view_model/FaviconViewModel
+// KARMA_SPECS=view_model/FaviconViewModel yarn test:app
 
 describe('z.viewModel.FaviconViewModel', () => {
   it('subscribes to uread count events', () => {

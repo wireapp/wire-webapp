@@ -17,9 +17,8 @@
  *
  */
 
-// grunt test_run:conversation/ConversationService
-
-'use strict';
+// KARMA_SPECS=conversation/ConversationService yarn test:app
+import ConversationMapper from 'app/script/conversation/ConversationMapper';
 
 describe('ConversationService', () => {
   let conversation_mapper = null;
@@ -32,7 +31,7 @@ describe('ConversationService', () => {
   beforeAll(() => {
     return test_factory.exposeConversationActors().then(storage_repository => {
       conversation_service = TestFactory.conversation_service;
-      conversation_mapper = new z.conversation.ConversationMapper();
+      conversation_mapper = new ConversationMapper();
       storage_service = TestFactory.storage_service;
       server = sinon.fakeServer.create();
     });

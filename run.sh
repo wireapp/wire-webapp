@@ -6,4 +6,4 @@
 
 port=${NODE_PORT:-8080}
 
-PORT=$port node /src/aws/index.js
+PORT=$port node /src/server/dist/index.js

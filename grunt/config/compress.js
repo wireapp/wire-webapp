@@ -17,21 +17,19 @@
  *
  */
 
-'use strict';
-
 // https://github.com/gruntjs/grunt-contrib-compress
 
 module.exports = {
-  aws: {
+  server: {
     files: [
       {
-        cwd: '<%= dir.aws_ %>',
+        cwd: '<%= dir.dist_ %>',
         expand: true,
-        src: ['../package.json', '**/*', '.**/*', '!<%= dir.aws.s3 %>'],
+        src: ['../package.json', '**/*', '.**/*', '!<%= dir.dist.s3 %>'],
       },
     ],
     options: {
-      archive: '<%= dir.aws.s3 %>/ebs.zip',
+      archive: '<%= dir.dist.s3 %>/ebs.zip',
     },
   },
 };

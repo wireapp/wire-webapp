@@ -82,7 +82,7 @@
   "BackendError.LABEL.KEY_EXISTS": "",
   "BackendError.LABEL.ALREADY_INVITED": "",
   "BackendError.LABEL.PENDING_ACTIVATION": "",
-  "BackendError.LABEL.PENDING_LOGIN": "BackendError.LABEL.PENDING_LOGIN",
+  "BackendError.LABEL.PENDING_LOGIN": "",
   "BackendError.LABEL.TOO_MANY_LOGINS": "",
   "BackendError.LABEL.BAD_REQUEST": "Entrada inválida",
   "BackendError.LABEL.INVALID_PAYLOAD": "Entrada inválida",

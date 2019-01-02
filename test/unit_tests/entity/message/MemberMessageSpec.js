@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:entity/message/MemberMessage
+// KARMA_SPECS=entity/message/MemberMessage yarn test:app
 
 describe('Member Message', () => {
   describe('generateNameString', () => {

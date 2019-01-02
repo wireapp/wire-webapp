@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:links/LinkPreviewBlackList
+// KARMA_SPECS=links/LinkPreviewBlackList yarn test:app
 
 describe('is_blacklisted', () => {
   it('blacklists youtu.be links', () => {

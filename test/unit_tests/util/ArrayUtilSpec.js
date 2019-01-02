@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:util/ArrayUtil
-
-'use strict';
+// KARMA_SPECS=util/ArrayUtil yarn test:app
 
 describe('z.util.ArrayUtil', () => {
   describe('chunk', () => {

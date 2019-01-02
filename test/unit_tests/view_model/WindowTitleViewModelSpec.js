@@ -17,9 +17,7 @@
  *
  */
 
-'use strict';
-
-// grunt test_run:view_model/WindowTitleViewModel
+// KARMA_SPECS=view_model/WindowTitleViewModel yarn test:app
 
 describe('z.viewModel.WindowTitleViewModel', () => {
   const suffix = z.l10n.text(z.string.wire);

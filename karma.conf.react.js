@@ -17,7 +17,7 @@
  *
  */
 
-const dist = 'aws/static/min';
+const dist = 'server/dist/static/min';
 const test = 'test';
 
 const preprocessors = {};
@@ -41,7 +41,7 @@ module.exports = function(config) {
     },
     customLaunchers: {
       ChromeNoSandbox: {
-        base: 'Chrome',
+        base: 'ChromeHeadless',
         flags: ['--no-sandbox'],
       },
     },

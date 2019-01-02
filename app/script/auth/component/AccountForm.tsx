@@ -152,9 +152,18 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
               this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
               break;
             }
+            default: {
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                error.label.endsWith(errorType)
+              );
+              if (!isValidationError) {
+                throw error;
+              }
+            }
           }
+        } else {
+          throw error;
         }
-        console.error('Failed to send email code', error);
       });
   };
 

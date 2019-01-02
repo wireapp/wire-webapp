@@ -8,9 +8,9 @@
     <div class="panel__content">
       <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder, focusDelay: z.motion.MotionDuration.LONG" spellcheck="false"></user-input>
       <!-- ko if: showIntegrations() -->
-        <div class="add-participants__tabs">
-          <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
-          <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isStateAddService}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
+        <div class="panel__tabs">
+          <div class="panel__tab" data-bind="css: {'panel__tab--active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
+          <div class="panel__tab" data-bind="css: {'panel__tab--active': isStateAddService}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
         </div>
       <!-- /ko -->
 
@@ -21,7 +21,7 @@
           <!-- /ko -->
           <!-- ko if: isStateAddService() -->
             <!-- ko if: services().length -->
-              <!-- ko if: isTeamManager() -->
+              <!-- ko if: isTeamManager() && !!manageServicesUrl -->
                 <ul class="panel-manage-services left-list-items">
                   <li class="left-list-item left-list-item-clickable" data-bind="click: clickOpenManageServices" data-uie-name="go-manage-services">
                     <service-icon class="left-column-icon left-column-icon-dark"></service-icon>
@@ -29,12 +29,12 @@
                   </li>
                 </ul>
               <!-- /ko -->
-              <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching, altStyle: true"></service-list>
+              <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching, noUnderline: true, arrow: true"></service-list>
             <!-- /ko -->
             <!-- ko if: !services().length && !isInitialServiceSearch() -->
               <div class="search__no-services">
                 <service-icon class="search__no-services__icon"></service-icon>
-                <!-- ko if: isTeamManager() -->
+                <!-- ko if: isTeamManager() && !!manageServicesUrl -->
                   <div class="search__no-services__info" data-bind="l10n_text: z.string.addParticipantsNoServicesManager" data-uie-name="label-no-services-enabled-manager"></div>
                   <div class="search__no-services__manage-button search__no-services__manage-button--alternate" data-bind="l10n_text: z.string.addParticipantsManageServicesNoResults, click: clickOpenManageServices" data-uie-name="go-enable-services"></div>
                 <!-- /ko -->

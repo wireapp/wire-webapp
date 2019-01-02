@@ -17,7 +17,9 @@
  *
  */
 
-// grunt test_run:backup/BackupRepository
+// KARMA_SPECS=backup/BackupRepository yarn test:app
+
+import JSZip from 'jszip';
 
 const noop = () => {};
 

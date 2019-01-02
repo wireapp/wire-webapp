@@ -17,9 +17,7 @@
  *
  */
 
-// grunt test_run:connection/ConnectionService
-
-'use strict';
+// KARMA_SPECS=connection/ConnectionService yarn test:app
 
 describe('User Service', () => {
   let server = null;
