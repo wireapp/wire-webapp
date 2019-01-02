@@ -42,10 +42,9 @@ class StorageService {
    * Initialize the IndexedDB for a user.
    *
    * @param {string} userId - User ID
-   * @param {boolean} enableListeners - enable DB change listeners
    * @returns {Promise} Resolves with the database name
    */
-  init(userId = this.userId, enableListeners = true) {
+  init(userId = this.userId) {
     return Promise.resolve().then(() => {
       const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
@@ -57,15 +56,13 @@ class StorageService {
 
       this.db.on('blocked', () => this.logger.error('Database is blocked'));
 
-      if (enableListeners) {
-        this.db.on('changes', changes => {
-          changes.forEach(change => {
-            this.dbListeners
-              .filter(listener => listener.type === change.type && listener.store === change.table)
-              .forEach(listener => listener.callback(change));
-          });
+      this.db.on('changes', changes => {
+        changes.forEach(change => {
+          this.dbListeners
+            .filter(listener => listener.type === change.type && listener.store === change.table)
+            .forEach(listener => listener.callback(change));
         });
-      }
+      });
 
       this._upgradeStores(this.db);
 

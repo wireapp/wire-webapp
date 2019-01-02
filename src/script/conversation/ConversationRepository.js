@@ -246,7 +246,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _deleteLocalMessageEntity({oldObj: deletedEvent}) {
-    this.find_conversation_by_id(deletedEvent.conversation).then(conversationEntity => {
+    return this.find_conversation_by_id(deletedEvent.conversation).then(conversationEntity => {
       conversationEntity.remove_message_by_id(deletedEvent.id);
     });
   }
