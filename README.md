@@ -50,7 +50,7 @@ where `specN` is the path to the spec to run relative to `tests/unit_tests` and 
 
 example:
 
-If you want to run the tests for the ConversationRepository, the file containing the test is
+If you want to run the tests for the ConversationRepository, the file containing the test is:
 
 `tests/unit_tests/conversation/ConversationRepositorySpec.js`
 
