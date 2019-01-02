@@ -1605,7 +1605,7 @@ z.calling.CallingRepository = class CallingRepository {
         callingConfig.expiration = expirationDate;
 
         const turnServersConfig = (callingConfig.ice_servers || []).map(server => server.urls.join('\n')).join('\n');
-        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers :
+        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
 ${turnServersConfig}`;
         this.callLogger.info(logMessage);
         this.callingConfig = callingConfig;
