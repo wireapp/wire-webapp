@@ -238,7 +238,7 @@ class Login extends React.Component<CombinedProps, State> {
       .then(this.navigateChooseHandleOrWebapp)
       .catch((error: Error | BackendError) => {
         if ((error as BackendError).label) {
-          const backendError: BackendError = error as BackendError;
+          const backendError = error as BackendError;
           switch (backendError.label) {
             case BackendError.LABEL.NEW_CLIENT: {
               this.props.resetAuthError();
