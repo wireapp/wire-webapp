@@ -42,7 +42,7 @@ Alternatively, you can run specific parts of the app:
 
 `yarn test:(server|types|auth|app)`
 
-Since the test suite for the app is the biggest test suite, you might want to run a single test file, in which case, you can use the `--specs` option
+Since the test suite for the app is the biggest test suite, you might want to run a single test file, in which case, you can use the `--specs` option:
 
 `yarn test:app --specs spec1[,spec2...]`
 
