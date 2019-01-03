@@ -236,39 +236,44 @@ class Login extends React.Component<CombinedProps, State> {
           : this.props.doLogin(login);
       })
       .then(this.navigateChooseHandleOrWebapp)
-      .catch(error => {
-        switch (error.label) {
-          case BackendError.LABEL.NEW_CLIENT: {
-            this.props.resetAuthError();
-            /**
-             * Show history screen if:
-             *   1. database contains at least one event
-             *   2. there is at least one previously registered client
-             *   3. new local client is temporary
-             */
-            return this.props.doGetAllClients().then(clients => {
-              const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
-              return shouldShowHistoryInfo
-                ? this.props.history.push(ROUTE.HISTORY_INFO)
-                : this.navigateChooseHandleOrWebapp();
-            });
-          }
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            this.props.resetAuthError();
-            return this.props.history.push(ROUTE.CLIENTS);
-          }
-          case BackendError.LABEL.INVALID_CREDENTIALS:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
-            return;
-          }
-          default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType)
-            );
-            if (!isValidationError) {
-              throw error;
+      .catch((error: Error | BackendError) => {
+        if ((error as BackendError).label) {
+          const backendError: BackendError = error as BackendError;
+          switch (backendError.label) {
+            case BackendError.LABEL.NEW_CLIENT: {
+              this.props.resetAuthError();
+              /**
+               * Show history screen if:
+               *   1. database contains at least one event
+               *   2. there is at least one previously registered client
+               *   3. new local client is temporary
+               */
+              return this.props.doGetAllClients().then(clients => {
+                const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
+                return shouldShowHistoryInfo
+                  ? this.props.history.push(ROUTE.HISTORY_INFO)
+                  : this.navigateChooseHandleOrWebapp();
+              });
+            }
+            case BackendError.LABEL.TOO_MANY_CLIENTS: {
+              this.props.resetAuthError();
+              return this.props.history.push(ROUTE.CLIENTS);
+            }
+            case BackendError.LABEL.INVALID_CREDENTIALS:
+            case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+              return;
+            }
+            default: {
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                backendError.label.endsWith(errorType)
+              );
+              if (!isValidationError) {
+                throw backendError;
+              }
             }
           }
+        } else {
+          throw error;
         }
       });
   };
