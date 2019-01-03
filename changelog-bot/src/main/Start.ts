@@ -23,7 +23,7 @@ import {ChangelogBot} from './ChangelogBot';
 import {ChangelogData, LoginDataBackend, Parameters} from './Interfaces';
 
 export async function start(parameters: Parameters): Promise<void> {
-  const {backend, conversationIds, email, password, travisCommitRange, travisRepoSlug} = parameters;
+  const {backend, conversationIds, email, excludeCommitTypes, password, travisCommitRange, travisRepoSlug} = parameters;
   let message = parameters.message;
   const isCustomMessage = !!message;
 
@@ -51,7 +51,7 @@ export async function start(parameters: Parameters): Promise<void> {
   }
 
   if (!message) {
-    message = await ChangelogBot.generateChangelog(travisRepoSlug, travisCommitRange);
+    message = await ChangelogBot.generateChangelog(travisRepoSlug, travisCommitRange, undefined, excludeCommitTypes);
   }
 
   const messageData: ChangelogData = {

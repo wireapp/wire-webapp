@@ -44,12 +44,21 @@ program
   .option('-b, --backend <type>', 'Backend type ("production" or "staging")')
   .option('-s, --slug <slug>', 'A repo slug')
   .option('-r, --range <range>', 'The commit range')
+  .option('-x, --exclude-commit-types <type,...>', 'Commit types to exclude (e.g. chore,build,...)')
   .parse(process.argv);
+
+let excludeCommitTypes =
+  typeof program.excludeCommitTypes !== 'undefined' ? program.excludeCommitTypes : process.env.EXCLUDE_COMMIT_TYPES;
+
+if (typeof excludeCommitTypes !== 'undefined') {
+  excludeCommitTypes = excludeCommitTypes.includes(',') ? excludeCommitTypes.split(',') : [excludeCommitTypes];
+}
 
 const parameters: Parameters = {
   backend: program.backend,
   conversationIds: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
   email: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
+  excludeCommitTypes,
   message: program.message,
   password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
   travisCommitRange: program.range || process.env.TRAVIS_COMMIT_RANGE,

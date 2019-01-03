@@ -78,22 +78,30 @@ class ChangelogBot {
     }
   }
 
-  static async generateChangelog(repoSlug: string, previousGitTag: string, maximumChars?: number): Promise<string> {
+  static async generateChangelog(
+    repoSlug: string,
+    previousGitTag: string,
+    maximumChars?: number,
+    excludedCommitTypes?: string[]
+  ): Promise<string> {
     const headlines = new RegExp('^#+ (.*)$', 'gm');
     const listItems = new RegExp('^\\* (.*) \\(\\[.*$', 'gm');
     const githubIssueLinks = new RegExp('\\[[^\\]]+\\]\\((https:[^)]+)\\)', 'gm');
     const omittedMessage = '... (content omitted)';
 
+    const exclude = excludedCommitTypes || ChangelogBot.SETUP.EXCLUDED_COMMIT_TYPES;
+
     const changelog = await Changelog.generate({
-      exclude: ChangelogBot.SETUP.EXCLUDED_COMMIT_TYPES,
+      exclude,
       repoUrl: `https://github.com/${repoSlug}`,
       tag: previousGitTag,
     });
 
     if (!changelog.match(listItems)) {
-      const excludedTypes = ChangelogBot.SETUP.EXCLUDED_COMMIT_TYPES.join(', ');
-      const errorMessage = `Could not generate a meaningful changelog from the commit types given (excluded ${excludedTypes}).`;
-      throw new Error(errorMessage);
+      const excludedTypes = exclude.join(', ');
+      const errorMessage = `Could not generate a meaningful changelog from the commit types given (excluded "${excludedTypes}").`;
+      logger.warn(errorMessage);
+      process.exit();
     }
 
     let styledChangelog = changelog

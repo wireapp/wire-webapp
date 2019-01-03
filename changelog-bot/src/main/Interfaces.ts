@@ -32,6 +32,7 @@ interface Parameters {
   conversationIds?: string;
   backend?: string;
   email: string;
+  excludeCommitTypes?: string[];
   message?: string;
   password: string;
   travisCommitRange: string;
