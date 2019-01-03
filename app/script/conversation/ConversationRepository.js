@@ -1817,16 +1817,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
           retention,
         };
 
-        return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
-          const protoAsset = new z.proto.Asset();
-          const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, options.expectsReadConfirmation);
+        const messageEntityPromise = this.get_message_in_conversation_by_id(conversationEntity, messageId);
+        return messageEntityPromise.then(messageEntity => {
+          const assetEntity = messageEntity.get_first_asset();
+          assetEntity.status(z.assets.AssetTransferState.UPLOADING);
+          const onUploadStarted = xhr => (assetEntity.upload_cancel = () => xhr.abort());
 
-          const genericMessage = new z.proto.GenericMessage(messageId);
-          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
+          return this.asset_service.uploadAsset(imageBlob, options, onUploadStarted).then(uploadedImageAsset => {
+            const protoAsset = new z.proto.Asset();
+            const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+            protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
+            protoAsset.set(
+              z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+              options.expectsReadConfirmation
+            );
 
-          return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+            const genericMessage = new z.proto.GenericMessage(messageId);
+            genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
+
+            return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+          });
         });
       })
       .catch(error => {
