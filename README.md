@@ -38,7 +38,7 @@ To launch the full test suite (types check + linting + server tests + app tests)
 
 `yarn test`
 
-Alternatively, you can run specific parts of the app
+Alternatively, you can run specific parts of the app:
 
 `yarn test:(server|types|auth|app)`
 
