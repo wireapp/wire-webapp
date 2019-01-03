@@ -11,7 +11,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
     "libsodium-wrappers": "0.7.3",
-    "rimraf": "2.6.2",
+    "rimraf": "2.6.3",
     "typescript": "3.2.2",
     "webpack": "4.28.3"
   },

@@ -13,7 +13,7 @@
     "bower": "1.8.4",
     "chai": "4.2.0",
     "jasmine": "3.3.1",
-    "rimraf": "2.6.2",
+    "rimraf": "2.6.3",
     "typescript": "3.2.2",
     "webpack": "4.28.3",
     "webpack-cli": "3.1.2"

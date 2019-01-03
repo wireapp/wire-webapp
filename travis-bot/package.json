@@ -11,7 +11,7 @@
   "description": "A Travis deployment notification bot.",
   "devDependencies": {
     "logdown": "3.2.7",
-    "rimraf": "2.6.2",
+    "rimraf": "2.6.3",
     "typescript": "3.2.2"
   },
   "files": [
