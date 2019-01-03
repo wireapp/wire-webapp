@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.11.1...@wireapp/commons@1.0.0) (2019-01-03)
+
+
+### Features
+
+* **commons:** Add convenience method to create a logger name ([#1427](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1427)) ([afa03ef](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/afa03ef))
+
+
+### BREAKING CHANGES
+
+* **commons:** `LogFactory.NAMESPACE` got removed. To add a namespace to your logger instance, simply call `LogFactory.getLogger('MyLogger', {namespace: 'MyPackage'})`.
+
+
+
+
+
 ## [0.11.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.11.0...@wireapp/commons@0.11.1) (2019-01-02)
 
 **Note:** Version bump only for package @wireapp/commons
