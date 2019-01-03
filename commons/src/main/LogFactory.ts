@@ -21,17 +21,19 @@ import ansiRegex = require('ansi-regex');
 import * as fs from 'fs-extra';
 import * as logdown from 'logdown';
 import * as moment from 'moment';
+import * as path from 'path';
 
 interface LoggerOptions {
   color?: string;
   forceEnable?: boolean;
   logFilePath?: string;
+  namespace?: string;
+  separator?: string;
 }
 
 class LogFactory {
   private static readonly logFilePath?: string = undefined;
-
-  static NAMESPACE: string = '';
+  private static readonly namespace?: string = undefined;
 
   static COLOR_STEP = {
     B: 97,
@@ -60,7 +62,7 @@ class LogFactory {
   }
 
   static addTimestamp(logTransport: logdown.TransportOptions): void {
-    if (~logTransport.msg.indexOf(LogFactory.NAMESPACE)) {
+    if (this.namespace && ~logTransport.msg.indexOf(this.namespace)) {
       logTransport.args.unshift(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
     }
   }
@@ -82,20 +84,28 @@ class LogFactory {
     }
   }
 
+  static createLoggerName(fileName: string, namespace: string, separator: string): string {
+    if (typeof window === 'undefined') {
+      fileName = path.basename(fileName, path.extname(fileName));
+    }
+    return [namespace, fileName].join(separator);
+  }
+
   static getLogger(name: string, options?: LoggerOptions): logdown.Logger {
-    const defaults: LoggerOptions = {
+    const defaults = {
       color: LogFactory.getColor(),
       forceEnable: false,
+      logFilePath: '',
+      namespace: typeof window === 'undefined' ? String(process.env.npm_package_name) : '',
+      separator: '::',
     };
-    const config: LoggerOptions = {...defaults, ...options};
+    const config = {...defaults, ...options};
 
     if (logdown.transports.length === 0) {
-      logdown.transports.push(LogFactory.addTimestamp);
-      if (options && options.logFilePath) {
-        logdown.transports.push(LogFactory.writeToFile.bind({logFilePath: config.logFilePath}));
-      }
+      logdown.transports.push(LogFactory.addTimestamp.bind({namespace: config.namespace}));
+      logdown.transports.push(LogFactory.writeToFile.bind({logFilePath: config.logFilePath}));
     }
-    const loggerName = `${LogFactory.NAMESPACE}${name}`;
+    const loggerName = this.createLoggerName(name, config.namespace, config.separator);
 
     const logger = logdown(loggerName, {
       logger: console,

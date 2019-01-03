@@ -21,22 +21,9 @@ const {LogFactory} = require('@wireapp/commons');
 
 describe('LogFactory', () => {
   describe('getLogger', () => {
-    it('sets a different color for every new logger', () => {
-      const firstLogger = LogFactory.getLogger('FirstLogger', {forceEnable: false});
-      const secondLogger = LogFactory.getLogger('SecondLogger', {forceEnable: false});
-
-      expect(firstLogger.opts.prefixColor).not.toBe(secondLogger.opts.prefixColor);
-    });
-
-    it('shares the prefix with all logger instances', () => {
-      const namespace = 'OurCompany-';
-      LogFactory.NAMESPACE = namespace;
-
-      const firstLogger = LogFactory.getLogger('FirstLogger', {forceEnable: false});
-      const secondLogger = LogFactory.getLogger('SecondLogger', {forceEnable: false});
-
-      expect(firstLogger.opts.prefix.startsWith(namespace)).toBe(true);
-      expect(secondLogger.opts.prefix.startsWith(namespace)).toBe(true);
+    it('prefixes Node.js packages by default', () => {
+      const logger = LogFactory.getLogger(__filename);
+      expect(logger.opts.prefix).toBe('@wireapp/commons::LogFactory.test.node');
     });
   });
 });
