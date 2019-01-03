@@ -1702,7 +1702,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           retention,
         };
 
-        assetEntity.uploaded_on_this_client(true);
+        assetEntity.status(z.assets.AssetTransferState.UPLOADING);
         return this.asset_service.uploadAsset(file, options, xhr => {
           xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round((event.loaded / event.total) * 100));
           assetEntity.upload_cancel = () => xhr.abort();
@@ -2697,7 +2697,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   upload_file(conversation_et, file) {
     let message_id;
     const upload_started = Date.now();
-
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
         message_id = id;

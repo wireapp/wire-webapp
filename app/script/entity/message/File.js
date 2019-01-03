@@ -53,11 +53,10 @@ z.entity.File = class File extends z.entity.Asset {
 
     this.upload_id = ko.observable();
     this.upload_progress = ko.observable();
-    this.uploaded_on_this_client = ko.observable(false);
     this.upload_failed_reason = ko.observable();
     this.upload_cancel = undefined;
     this.pending_upload = ko.pureComputed(() => {
-      return this.status() === z.assets.AssetTransferState.UPLOADING && this.uploaded_on_this_client();
+      return this.status() === z.assets.AssetTransferState.UPLOAD_PENDING;
     });
 
     // update progress

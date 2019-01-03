@@ -577,7 +577,7 @@ export default class EventMapper {
       assetEntity.preview_resource(remoteDataPreview);
     }
 
-    assetEntity.status(status || z.assets.AssetTransferState.UPLOADING);
+    assetEntity.status(status || z.assets.AssetTransferState.UPLOAD_PENDING);
 
     return assetEntity;
   }
