@@ -94,11 +94,13 @@ class StorageService {
 
   // Hooks
   addUpdatedListener(storeName, callback) {
-    this.dbListeners.push({callback, store: storeName, type: 2});
+    const dexieUpdateEventType = 2;
+    this.dbListeners.push({callback, store: storeName, type: dexieUpdateEventType});
   }
 
   addDeletedListener(storeName, callback) {
-    this.dbListeners.push({callback, store: storeName, type: 3});
+    const dexieDeleteEventType = 3;
+    this.dbListeners.push({callback, store: storeName, type: dexieDeleteEventType});
   }
 
   //##############################################################################
