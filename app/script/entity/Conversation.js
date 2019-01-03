@@ -690,17 +690,10 @@ class Conversation {
    * @returns {number} Count of pending uploads
    */
   get_number_of_pending_uploads() {
-    const pendingUploads = [];
-
-    for (const messageEntity of this.messages()) {
+    return this.messages().filter(messageEntity => {
       const [assetEntity] = (messageEntity.assets && messageEntity.assets()) || [];
-      const isPendingUpload = assetEntity && assetEntity.pending_upload && assetEntity.pending_upload();
-      if (isPendingUpload) {
-        pendingUploads.push(messageEntity);
-      }
-    }
-
-    return pendingUploads.length;
+      return assetEntity && assetEntity.isUploading && assetEntity.isUploading();
+    }).length;
   }
 
   updateGuests() {
