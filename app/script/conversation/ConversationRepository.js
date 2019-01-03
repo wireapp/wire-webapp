@@ -3703,14 +3703,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return messageEntity;
           });
         }
-
-        if (messageEntity.has_asset_text()) {
-          messageEntity.assets().forEach(assetEntity => {
-            if (assetEntity.is_text()) {
-              assetEntity.theme_color = messageEntity.user().accent_color();
-            }
-          });
-        }
       }
 
       return messageEntity;
