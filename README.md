@@ -48,7 +48,7 @@ Since the test suite for the app is the biggest test suite, you might want to ru
 
 where `specN` is the path to the spec to run relative to `test/unit_tests` and without `Spec.js`.
 
-example:
+**Example**
 
 If you want to run the tests for the ConversationRepository, the file containing the test is:
 
