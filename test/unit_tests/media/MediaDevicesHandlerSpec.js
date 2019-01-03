@@ -17,7 +17,6 @@
  *
  */
 /* eslint-disable */
-// KARMA_SPECS=media/MediaDevicesHandler yarn test:app
 
 describe('z.media.MediaDevicesHandler', () => {
   const test_factory = new TestFactory();

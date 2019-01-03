@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=entity/Conversation yarn test:app
-
 import Conversation from 'app/script/entity/Conversation';
 import ContentMessage from 'app/script/entity/message/ContentMessage';
 import Message from 'app/script/entity/message/Message';

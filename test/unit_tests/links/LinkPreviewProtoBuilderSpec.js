@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=links/LinkPreviewProtoBuilder yarn test:app
-
 describe('LinkPreviewProtoBuilder', () => {
   const compare_article_with_mock = function(url, offset, preview, mock) {
     expect(preview).toBeDefined();

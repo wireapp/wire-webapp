@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=calling/CallMessageBuilder yarn test:app
-
 describe('z.calling.CallMessageBuilder', () => {
   const callMessageBuilder = z.calling.CallMessageBuilder;
 

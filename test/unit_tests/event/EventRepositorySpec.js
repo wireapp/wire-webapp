@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=event/EventRepository yarn test:app
-
 'use strict';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
