@@ -63,7 +63,10 @@ export const mergeEntities = (destination, source, ignoredProperties = []) => {
   if (isArray(source)) {
     destination.length = source.length;
     source.forEach((value, index) => {
-      destination[index] = mergeEntities(destination[index], value, ignoredProperties);
+      if (JSON.stringify(destination[index]) !== JSON.stringify(value)) {
+        // only modify the object if the serialization is different. This avoids generating false positive diffs and prevents UI blinking
+        destination[index] = mergeEntities(destination[index], value, ignoredProperties);
+      }
     });
     return destination;
   }
