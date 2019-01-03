@@ -24,11 +24,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
-    params.repositories.event.eventService.addEventUpdatedListener((updatedEvent, oldEvent) => {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
       // listen for any changes in the DB to the event being viewed.
       // if the event's id has changed, we replace the local event id with the new one
-      if (oldEvent.id === this.messageId()) {
-        this.messageId(updatedEvent.id);
+      if (oldId === this.messageId()) {
+        this.messageId(updatedMessageEntity.id);
       }
     });
 
@@ -161,7 +161,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
   }
 
   getEntityId() {
-    return this.message().id;
+    return this.messageId();
   }
 
   initView({entity: {id}, showLikes}) {
