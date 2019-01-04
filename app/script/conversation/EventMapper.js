@@ -90,7 +90,7 @@ export default class EventMapper {
    * @param {Object} event - new json data to feed into the entity
    * @returns {z.entity.MessageEntity} - the updated message entity
    */
-  updateMessageAddEvent(originalEntity, event) {
+  updateMessageEvent(originalEntity, event) {
     const {id, data: eventData, edited_time: editedTime} = event;
 
     if (id !== originalEntity.id) {
@@ -110,7 +110,9 @@ export default class EventMapper {
     originalEntity.id = id;
     originalEntity.status(event.status || z.message.StatusType.SENT);
     originalEntity.replacing_message_id = eventData.replacing_message_id;
-    originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
+    if (editedTime || eventData.edited_time) {
+      originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
+    }
 
     return addReadReceiptData(originalEntity, event);
   }

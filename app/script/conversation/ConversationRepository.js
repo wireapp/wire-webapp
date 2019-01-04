@@ -3588,7 +3588,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (!originalMessage) {
       return Promise.resolve();
     }
-    const replacedMessageEntity = this.event_mapper.updateMessageAddEvent(originalMessage, newData);
+    const replacedMessageEntity = this.event_mapper.updateMessageEvent(originalMessage, newData);
     this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }
