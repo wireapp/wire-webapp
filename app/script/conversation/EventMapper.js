@@ -112,7 +112,7 @@ export default class EventMapper {
     originalEntity.replacing_message_id = eventData.replacing_message_id;
     originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
 
-    return originalEntity;
+    return addReadReceiptData(originalEntity, event);
   }
 
   /**
