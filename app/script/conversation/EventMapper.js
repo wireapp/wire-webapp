@@ -83,6 +83,39 @@ export default class EventMapper {
   }
 
   /**
+   * Will update the content of the originalEntity with the new data given.
+   * Will try to do as little updates as possible to avoid to many observable emission.
+   *
+   * @param {z.entity.MessageEntity} originalEntity - the original message to update
+   * @param {Object} event - new json data to feed into the entity
+   * @returns {z.entity.MessageEntity} - the updated message entity
+   */
+  updateMessageAddEvent(originalEntity, event) {
+    const {id, data: eventData, edited_time: editedTime} = event;
+
+    if (id !== originalEntity.id) {
+      originalEntity.assets.removeAll();
+      originalEntity.assets.push(this._mapAssetText(eventData));
+
+      if (eventData.quote) {
+        const {message_id: messageId, user_id: userId, error} = eventData.quote;
+        originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+      }
+    } else if (eventData.previews) {
+      const asset = originalEntity.get_first_asset();
+      if (asset.previews().length !== eventData.previews.length) {
+        asset.previews(this._mapAssetLinkPreviews(eventData.previews));
+      }
+    }
+    originalEntity.id = id;
+    originalEntity.status(event.status || z.message.StatusType.SENT);
+    originalEntity.replacing_message_id = eventData.replacing_message_id;
+    originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
+
+    return originalEntity;
+  }
+
+  /**
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data

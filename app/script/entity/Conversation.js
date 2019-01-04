@@ -20,8 +20,6 @@
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 
-import {mergeEntities} from '../util/objectUtil';
-
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -407,12 +405,6 @@ class Conversation {
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
-  }
-
-  replaceMessage(originalMessage, newMessage) {
-    // we don't want to change the `user` observable of message as they are entities shared by other parts of the app
-    const propertiesToIgnore = ['user'];
-    return mergeEntities(originalMessage, newMessage, propertiesToIgnore);
   }
 
   /**
