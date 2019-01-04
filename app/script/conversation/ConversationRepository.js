@@ -235,9 +235,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _updateLocalMessageEntity(updatedEvent, oldEvent) {
     this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
-      this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent).then(messageEntity => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
-      });
+      const messageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
     });
   }
 
@@ -3589,11 +3588,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (!originalMessage) {
       return Promise.resolve();
     }
-    return this._initMessageEntity(conversationEntity, newData).then(messageEntity => {
-      const replacedMessageEntity = conversationEntity.replaceMessage(originalMessage, messageEntity);
-      this.ephemeralHandler.validateMessage(replacedMessageEntity);
-      return replacedMessageEntity;
-    });
+    const replacedMessageEntity = this.event_mapper.updateMessageAddEvent(originalMessage, newData);
+    this.ephemeralHandler.validateMessage(replacedMessageEntity);
+    return replacedMessageEntity;
   }
 
   /**
