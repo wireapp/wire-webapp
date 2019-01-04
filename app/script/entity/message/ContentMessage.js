@@ -99,26 +99,25 @@ class ContentMessage extends Message {
     return this.assets()[0];
   }
 
-  update_reactions({data: event_data, from}) {
+  getUpdatedReactions({data: event_data, from}) {
     const reaction = event_data && event_data.reaction;
     const hasUser = this.reactions()[from];
     const shouldAdd = reaction && !hasUser;
     const shouldDelete = !reaction && hasUser;
 
+    if (!shouldAdd && !shouldDelete) {
+      return false;
+    }
+
+    const newReactions = Object.assign({}, this.reactions());
+
     if (shouldAdd) {
-      this.reactions(Object.assign({}, this.reactions(), {[from]: reaction}));
+      Object.assign(newReactions, {[from]: reaction});
+    } else {
+      delete newReactions[from];
     }
 
-    if (shouldDelete) {
-      const reactions = Object.assign({}, this.reactions());
-      delete reactions[from];
-      this.reactions(reactions);
-    }
-
-    if (shouldAdd || shouldDelete) {
-      this.version += 1;
-      return {reactions: this.reactions(), version: this.version};
-    }
+    return {reactions: newReactions, version: this.version + 1};
   }
 
   /**

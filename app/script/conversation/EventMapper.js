@@ -112,6 +112,12 @@ export default class EventMapper {
         asset.status(eventData.status);
       }
     }
+
+    if (event.reactions !== undefined) {
+      originalEntity.reactions(event.reactions);
+      originalEntity.version = event.version;
+    }
+
     originalEntity.id = id;
     originalEntity.status(event.status || z.message.StatusType.SENT);
     originalEntity.replacing_message_id = eventData.replacing_message_id;
