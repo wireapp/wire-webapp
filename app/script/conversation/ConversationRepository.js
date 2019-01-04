@@ -235,8 +235,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _updateLocalMessageEntity(updatedEvent, oldEvent) {
     this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
-      const messageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
-      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+      const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+      this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+      });
     });
   }
 
@@ -3505,15 +3507,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_TYPE);
         }
 
-        const changes = messageEntity.update_reactions(eventJson);
+        const changes = messageEntity.getUpdatedReactions(eventJson);
         if (changes) {
           const log = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
           this.logger.debug(log, {changes, event: eventJson});
 
-          return this._updateMessageUserEntities(messageEntity).then(changedMessageEntity => {
-            this.eventService.updateEventSequentially(changedMessageEntity.primary_key, changes);
-            return this._prepareReactionNotification(conversationEntity, changedMessageEntity, eventJson);
-          });
+          this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+          return this._prepareReactionNotification(conversationEntity, messageEntity, eventJson);
         }
       })
       .catch(error => {
