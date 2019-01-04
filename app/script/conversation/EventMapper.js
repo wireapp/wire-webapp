@@ -101,10 +101,15 @@ export default class EventMapper {
         const {message_id: messageId, user_id: userId, error} = eventData.quote;
         originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
       }
-    } else if (eventData.previews) {
+    } else {
       const asset = originalEntity.get_first_asset();
-      if (asset.previews().length !== eventData.previews.length) {
-        asset.previews(this._mapAssetLinkPreviews(eventData.previews));
+      if (eventData.previews) {
+        if (asset.previews().length !== eventData.previews.length) {
+          asset.previews(this._mapAssetLinkPreviews(eventData.previews));
+        }
+      }
+      if (eventData.status) {
+        asset.status(eventData.status);
       }
     }
     originalEntity.id = id;
