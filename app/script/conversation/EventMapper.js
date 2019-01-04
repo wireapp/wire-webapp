@@ -101,7 +101,7 @@ export default class EventMapper {
         const {message_id: messageId, user_id: userId, error} = eventData.quote;
         originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
       }
-    } else {
+    } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
       if (eventData.previews) {
         if (asset.previews().length !== eventData.previews.length) {
@@ -119,7 +119,9 @@ export default class EventMapper {
     }
 
     originalEntity.id = id;
-    originalEntity.status(event.status || z.message.StatusType.SENT);
+    if (originalEntity.is_content() || originalEntity.is_ping()) {
+      originalEntity.status(event.status || z.message.StatusType.SENT);
+    }
     originalEntity.replacing_message_id = eventData.replacing_message_id;
     if (editedTime || eventData.edited_time) {
       originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
