@@ -101,7 +101,7 @@ module.exports = function(config) {
       ],
       resolve: {
         alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
-          app: path.resolve(__dirname, 'app'),
+          src: path.resolve(__dirname, 'src'),
         }),
       },
     },
