@@ -22,6 +22,6 @@
 module.exports = {
   options: {
     cleanTargetDir: true,
-    targetDir: '<%= dir.src.ext %>',
+    targetDir: 'src/ext',
   },
 };
