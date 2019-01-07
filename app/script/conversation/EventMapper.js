@@ -103,13 +103,14 @@ export default class EventMapper {
       }
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
+      if (eventData.status && asset.status && eventData.status !== asset.status()) {
+        const assetEntity = this._mapAsset(event);
+        originalEntity.assets([assetEntity]);
+      }
       if (eventData.previews) {
         if (asset.previews().length !== eventData.previews.length) {
           asset.previews(this._mapAssetLinkPreviews(eventData.previews));
         }
-      }
-      if (eventData.status && asset.status) {
-        asset.status(eventData.status);
       }
     }
 
@@ -305,12 +306,9 @@ export default class EventMapper {
    * @returns {ContentMessage} Content message entity
    */
   _mapEventAssetAdd(event, createDummyImage) {
-    const eventData = event.data;
     const messageEntity = new z.entity.ContentMessage();
 
-    const assetInfo = eventData.info;
-    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
-    const assetEntity = isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
+    const assetEntity = this._mapAsset(event, createDummyImage);
     messageEntity.assets.push(assetEntity);
 
     return messageEntity;
@@ -580,6 +578,13 @@ export default class EventMapper {
 
   _createDummyImage(width, height) {
     return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
+  }
+
+  _mapAsset(event, createDummyImage) {
+    const eventData = event.data;
+    const assetInfo = eventData.info;
+    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
+    return isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
   }
 
   /**
