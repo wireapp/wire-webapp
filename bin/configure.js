@@ -32,12 +32,16 @@ const gitConfigurationUrl = process.env.WIRE_CONFIGURATION_REPOSITORY || default
 const configDirName = 'config';
 const configDir = resolve(configDirName);
 const src = resolve(configDir, pkg.name, 'content');
-const dest = '../../../resource/';
+const root = '../../..';
+const dest = `${root}/resource/`;
 const ignoreList = ['.DS_Store'];
 
 console.log(`Cleaning config directory "${configDir}"`);
 fs.removeSync(configDir);
 execSync(`git clone ${gitConfigurationUrl} ${configDirName}`, {stdio: [0, 1]});
+
+// Copy .env file configuration
+fs.copySync(resolve(configDir, pkg.name, '.env'), resolve(root, '.env'));
 
 process.chdir(src);
 
