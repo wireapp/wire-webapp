@@ -1417,16 +1417,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation to send message in
    * @param {string} url - URL of giphy image
    * @param {string} tag - tag tag used for gif search
+   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves when the gif was posted
    */
-  sendGif(conversationEntity, url, tag) {
+  sendGif(conversationEntity, url, tag, quoteEntity) {
     if (!tag) {
       tag = z.l10n.text(z.string.extensionsGiphyRandom);
     }
 
     return z.util.loadUrlBlob(url).then(blob => {
       const textMessage = z.l10n.text(z.string.extensionsGiphyMessage, tag);
-      this.sendText(conversationEntity, textMessage);
+      this.sendText(conversationEntity, textMessage, null, quoteEntity);
       return this.upload_images(conversationEntity, [blob]);
     });
   }
