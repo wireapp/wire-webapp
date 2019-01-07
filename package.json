@@ -220,7 +220,7 @@
     },
     "@bower_components/webapp-module-bubble": {
       "js": "dist/script/*.js",
-      "less": "src/style/webapp-module-bubble.less"
+      "less": "app/style/webapp-module-bubble.less"
     },
     "@bower_components/webapp-module-logger": {
       "js": "dist/js/Logger.js"
@@ -229,7 +229,7 @@
       "js": "js/*.js"
     },
     "@bower_components/wire-theme": {
-      "less": "src/style/{wire-theme,variables,input}.less"
+      "less": "app/style/{wire-theme,variables,input}.less"
     }
   }
 }
