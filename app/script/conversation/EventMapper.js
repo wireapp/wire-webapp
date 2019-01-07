@@ -108,7 +108,7 @@ export default class EventMapper {
           asset.previews(this._mapAssetLinkPreviews(eventData.previews));
         }
       }
-      if (eventData.status) {
+      if (eventData.status && asset.status) {
         asset.status(eventData.status);
       }
     }
