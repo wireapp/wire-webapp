@@ -22,7 +22,6 @@
 const fs = require('fs-extra');
 const less = require('less');
 const path = require('path');
-const fs = require('fs-extra');
 const {SRC_PATH, DIST_PATH} = require('../locations');
 
 const src = path.resolve(SRC_PATH, 'style');
