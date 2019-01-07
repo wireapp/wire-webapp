@@ -20,8 +20,6 @@
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 
-import {mergeEntities} from '../util/objectUtil';
-
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -119,27 +117,27 @@ class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
-      const NOTIIFCATION_STATE = z.conversation.NotificationSetting.STATE;
+      const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
       if (!this.selfUser()) {
-        return NOTIIFCATION_STATE.NOTHING;
+        return NOTIFICATION_STATE.NOTHING;
       }
 
-      const knownNotificationStates = Object.values(NOTIIFCATION_STATE);
+      const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(this.mutedState())) {
-        const isStateMentionsAndReplies = this.mutedState() === NOTIIFCATION_STATE.MENTIONS_AND_REPLIES;
+        const isStateMentionsAndReplies = this.mutedState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
         const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
 
-        return isInvalidState ? NOTIIFCATION_STATE.NOTHING : this.mutedState();
+        return isInvalidState ? NOTIFICATION_STATE.NOTHING : this.mutedState();
       }
 
       if (typeof this.mutedState() === 'boolean') {
         const migratedMutedState = this.selfUser().inTeam()
-          ? NOTIIFCATION_STATE.MENTIONS_AND_REPLIES
-          : NOTIIFCATION_STATE.NOTHING;
-        return this.mutedState() ? migratedMutedState : NOTIIFCATION_STATE.EVERYTHING;
+          ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
+          : NOTIFICATION_STATE.NOTHING;
+        return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
       }
 
-      return NOTIIFCATION_STATE.EVERYTHING;
+      return NOTIFICATION_STATE.EVERYTHING;
     });
 
     this.is_archived = this.archivedState;
@@ -407,12 +405,6 @@ class Conversation {
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
-  }
-
-  replaceMessage(originalMessage, newMessage) {
-    // we don't want to change the `user` observable of message as they are entities shared by other parts of the app
-    const propertiesToIgnore = ['user'];
-    return mergeEntities(originalMessage, newMessage, propertiesToIgnore);
   }
 
   /**
@@ -690,17 +682,10 @@ class Conversation {
    * @returns {number} Count of pending uploads
    */
   get_number_of_pending_uploads() {
-    const pendingUploads = [];
-
-    for (const messageEntity of this.messages()) {
+    return this.messages().filter(messageEntity => {
       const [assetEntity] = (messageEntity.assets && messageEntity.assets()) || [];
-      const isPendingUpload = assetEntity && assetEntity.pending_upload && assetEntity.pending_upload();
-      if (isPendingUpload) {
-        pendingUploads.push(messageEntity);
-      }
-    }
-
-    return pendingUploads.length;
+      return assetEntity && assetEntity.isUploading && assetEntity.isUploading();
+    }).length;
   }
 
   updateGuests() {

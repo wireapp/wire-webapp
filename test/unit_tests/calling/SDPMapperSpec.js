@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=calling/SDPMapper yarn test:app
-
 describe('z.calling.SDPMapper', () => {
   const envInitialState = Object.assign({}, z.util.Environment);
 

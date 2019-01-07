@@ -26,12 +26,11 @@ describe('z.entity.File', () => {
     file = new z.entity.File();
   });
 
-  describe('pending_upload', () => {
-    it('should be true if status is uploading and uploaded on this client', () => {
-      file.uploaded_on_this_client(true);
+  describe('isUploading', () => {
+    it('should be true if status is uploading', () => {
       file.status(z.assets.AssetTransferState.UPLOADING);
 
-      expect(file.pending_upload()).toBeTruthy();
+      expect(file.isUploading()).toBeTruthy();
     });
   });
 

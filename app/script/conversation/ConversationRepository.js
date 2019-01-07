@@ -235,9 +235,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _updateLocalMessageEntity(updatedEvent, oldEvent) {
     this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
-      this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent).then(messageEntity => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
-      });
+      const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+      if (replacedMessageEntity) {
+        this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
+          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+        });
+      }
     });
   }
 
@@ -1702,7 +1705,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           retention,
         };
 
-        assetEntity.uploaded_on_this_client(true);
+        assetEntity.status(z.assets.AssetTransferState.UPLOADING);
         return this.asset_service.uploadAsset(file, options, xhr => {
           xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round((event.loaded / event.total) * 100));
           assetEntity.upload_cancel = () => xhr.abort();
@@ -1817,16 +1820,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
           retention,
         };
 
-        return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
-          const protoAsset = new z.proto.Asset();
-          const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
-          protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, options.expectsReadConfirmation);
+        const messageEntityPromise = this.get_message_in_conversation_by_id(conversationEntity, messageId);
+        return messageEntityPromise.then(messageEntity => {
+          const assetEntity = messageEntity.get_first_asset();
+          assetEntity.status(z.assets.AssetTransferState.UPLOADING);
+          const onUploadStarted = xhr => (assetEntity.upload_cancel = () => xhr.abort());
 
-          const genericMessage = new z.proto.GenericMessage(messageId);
-          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
+          return this.asset_service.uploadAsset(imageBlob, options, onUploadStarted).then(uploadedImageAsset => {
+            const protoAsset = new z.proto.Asset();
+            const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+            protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
+            protoAsset.set(
+              z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
+              options.expectsReadConfirmation
+            );
 
-          return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+            const genericMessage = new z.proto.GenericMessage(messageId);
+            genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
+
+            return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+          });
         });
       })
       .catch(error => {
@@ -2697,7 +2710,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   upload_file(conversation_et, file) {
     let message_id;
     const upload_started = Date.now();
-
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
         message_id = id;
@@ -3497,15 +3509,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_TYPE);
         }
 
-        const changes = messageEntity.update_reactions(eventJson);
+        const changes = messageEntity.getUpdatedReactions(eventJson);
         if (changes) {
           const log = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
           this.logger.debug(log, {changes, event: eventJson});
 
-          return this._updateMessageUserEntities(messageEntity).then(changedMessageEntity => {
-            this.eventService.updateEventSequentially(changedMessageEntity.primary_key, changes);
-            return this._prepareReactionNotification(conversationEntity, changedMessageEntity, eventJson);
-          });
+          this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+          return this._prepareReactionNotification(conversationEntity, messageEntity, eventJson);
         }
       })
       .catch(error => {
@@ -3578,13 +3588,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _replaceMessageInConversation(conversationEntity, eventId, newData) {
     const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
-      return Promise.resolve();
+      return undefined;
     }
-    return this._initMessageEntity(conversationEntity, newData).then(messageEntity => {
-      const replacedMessageEntity = conversationEntity.replaceMessage(originalMessage, messageEntity);
-      this.ephemeralHandler.validateMessage(replacedMessageEntity);
-      return replacedMessageEntity;
-    });
+    const replacedMessageEntity = this.event_mapper.updateMessageEvent(originalMessage, newData);
+    this.ephemeralHandler.validateMessage(replacedMessageEntity);
+    return replacedMessageEntity;
   }
 
   /**
@@ -3701,14 +3709,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.user_repository.get_users_by_id(userIds).then(userEntities => {
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
-          });
-        }
-
-        if (messageEntity.has_asset_text()) {
-          messageEntity.assets().forEach(assetEntity => {
-            if (assetEntity.is_text()) {
-              assetEntity.theme_color = messageEntity.user().accent_color();
-            }
           });
         }
       }

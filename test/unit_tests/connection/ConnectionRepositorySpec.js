@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=connection/ConnectionRepository yarn test:app
-
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
   let connectionRepository = undefined;

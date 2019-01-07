@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=location/LocationRepository yarn test:app
-
 describe('z.location.LocationRepository', () => {
   describe('getMapsUrl', () => {
     it('should return the proper urls', () => {

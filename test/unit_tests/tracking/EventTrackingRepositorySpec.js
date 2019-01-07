@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=tracking/EventTrackingRepository yarn test:app
-
 import WebappProperties from 'app/script/properties/WebappProperties';
 
 describe('z.tracking.EventTrackingRepository', () => {
