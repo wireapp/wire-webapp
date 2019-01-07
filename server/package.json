@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "0.11.0",
+    "@wireapp/commons": "1.0.1",
     "dotenv": "6.2.0",
     "express": "4.16.4",
     "express-sitemap-xml": "1.0.2",
@@ -29,7 +29,7 @@
     "@types/jasmine": "3.3.5",
     "@types/node": "10.12.18",
     "jasmine": "3.3.1",
-    "rimraf": "2.6.2",
+    "rimraf": "2.6.3",
     "ts-node": "7.0.1",
     "tslint": "5.12.0",
     "tslint-config-prettier": "1.17.0",
