@@ -17,6 +17,7 @@
  *
  */
 
+import 'core-js/es7/object';
 import * as cookieStore from 'js-cookie';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
