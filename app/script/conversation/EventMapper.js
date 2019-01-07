@@ -93,7 +93,7 @@ export default class EventMapper {
   updateMessageEvent(originalEntity, event) {
     const {id, data: eventData, edited_time: editedTime} = event;
 
-    if (id !== originalEntity.id) {
+    if (id !== originalEntity.id && originalEntity.has_asset_text()) {
       originalEntity.assets.removeAll();
       originalEntity.assets.push(this._mapAssetText(eventData));
 
