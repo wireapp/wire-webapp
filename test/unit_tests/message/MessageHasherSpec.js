@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=message/MessageHasher yarn test:app
-
 describe('z.message.MessageHasher', () => {
   describe('hashEvent', () => {
     describe('unhandled event type', () => {

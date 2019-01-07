@@ -17,7 +17,6 @@
  *
  */
 
-// KARMA_SPECS=conversation/ConversationRepository yarn test:app
 import Conversation from 'src/script/entity/Conversation';
 
 describe('ConversationRepository', () => {
@@ -32,9 +31,8 @@ describe('ConversationRepository', () => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
   };
 
-  const _generate_asset_message = (state, uploaded_on_this_client = false) => {
+  const _generate_asset_message = state => {
     const file_et = new z.entity.File();
-    file_et.uploaded_on_this_client(uploaded_on_this_client);
     file_et.status(state);
     const message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
     message_et.assets.push(file_et);
@@ -348,18 +346,18 @@ describe('ConversationRepository', () => {
   describe('get_number_of_pending_uploads', () => {
     it('should return number of pending uploads if there are pending uploads', () => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
 
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
+      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
+      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOAD_PENDING));
+
+      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
+
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
 
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);

@@ -35,7 +35,8 @@ z.string.authAccountSignInPhone = 'Phone Log in';
 
 // Authentication: BLOCKED section
 z.string.authBlockedCookies = 'Enable cookies to log in to Wire.';
-z.string.authBlockedDatabase = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
+z.string.authBlockedDatabase =
+  'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
 z.string.authBlockedTabs = 'Wire is already open in another tab.';
 z.string.authBlockedTabsAction = 'Use this tab instead';
 
@@ -128,15 +129,18 @@ z.string.modalOptionSecondary = 'Cancel';
 // Modals content
 z.string.modalAccountCreateAction = 'OK';
 z.string.modalAccountCreateHeadline = 'Create an account?';
-z.string.modalAccountCreateMessage = 'By creating an account you will lose the conversation history in this guest room.';
+z.string.modalAccountCreateMessage =
+  'By creating an account you will lose the conversation history in this guest room.';
 
 z.string.modalAccountDeletionAction = 'Delete';
 z.string.modalAccountDeletionHeadline = 'Delete account';
-z.string.modalAccountDeletionMessage = 'We will send a message via email or SMS. Follow the link to permanently delete your account.';
+z.string.modalAccountDeletionMessage =
+  'We will send a message via email or SMS. Follow the link to permanently delete your account.';
 
 z.string.modalAccountLeaveGuestRoomAction = 'Leave';
 z.string.modalAccountLeaveGuestRoomHeadline = 'Leave the guest room?';
-z.string.modalAccountLeaveGuestRoomMessage = 'Conversation history will be deleted. To keep it, create an account next time.';
+z.string.modalAccountLeaveGuestRoomMessage =
+  'Conversation history will be deleted. To keep it, create an account next time.';
 
 z.string.modalAccountLogoutAction = 'Log out';
 z.string.modalAccountLogoutHeadline = 'Clear Data?';
@@ -186,7 +190,8 @@ z.string.modalCallSecondOngoingMessage = 'You can only be in one call at a time.
 
 z.string.modalCallSecondOutgoingAction = 'Call Anyway';
 z.string.modalCallSecondOutgoingHeadline = 'Hang up current call?';
-z.string.modalCallSecondOutgoingMessage = 'A call is active in another conversation. Calling here will hang up the other call.';
+z.string.modalCallSecondOutgoingMessage =
+  'A call is active in another conversation. Calling here will hang up the other call.';
 
 z.string.modalConnectCancelAction = 'Yes';
 z.string.modalConnectCancelHeadline = 'Cancel Request?';
@@ -230,7 +235,8 @@ z.string.modalConversationNewDeviceOutgoingCallMessage = 'Do you still want to p
 
 z.string.modalConversationNotConnectedHeadline = 'No one added to conversation';
 z.string.modalConversationNotConnectedMessageOne = '{{name}} does not want to be added to conversations.';
-z.string.modalConversationNotConnectedMessageMany = 'One of the people you selected does not want to be added to conversations.';
+z.string.modalConversationNotConnectedMessageMany =
+  'One of the people you selected does not want to be added to conversations.';
 
 z.string.modalConversationRemoveAction = 'Remove';
 z.string.modalConversationRemoveHeadline = 'Remove?';
@@ -238,11 +244,13 @@ z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or r
 
 z.string.modalConversationRemoveGuestsAction = 'Remove';
 z.string.modalConversationRemoveGuestsHeadline = 'Disable access?';
-z.string.modalConversationRemoveGuestsMessage = 'Current guests and services will be removed from the conversation. New guests and services will not be allowed.';
+z.string.modalConversationRemoveGuestsMessage =
+  'Current guests and services will be removed from the conversation. New guests and services will not be allowed.';
 
 z.string.modalConversationRevokeLinkAction = 'Revoke link';
 z.string.modalConversationRevokeLinkHeadline = 'Revoke the link?';
-z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
+z.string.modalConversationRevokeLinkMessage =
+  'New guests will not be able to join with this link. Current guests will still have access.';
 
 z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests and services. Please try again.';
 z.string.modalConversationGuestOptionsDisableGuestMessage = 'Could not remove guests and services. Please try again.';
@@ -252,13 +260,15 @@ z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke acce
 z.string.modalConversationGuestOptionsToggleGuestsMessage = 'Could not change guests state.';
 
 z.string.modalConversationTooManyMembersHeadline = 'The group is full';
-z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. Currently there is only room for {{number2}} more.';
+z.string.modalConversationTooManyMembersMessage =
+  'Up to {{number1}} people can join a conversation. Currently there is only room for {{number2}} more.';
 
 z.string.modalGifTooLargeHeadline = 'Selected animation is too large';
 z.string.modalGifTooLargeMessage = 'Maximum size is {{number}} MB.';
 
 z.string.modalIntegrationUnavailableHeadline = 'Bots currently unavailable';
-z.string.modalIntegrationUnavailableMessage = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
+z.string.modalIntegrationUnavailableMessage =
+  'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
 
 z.string.modalPictureFileFormatHeadline = 'Can’t use this picture';
 z.string.modalPictureFileFormatMessage = 'Please choose a PNG or JPEG file.';
@@ -272,7 +282,8 @@ z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least
 z.string.modalImproveWireAction = 'I Agree';
 z.string.modalImproveWireSecondary = 'No';
 z.string.modalImproveWireHeadline = 'Help us make Wire better';
-z.string.modalImproveWireMessage = 'I agree that Wire may create and use anonymous usage and error reports to improve the Wire App. I can revoke this consent at any time.';
+z.string.modalImproveWireMessage =
+  'I agree that Wire may create and use anonymous usage and error reports to improve the Wire App. I can revoke this consent at any time.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable at the moment.';
@@ -294,7 +305,8 @@ z.string.modalUserUnblockHeadline = 'Unblock?';
 z.string.modalUserUnblockMessage = '{{user}} will be able to contact you and add you to group conversations again.';
 
 z.string.modalNoCameraTitle = 'No camera access';
-z.string.modalNoCameraMessage = 'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
+z.string.modalNoCameraMessage =
+  'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
 
 // Connection requests
 z.string.connectionRequestConnect = 'Connect';
@@ -327,11 +339,13 @@ z.string.conversationDeviceNewPeopleJoinedVerify = 'Verify devices';
 z.string.conversationJustNow = 'Just now';
 z.string.conversationLocationLink = 'Open Map';
 z.string.conversationCreated = '[bold]{{name}}[/bold] started a conversation with {{users}}';
-z.string.conversationCreatedMore = '[bold]{{name}}[/bold] started a conversation with {{users}}, and [showmore]{{count}} more[/showmore]';
+z.string.conversationCreatedMore =
+  '[bold]{{name}}[/bold] started a conversation with {{users}}, and [showmore]{{count}} more[/showmore]';
 z.string.conversationCreatedName = '[bold]{{name}}[/bold] started the conversation';
 z.string.conversationCreatedNameYou = '[bold]You[/bold] started the conversation';
 z.string.conversationCreatedYou = 'You started a conversation with {{users}}';
-z.string.conversationCreatedYouMore = 'You started a conversation with {{users}}, and [showmore]{{count}} more[/showmore]';
+z.string.conversationCreatedYouMore =
+  'You started a conversation with {{users}}, and [showmore]{{count}} more[/showmore]';
 z.string.conversationCreateWithMore = 'with {{users}}, and [showmore]{{count}} more[/showmore]';
 z.string.conversationCreateTeam = 'with [showmore]all team members[/showmore]';
 z.string.conversationCreateTeamGuest = 'with [showmore]all team members and one guest[/showmore]';
@@ -339,8 +353,10 @@ z.string.conversationCreateTeamGuests = 'with [showmore]all team members and {{c
 z.string.conversationCreateReceiptsEnabled = 'Read receipts are on';
 z.string.conversationMemberJoined = '[bold]{{name}}[/bold] added {{users}} to the conversation';
 z.string.conversationMemberJoinedYou = '[bold]You[/bold] added {{users}} to the conversation';
-z.string.conversationMemberJoinedMore = '[bold]{{name}}[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
-z.string.conversationMemberJoinedYouMore = '[bold]You[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
+z.string.conversationMemberJoinedMore =
+  '[bold]{{name}}[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
+z.string.conversationMemberJoinedYouMore =
+  '[bold]You[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation';
 z.string.conversationMemberJoinedSelf = '[bold]{{name}}[/bold] joined';
 z.string.conversationMemberJoinedSelfYou = '[bold]You[/bold] joined';
 z.string.conversationMemberLeft = '[bold]{{name}}[/bold] left';
@@ -367,7 +383,8 @@ z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
 z.string.conversationYesterday = 'Yesterday';
 z.string.conversationUnableToDecrypt1 = 'A message from [highlight]{{user}}[/highlight] was not received.';
-z.string.conversationUnableToDecrypt2 = '[highlight]{{user}}[/highlight]´s device identity changed. Undelivered message.';
+z.string.conversationUnableToDecrypt2 =
+  '[highlight]{{user}}[/highlight]´s device identity changed. Undelivered message.';
 z.string.conversationUnableToDecryptLink = 'Why?';
 z.string.conversationUnableToDecryptErrorMessage = 'Error';
 z.string.conversationUnableToDecryptResetSession = 'Reset session';
@@ -404,13 +421,15 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
-z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work with up to 3 other people and you.';
+z.string.groupSizeInfo =
+  'Up to {{count}} people can join a group conversation. Video calls work with up to 3 other people and you.';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests and services';
 z.string.guestRoomToggleInfo = 'Open this conversation to services and people outside your team.';
-z.string.guestRoomToggleInfoExtended = 'Open this conversation to services and people outside your team. You can always change it later.';
+z.string.guestRoomToggleInfoExtended =
+  'Open this conversation to services and people outside your team. You can always change it later.';
 
 z.string.guestRoomConversationBadge = 'Guests are present';
 z.string.guestRoomConversationBadgeService = 'Services are active';
@@ -478,7 +497,7 @@ z.string.conversationsSecondaryLineSummaryMentions = '{{number}} mentions';
 z.string.conversationsSecondaryLineSummaryMissedCall = '{{number}} missed call';
 z.string.conversationsSecondaryLineSummaryMissedCalls = '{{number}} missed calls';
 z.string.conversationsSecondaryLineSummaryPing = '{{number}} ping';
-z.string.conversationsSecondaryLineSummaryPings = '{{number}} pings'
+z.string.conversationsSecondaryLineSummaryPings = '{{number}} pings';
 z.string.conversationsSecondaryLineSummaryReply = '{{number}} reply';
 z.string.conversationsSecondaryLineSummaryReplies = '{{number}} replies';
 z.string.conversationsSecondaryLineYouLeft = 'You left';
@@ -517,7 +536,8 @@ z.string.addParticipantsHeaderWithCounter = 'Add participants ({{number}})';
 z.string.addParticipantsManageServices = 'Manage services';
 z.string.addParticipantsManageServicesNoResults = 'Manage services';
 z.string.addParticipantsNoServicesManager = 'Services are helpers that can improve your workflow.';
-z.string.addParticipantsNoServicesMember = 'Services are helpers that can improve your workflow. To enable them, ask your administrator.';
+z.string.addParticipantsNoServicesMember =
+  'Services are helpers that can improve your workflow. To enable them, ask your administrator.';
 z.string.addParticipantsSearchPlaceholder = 'Search by name';
 z.string.addParticipantsServiceConfirmButton = 'Add service';
 z.string.addParticipantsTabsPeople = 'People';
@@ -547,7 +567,8 @@ z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 z.string.conversationDetails1to1ReceiptsHeadEnabled = 'You have enabled read receipts';
 z.string.conversationDetails1to1ReceiptsHeadDisabled = 'You have disabled read receipts';
-z.string.conversationDetails1to1ReceiptsFirst = 'If both sides turn on read receipts, you can see when messages are read.';
+z.string.conversationDetails1to1ReceiptsFirst =
+  'If both sides turn on read receipts, you can see when messages are read.';
 z.string.conversationDetails1to1ReceiptsSecond = 'You can change this option in your account settings.';
 
 // Panel: Conversation participants
@@ -579,7 +600,8 @@ z.string.guestOptionsTitle = 'Guests and services';
 
 // Panel: Notifications
 z.string.notificationSettingsTitle = 'Notifications';
-z.string.notificationSettingsDisclaimer = 'You can be notified about everything (including audio and video calls) or only when someone mentions you or replies to one of your messages.';
+z.string.notificationSettingsDisclaimer =
+  'You can be notified about everything (including audio and video calls) or only when someone mentions you or replies to one of your messages.';
 z.string.notificationSettingsEverything = 'Everything';
 z.string.notificationSettingsMentionsAndReplies = 'Mentions and replies';
 z.string.notificationSettingsNothing = 'Nothing';
@@ -589,17 +611,20 @@ z.string.timedMessagesTitle = 'Timed messages';
 z.string.timedMessageDisclaimer = 'Timed messages will be turned on for all the participants in this conversation.';
 
 // Panel: Participant devices
-z.string.participantDevicesDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
+z.string.participantDevicesDetailHeadline =
+  'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
 z.string.participantDevicesDetailHowTo = 'How do I do that?';
 z.string.participantDevicesDetailResetSession = 'Reset session';
 z.string.participantDevicesDetailShowMyDevice = 'Show my device fingerprint';
 z.string.participantDevicesDetailVerify = 'Verified';
 
 z.string.participantDevicesHeader = 'Devices';
-z.string.participantDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
+z.string.participantDevicesHeadline =
+  'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
 z.string.participantDevicesLearnMore = 'Learn more';
 z.string.participantDevicesWhyVerify = 'Why verify conversations?';
-z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old version of Wire. No devices are shown here.';
+z.string.participantDevicesOutdatedClientMessage =
+  '{{user}} is using an old version of Wire. No devices are shown here.';
 
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';
 z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
@@ -617,7 +642,6 @@ z.string.messageDetailsNoReceipts = 'No one has read this message yet.';
 // Read receipt toggle
 z.string.receiptToggleLabel = 'Read receipts';
 z.string.receiptToggleInfo = 'When this is on, people can see when their messages in this conversation are read.';
-
 
 // User profile actions
 z.string.userProfileButtonConnect = 'Connect';
@@ -649,14 +673,16 @@ z.string.preferencesAccountDataCheckbox = 'Send anonymous data';
 z.string.preferencesAccountDataDetail = 'Help make Wire better by sending anonymous usage and crash reports.';
 z.string.preferencesAccountDelete = 'Delete account';
 z.string.preferencesAccountLeaveGuestRoom = 'Leave the guest room';
-z.string.preferencesAccountLeaveGuestRoomDescription = 'You will no longer be able to access the messages in this conversation.';
+z.string.preferencesAccountLeaveGuestRoomDescription =
+  'You will no longer be able to access the messages in this conversation.';
 z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
 z.string.preferencesAccountMarketingConsentCheckbox = 'Receive newsletter';
 z.string.preferencesAccountMarketingConsentDetail = 'Receive news and product updates from Wire via email.';
 z.string.preferencesAccountPrivacy = 'Privacy';
 z.string.preferencesAccountReadReceiptsCheckbox = 'Read receipts';
-z.string.preferencesAccountReadReceiptsDetail = 'When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.';
+z.string.preferencesAccountReadReceiptsDetail =
+  'When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.';
 z.string.preferencesAccountResetPassword = 'Reset password';
 z.string.preferencesAccountTeam = 'in {{name}}';
 z.string.preferencesAccountUsernameAvailable = 'Available';
@@ -668,22 +694,27 @@ z.string.preferencesAVCamera = 'Camera';
 z.string.preferencesAVMicrophone = 'Microphone';
 z.string.preferencesAVPermissionDetail = 'Enable from your browser Preferences';
 z.string.preferencesAVSpeakers = 'Speakers';
-z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferences. Select the camera to use if you join one.';
-z.string.preferencesAVNoCamera = 'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
-z.string.preferencesAVTryAgain= 'Try Again';
+z.string.preferencesAVTemporaryDisclaimer =
+  'Guests can’t start video conferences. Select the camera to use if you join one.';
+z.string.preferencesAVNoCamera =
+  'Wire doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.';
+z.string.preferencesAVTryAgain = 'Try Again';
 
 z.string.preferencesDevicesActivatedOn = 'Activated {{date}}';
 z.string.preferencesDevicesActive = 'Active';
 z.string.preferencesDevicesActiveDetail = 'If you don’t recognize a device above, remove it and reset your password.';
 z.string.preferencesDevicesCurrent = 'Current';
 z.string.preferencesDevicesFingerprint = 'Key fingerprint';
-z.string.preferencesDevicesFingerprintDetail = 'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.';
+z.string.preferencesDevicesFingerprintDetail =
+  'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.';
 z.string.preferencesDevicesId = 'ID: ';
 z.string.preferencesDevicesRemove = 'Remove…';
 z.string.preferencesDevicesRemoveCancel = 'Cancel';
-z.string.preferencesDevicesRemoveDetail = 'Remove this device if you have stopped using it. You will be logged out of this device immediately.';
+z.string.preferencesDevicesRemoveDetail =
+  'Remove this device if you have stopped using it. You will be logged out of this device immediately.';
 z.string.preferencesDevicesSessionConfirmation = 'The session has been reset.';
-z.string.preferencesDevicesSessionDetail = 'If fingerprints don’t match, reset the session to generate new encryption keys on both sides.';
+z.string.preferencesDevicesSessionDetail =
+  'If fingerprints don’t match, reset the session to generate new encryption keys on both sides.';
 z.string.preferencesDevicesSessionReset = 'Reset session';
 z.string.preferencesDevicesSessionOngoing = 'Resetting session…';
 z.string.preferencesDevicesVerification = 'Verified';
@@ -697,8 +728,10 @@ z.string.preferencesOptionsAudioSome = 'Some';
 z.string.preferencesOptionsAudioSomeDetail = 'Pings and calls';
 z.string.preferencesOptionsContacts = 'Contacts';
 z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
-z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
+z.string.preferencesOptionsContactsDetail =
+  'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferencesOptionsPopular = 'By popular demand';
+z.string.preferencesOptionsUseDarkMode = 'Dark theme';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
 z.string.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.preferencesOptionsPreviewsSendCheckbox = 'Create previews for links you send';
@@ -714,9 +747,11 @@ z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support
 
 z.string.preferencesOptionsBackupHeader = 'History';
 z.string.preferencesOptionsBackupExportHeadline = 'Back up conversations';
-z.string.preferencesOptionsBackupExportSecondary = 'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
+z.string.preferencesOptionsBackupExportSecondary =
+  'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
 z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
-z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
+z.string.preferencesOptionsBackupImportSecondary =
+  'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
 
 // History Backup
 z.string.backupExportGenericErrorHeadline = 'The file could not be saved';
@@ -726,17 +761,20 @@ z.string.backupExportProgressSecondary = 'Backing up · {{processed}} of {{total
 z.string.backupExportProgressCompressing = 'Preparing backup file';
 z.string.backupExportSaveFileAction = 'Save file';
 z.string.backupExportSuccessHeadline = 'Backup ready';
-z.string.backupExportSuccessSecondary = 'You can use this to restore history if you lose your computer or switch to a new one.';
+z.string.backupExportSuccessSecondary =
+  'You can use this to restore history if you lose your computer or switch to a new one.';
 z.string.backupImportGenericErrorHeadline = 'Something went wrong';
 z.string.backupImportGenericErrorSecondary = 'Your history could not be restored.';
 z.string.backupImportAccountErrorHeadline = 'Wrong backup';
 z.string.backupImportAccountErrorSecondary = 'You cannot restore history from a different account.';
 z.string.backupImportVersionErrorHeadline = 'Incompatible backup';
-z.string.backupImportVersionErrorSecondary = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
+z.string.backupImportVersionErrorSecondary =
+  'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
 z.string.backupImportIncompatibleErrorHeadline = 'Wrong backup';
 z.string.backupImportIncompatibleErrorSecondary = 'You cannot restore history from a different account.';
 z.string.backupImportOutdatedErrorHeadline = 'Incompatible backup';
-z.string.backupImportOutdatedErrorSecondary = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
+z.string.backupImportOutdatedErrorSecondary =
+  'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
 z.string.backupImportProgressHeadline = 'Preparing…';
 z.string.backupImportProgressSecondary = 'Restoring history · {{processed}} of {{total}} — {{progress}}%';
 z.string.backupImportSuccessHeadline = 'History restored.';
@@ -757,7 +795,8 @@ z.string.searchServices = 'Services';
 z.string.searchManageServices = 'Manage Services';
 z.string.searchManageServicesNoResults = 'Manage services';
 z.string.searchNoServicesManager = 'Services are helpers that can improve your workflow.';
-z.string.searchNoServicesMember = 'Services are helpers that can improve your workflow. To enable them, ask your administrator.';
+z.string.searchNoServicesMember =
+  'Services are helpers that can improve your workflow. To enable them, ask your administrator.';
 z.string.searchTeamGroups = 'Team conversations';
 z.string.searchTeamMembers = 'Team members';
 z.string.searchTopPeople = 'Top people';
@@ -767,7 +806,8 @@ z.string.searchMemberInvite = 'Invite people to join the team';
 z.string.searchOthers = 'Connect';
 
 z.string.searchInvite = 'Invite people to join Wire';
-z.string.searchInviteDetail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
+z.string.searchInviteDetail =
+  'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
 z.string.searchInviteButtonContacts = 'From Contacts';
 z.string.searchInviteHeadline = 'Bring your friends';
 z.string.searchInviteShare = 'Share Contacts';
@@ -787,7 +827,8 @@ z.string.temporaryGuestJoinMessage = 'This conversation will be available to you
 z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you will lose access.';
 
 z.string.temporaryGuestLeaveMessage = 'You are no longer part of this conversation.';
-z.string.temporaryGuestLeaveDescription = 'If you close or refresh this page, you will lose access to the conversation history.';
+z.string.temporaryGuestLeaveDescription =
+  'If you close or refresh this page, you will lose access to the conversation history.';
 
 // URLs & Warnings: Permission requests & permission callbacks
 z.string.urlSupportRoot = '/';
@@ -810,7 +851,8 @@ z.string.warningLifecycleUpdateLink = 'Update now';
 z.string.warningNotFoundCamera = 'You cannot call because your computer does not have a camera.';
 z.string.warningNotFoundMicrophone = 'You cannot call because your computer does not have a microphone.';
 z.string.warningPermissionDeniedCamera = 'You cannot call because your browser does not have access to the camera.';
-z.string.warningPermissionDeniedMicrophone = 'You cannot call because your browser does not have access to the microphone.';
+z.string.warningPermissionDeniedMicrophone =
+  'You cannot call because your browser does not have access to the microphone.';
 z.string.warningPermissionDeniedScreen = 'Your browser needs permission to share your screen.';
 z.string.warningPermissionRequestCamera = '[icon] Allow access to camera';
 z.string.warningPermissionRequestMicrophone = '[icon] Allow access to microphone';
@@ -916,4 +958,4 @@ z.string.replyQuoteError = 'You cannot see this message.';
 z.string.replyQuoteShowMore = 'Show more';
 z.string.replyQuoteShowLess = 'Show less';
 z.string.replyQuoteTimeStampDate = 'Original message from {{date}}';
-z.string.replyQuoteTimeStampTime = 'Original message from {{time}}'
+z.string.replyQuoteTimeStampTime = 'Original message from {{time}}';

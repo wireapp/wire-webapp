@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=properties/PropertiesRepository yarn test:app
-
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import PropertiesService from 'src/script/properties/PropertiesService';
 

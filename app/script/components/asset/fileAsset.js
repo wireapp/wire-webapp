@@ -60,14 +60,14 @@ ko.components.register('file-asset', {
          data-bind="attr: {'data-uie-value': asset.file_name},
                     click: asset.status() === z.assets.AssetTransferState.UPLOADED ? asset.download : null,
                     css: {'cursor-pointer': asset.status() === z.assets.AssetTransferState.UPLOADED}">
-        <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
+        <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_PENDING -->
           <div class="asset-placeholder">
             <div class="three-dots">
               <span></span><span></span><span></span>
             </div>
           </div>
         <!-- /ko -->
-        <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
+        <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
           <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADED -->
             <div class="file-icon icon-file" data-bind="click: asset.download, clickBubble: false" data-uie-name="file-icon">
               <span class="file-icon-ext icon-view"></span>
@@ -98,7 +98,7 @@ ko.components.register('file-asset', {
             <div data-uie-name="file-name"
                  data-bind="text: z.util.trimFileExtension(asset.file_name)"
                  class="label-bold-xs ellipsis"></div>
-            <ul class="file-desc-meta label-xs text-graphite">
+            <ul class="file-desc-meta label-xs text-foreground">
               <li data-bind="text: z.util.formatBytes(asset.file_size)" data-uie-name="file-size"></li>
               <!-- ko if: z.util.getFileExtension(asset.file_name) -->
                 <li data-bind="text: z.util.getFileExtension(asset.file_name)" data-uie-name="file-type"></li>

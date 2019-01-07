@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=media/MediaEmbeds yarn test:app
-
 describe('MediaEmbeds', () => {
   // Will test all common link variations
   const test_link_variants = (site, re) => {

@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=view_model/FaviconViewModel yarn test:app
-
 describe('z.viewModel.FaviconViewModel', () => {
   it('subscribes to uread count events', () => {
     const dispatcher = {subscribe: () => {}};

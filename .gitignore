@@ -16,6 +16,7 @@ aws-keys.json
 npm-debug.log
 yarn-error.log
 CHANGELOG.md
+**/.DS_Store
 
 # Configuration imported from https://github.com/wireapp/wire-web-config-default/
 resource

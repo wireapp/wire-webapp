@@ -39,11 +39,11 @@
   z-index: @z-index-bubble;
   width: @bubble-width;
   padding: 0;
-  color: @graphite-dark;
+  color: var(--background);
 }
 
 .invite-bubble-inner {
-  background-color: #fff;
+  background-color: var(--app-bg-secondary);
   border-radius: 4px;
 }
 
@@ -106,6 +106,7 @@
     height: 100%;
     padding: 8px;
     background-color: transparent;
+    color: var(--background);
   }
 }
 
@@ -117,6 +118,6 @@
   .label-bold-xs;
 
   margin-bottom: 24px;
-  color: @graphite;
+  color: var(--foreground);
   text-align: center;
 }

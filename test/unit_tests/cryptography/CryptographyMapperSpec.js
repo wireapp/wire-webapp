@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=cryptography/CryptographyMapper yarn test:app
-
 import CryptographyMapper from 'src/script/cryptography/CryptographyMapper';
 
 describe('CryptographyMapper', () => {

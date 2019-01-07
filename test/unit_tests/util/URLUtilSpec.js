@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=util/URLUtil yarn test:app
-
 describe('z.util.URLUtil', () => {
   describe('appendParameter', () => {
     it('append param with & when url contains param', () => {

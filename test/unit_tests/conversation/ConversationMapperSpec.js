@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=conversation/ConversationMapper yarn test:app
-
 import UUID from 'uuidjs';
 import Conversation from 'src/script/entity/Conversation';
 import ConversationMapper from 'src/script/conversation/ConversationMapper';

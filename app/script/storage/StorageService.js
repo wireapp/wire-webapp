@@ -92,7 +92,7 @@ class StorageService {
   addUpdatedListener(storeName, callback) {
     this.updateListeners.push(callback);
     const initHook = () => {
-      if (this.updateListeners.length > 1) {
+      if (this.updateListeners.length > 0) {
         const updateListeners = this.updateListeners;
         this.db[storeName].hook('updating', function(modifications, primaryKey, previousRecord, transaction) {
           // we need to wait for the transaction to be finished in order to be able to access the DB later on

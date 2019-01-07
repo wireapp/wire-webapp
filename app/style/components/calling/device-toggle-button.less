@@ -26,10 +26,10 @@ device-toggle-button {
 }
 
 .device-toggle-button-dark {
-  color: @graphite-dark;
+  color: var(--background);
 
   .device-toggle-button-indicator-dot {
-    color: @graphite-dark;
+    color: var(--background);
   }
 }
 
@@ -41,7 +41,7 @@ device-toggle-button {
 .device-toggle-button-indicator-dot {
   .dot-md;
 
-  background-color: fade(@graphite, 24%);
+  background-color: var(--foreground-fade-24);
 
   &:not(:last-child) {
     margin-right: 8px;

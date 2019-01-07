@@ -27,6 +27,9 @@ class WebappProperties {
       emoji: {
         replace_inline: true,
       },
+      interface: {
+        theme: 'default',
+      },
       notifications: z.notification.NotificationPreference.ON,
       previews: {
         send: true,

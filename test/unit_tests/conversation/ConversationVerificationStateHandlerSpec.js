@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=conversation/ConversationVerificationStateHandler yarn test:app
-
 import ClientEntity from 'src/script/client/ClientEntity';
 import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
