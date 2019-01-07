@@ -1,0 +1,124 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+user-input {
+  position: relative;
+  display: block;
+  background: fade(#fff, 8%);
+  border-radius: 4px;
+  color: #fff;
+
+  &.user-list-light {
+    background: fade(@w-gray, 16%);
+    color: @graphite-dark;
+  }
+}
+
+.search-outer {
+  overflow: hidden;
+  padding: 4px 8px;
+}
+
+.search-inner-wrap {
+  overflow-x: hidden;
+}
+
+.search-inner {
+  .hide-scrollbar;
+
+  display: flex;
+  max-height: 84px;
+  flex-wrap: wrap;
+  margin-right: -17px;
+  overflow-y: auto;
+}
+
+.search-inner > span {
+  .label-bold-xs;
+
+  position: relative;
+  flex: 0 0 auto;
+  padding-right: 16px;
+  line-height: @line-height-lg;
+
+  &::before {
+    .dot-size(2px);
+
+    position: absolute;
+    top: 11px;
+    right: 7px;
+    background-color: fade(#fff, 40%);
+    content: '';
+
+    .user-list-light & {
+      background-color: fade(#222, 40%);
+    }
+  }
+
+  &:last-child {
+    margin-right: 8px;
+  }
+}
+
+.search-inner > input {
+  min-width: 65px;
+  height: @avatar-diameter-xs;
+  flex: 1 1;
+  border: none;
+  appearance: none;
+  background-color: transparent;
+  color: currentColor;
+  line-height: @avatar-diameter-xs;
+  outline: none;
+
+  &:invalid {
+    box-shadow: none;
+  }
+
+  &::placeholder {
+    &:invalid {
+      color: fade(#fff, 40%);
+    }
+    .label-xs;
+
+    padding-left: 8px;
+    color: fade(#fff, 40%);
+  }
+
+  // hack for chrome to fix line height issue
+  &::-webkit-input-placeholder {
+    transform: translateY(-2px);
+  }
+
+  .user-list-light & {
+    &::placeholder {
+      color: fade(@graphite-dark, 40%);
+    }
+  }
+}
+
+.search-icon {
+  height: @avatar-diameter-xs;
+  margin-right: 8px;
+  line-height: @avatar-diameter-xs;
+}
+
+.search-input-show-placeholder {
+  margin-right: 41px;
+}

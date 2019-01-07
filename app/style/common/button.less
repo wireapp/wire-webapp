@@ -1,0 +1,247 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// default
+.button {
+  .accent-background-color;
+  .button-large; // default size is large
+  .label-bold-xs;
+
+  display: inline-block;
+  padding: 0 16px;
+  border: @button-border-size solid transparent;
+  border-radius: @button-border-radius;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+
+  > input {
+    position: absolute;
+    left: @offscreen-left;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  // types
+  &.button-inverted {
+    .accent-color;
+    .accent-border-color;
+
+    background-color: transparent;
+  }
+
+  &.button-white {
+    border-color: #fff;
+    background-color: #fff;
+    color: #222;
+
+    &:active,
+    &:focus {
+      border-color: darken(#fff, 16%);
+      background-color: darken(#fff, 16%);
+      color: darken(#222, 16%);
+    }
+  }
+
+  &.button-outline {
+    border-color: fade(#fff, 32%);
+    background-color: transparent;
+    font-weight: normal;
+
+    &:active,
+    &:focus {
+      border-color: darken(fade(#fff, 32%), 16%);
+      background-color: fade(@graphite-dark, 16%);
+      color: darken(#fff, 16%);
+    }
+  }
+
+  // sizes
+  &.button-large {
+    width: @button-width;
+    height: @button-height;
+    line-height: (@button-height - @button-border-size * 2);
+  }
+
+  &.button-small,
+  &.button-medium {
+    width: @button-medium-width;
+    min-width: @button-medium-width;
+    height: @button-medium-sm-height;
+    line-height: (@button-medium-sm-height - @button-border-size * 2);
+  }
+
+  // expansion
+  &.button-fluid {
+    width: auto;
+  }
+
+  &.button-full {
+    width: 100%;
+  }
+
+  // misc
+  &:disabled,
+  &.button-disabled {
+    cursor: default;
+    opacity: 0.32;
+    pointer-events: none;
+  }
+
+  &.button-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px; // TODO
+
+    span + span {
+      margin-left: 8px;
+    }
+  }
+}
+
+// groups
+.button-group {
+  display: flex;
+  width: 100%;
+
+  > .button {
+    flex: 1 1;
+
+    &:first-child {
+      margin-right: 4%;
+    }
+  }
+}
+
+// 1. icon only
+// <div class="icon-add icon-button"></div>
+// 2. icon with text
+// <div class="icon-add icon-button"><span>add people</span></div>
+// 3. new style
+// <div class="button-icon">
+//  <span class="button-round icon-plus"/> or: <svg/> or <span class="icon-plus"/>
+//  <label>add people</label>
+// </div>
+//
+.icon-button,
+.button-icon {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+
+  > label,
+  > span {
+    .label-xs;
+
+    margin-left: 8px;
+    color: @graphite-dark;
+    cursor: pointer;
+  }
+
+  > input {
+    position: absolute;
+    left: -9999px;
+  }
+
+  &.disabled {
+    .translucent;
+
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.button-icon-large {
+  .button-icon;
+
+  padding: 8px;
+}
+
+// button with label-xs style
+// <span class="button-label">ok</span>
+.button-label {
+  .label-xs;
+
+  border: 0;
+  -webkit-appearance: none;
+  background: none;
+  cursor: pointer;
+  line-height: 24px;
+  outline: 0;
+}
+
+// Colors and more
+.button-color() {
+  border: none;
+  color: #fff;
+  &.disabled {
+    background: transparent;
+  }
+}
+
+.button-theme {
+  .accent-background-color;
+  .button-color;
+  &.disabled {
+    .accent-color(24%);
+  }
+}
+
+.button-theme-color(@color) {
+  .button-color;
+
+  background-color: @color !important;
+  &.toggled {
+    color: @color !important;
+  }
+  &.disabled {
+    color: fade(@color, 24%) !important;
+  }
+}
+
+.button-theme-blue {
+  .button-theme-color(@w-blue);
+}
+.button-theme-green {
+  .button-theme-color(@w-green);
+}
+.button-theme-yellow {
+  .button-theme-color(@w-yellow);
+}
+.button-theme-red {
+  .button-theme-color(@w-red);
+}
+.button-theme-orange {
+  .button-theme-color(@w-orange);
+}
+.button-theme-pink {
+  .button-theme-color(@w-pink);
+}
+.button-theme-purple {
+  .button-theme-color(@w-purple);
+}
+
+.svg-button {
+  cursor: pointer;
+}

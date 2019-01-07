@@ -1,0 +1,188 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.search-list {
+  .search-list-sm& {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.search-list-item {
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  .search-list-sm & {
+    text-align: center;
+
+    &:nth-child(3n) {
+      margin-right: 0;
+    }
+  }
+
+  .search-list-lg & {
+    display: flex;
+    height: 56px;
+    margin: 0;
+  }
+}
+
+.search-list-item-image {
+  .search-list-sm & {
+    .square(@avatar-diameter-l);
+
+    position: relative;
+    margin-bottom: 3px;
+  }
+
+  .search-list-lg & {
+    position: relative;
+    display: flex;
+    height: @avatar-diameter-m;
+    flex: 0 0 auto;
+    align-items: center;
+  }
+}
+
+.search-list-item-image-guest-indicator-badge {
+  .guest-badge;
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.search-list-item-image-overlay {
+  .full-screen;
+  .flex-center;
+
+  .background {
+    .full-screen;
+
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  .checkmark {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+.search-list-item-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  .search-list-sm & {
+    width: @avatar-diameter-l;
+  }
+
+  .search-list-lg & {
+    min-width: 0; // this will ensure that ellipses is working
+    height: @avatar-diameter-m;
+    flex: 1 1;
+    margin-left: 16px;
+  }
+}
+
+.search-list-item-content-availability {
+  .availability-state-label {
+    .ellipsis;
+  }
+
+  .search-list-sm & {
+    height: 12px;
+    justify-content: center;
+  }
+}
+
+.search-list-item-content-name {
+  .ellipsis;
+
+  width: 100%;
+
+  .search-list-sm & {
+    .label-xs;
+  }
+}
+
+.search-list-item-content-info {
+  display: flex;
+  font-size: @font-size-xs;
+  line-height: 16px;
+  opacity: 0.56;
+}
+
+.search-list-item-header {
+  .ellipsis;
+
+  max-width: 184px;
+  height: @avatar-diameter-m;
+  margin-left: 16px;
+  line-height: @avatar-diameter-m;
+}
+
+.search-list-theme-black .image.state-badge::before {
+  background-color: #000;
+  color: #fff;
+}
+
+.search-list-item-guest-indicator {
+  display: flex;
+  height: @avatar-diameter-m;
+  align-items: center;
+  font-size: @font-size-xs;
+}
+
+.search-list-item-select {
+  .square(24px);
+
+  display: block;
+  margin: 8px 0 8px 16px;
+  border: 2px solid fade(@graphite-dark, 64%);
+  border-radius: 12px;
+
+  &::before {
+    margin-left: 4px;
+    color: #fff;
+    font-size: 12px;
+    opacity: 0;
+  }
+
+  &.selected {
+    border: 2px solid @graphite-dark;
+    background-color: @graphite-dark;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.search-list-item-guest-indicator-badge {
+  .guest-badge;
+
+  .user-list-light & {
+    .cell-badge-dark;
+  }
+}

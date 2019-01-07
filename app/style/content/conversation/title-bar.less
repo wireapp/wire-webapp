@@ -1,0 +1,92 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversation-title-bar {
+  .flex-center;
+
+  position: relative;
+  width: 100%;
+  height: @content-title-bar-height;
+  background-color: #fff;
+}
+
+.conversation-title-bar-name {
+  .ellipsis-nowrap;
+  .flex-center;
+
+  display: flex;
+  height: 100%;
+  flex-grow: 1;
+  cursor: pointer;
+  user-select: none;
+
+  &--verified {
+    margin: 4px 16px 0 0;
+  }
+}
+
+.conversation-title-bar-indication-badge {
+  .text-white;
+
+  position: absolute;
+  z-index: @z-index-badge;
+  top: 56px;
+  padding: 5px 16px;
+  background-color: #95989a;
+  border-radius: 6px;
+  box-shadow: 0 2px 16px 0 fade(#000, 8%);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.conversation-title-bar-icons,
+.conversation-title-bar-library {
+  display: flex;
+  width: 112px;
+  height: 100%;
+  align-items: center;
+}
+
+.conversation-title-bar-icons {
+  justify-content: flex-end;
+}
+
+.conversation-title-bar-icon {
+  display: flex;
+  height: 16px;
+  flex: 0 0 auto;
+  align-items: center;
+  margin-right: 12px;
+  margin-left: 12px;
+  cursor: pointer;
+
+  svg path {
+    fill: @graphite-dark;
+  }
+
+  &--active {
+    svg path {
+      fill: @w-blue;
+    }
+  }
+}
+
+.conversation-title-bar-name-label {
+  .label-bold-xs;
+}

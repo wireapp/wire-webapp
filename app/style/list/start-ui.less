@@ -1,0 +1,351 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+#start-ui {
+  .left-list-container;
+
+  z-index: 1;
+
+  &.left-list-is-visible {
+    .start-ui-transition-fadein;
+  }
+
+  &:not(left-list-is-visible) {
+    .start-ui-transition-fadeout;
+  }
+
+  group-list,
+  top-people {
+    & > div {
+      padding: 0 16px;
+    }
+  }
+}
+
+.start-ui-header {
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  &.start-ui-header-integrations {
+    padding-bottom: 0;
+    margin-bottom: -1px;
+  }
+}
+
+.start-ui-header-icons {
+  position: absolute;
+  top: 6px;
+  right: 0;
+}
+
+.start-ui-header-icon {
+  position: absolute;
+  right: 0;
+}
+
+.start-ui-list-wrapper {
+  display: flex;
+  overflow: hidden;
+  flex: 1 1;
+  flex-direction: column;
+
+  &.split-view {
+    flex: unset;
+  }
+}
+
+.start-ui-list {
+  position: relative;
+  flex: 1 1;
+  overflow-x: hidden;
+  overflow-y: scroll;
+
+  .split-view & {
+    overflow: hidden;
+    flex: unset;
+  }
+}
+
+.start-ui-list-spinner {
+  .full-screen;
+  .flex-center;
+
+  .icon-spinner {
+    font-size: @font-size-xl;
+  }
+}
+
+.start-ui-list-tabs {
+  display: flex;
+  height: 44px;
+  padding: 0 8px;
+
+  .start-ui-list-tab {
+    .flex-center;
+
+    flex-grow: 1;
+    border-bottom: 1px solid transparent;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.56;
+    text-transform: uppercase;
+
+    &.active {
+      border-bottom-color: #fff;
+      cursor: default;
+      opacity: 1;
+    }
+  }
+}
+.panel-manage-services,
+.start-ui-create-group,
+.start-ui-create-guest-room,
+.start-ui-invite-people,
+.start-ui-manage-services {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: @font-weight-regular;
+
+  .left-list-item {
+    height: 56px;
+    min-height: 56px;
+    line-height: 56px;
+  }
+
+  .left-column {
+    width: 60px;
+  }
+
+  .center-column {
+    margin-right: 16px;
+  }
+}
+
+.start-ui-list-top-people {
+  overflow: hidden;
+
+  .search-list-item {
+    margin-right: 20px;
+
+    &:nth-child(3n) {
+      margin-right: 0;
+    }
+    &:nth-last-child(-n + 3) {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.start-ui-no-contacts,
+.start-ui-no-search-results {
+  margin-top: 40px;
+  margin-bottom: 16px;
+  line-height: 24px;
+  text-align: center;
+  white-space: pre;
+}
+
+.start-ui-list-header {
+  .label-bold-xs;
+
+  display: block;
+  margin-top: 24px;
+  margin-left: 16px;
+  line-height: 24px;
+}
+
+.start-ui-list-header-connections,
+.start-ui-list-header-contacts,
+.start-ui-list-header-top-people {
+  margin-top: 16px;
+}
+
+.start-ui-import {
+  .accent-background-color;
+
+  display: flex;
+  height: @conversation-input-min-height;
+  flex: 0 0 auto;
+  align-items: center;
+  cursor: pointer;
+  line-height: 24px;
+}
+
+.start-ui-import-icon {
+  margin: 0 16px;
+}
+
+.start-ui-user-bubble {
+  user-profile,
+  .start-ui-service {
+    .bubble-content;
+
+    position: relative;
+    margin: -@bubble-border-radius;
+    background: #fff;
+    border-radius: 4px;
+    color: @graphite-dark;
+  }
+
+  .start-ui-service-body {
+    display: flex;
+    flex-basis: 104px;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 16px;
+    background-color: @app-bg;
+    border-radius: 4px;
+  }
+
+  .start-ui-service-button {
+    .button;
+
+    width: 100%;
+    height: 48px;
+  }
+
+  .start-ui-service-details {
+    display: flex;
+  }
+
+  .start-ui-service-details-content {
+    margin-left: 16px;
+  }
+
+  .start-ui-service-description {
+    padding: 8px;
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  .start-ui-service-header {
+    display: flex;
+    flex-basis: 48px;
+    padding: 16px;
+  }
+
+  .start-ui-service-footer {
+    padding: 24px;
+  }
+
+  .start-ui-service-name {
+    font-size: 24px;
+    font-weight: @font-weight-regular;
+    line-height: 32px;
+  }
+
+  .start-ui-service-provider {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.56;
+  }
+
+  &.start-ui-service-bubble.bubble-left-top,
+  &.start-ui-service-bubble.bubble-left {
+    &::before {
+      background-color: @app-bg;
+    }
+    &::after {
+      background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
+    }
+  }
+}
+
+.start-ui-import-container {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  margin-right: 24px;
+  margin-left: 24px;
+}
+
+.start-ui-import-headline {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  font-size: @font-size-lg;
+  font-weight: normal;
+}
+
+.start-ui-import-buttons {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.start-ui-import-buttons-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  margin-right: 16px;
+  border: 1px solid rgba(141, 152, 159, 0.16);
+  background-color: #fff;
+  border-radius: 4px;
+  color: @graphite-dark;
+}
+
+.start-ui-import-detail {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
+}
+.search__no-services {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &__icon {
+    opacity: 0.24;
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &__info {
+    max-width: 200px;
+    margin-top: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &__manage-button {
+    padding: 4px 16px;
+    margin-top: 16px;
+    background-color: rgba(255, 255, 255, 0.24);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+
+    &--alternate {
+      background-color: @separator-color;
+    }
+  }
+}
