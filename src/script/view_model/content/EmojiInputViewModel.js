@@ -17,6 +17,8 @@
  *
  */
 
+import emojiBindings from './emoji.json';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -133,31 +135,27 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
       $(event.currentTarget).addClass('selected');
     });
 
-    fetch('/image/emoji.json')
-      .then(response => response.json())
-      .then(json => {
-        for (const code in json) {
-          const details = json[code];
+    for (const code in emojiBindings) {
+      const details = emojiBindings[code];
 
-          // Ignore 'tone' emojis for now, they clutter suggestions too much.
-          if (details.alpha_code.match(/_tone\d/)) {
-            continue;
-          }
+      // Ignore 'tone' emojis for now, they clutter suggestions too much.
+      if (details.alpha_code.match(/_tone\d/)) {
+        continue;
+      }
 
-          const icon = String.fromCodePoint.apply(null, details.output.split('-').map(char => `0x${char}`));
-          const alphaCodes = [details.alpha_code, ...details.aliases.split('|')];
-          alphaCodes.forEach(alphaCode => {
-            if (alphaCode) {
-              const name = alphaCode
-                .slice(1, -1)
-                .replace(/_/g, ' ')
-                .toLowerCase();
-              this.emojiList.push({icon, name});
-              this.emojiDict[name] = icon;
-            }
-          });
+      const icon = String.fromCodePoint.apply(null, details.output.split('-').map(char => `0x${char}`));
+      const alphaCodes = [details.alpha_code, ...details.aliases.split('|')];
+      alphaCodes.forEach(alphaCode => {
+        if (alphaCode) {
+          const name = alphaCode
+            .slice(1, -1)
+            .replace(/_/g, ' ')
+            .toLowerCase();
+          this.emojiList.push({icon, name});
+          this.emojiDict[name] = icon;
         }
       });
+    }
 
     this._initSubscriptions();
   }
