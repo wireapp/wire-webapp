@@ -20,6 +20,12 @@
 // https://github.com/gruntjs/grunt-contrib-copy
 
 module.exports = {
+  dist_emoji: {
+    cwd: '<%= dir.src_ %>',
+    dest: '<%= dir.dist.static %>',
+    expand: true,
+    src: ['image/**/*'],
+  },
   dist_resource: {
     cwd: '<%= dir.resource %>',
     dest: '<%= dir.dist.static %>',

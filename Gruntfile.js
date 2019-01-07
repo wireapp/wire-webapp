@@ -77,6 +77,7 @@ module.exports = grunt => {
     'build_style',
     'copy:dist_serviceworker',
     'copy:dist_resource',
+    'copy:dist_emoji',
     'build_markup',
   ]);
 
