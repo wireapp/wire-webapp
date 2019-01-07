@@ -117,27 +117,27 @@ class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
-      const NOTIIFCATION_STATE = z.conversation.NotificationSetting.STATE;
+      const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
       if (!this.selfUser()) {
-        return NOTIIFCATION_STATE.NOTHING;
+        return NOTIFICATION_STATE.NOTHING;
       }
 
-      const knownNotificationStates = Object.values(NOTIIFCATION_STATE);
+      const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(this.mutedState())) {
-        const isStateMentionsAndReplies = this.mutedState() === NOTIIFCATION_STATE.MENTIONS_AND_REPLIES;
+        const isStateMentionsAndReplies = this.mutedState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
         const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
 
-        return isInvalidState ? NOTIIFCATION_STATE.NOTHING : this.mutedState();
+        return isInvalidState ? NOTIFICATION_STATE.NOTHING : this.mutedState();
       }
 
       if (typeof this.mutedState() === 'boolean') {
         const migratedMutedState = this.selfUser().inTeam()
-          ? NOTIIFCATION_STATE.MENTIONS_AND_REPLIES
-          : NOTIIFCATION_STATE.NOTHING;
-        return this.mutedState() ? migratedMutedState : NOTIIFCATION_STATE.EVERYTHING;
+          ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
+          : NOTIFICATION_STATE.NOTHING;
+        return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
       }
 
-      return NOTIIFCATION_STATE.EVERYTHING;
+      return NOTIFICATION_STATE.EVERYTHING;
     });
 
     this.is_archived = this.archivedState;
