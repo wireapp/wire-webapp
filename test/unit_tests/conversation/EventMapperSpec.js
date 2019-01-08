@@ -186,6 +186,48 @@ describe('Event Mapper', () => {
         expect(mentions.length).toBe(1);
       });
     });
+
+    it('filters mentions that are overlapping', () => {
+      const mandy = '@Mandy';
+      const randy = '@Randy';
+      const sandy = '@Sandy';
+      const text = `Hi ${mandy}, ${randy} and ${sandy}.`;
+
+      const mandyStart = text.indexOf(mandy);
+      const sandyStart = text.indexOf(sandy);
+      const validMention1 = new z.message.MentionEntity(mandyStart, mandy.length, z.util.createRandomUuid());
+      const validMention2 = new z.message.MentionEntity(sandyStart, sandy.length, z.util.createRandomUuid());
+
+      const overlappingStart = mandyStart + mandy.length - 1;
+      const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, z.util.createRandomUuid());
+
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+
+      const event = {
+        category: 16,
+        conversation: conversationEntity.id,
+        data: {
+          content: text,
+          mentions: [
+            validMention1.toProto().encode64(),
+            overlappingMention.toProto().encode64(),
+            validMention2.toProto().encode64(),
+          ],
+          previews: [],
+        },
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
+        primary_key: 5,
+        time: '2018-09-27T15:23:14.177Z',
+        type: 'conversation.message-add',
+      };
+
+      event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
+        const mentions = messageEntity.get_first_asset().mentions();
+
+        expect(mentions.length).toBe(2);
+      });
+    });
   });
 
   describe('_mapAssetImage', () => {

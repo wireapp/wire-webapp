@@ -738,10 +738,10 @@ export default class EventMapper {
         const protoMention = z.proto.Mention.decode64(encodedMention);
         return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
       })
-      .filter(mentionEntity => {
+      .filter((mentionEntity, _, allMentions) => {
         if (mentionEntity) {
           try {
-            return mentionEntity.validate(messageText);
+            return mentionEntity.validate(messageText, allMentions);
           } catch (error) {
             this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
             return false;
