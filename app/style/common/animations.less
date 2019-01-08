@@ -1,0 +1,34 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.start-ui-transition-fadein {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: all @animation-timing-slow @ease-out-expo @animation-timing-fast;
+}
+
+.start-ui-transition-fadeout {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(@start-ui-search-bar-offset);
+  transition-delay: 0s;
+  transition-duration: @animation-timing-fast;
+  transition-timing-function: @ease-in-expo;
+}

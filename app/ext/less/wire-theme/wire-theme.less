@@ -1,0 +1,320 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@import 'variables';
+@import 'input';
+
+///////////////////////////////////////////////////////////////////////////////
+// Variables
+///////////////////////////////////////////////////////////////////////////////
+@w-black: #000000;
+@w-white: #ffffff;
+
+@w-blue: #2391d3;
+@w-green: #00c800;
+@w-gray: #bac8d1;
+@w-orange: #ff8900;
+@w-pink: #fe5ebd;
+@w-purple: #9c00fe;
+@w-red: #fb0807;
+@w-yellow: #febf02;
+
+///////////////////////////////////////////////////////////////////////////////
+// Utils
+///////////////////////////////////////////////////////////////////////////////
+.w-bg(@color) {
+  background-color: @color;
+}
+
+.w-text(@color) {
+  color: @color;
+}
+
+.w-link(@color) {
+  color: @color;
+  &:hover,
+  &:focus {
+    color: fade(@color, 80%);
+  }
+}
+
+.w-bg-hover(@color) {
+  &:hover {
+    background-color: @color;
+    color: #fff;
+  }
+}
+
+.w-border(@color) {
+  border-color: @color;
+}
+
+.w-btn(@color) {
+  .button-variant(#fff, @color, transparent);
+}
+
+.w-btn-outline(@color) {
+  .button-variant(#fff, transparent, @color);
+}
+
+.w-svg(@color) {
+  .fill-theme {
+    fill: @color;
+  }
+  .stroke-theme {
+    stroke: @color;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Theme Mixin
+///////////////////////////////////////////////////////////////////////////////
+.theme(@color) {
+  .bg-theme,
+  &.bg-theme {
+    .w-bg(@color);
+    .btn-theme {
+      .w-btn(darken(@color, 16%));
+    }
+    .btn-outline-theme {
+      .w-btn-outline(darken(@color, 16%));
+    }
+    .border-theme {
+      .w-border(darken(@color, 16%));
+    }
+    .text-theme {
+      .w-text(@w-white);
+    }
+    .svg-theme {
+      .w-svg(@w-white);
+    }
+    a {
+      .w-link(@w-white);
+    }
+    .w-input-range(@w-white, @color);
+  }
+
+  .bg-hover-theme {
+    .w-bg-hover(@color);
+  }
+  .btn-theme {
+    .w-btn(@color);
+  }
+  .btn-outline-theme {
+    .w-btn-outline(@color);
+  }
+  .border-theme {
+    .w-border(@color);
+  }
+  .text-theme {
+    .w-text(@color);
+  }
+  .svg-theme {
+    .w-svg(@color);
+  }
+  a {
+    color: @color;
+  }
+
+  .w-input-range(@color);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Default
+///////////////////////////////////////////////////////////////////////////////
+.theme(@w-gray);
+
+///////////////////////////////////////////////////////////////////////////////
+// Themes
+///////////////////////////////////////////////////////////////////////////////
+.theme(@name, @color) {
+  .theme-@{name} {
+    .theme(@color);
+  }
+}
+
+.theme(e('blue'), @w-blue);
+.theme(e('green'), @w-green);
+.theme(e('gray'), @w-gray);
+.theme(e('orange'), @w-orange);
+.theme(e('pink'), @w-pink);
+.theme(e('purple'), @w-purple);
+.theme(e('red'), @w-red);
+.theme(e('yellow'), @w-yellow);
+
+///////////////////////////////////////////////////////////////////////////////
+// Background colors for testing purposes
+///////////////////////////////////////////////////////////////////////////////
+.bg-black {
+  .w-bg(fade(@w-black, 32%));
+}
+.bg-blue {
+  .w-bg(fade(@w-blue, 32%));
+}
+.bg-green {
+  .w-bg(fade(@w-green, 32%));
+}
+.bg-gray {
+  .w-bg(fade(@w-gray, 32%));
+}
+.bg-orange {
+  .w-bg(fade(@w-orange, 32%));
+}
+.bg-pink {
+  .w-bg(fade(@w-pink, 32%));
+}
+.bg-purple {
+  .w-bg(fade(@w-purple, 32%));
+}
+.bg-red {
+  .w-bg(fade(@w-red, 32%));
+}
+.bg-white {
+  .w-bg(fade(@w-white, 32%));
+}
+.bg-yellow {
+  .w-bg(fade(@w-yellow, 32%));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Mixins (stolen from Bootstrap and modified)
+///////////////////////////////////////////////////////////////////////////////
+.button-variant(@color; @background; @border) {
+  border-width: 2px;
+  border-style: solid;
+  border-color: @border;
+  background-color: @background;
+  color: @color;
+
+  &:focus,
+  &.focus,
+  &:active,
+  &.active {
+    border-color: darken(@border, 8%);
+    background-color: darken(@background, 8%);
+    color: @color;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active {
+      border-color: @border;
+      background-color: @background;
+    }
+  }
+}
+
+.button-size(@padding-vertical; @padding-horizontal; @font-size; @line-height; @border-radius, @font-weight:600) {
+  padding: @padding-vertical @padding-horizontal;
+  border-radius: @border-radius;
+  font-size: @font-size;
+  font-weight: @font-weight;
+  line-height: @line-height;
+}
+
+.user-select(@select) {
+  -webkit-user-select: @select;
+  -moz-user-select: @select;
+  -ms-user-select: @select; // IE10+
+  user-select: @select;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Buttons
+///////////////////////////////////////////////////////////////////////////////
+.btn {
+  .button-size(
+    @padding-base-vertical; @padding-base-horizontal; @font-size-base; @line-height-base; @border-radius-base
+  );
+  .user-select(none);
+  display: inline-block;
+  margin-bottom: 0; // For input.btn
+  border: 1px solid transparent;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+
+  cursor: pointer;
+  font-weight: @btn-font-weight;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  &,
+  &:active,
+  &.active {
+    &:focus,
+    &.focus {
+      outline: thin dotted;
+      // WebKit
+      outline: 5px auto -webkit-focus-ring-color;
+      outline-offset: -2px;
+    }
+  }
+
+  &:hover,
+  &:focus,
+  &.focus {
+    text-decoration: none;
+  }
+
+  &:active,
+  &.active {
+    outline: 0;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: not-allowed;
+    opacity: 0.65;
+    pointer-events: none; // Future-proof disabling of clicks
+  }
+}
+
+.btn-lg {
+  .button-size(
+    @padding-large-vertical; @padding-large-horizontal; @font-size-large; @line-height-large; @border-radius-large
+  );
+}
+.btn-sm {
+  .button-size(
+    @padding-small-vertical; @padding-small-horizontal; @font-size-small; @line-height-small; @border-radius-small
+  );
+}
+.btn-xs {
+  .button-size(
+    @padding-xs-vertical; @padding-xs-horizontal; @font-size-small; @line-height-small; @border-radius-small
+  );
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+.btn-block + .btn-block {
+  margin-top: 4px;
+}

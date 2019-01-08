@@ -1,0 +1,281 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.call-ui {
+  &__button {
+    display: flex;
+    min-width: 40px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
+    background-color: var(--background-fade-8);
+    border-radius: 12px;
+    color: var(--background);
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: center;
+
+    > * {
+      line-height: 0;
+    }
+
+    svg > path {
+      fill: var(--background);
+    }
+
+    &--active {
+      background-color: var(--background);
+      color: var(--app-bg-secondary);
+
+      svg > path {
+        fill: var(--app-bg-secondary);
+      }
+    }
+
+    &--disabled {
+      cursor: default;
+
+      svg {
+        opacity: 0.4;
+      }
+    }
+
+    &--join,
+    &--participants {
+      padding: 0 8px;
+    }
+
+    &--join {
+      font-weight: @font-weight-bold;
+      text-transform: uppercase;
+    }
+
+    &--participants {
+      font-weight: @font-weight-regular;
+
+      chevron-icon {
+        margin-left: 8px;
+
+        svg path {
+          fill: currentcolor;
+        }
+      }
+    }
+
+    &--active&--participants {
+      chevron-icon {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &--large {
+      width: 64px;
+    }
+
+    &--green,
+    &--red {
+      color: #fff;
+      svg > path {
+        fill: #fff;
+      }
+    }
+
+    &--green {
+      background-color: @w-green !important;
+    }
+
+    &--red {
+      background-color: @w-red !important;
+    }
+
+    & + & {
+      margin-left: 8px;
+    }
+  }
+  &__participant-list {
+    max-height: 184px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    &__wrapper {
+      overflow: hidden;
+      max-height: 0;
+      color: var(--background);
+
+      &::before {
+        display: block;
+        margin: 0 16px;
+        border-top: 1px solid var(--background-fade-8);
+        content: '';
+      }
+
+      &--active {
+        max-height: 184px;
+      }
+    }
+
+    .participant-item {
+      height: 40px;
+      cursor: default;
+      fill: var(--background);
+      pointer-events: none;
+
+      .participant-item-image {
+        width: 48px;
+
+        participant-avatar {
+          width: 16px;
+          height: 16px;
+
+          .avatar-initials {
+            font-size: 8px;
+            line-height: 16px;
+          }
+        }
+      }
+
+      .availability-state-icon {
+        display: none;
+      }
+
+      verified-icon svg,
+      guest-icon svg {
+        height: 12px;
+      }
+
+      camera-icon svg {
+        width: 12px;
+      }
+    }
+  }
+
+  &__avatar {
+    border: 1px solid var(--background-fade-8);
+
+    .group-avatar-box-wrapper {
+      background: var(--background-fade-16);
+    }
+  }
+}
+
+.small-icon {
+  > svg {
+    max-width: 12px;
+    max-height: 12px;
+  }
+}
+
+hangup-icon.small-icon {
+  > svg {
+    max-width: 17px;
+  }
+}
+
+conversation-list-calling-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin: 0 16px 16px;
+  animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
+  background-color: var(--app-bg-secondary);
+  border-radius: 8px;
+
+  &.dark-bg {
+    color: var(--app-bg-secondary);
+
+    &::before {
+      background-color: var(--background-fade-80);
+    }
+  }
+
+  .conversation-list-cell-name {
+    color: var(--background);
+  }
+
+  .conversation-list-cell-description {
+    margin-top: 0;
+    color: var(--background-fade-40);
+    font-size: 11px;
+    opacity: 1;
+  }
+
+  &.temporary-user-style {
+    margin-top: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  group-video-grid {
+    height: 168px;
+  }
+}
+
+conversation-list-calling-cell:first-of-type {
+  &::before {
+    top: -40px;
+  }
+}
+
+.conversation-list-calling-cell {
+  height: 60px;
+}
+
+.conversation-list-calling-cell::after {
+  display: none;
+}
+
+.conversation-list-calling-cell-controls {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding-right: 16px;
+  padding-bottom: 16px;
+  padding-left: 16px;
+
+  &-left,
+  &-right {
+    display: flex;
+  }
+}
+
+@keyframes show-call-ui {
+  0% {
+    max-height: 0;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    max-height: 500px;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes show-call-ui-button {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
