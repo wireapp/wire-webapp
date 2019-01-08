@@ -685,8 +685,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.publish(z.event.WebApp.INPUT.RESIZE, newInputHeight - previousInputHeight);
   }
 
-  sendGiphy() {
-    this._resetDraftState();
+  sendGiphy(gifUrl, tag) {
+    const conversationEntity = this.conversationEntity();
+    const replyMessageEntity = this.replyMessageEntity();
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
+      this.conversationRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+      this.cancelMessageEditing(true);
+    });
   }
 
   _generateQuote(replyMessageEntity) {
