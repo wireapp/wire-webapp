@@ -1314,10 +1314,10 @@
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.14.tgz#dbb973c20908a8e7468974a329df35c256cb459d"
   integrity sha512-NPj7mYJ6LjKZOxknobs9t3FKJto6btG9KSP9K7kSIzEhkWoA/2i+RAcHRqs3/6cMMflnt2FxajyIdmkl71B2VA==
 
-"@types/react-redux@6.0.11":
-  version "6.0.11"
-  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-6.0.11.tgz#d872254bbcba42465195a5475f40b22502b0407d"
-  integrity sha512-I3POoeGGwNqZjbK7TfnPJS2C51TFvT0atQPz4M+xpVTrLMjsX37AAfcTF3XUOTnmxHsryEjwJN9r/ScGwSXdtg==
+"@types/react-redux@6.0.12":
+  version "6.0.12"
+  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-6.0.12.tgz#f3e9a400b8d40db43ffd8949ce14db4aa17a53ce"
+  integrity sha512-fvcpm7cfW/JMflRdZgegCVbSGYt/hyEWQKriesaLZDRDjBGKQsAiui08VCQg5lBpocPmulVGKFhICtOAcMUPOQ==
   dependencies:
     "@types/react" "*"
     redux "^4.0.0"
