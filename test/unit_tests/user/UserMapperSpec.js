@@ -147,6 +147,9 @@ describe('User Mapper', () => {
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data);
 
+      expect(mapper.serverTimeRepository.toLocalTimestamp).not.toHaveBeenCalledWith();
+      mapper.serverTimeRepository.timeOffset(10);
+
       expect(mapper.serverTimeRepository.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
