@@ -27,7 +27,8 @@ const pkg = require('../package');
 
 console.log(`Loading configuration for project "${pkg.name}"`);
 
-const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default';
+// const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default';
+const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-ey';
 const gitConfigurationUrl = process.env.WIRE_CONFIGURATION_REPOSITORY || defaultGitConfigurationUrl;
 const configDirName = 'config';
 const configDir = resolve(configDirName);
