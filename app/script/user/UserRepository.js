@@ -433,7 +433,7 @@ z.user.UserRepository = class UserRepository {
       .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
-        const promises = [this.save_user(userEntity, true), this.initMarketingConsent()];
+        const promises = [this.save_user(userEntity, true), this.getMarketingConsent()];
         return Promise.all(promises).then(() => userEntity);
       })
       .catch(error => {
@@ -798,7 +798,7 @@ z.user.UserRepository = class UserRepository {
     });
   }
 
-  initMarketingConsent() {
+  getMarketingConsent() {
     if (!z.config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
       return Promise.resolve();
@@ -811,6 +811,7 @@ z.user.UserRepository = class UserRepository {
           if (isMarketingConsent) {
             const hasGivenConsent = consentValue === z.user.ConsentValue.GIVEN;
             this.marketingConsent(hasGivenConsent);
+            this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
 
             this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
             return;
@@ -818,9 +819,6 @@ z.user.UserRepository = class UserRepository {
         }
 
         this.logger.log(`Marketing consent not set. Defaulting to '${this.marketingConsent()}'`);
-      })
-      .then(() => {
-        this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
       })
       .catch(error => {
         this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
