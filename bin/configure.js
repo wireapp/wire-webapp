@@ -25,16 +25,17 @@ const {execSync} = require('child_process');
 const {resolve, join} = require('path');
 const pkg = require('../package');
 
-console.log(`Loading configuration for project "${pkg.name}"`);
-
 // const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default';
 const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-ey';
 const gitConfigurationUrl = process.env.WIRE_CONFIGURATION_REPOSITORY || defaultGitConfigurationUrl;
+
+console.log(`Loading configuration for project "${pkg.name}" from "${gitConfigurationUrl}"`);
+
 const configDirName = 'config';
 const configDir = resolve(configDirName);
 const src = resolve(configDir, pkg.name, 'content');
-const root = '../../..';
-const dest = `${root}/resource/`;
+const projectDir = resolve('./');
+const dest = resolve(projectDir, 'resource');
 const ignoreList = ['.DS_Store'];
 
 console.log(`Cleaning config directory "${configDir}"`);
@@ -42,7 +43,7 @@ fs.removeSync(configDir);
 execSync(`git clone ${gitConfigurationUrl} ${configDirName}`, {stdio: [0, 1]});
 
 // Copy .env file configuration
-fs.copySync(resolve(configDir, pkg.name, '.env'), resolve(root, '.env'));
+fs.copySync(resolve(configDir, pkg.name, '.env'), resolve(projectDir, '.env'));
 
 process.chdir(src);
 
