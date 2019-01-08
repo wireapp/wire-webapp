@@ -129,7 +129,12 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.showTabs = ko.pureComputed(() => this.supportsReceipts() && this.supportsLikes());
 
     this.editedFooter = ko.pureComputed(() => {
-      return this.message() && this.message().edited_timestamp() && formatTime(this.message().edited_timestamp());
+      return (
+        this.message() &&
+        this.message().edited_timestamp &&
+        this.message().edited_timestamp() &&
+        formatTime(this.message().edited_timestamp())
+      );
     });
 
     this.panelTitle = ko.pureComputed(() => {
