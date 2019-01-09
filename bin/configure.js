@@ -25,10 +25,14 @@ const {execSync} = require('child_process');
 const {resolve, join} = require('path');
 const pkg = require('../package');
 
-const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default#v0.1.4';
+const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default';
+const defaultGitConfigurationVersion = 'v0.1.4';
 const gitConfigurationUrl = process.env.WIRE_CONFIGURATION_REPOSITORY || defaultGitConfigurationUrl;
+const gitConfigurationVersion = process.env.WIRE_CONFIGURATION_REPOSITORY_VERSION || defaultGitConfigurationVersion;
 
-console.log(`Loading configuration for project "${pkg.name}" from "${gitConfigurationUrl}"`);
+console.log(
+  `Loading configuration version "${gitConfigurationVersion}" for project "${pkg.name}" from "${gitConfigurationUrl}"`
+);
 
 const configDirName = 'config';
 const configDir = resolve(configDirName);
@@ -39,7 +43,7 @@ const ignoreList = ['.DS_Store'];
 
 console.log(`Cleaning config directory "${configDir}"`);
 fs.removeSync(configDir);
-execSync(`git clone ${gitConfigurationUrl} ${configDirName}`, {stdio: [0, 1]});
+execSync(`git clone -b ${gitConfigurationVersion} ${gitConfigurationUrl} ${configDirName}`, {stdio: [0, 1]});
 
 // Copy .env file configuration
 fs.copySync(resolve(configDir, pkg.name, '.env'), resolve(projectDir, '.env'));
