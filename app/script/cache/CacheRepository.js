@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.cache = z.cache || {};
 
@@ -50,7 +52,7 @@ z.cache.CacheRepository = class CacheRepository {
       const shouldBeDeleted = !protectedKeyPatterns.some(pattern => storedKey.startsWith(pattern));
 
       if (shouldBeDeleted) {
-        z.util.StorageUtil.resetValue(storedKey);
+        StorageUtil.resetValue(storedKey);
         deletedKeys.push(storedKey);
       }
     }

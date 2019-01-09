@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -116,7 +118,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
     this.emojiDiv = $(`<div class='${EMOJI_DIV_CLASS}' />`);
     this.emojiStartPosition = -1;
-    this.emojiUsageCount = z.util.StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+    this.emojiUsageCount = StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     this.shouldReplaceEmoji = repositories.properties.getPreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
@@ -439,7 +441,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
   _increaseUsageCount(emojiName) {
     this.emojiUsageCount[emojiName] = this._getUsageCount(emojiName) + 1;
-    z.util.StorageUtil.setValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
+    StorageUtil.setValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
   }
 
   _escapeRegexp(string) {

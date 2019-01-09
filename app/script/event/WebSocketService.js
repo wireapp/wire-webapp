@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -146,7 +148,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(

@@ -19,6 +19,8 @@
 
 import platform from 'platform';
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.client = z.client || {};
 
@@ -370,7 +372,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   _getCookieLabelValue(login) {
-    return z.util.StorageUtil.getValue(this.constructCookieLabelKey(login));
+    return StorageUtil.getValue(this.constructCookieLabelKey(login));
   }
 
   /**
@@ -389,7 +391,7 @@ z.client.ClientRepository = class ClientRepository {
     if (cookieLabel === undefined) {
       cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
-      z.util.StorageUtil.setValue(localStorageKey, cookieLabel);
+      StorageUtil.setValue(localStorageKey, cookieLabel);
     }
 
     this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
@@ -409,7 +411,7 @@ z.client.ClientRepository = class ClientRepository {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
+    const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
     const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return z.util.Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
