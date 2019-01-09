@@ -91,6 +91,14 @@ module.exports = function(config) {
       externals: {
         'fs-extra': '{}',
       },
+      module: {
+        rules: [
+          {
+            loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+            test: /\.svg$/,
+          },
+        ],
+      },
       plugins: [
         new webpack.ProvidePlugin({
           $: 'jquery',
