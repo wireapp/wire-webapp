@@ -48,8 +48,8 @@
   }
 
   &--disabled {
-    border-color: fade(@graphite, 24%);
-    color: @graphite;
+    border-color: var(--foreground-fade-24);
+    color: var(--foreground);
   }
 
   &--enabled {
@@ -65,7 +65,7 @@
   position: absolute;
   top: -4px;
   right: -9px;
-  background-color: #fff;
+  background-color: var(--app-bg-secondary);
   letter-spacing: 0;
   line-height: 14px;
 }

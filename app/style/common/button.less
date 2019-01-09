@@ -71,7 +71,7 @@
     &:active,
     &:focus {
       border-color: darken(fade(#fff, 32%), 16%);
-      background-color: fade(@graphite-dark, 16%);
+      background-color: var(--background-fade-16);
       color: darken(#fff, 16%);
     }
   }
@@ -155,7 +155,7 @@
     .label-xs;
 
     margin-left: 8px;
-    color: @graphite-dark;
+    color: var(--background);
     cursor: pointer;
   }
 

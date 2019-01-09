@@ -159,19 +159,19 @@
 
   display: block;
   margin: 8px 0 8px 16px;
-  border: 2px solid fade(@graphite-dark, 64%);
+  border: 2px solid var(--background-fade-64);
   border-radius: 12px;
 
   &::before {
     margin-left: 4px;
-    color: #fff;
+    color: var(--foreground);
     font-size: 12px;
     opacity: 0;
   }
 
   &.selected {
-    border: 2px solid @graphite-dark;
-    background-color: @graphite-dark;
+    border: 2px solid var(--background);
+    background-color: var(--background);
 
     &::before {
       opacity: 1;

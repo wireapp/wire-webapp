@@ -24,7 +24,7 @@
   bottom: 0;
   left: 0;
   display: flex;
-  width: @left-width;
+  width: @conversation-list-width;
   flex-direction: column;
 
   .team-mode & {
@@ -63,7 +63,7 @@
     .label-bold-xs;
 
     display: inline-block;
-    max-width: @left-width - 58px;
+    max-width: @conversation-list-width - 58px;
     line-height: 12px;
   }
 }
@@ -73,7 +73,7 @@
   .label-bold-xs;
 
   display: inline-block;
-  max-width: @left-width - 40px;
+  max-width: @conversation-list-width - 40px;
 }
 
 .left-list-header-close-button {
@@ -139,7 +139,7 @@
 
     &-dark {
       path {
-        fill: @graphite-dark;
+        fill: var(--background);
       }
     }
   }

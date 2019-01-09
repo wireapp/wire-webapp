@@ -521,6 +521,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyDown(data, keyboardEvent) {
+    const textAreaValue = $(keyboardEvent.target).val();
+
+    // Manually move the cursor when pressing "Page Up", and do nothing else
+    // see https://bugs.chromium.org/p/chromium/issues/detail?id=890248
+    if (keyboardEvent.keyCode === 33) {
+      keyboardEvent.target.setSelectionRange(0, 0);
+      return false;
+    }
+
+    // Manually move the cursor when pressing "Page Down", and do nothing else
+    if (keyboardEvent.keyCode === 34 && textAreaValue) {
+      keyboardEvent.target.setSelectionRange(textAreaValue.length, textAreaValue.length);
+      return false;
+    }
+
     const inputHandledByEmoji = !this.editedMention() && this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
     if (!inputHandledByEmoji) {
@@ -685,8 +700,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     amplify.publish(z.event.WebApp.INPUT.RESIZE, newInputHeight - previousInputHeight);
   }
 
-  sendGiphy() {
-    this._resetDraftState();
+  sendGiphy(gifUrl, tag) {
+    const conversationEntity = this.conversationEntity();
+    const replyMessageEntity = this.replyMessageEntity();
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
+      this.conversationRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+      this.cancelMessageEditing(true);
+    });
   }
 
   _generateQuote(replyMessageEntity) {

@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=notification/NotificationRepository yarn test:app
-
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 

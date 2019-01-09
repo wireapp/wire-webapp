@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=entity/User yarn test:app
-
 describe('z.entity.User', () => {
   describe('First Name', () => {
     it('can generate first name', () => {

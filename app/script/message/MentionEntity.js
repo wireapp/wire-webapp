@@ -31,6 +31,7 @@ z.message.MentionEntity = class MentionEntity {
       MISSING_START_INDEX: 'Invalid mention: Missing startIndex',
       MISSING_USER_ID: 'Invalid mention: Missing user ID',
       OUT_OF_BOUNDS: 'Invalid mention: Length out of string boundary',
+      OVERLAPPING: 'Invalid mention: Overlap with another mention',
     };
   }
 
@@ -52,7 +53,18 @@ z.message.MentionEntity = class MentionEntity {
     return this.startIndex + this.length;
   }
 
-  validate(messageText = '') {
+  validate(messageText = '', allMentions = []) {
+    if (allMentions.includes(this)) {
+      const mentionIndex = allMentions.indexOf(this);
+      const otherMentions = allMentions.slice(0, mentionIndex);
+      const isOverlapping = otherMentions.some(
+        mention => this.endIndex > mention.startIndex && this.startIndex < mention.endIndex
+      );
+      if (isOverlapping) {
+        throw new Error(MentionEntity.ERROR.OVERLAPPING);
+      }
+    }
+
     const startIndexIsNumber = typeof this.startIndex === 'number';
     if (!startIndexIsNumber) {
       throw new Error(MentionEntity.ERROR.MISSING_START_INDEX);
@@ -88,7 +100,7 @@ z.message.MentionEntity = class MentionEntity {
       throw new Error(MentionEntity.ERROR.INVALID_USER_ID);
     }
 
-    const isValidMention = messageText.substr(this.startIndex, 1) === '@';
+    const isValidMention = messageText.charAt(this.startIndex) === '@';
     if (!isValidMention) {
       throw new Error(MentionEntity.ERROR.INVALID_START_CHAR);
     }

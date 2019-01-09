@@ -218,9 +218,9 @@ ko.components.register('conversation-list-calling-cell', {
             <micoff-icon class="small-icon"></micoff-icon>
           </div>
           <!-- ko if: showVideoButton() -->
-            <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+            <button class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}, disable: disableVideoButton(), attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>
-            </div>
+            </button>
           <!-- /ko -->
           <!-- ko if: isConnected() -->
             <div class="call-ui__button" data-bind="tooltip: {text: z.string.videoCallScreenShareNotSupported, disabled: !disableScreenButton(), position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">

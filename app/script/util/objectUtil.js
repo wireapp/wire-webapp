@@ -17,8 +17,6 @@
  *
  */
 
-import {isObject, isArray} from 'underscore';
-
 /**
  * Creates an object copy and applies a mapping functions to all properties of that object.
  *
@@ -46,38 +44,3 @@ const mapRecursive = (object, mappingFunction) => {
  * @returns {Object} Object copy with escaped properties
  */
 export const escapeProperties = object => mapRecursive(object, _.escape);
-
-/**
- * Deep merges two high end entities together (containing observables)
- * This will allow fine grained change detection on the observable level.
- *
- * @param {Entity} destination - the object that will receive the properties from the source object
- * @param {Entity} source - the entity containing the data that will be fed to the destination
- * @param {string[]} ignoredProperties - list of properties that should be left untouched from the destination entity
- * @returns {Entity} mergedEntity
- */
-export const mergeEntities = (destination, source, ignoredProperties = []) => {
-  if (!isObject(source) || !isObject(destination) || isArray(source)) {
-    return source;
-  }
-
-  const properties = Object.entries(source).filter(([property]) => !ignoredProperties.includes(property));
-  const rawValues = properties.filter(([_, accessor]) => {
-    return typeof accessor !== 'function';
-  });
-
-  const deletedProperties = Object.keys(destination).filter(property => !source.hasOwnProperty(property));
-
-  const observableValues = properties.filter(([_, accessor]) => {
-    return ko.isObservable(accessor) && !ko.isComputed(accessor) && !ko.isPureComputed(accessor);
-  });
-
-  // update raw values first (in order to have them up to date when observables are updated)
-  rawValues.forEach(([property, value]) => (destination[property] = mergeEntities(destination[property], value)));
-  deletedProperties.forEach(property => delete destination[property]);
-  observableValues.forEach(([property, value]) => {
-    destination[property](mergeEntities(ko.unwrap(destination[property]), ko.unwrap(value)));
-  });
-
-  return destination;
-};

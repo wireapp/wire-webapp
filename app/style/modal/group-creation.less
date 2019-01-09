@@ -33,7 +33,7 @@
     width: 100%;
     flex-grow: 1;
     margin: 0;
-    background-color: @app-bg;
+    background-color: var(--app-bg);
   }
 
   .group-creation-modal-content {
@@ -68,14 +68,14 @@
   .group-creation-modal-teamname-input {
     height: 56px;
     margin: 60px 0 0;
-    background-color: #fff;
+    background-color: var(--group-creation-modal-teamname-input-bg);
     border-radius: 0;
-    color: @graphite-dark;
+    color: var(--background);
     line-height: 56px;
 
     &::placeholder {
       padding: 0 8px;
-      color: @graphite;
+      color: var(--foreground);
       font-size: @font-size-xs;
       transform: translateY(-2px);
     }
@@ -87,7 +87,7 @@
 
   .group-size-info {
     margin: 16px 16px 0;
-    color: @graphite;
+    color: var(--foreground);
     font-size: @font-size-xs;
     line-height: @line-height-sm;
   }

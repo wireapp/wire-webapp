@@ -23,8 +23,8 @@
   right: 16px;
   left: 64px;
   max-height: 150px;
-  border: 0.5px solid fade(@graphite-dark, 12%);
-  background-color: #fff;
+  border: 0.5px solid var(--background-fade-16);
+  background-color: var(--app-bg-secondary);
   border-radius: 8px;
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
 }
@@ -47,7 +47,7 @@
     padding: 0 12px;
 
     &--highlighted {
-      background-color: fade(@graphite-dark, 4%);
+      background-color: var(--background-fade-8);
     }
 
     participant-avatar {
@@ -63,7 +63,7 @@
 
     &__username,
     &__remaining {
-      color: fade(@graphite-dark, 40%);
+      color: var(--background-fade-40);
       font-size: 12px;
       line-height: 14px;
     }
@@ -81,7 +81,7 @@
         width: 12px;
         height: 12px;
         path {
-          fill: fade(@graphite-dark, 40%);
+          fill: var(--background-fade-40);
         }
       }
     }

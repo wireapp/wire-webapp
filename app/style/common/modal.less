@@ -79,7 +79,8 @@
     padding: @modal-padding;
     margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
 
-    background-color: #fff;
+    border: var(--modal-border-color);
+    background-color: var(--app-bg-secondary);
     border-radius: 4px;
     cursor: default;
 
@@ -123,15 +124,15 @@
     width: 100%;
     height: 28px;
     padding-left: 4px;
-    border: 1px solid fade(@graphite, 56%);
-    background: #fff;
+    border: 1px solid var(--foreground-fade-56);
+    background: var(--app-bg-secondary);
     border-radius: 4px;
     outline: none;
 
     &::placeholder {
       .label-xs;
 
-      color: fade(@graphite, 56%);
+      color: var(--foreground-fade-56);
     }
   }
 

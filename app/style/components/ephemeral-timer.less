@@ -22,8 +22,8 @@
 
 .ephemeral-timer {
   &__background {
-    fill: fade(@graphite, 16%);
-    stroke: @graphite;
+    fill: var(--foreground-fade-16);
+    stroke: var(--foreground);
     stroke-width: 1px;
   }
 
@@ -31,7 +31,7 @@
     animation-name: dial-animation;
     animation-timing-function: steps(40);
     fill: none;
-    stroke: @graphite;
+    stroke: var(--foreground);
     stroke-dasharray: @strokelength;
     stroke-dashoffset: @strokelength;
     stroke-width: @strokewidth;
