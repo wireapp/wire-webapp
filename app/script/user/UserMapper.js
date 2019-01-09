@@ -136,10 +136,7 @@ z.user.UserMapper = class UserMapper {
       if (this.serverTimeRepository.timeOffset() !== undefined) {
         setAdjustedTimestamp();
       } else {
-        const timeOffsetSubscription = this.serverTimeRepository.timeOffset.subscribe(() => {
-          setAdjustedTimestamp();
-          timeOffsetSubscription.dispose();
-        });
+        this.serverTimeRepository.timeOffset.subscribe_once(setAdjustedTimestamp);
       }
     }
 
