@@ -19,6 +19,8 @@
 
 import Dexie from 'dexie';
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 class StorageService {
   // Construct an new StorageService.
   constructor() {
@@ -45,7 +47,7 @@ class StorageService {
    */
   init(userId = this.userId) {
     return Promise.resolve().then(() => {
-      const isPermanent = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
+      const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.userId = userId;

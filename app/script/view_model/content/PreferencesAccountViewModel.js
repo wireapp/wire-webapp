@@ -22,6 +22,7 @@ import {groupBy} from 'underscore';
 import backendEvent from '../../event/Backend';
 import PropertiesRepository from '../../properties/PropertiesRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
+import * as StorageUtil from 'utils/StorageUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -65,10 +66,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
 
-    this.notifications = ko.observableArray([]);
+    const notificationsStorageKey = 'preferences_notifications';
+    const storedNotifications = StorageUtil.getValue(notificationsStorageKey);
+    this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
     this.notifications.subscribe(notifications => {
-      const event = notifications.length > 0 ? z.event.WebApp.SEARCH.BADGE.SHOW : z.event.WebApp.SEARCH.BADGE.HIDE;
-      amplify.publish(event);
+      return notifications.length > 0
+        ? StorageUtil.setValue(notificationsStorageKey, JSON.stringify(notifications))
+        : StorageUtil.resetValue(notificationsStorageKey);
     });
 
     this.name = ko.pureComputed(() => this.selfUser().name());

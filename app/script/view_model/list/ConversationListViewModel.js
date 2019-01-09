@@ -104,7 +104,9 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
 
-    this.showBadge = ko.observable(false);
+    this.showBadge = ko.pureComputed(() => {
+      return this.contentViewModel.preferencesAccount.notifications().length > 0;
+    });
 
     this._initSubscriptions();
   }
@@ -113,8 +115,6 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setShowCallsState.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.showBadge(true));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.showBadge(false));
   }
 
   clickOnAvailability(viewModel, event) {

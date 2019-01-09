@@ -189,10 +189,6 @@ z.event.WebApp = {
     UPDATED: 'wire.webapp.properties.updated',
   },
   SEARCH: {
-    BADGE: {
-      HIDE: 'wire.webapp.search.badge.hide',
-      SHOW: 'wire.webapp.search.badge.show',
-    },
     HIDE: 'wire.webapp.search.hide',
     SHOW: 'wire.webapp.search.show',
   },
