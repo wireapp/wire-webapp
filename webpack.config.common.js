@@ -89,6 +89,7 @@ module.exports = {
   resolve: {
     alias: {
       components: path.resolve(__dirname, `${appSrc}/components/`),
+      utils: path.resolve(__dirname, `${appSrc}/util/`),
       // override phoneformat export, because the 'main' file is not exporting anything
       'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
     },

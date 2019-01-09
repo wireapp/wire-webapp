@@ -20,18 +20,15 @@
 'use strict';
 import {amplify} from 'amplify';
 
-window.z = window.z || {};
-window.z.util = z.util || {};
+export function getValue(key) {
+  return amplify.store(key);
+}
 
-z.util.StorageUtil = {
-  getValue: function(key) {
-    return amplify.store(key);
-  },
-  resetValue: function(key) {
-    return z.util.StorageUtil.setValue(key, null);
-  },
-  setValue: function(key, value, secondsToExpire) {
-    const config = secondsToExpire ? {expires: secondsToExpire * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND} : undefined;
-    return amplify.store(key, value, config);
-  },
-};
+export function resetValue(key) {
+  return setValue(key, null);
+}
+
+export function setValue(key, value, secondsToExpire) {
+  const config = secondsToExpire ? {expires: secondsToExpire * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND} : undefined;
+  return amplify.store(key, value, config);
+}

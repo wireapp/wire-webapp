@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -306,7 +308,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       // we only save state for newly written messages
       reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      z.util.StorageUtil.setValue(storageKey, {mentions, reply, text});
+      StorageUtil.setValue(storageKey, {mentions, reply, text});
     }
   }
 
@@ -316,7 +318,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = z.util.StorageUtil.getValue(storageKey);
+    const storageValue = StorageUtil.getValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {}, text: ''};

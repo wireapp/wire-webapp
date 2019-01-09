@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
@@ -83,8 +85,8 @@ z.auth.AuthRepository = class AuthRepository {
   login(login, persist) {
     return this.authService.postLogin(login, persist).then(accessTokenResponse => {
       this.saveAccessToken(accessTokenResponse);
-      z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, persist);
-      z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, persist);
+      StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
       return accessTokenResponse;
     });
   }
@@ -148,10 +150,10 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {undefined} No return value
    */
   deleteAccessToken() {
-    z.util.StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-    z.util.StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
-    z.util.StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL);
-    z.util.StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
+    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL);
+    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
   }
 
   /**
@@ -160,13 +162,13 @@ z.auth.AuthRepository = class AuthRepository {
    */
   getCachedAccessToken() {
     return new Promise((resolve, reject) => {
-      const accessToken = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      const accessTokenType = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+      const accessToken = StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+      const accessTokenType = StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (accessToken) {
         this.logger.info('Cached access token found in Local Storage', {accessToken});
         this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
-        this._scheduleTokenRefresh(z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
+        this._scheduleTokenRefresh(StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
       }
 
@@ -196,10 +198,10 @@ z.auth.AuthRepository = class AuthRepository {
     const expiresInMillis = expiresIn * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
+    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
+    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
+    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
+    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
 
     this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 
