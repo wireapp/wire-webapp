@@ -129,11 +129,18 @@ z.user.UserMapper = class UserMapper {
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
-      const timeOffsetSubscription = this.serverTimeRepository.timeOffset.subscribe(() => {
+      const setAdjustedTimestamp = () => {
         const adjustedTimestamp = this.serverTimeRepository.toLocalTimestamp(new Date(expirationDate).getTime());
         userEntity.setGuestExpiration(adjustedTimestamp);
-        timeOffsetSubscription.dispose();
-      });
+      };
+      if (this.serverTimeRepository.timeOffset() !== undefined) {
+        setAdjustedTimestamp();
+      } else {
+        const timeOffsetSubscription = this.serverTimeRepository.timeOffset.subscribe(() => {
+          setAdjustedTimestamp();
+          timeOffsetSubscription.dispose();
+        });
+      }
     }
 
     if (handle) {
