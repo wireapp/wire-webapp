@@ -25,7 +25,7 @@ const {execSync} = require('child_process');
 const {resolve, join} = require('path');
 const pkg = require('../package');
 
-const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default';
+const defaultGitConfigurationUrl = 'https://github.com/wireapp/wire-web-config-default#v0.1.4';
 const gitConfigurationUrl = process.env.WIRE_CONFIGURATION_REPOSITORY || defaultGitConfigurationUrl;
 
 console.log(`Loading configuration for project "${pkg.name}" from "${gitConfigurationUrl}"`);
