@@ -33,6 +33,7 @@ declare global {
           MOBILE_BASE: string;
           TEAMS_BASE: string;
           WEBSITE_BASE: string;
+          SUPPORT_BASE: string;
         };
         VERSION: string;
         FEATURE: {
@@ -56,6 +57,7 @@ export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
 export const URL = window.wire.env.URL || {
   ACCOUNT_BASE: 'https://account.wire.com',
   MOBILE_BASE: '/',
+  SUPPORT_BASE: 'https://support.wire.com',
   TEAMS_BASE: 'https://teams.wire.com',
   WEBSITE_BASE: 'https://wire.com',
 };

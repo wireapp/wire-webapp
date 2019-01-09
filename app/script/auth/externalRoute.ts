@@ -27,6 +27,7 @@ export default {
   WIRE_ACCOUNT: config.URL.ACCOUNT_BASE,
   WIRE_ACCOUNT_PASSWORD_RESET: `${config.URL.ACCOUNT_BASE}/forgot/`,
   WIRE_PRIVACY_POLICY: `${config.URL.WEBSITE_BASE}/legal/#privacy`,
+  WIRE_SUPPORT: config.URL.SUPPORT_BASE,
   WIRE_TEAM_FEATURES: `${config.URL.WEBSITE_BASE}/create-team/#features`,
   WIRE_TERMS_PERSONAL: `${config.URL.WEBSITE_BASE}/legal/terms/#personal`,
   WIRE_TERMS_TEAMS: `${config.URL.WEBSITE_BASE}/legal/terms/#teams`,
