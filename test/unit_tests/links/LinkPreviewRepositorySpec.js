@@ -17,9 +17,7 @@
  *
  */
 
-import PropertiesRepository from 'app/script/properties/PropertiesRepository';
-
-// KARMA_SPECS=links/LinkPreviewRepository yarn test:app
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;

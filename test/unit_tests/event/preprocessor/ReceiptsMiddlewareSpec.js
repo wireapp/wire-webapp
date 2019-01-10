@@ -20,7 +20,7 @@
 // KARMA_SPECS=event/preprocessor/ReceiptsMiddleware yarn test:app
 
 import UUID from 'uuidjs';
-import ReceiptsMiddleware from 'app/script/event/preprocessor/ReceiptsMiddleware';
+import ReceiptsMiddleware from 'src/script/event/preprocessor/ReceiptsMiddleware';
 
 describe('ReceiptsMiddleware', () => {
   const noop = () => {};

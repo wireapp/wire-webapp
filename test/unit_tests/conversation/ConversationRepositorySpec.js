@@ -17,8 +17,7 @@
  *
  */
 
-// KARMA_SPECS=conversation/ConversationRepository yarn test:app
-import Conversation from 'app/script/entity/Conversation';
+import Conversation from 'src/script/entity/Conversation';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -32,9 +31,8 @@ describe('ConversationRepository', () => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
   };
 
-  const _generate_asset_message = (state, uploaded_on_this_client = false) => {
+  const _generate_asset_message = state => {
     const file_et = new z.entity.File();
-    file_et.uploaded_on_this_client(uploaded_on_this_client);
     file_et.status(state);
     const message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
     message_et.assets.push(file_et);
@@ -164,6 +162,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should send delete and deletes message for own messages', () => {
+      spyOn(TestFactory.event_service, 'deleteEvent');
       const userEntity = new z.entity.User();
       userEntity.is_me = true;
       const messageEntityToDelete = new z.entity.Message();
@@ -175,12 +174,10 @@ describe('ConversationRepository', () => {
         Promise.resolve(conversation_et)
       );
 
-      expect(conversation_et.getMessage(messageEntityToDelete.id)).toBeDefined();
-
       return TestFactory.conversation_repository
         .deleteMessageForEveryone(conversation_et, messageEntityToDelete)
         .then(() => {
-          expect(conversation_et.getMessage(messageEntityToDelete.id)).not.toBeDefined();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
         });
     });
   });
@@ -348,18 +345,18 @@ describe('ConversationRepository', () => {
   describe('get_number_of_pending_uploads', () => {
     it('should return number of pending uploads if there are pending uploads', () => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
 
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
 
       conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING, true));
+      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
+      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOAD_PENDING));
+
+      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
+
+      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
       conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
 
       expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
@@ -775,6 +772,7 @@ describe('ConversationRepository', () => {
       });
 
       it('should delete message if user is self', () => {
+        spyOn(TestFactory.event_service, 'deleteEvent');
         const message_delete_event = {
           conversation: conversation_et.id,
           data: {
@@ -789,12 +787,13 @@ describe('ConversationRepository', () => {
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
           expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-          expect(conversation_et.getMessage(message_et.id)).not.toBeDefined();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
           expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
         });
       });
 
       it('should delete message and add delete message if user is not self', () => {
+        spyOn(TestFactory.event_service, 'deleteEvent');
         const other_user_id = z.util.createRandomUuid();
         message_et.from = other_user_id;
 
@@ -812,12 +811,13 @@ describe('ConversationRepository', () => {
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
           expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-          expect(conversation_et.getMessage(message_et.id)).not.toBeDefined();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
           expect(TestFactory.conversation_repository._addDeleteMessage).toHaveBeenCalled();
         });
       });
 
       it('should delete message and skip adding delete message for ephemeral messages', () => {
+        spyOn(TestFactory.event_service, 'deleteEvent');
         const other_user_id = z.util.createRandomUuid();
         message_et.from = other_user_id;
         message_et.ephemeral_expires(true);
@@ -836,7 +836,7 @@ describe('ConversationRepository', () => {
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         return TestFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
           expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
-          expect(conversation_et.getMessage(message_et.id)).not.toBeDefined();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
           expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
         });
       });
@@ -885,6 +885,7 @@ describe('ConversationRepository', () => {
       });
 
       it('should hide message if sender is self user', () => {
+        spyOn(TestFactory.event_service, 'deleteEvent');
         const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
@@ -901,11 +902,12 @@ describe('ConversationRepository', () => {
 
         return TestFactory.conversation_repository._handleConversationEvent(messageHiddenEvent).then(() => {
           expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-          expect(conversation_et.getMessage(messageId)).not.toBeDefined();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
         });
       });
 
       it('should not hide message if not send via self conversation', () => {
+        spyOn(TestFactory.event_service, 'deleteEvent');
         const messageHiddenEvent = {
           conversation: z.util.createRandomUuid(),
           data: {
@@ -922,7 +924,28 @@ describe('ConversationRepository', () => {
 
         return TestFactory.conversation_repository._onMessageHidden(messageHiddenEvent).then(() => {
           expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
-          expect(conversation_et.getMessage(messageId)).not.toBeDefined();
+          expect(TestFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      it('syncs message deletion with the database', () => {
+        const deletedMessagePayload = {
+          conversation: z.util.createRandomUuid(),
+          id: z.util.createRandomUuid(),
+        };
+
+        const conversationEntity = new Conversation();
+        spyOn(conversationEntity, 'remove_message_by_id');
+
+        const conversationRepository = TestFactory.conversation_repository;
+        spyOn(conversationRepository, 'find_conversation_by_id').and.returnValue(Promise.resolve(conversationEntity));
+
+        return conversationRepository._deleteLocalMessageEntity({oldObj: deletedMessagePayload}).then(() => {
+          expect(conversationRepository.find_conversation_by_id).toHaveBeenCalledWith(
+            deletedMessagePayload.conversation
+          );
+
+          expect(conversationEntity.remove_message_by_id).toHaveBeenCalledWith(deletedMessagePayload.id);
         });
       });
     });

@@ -17,7 +17,7 @@
  *
  */
 
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv-extended';
 import * as fs from 'fs-extra';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as logdown from 'logdown';
@@ -33,7 +33,7 @@ const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 const VERSION_FILE = path.join(__dirname, 'version');
 
 if (nodeEnvironment === 'development') {
-  dotenv.config();
+  dotenv.load();
 }
 
 const defaultCSP: HelmetCSP = {

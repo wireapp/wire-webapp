@@ -1,0 +1,73 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// Custom checkbox component using Wire icon font
+// Checkbox can be style using 'text-theme'
+// Example:
+//
+//<div class="checkbox text-theme">
+//  <input type="checkbox" id="checkbox" name="check"/>
+//  <label for="checkbox"><div>Option</div></label>
+//</div>
+//
+.checkbox {
+  display: inline-block;
+
+  input[type='checkbox'] {
+    position: absolute;
+    left: @offscreen-left;
+    opacity: 0;
+
+    &:checked + label {
+      &::after {
+        content: '\e601';
+      }
+    }
+  }
+
+  label {
+    position: relative;
+    display: inline-block;
+    padding-left: 24px;
+    cursor: pointer;
+    line-height: @font-size-sm;
+    user-select: none;
+
+    &::after {
+      .font-antialiasing;
+
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: '\e600';
+      font-family: Wire;
+      font-size: @icon-size-sm;
+      font-style: normal;
+      font-variant: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-transform: none;
+    }
+
+    > div {
+      color: var(--background) !important;
+      line-height: 16px;
+    }
+  }
+}

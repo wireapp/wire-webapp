@@ -3,8 +3,8 @@ base_path: .
 
 files:
   -
-    source: '/app/script/localization/webapp.js'
-    translation: '/app/script/localization/translations/webapp-%locale%.js'
+    source: '/src/script/localization/webapp.js'
+    translation: '/src/script/localization/translations/webapp-%locale%.js'
     type: 'properties_play'
     update_option: 'update_as_unapproved'
   -

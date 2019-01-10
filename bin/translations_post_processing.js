@@ -19,7 +19,8 @@
 
 const {join, resolve} = require('path');
 const fs = require('fs');
-const SUPPORTED_LOCALE = require('../app/script/auth/supportedLocales');
+const {SRC_PATH} = require('../locations');
+const SUPPORTED_LOCALE = require(resolve(SRC_PATH, 'script/auth/supportedLocales'));
 
 const root = resolve(__dirname, '..');
 const translationsDir = resolve(root, process.argv[2] || '');

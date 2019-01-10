@@ -17,6 +17,4 @@
  *
  */
 
-// KARMA_SPECS=event/EventService yarn test:app
-
 window.testEventServiceClass('event_service_no_compound', 'z.event.EventServiceNoCompound');
