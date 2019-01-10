@@ -36,10 +36,20 @@ z.links.LinkPreviewProtoBuilder = {
       data.url = data.url || url;
 
       if (data.title && data.url) {
-        const protoArticle = new z.proto.Article(data.url, data.title, data.description); // deprecated format
+        const {description = '', title = '', url: dataUrl} = data;
 
-        const {description, title, url: dataUrl} = data;
-        const protoLinkPreview = new z.proto.LinkPreview(url, offset, protoArticle, dataUrl, title, description);
+        const truncatedDescription = z.util.StringUtil.truncate(description, 200);
+        const truncatedTitle = z.util.StringUtil.truncate(title, 200);
+
+        const protoArticle = new z.proto.Article(dataUrl, truncatedTitle, truncatedDescription); // deprecated format
+        const protoLinkPreview = new z.proto.LinkPreview(
+          url,
+          offset,
+          protoArticle,
+          dataUrl,
+          truncatedTitle,
+          truncatedDescription
+        );
 
         if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.isTweet(data.url)) {
           const author = data.title.replace('on Twitter', '').trim();
@@ -47,7 +57,7 @@ z.links.LinkPreviewProtoBuilder = {
           const protoTweet = new z.proto.Tweet(author, username);
 
           protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.TWEET, protoTweet);
-          protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE, data.description);
+          protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE, truncatedTitle);
         }
 
         return protoLinkPreview;
