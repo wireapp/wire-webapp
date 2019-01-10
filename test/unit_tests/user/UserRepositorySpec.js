@@ -33,7 +33,33 @@ describe('z.user.UserRepository', () => {
     server.restore();
   });
 
-  describe('users', () => {
+  describe('Account preferences ', () => {
+    describe('Privacy', () => {
+      it('syncs the "Read receipts" preference through WebSocket events', () => {
+        const turnOnReceiptMode = {
+          key: 'WIRE_RECEIPT_MODE',
+          type: 'user.properties-set',
+          value: 1,
+        };
+        const turnOffReceiptMode = {
+          key: 'WIRE_RECEIPT_MODE',
+          type: 'user.properties-delete',
+        };
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const receiptMode = TestFactory.user_repository.propertyRepository.receiptMode;
+
+        expect(receiptMode()).toBe(0);
+        TestFactory.user_repository.on_user_event(turnOnReceiptMode, source);
+
+        expect(receiptMode()).toBe(1);
+        TestFactory.user_repository.on_user_event(turnOffReceiptMode, source);
+
+        expect(receiptMode()).toBe(0);
+      });
+    });
+  });
+
+  describe('User handling', () => {
     describe('fetchUsersById', () => {
       it('should handle malformed input', () => {
         return TestFactory.user_repository
