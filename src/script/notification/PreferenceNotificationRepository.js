@@ -44,8 +44,6 @@ class PreferenceNotificationRepository {
    * @param {Observable<User>} selfUserObservable - an observable that contains the self user
    */
   constructor(selfUserObservable) {
-    this.selfUser = selfUserObservable;
-
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
     const storedNotifications = StorageUtil.getValue(notificationsStorageKey);
     this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
@@ -55,8 +53,16 @@ class PreferenceNotificationRepository {
         : StorageUtil.resetValue(notificationsStorageKey);
     });
 
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
+    const executeIfSelfUser = callback => {
+      return (userId, data) => {
+        if (userId === selfUserObservable().id) {
+          callback(userId, data);
+        }
+      };
+    };
+
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, executeIfSelfUser(this.onClientAdd.bind(this)));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, executeIfSelfUser(this.onClientRemove.bind(this)));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
@@ -78,24 +84,17 @@ class PreferenceNotificationRepository {
   }
 
   onClientAdd(userId, clientEntity) {
-    const isSelfUser = userId === this.selfUser().id;
-    if (isSelfUser) {
-      this.notifications.push({
-        data: clientEntity,
-        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
-      });
-    }
+    this.notifications.push({
+      data: clientEntity,
+      type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+    });
   }
 
   onClientRemove(userId, clientId) {
-    const isSelfUser = userId === this.selfUser().id;
-    if (isSelfUser) {
-      this.notifications.remove(({data: clientEntity}) => {
-        const isExpectedId = clientEntity.id === clientId;
-        return isExpectedId && clientEntity.isPermanent();
-      });
-    }
-    return true;
+    this.notifications.remove(({data: clientEntity}) => {
+      const isExpectedId = clientEntity.id === clientId;
+      return isExpectedId && clientEntity.isPermanent();
+    });
   }
 
   onUserEvent(event) {
