@@ -7,6 +7,7 @@
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@bower_components/wire-theme": "wireapp/wire-theme#v1.0.6",
+    "wire-web-config-default": "https://github.com/wireapp/wire-web-config-default#v0.3.0",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/core": "8.1.9",
     "@wireapp/react-ui-kit": "4.3.6",
