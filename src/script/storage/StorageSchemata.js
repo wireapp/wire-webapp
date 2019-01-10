@@ -310,6 +310,10 @@ z.storage.StorageSchemata = class StorageSchemata {
         },
         version: 15,
       },
+      {
+        schema: {},
+        version: 16,
+      },
     ];
   }
 };

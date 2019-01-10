@@ -231,9 +231,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
 
     this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
+    this.eventService.addEventDeletedListener(this._deleteLocalMessageEntity.bind(this));
   }
 
-  _updateLocalMessageEntity(updatedEvent, oldEvent) {
+  _updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}) {
     this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
       const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
       if (replacedMessageEntity) {
@@ -241,6 +242,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
         });
       }
+    });
+  }
+
+  _deleteLocalMessageEntity({oldObj: deletedEvent}) {
+    return this.find_conversation_by_id(deletedEvent.conversation).then(conversationEntity => {
+      conversationEntity.remove_message_by_id(deletedEvent.id);
     });
   }
 
@@ -3740,7 +3747,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when message was deleted
    */
   _delete_message(conversation_et, message_et) {
-    conversation_et.remove_message_by_id(message_et.id);
     return this.eventService.deleteEventByKey(message_et.primary_key);
   }
 
@@ -3753,7 +3759,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when message was deleted
    */
   _delete_message_by_id(conversation_et, message_id) {
-    conversation_et.remove_message_by_id(message_id);
     return this.eventService.deleteEvent(conversation_et.id, message_id);
   }
 
@@ -3766,7 +3771,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _deleteMessages(conversationEntity, timestamp) {
-    conversationEntity.remove_messages(timestamp);
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
