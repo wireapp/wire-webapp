@@ -67,6 +67,3 @@ files.forEach(([dir, file]) => {
   fs.mkdirpSync(resolve(dir));
   fs.copySync(source, destination);
 });
-
-console.log(`Cleaning config directory "${configDir}"`);
-fs.removeSync(configDir);

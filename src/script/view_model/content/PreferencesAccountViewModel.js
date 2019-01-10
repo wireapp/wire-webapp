@@ -17,12 +17,8 @@
  *
  */
 
-import {groupBy} from 'underscore';
-
-import backendEvent from '../../event/Backend';
-import PropertiesRepository from '../../properties/PropertiesRepository';
+import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
-import * as StorageUtil from 'utils/StorageUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -31,10 +27,6 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get CONFIG() {
     return {
-      NOTIFICATION_TYPES: {
-        NEW_CLIENT: 'new-client',
-        READ_RECEIPTS_CHANGED: 'read-receipt-changed',
-      },
       PROFILE_IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
@@ -59,21 +51,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
+    this.preferenceNotificationRepository = repositories.preferenceNotification;
     this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
-
-    const notificationsStorageKey = 'preferences_notifications';
-    const storedNotifications = StorageUtil.getValue(notificationsStorageKey);
-    this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
-    this.notifications.subscribe(notifications => {
-      return notifications.length > 0
-        ? StorageUtil.setValue(notificationsStorageKey, JSON.stringify(notifications))
-        : StorageUtil.resetValue(notificationsStorageKey);
-    });
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
@@ -121,21 +105,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
-  }
-
-  onUserEvent(event) {
-    if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
-      if (event.key === PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key) {
-        const defaultValue = !!PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue;
-        this.notifications.push({
-          data: event.value === undefined ? defaultValue : !!event.value,
-          type: PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
-        });
-      }
-    }
   }
 
   changeAccentColor(id) {
@@ -212,25 +181,16 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   popNotification() {
-    if (!this.notifications().length) {
-      return;
-    }
-    const notificationPriorities = [
-      PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
-      PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
-    ];
-    const groupedNotifications = groupBy(this.notifications(), notification => notification.type);
-    for (const type of notificationPriorities) {
-      if (groupedNotifications[type]) {
-        this.notifications.remove(notification => notification.type === type);
-        return this._showNotification(type, groupedNotifications[type], this.popNotification.bind(this));
-      }
+    const notificationData = this.preferenceNotificationRepository.popNotification();
+    if (notificationData) {
+      const {type, notification} = notificationData;
+      return this._showNotification(type, notification, this.popNotification.bind(this));
     }
   }
 
   _showNotification(type, aggregatedNotifications, closeAction) {
     switch (type) {
-      case PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
+      case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
           close: closeAction,
           data: aggregatedNotifications.map(notification => notification.data),
@@ -242,7 +202,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         break;
       }
 
-      case PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
+      case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
           close: closeAction,
           data: aggregatedNotifications.pop().data,
@@ -319,27 +279,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   clickOnResetPassword() {
     const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, URL_PATH.PASSWORD_RESET);
     z.util.SanitizationUtil.safeWindowOpen(url);
-  }
-
-  onClientAdd(userId, clientEntity) {
-    const isSelfUser = userId === this.selfUser().id;
-    if (isSelfUser) {
-      this.notifications.push({
-        data: clientEntity,
-        type: PreferencesAccountViewModel.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
-      });
-    }
-  }
-
-  onClientRemove(userId, clientId) {
-    const isSelfUser = userId === this.selfUser().id;
-    if (isSelfUser) {
-      this.notifications.remove(({data: clientEntity}) => {
-        const isExpectedId = clientEntity.id === clientId;
-        return isExpectedId && clientEntity.isPermanent();
-      });
-    }
-    return true;
   }
 
   removedFromView() {

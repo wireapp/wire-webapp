@@ -21,6 +21,7 @@ import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
+import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import DebugUtil from '../util/DebugUtil';
 
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
@@ -198,6 +199,7 @@ class App {
       repositories.permission,
       repositories.user
     );
+    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
     repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
