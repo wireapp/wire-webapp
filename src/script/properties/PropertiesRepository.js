@@ -208,10 +208,16 @@ class PropertiesRepository {
 
   // Map a property and set it into our state
   setProperty(key, value) {
-    this.logger.info(`Setting key "${key}" to value "${value}"...`);
+    this.logger.info(`Setting key "${key}"...`, value);
+
     switch (key) {
+      case PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS:
+        if (this.properties.version === value.version) {
+          this.properties = {...this.properties, ...value};
+          this._publishProperties();
+        }
+        break;
       case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
-        value = JSON.parse(value);
         this.receiptMode(value);
         break;
     }
