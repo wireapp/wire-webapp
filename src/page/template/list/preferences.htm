@@ -14,18 +14,18 @@
         <div class="center-column" data-bind="l10n_text: z.string.preferencesDevices"></div>
       </li>
       <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnOptions, css: {'text-theme': selectedOptions}" data-uie-name="go-options">
-        <div class="left-column-icon icon-options"></div>
+        <options-icon class="left-column-icon"></options-icon>
         <div class="center-column" data-bind="l10n_text: z.string.preferencesOptions"></div>
       </li>
       <!-- ko if: z.calling.CallingRepository.supportsCalling -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAV, css: {'text-theme': selectedAV}" data-uie-name="go-audio-video">
-          <div class="left-column-icon icon-av"></div>
+          <av-icon class="left-column-icon"></av-icon>
           <div class="center-column" data-bind="l10n_text: z.string.preferencesAV"></div>
         </li>
       <!-- /ko -->
       <!-- ko ifnot: z.util.Environment.desktop -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAbout, css: {'text-theme': selectedAbout}" data-uie-name="go-about">
-          <div class="left-column-icon icon-wire"></div>
+          <about-icon class="left-column-icon"></about-icon>
           <div class="center-column" data-bind="l10n_text: z.string.preferencesAbout"></div>
         </li>
       <!-- /ko -->
