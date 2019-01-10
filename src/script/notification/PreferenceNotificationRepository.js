@@ -26,7 +26,6 @@ import * as StorageUtil from 'utils/StorageUtil';
 
 /**
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
- *
  */
 class PreferenceNotificationRepository {
   static get CONFIG() {
