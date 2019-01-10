@@ -12,12 +12,13 @@
     proxy-agent "^3.0.3"
     ws "^6.0.0"
 
-"@pm2/agent@^0.5.11":
-  version "0.5.20"
-  resolved "https://registry.yarnpkg.com/@pm2/agent/-/agent-0.5.20.tgz#48afdd19d92554a4a95c428ec591fb6f4eecec18"
-  integrity sha512-WKZZ1fVlLjwWmN0qBpmR4Q3N8uV7KX5lq4D97ac1vEGHeO58I4GayabqYw7nxg2G/XFPdNIhLX6OrALEGFvv6Q==
+"@pm2/agent@^0.5.22":
+  version "0.5.22"
+  resolved "https://registry.yarnpkg.com/@pm2/agent/-/agent-0.5.22.tgz#df1558b9fd077ae0b6e9cc3c6f13449746d063d6"
+  integrity sha512-f858kJafdzRwl00xUlbrw/bBSY3P7jubNFCkxQ2CVACW/XU40GRz2aWmddgR7lrIPrnQQWUq3fr/ENEJnnSZ7w==
   dependencies:
     async "^2.6.0"
+    chalk "^2.3.2"
     eventemitter2 "^5.0.1"
     fclone "^1.0.11"
     moment "^2.21.0"
@@ -44,10 +45,10 @@
     tslib "1.9.3"
     vxx "1.2.2"
 
-"@pm2/js-api@^0.5.15":
-  version "0.5.35"
-  resolved "https://registry.yarnpkg.com/@pm2/js-api/-/js-api-0.5.35.tgz#75726d09dc022abd2f5e6732168e1727d774361b"
-  integrity sha512-9hbstLp+40i7BvqLlKbse1jq0mnkhm3yt70X6G17rGASS6VSlo3LqzdDRSZFWeCOMsNs3mS2vWlAbHB521774g==
+"@pm2/js-api@^0.5.43":
+  version "0.5.43"
+  resolved "https://registry.yarnpkg.com/@pm2/js-api/-/js-api-0.5.43.tgz#6460a929fbb0816b78a27fa59e4eef7e4120be41"
+  integrity sha512-mRSjJM6JBu5Bophz8xQiRLlE5/SyLeQM3KW0xmUkiCiGoqnNoYVhaGm+JTsaxB94NDHiPIlwww+hbQktMGW2vQ==
   dependencies:
     async "^2.4.1"
     axios "^0.16.2"
@@ -541,10 +542,10 @@ chalk@^1.1.3:
     strip-ansi "^3.0.0"
     supports-color "^2.0.0"
 
-chalk@^2.3.0, chalk@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.1.tgz#18c49ab16a037b6eb0152cc83e3471338215b66e"
-  integrity sha512-ObN6h1v2fTJSmUXoS3nMQ92LbDK9be4TV+6G+omQlGJFdcUX5heKi1LZ1YnRMIgwTLEj3E24bT6tYni50rlCfQ==
+chalk@^2.3.0, chalk@^2.3.2, chalk@^2.4.1:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
+  integrity sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==
   dependencies:
     ansi-styles "^3.2.1"
     escape-string-regexp "^1.0.5"
@@ -1980,15 +1981,10 @@ moment-timezone@^0.5.x:
   dependencies:
     moment ">= 2.9.0"
 
-moment@2.23.0:
+moment@2.23.0, "moment@>= 2.9.0", moment@^2.21.0, moment@^2.22.2:
   version "2.23.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.23.0.tgz#759ea491ac97d54bac5ad776996e2a58cc1bc225"
   integrity sha512-3IE39bHVqFbWWaPOMHZF98Q9c3LDKGTmypMiTM2QygGXXElkFWIH7GxfmlwmY2vwa+wmNsoYZmG2iusf1ZjJoA==
-
-"moment@>= 2.9.0", moment@^2.21.0, moment@^2.22.2:
-  version "2.22.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
-  integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
 ms@2.0.0:
   version "2.0.0"
@@ -2314,10 +2310,10 @@ pm2-axon@3.3.0, pm2-axon@^3.2.0:
     debug "^3.0"
     escape-regexp "0.0.1"
 
-pm2-deploy@^0.3.9:
-  version "0.3.10"
-  resolved "https://registry.yarnpkg.com/pm2-deploy/-/pm2-deploy-0.3.10.tgz#5b6689df8db2390589244b7c15c563bd467093f6"
-  integrity sha512-WagPKsX+LDCe8wLCL5nzu8RQvVUQ5GlFdJRVYCL0ogFnHfYRym91qNU4PkNSWSq11pdvG8la7DTjdW6FWXc8lw==
+pm2-deploy@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/pm2-deploy/-/pm2-deploy-0.4.0.tgz#d543076919f7776c57eb75841a4320f547287661"
+  integrity sha512-3BdCghcGwMKwl3ffHZhc+j5JY5dldH9nq8m/I9W5wehJuSRZIyO96VOgKTMv3hYp7Yk5E+2lRGm8WFNlp65vOA==
   dependencies:
     async "^2.6"
     tv4 "^1.3"
@@ -2329,14 +2325,14 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@3.2.4:
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.2.4.tgz#fb9c0ed402e04ce8f6d6e1ae935a765aa0e95c89"
-  integrity sha512-UlMsa8Tbdq5B9LJWW+sEZ1xpQv/lP7pkXKpyT2jyvIWOy+IzO60MGsLvkNEmPdyzgwi/S1qQK/FM/4DCCAu37w==
+pm2@3.2.7:
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.2.7.tgz#1ef9bf54c8203c07383155e83f4382daedd1c11b"
+  integrity sha512-nkJdCfdx1f5F1zPEQTEPmJ6iF+VfntEPo8MKvjcrRxq8NbMlkHjarRl09UnRaa3LcJOzi5kqY3w41Qsj3wyIvQ==
   dependencies:
-    "@pm2/agent" "^0.5.11"
+    "@pm2/agent" "^0.5.22"
     "@pm2/io" "~2.4.2"
-    "@pm2/js-api" "^0.5.15"
+    "@pm2/js-api" "^0.5.43"
     async "^2.6.1"
     blessed "^0.1.81"
     chalk "^2.4.1"
@@ -2355,7 +2351,7 @@ pm2@3.2.4:
     pidusage "^2.0.14"
     pm2-axon "3.3.0"
     pm2-axon-rpc "^0.5.1"
-    pm2-deploy "^0.3.9"
+    pm2-deploy "^0.4.0"
     pm2-multimeter "^0.1.2"
     promptly "^2"
     semver "^5.5"

@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.media = z.media || {};
 
@@ -88,13 +90,13 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   _setCurrentDevices() {
     const defaultDeviceId = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE_ID;
 
-    const audioInputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
+    const audioInputId = StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
     this.currentDeviceId.audioInput(audioInputId);
 
-    const audioOutputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
+    const audioOutputId = StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
     this.currentDeviceId.audioOutput(audioOutputId);
 
-    const videoInputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT);
+    const videoInputId = StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT);
     this.currentDeviceId.videoInput(videoInputId);
 
     const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.deviceSupport.videoInput();
@@ -150,7 +152,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
-      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
+      StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
 
       const updateStream = mediaDeviceId && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
@@ -159,7 +161,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
-      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
+      StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
 
       if (mediaDeviceId) {
         this.mediaRepository.elementHandler.switchMediaElementOutput(mediaDeviceId);
@@ -184,7 +186,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this._updateCurrentIndexFromId(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
 
-      z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+      StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
 
       const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.VIDEO;
       const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();

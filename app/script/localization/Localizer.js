@@ -19,6 +19,9 @@
 
 import ko from 'knockout';
 import moment from 'moment';
+
+import * as StorageUtil from 'utils/StorageUtil';
+
 /* eslint-disable no-unused-vars */
 import cs from 'moment/locale/cs.js';
 import da from 'moment/locale/da.js';
@@ -73,10 +76,10 @@ window.z = window.z || {};
   const DEFAULT_LOCALE = 'en';
   const queryParam = z.util.URLUtil.getParameter(z.auth.URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2);
-  let storedLocale = z.util.StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
+  let storedLocale = StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
 
   if (queryParam) {
-    storedLocale = z.util.StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
+    storedLocale = StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;

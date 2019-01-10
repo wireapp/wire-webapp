@@ -69,7 +69,7 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>
             <Link
-              href="https://support.wire.com/hc/articles/207834645"
+              href={`${EXTERNAL_ROUTE.WIRE_SUPPORT}/hc/articles/207834645`}
               target="_blank"
               data-uie-name="do-history-learn-more"
             >

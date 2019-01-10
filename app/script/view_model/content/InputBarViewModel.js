@@ -17,6 +17,8 @@
  *
  */
 
+import * as StorageUtil from 'utils/StorageUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -306,7 +308,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       // we only save state for newly written messages
       reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      z.util.StorageUtil.setValue(storageKey, {mentions, reply, text});
+      StorageUtil.setValue(storageKey, {mentions, reply, text});
     }
   }
 
@@ -316,7 +318,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = z.util.StorageUtil.getValue(storageKey);
+    const storageValue = StorageUtil.getValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {}, text: ''};
@@ -521,6 +523,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyDown(data, keyboardEvent) {
+    const textAreaValue = $(keyboardEvent.target).val();
+
+    // Manually move the cursor when pressing "Page Up", and do nothing else
+    // see https://bugs.chromium.org/p/chromium/issues/detail?id=890248
+    if (keyboardEvent.keyCode === 33) {
+      keyboardEvent.target.setSelectionRange(0, 0);
+      return false;
+    }
+
+    // Manually move the cursor when pressing "Page Down", and do nothing else
+    if (keyboardEvent.keyCode === 34 && textAreaValue) {
+      keyboardEvent.target.setSelectionRange(textAreaValue.length, textAreaValue.length);
+      return false;
+    }
+
     const inputHandledByEmoji = !this.editedMention() && this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
     if (!inputHandledByEmoji) {
