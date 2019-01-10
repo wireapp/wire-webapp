@@ -6,7 +6,6 @@
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
-    "@bower_components/wire-audio-files": "wireapp/wire-audio-files#v1.1.2",
     "@bower_components/wire-theme": "wireapp/wire-theme#v1.0.6",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/core": "8.1.9",
@@ -176,6 +175,7 @@
     "bundle:prod": "webpack --config webpack.config.prod.js",
     "bundle:test": "webpack --config webpack.config.test.js",
     "build:prod": "yarn build:server && grunt build_prod",
+    "configure": "node ./bin/configure.js",
     "dist": "grunt build",
     "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
     "fix:assets": "yarn prettier --write && yarn stylelint",
@@ -184,10 +184,10 @@
     "fix:ts:server": "cd server && yarn fix",
     "lint": "yarn lint:assets && yarn lint:js && yarn lint:ts:auth",
     "lint:assets": "yarn prettier --list-different",
-    "lint:js": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore --ext .js app/script/ test/ bin/ grunt/",
-    "lint:ts:auth": "tslint --config tslint.json --project tsconfig.json \"app/script/**/*.{ts,tsx}\"",
+    "lint:js": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore --ext .js src/script/ test/ bin/ grunt/",
+    "lint:ts:auth": "tslint --config tslint.json --project tsconfig.json \"src/script/**/*.{ts,tsx}\"",
     "lint:ts:server": "cd server && yarn lint",
-    "postinstall": "grunt init && cd server && yarn",
+    "postinstall": "yarn configure && grunt init && cd server && yarn",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "yarn build:server && grunt build && concurrently \"yarn start:server:dev\" \"grunt watch\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
@@ -202,8 +202,8 @@
     "translate:buildpot": "rip json2pot \"temp/i18n/**/*.json\" -o \"temp/i18n/webapp.pot\"",
     "translate:download": "node ./bin/translations_download.js && yarn translate:postprocess && yarn translate:extractpo && yarn fix:assets",
     "translate:upload": "yarn translate:buildpot && node ./bin/translations_upload.js",
-    "translate:extractpo": "rip po2json \"temp/i18n/*.po\" -m \"temp/i18n/**/*.json\" -o \"app/i18n\"",
-    "translate:postprocess": "node ./bin/translations_post_processing.js app/script/localization/translations && node ./bin/translations_post_processing.js temp/i18n"
+    "translate:extractpo": "rip po2json \"temp/i18n/*.po\" -m \"temp/i18n/**/*.json\" -o \"src/i18n\"",
+    "translate:postprocess": "node ./bin/translations_post_processing.js src/script/localization/translations && node ./bin/translations_post_processing.js temp/i18n"
   },
   "private": true,
   "repository": {
@@ -213,9 +213,6 @@
   "exportsOverride": {
     "@bower_components/normalize-css": {
       "css": "normalize.css"
-    },
-    "@bower_components/wire-audio-files": {
-      "audio": "webapp/*"
     },
     "@bower_components/webapp-module-bubble": {
       "js": "dist/script/*.js",

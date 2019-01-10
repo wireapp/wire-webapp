@@ -17,8 +17,8 @@
  *
  */
 
-import PropertiesRepository from 'app/script/properties/PropertiesRepository';
-import PropertiesService from 'app/script/properties/PropertiesService';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import PropertiesService from 'src/script/properties/PropertiesService';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;

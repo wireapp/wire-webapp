@@ -17,7 +17,7 @@
  *
  */
 
-import PropertiesRepository from 'app/script/properties/PropertiesRepository';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 
 describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;

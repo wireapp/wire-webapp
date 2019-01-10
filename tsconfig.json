@@ -10,8 +10,8 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "app/script/auth",
-    "rootDirs": ["app/script"],
+    "outDir": "src/script/auth",
+    "rootDirs": ["src/script"],
     "sourceMap": true,
     "target": "es6"
   },

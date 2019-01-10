@@ -16,12 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-// https://github.com/wireapp/grunt-npm-bower
+const {resolve} = require('path');
 
 module.exports = {
-  options: {
-    cleanTargetDir: true,
-    targetDir: 'src/ext',
-  },
+  DIST_PATH: resolve(__dirname, 'server', 'dist'),
+  ROOT_PATH: resolve(__dirname),
+  SRC_PATH: resolve(__dirname, 'src'),
 };

@@ -34,7 +34,7 @@ module.exports = {
   },
   options: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    region: 'eu-west-1',
+    region: 'eu-central-1',
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 };

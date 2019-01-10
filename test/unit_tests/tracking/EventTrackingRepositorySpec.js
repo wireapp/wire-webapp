@@ -17,7 +17,7 @@
  *
  */
 
-import WebappProperties from 'app/script/properties/WebappProperties';
+import WebappProperties from 'src/script/properties/WebappProperties';
 
 describe('z.tracking.EventTrackingRepository', () => {
   const test_factory = new TestFactory();

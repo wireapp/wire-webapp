@@ -18,29 +18,31 @@
  */
 
 const path = require('path');
+const {SRC_PATH, DIST_PATH} = require('./locations');
 
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
   /* eslint-disable sort-keys */
   const dir = {
-    app_: 'app',
-    app: {
-      demo: 'app/demo',
-      ext: 'app/ext',
-      page: 'app/page',
-      style: 'app/style',
+    src_: SRC_PATH,
+    src: {
+      demo: `${SRC_PATH}/demo`,
+      ext: `${SRC_PATH}/ext`,
+      page: `${SRC_PATH}/page`,
+      style: `${SRC_PATH}/style`,
     },
     dist: {
-      s3: 'server/dist/s3',
-      static: 'server/dist/static',
-      templates: 'server/dist/templates',
+      s3: `${DIST_PATH}/s3`,
+      static: `${DIST_PATH}/static`,
+      templates: `${DIST_PATH}/templates`,
     },
-    dist_: 'server/dist',
+    dist_: DIST_PATH,
     docs: {
       api: 'docs/api',
       coverage: 'docs/coverage',
     },
+    resource: 'resource',
     test_: 'test',
     test: {
       api: 'test/api',
@@ -69,13 +71,12 @@ module.exports = grunt => {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'clean:dist_app',
+    'clean:dist_src',
     'clean:dist_s3',
     'set_version',
     'build_style',
-    'copy:dist',
-    'copy:dist_audio',
-    'copy:dist_favicon',
+    'copy:dist_serviceworker',
+    'copy:dist_resource',
     'build_markup',
   ]);
 

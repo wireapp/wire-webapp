@@ -17,7 +17,7 @@
  *
  */
 
-import ConversationMapper from 'app/script/conversation/ConversationMapper';
+import ConversationMapper from 'src/script/conversation/ConversationMapper';
 
 describe('ConversationService', () => {
   let conversation_mapper = null;

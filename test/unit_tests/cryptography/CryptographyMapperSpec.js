@@ -17,7 +17,7 @@
  *
  */
 
-import CryptographyMapper from 'app/script/cryptography/CryptographyMapper';
+import CryptographyMapper from 'src/script/cryptography/CryptographyMapper';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();

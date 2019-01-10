@@ -18,8 +18,8 @@
  */
 
 import UUID from 'uuidjs';
-import Conversation from 'app/script/entity/Conversation';
-import ConversationMapper from 'app/script/conversation/ConversationMapper';
+import Conversation from 'src/script/entity/Conversation';
+import ConversationMapper from 'src/script/conversation/ConversationMapper';
 
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
