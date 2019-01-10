@@ -21,6 +21,7 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const {SRC_PATH} = require('./locations');
 
 const rootWebpackConfig = require('./webpack.config.common.js');
 
@@ -52,8 +53,8 @@ module.exports = function(config) {
         pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
         served: true,
       },
-      {included: false, nocache: false, pattern: 'src/ext/audio/*.mp3', served: true},
-      {included: false, nocache: true, pattern: 'src/worker/*.js', served: true},
+      {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
+      {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
 
       'node_modules/jasmine-ajax/lib/mock-ajax.js',
       'node_modules/sinon/pkg/sinon.js',
@@ -61,7 +62,7 @@ module.exports = function(config) {
       'test/api/payloads.js',
       'test/api/SDP_payloads.js',
       'test/config.test.js',
-      'src/script/main/globals.js',
+      `${SRC_PATH}/script/main/globals.js`,
       'test/api/OpenGraphMocks.js',
       'test/js/calling/CallRequestResponseMock.js',
       'test/api/TestFactory.js',
@@ -78,7 +79,7 @@ module.exports = function(config) {
     preprocessors: {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
-      'src/script/main/globals.js': ['webpack', 'sourcemap'],
+      [`${SRC_PATH}/script/main/globals.js`]: ['webpack', 'sourcemap'],
       // FIXME fails because of import statements 'src/script/**/*.js': ['coverage'],
     },
 
