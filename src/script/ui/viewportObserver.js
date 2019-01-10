@@ -22,7 +22,7 @@ const tolerance = 0.8;
 const onIntersect = entries => {
   entries.forEach(({intersectionRatio, isIntersecting, target: element}) => {
     if (isIntersecting) {
-      const {callback, fullyInView, container} = observedElements.get(element);
+      const {callback, fullyInView, container} = observedElements.get(element) || {};
       if (!callback) {
         return _removeElement(element);
       }
