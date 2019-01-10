@@ -18,6 +18,7 @@
  */
 
 import {groupBy} from 'underscore';
+import {amplify} from 'amplify';
 
 import PropertiesRepository from '../properties/PropertiesRepository';
 import backendEvent from '../event/Backend';
@@ -40,9 +41,11 @@ class PreferenceNotificationRepository {
 
   /**
    * Construct a new PreferenceNotificationRepository.
+   *
+   * @param {Observable<User>} selfUserObservable - an observable that contains the self user
    */
-  constructor() {
-    this.notifications = ko.observableArray([]);
+  constructor(selfUserObservable) {
+    this.selfUser = selfUserObservable;
 
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
     const storedNotifications = StorageUtil.getValue(notificationsStorageKey);
@@ -53,10 +56,6 @@ class PreferenceNotificationRepository {
         : StorageUtil.resetValue(notificationsStorageKey);
     });
 
-    this._subscribeToEvents();
-  }
-
-  _subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));

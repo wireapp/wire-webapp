@@ -199,7 +199,7 @@ class App {
       repositories.permission,
       repositories.user
     );
-    repositories.preferenceNotification = new PreferenceNotificationRepository();
+    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
     repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
