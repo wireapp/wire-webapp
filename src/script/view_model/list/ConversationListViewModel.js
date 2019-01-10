@@ -36,6 +36,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
     this.permissionRepository = repositories.permission;
+    this.preferenceNotificationRepository = repositories.preferenceNotification;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
@@ -105,7 +106,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
 
     this.showBadge = ko.pureComputed(() => {
-      return this.contentViewModel.preferencesAccount.notifications().length > 0;
+      return this.preferenceNotificationRepository.notifications().length > 0;
     });
 
     this._initSubscriptions();
