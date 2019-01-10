@@ -44,6 +44,10 @@ module.exports = {
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },
+      {
+        loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+        test: /\.svg$/,
+      },
     ],
   },
   node: {
@@ -93,7 +97,7 @@ module.exports = {
       // override phoneformat export, because the 'main' file is not exporting anything
       'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
     },
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
     modules: [path.resolve(srcScript), 'node_modules'],
   },
 };
