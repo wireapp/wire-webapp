@@ -19,5 +19,6 @@ CHANGELOG.md
 **/.DS_Store
 
 # Configuration imported from https://github.com/wireapp/wire-web-config-default/
-resource
+/config
+/resource
 .env
