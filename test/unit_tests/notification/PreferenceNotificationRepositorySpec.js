@@ -99,4 +99,33 @@ describe('PreferenceNotificationRepository', () => {
     expect(preferenceNotificationRepository.notifications().length).toBe(storedNotifications.length);
     expect(JSON.stringify(preferenceNotificationRepository.notifications())).toBe(JSON.stringify(storedNotifications));
   });
+
+  it('groups and prioritizes notifications when popped', () => {
+    const storedNotifications = [
+      {
+        data: 2,
+        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+      },
+      {
+        data: 1,
+        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+      },
+    ];
+
+    amplify.store.and.returnValue(JSON.stringify(storedNotifications));
+    const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
+
+    let nextNotification = preferenceNotificationRepository.popNotification();
+
+    expect(nextNotification.type).toBe(PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT);
+    expect(preferenceNotificationRepository.notifications().length).toBe(storedNotifications.length - 1);
+
+    nextNotification = preferenceNotificationRepository.popNotification();
+
+    expect(nextNotification.type).toBe(
+      PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED
+    );
+
+    expect(preferenceNotificationRepository.notifications().length).toBe(storedNotifications.length - 2);
+  });
 });
