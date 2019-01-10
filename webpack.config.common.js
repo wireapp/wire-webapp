@@ -20,17 +20,18 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
-const dist = 'server/dist/static/';
-const srcScript = 'src/script/auth/';
-const src = 'src/script/';
+const dist = path.resolve(DIST_PATH, 'static');
+const srcScript = path.resolve(SRC_PATH, 'script', 'auth');
+const src = path.resolve(SRC_PATH, 'script');
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    app: path.resolve(__dirname, src, 'main/app.js'),
-    auth: path.resolve(__dirname, srcScript, 'main.tsx'),
-    login: path.resolve(__dirname, src, 'main/login.js'),
+    app: path.resolve(src, 'main/app.js'),
+    auth: path.resolve(srcScript, 'main.tsx'),
+    login: path.resolve(src, 'main/login.js'),
   },
   externals: {
     'fs-extra': '{}',
@@ -40,7 +41,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        include: path.resolve(__dirname, srcScript),
+        include: srcScript,
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },
@@ -77,7 +78,7 @@ module.exports = {
   },
   output: {
     filename: 'min/[name].js',
-    path: path.resolve(__dirname, dist),
+    path: dist,
     publicPath: '/',
   },
   plugins: [
@@ -92,12 +93,13 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      components: path.resolve(__dirname, `${src}/components/`),
+      components: path.resolve(src, 'components'),
       // override phoneformat export, because the 'main' file is not exporting anything
-      'phoneformat.js': path.resolve(__dirname, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
-      utils: path.resolve(__dirname, `${src}/util/`),
+      'phoneformat.js': path.resolve(ROOT_PATH, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
+      resource: path.resolve(ROOT_PATH, 'resource'),
+      utils: path.resolve(src, 'util'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
-    modules: [path.resolve(srcScript), 'node_modules'],
+    modules: [srcScript, 'node_modules'],
   },
 };
