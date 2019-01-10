@@ -1,0 +1,75 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// mixins
+.seekbar-thumb-style() {
+  .accent-background-color;
+  .circle(12px);
+
+  border: none;
+  appearance: none !important;
+  background-color: transparent;
+  opacity: 0;
+  transition: opacity @animation-timing-slow ease-in-out;
+}
+
+seek-bar {
+  display: inline-flex;
+  width: 100%;
+
+  input {
+    .accent-color;
+
+    width: 100%;
+    height: 2px;
+    appearance: none;
+    border-radius: 1px;
+    cursor: pointer;
+    outline: none;
+
+    &::-moz-range-thumb {
+      .seekbar-thumb-style;
+    }
+    &::-webkit-slider-thumb {
+      .seekbar-thumb-style;
+    }
+    &::-ms-thumb {
+      .seekbar-thumb-style;
+    }
+
+    &::-moz-range-track {
+      border: none;
+      background-color: fade(#fff, 40%);
+    }
+
+    &.show-seek-bar-thumb::-webkit-slider-thumb {
+      opacity: 1;
+    }
+    &.show-seek-bar-thumb::-moz-range-thumb {
+      opacity: 1;
+    }
+    &.show-seek-bar-thumb::-ms-thumb {
+      opacity: 1;
+    }
+
+    &::-moz-focus-outer {
+      border: 0;
+    } // remove dotted outline
+  }
+}

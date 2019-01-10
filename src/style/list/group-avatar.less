@@ -1,0 +1,49 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+group-avatar {
+  .square(32px);
+
+  border: 1px solid fade(#fff, 12%);
+  border-radius: 6px;
+}
+
+.group-avatar-box-wrapper {
+  .square(28px);
+
+  display: flex;
+  overflow: hidden;
+  flex-wrap: wrap;
+  margin: 1px;
+  background-color: fade(#000, 40%);
+  border-radius: 4px;
+}
+
+.group-avatar-box {
+  .flex-center;
+  .square(14px);
+
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.group-avatar-active {
+  .accent-border-color;
+}
