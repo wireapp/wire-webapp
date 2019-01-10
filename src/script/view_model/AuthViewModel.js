@@ -20,7 +20,7 @@
 import Cookies from 'js-cookie';
 
 import App from '../main/app';
-import {URL_PATH} from '../externalRoute';
+import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import StorageService from '../storage/StorageService';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
@@ -681,7 +681,7 @@ class AuthViewModel {
   }
 
   clicked_on_password() {
-    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, URL_PATH.PASSWORD_RESET);
+    const url = getAccountPagesUrl(URL_PATH.PASSWORD_RESET);
     z.util.SanitizationUtil.safeWindowOpen(url);
   }
 
@@ -719,7 +719,7 @@ class AuthViewModel {
 
   clicked_on_wire_link() {
     const path = z.l10n.text(z.string.urlWebsiteRoot);
-    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+    z.util.SanitizationUtil.safeWindowOpen(getWebsiteUrl(path));
   }
 
   keydown_auth(keyboard_event) {

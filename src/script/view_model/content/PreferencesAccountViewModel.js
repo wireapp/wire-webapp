@@ -18,7 +18,7 @@
  */
 
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
-import {getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
+import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -277,8 +277,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnResetPassword() {
-    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, URL_PATH.PASSWORD_RESET);
-    z.util.SanitizationUtil.safeWindowOpen(url);
+    z.util.SanitizationUtil.safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   }
 
   removedFromView() {
