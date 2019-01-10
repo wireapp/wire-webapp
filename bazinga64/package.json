@@ -10,7 +10,7 @@
     "karma-jasmine-diff-reporter": "2.0.0",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
-    "libsodium-wrappers": "0.7.3",
+    "libsodium-wrappers": "0.7.4",
     "rimraf": "2.6.3",
     "typescript": "3.2.2",
     "webpack": "4.28.3"
