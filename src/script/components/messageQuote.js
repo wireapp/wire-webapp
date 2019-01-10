@@ -135,7 +135,7 @@ ko.components.register('message-quote', {
         <div class="message-quote__sender">
           <span data-bind="text: quotedMessage().headerSenderName(), click: () => showUserDetails(quotedMessage().user)" data-uie-name="label-name-quote"></span>
           <!-- ko if: quotedMessage().was_edited() -->
-            <edit-icon data-uie-name="message-edited-quote"></edit-icon>
+            <edit-icon data-uie-name="message-edited-quote" data-bind="attr: {title: quotedMessage().display_edited_timestamp()}"></edit-icon>
           <!-- /ko -->
         </div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset', afterRender: updateCanShowMore} -->
