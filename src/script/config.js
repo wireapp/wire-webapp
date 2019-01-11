@@ -66,6 +66,9 @@ window.z.config = {
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 
+  // maximum chars for link preview titles and descriptions
+  MAXIMUM_LINK_PREVIEW_CHARS: 200,
+
   // Maximum characters per sent message
   MAXIMUM_MESSAGE_LENGTH: 8000,
 

@@ -38,8 +38,8 @@ z.links.LinkPreviewProtoBuilder = {
       if (data.title && data.url) {
         const {description = '', title = '', url: dataUrl} = data;
 
-        const truncatedDescription = z.util.StringUtil.truncate(description, 200);
-        const truncatedTitle = z.util.StringUtil.truncate(title, 200);
+        const truncatedDescription = z.util.StringUtil.truncate(description, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
+        const truncatedTitle = z.util.StringUtil.truncate(title, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
 
         const protoArticle = new z.proto.Article(dataUrl, truncatedTitle, truncatedDescription); // deprecated format
         const protoLinkPreview = new z.proto.LinkPreview(
