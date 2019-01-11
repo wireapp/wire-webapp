@@ -41,8 +41,14 @@ describe('z.user.UserRepository', () => {
           type: 'user.properties-set',
           value: {
             settings: {
+              previews: {
+                send: true,
+              },
               privacy: {
                 improve_wire: true,
+              },
+              sound: {
+                alerts: 'all',
               },
             },
             version: 1,
@@ -54,8 +60,14 @@ describe('z.user.UserRepository', () => {
           type: 'user.properties-set',
           value: {
             settings: {
+              previews: {
+                send: true,
+              },
               privacy: {
                 improve_wire: false,
+              },
+              sound: {
+                alerts: 'all',
               },
             },
             version: 1,
