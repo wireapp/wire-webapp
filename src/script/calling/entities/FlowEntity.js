@@ -883,6 +883,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
           }
         }
 
+        this.iceCandidatesGatheringAttempts = 1;
+
         const iceCandidateTypes = z.util.PeerConnectionUtil.getIceCandidatesTypes(iceCandidates);
 
         const iceCandidateTypesLog = Object.keys(iceCandidateTypes)
