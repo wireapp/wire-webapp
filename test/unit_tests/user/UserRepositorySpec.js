@@ -40,33 +40,9 @@ describe('z.user.UserRepository', () => {
           key: 'webapp',
           type: 'user.properties-set',
           value: {
-            app_banner: true,
-            contact_import: {},
-            enable_debugging: false,
-            has_created_conversation: true,
             settings: {
-              call: {
-                mute: false,
-              },
-              emoji: {
-                replace_inline: true,
-              },
-              interface: {
-                theme: 'default',
-              },
-              notifications: 'on',
-              permissions: {
-                notifications: 'default',
-              },
-              previews: {
-                send: true,
-              },
               privacy: {
-                enable_read_receipts: false,
                 improve_wire: true,
-              },
-              sound: {
-                alerts: 'all',
               },
             },
             version: 1,
@@ -77,33 +53,9 @@ describe('z.user.UserRepository', () => {
           key: 'webapp',
           type: 'user.properties-set',
           value: {
-            app_banner: true,
-            contact_import: {},
-            enable_debugging: false,
-            has_created_conversation: true,
             settings: {
-              call: {
-                mute: false,
-              },
-              emoji: {
-                replace_inline: true,
-              },
-              interface: {
-                theme: 'default',
-              },
-              notifications: 'on',
-              permissions: {
-                notifications: 'default',
-              },
-              previews: {
-                send: true,
-              },
               privacy: {
-                enable_read_receipts: false,
                 improve_wire: false,
-              },
-              sound: {
-                alerts: 'all',
               },
             },
             version: 1,

@@ -213,7 +213,7 @@ class PropertiesRepository {
     switch (key) {
       case PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS:
         if (this.properties.version === value.version) {
-          this.properties = {...this.properties, ...value};
+          this.properties = Object.assign({}, this.properties, value);
           this._publishProperties();
         }
         break;
