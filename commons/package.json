@@ -19,7 +19,7 @@
     "karma-spec-reporter": "0.0.32",
     "rimraf": "2.6.3",
     "typescript": "3.2.2",
-    "webpack": "4.28.3",
+    "webpack": "4.28.4",
     "webpack-cli": "3.2.1"
   },
   "description": "Collection of common components that are used across Wire web applications.",
