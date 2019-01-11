@@ -23,6 +23,27 @@
   box-sizing: border-box;
 }
 
+* {
+  --scrollbar-color: fade(#000, 50%);
+  @scrollbar-size: 7px;
+  scrollbar-color: var(--scrollbar-color) transparent;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: @scrollbar-size;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    border-radius: @scrollbar-size;
+    box-shadow: 0 0 1px #fff;
+    transition: background-color 1s;
+  }
+}
+
 body {
   color: var(--background);
   font-family: @font-family-base;

@@ -344,25 +344,6 @@
 // SCROLLBARS
 // ----------------------------------------------------------------------------
 
-// creates mac like scrollbar, but only in webkit browsers
-.custom-scrollbar() {
-  @scrollbar-size: 7px;
-
-  &::-webkit-scrollbar {
-    width: @scrollbar-size;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: none;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: fade(#000, 50%);
-    border-radius: @scrollbar-size;
-    box-shadow: 0 0 1px #fff;
-  }
-}
-
 .hide-scrollbar() {
   overflow: -moz-scrollbars-none;
   -ms-overflow-style: none;

@@ -21,6 +21,7 @@ import ko from 'knockout';
 import $ from 'jquery';
 import moment from 'moment';
 import SimpleBar from 'simplebar';
+import {debounce} from 'underscore';
 /* eslint-disable no-unused-vars */
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
@@ -362,6 +363,79 @@ ko.subscribable.fn.subscribeChanged = function(handler) {
     savedValue = latestValue;
     handler(latestValue, oldValue);
   });
+};
+
+ko.bindingHandlers.fadingscrollbar = {
+  init(element) {
+    const animationSpeed = 12;
+    function parseColor(color) {
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 1, 1);
+      return ctx.getImageData(0, 0, 1, 1).data;
+    }
+
+    const initialColor = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
+    const currentColor = initialColor.slice();
+    let state = 'idle';
+    let animating = false;
+
+    function setAnimationState(newState) {
+      state = newState;
+      if (!animating) {
+        animate();
+      }
+    }
+
+    function animate() {
+      switch (state) {
+        case 'fadein':
+          fadeStep(animationSpeed);
+          break;
+        case 'fadeout':
+          fadeStep(-animationSpeed);
+          break;
+
+        default:
+          animating = false;
+          return;
+      }
+      animating = true;
+      window.requestAnimationFrame(animate);
+    }
+
+    const fadeStep = delta => {
+      const initialAlpha = initialColor[3];
+      const currentAlpha = currentColor[3];
+      const hasAppeared = delta > 0 && currentAlpha >= initialAlpha;
+      const hasDisappeared = delta < 0 && currentAlpha <= 0;
+      if (hasAppeared || hasDisappeared) {
+        return setAnimationState('idle');
+      }
+      currentColor[3] += delta;
+      const [r, g, b, a] = currentColor;
+      element.style.setProperty('--scrollbar-color', ` rgba(${r}, ${g}, ${b}, ${a / 255})`);
+    };
+    const fadeIn = () => setAnimationState('fadein');
+    const fadeOut = () => setAnimationState('fadeout');
+    const debouncedFadeOut = debounce(fadeOut, 1000);
+
+    element.addEventListener('mouseenter', fadeIn);
+    element.addEventListener('mouseleave', fadeOut);
+    element.addEventListener('mousemove', fadeIn);
+    element.addEventListener('mousemove', debouncedFadeOut);
+    element.addEventListener('scroll', fadeIn);
+    element.addEventListener('scroll', debouncedFadeOut);
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      element.removeEventListener('mouseenter', fadeIn);
+      element.removeEventListener('mouseleave', fadeOut);
+      element.removeEventListener('mousemove', fadeIn);
+      element.removeEventListener('mousemove', debouncedFadeOut);
+      element.removeEventListener('scroll', fadeIn);
+      element.removeEventListener('scroll', debouncedFadeOut);
+    });
+  },
 };
 
 /**
