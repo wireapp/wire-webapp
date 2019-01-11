@@ -33,7 +33,85 @@ describe('z.user.UserRepository', () => {
     server.restore();
   });
 
-  describe('users', () => {
+  describe('Account preferences ', () => {
+    beforeEach(() => {
+      spyOn(TestFactory.user_repository.propertyRepository, '_publishProperties').and.callFake(properties => {
+        return properties;
+      });
+    });
+
+    describe('Data usage permissions', () => {
+      it('syncs the "Send anonymous data" preference through WebSocket events', () => {
+        const turnOnErrorReporting = {
+          key: 'webapp',
+          type: 'user.properties-set',
+          value: {
+            settings: {
+              privacy: {
+                improve_wire: true,
+              },
+            },
+            version: 1,
+          },
+        };
+
+        const turnOffErrorReporting = {
+          key: 'webapp',
+          type: 'user.properties-set',
+          value: {
+            settings: {
+              privacy: {
+                improve_wire: false,
+              },
+            },
+            version: 1,
+          },
+        };
+
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const errorReporting = () =>
+          TestFactory.user_repository.propertyRepository.properties.settings.privacy.improve_wire;
+
+        expect(errorReporting()).toBeUndefined();
+
+        TestFactory.user_repository.on_user_event(turnOnErrorReporting, source);
+
+        expect(errorReporting()).toBe(true);
+
+        TestFactory.user_repository.on_user_event(turnOffErrorReporting, source);
+
+        expect(errorReporting()).toBe(false);
+      });
+    });
+
+    describe('Privacy', () => {
+      it('syncs the "Read receipts" preference through WebSocket events', () => {
+        const turnOnReceiptMode = {
+          key: 'WIRE_RECEIPT_MODE',
+          type: 'user.properties-set',
+          value: 1,
+        };
+        const turnOffReceiptMode = {
+          key: 'WIRE_RECEIPT_MODE',
+          type: 'user.properties-delete',
+        };
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const receiptMode = TestFactory.user_repository.propertyRepository.receiptMode;
+
+        expect(receiptMode()).toBe(0);
+
+        TestFactory.user_repository.on_user_event(turnOnReceiptMode, source);
+
+        expect(receiptMode()).toBe(1);
+
+        TestFactory.user_repository.on_user_event(turnOffReceiptMode, source);
+
+        expect(receiptMode()).toBe(0);
+      });
+    });
+  });
+
+  describe('User handling', () => {
     describe('fetchUsersById', () => {
       it('should handle malformed input', () => {
         return TestFactory.user_repository
