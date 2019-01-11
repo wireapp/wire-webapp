@@ -19,6 +19,9 @@
 
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
+import ConsentValue from '../../user/ConsentValue';
+import ReceiptMode from '../../conversation/ReceiptMode';
+import PropertiesRepository from '../../properties/PropertiesRepository';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -92,8 +95,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     });
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
+    this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.optionMarketingConsent = this.userRepository.marketingConsent;
     this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
@@ -377,9 +380,16 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   onReadReceiptsChange(viewModel, event) {
-    const enableReadReceipts = event.target.checked;
-    const receiptMode = enableReadReceipts ? 1 : 0;
-    this.propertiesRepository.saveReceiptMode(receiptMode);
+    const isChecked = event.target.checked;
+    const mode = isChecked ? ReceiptMode.DELIVERY_AND_READ : ReceiptMode.DELIVERY;
+    this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE, mode);
+    return true;
+  }
+
+  onMarketingConsentChange(viewModel, event) {
+    const isChecked = event.target.checked;
+    const mode = isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN;
+    this.propertiesRepository.saveMarketingConsent(mode);
     return true;
   }
 
