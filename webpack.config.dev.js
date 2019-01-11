@@ -21,7 +21,7 @@ const commonConfig = require('./webpack.config.common');
 const path = require('path');
 const webpack = require('webpack');
 
-const srcScript = 'app/script/';
+const srcScript = 'src/script/';
 
 module.exports = Object.assign(commonConfig, {
   entry: Object.assign(commonConfig.entry, {

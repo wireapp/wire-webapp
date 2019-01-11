@@ -17,10 +17,10 @@
  *
  */
 
-import Conversation from 'app/script/entity/Conversation';
-import ContentMessage from 'app/script/entity/message/ContentMessage';
-import Message from 'app/script/entity/message/Message';
-import ConversationMapper from 'app/script/conversation/ConversationMapper';
+import Conversation from 'src/script/entity/Conversation';
+import ContentMessage from 'src/script/entity/message/ContentMessage';
+import Message from 'src/script/entity/message/Message';
+import ConversationMapper from 'src/script/conversation/ConversationMapper';
 
 describe('Conversation', () => {
   let conversation_et = null;

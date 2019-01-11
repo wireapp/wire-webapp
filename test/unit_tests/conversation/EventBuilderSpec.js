@@ -17,7 +17,7 @@
  *
  */
 
-import EventMapper from 'app/script/conversation/EventMapper';
+import EventMapper from 'src/script/conversation/EventMapper';
 
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;

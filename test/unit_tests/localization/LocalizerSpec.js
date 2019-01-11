@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import localizer from '../../../app/script/localization/Localizer';
+import localizer from '../../../src/script/localization/Localizer';
 
 describe('l10n', () => {
   describe('text', () => {

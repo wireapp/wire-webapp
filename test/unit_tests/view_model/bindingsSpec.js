@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import $ from 'jquery';
 /* eslint-disable no-unused-vars */
-import bindingHandlersGlobal from '../../../app/script/view_model/bindings/CommonBindings';
+import bindingHandlersGlobal from '../../../src/script/view_model/bindings/CommonBindings';
 /* eslint-enable no-unused-vars */
 
 describe('ko.bindingHandlers', () => {

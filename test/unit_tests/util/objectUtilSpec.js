@@ -17,7 +17,7 @@
  *
  */
 
-import {escapeProperties} from 'app/script/util/objectUtil';
+import {escapeProperties} from 'src/script/util/objectUtil';
 
 describe('objectUtil', () => {
   describe('escapeProperties', () => {

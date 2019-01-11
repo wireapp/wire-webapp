@@ -21,6 +21,7 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const {SRC_PATH} = require('./locations');
 
 const rootWebpackConfig = require('./webpack.config.common.js');
 
@@ -52,8 +53,8 @@ module.exports = function(config) {
         pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
         served: true,
       },
-      {included: false, nocache: false, pattern: 'app/ext/audio/*.mp3', served: true},
-      {included: false, nocache: true, pattern: 'app/worker/*.js', served: true},
+      {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
+      {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
 
       'node_modules/jasmine-ajax/lib/mock-ajax.js',
       'node_modules/sinon/pkg/sinon.js',
@@ -61,7 +62,7 @@ module.exports = function(config) {
       'test/api/payloads.js',
       'test/api/SDP_payloads.js',
       'test/config.test.js',
-      'app/script/main/globals.js',
+      `${SRC_PATH}/script/main/globals.js`,
       'test/api/OpenGraphMocks.js',
       'test/js/calling/CallRequestResponseMock.js',
       'test/api/TestFactory.js',
@@ -78,8 +79,8 @@ module.exports = function(config) {
     preprocessors: {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
-      'app/script/main/globals.js': ['webpack', 'sourcemap'],
-      // FIXME fails because of import statements 'app/script/**/*.js': ['coverage'],
+      [`${SRC_PATH}/script/main/globals.js`]: ['webpack', 'sourcemap'],
+      // FIXME fails because of import statements 'src/script/**/*.js': ['coverage'],
     },
 
     webpack: {
@@ -91,6 +92,14 @@ module.exports = function(config) {
       externals: {
         'fs-extra': '{}',
       },
+      module: {
+        rules: [
+          {
+            loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+            test: /\.svg$/,
+          },
+        ],
+      },
       plugins: [
         new webpack.ProvidePlugin({
           $: 'jquery',
@@ -101,7 +110,7 @@ module.exports = function(config) {
       ],
       resolve: {
         alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
-          app: path.resolve(__dirname, 'app'),
+          src: path.resolve(__dirname, 'src'),
         }),
       },
     },
@@ -114,7 +123,8 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['coverage', 'progress'],
+    reporters: ['coverage', 'spec'],
+    specReporter: {showSpecTiming: true},
 
     // web server port
     port: 9876,
@@ -180,7 +190,7 @@ module.exports = function(config) {
   if (process.env.TRAVIS) {
     config.set({
       port: 9877,
-      reporters: ['dots', 'coverage'],
+      specReporter: {suppressPassed: true},
     });
   }
 };
