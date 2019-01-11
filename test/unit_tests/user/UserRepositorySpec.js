@@ -34,6 +34,12 @@ describe('z.user.UserRepository', () => {
   });
 
   describe('Account preferences ', () => {
+    beforeEach(() => {
+      spyOn(TestFactory.user_repository.propertyRepository, '_publishProperties').and.callFake(properties => {
+        return properties;
+      });
+    });
+
     describe('Data usage permissions', () => {
       it('syncs the "Send anonymous data" preference through WebSocket events', () => {
         const turnOnErrorReporting = {
@@ -41,14 +47,8 @@ describe('z.user.UserRepository', () => {
           type: 'user.properties-set',
           value: {
             settings: {
-              previews: {
-                send: true,
-              },
               privacy: {
                 improve_wire: true,
-              },
-              sound: {
-                alerts: 'all',
               },
             },
             version: 1,
@@ -60,14 +60,8 @@ describe('z.user.UserRepository', () => {
           type: 'user.properties-set',
           value: {
             settings: {
-              previews: {
-                send: true,
-              },
               privacy: {
                 improve_wire: false,
-              },
-              sound: {
-                alerts: 'all',
               },
             },
             version: 1,
