@@ -883,6 +883,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
           }
         }
 
+        this.iceCandidatesGatheringAttempts = 1;
+
         const iceCandidateTypes = z.util.PeerConnectionUtil.getIceCandidatesTypes(iceCandidates);
 
         const iceCandidateTypesLog = Object.keys(iceCandidateTypes)
@@ -901,6 +903,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
             obfuscated: [
               transformedSdp.type,
               iceCandidates.length,
+              iceCandidateTypesLog,
               this.callLogger.obfuscate(this.remoteUser.id),
               this.callLogger.obfuscateSdp(transformedSdp.sdp),
             ],
