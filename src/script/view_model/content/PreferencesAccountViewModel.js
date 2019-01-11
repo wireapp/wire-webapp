@@ -382,14 +382,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   onReadReceiptsChange(viewModel, event) {
     const isChecked = event.target.checked;
     const mode = isChecked ? ReceiptMode.DELIVERY_AND_READ : ReceiptMode.DELIVERY;
-    this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE, mode);
+    this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
   }
 
   onMarketingConsentChange(viewModel, event) {
     const isChecked = event.target.checked;
     const mode = isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN;
-    this.propertiesRepository.saveMarketingConsent(mode);
+    this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key, mode);
     return true;
   }
 

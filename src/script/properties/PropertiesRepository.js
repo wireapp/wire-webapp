@@ -235,13 +235,13 @@ class PropertiesRepository {
 
   updateProperty(key, value) {
     switch (key) {
-      case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE:
+      case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         if (value === ReceiptMode.DELIVERY) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);
         break;
-      case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT:
+      case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         return this.selfService
           .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${z.util.Environment.version(false)}`)
           .then(() => {
@@ -253,8 +253,6 @@ class PropertiesRepository {
         break;
     }
   }
-
-  saveMarketingConsent(mode) {}
 
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
     return this.propertiesService
