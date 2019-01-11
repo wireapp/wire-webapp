@@ -10,7 +10,7 @@ COPY . /src
 ENV NODE_PATH=/src/node_modules
 ENV PATH=$PATH:/src/node_modules/.bin
 WORKDIR /src
-RUN yarn && yarn deploy-travis
+RUN yarn && yarn build:prod
 
 EXPOSE 8080
 
