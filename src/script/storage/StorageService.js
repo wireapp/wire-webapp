@@ -54,7 +54,11 @@ class StorageService {
 
       this.db = new Dexie(this.dbName);
 
-      this.db.on('blocked', () => this.logger.error('Database is blocked'));
+      this.db.on('blocked', event => {
+        if (event.dataLoss !== 'none') {
+          this.logger.error('Database is blocked', event);
+        }
+      });
 
       this.db.on('changes', changes => {
         changes.forEach(change => {
