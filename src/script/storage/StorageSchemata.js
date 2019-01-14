@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.storage = z.storage || {};
 
-z.storage.StorageSchemata = class StorageSchemata {
+class StorageSchemata {
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
@@ -316,4 +316,7 @@ z.storage.StorageSchemata = class StorageSchemata {
       },
     ];
   }
-};
+}
+
+export default StorageSchemata;
+z.storage.StorageSchemata = StorageSchemata;

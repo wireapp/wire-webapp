@@ -19,6 +19,8 @@
 
 import JSZip from 'jszip';
 
+import StorageSchemata from '../storage/StorageSchemata';
+
 window.z = window.z || {};
 window.z.backup = z.backup || {};
 
@@ -311,8 +313,15 @@ z.backup.BackupRepository = class BackupRepository {
       throw new z.backup.IncompatiblePlatformError(message);
     }
 
-    const isExpectedVersion = archiveMetadata.version === localMetadata.version;
-    if (!isExpectedVersion) {
+    const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
+    const involvesDatabaseMigration = StorageSchemata.SCHEMATA.reduce((involvesMigration, schemaData) => {
+      if (schemaData.version > lowestDbVersion) {
+        return involvesMigration || !!schemaData.upgrade;
+      }
+      return involvesMigration;
+    }, false);
+
+    if (involvesDatabaseMigration) {
       const message = `History cannot be restored: Database version mismatch`;
       throw new z.backup.IncompatibleBackupError(message);
     }
