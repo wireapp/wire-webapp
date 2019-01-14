@@ -20,10 +20,13 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-z.assets.AssetTransferState = {
+const AssetTransferState = {
   DOWNLOADING: 'downloading',
   UPLOAD_FAILED: 'upload-failed',
   UPLOAD_PENDING: 'upload-pending',
   UPLOADED: 'uploaded',
   UPLOADING: 'uploading',
 };
+
+export default AssetTransferState;
+z.assets.AssetTransferState = AssetTransferState;
