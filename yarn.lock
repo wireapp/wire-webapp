@@ -3260,15 +3260,10 @@ core-js@^1.0.0:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-1.2.7.tgz#652294c14651db28fa93bd2d5ff2983a4f08c636"
   integrity sha1-ZSKUwUZR2yj6k70tX/KYOk8IxjY=
 
-core-js@^2.2.0:
-  version "2.5.5"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.5.tgz#b14dde936c640c0579a6b50cabcc132dd6127e3b"
-  integrity sha1-sU3ek2xkDAV5prUMq8wTLdYSfjs=
-
-core-js@^2.4.0:
-  version "2.5.6"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.6.tgz#0fe6d45bf3cac3ac364a9d72de7576f4eb221b9d"
-  integrity sha512-lQUVfQi0aLix2xpyjrrJEvfuYCqPc/HwmTKsC/VNf8q0zsjX7SQZtp4+oRONN5Tsur9GDETPjj+Ub2iDiGZfSQ==
+core-js@^2.2.0, core-js@^2.4.0, core-js@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.2.tgz#267988d7268323b349e20b4588211655f0e83944"
+  integrity sha512-NdBPF/RVwPW6jr0NCILuyN9RiqLo2b1mddWHkUL+VnvcB7dzlnBJ1bXYntjpTGOgkZiiLWj2JxmOr7eGE3qK6g==
 
 core-js@~2.3.0:
   version "2.3.0"
@@ -10571,12 +10566,13 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar@3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-3.1.1.tgz#ddd9d854205baf45cb6e4a62a5e8952218a0a9fa"
-  integrity sha512-R3PUPtpLp8kCqFTQcwoeL9YYpA4laa4zZHmJ8kMN1XLOXeydTddJ63292qMOxWfCI3Ecnuqds/g2xMoZL7vqIA==
+simplebar@3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-3.1.2.tgz#2c4f075b454cbe80aabe3e522900c9942cb71931"
+  integrity sha512-PcuNoaoCdfT3klS8sumecKemOEGMHRjzP1WRO1oo4xrnNmR9tTQgEbnwQ3IrB5edn7dlCYLuU+6lWGAK4XTrNw==
   dependencies:
     can-use-dom "^0.1.0"
+    core-js "^2.6.2"
     lodash.debounce "^4.0.8"
     lodash.memoize "^4.1.2"
     lodash.throttle "^4.1.1"
