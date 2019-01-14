@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.user = z.user || {};
-
-z.user.ConsentValue = {
+export default {
   GIVEN: 1,
   NOT_GIVEN: 0,
 };

@@ -17,6 +17,10 @@
  *
  */
 
+import ConsentValue from 'src/script/user/ConsentValue';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import ReceiptMode from 'src/script/conversation/ReceiptMode';
+
 describe('z.user.UserRepository', () => {
   let server = null;
   const test_factory = new TestFactory();
@@ -82,31 +86,56 @@ describe('z.user.UserRepository', () => {
 
         expect(errorReporting()).toBe(false);
       });
+
+      it('syncs the "Receive newsletter" preference through WebSocket events', () => {
+        const giveOnMarketingConsent = {
+          key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+          type: 'user.properties-set',
+          value: ConsentValue.GIVEN,
+        };
+        const revokeMarketingConsent = {
+          key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+          type: 'user.properties-delete',
+        };
+
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const marketingConsent = TestFactory.user_repository.propertyRepository.marketingConsent;
+
+        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+
+        TestFactory.user_repository.on_user_event(giveOnMarketingConsent, source);
+
+        expect(marketingConsent()).toBe(ConsentValue.GIVEN);
+
+        TestFactory.user_repository.on_user_event(revokeMarketingConsent, source);
+
+        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+      });
     });
 
     describe('Privacy', () => {
       it('syncs the "Read receipts" preference through WebSocket events', () => {
         const turnOnReceiptMode = {
-          key: 'WIRE_RECEIPT_MODE',
+          key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-set',
-          value: 1,
+          value: ReceiptMode.DELIVERY_AND_READ,
         };
         const turnOffReceiptMode = {
-          key: 'WIRE_RECEIPT_MODE',
+          key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-delete',
         };
         const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
         const receiptMode = TestFactory.user_repository.propertyRepository.receiptMode;
 
-        expect(receiptMode()).toBe(0);
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
 
         TestFactory.user_repository.on_user_event(turnOnReceiptMode, source);
 
-        expect(receiptMode()).toBe(1);
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY_AND_READ);
 
         TestFactory.user_repository.on_user_event(turnOffReceiptMode, source);
 
-        expect(receiptMode()).toBe(0);
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
       });
     });
   });

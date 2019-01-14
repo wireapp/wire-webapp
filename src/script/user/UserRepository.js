@@ -18,6 +18,8 @@
  */
 
 import {UNSPLASH_URL} from '../externalRoute';
+import ConsentValue from './ConsentValue';
+import ConsentType from './ConsentType';
 
 window.z = window.z || {};
 window.z.user = z.user || {};
@@ -87,8 +89,6 @@ z.user.UserRepository = class UserRepository {
     this.number_of_contacts.subscribe(number_of_contacts => {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
-
-    this.marketingConsent = ko.observable(false);
 
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
@@ -800,42 +800,29 @@ z.user.UserRepository = class UserRepository {
 
   initMarketingConsent() {
     if (!z.config.FEATURE.CHECK_CONSENT) {
-      this.logger.warn(`Consent check feature is disabled. Defaulting to '${this.marketingConsent()}'`);
+      this.logger.warn(
+        `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`
+      );
       return Promise.resolve();
     }
     return this.selfService
       .getSelfConsent()
       .then(consents => {
         for (const {type: consentType, value: consentValue} of consents) {
-          const isMarketingConsent = consentType === z.user.ConsentType.MARKETING;
+          const isMarketingConsent = consentType === ConsentType.MARKETING;
           if (isMarketingConsent) {
-            const hasGivenConsent = consentValue === z.user.ConsentValue.GIVEN;
-            this.marketingConsent(hasGivenConsent);
+            const hasGivenConsent = consentValue === ConsentValue.GIVEN;
+            this.propertyRepository.marketingConsent(hasGivenConsent);
 
             this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
             return;
           }
         }
 
-        this.logger.log(`Marketing consent not set. Defaulting to '${this.marketingConsent()}'`);
-      })
-      .then(() => {
-        this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
+        this.logger.log(`Marketing consent not set. Defaulting to '${this.propertyRepository.marketingConsent()}'`);
       })
       .catch(error => {
         this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
       });
-  }
-
-  setConsent(consentType, consentValue) {
-    return this.selfService.putSelfConsent(consentType, consentValue, `Webapp ${z.util.Environment.version(false)}`);
-  }
-
-  changeMarketingConsent(consentGiven) {
-    const consentValue = consentGiven ? z.user.ConsentValue.GIVEN : z.user.ConsentValue.NOT_GIVEN;
-    return this.setConsent(z.user.ConsentType.MARKETING, consentValue).then(() => {
-      this.logger.log(`Marketing consent updated to ${consentValue}`);
-      this.marketingConsent(consentGiven);
-    });
   }
 };

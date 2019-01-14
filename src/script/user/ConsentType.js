@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.user = z.user || {};
-
-z.user.ConsentType = {
+export default {
   MARKETING: 2,
   TERMS_OF_USE: 1,
 };
