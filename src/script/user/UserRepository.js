@@ -18,6 +18,7 @@
  */
 
 import {UNSPLASH_URL} from '../externalRoute';
+import {t} from '../localization/Localizer';
 
 window.z = window.z || {};
 window.z.user = z.user || {};
@@ -630,7 +631,7 @@ z.user.UserRepository = class UserRepository {
 
       if (!matching_user_ids) {
         const user_et = new z.entity.User(user_id);
-        user_et.name(z.l10n.text(z.string.nonexistentUser));
+        user_et.name(t('nonexistentUser'));
         user_ets.push(user_et);
       }
     }

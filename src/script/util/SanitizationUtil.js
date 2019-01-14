@@ -83,3 +83,5 @@ z.util.SanitizationUtil = (() => {
     },
   };
 })();
+
+export default z.util.SanitizationUtil;

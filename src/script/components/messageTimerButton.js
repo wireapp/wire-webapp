@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -46,7 +48,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
     const entries = [
       {
         click: () => this.conversationEntity().localMessageTimer(0),
-        label: z.l10n.text(z.string.ephemeralUnitsNone),
+        label: t('ephemeralUnitsNone'),
       },
     ].concat(
       z.ephemeral.timings.VALUES.map(milliseconds => {

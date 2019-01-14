@@ -19,6 +19,7 @@
 
 import moment from 'moment';
 import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
+import {t} from '../../localization/Localizer';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -142,7 +143,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   getTitleForHeader(messageEntity) {
     const messageDate = moment(messageEntity.timestamp());
     if (isToday(messageDate)) {
-      return z.l10n.text(z.string.conversationToday);
+      return t('conversationToday');
     }
 
     return isCurrentYear(messageDate) ? messageDate.format('MMMM') : messageDate.format('MMMM Y');

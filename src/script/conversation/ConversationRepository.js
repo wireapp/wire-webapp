@@ -21,6 +21,7 @@ import poster from 'poster-image';
 
 import EventMapper from './EventMapper';
 import ConversationMapper from './ConversationMapper';
+import {t} from '../localization/Localizer';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -333,7 +334,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the conversation that was created
    */
   createGuestRoom() {
-    const groupName = z.l10n.text(z.string.guestRoomConversationName);
+    const groupName = t('guestRoomConversationName');
     return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
@@ -1234,8 +1235,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.error.BackendClientError.LABEL.SERVER_ERROR:
       case z.error.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.error.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
-        const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+        const messageText = t('modalServiceUnavailableMessage');
+        const titleText = t('modalServiceUnavailableHeadline');
 
         this._showModal(messageText, titleText);
         break;
@@ -1429,11 +1430,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendGif(conversationEntity, url, tag, quoteEntity) {
     if (!tag) {
-      tag = z.l10n.text(z.string.extensionsGiphyRandom);
+      tag = t('extensionsGiphyRandom');
     }
 
     return z.util.loadUrlBlob(url).then(blob => {
-      const textMessage = z.l10n.text(z.string.extensionsGiphyMessage, tag);
+      const textMessage = t('extensionsGiphyMessage', tag);
       this.sendText(conversationEntity, textMessage, null, quoteEntity);
       return this.upload_images(conversationEntity, [blob]);
     });
@@ -1621,8 +1622,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
 
-    const messageText = z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions);
-    const titleText = z.l10n.text(z.string.modalConversationTooManyMembersHeadline);
+    const messageText = t('modalConversationTooManyMembersMessage', substitutions);
+    const titleText = t('modalConversationTooManyMembersHeadline');
     this._showModal(messageText, titleText);
   }
 
@@ -1637,7 +1638,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         : z.string.modalConversationNotConnectedMessageMany;
 
       const messageText = z.l10n.text(messageStringId, username);
-      const titleText = z.l10n.text(z.string.modalConversationNotConnectedHeadline);
+      const titleText = t('modalConversationNotConnectedHeadline');
       this._showModal(messageText, titleText);
     });
   }

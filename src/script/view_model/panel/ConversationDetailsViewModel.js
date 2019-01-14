@@ -21,6 +21,7 @@
 import receiptModeToggle from 'components/receiptModeToggle';
 /* eslint-enable no-unused-vars */
 import BasePanelViewModel from './BasePanelViewModel';
+import {t} from '../../localization/Localizer';
 
 export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -175,19 +176,19 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
       return hasMultipleParticipants
-        ? z.string.conversationDetailsParticipantsUsersMany
-        : z.string.conversationDetailsParticipantsUsersOne;
+        ? t('conversationDetailsParticipantsUsersMany')
+        : t('conversationDetailsParticipantsUsersOne');
     });
 
     this.participantsServiceText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.serviceParticipants().length > 1;
       return hasMultipleParticipants
-        ? z.string.conversationDetailsParticipantsServicesMany
-        : z.string.conversationDetailsParticipantsServicesOne;
+        ? t('conversationDetailsParticipantsServicesMany')
+        : t('conversationDetailsParticipantsServicesOne');
     });
 
     this.guestOptionsText = ko.pureComputed(() => {
-      return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
+      return this.isTeamOnly() ? t('conversationDetailsGuestsOff') : t('conversationDetailsGuestsOn');
     });
 
     this.notificationStatusText = ko.pureComputed(() => {
@@ -203,12 +204,12 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
           return z.util.TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
         }
       }
-      return z.l10n.text(z.string.ephemeralUnitsNone);
+      return t('ephemeralUnitsNone');
     });
 
     const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
+      return t('tooltipConversationDetailsAddPeople', addPeopleShortcut);
     });
 
     this.shouldUpdateScrollbar = ko

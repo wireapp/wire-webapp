@@ -168,7 +168,7 @@ ko.components.register('group-video-grid', {
                     <div class="background-image"></div>
                     <div class="background-darken"></div>
                   </div>
-                  <div class="group-video-grid__pause-overlay__label" data-bind="l10n_text: z.string.videoCallPaused, css: {'group-video-grid__pause-overlay__label--minimized': $parent.minimized}" data-uie-name="status-video-paused"></div>
+                  <div class="group-video-grid__pause-overlay__label" data-bind="text: t('videoCallPaused'), css: {'group-video-grid__pause-overlay__label--minimized': $parent.minimized}" data-uie-name="status-video-paused"></div>
                 </div>
               <!-- /ko -->
             </div>

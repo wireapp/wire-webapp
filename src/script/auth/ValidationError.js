@@ -21,7 +21,7 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.ValidationError = class ValidationError extends Error {
-  constructor(types, string_identifier) {
+  constructor(types, errorMessage) {
     super();
 
     if (_.isString(types)) {
@@ -29,6 +29,6 @@ z.auth.ValidationError = class ValidationError extends Error {
     }
 
     this.types = types;
-    this.message = z.l10n.text(string_identifier);
+    this.message = errorMessage;
   }
 };

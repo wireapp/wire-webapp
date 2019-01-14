@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
+import {t} from '../localization/Localizer';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -292,7 +293,7 @@ class Conversation {
 
         const hasUserIds = !!this.participating_user_ids().length;
         if (!hasUserIds) {
-          return z.l10n.text(z.string.conversationsEmptyConversation);
+          return t('conversationsEmptyConversation');
         }
       }
 

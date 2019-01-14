@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};
@@ -52,9 +54,9 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
       action: () => window.location.replace(`/auth/${location.search}`),
       preventClose: true,
       text: {
-        action: z.l10n.text(z.string.modalAccountCreateAction),
-        message: z.l10n.text(z.string.modalAccountCreateMessage),
-        title: z.l10n.text(z.string.modalAccountCreateHeadline),
+        action: t('modalAccountCreateAction'),
+        message: t('modalAccountCreateMessage'),
+        title: t('modalAccountCreateHeadline'),
       },
       warning: false,
     });

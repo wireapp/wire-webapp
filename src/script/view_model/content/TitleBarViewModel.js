@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -84,7 +86,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     });
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
-    this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
+    this.peopleTooltip = t('tooltipConversationPeople', shortcut);
   }
 
   addedToView() {

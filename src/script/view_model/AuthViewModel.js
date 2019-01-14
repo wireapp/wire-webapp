@@ -22,6 +22,7 @@ import Cookies from 'js-cookie';
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import StorageService from '../storage/StorageService';
+import {t} from '../localization/Localizer';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';
@@ -181,16 +182,14 @@ class AuthViewModel {
     this.can_verify_account = ko.pureComputed(() => !this.disabled_by_animation());
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
-    this.posted_text = ko.pureComputed(() => z.l10n.text(z.string.authPostedResend, this.username()));
+    this.posted_text = ko.pureComputed(() => t('authPostedResend', this.username()));
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number =
         PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
-      return z.l10n.text(z.string.authVerifyCodeDescription, phone_number);
+      return t('authVerifyCodeDescription', phone_number);
     });
 
-    this.verify_code_timer_text = ko.pureComputed(() =>
-      z.l10n.text(z.string.authVerifyCodeResendTimer, this.code_expiration_in())
-    );
+    this.verify_code_timer_text = ko.pureComputed(() => t('authVerifyCodeResendTimer', this.code_expiration_in()));
 
     this.visible_section = ko.observable(undefined);
     this.visible_mode = ko.observable(undefined);
@@ -445,10 +444,10 @@ class AuthViewModel {
           if (navigator.onLine) {
             switch (error.label) {
               case z.error.BackendClientError.LABEL.BAD_REQUEST:
-                this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(t('authErrorPhoneNumberInvalid'), z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.error.BackendClientError.LABEL.INVALID_PHONE:
-                this._add_error(z.string.authErrorPhoneNumberUnknown, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(t('authErrorPhoneNumberUnknown'), z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.error.BackendClientError.LABEL.PASSWORD_EXISTS:
                 this._set_hash(z.auth.AuthView.MODE.VERIFY_PASSWORD);
@@ -457,19 +456,19 @@ class AuthViewModel {
                 _on_code_request_success(error);
                 break;
               case z.error.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
-                this._add_error(z.string.authErrorPhoneNumberBudget, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(t('authErrorPhoneNumberBudget'), z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.error.BackendClientError.LABEL.SUSPENDED:
-                this._add_error(z.string.authErrorSuspended);
+                this._add_error(t('authErrorSuspended'));
                 break;
               case z.error.BackendClientError.LABEL.UNAUTHORIZED:
-                this._add_error(z.string.authErrorPhoneNumberForbidden, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(t('authErrorPhoneNumberForbidden'), z.auth.AuthView.TYPE.PHONE);
                 break;
               default:
-                this._add_error(z.string.authErrorMisc);
+                this._add_error(t('authErrorMisc'));
             }
           } else {
-            this._add_error(z.string.authErrorOffline);
+            this._add_error(t('authErrorOffline'));
           }
           this._has_errors();
         });
@@ -506,16 +505,16 @@ class AuthViewModel {
           if (error) {
             switch (error.label) {
               case z.error.BackendClientError.LABEL.BLACKLISTED_EMAIL:
-                this._add_error(z.string.authErrorEmailForbidden, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(t('authErrorEmailForbidden'), z.auth.AuthView.TYPE.EMAIL);
                 break;
               case z.error.BackendClientError.LABEL.KEY_EXISTS:
-                this._add_error(z.string.authErrorEmailExists, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(t('authErrorEmailExists'), z.auth.AuthView.TYPE.EMAIL);
                 break;
               case z.error.BackendClientError.LABEL.INVALID_EMAIL:
-                this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(t('authErrorEmailMalformed'), z.auth.AuthView.TYPE.EMAIL);
                 break;
               default:
-                this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(t('authErrorEmailMalformed'), z.auth.AuthView.TYPE.EMAIL);
             }
             return this._has_errors();
           }
@@ -537,7 +536,7 @@ class AuthViewModel {
         .then(() => this._authentication_successful())
         .catch(() => {
           if (!this.validation_errors().length) {
-            this._add_error(z.string.authErrorCode, z.auth.AuthView.TYPE.CODE);
+            this._add_error(t('authErrorCode'), z.auth.AuthView.TYPE.CODE);
             this._has_errors();
           }
           this.pending_server_request(false);
@@ -563,15 +562,15 @@ class AuthViewModel {
           if (navigator.onLine) {
             if (error.label) {
               if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
-                this._add_error(z.string.authErrorPending);
+                this._add_error(t('authErrorPending'));
               } else {
-                this._add_error(z.string.authErrorSignIn, z.auth.AuthView.TYPE.PASSWORD);
+                this._add_error(t('authErrorSignIn'), z.auth.AuthView.TYPE.PASSWORD);
               }
             } else {
-              this._add_error(z.string.authErrorMisc);
+              this._add_error(t('authErrorMisc'));
             }
           } else {
-            this._add_error(z.string.authErrorOffline);
+            this._add_error(t('authErrorOffline'));
           }
           this._has_errors();
         });
@@ -655,7 +654,7 @@ class AuthViewModel {
     this.phone_number(phone_number);
 
     if (input_value.length && !this.phone_number().length) {
-      this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
+      this._add_error(t('authErrorPhoneNumberInvalid'), z.auth.AuthView.TYPE.PHONE);
     }
   }
 
@@ -718,7 +717,7 @@ class AuthViewModel {
   }
 
   clicked_on_wire_link() {
-    const path = z.l10n.text(z.string.urlWebsiteRoot);
+    const path = t('urlWebsiteRoot');
     z.util.SanitizationUtil.safeWindowOpen(getWebsiteUrl(path));
   }
 
@@ -1265,12 +1264,12 @@ class AuthViewModel {
    * Add a validation error.
    *
    * @private
-   * @param {string} string_identifier - Identifier of error message
+   * @param {string} errorMessage - The error message
    * @param {Array<string>|string} [types] - Input type(s) of validation error
    * @returns {undefined} No return value
    */
-  _add_error(string_identifier, types) {
-    const error = new z.auth.ValidationError(types || [], string_identifier);
+  _add_error(errorMessage, types) {
+    const error = new z.auth.ValidationError(types || [], errorMessage);
     this.validation_errors.push(error);
 
     error.types.map(type => {
@@ -1387,11 +1386,11 @@ class AuthViewModel {
       .toLowerCase();
 
     if (!username.length) {
-      return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
+      return this._add_error(t('authErrorEmailMissing'), z.auth.AuthView.TYPE.EMAIL);
     }
 
     if (!z.util.isValidEmail(username)) {
-      this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
+      this._add_error(t('authErrorEmailMalformed'), z.auth.AuthView.TYPE.EMAIL);
     }
   }
 
@@ -1432,8 +1431,8 @@ class AuthViewModel {
   _validate_password(mode) {
     if (this.password().length < z.config.MINIMUM_PASSWORD_LENGTH) {
       const isPasswordVerification = mode === z.auth.AuthView.MODE.VERIFY_PASSWORD;
-      const stringId = isPasswordVerification ? z.string.authErrorPasswordWrong : z.string.authErrorPasswordShort;
-      this._add_error(stringId, z.auth.AuthView.TYPE.PASSWORD);
+      const errorMessage = isPasswordVerification ? t('authErrorPasswordWrong') : t('authErrorPasswordShort');
+      this._add_error(errorMessage, z.auth.AuthView.TYPE.PASSWORD);
     }
   }
 
@@ -1444,7 +1443,7 @@ class AuthViewModel {
    */
   _validate_phone() {
     if (!z.util.isValidPhoneNumber(this.phone_number_e164())) {
-      this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
+      this._add_error(t('authErrorPhoneNumberInvalid'), z.auth.AuthView.TYPE.PHONE);
     }
   }
 
@@ -1521,7 +1520,7 @@ class AuthViewModel {
       .catch(error => {
         if (error.type !== z.error.UserError.TYPE.USER_MISSING_EMAIL) {
           this.logger.error(`Login failed: ${error.message}`, error);
-          this._add_error(z.string.authErrorMisc);
+          this._add_error(t('authErrorMisc'));
           this._has_errors();
           this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
         }

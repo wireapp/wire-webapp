@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.media = z.media || {};
 
@@ -99,7 +101,7 @@ z.media.MediaRepository = class MediaRepository {
               '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
           },
         }),
-        title: z.l10n.text(z.string.modalNoCameraTitle),
+        title: t('modalNoCameraTitle'),
       },
     };
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);

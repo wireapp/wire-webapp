@@ -20,6 +20,8 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
+import {t} from '../localization/Localizer';
+
 z.util.LocalizerUtil = {
   joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
@@ -45,8 +47,8 @@ z.util.LocalizerUtil = {
 
       const exactlyTwoNames = numberOfNames === 2;
       const additionalNames = exactlyTwoNames
-        ? `${secondLastName} ${z.l10n.text(z.string.and)} ${lastName}`
-        : `${secondLastName}${z.l10n.text(z.string.enumerationAnd)}${lastName}`;
+        ? `${secondLastName} ${t('and')} ${lastName}`
+        : `${secondLastName}${t('enumerationAnd')}${lastName}`;
       firstNames.push(additionalNames);
     }
 

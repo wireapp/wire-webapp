@@ -14,14 +14,14 @@
         <div class="group-creation-header-block">
           <span class="button-icon icon-close" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
         </div>
-        <span class="label-xs group-creation-modal-title" data-bind="l10n_text: z.string.groupCreationPreferencesHeader"></span>
+        <span class="label-xs group-creation-modal-title" data-bind="text: t('groupCreationPreferencesHeader')"></span>
         <div class="group-creation-header-block">
-          <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, l10n_text: z.string.groupCreationPreferencesAction" data-uie-name="go-next"></span>
+          <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction')" data-uie-name="go-next"></span>
         </div>
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants -->
-      <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: z.string.groupCreationParticipantsPlaceholder, enter: clickOnCreate" spellcheck="false"></user-input>
+      <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: t('groupCreationParticipantsPlaceholder'), enter: clickOnCreate" spellcheck="false"></user-input>
     <!-- /ko -->
     <div class="modal-center group-creation-modal-center">
       <!-- ko if: stateIsParticipants() -->
@@ -36,14 +36,14 @@
                data-uie-name="enter-group-name">
         <div class="group-creation-error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
         <!-- ko if: isTeam -->
-          <div class="group-size-info" data-bind="l10n_text: {id: z.string.groupSizeInfo, substitute: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE}" data-uie-name="status-group-size-info"></div>
+          <div class="group-size-info" data-bind="text: t('groupSizeInfo', z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info"></div>
           <guest-mode-toggle params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
           <info-toggle params="
             dataUieName: 'read-receipts',
-            info: z.string.readReceiptsToogleInfo,
+            info: t('readReceiptsToogleInfo'),
             isChecked: enableReadReceipts,
             isDisabled: false,
-            name: z.string.readReceiptsToogleName
+            name: t('readReceiptsToogleName')
           "></info-toggle>
         <!-- /ko -->
       <!-- /ko -->

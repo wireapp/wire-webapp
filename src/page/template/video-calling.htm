@@ -26,7 +26,7 @@
 
         <!-- ko ifnot: isChoosingScreen() -->
           <div id="video-controls" class="video-controls hide-controls-hidden">
-            <div class="video-controls__fit-info" data-bind="l10n_text: z.string.videoCallOverlayFitVideoLabel" data-uie-name="label-fit-fill-info"></div>
+            <div class="video-controls__fit-info" data-bind="text: t('videoCallOverlayFitVideoLabel')" data-uie-name="label-fit-fill-info"></div>
             <div class="video-controls__wrapper">
               <div class="video-controls__button" data-bind="click: clickedOnMinimize" data-uie-name="do-call-controls-video-minimize">
                 <!-- ko if: hasUnreadMessages() -->
@@ -35,14 +35,14 @@
                 <!-- ko ifnot: hasUnreadMessages() -->
                   <message-icon></message-icon>
                 <!-- /ko -->
-                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayConversations"></div>
+                <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayConversations')"></div>
               </div>
 
               <div class="video-controls__button"
                   data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}"
                   data-uie-name="do-call-controls-video-call-mute">
                 <micoff-icon></micoff-icon>
-                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayMute"></div>
+                <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayMute')"></div>
               </div>
 
               <!-- ko if: showToggleVideo() -->
@@ -56,7 +56,7 @@
                     </device-toggle-button>
                   <!-- /ko -->
                   <!-- ko ifnot: showSwitchCamera() -->
-                    <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayVideo"></div>
+                    <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayVideo')"></div>
                   <!-- /ko -->
                 </div>
               <!-- /ko -->
@@ -71,13 +71,13 @@
                   </device-toggle-button>
                 <!-- /ko -->
                 <!-- ko ifnot: showSwitchScreen() -->
-                  <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayShareScreen"></div>
+                  <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayShareScreen')"></div>
                 <!-- /ko -->
               </div>
 
               <div class="video-controls__button video-controls__button--red" data-bind="click: clickedOnLeaveCall" data-uie-name="do-call-controls-video-call-cancel">
                 <hangup-icon></hangup-icon>
-                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayHangUp"></div>
+                <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayHangUp')"></div>
               </div>
             </div>
           </div>

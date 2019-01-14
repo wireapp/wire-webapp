@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.URLUtil = (() => {
+const URLUtil = (() => {
   const TYPE = {
     ACCOUNT: 'TYPE.ACCOUNT',
     SUPPORT: 'TYPE.SUPPORT',
@@ -138,3 +138,7 @@ z.util.URLUtil = (() => {
     prependProtocol: _prependProtocol,
   };
 })();
+
+export default URLUtil;
+
+z.util.URLUtil = URLUtil;

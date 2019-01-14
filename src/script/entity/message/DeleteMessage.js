@@ -19,6 +19,8 @@
 
 import moment from 'moment';
 
+import {t} from '../../localization/Localizer';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -30,7 +32,7 @@ z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
     this.deleted_timestamp = null;
 
     this.display_deleted_timestamp = () => {
-      return z.l10n.text(z.string.conversationDeleteTimestamp, moment(this.deleted_timestamp).format('HH:mm'));
+      return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('HH:mm'));
     };
   }
 };

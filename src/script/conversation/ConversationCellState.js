@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -60,19 +62,19 @@ z.conversation.ConversationCellState = (() => {
         const messageEntity = mentionMessageEntity || replyMessageEntity;
 
         if (messageEntity.is_ephemeral()) {
-          let stringId;
+          let summary;
 
           if (hasSingleMention) {
-            stringId = conversationEntity.isGroup()
-              ? z.string.conversationsSecondaryLineEphemeralMentionGroup
-              : z.string.conversationsSecondaryLineEphemeralMention;
+            summary = conversationEntity.isGroup()
+              ? t('conversationsSecondaryLineEphemeralMentionGroup')
+              : t('conversationsSecondaryLineEphemeralMention');
           } else {
-            stringId = conversationEntity.isGroup()
-              ? z.string.conversationsSecondaryLineEphemeralReplyGroup
-              : z.string.conversationsSecondaryLineEphemeralReply;
+            summary = conversationEntity.isGroup()
+              ? t('conversationsSecondaryLineEphemeralReplyGroup')
+              : t('conversationsSecondaryLineEphemeralReply');
           }
 
-          return z.l10n.text(stringId);
+          return summary;
         }
 
         return conversationEntity.isGroup()
@@ -185,7 +187,7 @@ z.conversation.ConversationCellState = (() => {
   const _getStateCall = {
     description: conversationEntity => {
       const creatorName = conversationEntity.call().creatingUser.first_name();
-      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, creatorName);
+      return t('conversationsSecondaryLineIncomingCall', creatorName);
     },
     icon: () => z.conversation.ConversationStatusIcon.NONE,
     match: conversationEntity => {
@@ -214,7 +216,7 @@ z.conversation.ConversationCellState = (() => {
           if (lastMessageEntity.isMemberJoin()) {
             if (userCountIsOne) {
               if (!lastMessageEntity.remoteUserEntities().length) {
-                return z.l10n.text(z.string.conversationsSecondaryLinePersonAddedYou, lastMessageEntity.user().name());
+                return t('conversationsSecondaryLinePersonAddedYou', lastMessageEntity.user().name());
               }
 
               const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
@@ -226,7 +228,7 @@ z.conversation.ConversationCellState = (() => {
               return z.l10n.text(stringId, remoteUserEntity.name());
             }
 
-            return z.l10n.text(z.string.conversationsSecondaryLinePeopleAdded, userCount);
+            return t('conversationsSecondaryLinePeopleAdded', userCount);
           }
 
           if (lastMessageEntity.isMemberRemoval()) {
@@ -236,7 +238,7 @@ z.conversation.ConversationCellState = (() => {
               if (remoteUserEntity) {
                 if (lastMessageEntity.isTeamMemberLeave()) {
                   const name = lastMessageEntity.name() || remoteUserEntity.name();
-                  return z.l10n.text(z.string.conversationsSecondaryLinePersonRemovedTeam, name);
+                  return t('conversationsSecondaryLinePersonRemovedTeam', name);
                 }
 
                 const userSelfLeft = remoteUserEntity.id === lastMessageEntity.user().id;
@@ -248,14 +250,14 @@ z.conversation.ConversationCellState = (() => {
               }
             }
 
-            return z.l10n.text(z.string.conversationsSecondaryLinePeopleLeft, userCount);
+            return t('conversationsSecondaryLinePeopleLeft', userCount);
           }
         }
       }
 
       const isConversationRename = lastMessageEntity.is_system() && lastMessageEntity.is_conversation_rename();
       if (isConversationRename) {
-        return z.l10n.text(z.string.conversationsSecondaryLineRenamed, lastMessageEntity.user().name());
+        return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
       }
     },
     icon: conversationEntity => {

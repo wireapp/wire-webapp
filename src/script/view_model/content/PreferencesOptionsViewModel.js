@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -91,8 +93,8 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
-        message: z.l10n.text(z.string.modalCallEmptyLogMessage),
-        title: z.l10n.text(z.string.modalCallEmptyLogHeadline),
+        message: t('modalCallEmptyLogMessage'),
+        title: t('modalCallEmptyLogHeadline'),
       },
     });
   }

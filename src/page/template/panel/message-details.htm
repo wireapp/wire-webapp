@@ -38,19 +38,19 @@
           <!-- ko if: state() === states.NO_RECEIPTS -->
             <div class="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
               <read-icon class="message-details__empty__icon"></read-icon>
-              <div class="message-details__empty__text" data-bind="l10n_text: z.string.messageDetailsNoReceipts"></div>
+              <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoReceipts')"></div>
             </div>
           <!-- /ko -->
           <!-- ko if: state() === states.NO_LIKES -->
             <div class="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
               <like-icon class="message-details__empty__icon"></like-icon>
-              <div class="message-details__empty__text" data-bind="l10n_text: z.string.messageDetailsNoLikes"></div>
+              <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoLikes')"></div>
             </div>
           <!-- /ko -->
           <!-- ko if: state() === states.RECEIPTS_OFF -->
             <div class="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
               <read-icon class="message-details__empty__icon"></read-icon>
-              <div class="message-details__empty__text" data-bind="l10n_text: z.string.messageDetailsReceiptsOff"></div>
+              <div class="message-details__empty__text" data-bind="text: t('messageDetailsReceiptsOff')"></div>
             </div>
           <!-- /ko -->
         </div>
@@ -59,13 +59,13 @@
     <div class="panel__footer">
       <div
         class="panel__footer__info"
-        data-bind="l10n_text: {id: z.string.messageDetailsSent, substitute: sentFooter()}"
+        data-bind="text: t('messageDetailsSent', sentFooter())"
         data-uie-name="status-message-details-sent"
       ></div>
       <!-- ko if: editedFooter() -->
         <div
           class="panel__footer__info"
-          data-bind="l10n_text: {id: z.string.messageDetailsEdited, substitute: editedFooter()}"
+          data-bind="text: t('messageDetailsEdited', editedFooter())"
           data-uie-name="status-message-details-edited"
         ></div>
       <!-- /ko -->

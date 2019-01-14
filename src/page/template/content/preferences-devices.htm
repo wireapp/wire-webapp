@@ -1,17 +1,17 @@
 <div id="preferences-devices" class="preferences-page preferences-devices" data-bind="with: $root.preferencesDevices">
-  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesDevices"></div>
+  <div class="preferences-titlebar" data-bind="text: t('preferencesDevices')"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll: shouldUpdateScrollbar">
       <section class="preferences-section" data-uie-name="preferences-device-current">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesDevicesCurrent"></header>
+        <header class="preferences-header" data-bind="text: t('preferencesDevicesCurrent')"></header>
         <div class="preferences-devices-model" data-bind="text: currentClient().model"></div>
-        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
+        <div class="preferences-devices-id"><span data-bind="text: t('preferencesDevicesId')"></span>
           <span data-bind="foreach: displayClientId()" data-uie-name="preferences-device-current-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
         <div class="preferences-devices-activated">
           <div data-bind="foreach: activationDate"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         </div>
-        <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferencesDevicesFingerprint"></div>
+        <div class="preferences-devices-fingerprint-label" data-bind="text: t('preferencesDevicesFingerprint')"></div>
         <div class="preferences-devices-fingerprint" data-bind="foreach: localFingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>
       </section>
 
@@ -19,7 +19,7 @@
 
       <!-- ko if: devices().length -->
         <section class="preferences-section">
-          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesDevicesActive"></header>
+          <header class="preferences-header" data-bind="text: t('preferencesDevicesActive')"></header>
           <!-- ko foreach: devices -->
             <div class="preferences-devices-card" data-bind="click: $parent.clickOnShowDevice">
               <div class="preferences-devices-card-data">
@@ -34,7 +34,7 @@
                 <div class="preferences-devices-card-info">
                   <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
                   <div class="preferences-devices-id">
-                    <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
+                    <span data-bind="text: t('preferencesDevicesId')"></span>
                     <span data-bind="foreach: formatId()" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
                   </div>
                 </div>
@@ -47,7 +47,7 @@
               </div>
             </div>
           <!-- /ko -->
-          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesDevicesActiveDetail"></div>
+          <div class="preferences-detail" data-bind="text: t('preferencesDevicesActiveDetail')"></div>
         </section>
       <!-- /ko -->
     </div>

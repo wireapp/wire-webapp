@@ -17,8 +17,10 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
 import moment from 'moment';
+
+import BasePanelViewModel from './BasePanelViewModel';
+import {t} from '../../localization/Localizer';
 
 export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
@@ -119,11 +121,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.receiptsTitle = ko.pureComputed(() => {
-      return z.l10n.text(z.string.messageDetailsTitleReceipts, formatUserCount(this.receiptUsers()));
+      return t('messageDetailsTitleReceipts', formatUserCount(this.receiptUsers()));
     });
 
     this.likesTitle = ko.pureComputed(() => {
-      return z.l10n.text(z.string.messageDetailsTitleLikes, formatUserCount(this.likeUsers()));
+      return t('messageDetailsTitleLikes', formatUserCount(this.likeUsers()));
     });
 
     this.showTabs = ko.pureComputed(() => this.supportsReceipts() && this.supportsLikes());
@@ -144,7 +146,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       if (!this.supportsLikes()) {
         return this.receiptsTitle();
       }
-      return z.l10n.text(z.string.messageDetailsTitle);
+      return t('messageDetailsTitle');
     });
 
     this.shouldUpdateScrollbar = ko

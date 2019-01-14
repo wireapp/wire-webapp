@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -62,7 +64,7 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
             number2: replaceContent.total,
           };
 
-          const handlingProgress = z.l10n.text(z.string.initProgress, substitutes);
+          const handlingProgress = t('initProgress', substitutes);
           updatedLoadingMessage = `${z.l10n.text(messageLocator)}${handlingProgress}`;
           break;
         }

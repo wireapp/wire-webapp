@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -119,9 +121,9 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
             z.util.SanitizationUtil.safeWindowOpen(url);
           },
           text: {
-            action: z.l10n.text(z.string.modalCallNoMicrophoneAction),
-            message: z.l10n.text(z.string.modalCallNoMicrophoneMessage),
-            title: z.l10n.text(z.string.modalCallNoMicrophoneHeadline),
+            action: t('modalCallNoMicrophoneAction'),
+            message: t('modalCallNoMicrophoneMessage'),
+            title: t('modalCallNoMicrophoneHeadline'),
           },
         });
         break;

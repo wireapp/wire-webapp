@@ -19,6 +19,7 @@
 
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
+import {t} from '../../localization/Localizer';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -70,7 +71,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       const parts = [];
 
       if (this.error_code) {
-        const error_text = z.l10n.text(z.string.conversationUnableToDecryptErrorMessage);
+        const error_text = t('conversationUnableToDecryptErrorMessage');
         parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span> `);
       }
 

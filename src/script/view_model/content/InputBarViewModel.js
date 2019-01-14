@@ -18,6 +18,7 @@
  */
 
 import * as StorageUtil from 'utils/StorageUtil';
+import {t} from '../../localization/Localizer';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -224,7 +225,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
-    this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
+    this.pingTooltip = t('tooltipConversationPing', pingShortcut);
 
     this.isEditing.subscribe(isEditing => {
       if (isEditing) {
@@ -242,7 +243,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
-        return this.pastedFileName(z.l10n.text(z.string.conversationSendPastedFile, date));
+        return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
       this.pastedFilePreviewUrl(null);
@@ -506,8 +507,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (isMessageTextTooLong) {
       return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: z.l10n.text(z.string.modalConversationMessageTooLongMessage, z.config.MAXIMUM_MESSAGE_LENGTH),
-          title: z.l10n.text(z.string.modalConversationMessageTooLongHeadline),
+          message: t('modalConversationMessageTooLongMessage', z.config.MAXIMUM_MESSAGE_LENGTH),
+          title: t('modalConversationMessageTooLongHeadline'),
         },
       });
     }
@@ -799,8 +800,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           const fileSize = z.util.formatBytes(uploadLimit);
           const options = {
             text: {
-              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
-              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
+              message: t('modalAssetTooLargeMessage', fileSize),
+              title: t('modalAssetTooLargeHeadline'),
             },
           };
 
@@ -820,8 +821,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (isHittingUploadLimit) {
       const modalOptions = {
         text: {
-          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, concurrentUploadLimit),
-          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
+          message: t('modalAssetParallelUploadsMessage', concurrentUploadLimit),
+          title: t('modalAssetParallelUploadsHeadline'),
         },
       };
 

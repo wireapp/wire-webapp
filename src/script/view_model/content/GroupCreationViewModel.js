@@ -18,6 +18,7 @@
  */
 
 import ReceiptMode from '../../conversation/ReceiptMode';
+import {t} from '../../localization/Localizer';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -193,11 +194,11 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
-        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
+        return this.nameError(t('groupCreationPreferencesErrorNameLong'));
       }
 
       if (nameTooShort) {
-        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
+        return this.nameError(t('groupCreationPreferencesErrorNameShort'));
       }
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {

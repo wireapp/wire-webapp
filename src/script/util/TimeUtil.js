@@ -21,6 +21,8 @@
 
 import moment from 'moment';
 
+import {t} from '../localization/Localizer';
+
 /**
  * @typedef {object} DiscreteTimeUnit
  * @property {string} longUnit
@@ -132,8 +134,8 @@ z.util.TimeUtil = {
         break;
       }
     }
-    const joiner = ` ${z.l10n.text(z.string.and)} `;
-    return `${validUnitStrings.join(joiner)} ${z.l10n.text(z.string.ephemeralRemaining)}`;
+    const joiner = ` ${t('and')} `;
+    return `${validUnitStrings.join(joiner)} ${t('ephemeralRemaining')}`;
   },
 
   /**

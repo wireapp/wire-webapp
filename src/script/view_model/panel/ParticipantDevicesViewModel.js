@@ -19,6 +19,7 @@
 
 import BasePanelViewModel from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
+import {t} from '../../localization/Localizer';
 
 export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
@@ -68,7 +69,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
         return '';
       }
 
-      const text = z.l10n.text(z.string.participantDevicesDetailHeadline, {user: this.userEntity().first_name()});
+      const text = t('participantDevicesDetailHeadline', this.userEntity().first_name());
 
       const textWithHtmlTags = /\{\{[^\}]+\}\}[^\{]+\{\{[^\}]+\}\}/;
       const textWithinHtmlTags = /\{\{[^\}]+\}\}/gm;
@@ -85,13 +86,11 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {
-      return this.userEntity() ? z.l10n.text(z.string.participantDevicesHeadline, this.userEntity().first_name()) : '';
+      return this.userEntity() ? t('participantDevicesHeadline', this.userEntity().first_name()) : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
-      return this.userEntity()
-        ? z.l10n.text(z.string.participantDevicesOutdatedClientMessage, this.userEntity().first_name())
-        : '';
+      return this.userEntity() ? t('participantDevicesOutdatedClientMessage', this.userEntity().first_name()) : '';
     });
 
     this.isVisible.subscribe(isVisible => {

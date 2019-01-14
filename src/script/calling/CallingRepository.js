@@ -19,6 +19,8 @@
 
 import adapter from 'webrtc-adapter';
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
@@ -972,7 +974,7 @@ z.calling.CallingRepository = class CallingRepository {
     return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
       const noConversationParticipants = !conversationEntity.participating_user_ids().length;
       if (noConversationParticipants) {
-        this._showModal(z.string.modalCallEmptyConversationHeadline, z.string.modalCallEmptyConversationMessage);
+        this._showModal(t('modalCallEmptyConversationHeadline'), t('modalCallEmptyConversationMessage'));
         throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
 
@@ -984,7 +986,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
       if (isVideoCall && !conversationEntity.supportsVideoCall(isOutgoingCall)) {
-        this._showModal(z.string.modalCallNoGroupVideoHeadline, z.string.modalCallNoGroupVideoMessage);
+        this._showModal(t('modalCallNoGroupVideoHeadline'), t('modalCallNoGroupVideoMessage'));
         throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
     });
@@ -1005,30 +1007,30 @@ z.calling.CallingRepository = class CallingRepository {
       if (!ongoingCallId) {
         resolve();
       } else {
-        let actionStringId;
-        let messageStringId;
-        let titleStringId;
+        let actionString;
+        let messageString;
+        let titleString;
 
         switch (callState) {
           case z.calling.enum.CALL_STATE.INCOMING:
           case z.calling.enum.CALL_STATE.REJECTED: {
-            actionStringId = z.string.modalCallSecondIncomingAction;
-            messageStringId = z.string.modalCallSecondIncomingMessage;
-            titleStringId = z.string.modalCallSecondIncomingHeadline;
+            actionString = t('modalCallSecondIncomingAction');
+            messageString = t('modalCallSecondIncomingMessage');
+            titleString = t('modalCallSecondIncomingHeadline');
             break;
           }
 
           case z.calling.enum.CALL_STATE.ONGOING: {
-            actionStringId = z.string.modalCallSecondOngoingAction;
-            messageStringId = z.string.modalCallSecondOngoingMessage;
-            titleStringId = z.string.modalCallSecondOngoingHeadline;
+            actionString = t('modalCallSecondOngoingAction');
+            messageString = t('modalCallSecondOngoingMessage');
+            titleString = t('modalCallSecondOngoingHeadline');
             break;
           }
 
           case z.calling.enum.CALL_STATE.OUTGOING: {
-            actionStringId = z.string.modalCallSecondOutgoingAction;
-            messageStringId = z.string.modalCallSecondOutgoingMessage;
-            titleStringId = z.string.modalCallSecondOutgoingHeadline;
+            actionString = t('modalCallSecondOutgoingAction');
+            messageString = t('modalCallSecondOutgoingMessage');
+            titleString = t('modalCallSecondOutgoingHeadline');
             break;
           }
 
@@ -1051,9 +1053,9 @@ z.calling.CallingRepository = class CallingRepository {
             }
           },
           text: {
-            action: z.l10n.text(actionStringId),
-            message: z.l10n.text(messageStringId),
-            title: z.l10n.text(titleStringId),
+            action: actionString,
+            message: messageString,
+            title: titleString,
           },
         });
         this.callLogger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
@@ -1276,15 +1278,15 @@ z.calling.CallingRepository = class CallingRepository {
    * Show acknowledgement warning modal.
    *
    * @private
-   * @param {string} titleStringId - String ID for modal title
-   * @param {string} messageStringId - String ID for modal message
+   * @param {string} title - modal title
+   * @param {string} message - modal message
    * @returns {undefined} No return value
    */
-  _showModal(titleStringId, messageStringId) {
+  _showModal(title, message) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
-        message: z.l10n.text(messageStringId),
-        title: z.l10n.text(titleStringId),
+        message,
+        title,
       },
     });
   }

@@ -18,6 +18,7 @@
  */
 
 import BasePanelViewModel from './BasePanelViewModel';
+import {t} from '../../localization/Localizer';
 
 export default class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -97,9 +98,9 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
       },
       preventClose: true,
       text: {
-        action: z.l10n.text(z.string.modalConversationRevokeLinkAction),
-        message: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
-        title: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
+        action: t('modalConversationRevokeLinkAction'),
+        message: t('modalConversationRevokeLinkMessage'),
+        title: t('modalConversationRevokeLinkHeadline'),
       },
     });
   }
@@ -131,9 +132,9 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
         action: () => _changeAccessState(),
         preventClose: true,
         text: {
-          action: z.l10n.text(z.string.modalConversationRemoveGuestsAction),
-          message: z.l10n.text(z.string.modalConversationRemoveGuestsMessage),
-          title: z.l10n.text(z.string.modalConversationRemoveGuestsHeadline),
+          action: t('modalConversationRemoveGuestsAction'),
+          message: t('modalConversationRemoveGuestsMessage'),
+          title: t('modalConversationRemoveGuestsHeadline'),
         },
       });
     }

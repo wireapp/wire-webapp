@@ -21,65 +21,99 @@ import ko from 'knockout';
 import moment from 'moment';
 
 import * as StorageUtil from 'utils/StorageUtil';
+import SanitizationUtil from 'utils/SanitizationUtil';
+import URLUtil from 'utils/URLUtil';
+import URLParameter from '../auth/URLParameter';
+import StorageKey from '../storage/StorageKey';
 
 /* eslint-disable no-unused-vars */
-import cs from 'moment/locale/cs.js';
-import da from 'moment/locale/da.js';
-import de from 'moment/locale/de.js';
-import el from 'moment/locale/el.js';
-import es from 'moment/locale/es.js';
-import et from 'moment/locale/et.js';
-import fi from 'moment/locale/fi.js';
-import fr from 'moment/locale/fr.js';
-import hr from 'moment/locale/hr.js';
-import hu from 'moment/locale/hu.js';
-import it from 'moment/locale/it.js';
-import lt from 'moment/locale/lt.js';
-import nl from 'moment/locale/nl.js';
-import pl from 'moment/locale/pl.js';
-import pt from 'moment/locale/pt.js';
-import ro from 'moment/locale/ro.js';
-import ru from 'moment/locale/ru.js';
-import sk from 'moment/locale/sk.js';
-import sl from 'moment/locale/sl.js';
-import tr from 'moment/locale/tr.js';
-import uk from 'moment/locale/uk.js';
-
-import initGlobal from '../localization/strings-init.js';
-import webappGlobal from '../localization/webapp.js';
-import csGlobal from '../localization/translations/webapp-cs.js';
-import daGlobal from '../localization/translations/webapp-da.js';
-import deGlobal from '../localization/translations/webapp-de.js';
-import elGlobal from '../localization/translations/webapp-el.js';
-import esGlobal from '../localization/translations/webapp-es.js';
-import etGlobal from '../localization/translations/webapp-et.js';
-import fiGlobal from '../localization/translations/webapp-fi.js';
-import frGlobal from '../localization/translations/webapp-fr.js';
-import hrGlobal from '../localization/translations/webapp-hr.js';
-import huGlobal from '../localization/translations/webapp-hu.js';
-import itGlobal from '../localization/translations/webapp-it.js';
-import ltGlobal from '../localization/translations/webapp-lt.js';
-import nlGlobal from '../localization/translations/webapp-nl.js';
-import plGlobal from '../localization/translations/webapp-pl.js';
-import ptGlobal from '../localization/translations/webapp-pt.js';
-import roGlobal from '../localization/translations/webapp-ro.js';
-import ruGlobal from '../localization/translations/webapp-ru.js';
-import skGlobal from '../localization/translations/webapp-sk.js';
-import slGlobal from '../localization/translations/webapp-sl.js';
-import trGlobal from '../localization/translations/webapp-tr.js';
-import ukGlobal from '../localization/translations/webapp-uk.js';
+import moment_cs from 'moment/locale/cs.js';
+import moment_da from 'moment/locale/da.js';
+import moment_de from 'moment/locale/de.js';
+import moment_el from 'moment/locale/el.js';
+import moment_es from 'moment/locale/es.js';
+import moment_et from 'moment/locale/et.js';
+import moment_fi from 'moment/locale/fi.js';
+import moment_fr from 'moment/locale/fr.js';
+import moment_hr from 'moment/locale/hr.js';
+import moment_hu from 'moment/locale/hu.js';
+import moment_it from 'moment/locale/it.js';
+import moment_lt from 'moment/locale/lt.js';
+import moment_nl from 'moment/locale/nl.js';
+import moment_pl from 'moment/locale/pl.js';
+import moment_pt from 'moment/locale/pt.js';
+import moment_ro from 'moment/locale/ro.js';
+import moment_ru from 'moment/locale/ru.js';
+import moment_sk from 'moment/locale/sk.js';
+import moment_sl from 'moment/locale/sl.js';
+import moment_tr from 'moment/locale/tr.js';
+import moment_uk from 'moment/locale/uk.js';
 /* eslint-enable no-unused-vars */
+
+import cs from '../localization/translations/cs.json';
+import da from '../localization/translations/da.json';
+import de from '../localization/translations/de.json';
+import el from '../localization/translations/el.json';
+import en from '../localization/translations/en.json';
+import es from '../localization/translations/es.json';
+import et from '../localization/translations/et.json';
+import fi from '../localization/translations/fi.json';
+import fr from '../localization/translations/fr.json';
+import hr from '../localization/translations/hr.json';
+import hu from '../localization/translations/hu.json';
+import it from '../localization/translations/it.json';
+import lt from '../localization/translations/lt.json';
+import nl from '../localization/translations/nl.json';
+import pl from '../localization/translations/pl.json';
+import pt from '../localization/translations/pt.json';
+import ro from '../localization/translations/ro.json';
+import ru from '../localization/translations/ru.json';
+import sk from '../localization/translations/sk.json';
+import sl from '../localization/translations/sl.json';
+import tr from '../localization/translations/tr.json';
+import uk from '../localization/translations/uk.json';
 
 window.z = window.z || {};
 
+window.z.string = {
+  cs,
+  da,
+  de,
+  el,
+  en,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  sk,
+  sl,
+  tr,
+  uk,
+};
+
+window.z.string.Declension = {
+  ACCUSATIVE: 'accusative',
+  DATIVE: 'dative',
+  NOMINATIVE: 'nominative',
+};
+
 (function setAppLocale() {
   const DEFAULT_LOCALE = 'en';
-  const queryParam = z.util.URLUtil.getParameter(z.auth.URLParameter.LOCALE);
+  const queryParam = URLUtil.getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2);
-  let storedLocale = StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
+  let storedLocale = StorageUtil.getValue(StorageKey.LOCALIZATION.LOCALE);
 
   if (queryParam) {
-    storedLocale = StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
+    storedLocale = StorageUtil.setValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
@@ -89,20 +123,20 @@ window.z = window.z || {};
   moment.locale([locale, DEFAULT_LOCALE]);
 
   if (z.string[locale]) {
-    Object.assign(z.string, z.string[locale]);
+    Object.assign(z.string, z.string[DEFAULT_LOCALE], z.string[locale]);
   }
 })();
 
+const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
+
+const replaceSubstitute = (string, regex, substitute) => {
+  const replacement = isStringOrNumber(substitute)
+    ? substitute
+    : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
+  return string.replace(regex, replacement);
+};
+
 z.l10n = (() => {
-  const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
-
-  const replaceSubstitute = (string, regex, substitute) => {
-    const replacement = isStringOrNumber(substitute)
-      ? substitute
-      : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
-    return string.replace(regex, replacement);
-  };
-
   return {
     safeHtml(value, substitutions = {}) {
       const replace = isStringOrNumber(substitutions) ? substitutions : substitutions.replace;
@@ -122,7 +156,7 @@ z.l10n = (() => {
         string = replaceSubstitute(string, /{{(.+?)}}/g, replace);
       }
 
-      string = z.util.SanitizationUtil.escapeString(string);
+      string = SanitizationUtil.escapeString(string);
 
       string = replaceSubstitute(string, /\[(.+?)\]/g, replaceDangerously);
 
@@ -147,5 +181,26 @@ z.l10n = (() => {
     text: (value, substitute) => replaceSubstitute(ko.unwrap(value), /{{(.+?)}}/g, substitute),
   };
 })();
+
+export function t(identifier, substitutions, dangerousSubstitutions) {
+  const value = z.string[identifier];
+  const replaceDangerously = Object.assign(
+    {
+      '/bold': '</b>',
+      '/italic': '</i>',
+      bold: '<b>',
+      italic: '<i>',
+    },
+    dangerousSubstitutions
+  );
+
+  const substituted = replaceSubstitute(value, /{{(.+?)}}/g, substitutions);
+  const escaped = SanitizationUtil.escapeString(substituted);
+  const dangerouslySubstituted = replaceSubstitute(escaped, /\[(.+?)\]/g, replaceDangerously);
+
+  return dangerouslySubstituted;
+}
+
+window.t = t;
 
 export default z.l10n;

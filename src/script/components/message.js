@@ -19,6 +19,8 @@
 
 import moment from 'moment';
 
+import {t} from '../localization/Localizer';
+
 class Message {
   constructor({
     message,
@@ -113,39 +115,37 @@ class Message {
     if (messageEntity.is_downloadable()) {
       entries.push({
         click: () => messageEntity.download(),
-        label: z.l10n.text(z.string.conversationContextMenuDownload),
+        label: t('conversationContextMenuDownload'),
       });
     }
 
     if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
-      const stringId = messageEntity.is_liked()
-        ? z.string.conversationContextMenuUnlike
-        : z.string.conversationContextMenuLike;
+      const label = messageEntity.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
 
       entries.push({
         click: () => this.onLike(messageEntity, false),
-        label: z.l10n.text(stringId),
+        label,
       });
     }
 
     if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
       entries.push({
         click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
-        label: z.l10n.text(z.string.conversationContextMenuEdit),
+        label: t('conversationContextMenuEdit'),
       });
     }
 
     if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
       entries.push({
         click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
-        label: z.l10n.text(z.string.conversationContextMenuReply),
+        label: t('conversationContextMenuReply'),
       });
     }
 
     if (messageEntity.isCopyable()) {
       entries.push({
         click: () => messageEntity.copy(),
-        label: z.l10n.text(z.string.conversationContextMenuCopy),
+        label: t('conversationContextMenuCopy'),
       });
     }
 
@@ -156,14 +156,14 @@ class Message {
     ) {
       entries.push({
         click: () => this.onClickReceipts(this),
-        label: z.l10n.text(z.string.conversationContextMenuDetails),
+        label: t('conversationContextMenuDetails'),
       });
     }
 
     if (messageEntity.is_deletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
-        label: z.l10n.text(z.string.conversationContextMenuDelete),
+        label: t('conversationContextMenuDelete'),
       });
     }
 
@@ -173,7 +173,7 @@ class Message {
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
-        label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
+        label: t('conversationContextMenuDeleteEveryone'),
       });
     }
 
@@ -194,7 +194,7 @@ class Message {
 
 const receiptStatusTemplate = `
   <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
-    <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
+    <span class="message-status" data-bind="text: t('conversationMessageDelivered')"></span>
   <!-- /ko -->
   <!-- ko if: readReceiptText() -->
     <span class="message-status-read" data-bind="
@@ -335,7 +335,7 @@ const missedTemplate = `
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
     </div>
-    <div class="message-header-label" data-bind="l10n_text: z.string.conversationMissedMessages"></div>
+    <div class="message-header-label" data-bind="text: t('conversationMissedMessages')"></div>
   </div>
   `;
 
@@ -347,7 +347,7 @@ const unableToDecryptTemplate = `
     <div class="message-header-label ellipsis">
       <span data-bind="html: message.htmlCaption()"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
+      <a class="text-theme" data-bind="text: t('conversationUnableToDecryptLink'), attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
@@ -361,7 +361,7 @@ const unableToDecryptTemplate = `
           <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
         </svg>
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
-              data-bind="click: () => onClickResetSession(message), l10n_text: z.string.conversationUnableToDecryptResetSession, style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
+              data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
     <!-- /ko -->
   </div>
@@ -429,11 +429,11 @@ const verificationTemplate = `
     </div>
     <div class="message-header-label">
       <!-- ko if: message.isTypeVerified() -->
-        <span data-bind="l10n_text: z.string.tooltipConversationAllVerified"></span>
+        <span data-bind="text: t('tooltipConversationAllVerified')"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeUnverified() -->
         <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceUnverified"></span>
+        <span class="ellipsis" data-bind="text: t('conversationDeviceUnverified')"></span>
         <span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewDevice() -->
@@ -442,7 +442,7 @@ const verificationTemplate = `
         <span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="text: t('conversationDeviceNewPeopleJoined')"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: t('conversationDeviceNewPeopleJoinedVerify')" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -485,11 +485,11 @@ const memberTemplate = `
       <!-- ko if: message.otherUser().isOutgoingRequest() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: () => onClickCancelRequest(message),
-                        l10n_text: z.string.conversationConnectionCancelRequest"
+                        text: t('conversationConnectionCancelRequest')"
              data-uie-name="do-cancel-request"></div>
       <!-- /ko -->
       <!-- ko if: message.showServicesWarning -->
-        <div class="message-services-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
+        <div class="message-services-warning" data-bind="text: t('conversationServicesWarning')" data-uie-name="label-services-warning"></div>
       <!-- /ko -->
     </div>
   <!-- /ko -->
@@ -519,21 +519,21 @@ const memberTemplate = `
         <!-- /ko -->
       </div>
       <!-- ko if: message.showServicesWarning -->
-        <div class="message-services-warning" data-bind="l10n_text: z.string.conversationServicesWarning" data-uie-name="label-services-warning"></div>
+        <div class="message-services-warning" data-bind="text: t('conversationServicesWarning')" data-uie-name="label-services-warning"></div>
       <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if: message.isGroupCreation() -->
       <!-- ko if: shouldShowInvitePeople -->
         <div class="message-member-footer">
-          <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
-          <div class="message-member-footer-button" data-bind="click: onClickInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
+          <div data-bind="text: t('guestRoomConversationHead')"></div>
+          <div class="message-member-footer-button" data-bind="click: onClickInvitePeople, text: t('guestRoomConversationButton')" data-uie-name="do-invite-people"></div>
         </div>
       <!-- /ko -->
       <!-- ko if: isSelfTemporaryGuest -->
         <div class="message-member-footer">
-          <div class="message-member-footer-message" data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
-          <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
+          <div class="message-member-footer-message" data-bind="text: t('temporaryGuestJoinMessage')"></div>
+          <div class="message-member-footer-description" data-bind="text: t('temporaryGuestJoinDescription')"></div>
         </div>
       <!-- /ko -->
       <!-- ko if: hasReadReceiptsTurnedOn -->
@@ -542,7 +542,7 @@ const memberTemplate = `
             <read-icon></read-icon>
           </div>
           <div class="message-header-label">
-            <span class="ellipsis" data-bind="l10n_text: z.string.conversationCreateReceiptsEnabled"></span>
+            <span class="ellipsis" data-bind="text: t('conversationCreateReceiptsEnabled')"></span>
             <hr class="message-header-line" />
           </div>
         </div>
@@ -551,7 +551,7 @@ const memberTemplate = `
 
     <!-- ko if: message.isMemberLeave() && message.user().is_me && isSelfTemporaryGuest -->
       <div class="message-member-footer">
-        <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestLeaveDescription"></div>
+        <div class="message-member-footer-description" data-bind="text: t('temporaryGuestLeaveDescription')"></div>
       </div>
     <!-- /ko -->
   <!-- /ko -->  `;

@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -64,7 +66,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
         case HistoryExportViewModel.STATE.PREPARING: {
-          return z.l10n.text(z.string.backupExportProgressHeadline);
+          return t('backupExportProgressHeadline');
         }
         case HistoryExportViewModel.STATE.EXPORTING: {
           const replacements = {
@@ -72,10 +74,10 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
             progress: this.loadingProgress(),
             total: this.numberOfRecords(),
           };
-          return z.l10n.text(z.string.backupExportProgressSecondary, replacements);
+          return t('backupExportProgressSecondary', replacements);
         }
         case HistoryExportViewModel.STATE.COMPRESSING: {
-          return z.l10n.text(z.string.backupExportProgressCompressing);
+          return t('backupExportProgressCompressing');
         }
         default:
           return '';

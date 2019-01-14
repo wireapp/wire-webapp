@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -78,10 +80,10 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         switch (this.contentState()) {
           case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
             const multipleRequests = connectionRequests > 1;
-            const stringId = multipleRequests
-              ? z.string.conversationsConnectionRequestMany
-              : z.string.conversationsConnectionRequestOne;
-            specificTitle += z.l10n.text(stringId, connectionRequests);
+            const requestsString = multipleRequests
+              ? t('conversationsConnectionRequestMany', connectionRequests)
+              : t('conversationsConnectionRequestOne', connectionRequests);
+            specificTitle += requestsString;
             break;
           }
 
@@ -93,32 +95,32 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
           }
 
           case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
-            specificTitle += z.l10n.text(z.string.preferencesAbout);
+            specificTitle += t('preferencesAbout');
             break;
           }
 
           case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
-            specificTitle += z.l10n.text(z.string.preferencesAccount);
+            specificTitle += t('preferencesAccount');
             break;
           }
 
           case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
-            specificTitle += z.l10n.text(z.string.preferencesAV);
+            specificTitle += t('preferencesAV');
             break;
           }
 
           case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
-            specificTitle += z.l10n.text(z.string.preferencesDeviceDetails);
+            specificTitle += t('preferencesDeviceDetails');
             break;
           }
 
           case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
-            specificTitle += z.l10n.text(z.string.preferencesDevices);
+            specificTitle += t('preferencesDevices');
             break;
           }
 
           case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
-            specificTitle += z.l10n.text(z.string.preferencesOptions);
+            specificTitle += t('preferencesOptions');
             break;
           }
 
@@ -127,7 +129,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         }
 
         const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
-        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
+        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${t('wire')}`;
       }
     }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   }

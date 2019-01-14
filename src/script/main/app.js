@@ -25,6 +25,7 @@ import PreferenceNotificationRepository from '../notification/PreferenceNotifica
 import DebugUtil from '../util/DebugUtil';
 
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
+import {t} from '../localization/Localizer';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -779,7 +780,7 @@ class App {
         const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
         const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
         if (isLeavingGuestRoom) {
-          const path = z.l10n.text(z.string.urlWebsiteRoot);
+          const path = t('urlWebsiteRoot');
           const url = getWebsiteUrl(path);
           return window.location.replace(url);
         }

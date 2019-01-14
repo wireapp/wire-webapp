@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from '../localization/Localizer';
+
 window.z = window.z || {};
 window.z.ui = z.ui || {};
 
@@ -25,23 +27,23 @@ z.ui.AvailabilityContextMenu = {
     const entries = [
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.NONE, method),
-        label: z.l10n.text(z.string.userAvailabilityNone),
-        title: z.l10n.text(z.string.userAvailabilityNone),
+        label: t('userAvailabilityNone'),
+        title: t('userAvailabilityNone'),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AVAILABLE, method),
-        label: z.l10n.text(z.string.userAvailabilityAvailable),
-        title: z.l10n.text(z.string.userAvailabilityAvailable),
+        label: t('userAvailabilityAvailable'),
+        title: t('userAvailabilityAvailable'),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.BUSY, method),
-        label: z.l10n.text(z.string.userAvailabilityBusy),
-        title: z.l10n.text(z.string.userAvailabilityBusy),
+        label: t('userAvailabilityBusy'),
+        title: t('userAvailabilityBusy'),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AWAY, method),
-        label: z.l10n.text(z.string.userAvailabilityAway),
-        title: z.l10n.text(z.string.userAvailabilityAway),
+        label: t('userAvailabilityAway'),
+        title: t('userAvailabilityAway'),
       },
     ];
 
