@@ -19,6 +19,8 @@
 
 import ko from 'knockout';
 
+import AssetTransferState from '../../assets/AssetTransferState';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -284,11 +286,13 @@ class Message {
   hasUnavailableAsset() {
     if (this.has_asset()) {
       return this.assets().some(asset => {
+        const unavailableStatus = [
+          AssetTransferState.UPLOAD_PENDING,
+          AssetTransferState.UPLOADING,
+          AssetTransferState.UPLOAD_FAILED,
+        ];
         const assetStatus = asset.status();
-        return (
-          assetStatus === z.assets.AssetTransferState.UPLOADING ||
-          assetStatus === z.assets.AssetTransferState.UPLOAD_FAILED
-        );
+        return unavailableStatus.includes(assetStatus);
       });
     }
     return false;
