@@ -155,7 +155,7 @@ describe('z.backup.BackupRepository', () => {
         },
         {
           expectedError: z.backup.IncompatibleBackupError,
-          metaChanges: {version: -1},
+          metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
         {
           expectedError: z.backup.IncompatiblePlatformError,
@@ -186,42 +186,48 @@ describe('z.backup.BackupRepository', () => {
     });
 
     it('successfully import backup', () => {
-      const archive = new JSZip();
+      const metadataArray = [backupRepository.createMetaData(), {...backupRepository.createMetaData(), version: 15}];
 
-      archive.file(
-        z.backup.BackupRepository.CONFIG.FILENAME.METADATA,
-        JSON.stringify(backupRepository.createMetaData())
-      );
-      archive.file(z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
-      archive.file(z.backup.BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
+      const archives = metadataArray.map(metadata => {
+        const archive = new JSZip();
+        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metadata));
+        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
+        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
 
-      return backupRepository.importHistory(archive, noop, noop).then(() => {
-        const conversationsTest = TestFactory.storage_service
-          .getAll(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS)
-          .then(conversationsData => {
-            expect(conversationsData.length).toEqual(1);
-            const [conversationData] = conversationsData;
-
-            expect(conversationData.name).toEqual(conversation.name);
-            expect(conversationData.id).toEqual(conversation.id);
-          });
-
-        const eventsTest = TestFactory.storage_service
-          .getAll(z.storage.StorageSchemata.OBJECT_STORE.EVENTS)
-          .then(events => {
-            expect(events.length).toEqual(messages.length);
-            expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
-          });
-
-        return Promise.all([conversationsTest, eventsTest]);
-
-        function removePrimaryKey(message) {
-          return {
-            ...message,
-            primary_key: undefined,
-          };
-        }
+        return archive;
       });
+
+      const importPromises = archives.map(archive => {
+        return backupRepository.importHistory(archive, noop, noop).then(() => {
+          const conversationsTest = TestFactory.storage_service
+            .getAll(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS)
+            .then(conversationsData => {
+              expect(conversationsData.length).toEqual(1);
+              const [conversationData] = conversationsData;
+
+              expect(conversationData.name).toEqual(conversation.name);
+              expect(conversationData.id).toEqual(conversation.id);
+            });
+
+          const eventsTest = TestFactory.storage_service
+            .getAll(z.storage.StorageSchemata.OBJECT_STORE.EVENTS)
+            .then(events => {
+              expect(events.length).toEqual(messages.length);
+              expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
+            });
+
+          return Promise.all([conversationsTest, eventsTest]);
+        });
+      });
+
+      return Promise.all(importPromises);
+
+      function removePrimaryKey(message) {
+        return {
+          ...message,
+          primary_key: undefined,
+        };
+      }
     });
   });
 });
