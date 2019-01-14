@@ -2325,10 +2325,10 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@3.2.7:
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.2.7.tgz#1ef9bf54c8203c07383155e83f4382daedd1c11b"
-  integrity sha512-nkJdCfdx1f5F1zPEQTEPmJ6iF+VfntEPo8MKvjcrRxq8NbMlkHjarRl09UnRaa3LcJOzi5kqY3w41Qsj3wyIvQ==
+pm2@3.2.8:
+  version "3.2.8"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.2.8.tgz#41d850eb43e86775a3c12300366c73bb4045f582"
+  integrity sha512-fSkmB1QNvRFQE0cuRfPkjN1Y161Gug9Ve1CTfEMgOZmAoyBQk7XonWG0/96i5bQqVUdqopT0KIy770evfvagxA==
   dependencies:
     "@pm2/agent" "^0.5.22"
     "@pm2/io" "~2.4.2"
