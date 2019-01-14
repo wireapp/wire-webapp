@@ -299,7 +299,6 @@ import inputLevelGlobal from '../components/inputLevel.js';
 import messageGlobal from '../components/message.js';
 import messageQuoteGlobal from '../components/messageQuote.js';
 import messageTimerButtonGlobal from '../components/messageTimerButton.js';
-import mentionSuggestionsGlobal from '../components/mentionSuggestions.js';
 import serviceListGlobal from '../components/serviceList.js';
 import topPeopleGlobal from '../components/topPeople.js';
 import participantAvatarGlobal from '../components/participantAvatar.js';

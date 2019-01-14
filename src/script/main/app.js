@@ -24,6 +24,8 @@ import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import DebugUtil from '../util/DebugUtil';
 
+import '../components/mentionSuggestions.js';
+
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
 
 /* eslint-disable no-unused-vars */
