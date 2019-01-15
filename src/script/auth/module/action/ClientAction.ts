@@ -110,9 +110,6 @@ export class ClientAction {
       } else {
         deviceModel = 'Wire Linux';
       }
-      if (config.ENVIRONMENT !== 'production') {
-        deviceModel = `${deviceModel} (Internal)`;
-      }
     } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
