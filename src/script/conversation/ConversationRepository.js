@@ -2514,7 +2514,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
     }
 
-    const logMessage = `Sending '${messageType}' message '${messageId}' to conversation '${conversationId}'`;
+    const numberOfUsers = Object.keys(payload.recipients).length;
+    const numberOfClients = Object.values(payload.recipients)
+      .map(clientId => Object.keys(clientId).length)
+      .reduce((a, b) => a + b, 0);
+
+    const logMessage = `Sending '${messageType}' message (${messageId}) to '${numberOfUsers}' users with '${numberOfClients}' clients into conversation '${conversationId}'`;
     this.logger.info(logMessage, payload);
 
     return this.conversation_service
@@ -2543,7 +2548,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._grantOutgoingMessage(eventInfoEntity, userIds);
           })
           .then(() => {
-            this.logger.info(`Updated '${messageType}' message for conversation '${conversationId}'`, updatedPayload);
+            this.logger.info(
+              `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
+              updatedPayload
+            );
             return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
           });
       });
