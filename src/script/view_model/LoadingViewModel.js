@@ -38,24 +38,24 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
     amplify.unsubscribeAll(z.event.WebApp.APP.UPDATE_PROGRESS);
   }
 
-  updateProgress(progress = 0, messageLocator, replaceContent) {
+  updateProgress(progress = 0, message, replaceContent) {
     const hasProgressIncreased = progress > this.loadingProgress();
     progress = hasProgressIncreased ? progress : this.loadingProgress() + 0.01;
     this.loadingProgress(progress);
 
-    if (messageLocator) {
+    if (message) {
       let updatedLoadingMessage;
 
-      switch (messageLocator) {
-        case z.string.initReceivedSelfUser: {
-          updatedLoadingMessage = z.l10n.text(messageLocator, this.userRepository.self().first_name());
+      switch (message) {
+        case t('initReceivedSelfUser'): {
+          updatedLoadingMessage = t('initReceivedSelfUser', this.userRepository.self().first_name());
           break;
         }
 
-        case z.string.initDecryption:
-        case z.string.initEvents: {
+        case t('initDecryption'):
+        case t('initEvents'): {
           if (!z.config.FEATURE.SHOW_LOADING_INFORMATION) {
-            updatedLoadingMessage = z.l10n.text(messageLocator);
+            updatedLoadingMessage = message;
             break;
           }
 
@@ -65,12 +65,12 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
           };
 
           const handlingProgress = t('initProgress', substitutes);
-          updatedLoadingMessage = `${z.l10n.text(messageLocator)}${handlingProgress}`;
+          updatedLoadingMessage = `${message}${handlingProgress}`;
           break;
         }
 
         default:
-          updatedLoadingMessage = z.l10n.text(messageLocator);
+          updatedLoadingMessage = message;
       }
 
       this.loadingMessage(updatedLoadingMessage);

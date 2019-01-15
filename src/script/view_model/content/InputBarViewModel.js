@@ -193,13 +193,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
+        const name = userEntity.first_name();
         const availabilityStrings = {
-          [z.user.AvailabilityType.AVAILABLE]: z.string.tooltipConversationInputPlaceholderAvailable,
-          [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAway,
-          [z.user.AvailabilityType.BUSY]: z.string.tooltipConversationInputPlaceholderBusy,
+          [z.user.AvailabilityType.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
+          [z.user.AvailabilityType.AWAY]: t('tooltipConversationInputPlaceholderAway', name),
+          [z.user.AvailabilityType.BUSY]: t('tooltipConversationInputPlaceholderBusy', name),
         };
 
-        return z.l10n.text(availabilityStrings[userEntity.availability()], userEntity.first_name());
+        return availabilityStrings[userEntity.availability()];
       }
 
       const stringId = this.conversationEntity().messageTimer()
@@ -844,13 +845,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _showUploadWarning(image) {
     const isGif = image.type === 'image/gif';
-    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
-    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
+    const maxSize = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+    const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
+    const title = isGif ? t('modalGifTooLargeHeadline') : t('modalPictureTooLargeHeadline');
 
     const modalOptions = {
       text: {
-        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
-        title: z.l10n.text(titleStringId),
+        message,
+        title,
       },
     };
 

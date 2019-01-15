@@ -53,17 +53,17 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
-      let stringId;
+      let string;
 
       if (this.conversationEntity().hasGuest()) {
-        stringId = this.conversationEntity().hasService()
-          ? z.string.guestRoomConversationBadgeGuestAndService
-          : z.string.guestRoomConversationBadge;
+        string = this.conversationEntity().hasService()
+          ? t('guestRoomConversationBadgeGuestAndService')
+          : t('guestRoomConversationBadge');
       } else if (this.conversationEntity().hasService()) {
-        stringId = z.string.guestRoomConversationBadgeService;
+        string = t('guestRoomConversationBadgeService');
       }
 
-      return stringId ? z.l10n.text(stringId) : '';
+      return string || '';
     });
 
     this.hasOngoingCall = ko.computed(() => {

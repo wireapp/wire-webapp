@@ -304,12 +304,12 @@ class App {
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
-        this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
+        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
-        this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
+        this.view.loading.updateProgress(7.5, t('initValidatedClient'));
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
@@ -325,7 +325,7 @@ class App {
         return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {
-        this.view.loading.updateProgress(25, z.string.initReceivedUserData);
+        this.view.loading.updateProgress(25, t('initReceivedUserData'));
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
@@ -358,7 +358,7 @@ class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
+        this.view.loading.updateProgress(97.5, t('initUpdatedFromNotifications'));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
