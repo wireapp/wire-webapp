@@ -19,7 +19,6 @@
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ClientInfo} from '@wireapp/core/dist/client/';
-import * as config from '../../config';
 import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';
 import {ThunkAction} from '../reducer';
