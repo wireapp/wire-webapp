@@ -2519,8 +2519,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .map(clientId => Object.keys(clientId).length)
       .reduce((a, b) => a + b, 0);
 
-    const logMessage = `Sending '${messageType}' message (${messageId}) to '${numberOfUsers}' users with '${numberOfClients}' clients into conversation '${conversationId}'`;
+    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${conversationId}'`;
     this.logger.info(logMessage, payload);
+
+    if (numberOfUsers > numberOfClients) {
+      this.logger.warn(
+        `Sending ${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`
+      );
+    }
 
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, options.precondition)
