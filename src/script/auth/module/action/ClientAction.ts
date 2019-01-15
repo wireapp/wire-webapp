@@ -19,7 +19,7 @@
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ClientInfo} from '@wireapp/core/dist/client/';
-import * as Environment from '../../Environment';
+import * as config from '../../config';
 import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';
 import {ThunkAction} from '../reducer';
@@ -110,7 +110,7 @@ export class ClientAction {
       } else {
         deviceModel = 'Wire Linux';
       }
-      if (!Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION)) {
+      if (config.ENVIRONMENT !== 'production') {
         deviceModel = `${deviceModel} (Internal)`;
       }
     } else if (clientType === ClientType.TEMPORARY) {
