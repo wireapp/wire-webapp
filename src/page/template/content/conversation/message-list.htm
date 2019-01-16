@@ -1,0 +1,45 @@
+ <div id="message-list" class="message-list" data-bind="with: $root.messageList, fadingscrollbar, event: {mousewheel: $root.messageList.onMouseWheel, scroll: $root.messageList.onScroll}">
+  <div class="messages"
+        data-bind="css: {'flex-center': verticallyCenterMessage},
+                   foreach: {data: conversation().messages_visible, as: 'message'}">
+    <div class="message"
+         data-bind="in_viewport: {onVisible: $parent.getInViewportCallback($parent.conversation(), message), container: $parent.getMessagesContainer()[0]},
+                    attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
+         data-uie-name="item-message">
+
+      <div class="message-header message-timestamp" data-bind="css: $parent.get_timestamp_class($data)">
+        <div class="message-header-icon">
+          <span class="message-unread-dot dot-md bg-theme"></span>
+        </div>
+        <div class="message-header-label">
+          <time data-timestamp-type="normal" class="label-xs" data-bind="relative_timestamp: message.timestamp(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+          <time data-timestamp-type="day" class="label-bold-xs" data-bind="relative_timestamp: message.timestamp(), relative_timestamp_day: true, attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+        </div>
+      </div>
+
+      <message params="
+          message: message,
+          conversation: $parent.conversation,
+          shouldShowAvatar: !$parent.should_hide_user_avatar(message),
+          shouldShowInvitePeople: $parent.showInvitePeople(),
+          selfId: $parent.selfUser().id,
+          isSelfTemporaryGuest: $parent.selfUser().isTemporaryGuest(),
+          isLastDeliveredMessage: $parent.is_last_delivered_message(message),
+          conversationRepository: $parent.conversation_repository,
+          locationRepository: $parent.locationRepository,
+          onClickAvatar: $parent.showUserDetails,
+          onClickImage: $parent.show_detail,
+          onClickInvitePeople: $parent.clickOnInvitePeople,
+          onClickMessage: $parent.handleClickOnMessage,
+          onClickTimestamp: $parent.focusMessage,
+          onClickParticipants: $parent.showParticipants,
+          onClickResetSession: $parent.on_session_reset_click,
+          onClickCancelRequest: $parent.click_on_cancel_request,
+          onClickReceipts: view => $parent.showMessageDetails(view, false),
+          onClickLikes: view => $parent.showMessageDetails(view, true),
+          onLike: $parent.click_on_like,
+          actionsViewModel: $parent.actionsViewModel"
+        data-bind="css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>
+    </div>
+  </div>
+</div>

@@ -32,6 +32,6 @@ module.exports = {
   // Amazon Web Services related
   //##############################################################################
   dist: '<%= dir.dist.static %>',
-  dist_app: '<%= dir.dist.templates %>/app',
+  dist_src: '<%= dir.dist.templates %>/<%= dir.src_ %>',
   dist_s3: '<%= dir.dist.s3 %>',
 };

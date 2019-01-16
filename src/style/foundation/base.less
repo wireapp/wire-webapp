@@ -1,0 +1,104 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  --scrollbar-color: fade(#000, 50%);
+  @scrollbar-size: 7px;
+  scrollbar-color: var(--scrollbar-color) transparent;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: @scrollbar-size;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    border-radius: @scrollbar-size;
+    box-shadow: 0 0 1px #fff;
+    transition: background-color 1s;
+  }
+}
+
+body {
+  color: var(--background);
+  font-family: @font-family-base;
+  font-size: @font-size-sm;
+  font-weight: 300;
+  overflow-x: hidden;
+  overflow-y: hidden !important;
+  text-rendering: optimizeLegibility;
+}
+
+// Set default icon size
+[class^='icon-'],
+[class*=' icon-'] {
+  font-size: @icon-size-sm;
+}
+
+// removed dotted outlines in firefox
+a,
+object {
+  outline: none !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+input[type='text']::-ms-clear {
+  display: none;
+}
+
+pre {
+  direction: ltr;
+
+  code {
+    display: block;
+    overflow: auto;
+  }
+}
+
+// Set the right background color for bubbles
+.bubble {
+  &:after {
+    background: linear-gradient(
+      -45deg,
+      var(--app-bg-secondary),
+      var(--app-bg-secondary) 50%,
+      transparent 0,
+      transparent
+    );
+  }
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: transparent;
+}
+
+b,
+strong {
+  font-weight: @font-weight-bold;
+}

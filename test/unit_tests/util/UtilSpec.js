@@ -17,10 +17,8 @@
  *
  */
 
-// KARMA_SPECS=util/Util yarn test:app
-
 import ko from 'knockout';
-import Conversation from 'app/script/entity/Conversation';
+import Conversation from 'src/script/entity/Conversation';
 
 describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {

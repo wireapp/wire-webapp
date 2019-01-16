@@ -20,24 +20,16 @@
 // https://github.com/gruntjs/grunt-contrib-copy
 
 module.exports = {
-  dist: {
-    cwd: '<%= dir.app_ %>',
+  dist_resource: {
+    cwd: '<%= dir.resource %>',
     dest: '<%= dir.dist.static %>',
     expand: true,
-    src: ['audio/**/*', 'image/**/*', 'font/**/*', 'worker/*', 'sw.js'],
+    src: ['audio/**/*', 'image/**/*', 'font/**/*'],
   },
-
-  dist_audio: {
-    cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files',
-    dest: '<%= dir.dist.static %>/audio',
-    expand: true,
-    src: '*',
-  },
-
-  dist_favicon: {
-    cwd: '<%= dir.dist.static %>/image',
+  dist_serviceworker: {
+    cwd: '<%= dir.src_ %>',
     dest: '<%= dir.dist.static %>',
     expand: true,
-    src: 'favicon.ico',
+    src: ['worker/*', 'sw.js'],
   },
 };

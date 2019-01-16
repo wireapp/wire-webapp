@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=conversation/ClientMismatchHandler yarn test:app
-
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();
 

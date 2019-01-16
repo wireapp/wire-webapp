@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=client/Client yarn test:app
-
 describe('z.client.ClientEntity', () => {
   describe('dismantleUserClientId', () => {
     it('can get the user ID and client ID from a session ID', () => {

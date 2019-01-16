@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=calling/videoGridRepository yarn test:app
-
 describe('z.calling.VideoGridRepository', () => {
   let groupVideoGrid;
   const initialGrid = [0, 0, 0, 0];

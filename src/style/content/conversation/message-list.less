@@ -1,0 +1,791 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// MEMBER LIST
+.message-list {
+  overflow: auto;
+  flex: 1 1;
+}
+
+.messages {
+  max-width: @conversation-max-width;
+  transform: translateZ(0);
+}
+
+// MESSAGE
+.message {
+  position: relative;
+  margin-bottom: 16px;
+
+  & a {
+    text-decoration: none;
+  }
+
+  & * {
+    .accent-selection-color;
+  }
+
+  &:last-child {
+    margin-bottom: 24px;
+  }
+
+  .context-menu,
+  .time {
+    background-color: var(--app-bg);
+  }
+
+  &.hover .time,
+  &:hover .time,
+  &.hover .context-menu,
+  &:hover .context-menu,
+  &.hover .message-status-read,
+  &:hover .message-status-read,
+  .show-timestamp.time {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &.hover,
+  &:hover {
+    .message-status,
+    .message-status-read {
+      &::before {
+        content: '·';
+      }
+    }
+  }
+
+  &.hover .time,
+  &:hover .time,
+  .show-timestamp.time {
+    cursor: default;
+  }
+
+  .context-menu {
+    cursor: pointer;
+  }
+
+  &:not(:hover) {
+    .message-status {
+      opacity: 1;
+    }
+  }
+
+  participant-avatar {
+    cursor: pointer;
+  }
+
+  .message-mention {
+    .accent-color;
+
+    font-weight: @font-weight-bold;
+
+    .mention-at-sign {
+      font-size: 14px;
+    }
+
+    &.self-mention {
+      background-color: fade(@w-yellow, 48%);
+      color: var(--background);
+    }
+
+    &:not(.self-mention) {
+      cursor: pointer;
+    }
+  }
+}
+
+@keyframes marked-animation {
+  to {
+    background-color: inherit;
+  }
+}
+
+.message-marked {
+  .context-menu,
+  .time {
+    background-color: transparent;
+  }
+
+  .message-body {
+    .accent-background-color(24%);
+
+    animation: @animation-timing-slower * 2 @ease-out-quart 1s forwards marked-animation;
+  }
+}
+
+.message-isreplying {
+  .message-body {
+    opacity: 0.6;
+  }
+}
+
+// MESSAGE - HEADER
+.message-header {
+  position: relative;
+  display: flex;
+  padding-top: 6px;
+  margin-bottom: 4px;
+  line-height: @avatar-diameter-xs;
+
+  & > .message-body-actions {
+    top: 6px;
+  }
+
+  + .message-services-warning {
+    margin-left: 72px;
+  }
+}
+
+.message-header-icon {
+  .flex-center;
+
+  width: @conversation-message-sender-width;
+  max-height: @avatar-diameter-xs;
+  color: var(--background);
+
+  &--svg {
+    line-height: 0;
+
+    svg path {
+      fill: var(--foreground);
+    }
+  }
+}
+
+.message-header-label {
+  display: flex;
+  min-width: 0; // fixes ellipsis not working with flexbox (FF)
+  flex: 1;
+  align-items: center;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  white-space: normal;
+
+  a {
+    cursor: pointer;
+  }
+
+  .message-header-plain-sender-name {
+    font-weight: @font-weight-bold;
+  }
+
+  .message-header-sender-name {
+    font-weight: @font-weight-bold;
+    text-transform: capitalize;
+  }
+  & > hr {
+    align-self: flex-start;
+    margin-top: 12px;
+  }
+}
+
+.message-header-label-sender {
+  .label-nocase-bold-xs;
+  &.accent-color-1 {
+    color: fade(@accent_colors-1, 80%);
+  }
+  &.accent-color-2 {
+    color: fade(@accent_colors-2, 72%);
+  }
+  &.accent-color-3 {
+    color: @accent_colors-3;
+  }
+  &.accent-color-4 {
+    color: fade(@accent_colors-4, 72%);
+  }
+  &.accent-color-5 {
+    color: fade(@accent_colors-5, 80%);
+  }
+  &.accent-color-6 {
+    color: fade(@accent_colors-6, 80%);
+  }
+  &.accent-color-7 {
+    color: fade(@accent_colors-7, 64%);
+  }
+}
+
+.message-header-label-icon {
+  margin-left: 8px;
+  font-size: 8px;
+}
+
+.message-header-icon-service {
+  display: inline-flex;
+  margin-top: -2px;
+  margin-left: 8px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: var(--background-fade-40);
+    }
+  }
+}
+
+.message-header-line {
+  min-width: @conversation-message-timestamp-width;
+  height: 1px;
+  flex: 1;
+  margin-left: 16px;
+  border: none;
+  background: @separator-color;
+}
+
+// MESSAGE - TIMESTAMP
+.message-timestamp {
+  height: 48px;
+  padding-top: 8px; // TODO margin top is not working because of collapsing margins
+  margin-bottom: 16px;
+  border-bottom: 1px solid @separator-color;
+  line-height: 40px;
+  user-select: none;
+
+  .message-header-icon {
+    max-height: 40px;
+  }
+
+  &:not(.message-timestamp-visible) {
+    display: none;
+  }
+
+  &:not(.message-timestamp-unread) {
+    .message-unread-dot {
+      display: none;
+    }
+  }
+
+  &:not(.message-timestamp-day) {
+    margin-right: @conversation-message-timestamp-width;
+    border: 0;
+
+    .message-header-label {
+      border-bottom: 1px dotted @separator-color;
+    }
+  }
+
+  time[data-timestamp-type='normal'] {
+    display: block;
+  }
+  time[data-timestamp-type='day'] {
+    display: none;
+  }
+}
+
+.message-timestamp-day {
+  time[data-timestamp-type='normal'] {
+    display: none;
+  }
+  time[data-timestamp-type='day'] {
+    display: block;
+  }
+}
+
+// MESSAGE - BODY
+.message-body {
+  position: relative;
+  padding-right: @conversation-message-timestamp-width;
+  padding-left: @conversation-message-sender-width;
+  margin-top: -5px;
+
+  .text {
+    .text-selection;
+    .accent-selection-color;
+
+    display: inline-block;
+    width: 100%;
+    line-height: @line-height-lg;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .text-large {
+    font-size: 40px;
+    line-height: 40px;
+  }
+
+  .iframe-container {
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+
+  .iframe-container-video {
+    position: relative;
+    padding-bottom: 75%;
+
+    embed,
+    iframe,
+    object {
+      position: absolute;
+      left: 0;
+      max-width: 100%;
+    }
+  }
+  .message-ephemeral-timer {
+    position: absolute;
+    top: 2px;
+    left: 32px;
+  }
+}
+
+.message-body-like {
+  .flex-center;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: @conversation-message-sender-width;
+}
+
+.message-asset-image {
+  margin-top: 16px;
+  margin-bottom: 24px;
+
+  .image {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  .image-loading {
+    .image-element {
+      cursor: default;
+    }
+    .image-placeholder-icon {
+      display: flex;
+    }
+  }
+
+  .image-element {
+    max-width: 100%;
+    max-height: 80vh;
+    cursor: pointer;
+
+    &.image-ephemeral {
+      cursor: default;
+      opacity: 0;
+    }
+  }
+
+  .image-placeholder-icon {
+    .asset-container-style;
+    .full-screen;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// MESSAGE FOOTER
+.message-footer {
+  display: flex;
+  flex-wrap: wrap;
+  line-height: @avatar-diameter-xs;
+}
+
+.message-footer-icon {
+  .flex-center;
+
+  width: @conversation-message-sender-width;
+}
+
+.message-footer-label {
+  display: flex;
+  align-items: center;
+  font-size: @font-size-xs;
+
+  > * + * {
+    margin-left: 8px;
+  }
+}
+
+.message-footer-bottom {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  margin-right: @conversation-message-timestamp-width;
+  margin-left: @conversation-message-sender-width;
+
+  > *:not(:last-child) {
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+.message-footer-close-button {
+  .square(@avatar-diameter-xs);
+  .flex-center;
+
+  cursor: pointer;
+  font-size: @font-size-xs;
+}
+
+// hover
+.message-show-on-hover {
+  opacity: 0;
+  transition-duration: @animation-timing-fast;
+  transition-property: opacity;
+  transition-timing-function: @ease-out-quart;
+
+  .message:hover & {
+    opacity: 1;
+    transition-delay: @animation-timing-faster + 0.05;
+  }
+}
+
+// MESSAGE - ACTIONS
+.message-body-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  width: @conversation-message-timestamp-width;
+  height: @line-height-lg;
+  align-items: center;
+
+  // actions pill
+  .action-pill-style() {
+    z-index: 1;
+    display: flex;
+    height: 16px;
+    align-items: center;
+    opacity: 0;
+    text-decoration: none;
+    transition: opacity, 0.3s;
+  }
+
+  // CONTEXT MENU
+  .context-menu {
+    .square(16px);
+    .action-pill-style;
+
+    position: absolute;
+    left: 8px;
+    justify-content: center;
+
+    &:focus {
+      opacity: 1 !important;
+      outline: none;
+    }
+  }
+
+  .message-status-read {
+    read-icon {
+      display: flex;
+      width: 16px;
+      height: 16px;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        max-width: 12px;
+        max-height: 12px;
+        fill: currentColor;
+      }
+    }
+
+    &__count {
+      margin-left: 4px;
+    }
+  }
+
+  .time,
+  .message-status,
+  .message-status-read {
+    .action-pill-style;
+    position: absolute;
+    color: var(--background-fade-40);
+    font-size: @font-size-xs;
+    pointer-events: none;
+    user-select: none;
+
+    &--clickable {
+      cursor: pointer;
+      pointer-events: all;
+    }
+  }
+  .message-status,
+  .message-status-read--visible {
+    opacity: 1;
+  }
+}
+
+.time {
+  left: 32px;
+}
+.message-status,
+.message-status-read {
+  left: 60px;
+  &::before {
+    display: flex;
+    width: 16px;
+    align-items: center;
+    justify-content: center;
+    content: '';
+  }
+}
+
+.message-body-actions-large {
+  position: relative;
+  width: 160px;
+}
+
+.message-services-warning {
+  color: @w-red;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+}
+
+// MEMBER MESSAGE
+.message-connected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 48px;
+
+  .message-services-warning {
+    margin-top: 32px;
+  }
+}
+
+.message-connected-header {
+  font-size: @font-size-lg;
+  line-height: 42px;
+}
+
+.message-connected-contacts,
+.message-connected-provider-name,
+.message-connected-username {
+  color: var(--foreground);
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
+}
+
+.message-connected-avatar {
+  margin-top: 32px;
+}
+
+.message-connected-cancel {
+  .label-xs;
+
+  margin-top: 32px;
+  cursor: pointer;
+}
+
+.message-group-creation-header,
+.message-member-footer {
+  padding-top: 16px;
+  margin-left: 72px;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+}
+
+.message-group-creation-header-name {
+  margin: 8px 0;
+  font-size: @font-size-lg;
+  font-weight: @font-weight-bold;
+}
+
+.message-group-creation-header-button,
+.message-member-footer-button {
+  display: inline-block;
+  padding: 4px 16px;
+  margin-top: 16px;
+  background-color: @separator-color;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: @font-weight-bold;
+  line-height: 16px;
+}
+
+.message-member-footer-message {
+  font-weight: @font-weight-regular;
+  line-height: 16px;
+}
+
+.message-member-footer-description {
+  margin-top: 8px;
+  color: var(--background-fade-40);
+  font-weight: @font-weight-regular;
+  line-height: 16px;
+}
+
+// PING MESSAGE
+@keyframes ping-scale-animation {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.8);
+  }
+}
+
+@keyframes ping-opacity-animation {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.ping-animation {
+  animation-delay: 0.05s, 0.05s;
+  animation-duration: 0.7s, 0.7s;
+  animation-name: ping-scale-animation, ping-opacity-animation;
+  animation-timing-function: @ease-out-expo, @ease-out-quart;
+}
+
+.ping-animation-soft {
+  animation-iteration-count: 3, 3;
+}
+
+.message-icon-ping {
+  margin-left: 8px;
+}
+
+// CALL MESSAGE
+.message-icon-missed-call {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+
+  &.accent-color-1 {
+    path {
+      fill: @accent_colors-1;
+    }
+  }
+  &.accent-color-2 {
+    path {
+      fill: @accent_colors-2;
+    }
+  }
+  &.accent-color-3 {
+    path {
+      fill: @accent_colors-3;
+    }
+  }
+  &.accent-color-4 {
+    path {
+      fill: @accent_colors-4;
+    }
+  }
+  &.accent-color-5 {
+    path {
+      fill: @accent_colors-5;
+    }
+  }
+  &.accent-color-6 {
+    path {
+      fill: @accent_colors-6;
+    }
+  }
+  &.accent-color-7 {
+    path {
+      fill: @accent_colors-7;
+    }
+  }
+}
+
+// DECRYPT MESSAGE
+.message-body-decrypt-error {
+  min-height: 24px;
+}
+
+.message-header-decrypt-error-label {
+  .label-xs;
+
+  color: var(--foreground);
+}
+
+.message-header-decrypt-reset-session {
+  .label-xs;
+
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 16px;
+  cursor: pointer;
+}
+
+.message-header-decrypt-reset-session-action,
+.message-header-decrypt-reset-session-spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.message-header-decrypt-reset-session-action {
+  height: 12px;
+}
+
+.message-header-decrypt-reset-session-spinner {
+  top: 4px;
+}
+
+.message-verification-action {
+  .ellipsis;
+
+  cursor: pointer;
+}
+
+// MESSAGE SPACING
+.message-asset {
+  margin-top: 16px;
+}
+
+.message-call,
+.message-ping {
+  padding-top: 16px;
+  margin-bottom: 24px;
+}
+
+.message-member,
+.message-rename {
+  padding-top: 16px;
+  margin-bottom: 32px;
+}
+
+.message-call,
+.message-member,
+.message-ping,
+.message-rename {
+  .message-body-actions {
+    position: relative;
+  }
+}
+
+// TODO make generic class
+.ephemeral-message-obfuscated {
+  font-family: @font-family-ephemeral;
+  .accent-color;
+}
+
+.ephemeral-asset-expired {
+  .bg-color-ephemeral;
+  .flex-center;
+
+  color: #fff;
+}

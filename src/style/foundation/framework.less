@@ -1,0 +1,103 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.app {
+  .font-antialiasing;
+  .full-screen;
+
+  display: flex;
+  min-width: @screen-md-min;
+  background-color: var(--app-bg);
+
+  .left-column {
+    position: relative;
+    width: @conversation-list-width;
+    flex: 0 0 auto;
+    color: @conversation-list-color;
+    fill: @conversation-list-color;
+
+    &--light-theme {
+      color: var(--background);
+      fill: var(--background);
+    }
+
+    .team-mode & {
+      width: @conversation-list-width + @teams-width;
+    }
+  }
+
+  .center-column {
+    position: relative;
+    flex: 1 1 auto;
+
+    &__overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: none;
+      opacity: 0;
+    }
+
+    #conversation-input-bar,
+    #conversation-title-bar {
+      width: 100%;
+    }
+  }
+
+  .right-column {
+    z-index: @z-index-panel;
+    overflow: hidden;
+    width: 0;
+    height: 100vh;
+    max-height: 100%;
+    background-color: var(--app-bg-secondary);
+    box-shadow: 0 0 24px var(--sidebar-box-shadow-lg);
+    transform: scale(1, 1);
+  }
+
+  @media (min-width: 1000px) {
+    .right-column {
+      box-shadow: -1px 0 0 var(--sidebar-box-shadow);
+    }
+  }
+
+  &.app--panel-open {
+    .center-column__overlay {
+      display: block;
+    }
+
+    .right-column {
+      position: absolute;
+      right: 0;
+      width: @right-width;
+    }
+
+    @media (min-width: 1000px) {
+      .right-column {
+        position: relative;
+      }
+
+      .center-column__overlay {
+        display: none;
+      }
+    }
+  }
+}
