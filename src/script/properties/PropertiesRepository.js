@@ -17,33 +17,37 @@
  *
  */
 
+import ConsentType from '../user/ConsentType';
+import ConsentValue from '../user/ConsentValue';
 import ReceiptMode from '../conversation/ReceiptMode';
 import WebappProperties from './WebappProperties';
 import {t} from 'utils/LocalizerUtil';
 
 class PropertiesRepository {
+  // Value names are specified by the protocol but key names can be changed.
   static get CONFIG() {
     return {
-      // Value names are specified by the protocol but key names can be changed.
-      ENABLE_READ_RECEIPTS: {
-        defaultValue: 0,
+      WEBAPP_ACCOUNT_SETTINGS: 'webapp',
+      WIRE_MARKETING_CONSENT: {
+        defaultValue: ConsentValue.NOT_GIVEN,
+        key: 'WIRE_MARKETING_CONSENT',
+      },
+      WIRE_RECEIPT_MODE: {
+        defaultValue: ReceiptMode.DELIVERY,
         key: 'WIRE_RECEIPT_MODE',
       },
-      WEBAPP_ACCOUNT_SETTINGS: 'webapp',
     };
   }
 
-  /**
-   * Construct a new User properties repository.
-   * @param {z.properties.PropertiesService} propertiesService - Backend REST API properties service implementation
-   */
-  constructor(propertiesService) {
+  constructor(propertiesService, selfService) {
     this.propertiesService = propertiesService;
+    this.selfService = selfService;
     this.logger = new z.util.Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
 
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();
-    this.receiptMode = ko.observable(PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
+    this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
+    this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
@@ -124,7 +128,7 @@ class PropertiesRepository {
   }
 
   _fetchReadReceiptsSetting() {
-    const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+    const property = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE;
 
     return this.propertiesService
       .getPropertiesByKey(property.key)
@@ -201,8 +205,11 @@ class PropertiesRepository {
   // Reset a property to it's default state. This method is only called from external event sources (when other clients sync the settings).
   deleteProperty(key) {
     switch (key) {
-      case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
-        this.setProperty(key, PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue);
+      case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
+        this.setProperty(key, ReceiptMode.DELIVERY);
+        break;
+      case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
+        this.setProperty(key, ConsentValue.NOT_GIVEN);
         break;
     }
   }
@@ -218,18 +225,34 @@ class PropertiesRepository {
           this._publishProperties();
         }
         break;
-      case PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key:
+      case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
+        this.marketingConsent(value);
+        break;
+      case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.receiptMode(value);
         break;
     }
   }
 
-  saveReceiptMode(receiptMode) {
-    const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
-    if (receiptMode === ReceiptMode.DELIVERY) {
-      return this.propertiesService.deletePropertiesByKey(property.key);
+  updateProperty(key, value) {
+    switch (key) {
+      case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
+        if (value === ReceiptMode.DELIVERY) {
+          return this.propertiesService.deletePropertiesByKey(key);
+        }
+        return this.propertiesService.putPropertiesByKey(key, value);
+        break;
+      case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
+        return this.selfService
+          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${z.util.Environment.version(false)}`)
+          .then(() => {
+            if (value === ConsentValue.NOT_GIVEN) {
+              return this.propertiesService.deletePropertiesByKey(key);
+            }
+            return this.propertiesService.putPropertiesByKey(key, value);
+          });
+        break;
     }
-    return this.propertiesService.putPropertiesByKey(property.key, receiptMode);
   }
 
   _savePreferenceActivatedAccount(propertiesType, updatedPreference) {

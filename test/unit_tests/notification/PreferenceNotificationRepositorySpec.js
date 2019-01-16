@@ -44,7 +44,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
     amplify.publish(z.event.WebApp.USER.EVENT_FROM_BACKEND, {
-      key: PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key,
+      key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
       type: backendEvent.USER.PROPERTIES_SET,
       value: true,
     });

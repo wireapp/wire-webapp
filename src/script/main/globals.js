@@ -236,8 +236,6 @@ import CallTelemetryGlobal from '../telemetry/calling/CallTelemetry.js';
 import CallLoggerGlobal from '../telemetry/calling/CallLogger.js';
 import AvailabilityMapperGlobal from '../user/AvailabilityMapper.js';
 import AvailabilityTypeGlobal from '../user/AvailabilityType.js';
-import ConsentTypeGlobal from '../user/ConsentType.js';
-import ConsentValueGlobal from '../user/ConsentValue.js';
 import UserServiceGlobal from '../user/UserService.js';
 import UserMapperGlobal from '../user/UserMapper.js';
 import UserRepositoryGlobal from '../user/UserRepository.js';

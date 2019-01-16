@@ -35,7 +35,7 @@ describe('PropertiesRepository', () => {
 
   describe('deleteProperty', () => {
     it('resets a known property to its default value', () => {
-      const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+      const property = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE;
       const defaultValue = property.defaultValue;
 
       propertiesRepository.setProperty(property.key, !defaultValue);

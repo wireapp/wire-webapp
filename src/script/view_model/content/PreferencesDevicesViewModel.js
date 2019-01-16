@@ -46,8 +46,6 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.selfUser = this.userRepository.self;
     this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
 
-    this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
-
     // All clients except the current client
     this.clientRepository.clients.subscribe(clientEntities => {
       const devices = clientEntities.filter(clientEntity => clientEntity.id !== this.currentClient().id);

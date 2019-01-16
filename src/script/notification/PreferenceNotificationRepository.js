@@ -99,8 +99,8 @@ class PreferenceNotificationRepository {
 
   onUserEvent(event) {
     if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
-      if (event.key === PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.key) {
-        const defaultValue = !!PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS.defaultValue;
+      if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
+        const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
         this.notifications.push({
           data: event.value === undefined ? defaultValue : !!event.value,
           type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,

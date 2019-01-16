@@ -102,7 +102,7 @@ class App {
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
-    repositories.properties = new PropertiesRepository(this.service.properties);
+    repositories.properties = new PropertiesRepository(this.service.properties, this.service.self);
     repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
