@@ -44,7 +44,9 @@ const ignoreList = ['.DS_Store'];
 
 console.log(`Cleaning config directory "${configDir}"`);
 fs.removeSync(configDir);
-execSync(`git clone -b ${gitConfigurationVersion} ${gitConfigurationUrl} ${configDirName}`, {stdio: [0, 1]});
+execSync(`git clone --single-branch -b ${gitConfigurationVersion} ${gitConfigurationUrl} ${configDirName}`, {
+  stdio: [0, 1],
+});
 
 // Copy .env file configuration
 fs.copySync(resolve(configDir, pkg.name, '.env'), resolve(projectDir, '.env'));

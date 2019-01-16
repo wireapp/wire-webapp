@@ -304,7 +304,7 @@ class App {
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
-        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
+        this.view.loading.updateProgress(5, 'initReceivedSelfUser');
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
