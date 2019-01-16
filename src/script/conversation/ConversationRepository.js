@@ -2524,7 +2524,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending ${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`
       );
     }
 
