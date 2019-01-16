@@ -1017,7 +1017,9 @@ describe('ConversationRepository', () => {
           expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
           expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
           expect(ephemeral.expire_after_millis.toString()).toBe(expectedValues.shift());
-          return Promise.resolve({});
+          return Promise.resolve({
+            recipients: {},
+          });
         }
       );
 
