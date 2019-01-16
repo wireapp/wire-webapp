@@ -19,7 +19,7 @@
 
 import adapter from 'webrtc-adapter';
 
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};

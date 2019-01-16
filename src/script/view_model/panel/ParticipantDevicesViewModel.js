@@ -19,7 +19,7 @@
 
 import BasePanelViewModel from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {

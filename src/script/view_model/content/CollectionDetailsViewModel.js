@@ -19,7 +19,7 @@
 
 import moment from 'moment';
 import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

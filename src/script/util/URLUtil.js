@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
@@ -35,8 +37,8 @@ const URLUtil = (() => {
   };
 
   const _buildSupportUrl = support_id => {
-    const urlPath = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
-    return `${_getDomain(TYPE.SUPPORT)}${z.l10n.text(urlPath)}${support_id}`;
+    const urlPath = _.isNumber(support_id) ? t('urlSupportArticles') : t('urlSupportRequests');
+    return `${_getDomain(TYPE.SUPPORT)}${urlPath}${support_id}`;
   };
 
   const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;

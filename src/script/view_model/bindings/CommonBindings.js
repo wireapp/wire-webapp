@@ -28,7 +28,7 @@ import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import overlayedObserver from '../../ui/overlayedObserver';
 import viewportObserver from '../../ui/viewportObserver';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 /**
  * Use it on the drop area.
@@ -649,9 +649,8 @@ ko.bindingHandlers.tooltip = {
   update(element, valueAccessor) {
     const {text = valueAccessor(), position, disabled} = valueAccessor();
     if (!disabled) {
-      const {id = text, substitute} = text;
       element.classList.add('with-tooltip', `with-tooltip--${position === 'bottom' ? 'bottom' : 'top'}`);
-      element.setAttribute('data-tooltip', z.l10n.text(id, substitute));
+      element.setAttribute('data-tooltip', text);
     }
   },
 };

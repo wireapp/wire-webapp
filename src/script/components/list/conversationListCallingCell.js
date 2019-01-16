@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -225,7 +225,7 @@ ko.components.register('conversation-list-calling-cell', {
             </button>
           <!-- /ko -->
           <!-- ko if: isConnected() -->
-            <div class="call-ui__button" data-bind="tooltip: {text: z.string.videoCallScreenShareNotSupported, disabled: !disableScreenButton(), position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+            <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton(), position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
           <!-- /ko -->

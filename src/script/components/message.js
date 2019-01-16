@@ -19,7 +19,7 @@
 
 import moment from 'moment';
 
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 class Message {
   constructor({

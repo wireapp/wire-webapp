@@ -18,7 +18,7 @@
  */
 
 import {UNSPLASH_URL} from '../externalRoute';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.user = z.user || {};

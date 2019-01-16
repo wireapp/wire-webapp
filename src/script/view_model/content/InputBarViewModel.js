@@ -18,7 +18,7 @@
  */
 
 import * as StorageUtil from 'utils/StorageUtil';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -203,11 +203,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         return availabilityStrings[userEntity.availability()];
       }
 
-      const stringId = this.conversationEntity().messageTimer()
-        ? z.string.tooltipConversationEphemeral
-        : z.string.tooltipConversationInputPlaceholder;
+      const string = this.conversationEntity().messageTimer()
+        ? t('tooltipConversationEphemeral')
+        : t('tooltipConversationInputPlaceholder');
 
-      return z.l10n.text(stringId);
+      return string;
     });
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {

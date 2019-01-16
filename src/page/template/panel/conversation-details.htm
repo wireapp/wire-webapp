@@ -28,7 +28,7 @@
         <!-- ko ifnot: isSingleUserMode() -->
           <div class="conversation-details__header">
             <!-- ko if: isActiveGroupParticipant() -->
-              <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipConversationDetailsRename" data-uie-name="status-name">
+              <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: clickToEditGroupName, attr: {title: t('tooltipConversationDetailsRename')}" data-uie-name="status-name">
                 <div class="conversation-details__name" data-bind="text: activeConversation() && activeConversation().display_name()"></div>
                 <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
               </div>

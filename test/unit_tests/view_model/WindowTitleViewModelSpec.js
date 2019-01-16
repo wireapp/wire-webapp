@@ -17,8 +17,11 @@
  *
  */
 
+import 'src/script/localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
+
 describe('z.viewModel.WindowTitleViewModel', () => {
-  const suffix = z.l10n.text(z.string.wire);
+  const suffix = t('wire');
   let test_factory = undefined;
   let title_view_model = undefined;
 
@@ -208,7 +211,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       // Test one connect request message
       title_view_model.userRepository.users.push(user_et);
 
-      let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
+      let message = t('conversationsConnectionRequestOne');
       let expectedWaitingPeople = '1';
       let expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -219,7 +222,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.userRepository.connect_requests.subscribe(() => {
         jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
         expectedWaitingPeople = '2';
-        message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
+        message = t('conversationsConnectionRequestMany', expectedWaitingPeople);
         expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
 
         expect(window.document.title).toBe(expected_title);

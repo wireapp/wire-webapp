@@ -1,7 +1,7 @@
 <div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
   <div class="left-list-header">
     <span class="left-list-header-text" data-bind="text: t('preferencesHeadline')"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClosePreferences, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close-preferences"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClosePreferences, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close-preferences"></span>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items preferences-list-items">

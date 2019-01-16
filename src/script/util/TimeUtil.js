@@ -21,7 +21,7 @@
 
 import moment from 'moment';
 
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 /**
  * @typedef {object} DiscreteTimeUnit
@@ -53,38 +53,38 @@ z.util.TimeUtil = {
   durationUnits: () => {
     return [
       {
-        plural: 'ephemeralUnitsYears',
-        singular: 'ephemeralUnitsYear',
+        plural: t('ephemeralUnitsYears'),
+        singular: t('ephemeralUnitsYear'),
         symbol: 'y',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
       },
       {
-        plural: 'ephemeralUnitsWeeks',
-        singular: 'ephemeralUnitsWeek',
+        plural: t('ephemeralUnitsWeeks'),
+        singular: t('ephemeralUnitsWeek'),
         symbol: 'w',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
       },
       {
-        plural: 'ephemeralUnitsDays',
-        singular: 'ephemeralUnitsDay',
+        plural: t('ephemeralUnitsDays'),
+        singular: t('ephemeralUnitsDay'),
         symbol: 'd',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
       },
       {
-        plural: 'ephemeralUnitsHours',
-        singular: 'ephemeralUnitsHour',
+        plural: t('ephemeralUnitsHours'),
+        singular: t('ephemeralUnitsHour'),
         symbol: 'h',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
       },
       {
-        plural: 'ephemeralUnitsMinutes',
-        singular: 'ephemeralUnitsMinute',
+        plural: t('ephemeralUnitsMinutes'),
+        singular: t('ephemeralUnitsMinute'),
         symbol: 'm',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       {
-        plural: 'ephemeralUnitsSeconds',
-        singular: 'ephemeralUnitsSecond',
+        plural: t('ephemeralUnitsSeconds'),
+        singular: t('ephemeralUnitsSecond'),
         symbol: 's',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
@@ -101,7 +101,7 @@ z.util.TimeUtil = {
     const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
     return {
       symbol: firstNonZeroUnit.symbol,
-      text: `${firstNonZeroUnit.value} ${z.l10n.text(firstNonZeroUnit.longUnit)}`,
+      text: `${firstNonZeroUnit.value} ${firstNonZeroUnit.longUnit}`,
       value: firstNonZeroUnit.value,
     };
   },
@@ -200,7 +200,7 @@ z.util.TimeUtil = {
       }
       value /= unit.value;
       value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
-      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
+      const longUnit = value === 1 ? unit.singular : unit.plural;
       return {
         longUnit,
         symbol: unit.symbol,

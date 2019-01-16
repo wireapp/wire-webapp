@@ -20,7 +20,7 @@
 import platform from 'platform';
 
 import * as StorageUtil from 'utils/StorageUtil';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.client = z.client || {};

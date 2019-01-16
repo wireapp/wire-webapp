@@ -32,7 +32,7 @@
       <!-- ko if: stateIsPreferences() -->
         <input class="input group-creation-modal-teamname-input"
                autocomplete="off" autofocus required spellcheck="false" type="text"
-               data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: clickOnNext, hasFocus: true, l10n_placeholder: z.string.groupCreationPreferencesPlaceholder, textInput: nameInput"
+               data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
                data-uie-name="enter-group-name">
         <div class="group-creation-error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
         <!-- ko if: isTeam -->

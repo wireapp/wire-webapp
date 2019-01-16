@@ -17,13 +17,53 @@
  *
  */
 
+import SanitizationUtil from './SanitizationUtil';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-import {t} from '../localization/Localizer';
+export const Declension = {
+  ACCUSATIVE: 'accusative',
+  DATIVE: 'dative',
+  NOMINATIVE: 'nominative',
+};
+
+const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
+
+const replaceSubstitute = (string, regex, substitute) => {
+  const replacement = isStringOrNumber(substitute)
+    ? substitute
+    : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
+  return string.replace(regex, replacement);
+};
+
+export const DEFAULT_LOCALE = 'en';
+let locale = DEFAULT_LOCALE;
+let strings = {};
+export const setLocale = newLocale => (locale = newLocale);
+export const setStrings = newStrings => (strings = newStrings);
+
+export function t(identifier, substitutions, dangerousSubstitutions) {
+  const value = strings[locale][identifier] || strings[DEFAULT_LOCALE][identifier];
+  const replaceDangerously = Object.assign(
+    {
+      '/bold': '</b>',
+      '/italic': '</i>',
+      bold: '<b>',
+      italic: '<i>',
+    },
+    dangerousSubstitutions
+  );
+
+  const substituted = replaceSubstitute(value, /{{(.+?)}}/g, substitutions);
+  const escaped = SanitizationUtil.escapeString(substituted);
+  const dangerouslySubstituted = replaceSubstitute(escaped, /\[(.+?)\]/g, replaceDangerously);
+
+  return dangerouslySubstituted;
+}
 
 z.util.LocalizerUtil = {
-  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
+  joinNames: (userEntities, declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
@@ -55,3 +95,5 @@ z.util.LocalizerUtil = {
     return firstNames.join(', ');
   },
 };
+
+window.t = t;

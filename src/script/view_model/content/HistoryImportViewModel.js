@@ -19,7 +19,7 @@
 
 import JSZip from 'jszip';
 
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

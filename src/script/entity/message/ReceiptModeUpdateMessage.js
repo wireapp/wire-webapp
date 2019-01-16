@@ -18,6 +18,7 @@
  */
 
 import SystemMessage from './SystemMessage';
+import {t} from 'utils/LocalizerUtil';
 
 export default class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled) {
@@ -27,13 +28,10 @@ export default class ReceiptModeUpdateMessage extends SystemMessage {
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
     this.caption = ko.pureComputed(() => {
-      let stringId;
       if (isReceiptEnabled) {
-        stringId = this.user().is_me ? z.string.conversationReceiptsOnYou : z.string.conversationReceiptsOn;
-      } else {
-        stringId = this.user().is_me ? z.string.conversationReceiptsOffYou : z.string.conversationReceiptsOff;
+        return this.user().is_me ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
       }
-      return z.l10n.text(stringId);
+      return this.user().is_me ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
     });
   }
 }

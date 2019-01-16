@@ -19,7 +19,7 @@
 
 import ReceiptMode from '../conversation/ReceiptMode';
 import WebappProperties from './WebappProperties';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 class PropertiesRepository {
   static get CONFIG() {

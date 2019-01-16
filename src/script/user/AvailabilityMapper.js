@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.user = z.user || {};
 
@@ -45,16 +47,16 @@ z.user.AvailabilityMapper = (() => {
 
   return {
     nameFromType: availabilityType => {
-      const TYPE_STRING_IDS = {
-        [z.user.AvailabilityType.AVAILABLE]: z.string.userAvailabilityAvailable,
-        [z.user.AvailabilityType.AWAY]: z.string.userAvailabilityAway,
-        [z.user.AvailabilityType.BUSY]: z.string.userAvailabilityBusy,
-        [z.user.AvailabilityType.NONE]: z.string.userAvailabilityNone,
+      const TYPE_STRINGS = {
+        [z.user.AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
+        [z.user.AvailabilityType.AWAY]: t('userAvailabilityAway'),
+        [z.user.AvailabilityType.BUSY]: t('userAvailabilityBusy'),
+        [z.user.AvailabilityType.NONE]: t('userAvailabilityNone'),
       };
 
-      const stringId = TYPE_STRING_IDS[availabilityType];
-      if (stringId) {
-        return z.l10n.text(stringId);
+      const string = TYPE_STRINGS[availabilityType];
+      if (string) {
+        return string;
       }
       throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
     },

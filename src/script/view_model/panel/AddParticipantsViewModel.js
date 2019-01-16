@@ -19,7 +19,7 @@
 
 import BasePanelViewModel from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {

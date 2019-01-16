@@ -17,38 +17,36 @@
  *
  */
 
-import ko from 'knockout';
 import moment from 'moment';
 
 import * as StorageUtil from 'utils/StorageUtil';
-import SanitizationUtil from 'utils/SanitizationUtil';
 import URLUtil from 'utils/URLUtil';
 import URLParameter from '../auth/URLParameter';
 import StorageKey from '../storage/StorageKey';
 
-/* eslint-disable no-unused-vars */
-import moment_cs from 'moment/locale/cs.js';
-import moment_da from 'moment/locale/da.js';
-import moment_de from 'moment/locale/de.js';
-import moment_el from 'moment/locale/el.js';
-import moment_es from 'moment/locale/es.js';
-import moment_et from 'moment/locale/et.js';
-import moment_fi from 'moment/locale/fi.js';
-import moment_fr from 'moment/locale/fr.js';
-import moment_hr from 'moment/locale/hr.js';
-import moment_hu from 'moment/locale/hu.js';
-import moment_it from 'moment/locale/it.js';
-import moment_lt from 'moment/locale/lt.js';
-import moment_nl from 'moment/locale/nl.js';
-import moment_pl from 'moment/locale/pl.js';
-import moment_pt from 'moment/locale/pt.js';
-import moment_ro from 'moment/locale/ro.js';
-import moment_ru from 'moment/locale/ru.js';
-import moment_sk from 'moment/locale/sk.js';
-import moment_sl from 'moment/locale/sl.js';
-import moment_tr from 'moment/locale/tr.js';
-import moment_uk from 'moment/locale/uk.js';
-/* eslint-enable no-unused-vars */
+import {DEFAULT_LOCALE, setLocale, setStrings} from 'utils/LocalizerUtil';
+
+import 'moment/locale/cs.js';
+import 'moment/locale/da.js';
+import 'moment/locale/de.js';
+import 'moment/locale/el.js';
+import 'moment/locale/es.js';
+import 'moment/locale/et.js';
+import 'moment/locale/fi.js';
+import 'moment/locale/fr.js';
+import 'moment/locale/hr.js';
+import 'moment/locale/hu.js';
+import 'moment/locale/it.js';
+import 'moment/locale/lt.js';
+import 'moment/locale/nl.js';
+import 'moment/locale/pl.js';
+import 'moment/locale/pt.js';
+import 'moment/locale/ro.js';
+import 'moment/locale/ru.js';
+import 'moment/locale/sk.js';
+import 'moment/locale/sl.js';
+import 'moment/locale/tr.js';
+import 'moment/locale/uk.js';
 
 import cs from '../localization/translations/cs.json';
 import da from '../localization/translations/da.json';
@@ -75,7 +73,7 @@ import uk from '../localization/translations/uk.json';
 
 window.z = window.z || {};
 
-window.z.string = {
+const strings = {
   cs,
   da,
   de,
@@ -100,14 +98,10 @@ window.z.string = {
   uk,
 };
 
-window.z.string.Declension = {
-  ACCUSATIVE: 'accusative',
-  DATIVE: 'dative',
-  NOMINATIVE: 'nominative',
-};
+window.z.string = strings;
+setStrings(strings);
 
 (function setAppLocale() {
-  const DEFAULT_LOCALE = 'en';
   const queryParam = URLUtil.getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2);
   let storedLocale = StorageUtil.getValue(StorageKey.LOCALIZATION.LOCALE);
@@ -117,6 +111,7 @@ window.z.string.Declension = {
   }
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
+  setLocale(locale);
 
   document.getElementsByTagName('html')[0].setAttribute('lang', locale);
 
@@ -126,81 +121,3 @@ window.z.string.Declension = {
     Object.assign(z.string, z.string[DEFAULT_LOCALE], z.string[locale]);
   }
 })();
-
-const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
-
-const replaceSubstitute = (string, regex, substitute) => {
-  const replacement = isStringOrNumber(substitute)
-    ? substitute
-    : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
-  return string.replace(regex, replacement);
-};
-
-z.l10n = (() => {
-  return {
-    safeHtml(value, substitutions = {}) {
-      const replace = isStringOrNumber(substitutions) ? substitutions : substitutions.replace;
-
-      const defaultReplacements = {
-        '/bold': '</b>',
-        '/italic': '</i>',
-        bold: '<b>',
-        italic: '<i>',
-      };
-
-      const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
-
-      let string = ko.unwrap(value);
-
-      if (replace !== undefined) {
-        string = replaceSubstitute(string, /{{(.+?)}}/g, replace);
-      }
-
-      string = SanitizationUtil.escapeString(string);
-
-      string = replaceSubstitute(string, /\[(.+?)\]/g, replaceDangerously);
-
-      return string;
-    },
-
-    /**
-     * Retrieve localized string and replace placeholders
-     *
-     * This method give you two options to replace placeholders
-     *
-     * @example using a string as substitute
-     * z.l10.text('Hey {{name}}', 'Tod') // returns 'Hey Tod'
-     *
-     * @example using an object as substitute
-     * z.l10.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey'}) // returns 'Hey Tod'
-     *
-     * @param {Observable|string} value - localized string in our case usually z.string.foo
-     * @param {string|Object} [substitute] - data to fill all the placeholder with
-     * @returns {string} - string with substituted placeholders
-     */
-    text: (value, substitute) => replaceSubstitute(ko.unwrap(value), /{{(.+?)}}/g, substitute),
-  };
-})();
-
-export function t(identifier, substitutions, dangerousSubstitutions) {
-  const value = z.string[identifier];
-  const replaceDangerously = Object.assign(
-    {
-      '/bold': '</b>',
-      '/italic': '</i>',
-      bold: '<b>',
-      italic: '<i>',
-    },
-    dangerousSubstitutions
-  );
-
-  const substituted = replaceSubstitute(value, /{{(.+?)}}/g, substitutions);
-  const escaped = SanitizationUtil.escapeString(substituted);
-  const dangerouslySubstituted = replaceSubstitute(escaped, /\[(.+?)\]/g, replaceDangerously);
-
-  return dangerouslySubstituted;
-}
-
-window.t = t;
-
-export default z.l10n;

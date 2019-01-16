@@ -1,7 +1,7 @@
 <div id="start-ui" data-bind="with: $root.start">
   <div class="left-list-header left-list-header-start-ui">
     <span class="left-list-header-text" data-bind="text: teamName" data-uie-name="status-team-name-search"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClose, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClose, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close"></span>
   </div>
   <div id="start-ui-header" class="start-ui-header border-theme" data-bind="css: {'start-ui-header-integrations': isTeam()}">
     <user-input class="start-ui-header-user-input"

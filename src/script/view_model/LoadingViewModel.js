@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -47,7 +47,7 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
       let updatedLoadingMessage;
 
       switch (message) {
-        case t('initReceivedSelfUser'): {
+        case 'initReceivedSelfUser': {
           updatedLoadingMessage = t('initReceivedSelfUser', this.userRepository.self().first_name());
           break;
         }

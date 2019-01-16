@@ -20,7 +20,7 @@
 import moment from 'moment';
 
 import viewportObserver from '../../ui/viewportObserver';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.

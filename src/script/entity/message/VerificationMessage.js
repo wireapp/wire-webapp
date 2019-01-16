@@ -17,6 +17,8 @@
  *
  */
 
+import {t, Declension} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -49,35 +51,25 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     });
 
     this.captionUser = ko.pureComputed(() => {
-      const namesString = z.util.LocalizerUtil.joinNames(this.userEntities(), z.string.Declension.NOMINATIVE);
+      const namesString = z.util.LocalizerUtil.joinNames(this.userEntities(), Declension.NOMINATIVE);
       return z.util.StringUtil.capitalizeFirstChar(namesString);
     });
 
     this.captionStartedUsing = ko.pureComputed(() => {
       const hasMultipleUsers = this.userIds().length > 1;
-      const stringId = hasMultipleUsers
-        ? z.string.conversationDeviceStartedUsingMany
-        : z.string.conversationDeviceStartedUsingOne;
-
-      return z.l10n.text(stringId);
+      return hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne');
     });
 
     this.captionNewDevice = ko.pureComputed(() => {
       const hasMultipleUsers = this.userIds().length > 1;
-      const stringId = hasMultipleUsers
-        ? z.string.conversationDeviceNewDeviceMany
-        : z.string.conversationDeviceNewDeviceOne;
-
-      return z.l10n.text(stringId);
+      return hasMultipleUsers ? t('conversationDeviceNewDeviceMany') : t('conversationDeviceNewDeviceOne');
     });
 
     this.captionUnverifiedDevice = ko.pureComputed(() => {
       const [firstUserEntity] = this.userEntities();
-      const stringId = this.isSelfClient()
-        ? z.string.conversationDeviceYourDevices
-        : z.string.conversationDeviceUserDevices;
-
-      return z.l10n.text(stringId, firstUserEntity.first_name());
+      return this.isSelfClient()
+        ? t('conversationDeviceYourDevices')
+        : t('conversationDeviceUserDevices', firstUserEntity.first_name());
     });
   }
 

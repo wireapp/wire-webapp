@@ -27,7 +27,7 @@ import DebugUtil from '../util/DebugUtil';
 import '../components/mentionSuggestions.js';
 
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -304,7 +304,7 @@ class App {
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
-        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
+        this.view.loading.updateProgress(5, 'initReceivedSelfUser');
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })

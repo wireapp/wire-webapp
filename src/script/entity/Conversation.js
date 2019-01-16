@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

@@ -8,7 +8,7 @@
             <div class="preferences-account-name-wrapper">
               <input class="preferences-account-name preferences-account-input"
                      id="name" type="text"
-                     data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, l10n_placeholder: z.string.preferencesAccountUsernamePlaceholder"
+                     data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder')}"
                      data-uie-name="enter-name"
                      maxlength="64"
                      spellcheck="false" />
@@ -67,7 +67,7 @@
         </div>
 
         <!-- ko if: isActivatedAccount() -->
-          <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
+          <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
             <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
             <input id="self-upload-file-input"
                   type="file"
@@ -145,7 +145,7 @@
           <!-- /ko -->
 
           <!-- ko ifnot: selfUser().isSingleSignOn -->
-            <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, text: t('preferencesAccountResetPassword'), l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
+            <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, text: t('preferencesAccountResetPassword'), attr: {title: t('tooltipPreferencesPassword')}" data-uie-name="do-reset-password"></div>
           <!-- /ko -->
 
           <!-- ko ifnot: isTeam() -->

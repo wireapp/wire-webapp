@@ -18,7 +18,7 @@
  */
 
 import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export default class EventMapper {

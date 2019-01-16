@@ -21,7 +21,7 @@
 import receiptModeToggle from 'components/receiptModeToggle';
 /* eslint-enable no-unused-vars */
 import BasePanelViewModel from './BasePanelViewModel';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {

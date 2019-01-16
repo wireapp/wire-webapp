@@ -22,7 +22,7 @@ import Cookies from 'js-cookie';
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import StorageService from '../storage/StorageService';
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';

@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.media = z.media || {};
@@ -93,14 +93,16 @@ z.media.MediaRepository = class MediaRepository {
   showNoCameraModal() {
     const modalOptions = {
       text: {
-        htmlMessage: z.l10n.safeHtml(z.string.modalNoCameraMessage, {
-          replaceDangerously: {
+        htmlMessage: t(
+          'modalNoCameraMessage',
+          {},
+          {
             '/faqLink': '</a>',
             br: '<br>',
             faqLink:
               '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
-          },
-        }),
+          }
+        ),
         title: t('modalNoCameraTitle'),
       },
     };

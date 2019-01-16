@@ -3,10 +3,10 @@
     <div class="panel__header">
       <arrow-left-icon class="icon-button" data-bind="clickOrDrag: clickOnBack" data-uie-name="go-back-participant-devices"></arrow-left-icon>
       <!-- ko if: !showDeviceDetails() && !showSelfFingerprint() -->
-        <div class="panel__header__title" data-bind="text: z.string.participantDevicesHeader"></div>
+        <div class="panel__header__title" data-bind="text: t('participantDevicesHeader')"></div>
       <!-- /ko -->
       <!-- ko if: showSelfFingerprint() -->
-        <div class="panel__header__title" data-bind="text: z.string.participantDevicesSelfFingerprint"></div>
+        <div class="panel__header__title" data-bind="text: t('participantDevicesSelfFingerprint')"></div>
       <!-- /ko -->
       <!-- ko if: showDeviceDetails() -->
         <!-- ko if: userEntity().is_me -->
@@ -45,7 +45,7 @@
         <!-- ko if: showDevicesNotFound() -->
           <div class="participant-devices__header">
             <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
-            <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsitePrivacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+            <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: t('urlWebsitePrivacy')}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           </div>
         <!-- /ko -->
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from '../localization/Localizer';
+import {t, Declension} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.notification = z.notification || {};
@@ -265,7 +265,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (updatedOneParticipant) {
       const [otherUserEntity] = messageEntity.userEntities();
 
-      const declension = z.string.Declension.ACCUSATIVE;
+      const declension = Declension.ACCUSATIVE;
       const nameOfJoinedUser = z.util.SanitizationUtil.getFirstName(otherUserEntity, declension);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;

@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from '../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -69,7 +69,7 @@ ko.components.register('message-timer-button', {
   template: `
     <span id="conversation-input-bar-message-timer"
       class="controls-right-button conversation-input-bar-message-timer"
-      data-bind="click: onClick, l10n_tooltip: z.string.tooltipConversationEphemeral, attr: {'data-uie-value': isTimerDisabled() ? 'disabled' : 'enabled'}"
+      data-bind="click: onClick, attr: {title: t('tooltipConversationEphemeral'), 'data-uie-value': isTimerDisabled() ? 'disabled' : 'enabled'}"
       data-uie-name="do-set-ephemeral-timer"
       data-uie-value>
       <!-- ko if: hasMessageTimer() && conversationEntity()-->

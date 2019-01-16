@@ -18,7 +18,7 @@
  */
 
 import ReceiptMode from '../../conversation/ReceiptMode';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -83,18 +83,16 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       }
       return [];
     });
-    this.participantsActionText = ko.pureComputed(() => {
-      const stringSelector = this.selectedContacts().length
-        ? z.string.groupCreationParticipantsActionCreate
-        : z.string.groupCreationParticipantsActionSkip;
-      return z.l10n.text(stringSelector);
-    });
-    this.participantsHeaderText = ko.pureComputed(() => {
-      const stringSelector = this.selectedContacts().length
-        ? z.string.groupCreationParticipantsHeaderWithCounter
-        : z.string.groupCreationParticipantsHeader;
-      return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
-    });
+    this.participantsActionText = ko.pureComputed(() =>
+      this.selectedContacts().length
+        ? t('groupCreationParticipantsActionCreate')
+        : t('groupCreationParticipantsActionSkip')
+    );
+    this.participantsHeaderText = ko.pureComputed(() =>
+      this.selectedContacts().length
+        ? t('groupCreationParticipantsHeaderWithCounter', this.selectedContacts().length)
+        : t('groupCreationParticipantsHeader')
+    );
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 

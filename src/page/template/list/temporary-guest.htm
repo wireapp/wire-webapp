@@ -16,6 +16,6 @@
       <span class="temporary-guest__footer__info-text__time" data-bind="text: selfUser().expirationRemainingText, css: {'temporary-guest__footer__info-text__time--urgent': selfUser().expirationIsUrgent}" data-uie-name="status-expiration-time"></span>
       <span data-bind="text: t('temporaryGuestTimeRemaining')"></span>
     </span>
-    <settings-icon  class="temporary-guest__footer__preferences" data-bind="click: clickOnPreferencesButton, l10n_tooltip: z.string.tooltipConversationsPreferences" data-uie-name="go-preferences"></settings-icon>
+    <settings-icon  class="temporary-guest__footer__preferences" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>

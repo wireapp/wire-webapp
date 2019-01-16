@@ -19,7 +19,7 @@
 
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

@@ -18,7 +18,7 @@
  */
 
 import BasePanelViewModel from './BasePanelViewModel';
-import {t} from '../../localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
 
 export default class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {

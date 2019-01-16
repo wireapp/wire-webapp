@@ -20,28 +20,7 @@
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor) {
     const {support, type, path} = valueAccessor();
-    const href = support ? z.util.URLUtil.buildSupportUrl(support) : z.util.URLUtil.buildUrl(type, z.l10n.text(path));
+    const href = support ? z.util.URLUtil.buildSupportUrl(support) : z.util.URLUtil.buildUrl(type, path);
     element.setAttribute('href', href);
-  },
-};
-
-ko.bindingHandlers.l10n_input = {
-  update(element, valueAccessor) {
-    const {id = valueAccessor(), substitute} = valueAccessor();
-    element.setAttribute('value', z.l10n.text(id, substitute));
-  },
-};
-
-ko.bindingHandlers.l10n_placeholder = {
-  update(element, valueAccessor) {
-    const {id = valueAccessor(), substitute} = valueAccessor();
-    element.setAttribute('placeholder', z.l10n.text(id, substitute));
-  },
-};
-
-ko.bindingHandlers.l10n_tooltip = {
-  update(element, valueAccessor) {
-    const {id = valueAccessor(), substitute} = valueAccessor();
-    element.setAttribute('title', z.l10n.text(id, substitute));
   },
 };

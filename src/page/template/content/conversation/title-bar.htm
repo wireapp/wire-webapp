@@ -3,7 +3,7 @@
     <div class="conversation-title-bar-library">
       <!-- ko if: isActivatedAccount() -->
         <span class="conversation-title-bar-icon button-icon-large icon-search"
-              data-bind="clickOrDrag: clickOnCollectionButton, l10n_tooltip: z.string.tooltipConversationSearch"
+              data-bind="clickOrDrag: clickOnCollectionButton, attr: {title: t('tooltipConversationSearch')}"
               data-uie-name="do-collections"></span>
       <!-- /ko -->
     </div>
@@ -23,12 +23,12 @@
       <!-- ko if: showCallControls() -->
         <!-- ko if: supportsVideoCall() -->
           <camera-icon class="conversation-title-bar-icon"
-                data-bind="clickOrDrag: clickOnVideoButton, l10n_tooltip: z.string.tooltipConversationVideoCall"
+                data-bind="clickOrDrag: clickOnVideoButton, attr: {title: t('tooltipConversationVideoCall')}"
                 data-uie-name="do-video-call">
           </camera-icon>
         <!-- /ko -->
         <pickup-icon class="conversation-title-bar-icon"
-              data-bind="clickOrDrag: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
+              data-bind="clickOrDrag: clickOnCallButton, attr: {title: t('tooltipConversationCall')}"
               data-uie-name="do-call">
         </pickup-icon>
       <!-- /ko -->
