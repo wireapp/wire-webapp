@@ -2517,7 +2517,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const numberOfUsers = Object.keys(payload.recipients).length;
     const numberOfClients = Object.values(payload.recipients)
       .map(clientId => Object.keys(clientId).length)
-      .reduce((a, b) => a + b, 0);
+      .reduce((result, clients) => result + clients, 0);
 
     const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${conversationId}'`;
     this.logger.info(logMessage, payload);
