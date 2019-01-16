@@ -18,38 +18,49 @@
  */
 
 const assets = require('gulp-bower-assets');
-const bower = require('gulp-bower');
 const clean = require('gulp-clean');
 const gulp = require('gulp');
 const runSequence = require('run-sequence');
-
-// Aliases
-gulp.task('c', ['clean']);
-gulp.task('i', ['install']);
-gulp.task('t', ['test']);
+const {spawn} = require('child_process');
 
 // Tasks
-gulp.task('clean', ['clean_browser', 'clean_node'], () => {});
+gulp.task('clean_browser', () => gulp.src('dist/window', {allowEmpty: true}).pipe(clean()));
 
-gulp.task('clean_browser', () => gulp.src('dist/window').pipe(clean()));
+gulp.task('clean_node', () => gulp.src('dist/commonjs', {allowEmpty: true}).pipe(clean()));
 
-gulp.task('clean_node', () => gulp.src('dist/commonjs').pipe(clean()));
+gulp.task(
+  'clean',
+  gulp.series('clean_browser', 'clean_node', done => {
+    done();
+  })
+);
 
 gulp.task('dist', done => runSequence('clean', 'install', done));
 
-gulp.task('install', ['install_bower_assets'], () => {});
+gulp.task('install_bower', done => {
+  const child = spawn('npx bower', ['install'], {shell: true, stdio: 'inherit'});
+  child.on('exit', done);
+});
 
-gulp.task('install_bower', () => bower({cmd: 'install'}));
+gulp.task(
+  'install_bower_assets',
+  gulp.series('install_bower', () => {
+    return gulp
+      .src('bower_assets.json')
+      .pipe(
+        assets({
+          prefix(name, prefix) {
+            return `${prefix}/${name}`;
+          },
+        })
+      )
+      .pipe(gulp.dest('dist/lib'));
+  })
+);
 
-gulp.task('install_bower_assets', ['install_bower'], () =>
-  gulp
-    .src('bower_assets.json')
-    .pipe(
-      assets({
-        prefix(name, prefix) {
-          return `${prefix}/${name}`;
-        },
-      })
-    )
-    .pipe(gulp.dest('dist/lib'))
+gulp.task(
+  'install',
+  gulp.series('install_bower_assets', done => {
+    done();
+  })
 );
