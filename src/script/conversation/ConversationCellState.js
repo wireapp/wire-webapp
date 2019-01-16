@@ -91,49 +91,41 @@ z.conversation.ConversationCellState = (() => {
       .map(([activity, activityCount]) => {
         if (activityCount) {
           const activityCountIsOne = activityCount === 1;
-          let description = undefined;
 
           switch (activity) {
             case ACTIVITY_TYPE.CALL: {
-              description = activityCountIsOne
+              return activityCountIsOne
                 ? t('conversationsSecondaryLineSummaryMissedCall', activityCount)
                 : t('conversationsSecondaryLineSummaryMissedCalls', activityCount);
-              break;
             }
 
             case ACTIVITY_TYPE.MENTION: {
-              description = activityCountIsOne
+              return activityCountIsOne
                 ? t('conversationsSecondaryLineSummaryMention', activityCount)
                 : t('conversationsSecondaryLineSummaryMentions', activityCount);
-              break;
             }
 
             case ACTIVITY_TYPE.MESSAGE: {
-              description = activityCountIsOne
+              return activityCountIsOne
                 ? t('conversationsSecondaryLineSummaryMessage', activityCount)
                 : t('conversationsSecondaryLineSummaryMessages', activityCount);
-              break;
             }
 
             case ACTIVITY_TYPE.PING: {
-              description = activityCountIsOne
+              return activityCountIsOne
                 ? t('conversationsSecondaryLineSummaryPing', activityCount)
                 : t('conversationsSecondaryLineSummaryPings', activityCount);
-              break;
             }
 
             case ACTIVITY_TYPE.REPLY: {
-              description = activityCountIsOne
+              return activityCountIsOne
                 ? t('conversationsSecondaryLineSummaryReply', activityCount)
                 : t('conversationsSecondaryLineSummaryReplies', activityCount);
-              break;
             }
 
             default:
               throw new z.error.ConversationError();
           }
-
-          return description;
         }
       })
       .filter(activityString => !!activityString)
@@ -311,11 +303,7 @@ z.conversation.ConversationCellState = (() => {
       const wasSelfRemoved = isMemberRemoval && lastMessageEntity.userIds().includes(selfUserId);
       if (wasSelfRemoved) {
         const selfLeft = lastMessageEntity.user().id === selfUserId;
-        const string = selfLeft
-          ? t('conversationsSecondaryLineYouLeft')
-          : t('conversationsSecondaryLineYouWereRemoved');
-
-        return string;
+        return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
       }
 
       return '';
@@ -356,10 +344,9 @@ z.conversation.ConversationCellState = (() => {
 
         if (!!string) {
           if (messageEntity.is_ephemeral()) {
-            string = conversationEntity.isGroup()
+            return conversationEntity.isGroup()
               ? t('conversationsSecondaryLineEphemeralMessageGroup')
               : t('conversationsSecondaryLineEphemeralMessage');
-            return string;
           }
 
           const hasString = string && string !== true;
