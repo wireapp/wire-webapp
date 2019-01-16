@@ -110,14 +110,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         return true;
       }
       const isScrollingUp = event.deltaY > 0;
-      const loadExtraMessagePromise = isScrollingUp ? this._loadPrecedingMessages() : this._loadFollowingMessages();
-
-      loadExtraMessagePromise.then(() => {
-        const antiscroll = $('.message-list').data('antiscroll');
-        if (antiscroll) {
-          antiscroll.rebuild();
-        }
-      });
+      if (isScrollingUp) {
+        this._loadPrecedingMessages();
+      } else {
+        this._loadFollowingMessages();
+      }
 
       return true;
     }, 50);
@@ -211,11 +208,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   _handleInputResize(inputSizeDiff) {
-    const antiscroll = $('.message-list').data('antiscroll');
-    if (antiscroll) {
-      antiscroll.rebuild();
-    }
-
     if (inputSizeDiff) {
       this.getMessagesContainer().scrollBy(inputSizeDiff);
     } else if (this._shouldStickToBottom()) {
@@ -276,7 +268,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   getMessagesContainer() {
     if (!this.messagesContainer) {
-      this.messagesContainer = $('.messages-wrap');
+      this.messagesContainer = $('.message-list');
     }
     return this.messagesContainer;
   }
