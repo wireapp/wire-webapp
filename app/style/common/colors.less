@@ -43,11 +43,11 @@
 .fill-purple {
   .fill(@w-purple);
 }
-.fill-foreground {
-  .fill(var(--foreground));
+.fill-graphite {
+  .fill(@graphite);
 }
-.fill-background {
-  .fill(var(--background));
+.fill-graphite-dark {
+  .fill(@graphite-dark);
 }
 
 // texts
@@ -76,11 +76,11 @@
 .text-purple {
   .text(@w-purple);
 }
-.text-foreground {
-  .text(var(--foreground));
+.text-graphite {
+  .text(@graphite);
 }
-.text-background {
-  .text(var(--background));
+.text-graphite-dark {
+  .text(@graphite-dark);
 }
 .text-white {
   .text(#fff);
@@ -179,7 +179,7 @@
   color: #fff;
 }
 .accent-color-temporary {
-  color: var(--background-fade-8);
+  color: fade(@graphite-dark, 8%);
 }
 
 // background colors

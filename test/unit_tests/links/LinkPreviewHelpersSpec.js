@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=links/LinkPreviewHelpers yarn test:app
+
 describe('containsOnlyLink', () => {
   it('should return true if text only contains a bare url', () => {
     const text = 'wire.com';

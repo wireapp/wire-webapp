@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=main/SingleInstanceHandler yarn test:app
+
 describe('z.main.SingleInstanceHandler', () => {
   describe('registerInstance', () => {
     it('registers the current instance', () => {

@@ -136,7 +136,7 @@ ko.components.register('video-asset', {
           <div class="video-playback-error label-xs" data-bind="l10n_text: z.string.conversationPlaybackError"></div>
         <!-- /ko -->
         <!-- ko ifnot: video_playback_error -->
-          <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
             <div class="asset-placeholder">
               <div class="three-dots">
                 <span></span><span></span><span></span>
@@ -144,7 +144,7 @@ ko.components.register('video-asset', {
             </div>
           <!-- /ko -->
 
-          <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
             <div class="video-controls-center">
               <!-- ko if: displaySmall() -->
                 <media-button params="src: video_element,

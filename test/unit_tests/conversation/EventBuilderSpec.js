@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=conversation/EventBuilder yarn test:app
+
 import EventMapper from 'app/script/conversation/EventMapper';
 
 describe('z.conversation.EventBuilder', () => {

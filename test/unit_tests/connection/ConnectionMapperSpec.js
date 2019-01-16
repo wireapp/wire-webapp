@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=connection/ConnectionMapper yarn test:app
+
 describe('z.connection.ConnectionMapper', () => {
   let connectionMapper = undefined;
 

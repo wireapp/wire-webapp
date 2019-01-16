@@ -30,6 +30,9 @@ z.entity.Text = class Text extends z.entity.Asset {
     // Raw message text
     this.text = text;
 
+    // Can be used to theme media embeds
+    this.theme_color = undefined;
+
     // Array of z.message.MentionEntity instances
     this.mentions = ko.observableArray();
 
@@ -46,9 +49,9 @@ z.entity.Text = class Text extends z.entity.Asset {
   }
 
   // Process text before rendering it
-  render(selfId, themeColor) {
+  render(selfId) {
     const message = z.util.renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, themeColor) : message;
+    return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, this.theme_color) : message;
   }
 
   isUserMentioned(userId) {

@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=calling/handler/MediaStreamHandler yarn test:app
+
 window.wire = window.wire || {};
 window.wire.auth = wire.auth || {};
 window.wire.auth.audio = wire.auth.audio || {};

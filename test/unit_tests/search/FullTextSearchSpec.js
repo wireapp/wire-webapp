@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=search/FullTextSearch yarn test:app
+
 describe('z.search.FullTextSearch', () => {
   describe('search', () => {
     it('should return false if text is not found', () => {

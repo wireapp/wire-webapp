@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=cache/CacheRepository yarn test:app
+
 describe('z.cache.CacheRepository', () => {
   const cache_repository = new z.cache.CacheRepository();
   const TEMP_KEY = 'should_be_deleted';

@@ -17,6 +17,7 @@
  *
  */
 
+// KARMA_SPECS=localization/Localizer yarn test:app
 import ko from 'knockout';
 
 import localizer from '../../../app/script/localization/Localizer';

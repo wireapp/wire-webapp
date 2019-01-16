@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=storage/StorageService yarn test:app
+
 describe('z.storage.StorageRepository', () => {
   const test_factory = new TestFactory();
 

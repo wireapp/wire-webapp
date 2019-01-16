@@ -43,14 +43,14 @@
   border: none;
   border-bottom: 1px solid @separator-color;
   background: transparent;
-  color: var(--background);
+  color: @graphite-dark;
   font-size: @font-size-sm;
   outline: none;
 }
 
 .preferences-av-select-disabled {
-  border-color: var(--foreground-fade-16);
-  color: var(--foreground-fade-48);
+  border-color: fade(@graphite, 16%);
+  color: fade(@graphite, 48%);
   cursor: default !important;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .preferences-av-video {
-  background-color: var(--background);
+  background-color: @graphite-dark;
   object-fit: cover;
 }
 
@@ -76,7 +76,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--foreground-fade-16);
+  background-color: fade(@graphite, 16%);
   font-size: 12px;
   font-weight: 600;
   text-align: center;

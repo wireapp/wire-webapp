@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/SanitizationUtil yarn test:app
+
 describe('z.util.SanitizationUtil', () => {
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {

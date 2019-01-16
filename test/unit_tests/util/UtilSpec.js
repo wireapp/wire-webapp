@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/Util yarn test:app
+
 import ko from 'knockout';
 import Conversation from 'app/script/entity/Conversation';
 

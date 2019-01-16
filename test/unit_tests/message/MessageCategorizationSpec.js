@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=message/MessageCategorization yarn test:app
+
 describe('z.message.MessageCategorization', () => {
   describe('categoryFromEvent', () => {
     it('malformed events should have category of type UNDEFINED', () => {

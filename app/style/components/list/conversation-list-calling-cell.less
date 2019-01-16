@@ -24,11 +24,10 @@
     height: 24px;
     align-items: center;
     justify-content: center;
-    border: none;
     animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
-    background-color: var(--background-fade-8);
+    background-color: fade(@graphite-dark, 8%);
     border-radius: 12px;
-    color: var(--background);
+    color: @graphite-dark;
     cursor: pointer;
     font-size: 12px;
     line-height: 24px;
@@ -39,20 +38,19 @@
     }
 
     svg > path {
-      fill: var(--background);
+      fill: @graphite-dark;
     }
 
     &--active {
-      background-color: var(--background);
-      color: var(--app-bg-secondary);
+      background-color: @graphite-dark;
+      color: #fff;
 
       svg > path {
-        fill: var(--app-bg-secondary);
+        fill: #fff;
       }
     }
 
-    &--disabled,
-    &:disabled {
+    &--disabled {
       cursor: default;
 
       svg {
@@ -101,11 +99,11 @@
     }
 
     &--green {
-      background-color: @w-green !important;
+      background-color: @w-green;
     }
 
     &--red {
-      background-color: @w-red !important;
+      background-color: @w-red;
     }
 
     & + & {
@@ -120,12 +118,12 @@
     &__wrapper {
       overflow: hidden;
       max-height: 0;
-      color: var(--background);
+      color: @graphite-dark;
 
       &::before {
         display: block;
         margin: 0 16px;
-        border-top: 1px solid var(--background-fade-8);
+        border-top: 1px solid fade(@graphite-dark, 4%);
         content: '';
       }
 
@@ -137,7 +135,7 @@
     .participant-item {
       height: 40px;
       cursor: default;
-      fill: var(--background);
+      fill: @graphite-dark;
       pointer-events: none;
 
       .participant-item-image {
@@ -170,10 +168,10 @@
   }
 
   &__avatar {
-    border: 1px solid var(--background-fade-8);
+    border: 1px solid fade(@graphite-dark, 8%);
 
     .group-avatar-box-wrapper {
-      background: var(--background-fade-16);
+      background: fade(@graphite-dark, 16%);
     }
   }
 }
@@ -198,24 +196,24 @@ conversation-list-calling-cell {
   flex-shrink: 0;
   margin: 0 16px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
-  background-color: var(--app-bg-secondary);
+  background-color: #fff;
   border-radius: 8px;
 
   &.dark-bg {
-    color: var(--app-bg-secondary);
+    color: #fff;
 
     &::before {
-      background-color: var(--background-fade-80);
+      background-color: fade(@graphite-dark, 80%);
     }
   }
 
   .conversation-list-cell-name {
-    color: var(--background);
+    color: @graphite-dark;
   }
 
   .conversation-list-cell-description {
     margin-top: 0;
-    color: var(--background-fade-40);
+    color: fade(@graphite-dark, 40%);
     font-size: 11px;
     opacity: 1;
   }

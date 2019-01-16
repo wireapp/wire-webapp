@@ -20,7 +20,7 @@
 .conversation-details {
   .right-panel-mute {
     path {
-      fill: var(--background);
+      fill: @graphite-dark;
     }
 
     &--active {
@@ -52,8 +52,6 @@
       width: 250px;
       height: auto;
       border: 0;
-      background-color: var(--app-bg-secondary);
-      color: var(--background);
       outline: none;
       resize: none;
     }
@@ -70,7 +68,7 @@
       }
 
       path {
-        fill: var(--background-fade-56);
+        fill: fade(@graphite-dark, 56%);
       }
     }
 
@@ -90,15 +88,15 @@
     }
 
     &__text {
-      color: var(--foreground);
+      color: @graphite;
     }
   }
 
   &__list-head {
     padding-bottom: 8px;
     margin: 32px 16px 4px;
-    border-bottom: 1px solid var(--background-fade-8);
-    color: var(--foreground);
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
+    color: @graphite;
     font-size: 11px;
     font-weight: @font-weight-bold;
     text-transform: uppercase;
@@ -125,7 +123,7 @@
 
   &__group-size-info {
     margin: 8px 0 0;
-    color: var(--foreground);
+    color: @graphite;
     font-size: @font-size-xs;
     line-height: @line-height-sm;
   }

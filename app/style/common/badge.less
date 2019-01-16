@@ -23,7 +23,7 @@
   .label-nocase-xs;
 
   min-width: 24px;
-  background-color: var(--foreground);
+  background-color: @graphite;
   border-radius: @badge-height / 2;
   color: #fff;
   line-height: @badge-height;
@@ -63,11 +63,11 @@
 .cell-badge-light {
   .cell-badge;
 
-  background-color: #feffff;
-  color: #323639;
+  background-color: #fff;
+  color: @graphite-dark;
 
   svg > path {
-    fill: #323639;
+    fill: @graphite-dark;
   }
 }
 

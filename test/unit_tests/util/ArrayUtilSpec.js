@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/ArrayUtil yarn test:app
+
 describe('z.util.ArrayUtil', () => {
   describe('chunk', () => {
     const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

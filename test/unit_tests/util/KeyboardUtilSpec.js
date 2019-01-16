@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/KeyboardUtil yarn test:app
+
 describe('z.util.KeyboardUtil.KEY', () => {
   describe('isArrowKey', () => {
     it('returns whether an arrow key has been pressed', () => {

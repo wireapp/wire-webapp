@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/Moment yarn test:app
+
 import moment from 'moment';
 /* eslint-disable no-unused-vars */
 import {isSameDay, isSameMonth, isCurrentYear, isToday} from '../../../app/script/util/moment';

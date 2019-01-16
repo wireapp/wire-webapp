@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=user/UserMapper yarn test:app
+
 describe('User Mapper', () => {
   const mapper = new z.user.UserMapper(new z.time.ServerTimeRepository());
 
@@ -146,9 +148,6 @@ describe('User Mapper', () => {
 
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data);
-
-      expect(mapper.serverTimeRepository.toLocalTimestamp).not.toHaveBeenCalledWith();
-      mapper.serverTimeRepository.timeOffset(10);
 
       expect(mapper.serverTimeRepository.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });

@@ -32,7 +32,7 @@ full-search {
 .full-search-header-icon {
   width: @conversation-message-sender-width;
   flex: 0 0 auto;
-  color: var(--foreground);
+  color: @graphite;
   text-align: center;
 }
 
@@ -49,7 +49,6 @@ full-search {
     width: 100%;
     height: 24px;
     background-color: transparent;
-    color: var(--background);
     line-height: 24px;
 
     &::placeholder {
@@ -57,7 +56,7 @@ full-search {
 
       height: 24px;
       padding-left: 8px;
-      color: var(--foreground-fade-48);
+      color: fade(@graphite, 48%);
       line-height: 24px;
     }
   }
@@ -86,7 +85,7 @@ full-search {
 
   width: @conversation-message-sender-width;
   flex: 0 0 auto;
-  color: var(--foreground);
+  color: @graphite;
 }
 
 .full-search-item-content {
@@ -102,7 +101,7 @@ full-search {
 .full-search-item-content-info {
   .label-nocase-xs;
 
-  color: var(--foreground);
+  color: @graphite;
   line-height: @line-height-sm;
 }
 

@@ -24,11 +24,11 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
-      // listen for any changes to local message entities.
-      // if the id of the message being viewed has changed, we store the new ID.
-      if (oldId === this.messageId()) {
-        this.messageId(updatedMessageEntity.id);
+    params.repositories.event.eventService.addEventUpdatedListener((updatedEvent, oldEvent) => {
+      // listen for any changes in the DB to the event being viewed.
+      // if the event's id has changed, we replace the local event id with the new one
+      if (oldEvent.id === this.messageId()) {
+        this.messageId(updatedEvent.id);
       }
     });
 
@@ -129,12 +129,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.showTabs = ko.pureComputed(() => this.supportsReceipts() && this.supportsLikes());
 
     this.editedFooter = ko.pureComputed(() => {
-      return (
-        this.message() &&
-        this.message().edited_timestamp &&
-        this.message().edited_timestamp() &&
-        formatTime(this.message().edited_timestamp())
-      );
+      return this.message() && this.message().edited_timestamp() && formatTime(this.message().edited_timestamp());
     });
 
     this.panelTitle = ko.pureComputed(() => {
@@ -166,7 +161,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
   }
 
   getEntityId() {
-    return this.messageId();
+    return this.message().id;
   }
 
   initView({entity: {id}, showLikes}) {

@@ -17,6 +17,7 @@
  *
  */
 
+// KARMA_SPECS=conversation/ConversationService yarn test:app
 import ConversationMapper from 'app/script/conversation/ConversationMapper';
 
 describe('ConversationService', () => {

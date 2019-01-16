@@ -28,10 +28,10 @@
   &__input {
     z-index: 10;
     display: flex;
-    background-color: var(--app-bg-secondary);
+    background-color: #fff;
 
     &--editing {
-      background-color: var(--text-input-editing);
+      background-color: mix(@w-yellow, #fff, 16%);
       transition: background-color @animation-timing-faster @ease-in-quad;
     }
   }
@@ -61,7 +61,7 @@
     .label-xs;
 
     padding-left: 8px;
-    color: var(--foreground-fade-48);
+    color: fade(@graphite, 48%);
   }
 
   &--accent::placeholder {
@@ -71,7 +71,7 @@
 
 @supports (caret-color: #000) {
   .conversation-input-bar-text {
-    caret-color: var(--background);
+    caret-color: @graphite-dark;
     color: transparent;
   }
 }
@@ -132,7 +132,7 @@
   line-height: 0;
 
   svg path {
-    fill: var(--background);
+    fill: @graphite-dark;
   }
 }
 
@@ -151,7 +151,7 @@
   animation-fill-mode: forwards;
   animation-name: paste-fade-in;
   animation-timing-function: @ease-out-expo;
-  background-color: var(--app-bg-secondary);
+  background-color: #fff;
   opacity: 0;
 }
 
@@ -163,7 +163,7 @@
   }
 
   svg path {
-    fill: var(--foreground);
+    fill: @graphite;
   }
 }
 
@@ -194,7 +194,6 @@
 
 .conversation-input-bar-paste-cancel {
   margin-right: 32px;
-  fill: var(--foreground);
   line-height: 0;
 }
 
@@ -202,7 +201,7 @@
   position: fixed;
   z-index: @z-index-context;
   display: block;
-  border: 0.5px solid var(--background-fade-16);
+  border: 0.5px solid fade(@graphite-dark, 12%);
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
@@ -222,7 +221,7 @@
     }
 
     &.selected {
-      background-color: var(--foreground-fade-16);
+      background-color: fade(@graphite, 16%);
     }
 
     .symbol {
@@ -252,12 +251,11 @@
   width: 100%;
   padding: 12px 16px 0 30px;
   animation: reply-box 0.15s ease-out;
-  background-color: var(--app-bg-secondary);
+  background-color: #fff;
 
   close-icon {
     margin-top: 4px;
     cursor: pointer;
-    fill: var(--background);
   }
 
   &__body {
@@ -272,7 +270,7 @@
     width: 4px;
     height: 100%;
     margin-right: 12px;
-    background-color: var(--message-quote-bg);
+    background-color: #cfcfcf;
     border-radius: 2px;
   }
 
@@ -292,7 +290,7 @@
       svg {
         width: 8px;
         height: 8px;
-        fill: var(--background-fade-40);
+        fill: fade(@graphite-dark, 40%);
       }
     }
   }
@@ -329,7 +327,7 @@
       &:not([src]) {
         width: 40px;
         height: 40px;
-        background-color: var(--foreground);
+        background-color: @graphite;
       }
     }
   }

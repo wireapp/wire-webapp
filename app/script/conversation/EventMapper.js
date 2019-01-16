@@ -83,55 +83,6 @@ export default class EventMapper {
   }
 
   /**
-   * Will update the content of the originalEntity with the new data given.
-   * Will try to do as little updates as possible to avoid to many observable emission.
-   *
-   * @param {z.entity.MessageEntity} originalEntity - the original message to update
-   * @param {Object} event - new json data to feed into the entity
-   * @returns {z.entity.MessageEntity} - the updated message entity
-   */
-  updateMessageEvent(originalEntity, event) {
-    const {id, data: eventData, edited_time: editedTime} = event;
-
-    if (id !== originalEntity.id && originalEntity.has_asset_text()) {
-      originalEntity.assets.removeAll();
-      originalEntity.assets.push(this._mapAssetText(eventData));
-
-      if (eventData.quote) {
-        const {message_id: messageId, user_id: userId, error} = eventData.quote;
-        originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
-      }
-    } else if (originalEntity.get_first_asset) {
-      const asset = originalEntity.get_first_asset();
-      if (eventData.status && asset.status && eventData.status !== asset.status()) {
-        const assetEntity = this._mapAsset(event);
-        originalEntity.assets([assetEntity]);
-      }
-      if (eventData.previews) {
-        if (asset.previews().length !== eventData.previews.length) {
-          asset.previews(this._mapAssetLinkPreviews(eventData.previews));
-        }
-      }
-    }
-
-    if (event.reactions !== undefined) {
-      originalEntity.reactions(event.reactions);
-      originalEntity.version = event.version;
-    }
-
-    originalEntity.id = id;
-    if (originalEntity.is_content() || originalEntity.is_ping()) {
-      originalEntity.status(event.status || z.message.StatusType.SENT);
-    }
-    originalEntity.replacing_message_id = eventData.replacing_message_id;
-    if (editedTime || eventData.edited_time) {
-      originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
-    }
-
-    return addReadReceiptData(originalEntity, event);
-  }
-
-  /**
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
@@ -306,9 +257,12 @@ export default class EventMapper {
    * @returns {ContentMessage} Content message entity
    */
   _mapEventAssetAdd(event, createDummyImage) {
+    const eventData = event.data;
     const messageEntity = new z.entity.ContentMessage();
 
-    const assetEntity = this._mapAsset(event, createDummyImage);
+    const assetInfo = eventData.info;
+    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
+    const assetEntity = isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
     messageEntity.assets.push(assetEntity);
 
     return messageEntity;
@@ -580,13 +534,6 @@ export default class EventMapper {
     return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
   }
 
-  _mapAsset(event, createDummyImage) {
-    const eventData = event.data;
-    const assetInfo = eventData.info;
-    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
-    return isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
-  }
-
   /**
    * Maps JSON data of file asset into asset entity.
    *
@@ -630,7 +577,7 @@ export default class EventMapper {
       assetEntity.preview_resource(remoteDataPreview);
     }
 
-    assetEntity.status(status || z.assets.AssetTransferState.UPLOAD_PENDING);
+    assetEntity.status(status || z.assets.AssetTransferState.UPLOADING);
 
     return assetEntity;
   }
@@ -738,10 +685,10 @@ export default class EventMapper {
         const protoMention = z.proto.Mention.decode64(encodedMention);
         return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
       })
-      .filter((mentionEntity, _, allMentions) => {
+      .filter(mentionEntity => {
         if (mentionEntity) {
           try {
-            return mentionEntity.validate(messageText, allMentions);
+            return mentionEntity.validate(messageText);
           } catch (error) {
             this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
             return false;
@@ -775,9 +722,7 @@ export default class EventMapper {
 
 function addReadReceiptData(entity, event) {
   const {data: eventData, read_receipts} = event;
-  if (eventData) {
-    entity.expectsReadConfirmation = eventData.expects_read_confirmation;
-  }
+  entity.expectsReadConfirmation = eventData.expects_read_confirmation;
   entity.readReceipts(read_receipts || []);
   return entity;
 }

@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/Crypto yarn test:app
+
 describe('z.util.Crypto', () => {
   describe('Jenkins’s one-at-a-time hash', () => {
     /* eslint-disable sort-keys */

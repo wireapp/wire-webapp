@@ -107,7 +107,7 @@ ko.components.register('media-button', {
         </svg>
       </div>
     <!-- /ko -->
-    <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
+    <!-- ko if: asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
       <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
         <svg class="svg-theme" data-bind="attr: {viewBox: svg_view_box}">

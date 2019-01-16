@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/NumberUtil yarn test:app
+
 describe('z.util.PeerConnectionUtil', () => {
   const hostIceCandidates = [
     'a=candidate:0 1 UDP 2122252543 192.168.120.196 32785 typ host',

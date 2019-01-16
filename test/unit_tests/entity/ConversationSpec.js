@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=entity/Conversation yarn test:app
+
 import Conversation from 'app/script/entity/Conversation';
 import ContentMessage from 'app/script/entity/message/ContentMessage';
 import Message from 'app/script/entity/message/Message';
@@ -136,15 +138,20 @@ describe('Conversation', () => {
       expect(conversation_et.messages().length).toBe(1);
     });
 
-    it('does not add new message if it already exists in the message list', () => {
+    it('updates existing message values with new message', () => {
       const initialLength = conversation_et.messages().length;
       const newMessageEntity = new Message(z.util.createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
+      newMessageEntity.status(3);
+      newMessageEntity.version = 3;
+      newMessageEntity.readReceipts([{userId: 'user-id'}]);
 
       conversation_et.add_message(newMessageEntity, true);
 
       expect(conversation_et.messages().length).toBe(initialLength);
-      expect(conversation_et.messages().some(message => message == newMessageEntity)).toBe(false);
+      expect(conversation_et.messages()[0].readReceipts()).toEqual(newMessageEntity.readReceipts());
+      expect(conversation_et.messages()[0].status()).toEqual(newMessageEntity.status());
+      expect(conversation_et.messages()[0].version).toEqual(newMessageEntity.version);
     });
 
     it('should add message with a newer timestamp', () => {
@@ -210,6 +217,36 @@ describe('Conversation', () => {
         conversation_et.add_message(message_et);
 
         expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
+      });
+
+      it('keeps the amount of read receipts if an edit message comes in', () => {
+        const conversationId = z.util.createRandomUuid();
+        const messageId = z.util.createRandomUuid();
+        const senderId = z.util.createRandomUuid();
+
+        const textMessage = new ContentMessage(messageId);
+        textMessage.add_asset(new z.entity.Text());
+        textMessage.conversation_id = conversationId;
+        textMessage.from = senderId;
+        textMessage.readReceipts([
+          {
+            time: new Date().toISOString(),
+            userId: z.util.createRandomUuid(),
+          },
+        ]);
+
+        const editMessage = new ContentMessage(z.util.createRandomUuid());
+        editMessage.conversation_id = conversationId;
+        editMessage.from = senderId;
+        editMessage.replacing_message_id = messageId;
+
+        conversation_et.id = conversationId;
+        conversation_et.add_message(textMessage, false);
+
+        expect(editMessage.readReceipts().length).toBe(0);
+        conversation_et.add_message(editMessage, true);
+
+        expect(editMessage.readReceipts().length).toBe(1);
       });
     });
 

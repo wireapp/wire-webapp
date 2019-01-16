@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=util/StringUtil yarn test:app
+
 import _ from 'underscore';
 
 describe('z.util.StringUtil', () => {

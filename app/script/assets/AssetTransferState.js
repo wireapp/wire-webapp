@@ -23,7 +23,6 @@ window.z.assets = z.assets || {};
 z.assets.AssetTransferState = {
   DOWNLOADING: 'downloading',
   UPLOAD_FAILED: 'upload-failed',
-  UPLOAD_PENDING: 'upload-pending',
   UPLOADED: 'uploaded',
   UPLOADING: 'uploading',
 };

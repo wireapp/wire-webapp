@@ -19,59 +19,32 @@
  *
  */
 
-const fs = require('fs-extra');
 const less = require('less');
 const path = require('path');
+const fs = require('fs-extra');
 
-const dist = path.resolve(__dirname, '../server/dist/static/style');
 const src = path.resolve(__dirname, '../app/style');
-
-const read = pathToFile => {
-  return new Promise((resolve, reject) => {
-    return fs.readFile(pathToFile, {encoding: 'utf8', flag: 'r'}, (error, data) => {
-      if (error) {
-        return reject(error);
-      }
-      resolve(data);
-    });
-  });
-};
-
-const write = (pathToFile, data) => {
-  return new Promise((resolve, reject) => {
-    return fs.writeFile(pathToFile, data, {encoding: 'utf8'}, error => {
-      if (error) {
-        return reject(error);
-      }
-      resolve();
-    });
-  });
-};
-
-function renderCSS(lessInput) {
-  return less.render(lessInput, {sourceMap: {}});
-}
-
-async function processLessFiles(files) {
-  try {
-    for (const outputPath in files) {
-      const lessInput = await read(files[outputPath]);
-      const output = await renderCSS(lessInput);
-      await write(outputPath, output.css);
-      if (output.map) {
-        await write(`${outputPath}.map`, output.map);
-      }
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
+const dist = path.resolve(__dirname, '../server/dist/static/style');
 
 process.chdir(src);
 fs.mkdirpSync(dist);
 
-processLessFiles({
-  [`${dist}/auth.css`]: `${src}/auth/auth.less`,
-  [`${dist}/default.css`]: `${src}/default.less`,
-  [`${dist}/support.css`]: `${src}/support.less`,
-});
+const files = {
+  [`${dist}/auth.css`]: fs.readFileSync(`${src}/auth/auth.less`, 'utf8'),
+  [`${dist}/main.css`]: fs.readFileSync(`${src}/main.less`, 'utf8'),
+  [`${dist}/support.css`]: fs.readFileSync(`${src}/support.less`, 'utf8'),
+};
+
+Object.entries(files).forEach(([outputPath, lessInput]) => renderCSS(lessInput, outputPath));
+
+function renderCSS(lessInput, outputPath) {
+  less
+    .render(lessInput, {sourceMap: {}})
+    .then(output => {
+      fs.writeFileSync(outputPath, output.css, 'utf8');
+      if (output.map) {
+        fs.writeFileSync(`${outputPath}.map`, output.map, 'utf8');
+      }
+    })
+    .catch(error => console.error('error', error));
+}

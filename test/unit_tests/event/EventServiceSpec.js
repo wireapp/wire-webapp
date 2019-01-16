@@ -17,4 +17,6 @@
  *
  */
 
+// KARMA_SPECS=event/EventService yarn test:app
+
 window.testEventServiceClass('event_service', 'z.event.EventService');

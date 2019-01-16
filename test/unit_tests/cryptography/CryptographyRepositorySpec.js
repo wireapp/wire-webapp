@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=cryptography/CryptographyRepository yarn test:app
+
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';

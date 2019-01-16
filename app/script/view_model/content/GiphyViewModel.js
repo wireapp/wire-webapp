@@ -41,6 +41,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.clickToSelectGif = this.clickToSelectGif.bind(this);
 
+    this.conversationRepository = repositories.conversation;
     this.giphyRepository = repositories.giphy;
     this.logger = new z.util.Logger('z.viewModel.content.GiphyViewModel', z.config.LOGGER.OPTIONS);
 
@@ -118,10 +119,15 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   }
 
   clickToSend() {
-    const selectedGif = this.selectedGif();
-    if (selectedGif) {
-      amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND, selectedGif.animated, this.query());
-      this.selectedGif(undefined);
+    if (this.selectedGif() && !this.sendingGiphyMessage) {
+      const conversationEntity = this.conversationRepository.active_conversation();
+      this.sendingGiphyMessage = true;
+
+      this.conversationRepository.sendGif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
+        this.sendingGiphyMessage = false;
+        amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
+      });
+
       this.modal.hide();
     }
   }

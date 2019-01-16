@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=links/LinkPreviewBlackList yarn test:app
+
 describe('is_blacklisted', () => {
   it('blacklists youtu.be links', () => {
     const url = 'https://youtu.be/t4gjl-uwUHc';

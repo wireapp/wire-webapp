@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=view_model/bindings yarn test:app
+
 import ko from 'knockout';
 import $ from 'jquery';
 /* eslint-disable no-unused-vars */

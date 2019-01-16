@@ -65,7 +65,7 @@ module.exports = function(config) {
       'test/api/OpenGraphMocks.js',
       'test/js/calling/CallRequestResponseMock.js',
       'test/api/TestFactory.js',
-    ].concat(getSpecs(config.specs)),
+    ].concat(getSpecs(process.env.KARMA_SPECS)),
 
     proxies: {
       '/audio/': '/base/audio/',

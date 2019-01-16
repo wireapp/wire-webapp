@@ -19,6 +19,8 @@
 
 /* eslint no-undef: "off" */
 
+// KARMA_SPECS=location/LocationService yarn test:app
+
 describe('z.location.LocationService', () => {
   describe('getLocation', () => {
     it('resolves a latitude & longitude via Google Maps API into a location name', () => {

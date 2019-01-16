@@ -33,9 +33,8 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid var(--foreground-fade-8);
-  background-color: var(--app-bg);
-  color: var(--background);
+  border-bottom: 1px solid fade(@graphite, 12%);
+  background-color: @app-bg;
 }
 
 .preferences-content-wrapper {
@@ -49,12 +48,8 @@
   min-width: 560px;
   height: 100%;
   padding: 32px 32px 32px 72px;
-  color: var(--background);
+  color: @graphite-dark;
   overflow-x: hidden;
-
-  input {
-    color: var(--background);
-  }
 }
 
 .preferences-button {
@@ -63,7 +58,7 @@
 
 .preferences-detail {
   width: 380px;
-  color: var(--foreground);
+  color: @graphite;
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
@@ -78,16 +73,15 @@
   .label-bold-xs;
 
   margin-bottom: 16px;
-  color: var(--background);
   line-height: @line-height-sm;
 }
 
 .preferences-hint {
-  color: var(--foreground);
+  color: @graphite;
 }
 
 .preferences-label {
-  color: var(--background);
+  color: @graphite-dark;
 }
 
 .preferences-info {

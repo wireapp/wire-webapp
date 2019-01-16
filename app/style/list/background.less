@@ -39,7 +39,7 @@
   transition-timing-function: @ease-out-quart;
 
   &--white {
-    background-color: var(--app-bg);
+    background-color: @app-bg;
     box-shadow: inset -1px 0 0 #eee;
   }
 }
@@ -52,5 +52,5 @@
 }
 
 .background-darken {
-  background-color: var(--conversation-list-bg-opacity);
+  background-color: fade(#000, 64%);
 }

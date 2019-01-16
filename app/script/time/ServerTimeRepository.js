@@ -17,29 +17,26 @@
  *
  */
 
-import ko from 'knockout';
-
 window.z = window.z || {};
 window.z.time = z.time || {};
 
 z.time.ServerTimeRepository = class ServerTimeRepository {
   constructor() {
     this.logger = new z.util.Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
-    this.timeOffset = ko.observable(undefined);
+    this._timeOffset = undefined;
   }
 
   computeTimeOffset(serverTimeString) {
-    const timeOffset = new Date() - new Date(serverTimeString);
-    this.timeOffset(timeOffset);
-    this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
+    this._timeOffset = new Date() - new Date(serverTimeString);
+    this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this._timeOffset}' ms`);
   }
 
   getTimeOffset() {
-    if (this.timeOffset() === undefined) {
+    if (this._timeOffset === undefined) {
       this.logger.warn('Trying to get server/client time offset, but no server time has been set.');
       return 0;
     }
-    return this.timeOffset();
+    return this._timeOffset;
   }
 
   /**

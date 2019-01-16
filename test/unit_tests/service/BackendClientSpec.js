@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=service/BackendClient yarn test:app
+
 describe('z.service.BackendClient', () => {
   let backend_client = null;
   let server = null;

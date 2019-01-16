@@ -17,6 +17,8 @@
  *
  */
 
+// KARMA_SPECS=time/ServerTimeRepository yarn test:app
+
 describe('z.time.ServerTimeRepository', () => {
   let serverTimeRepository;
   const testFactory = new window.TestFactory();
