@@ -47,7 +47,7 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
       let updatedLoadingMessage;
 
       switch (message) {
-        case 'initReceivedSelfUser': {
+        case t('initReceivedSelfUser'): {
           updatedLoadingMessage = t('initReceivedSelfUser', this.userRepository.self().first_name());
           break;
         }

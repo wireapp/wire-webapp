@@ -43,7 +43,7 @@ let strings = {};
 export const setLocale = newLocale => (locale = newLocale);
 export const setStrings = newStrings => (strings = newStrings);
 
-export function t(identifier, substitutions, dangerousSubstitutions) {
+export function t(identifier, substitutions = {}, dangerousSubstitutions = {}) {
   const value = strings[locale][identifier] || strings[DEFAULT_LOCALE][identifier];
   const replaceDangerously = Object.assign(
     {
