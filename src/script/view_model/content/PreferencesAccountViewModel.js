@@ -85,7 +85,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.team = this.teamRepository.team;
-    this.teamName = ko.pureComputed(() => t('referencesAccountTeam', this.teamRepository.teamName()));
+    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamRepository.teamName()));
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {

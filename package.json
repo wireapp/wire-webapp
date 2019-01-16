@@ -206,7 +206,7 @@
     "translate:download": "node ./bin/translations_download.js && yarn translate:postprocess && yarn translate:extractpo && yarn fix:assets",
     "translate:upload": "yarn translate:buildpot && node ./bin/translations_upload.js",
     "translate:extractpo": "rip po2json \"temp/i18n/*.po\" -m \"temp/i18n/**/*.json\" -o \"src/i18n\"",
-    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html}'",
+    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:postprocess": "node ./bin/translations_post_processing.js src/script/localization/translations && node ./bin/translations_post_processing.js temp/i18n"
   },
   "private": true,
