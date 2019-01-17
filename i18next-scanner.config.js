@@ -30,8 +30,9 @@ module.exports = {
       prefix: '{{',
       suffix: '}}',
     },
-    lngs: ['en-US', 'de-DE'],
+    lngs: ['en-US'],
     nsSeparator: false,
+    removeUnusedKeys: true,
     resource: {
       jsonIndent: 2,
       lineEnding: '\n',
