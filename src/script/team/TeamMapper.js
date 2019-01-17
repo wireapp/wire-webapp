@@ -17,7 +17,7 @@
  *
  */
 
-import {checkRole} from './TeamPermission';
+import {roleFromPermissions} from './TeamPermission';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -69,7 +69,7 @@ z.team.TeamMapper = class TeamMapper {
 
   mapRole(userEntity, permissions) {
     if (permissions) {
-      const teamRole = checkRole(permissions);
+      const teamRole = roleFromPermissions(permissions);
       this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
       userEntity.teamRole(teamRole);
     }

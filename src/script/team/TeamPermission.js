@@ -81,7 +81,7 @@ export const ROLE = {
   OWNER: 'z.team.TeamRole.ROLE.OWNER',
 };
 
-export function checkRole(permissions) {
+export function roleFromPermissions(permissions) {
   if (!permissions) {
     throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
   }

@@ -17,16 +17,16 @@
  *
  */
 
-import {ROLE, checkRole} from 'src/script/team/TeamPermission';
+import {ROLE, roleFromPermissions} from 'src/script/team/TeamPermission';
 
 const memberPermissionBitmask = 1587;
 const ownerPermissionBitmask = 8191;
 const adminPermissionBitmask = 5951;
 
 describe('TeamPermission', () => {
-  describe('checkRole', () => {
+  describe('roleFromPermissions', () => {
     it('throws an error if the permissions are not given', () => {
-      expect(() => checkRole()).toThrow();
+      expect(() => roleFromPermissions()).toThrow();
     });
 
     it('extracts a role from the given permissions', () => {
@@ -38,7 +38,7 @@ describe('TeamPermission', () => {
       ];
 
       tests.forEach(({expected, permission}) => {
-        const role = checkRole(permission);
+        const role = roleFromPermissions(permission);
 
         expect(role).toBe(expected);
       });
