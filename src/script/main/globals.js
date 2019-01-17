@@ -219,7 +219,6 @@ import ServerTimeRepositoryGlobal from '../time/ServerTimeRepository.js';
 import TeamEntityGlobal from '../team/TeamEntity.js';
 import TeamMapperGlobal from '../team/TeamMapper.js';
 import TeamMemberEntityGlobal from '../team/TeamMemberEntity.js';
-import TeamPermissionGlobal from '../team/TeamPermission.js';
 import TeamRepositoryGlobal from '../team/TeamRepository.js';
 import TeamRoleGlobal from '../team/TeamRole.js';
 import TeamServiceGlobal from '../team/TeamService.js';

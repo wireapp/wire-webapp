@@ -17,40 +17,32 @@
  *
  */
 
-window.z = window.z || {};
-window.z.team = z.team || {};
+import {hasPermissionForRole} from './TeamPermission';
 
-z.team.TeamRole = (() => {
-  const ROLE = {
-    ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
-    INVALID: 'z.team.TeamRole.ROLE.INVALID',
-    MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
-    NONE: 'z.team.TeamRole.ROLE.NONE',
-    OWNER: 'z.team.TeamRole.ROLE.OWNER',
-  };
+export const ROLE = {
+  ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
+  INVALID: 'z.team.TeamRole.ROLE.INVALID',
+  MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
+  NONE: 'z.team.TeamRole.ROLE.NONE',
+  OWNER: 'z.team.TeamRole.ROLE.OWNER',
+};
 
-  const _checkRole = permissions => {
-    if (!permissions) {
-      throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
-    }
+export function checkRole(permissions) {
+  if (!permissions) {
+    throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
+  }
 
-    if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.OWNER)) {
-      return ROLE.OWNER;
-    }
+  if (hasPermissionForRole(permissions.self, ROLE.OWNER)) {
+    return ROLE.OWNER;
+  }
 
-    if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.ADMIN)) {
-      return ROLE.ADMIN;
-    }
+  if (hasPermissionForRole(permissions.self, ROLE.ADMIN)) {
+    return ROLE.ADMIN;
+  }
 
-    if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.MEMBER)) {
-      return ROLE.MEMBER;
-    }
+  if (hasPermissionForRole(permissions.self, ROLE.MEMBER)) {
+    return ROLE.MEMBER;
+  }
 
-    return ROLE.INVALID;
-  };
-
-  return {
-    ROLE: ROLE,
-    checkRole: _checkRole,
-  };
-})();
+  return ROLE.INVALID;
+}
