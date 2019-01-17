@@ -17,8 +17,6 @@
  *
  */
 
-import {ROLE} from '../team/TeamRole';
-
 /**
  * Enum for different team permissions.
  * @returns {z.team.TeamPermission.PERMISSION} Enum of team permissions
@@ -75,6 +73,34 @@ function permissionsForRole(teamRole) {
   }
 }
 
+export const ROLE = {
+  ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
+  INVALID: 'z.team.TeamRole.ROLE.INVALID',
+  MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
+  NONE: 'z.team.TeamRole.ROLE.NONE',
+  OWNER: 'z.team.TeamRole.ROLE.OWNER',
+};
+
+export function checkRole(permissions) {
+  if (!permissions) {
+    throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
+  }
+
+  if (hasPermissionForRole(permissions.self, ROLE.OWNER)) {
+    return ROLE.OWNER;
+  }
+
+  if (hasPermissionForRole(permissions.self, ROLE.ADMIN)) {
+    return ROLE.ADMIN;
+  }
+
+  if (hasPermissionForRole(permissions.self, ROLE.MEMBER)) {
+    return ROLE.MEMBER;
+  }
+
+  return ROLE.INVALID;
+}
+
 function combinePermissions(permissions) {
   let result = 0;
   for (const permission of permissions) {
@@ -90,7 +116,7 @@ function hasPermission(memberPermissions, expectedPermissions) {
   return false;
 }
 
-export function hasPermissionForRole(memberPermissions, role) {
+function hasPermissionForRole(memberPermissions, role) {
   const rolePermissions = permissionsForRole(role);
   return hasPermission(memberPermissions, rolePermissions);
 }

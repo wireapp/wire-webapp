@@ -17,7 +17,7 @@
  *
  */
 
-import {checkRole} from './TeamRole';
+import {checkRole} from './TeamPermission';
 
 window.z = window.z || {};
 window.z.team = z.team || {};

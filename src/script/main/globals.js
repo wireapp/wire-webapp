@@ -220,7 +220,6 @@ import TeamEntityGlobal from '../team/TeamEntity.js';
 import TeamMapperGlobal from '../team/TeamMapper.js';
 import TeamMemberEntityGlobal from '../team/TeamMemberEntity.js';
 import TeamRepositoryGlobal from '../team/TeamRepository.js';
-import TeamRoleGlobal from '../team/TeamRole.js';
 import TeamServiceGlobal from '../team/TeamService.js';
 import AppInitStatisticsGlobal from '../telemetry/app_init/AppInitStatistics.js';
 import AppInitStatisticsValueGlobal from '../telemetry/app_init/AppInitStatisticsValue.js';

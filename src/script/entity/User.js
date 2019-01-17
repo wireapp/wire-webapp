@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {ROLE as TEAM_ROLE} from '../team/TeamRole';
+import {ROLE as TEAM_ROLE} from '../team/TeamPermission';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
