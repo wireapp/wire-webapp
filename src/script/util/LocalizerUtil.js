@@ -24,6 +24,14 @@ window.z.util = z.util || {};
 
 const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
 
+const replaceSubstituteEscaped = (string, regex, substitute) => {
+  const replacement = isStringOrNumber(substitute)
+    ? SanitizationUtil.escapeString(substitute)
+    : (found, content) =>
+        substitute.hasOwnProperty(content) ? SanitizationUtil.escapeString(substitute[content]) : found;
+  return string.replace(regex, replacement);
+};
+
 const replaceSubstitute = (string, regex, substitute) => {
   const replacement = isStringOrNumber(substitute)
     ? substitute
@@ -81,11 +89,10 @@ const LocalizerUtil = {
       dangerousSubstitutions
     );
 
-    const substituted = replaceSubstitute(value, /{{(.+?)}}/g, substitutions);
-    const escaped = SanitizationUtil.escapeString(substituted);
-    const dangerouslySubstituted = replaceSubstitute(escaped, /\[(.+?)\]/g, replaceDangerously);
+    const substitutedEscaped = replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
+    const substituted = replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
 
-    return dangerouslySubstituted;
+    return substituted;
   },
 };
 

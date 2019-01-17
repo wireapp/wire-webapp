@@ -37,7 +37,7 @@ z.util.SanitizationUtil = (() => {
   return {
     escapeRegex: string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
 
-    escapeString: string => _.escape(string),
+    escapeString: string => string, //_.escape(string),
 
     getFirstName: (userEntity, declension, bypassSanitization = false) => {
       if (userEntity.is_me) {
