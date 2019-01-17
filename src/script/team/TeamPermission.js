@@ -86,19 +86,14 @@ export function checkRole(permissions) {
     throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
   }
 
-  if (hasPermissionForRole(permissions.self, ROLE.OWNER)) {
-    return ROLE.OWNER;
-  }
+  const detectedRole = [ROLE.OWNER, ROLE.ADMIN, ROLE.MEMBER].reduce((foundRole, role) => {
+    if (foundRole) {
+      return foundRole;
+    }
+    return hasPermissionForRole(permissions.self, role) ? role : undefined;
+  }, undefined);
 
-  if (hasPermissionForRole(permissions.self, ROLE.ADMIN)) {
-    return ROLE.ADMIN;
-  }
-
-  if (hasPermissionForRole(permissions.self, ROLE.MEMBER)) {
-    return ROLE.MEMBER;
-  }
-
-  return ROLE.INVALID;
+  return detectedRole || ROLE.INVALID;
 }
 
 function combinePermissions(permissions) {
