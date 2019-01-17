@@ -65,7 +65,7 @@ describe('LocalizerUtil', () => {
       expect(result).toBe('Hey Hey Tod');
     });
 
-    it('escapes the raw string given', () => {
+    it('should not escape the source string', () => {
       setStrings({
         en: {
           test1: '<script>alert("fail")</script>',
@@ -74,7 +74,7 @@ describe('LocalizerUtil', () => {
         },
       });
 
-      expect(t('test1')).toBe('&lt;script&gt;alert(&quot;fail&quot;)&lt;/script&gt;');
+      expect(t('test1')).toBe('<script>alert("fail")</script>');
       expect(t('test2')).toBe('');
       expect(t('test3')).toBe('félix');
     });
@@ -88,14 +88,10 @@ describe('LocalizerUtil', () => {
 
       const result1 = t('test', '<script>alert("felix")</script>');
       const result2 = t('test', 12);
-      const result3 = t('test');
 
-      expect(result1).toBe(
-        '&lt;scri&gt;alert(&quot;&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;&quot;)&lt;/scri&gt;'
-      );
+      expect(result1).toBe('<scri>alert("&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;")</scri>');
 
-      expect(result2).toBe('&lt;scri&gt;alert(&quot;12&quot;)&lt;/scri&gt;');
-      expect(result3).toBe('&lt;scri&gt;alert(&quot;{{userName}}&quot;)&lt;/scri&gt;');
+      expect(result2).toBe('<scri>alert("12")</scri>');
     });
 
     it('escapes substitutions object', () => {
@@ -111,9 +107,7 @@ describe('LocalizerUtil', () => {
       const result2 = t('test2', {user: 'nan'});
       const result3 = t('test3', {status: '<script>a pickle</script>', user: 'Rick'});
 
-      expect(result1).toBe(
-        '&lt;scri&gt;alert(&quot;&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;&quot;)&lt;/scri&gt;'
-      );
+      expect(result1).toBe('<scri>alert("&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;")</scri>');
 
       expect(result2).toBe('nan nan nan Batman!');
 
