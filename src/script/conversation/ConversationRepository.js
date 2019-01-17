@@ -2599,6 +2599,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             let titleString;
 
             const hasMultipleUsers = userEntities.length > 1;
+            const userNames = joinNames(userEntities, Declension.NOMINATIVE);
             const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
 
             if (hasMultipleUsers) {
@@ -2630,8 +2631,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 reject(error);
               }
             }
-
-            const userNames = joinNames(userEntities, Declension.NOMINATIVE);
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
