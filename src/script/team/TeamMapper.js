@@ -19,12 +19,9 @@
 
 import {roleFromPermissions} from './TeamPermission';
 
-window.z = window.z || {};
-window.z.team = z.team || {};
-
-z.team.TeamMapper = class TeamMapper {
+export default class TeamMapper {
   constructor() {
-    this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
   mapTeamFromObject(data) {
@@ -89,4 +86,4 @@ z.team.TeamMapper = class TeamMapper {
       return memberEntity;
     }
   }
-};
+}
