@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.integration = z.integration || {};
 
@@ -120,8 +122,8 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
-            message: z.l10n.text(z.string.modalIntegrationUnavailableMessage),
-            title: z.l10n.text(z.string.modalIntegrationUnavailableHeadline),
+            message: t('modalIntegrationUnavailableMessage'),
+            title: t('modalIntegrationUnavailableHeadline'),
           },
         });
         throw error;

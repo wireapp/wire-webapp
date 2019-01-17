@@ -19,6 +19,8 @@
 
 import JSZip from 'jszip';
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -55,7 +57,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
         case HistoryImportViewModel.STATE.PREPARING: {
-          return z.l10n.text(z.string.backupImportProgressHeadline);
+          return t('backupImportProgressHeadline');
         }
         case HistoryImportViewModel.STATE.IMPORTING: {
           const replacements = {
@@ -63,7 +65,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
             progress: this.loadingProgress(),
             total: this.numberOfRecords(),
           };
-          return z.l10n.text(z.string.backupImportProgressSecondary, replacements);
+          return t('backupImportProgressSecondary', replacements);
         }
         default:
           return '';
@@ -75,14 +77,14 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
         this.errorHeadline('');
         this.errorSecondary('');
       } else if (error instanceof z.backup.DifferentAccountError) {
-        this.errorHeadline(z.l10n.text(z.string.backupImportAccountErrorHeadline));
-        this.errorSecondary(z.l10n.text(z.string.backupImportAccountErrorSecondary));
+        this.errorHeadline(t('backupImportAccountErrorHeadline'));
+        this.errorSecondary(t('backupImportAccountErrorSecondary'));
       } else if (error instanceof z.backup.IncompatibleBackupError) {
-        this.errorHeadline(z.l10n.text(z.string.backupImportVersionErrorHeadline));
-        this.errorSecondary(z.l10n.text(z.string.backupImportVersionErrorSecondary));
+        this.errorHeadline(t('backupImportVersionErrorHeadline'));
+        this.errorSecondary(t('backupImportVersionErrorSecondary'));
       } else {
-        this.errorHeadline(z.l10n.text(z.string.backupImportGenericErrorHeadline));
-        this.errorSecondary(z.l10n.text(z.string.backupImportGenericErrorSecondary));
+        this.errorHeadline(t('backupImportGenericErrorHeadline'));
+        this.errorSecondary(t('backupImportGenericErrorSecondary'));
       }
     });
 

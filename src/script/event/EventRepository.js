@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -505,7 +507,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = (this.notificationsHandled / this.notificationsTotal) * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
     }
   }
 

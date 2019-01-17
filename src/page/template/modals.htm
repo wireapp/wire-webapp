@@ -3,15 +3,15 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalAccountNewDevicesHeadline" data-uie-name="status-modal-title"></div>
+        <div class="modal-title" data-bind="text: t('modalAccountNewDevicesHeadline')" data-uie-name="status-modal-title"></div>
       </div>
       <div class="modal-text" data-uie-name="status-modal-text">
         <div class="modal-new-devices-list"></div>
-        <div data-bind="l10n_text: z.string.modalAccountNewDevicesMessage"></div>
+        <div data-bind="text: t('modalAccountNewDevicesMessage')"></div>
       </div>
       <div class="modal-footer">
-        <div class="modal-secondary button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalAccountNewDevicesSecondary" data-uie-name="go-manage-devices"></div>
-        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalAcknowledgeAction" data-uie-name="do-ok"></div>
+        <div class="modal-secondary button button-medium button-full button-inverted" data-bind="text: t('modalAccountNewDevicesSecondary')" data-uie-name="go-manage-devices"></div>
+        <div class="modal-close button button-medium button-full" data-bind="text: t('modalAcknowledgeAction')" data-uie-name="do-ok"></div>
       </div>
     </div>
   </div>
@@ -24,10 +24,10 @@
       </div>
       <div class="modal-text" data-uie-name="status-modal-text">
         <div class="modal-new-devices-list"></div>
-        <div data-bind="l10n_text: z.string.modalAccountReadReceiptsChangedMessage"></div>
+        <div data-bind="text: t('modalAccountReadReceiptsChangedMessage')"></div>
       </div>
       <div class="modal-footer">
-        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalAcknowledgeAction" data-uie-name="do-ok"></div>
+        <div class="modal-close button button-medium button-full" data-bind="text: t('modalAcknowledgeAction')" data-uie-name="do-ok"></div>
       </div>
     </div>
   </div>
@@ -36,14 +36,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalSessionResetHeadline" data-uie-name="status-modal-title"></div>
+        <div class="modal-title" data-bind="text: t('modalSessionResetHeadline')" data-uie-name="status-modal-title"></div>
       </div>
       <div class="modal-text" data-uie-name="status-modal-text">
-        <span data-bind="l10n_text: z.string.modalSessionResetMessage1"></span>
-        <a data-bind="l10n_href: {support: z.config.SUPPORT.FORM.BUG}, l10n_text: z.string.modalSessionResetMessageLink" rel="nofollow noopener noreferrer" target="_blank"></a>
-        <span data-bind="l10n_text: z.string.modalSessionResetMessage2"></span>
+        <span data-bind="text: t('modalSessionResetMessage1')"></span>
+        <a data-bind="l10n_href: {support: z.config.SUPPORT.FORM.BUG}, text: t('modalSessionResetMessageLink')" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <span data-bind="text: t('modalSessionResetMessage2')"></span>
       </div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalAcknowledgeAction" data-uie-name="do-close"></div>
+      <div class="modal-close button button-medium button-fluid" data-bind="text: t('modalAcknowledgeAction')" data-uie-name="do-close"></div>
     </div>
   </div>
 

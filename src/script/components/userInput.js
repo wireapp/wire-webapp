@@ -58,9 +58,8 @@ z.components.UserInput = class UserInput {
     this.placeholder = ko.pureComputed(() => {
       const emptyInput = typeof this.input !== 'function' || !this.input().length;
       if (emptyInput && this.noSelectedUsers()) {
-        return z.l10n.text(this.placeholderText);
+        return this.placeholderText;
       }
-
       return '';
     });
   }

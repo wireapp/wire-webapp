@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -73,7 +75,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.disableScreenButton = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
 
     this.participantsButtonLabel = ko.pureComputed(() => {
-      return z.l10n.text(z.string.callParticipants, this.callParticipants().length);
+      return t('callParticipants', this.callParticipants().length);
     });
 
     this.showVideoPreview = ko.pureComputed(() => {
@@ -167,17 +169,17 @@ ko.components.register('conversation-list-calling-cell', {
         <span class="conversation-list-cell-name" data-bind="text: conversation.display_name()"></span>
         <!-- ko if: isIncoming() -->
           <!-- ko if: call().isGroup -->
-            <span class="conversation-list-cell-description" data-bind="l10n_text: {id: z.string.callStateIncomingGroup, substitute: call().creatingUser.first_name()}" data-uie-name="call-label-incoming"></span>
+            <span class="conversation-list-cell-description" data-bind="text: t('callStateIncomingGroup', call().creatingUser.first_name())" data-uie-name="call-label-incoming"></span>
           <!-- /ko -->
           <!-- ko ifnot: call().isGroup -->
-            <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
+            <span class="conversation-list-cell-description" data-bind="text: t('callStateIncoming')" data-uie-name="call-label-incoming"></span>
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: isOutgoing() -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateOutgoing" data-uie-name="call-label-outgoing"></span>
+          <span class="conversation-list-cell-description" data-bind="text: t('callStateOutgoing')" data-uie-name="call-label-outgoing"></span>
         <!-- /ko -->
         <!-- ko if: isConnecting() -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateConnecting" data-uie-name="call-label-connecting"></span>
+          <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: isConnected() -->
           <span class="conversation-list-cell-description" data-bind="text: z.util.TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
@@ -191,7 +193,7 @@ ko.components.register('conversation-list-calling-cell', {
           </div>
         <!-- /ko -->
         <!-- ko if: canJoin() -->
-          <div class="call-ui__button call-ui__button--join call-ui__button--green" data-bind="click: onJoinDeclinedCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
+          <div class="call-ui__button call-ui__button--join call-ui__button--green" data-bind="click: onJoinDeclinedCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
 
@@ -208,7 +210,7 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
     <!-- /ko -->
     <!-- ko if: showNoCameraPreview() -->
-      <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="l10n_text: z.string.callNoCameraAccess" data-uie-name="label-no-camera-access-preview"></div>
+      <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="text: t('callNoCameraAccess')" data-uie-name="label-no-camera-access-preview"></div>
     <!-- /ko -->
 
     <!-- ko ifnot: canJoin() -->
@@ -223,7 +225,7 @@ ko.components.register('conversation-list-calling-cell', {
             </button>
           <!-- /ko -->
           <!-- ko if: isConnected() -->
-            <div class="call-ui__button" data-bind="tooltip: {text: z.string.videoCallScreenShareNotSupported, disabled: !disableScreenButton(), position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+            <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton(), position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
           <!-- /ko -->

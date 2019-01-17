@@ -1,5 +1,5 @@
 <div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferencesAccount, removed_from_view: $root.preferencesAccount.removedFromView">
-  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesAccount"></div>
+  <div class="preferences-titlebar" data-bind="text: t('preferencesAccount')"></div>
   <div class="preferences-content" data-bind="fadingscrollbar">
     <section class="preferences-section preferences-section-account-profile">
       <div class="preferences-account-user-data" data-bind="css: {'preferences-account-user-data-temporary': !isActivatedAccount()}">
@@ -7,7 +7,7 @@
           <div class="preferences-account-name-wrapper">
             <input class="preferences-account-name preferences-account-input"
                    id="name" type="text"
-                   data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, l10n_placeholder: z.string.preferencesAccountUsernamePlaceholder"
+                   data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder')}"
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
@@ -34,15 +34,15 @@
             <span class="preferences-account-input-icon" data-bind="css: usernameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
             <!-- ko ifnot: usernameState() -->
               <div class="preferences-account-username-hint text-foreground font-size-xs"
-                   data-bind="l10n_text: z.string.preferencesAccountUsernameHint"></div>
+                   data-bind="text: t('preferencesAccountUsernameHint')"></div>
             <!-- /ko -->
             <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE -->
               <div class="preferences-account-username-error font-size-xs"
-                   data-bind="l10n_text: z.string.preferencesAccountUsernameAvailable"></div>
+                   data-bind="text: t('preferencesAccountUsernameAvailable')"></div>
             <!-- /ko -->
             <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.TAKEN -->
               <div class="preferences-account-username-error font-size-xs"
-                   data-bind="l10n_text: z.string.preferencesAccountUsernameErrorTaken, css: {'text-red': submittedUsername() === enteredUsername()}"></div>
+                   data-bind="text: t('preferencesAccountUsernameErrorTaken'), css: {'text-red': submittedUsername() === enteredUsername()}"></div>
             <!-- /ko -->
           </div>
 
@@ -60,13 +60,13 @@
             <div class="preferences-account-name" data-bind="text: name" data-uie-name="status-name"></div>
           </div>
           <hr class="preferences-separator">
-          <div class="preferences-link text-theme" data-bind="click: clickOnLeaveGuestRoom, l10n_text: z.string.preferencesAccountLeaveGuestRoom" data-uie-name="do-leave-guest-room"></div>
-          <div class="preferences-leave-disclaimer" data-bind="l10n_text: z.string.preferencesAccountLeaveGuestRoomDescription"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOnLeaveGuestRoom, text: t('preferencesAccountLeaveGuestRoom')" data-uie-name="do-leave-guest-room"></div>
+          <div class="preferences-leave-disclaimer" data-bind="text: t('preferencesAccountLeaveGuestRoomDescription')"></div>
         <!-- /ko -->
       </div>
 
       <!-- ko if: isActivatedAccount() -->
-        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
+        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
           <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                 type="file"
@@ -86,76 +86,76 @@
     <!-- ko if: isConsentCheckEnabled() -->
       <section class="preferences-section preferences-section-data-usage">
         <hr class="preferences-separator">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountData"></header>
+        <header class="preferences-header" data-bind="text: t('preferencesAccountData')"></header>
         <div class="preferences-option">
           <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
             <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
-            <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="l10n_text: z.string.preferencesAccountDataCheckbox"></label>
+            <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="text: t('preferencesAccountDataCheckbox')"></label>
           </div>
         </div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountDataDetail"></div>
+        <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail')"></div>
 
         <!-- ko if: isActivatedAccount() -->
           <div class="preferences-option">
             <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionMarketingConsent}" data-uie-name="status-preference-marketing">
               <input type="checkbox" id="marketing-checkbox" data-bind="checked: optionMarketingConsent, event: {change: onMarketingConsentChange}">
-              <label class="preferences-options-checkbox-label" for="marketing-checkbox" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentCheckbox"></label>
+              <label class="preferences-options-checkbox-label" for="marketing-checkbox" data-bind="text: t('preferencesAccountMarketingConsentCheckbox')"></label>
             </div>
           </div>
-          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentDetail"></div>
+          <div class="preferences-detail" data-bind="text: t('preferencesAccountMarketingConsentDetail')"></div>
         <!-- /ko -->
       </section>
     <!-- /ko -->
 
     <section class="preferences-section preferences-section-privacy">
       <hr class="preferences-separator">
-      <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountPrivacy"></header>
+      <header class="preferences-header" data-bind="text: t('preferencesAccountPrivacy')"></header>
       <div class="preferences-option">
         <div class="preferences-option-icon checkbox text-theme" data-uie-name="status-preference-read-receipts">
           <input type="checkbox" id="read-receipts-checkbox" data-bind="checked: optionReadReceipts, event: {change: onReadReceiptsChange}">
-          <label class="preferences-options-checkbox-label" for="read-receipts-checkbox" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsCheckbox"></label>
+          <label class="preferences-options-checkbox-label" for="read-receipts-checkbox" data-bind="text: t('preferencesAccountReadReceiptsCheckbox')"></label>
         </div>
       </div>
-      <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountReadReceiptsDetail"></div>
+      <div class="preferences-detail" data-bind="text: t('preferencesAccountReadReceiptsDetail')"></div>
     </section>
 
     <!-- ko if: isActivatedAccount() -->
       <section class="preferences-section preferences-section-conversation-history">
         <hr class="preferences-separator">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsBackupHeader"></header>
-        <div class="preferences-link text-theme" data-bind="click: clickOnBackupExport, l10n_text: z.string.preferencesOptionsBackupExportHeadline" data-uie-name="do-backup-export"></div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupExportSecondary"></div>
+        <header class="preferences-header" data-bind="text: t('preferencesOptionsBackupHeader')"></header>
+        <div class="preferences-link text-theme" data-bind="click: clickOnBackupExport, text: t('preferencesOptionsBackupExportHeadline')" data-uie-name="do-backup-export"></div>
+        <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupExportSecondary')"></div>
         <label class="preferences-link text-theme preferences-history-backup-import-field" data-uie-name="do-backup-import">
-          <span data-bind="l10n_text: z.string.preferencesOptionsBackupImportHeadline"></span>
+          <span data-bind="text: t('preferencesOptionsBackupImportHeadline')"></span>
           <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${z.viewModel.content.HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}" data-uie-name="input-import-file"/>
         </label>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupImportSecondary"></div>
+        <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupImportSecondary')"></div>
       </section>
 
       <section class="preferences-section preferences-section-account-security">
         <hr class="preferences-separator">
 
         <!-- ko if: isTeamManager() && !!manageTeamUrl -->
-          <div class="preferences-link text-theme" data-bind="click: clickOpenManageTeam, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOpenManageTeam, text: t('preferencesAccountManageTeam')" data-uie-name="do-manage-team"></div>
         <!-- /ko -->
 
         <!-- ko if: !isMacOsWrapper && !!createTeamUrl -->
-          <a class="preferences-link text-theme" data-bind="attr: {href: createTeamUrl}, l10n_text: z.string.preferencesAccountCreateTeam" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
+          <a class="preferences-link text-theme" data-bind="attr: {href: createTeamUrl}, text: t('preferencesAccountCreateTeam')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
         <!-- /ko -->
 
         <!-- ko ifnot: selfUser().isSingleSignOn -->
-          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, text: t('preferencesAccountResetPassword'), attr: {title: t('tooltipPreferencesPassword')}" data-uie-name="do-reset-password"></div>
         <!-- /ko -->
 
         <!-- ko ifnot: isTeam() -->
-          <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, text: t('preferencesAccountDelete')" data-uie-name="go-delete-account"></div>
         <!-- /ko -->
       </section>
     <!-- /ko -->
 
     <!-- ko if: isActivatedAccount() && !z.util.Environment.desktop -->
       <section class="preferences-section">
-        <div class="preferences-link text-theme" data-bind="click: clickOnLogout, l10n_text: z.string.preferencesAccountLogOut" data-uie-name="do-logout"></div>
+        <div class="preferences-link text-theme" data-bind="click: clickOnLogout, text: t('preferencesAccountLogOut')" data-uie-name="do-logout"></div>
       </section>
     <!-- /ko -->
   </div>

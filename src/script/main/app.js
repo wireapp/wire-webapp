@@ -27,6 +27,7 @@ import DebugUtil from '../util/DebugUtil';
 import '../components/mentionSuggestions.js';
 
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
+import {t} from 'utils/LocalizerUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -303,12 +304,12 @@ class App {
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
-        this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
+        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
-        this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
+        this.view.loading.updateProgress(7.5, t('initValidatedClient'));
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
@@ -324,7 +325,7 @@ class App {
         return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {
-        this.view.loading.updateProgress(25, z.string.initReceivedUserData);
+        this.view.loading.updateProgress(25, t('initReceivedUserData'));
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
@@ -357,7 +358,7 @@ class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
+        this.view.loading.updateProgress(97.5, t('initUpdatedFromNotifications'));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
@@ -781,7 +782,7 @@ class App {
         const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
         const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
         if (isLeavingGuestRoom) {
-          const path = z.l10n.text(z.string.urlWebsiteRoot);
+          const path = t('urlWebsiteRoot');
           const url = getWebsiteUrl(path);
           return window.location.replace(url);
         }

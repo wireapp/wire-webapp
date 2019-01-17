@@ -17,6 +17,8 @@
  *
  */
 
+import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -83,7 +85,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
       return isTeamMemberLeave
         ? this.name()
-        : z.util.SanitizationUtil.getFirstName(this.user(), z.string.Declension.NOMINATIVE, true);
+        : z.util.SanitizationUtil.getFirstName(this.user(), Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
@@ -95,18 +97,21 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         return '';
       }
 
-      let substitutions;
-      const replaceDangerously = {
+      const replaceShowMore = {
         '/showmore': '</a>',
         showmore: '<a class="message-header-show-more" data-uie-name="do-show-more">',
       };
+
+      const count = this.hiddenUserCount();
+      const users = this._generateNameString(this.exceedsMaxVisibleUsers(), Declension.DATIVE);
+      const name = this.senderName();
 
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_REQUEST: {
           if (this.otherUser()) {
             if (this.otherUser().isBlocked()) {
-              return z.l10n.safeHtml(z.string.conversationConnectionBlocked);
+              return t('conversationConnectionBlocked');
             }
 
             if (this.otherUser().isOutgoingRequest()) {
@@ -114,7 +119,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             }
           }
 
-          return z.l10n.safeHtml(z.string.conversationConnectionAccepted);
+          return t('conversationConnectionAccepted');
         }
 
         case z.message.SystemMessageType.CONVERSATION_CREATE: {
@@ -122,74 +127,34 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
             if (this.allTeamMembers && exceedsMaxTeam) {
               const guestCount = this.joinedUserEntities().filter(userEntity => userEntity.isGuest()).length;
-              substitutions = {replace: {count: guestCount}, replaceDangerously};
               if (!guestCount) {
-                return z.l10n.safeHtml(z.string.conversationCreateTeam, substitutions);
+                return t('conversationCreateTeam', {}, replaceShowMore);
               }
 
               const hasSingleGuest = guestCount === 1;
-              const teamStringId = hasSingleGuest
-                ? z.string.conversationCreateTeamGuest
-                : z.string.conversationCreateTeamGuests;
-
-              return z.l10n.safeHtml(teamStringId, substitutions);
+              return hasSingleGuest
+                ? t('conversationCreateTeamGuest', {}, replaceShowMore)
+                : t('conversationCreateTeamGuests', guestCount, replaceShowMore);
             }
 
-            const createStringId = this.exceedsMaxVisibleUsers()
-              ? z.string.conversationCreateWithMore
-              : z.string.conversationCreateWith;
-
-            substitutions = {
-              replace: {
-                count: this.hiddenUserCount(),
-                users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
-              },
-              replaceDangerously,
-            };
-
-            return z.l10n.safeHtml(createStringId, substitutions);
+            return this.exceedsMaxVisibleUsers()
+              ? t('conversationCreateWithMore', {count, users}, replaceShowMore)
+              : t('conversationCreateWith', users);
           }
 
           if (this.user().is_me) {
-            const createStringId = this.exceedsMaxVisibleUsers()
-              ? z.string.conversationCreatedYouMore
-              : z.string.conversationCreatedYou;
-
-            substitutions = {
-              replace: {
-                count: this.hiddenUserCount(),
-                users: this._generateNameString(this.exceedsMaxVisibleUsers()),
-              },
-              replaceDangerously,
-            };
-
-            return z.l10n.safeHtml(createStringId, substitutions);
+            return this.exceedsMaxVisibleUsers()
+              ? t('conversationCreatedYouMore', {count, users}, replaceShowMore)
+              : t('conversationCreatedYou', users);
           }
 
-          const createStringId = this.exceedsMaxVisibleUsers()
-            ? z.string.conversationCreatedMore
-            : z.string.conversationCreated;
-
-          substitutions = {
-            replace: {
-              count: this.hiddenUserCount(),
-              name: this.senderName(),
-              users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
-            },
-            replaceDangerously,
-          };
-
-          return z.l10n.safeHtml(createStringId, substitutions);
+          return this.exceedsMaxVisibleUsers()
+            ? t('conversationCreatedMore', {count, name, users}, replaceShowMore)
+            : t('conversationCreated', {name, users});
         }
 
         case z.message.SystemMessageType.CONVERSATION_RESUME: {
-          substitutions = {
-            replace: {
-              users: this._generateNameString(false, z.string.Declension.DATIVE),
-            },
-          };
-
-          return z.l10n.safeHtml(z.string.conversationResume, substitutions);
+          return t('conversationResume', this._generateNameString(false, Declension.DATIVE));
         }
 
         default:
@@ -200,60 +165,40 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
-            const userJoinedStringId = this.user().is_me
-              ? z.string.conversationMemberJoinedSelfYou
-              : z.string.conversationMemberJoinedSelf;
-            return z.l10n.safeHtml(userJoinedStringId, this.senderName());
+            return this.user().is_me
+              ? t('conversationMemberJoinedSelfYou')
+              : t('conversationMemberJoinedSelf', this.senderName());
           }
-
-          let userJoinedStringId = '';
 
           if (this.user().is_me) {
-            userJoinedStringId = this.exceedsMaxVisibleUsers()
-              ? z.string.conversationMemberJoinedYouMore
-              : z.string.conversationMemberJoinedYou;
-          } else {
-            userJoinedStringId = this.exceedsMaxVisibleUsers()
-              ? z.string.conversationMemberJoinedMore
-              : z.string.conversationMemberJoined;
+            return this.exceedsMaxVisibleUsers()
+              ? t('conversationMemberJoinedYouMore', {count, users}, replaceShowMore)
+              : t('conversationMemberJoinedYou', users, replaceShowMore);
           }
-
-          substitutions = {
-            replace: {
-              count: this.hiddenUserCount(),
-              name: this.senderName(),
-              users: this._generateNameString(this.exceedsMaxVisibleUsers()),
-            },
-            replaceDangerously,
-          };
-
-          return z.l10n.safeHtml(userJoinedStringId, substitutions);
+          return this.exceedsMaxVisibleUsers()
+            ? t('conversationMemberJoinedMore', {count, name, users}, replaceShowMore)
+            : t('conversationMemberJoined', {name, users}, replaceShowMore);
         }
 
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
           const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
-            return z.l10n.safeHtml(z.string.temporaryGuestLeaveMessage);
+            return t('temporaryGuestLeaveMessage');
           }
 
           const senderLeft = this.otherUser().id === this.user().id;
           if (senderLeft) {
-            const userLeftStringId = this.user().is_me
-              ? z.string.conversationMemberLeftYou
-              : z.string.conversationMemberLeft;
-            return z.l10n.safeHtml(userLeftStringId, this.senderName());
+            return this.user().is_me ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
           }
 
-          const userRemovedStringId = this.user().is_me
-            ? z.string.conversationMemberRemovedYou
-            : z.string.conversationMemberRemoved;
-
-          substitutions = {replace: {name: this.senderName(), users: this._generateNameString()}};
-          return z.l10n.safeHtml(userRemovedStringId, substitutions);
+          const allUsers = this._generateNameString();
+          return this.user().is_me
+            ? t('conversationMemberRemovedYou', allUsers)
+            : t('conversationMemberRemoved', {name, users: allUsers});
         }
 
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
-          return z.l10n.safeHtml(z.string.conversationTeamLeft, this.senderName());
+          return t('conversationTeamLeft', name);
         }
 
         default:
@@ -265,13 +210,13 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
         if (this.user().isTemporaryGuest()) {
-          return z.l10n.safeHtml(z.string.conversationCreateTemporary);
+          return t('conversationCreateTemporary');
         }
 
-        const groupCreationStringId = this.user().is_me
-          ? z.string.conversationCreatedNameYou
-          : z.string.conversationCreatedName;
-        return z.util.StringUtil.capitalizeFirstChar(z.l10n.safeHtml(groupCreationStringId, this.senderName()));
+        const groupCreationString = this.user().is_me
+          ? t('conversationCreatedNameYou')
+          : t('conversationCreatedName', this.senderName());
+        return z.util.StringUtil.capitalizeFirstChar(groupCreationString);
       }
       return '';
     });
@@ -285,8 +230,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     };
   }
 
-  _generateNameString(skipAnd = false, declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd, true);
+  _generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE) {
+    return joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
 
   isConnection() {

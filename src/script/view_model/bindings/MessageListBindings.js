@@ -20,6 +20,7 @@
 import moment from 'moment';
 
 import viewportObserver from '../../ui/viewportObserver';
+import {t} from 'utils/LocalizerUtil';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
@@ -124,7 +125,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
     const current_day = date.local().format('YYMMDD');
 
     if (moment().diff(date, 'minutes') < 2) {
-      return z.l10n.text(z.string.conversationJustNow);
+      return t('conversationJustNow');
     }
 
     if (moment().diff(date, 'minutes') < 60) {
@@ -136,7 +137,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === yesterday) {
-      return `${z.l10n.text(z.string.conversationYesterday)} ${date.local().format('HH:mm')}`;
+      return `${t('conversationYesterday')} ${date.local().format('HH:mm')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
@@ -153,7 +154,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
     const current_day = date.local().format('YYMMDD');
 
     if (moment().diff(date, 'minutes') < 2) {
-      return z.l10n.text(z.string.conversationJustNow);
+      return t('conversationJustNow');
     }
 
     if (moment().diff(date, 'minutes') < 60) {
@@ -161,11 +162,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return `${z.l10n.text(z.string.conversationToday)} ${date.local().format('HH:mm')}`;
+      return `${t('conversationToday')} ${date.local().format('HH:mm')}`;
     }
 
     if (current_day === yesterday) {
-      return `${z.l10n.text(z.string.conversationYesterday)} ${date.local().format('HH:mm')}`;
+      return `${t('conversationYesterday')} ${date.local().format('HH:mm')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {

@@ -18,6 +18,7 @@
  */
 
 import * as StorageUtil from 'utils/StorageUtil';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -192,20 +193,21 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
+        const name = userEntity.first_name();
         const availabilityStrings = {
-          [z.user.AvailabilityType.AVAILABLE]: z.string.tooltipConversationInputPlaceholderAvailable,
-          [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAway,
-          [z.user.AvailabilityType.BUSY]: z.string.tooltipConversationInputPlaceholderBusy,
+          [z.user.AvailabilityType.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
+          [z.user.AvailabilityType.AWAY]: t('tooltipConversationInputPlaceholderAway', name),
+          [z.user.AvailabilityType.BUSY]: t('tooltipConversationInputPlaceholderBusy', name),
         };
 
-        return z.l10n.text(availabilityStrings[userEntity.availability()], userEntity.first_name());
+        return availabilityStrings[userEntity.availability()];
       }
 
-      const stringId = this.conversationEntity().messageTimer()
-        ? z.string.tooltipConversationEphemeral
-        : z.string.tooltipConversationInputPlaceholder;
+      const string = this.conversationEntity().messageTimer()
+        ? t('tooltipConversationEphemeral')
+        : t('tooltipConversationInputPlaceholder');
 
-      return z.l10n.text(stringId);
+      return string;
     });
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {
@@ -224,7 +226,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
-    this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
+    this.pingTooltip = t('tooltipConversationPing', pingShortcut);
 
     this.isEditing.subscribe(isEditing => {
       if (isEditing) {
@@ -242,7 +244,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
-        return this.pastedFileName(z.l10n.text(z.string.conversationSendPastedFile, date));
+        return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
       this.pastedFilePreviewUrl(null);
@@ -506,8 +508,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (isMessageTextTooLong) {
       return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: z.l10n.text(z.string.modalConversationMessageTooLongMessage, z.config.MAXIMUM_MESSAGE_LENGTH),
-          title: z.l10n.text(z.string.modalConversationMessageTooLongHeadline),
+          message: t('modalConversationMessageTooLongMessage', z.config.MAXIMUM_MESSAGE_LENGTH),
+          title: t('modalConversationMessageTooLongHeadline'),
         },
       });
     }
@@ -799,8 +801,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           const fileSize = z.util.formatBytes(uploadLimit);
           const options = {
             text: {
-              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
-              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
+              message: t('modalAssetTooLargeMessage', fileSize),
+              title: t('modalAssetTooLargeHeadline'),
             },
           };
 
@@ -820,8 +822,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (isHittingUploadLimit) {
       const modalOptions = {
         text: {
-          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, concurrentUploadLimit),
-          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
+          message: t('modalAssetParallelUploadsMessage', concurrentUploadLimit),
+          title: t('modalAssetParallelUploadsHeadline'),
         },
       };
 
@@ -843,13 +845,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _showUploadWarning(image) {
     const isGif = image.type === 'image/gif';
-    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
-    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
+    const maxSize = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+    const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
+    const title = isGif ? t('modalGifTooLargeHeadline') : t('modalPictureTooLargeHeadline');
 
     const modalOptions = {
       text: {
-        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
-        title: z.l10n.text(titleStringId),
+        message,
+        title,
       },
     };
 

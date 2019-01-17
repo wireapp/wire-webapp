@@ -19,6 +19,7 @@
 
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
+import {t} from 'utils/LocalizerUtil';
 import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
@@ -70,7 +71,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
       if (noStatusSet) {
-        label = z.l10n.text(z.string.preferencesAccountAvaibilityUnset);
+        label = t('preferencesAccountAvaibilityUnset');
       }
 
       return label;
@@ -87,7 +88,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.team = this.teamRepository.team;
-    this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
+    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamRepository.teamName()));
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
@@ -248,9 +249,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
-        action: z.l10n.text(z.string.modalAccountDeletionAction),
-        message: z.l10n.text(z.string.modalAccountDeletionMessage),
-        title: z.l10n.text(z.string.modalAccountDeletionHeadline),
+        action: t('modalAccountDeletionAction'),
+        message: t('modalAccountDeletionMessage'),
+        title: t('modalAccountDeletionHeadline'),
       },
     });
   }
@@ -260,9 +261,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
-        action: z.l10n.text(z.string.modalAccountLeaveGuestRoomAction),
-        message: z.l10n.text(z.string.modalAccountLeaveGuestRoomMessage),
-        title: z.l10n.text(z.string.modalAccountLeaveGuestRoomHeadline),
+        action: t('modalAccountLeaveGuestRoomAction'),
+        message: t('modalAccountLeaveGuestRoomMessage'),
+        title: t('modalAccountLeaveGuestRoomHeadline'),
       },
       warning: false,
     });
@@ -304,16 +305,16 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const isTooLarge = newUserPicture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
       const maximumSizeInMB = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      const messageString = z.l10n.text(z.string.modalPictureTooLargeMessage, maximumSizeInMB);
-      const titleString = z.l10n.text(z.string.modalPictureTooLargeHeadline);
+      const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
+      const titleString = t('modalPictureTooLargeHeadline');
 
       return this._showUploadWarning(titleString, messageString);
     }
 
     const isWrongFormat = !PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.includes(newUserPicture.type);
     if (isWrongFormat) {
-      const titleString = z.l10n.text(z.string.modalPictureFileFormatHeadline);
-      const messageString = z.l10n.text(z.string.modalPictureFileFormatMessage);
+      const titleString = t('modalPictureFileFormatHeadline');
+      const messageString = t('modalPictureFileFormatMessage');
 
       return this._showUploadWarning(titleString, messageString);
     }
@@ -326,8 +327,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         return this.userRepository.change_picture(newUserPicture);
       }
 
-      const messageString = z.l10n.text(z.string.modalPictureTooSmallMessage);
-      const titleString = z.l10n.text(z.string.modalPictureTooSmallHeadline);
+      const messageString = t('modalPictureTooSmallMessage');
+      const titleString = t('modalPictureTooSmallHeadline');
       return this._showUploadWarning(titleString, messageString);
     });
   }

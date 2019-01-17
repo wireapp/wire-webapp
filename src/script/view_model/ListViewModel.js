@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -307,21 +309,21 @@ z.viewModel.ListViewModel = class ListViewModel {
       if (this.isProAccount()) {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
-          label: z.l10n.text(z.string.conversationsPopoverNotificationSettings),
-          title: z.l10n.text(z.string.tooltipConversationsNotifications, notificationsShortcut),
+          label: t('conversationsPopoverNotificationSettings'),
+          title: t('tooltipConversationsNotifications', notificationsShortcut),
         });
       } else {
-        const labelStringId = conversationEntity.showNotificationsNothing()
-          ? z.string.conversationsPopoverNotify
-          : z.string.conversationsPopoverSilence;
-        const titleStringId = conversationEntity.showNotificationsNothing()
-          ? z.string.tooltipConversationsNotify
-          : z.string.tooltipConversationsSilence;
+        const label = conversationEntity.showNotificationsNothing()
+          ? t('conversationsPopoverNotify')
+          : t('conversationsPopoverSilence');
+        const title = conversationEntity.showNotificationsNothing()
+          ? t('tooltipConversationsNotify', notificationsShortcut)
+          : t('tooltipConversationsSilence', notificationsShortcut);
 
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
-          label: z.l10n.text(labelStringId),
-          title: z.l10n.text(titleStringId, notificationsShortcut),
+          label,
+          title,
         });
       }
     }
@@ -329,29 +331,29 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (conversationEntity.is_archived()) {
       entries.push({
         click: () => this.clickToUnarchive(conversationEntity),
-        label: z.l10n.text(z.string.conversationsPopoverUnarchive),
+        label: t('conversationsPopoverUnarchive'),
       });
     } else {
       const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
-        label: z.l10n.text(z.string.conversationsPopoverArchive),
-        title: z.l10n.text(z.string.tooltipConversationsArchive, shortcut),
+        label: t('conversationsPopoverArchive'),
+        title: t('tooltipConversationsArchive', shortcut),
       });
     }
 
     if (conversationEntity.isRequest()) {
       entries.push({
         click: () => this.clickToCancelRequest(conversationEntity),
-        label: z.l10n.text(z.string.conversationsPopoverCancel),
+        label: t('conversationsPopoverCancel'),
       });
     }
 
     if (conversationEntity.isClearable()) {
       entries.push({
         click: () => this.clickToClear(conversationEntity),
-        label: z.l10n.text(z.string.conversationsPopoverClear),
+        label: t('conversationsPopoverClear'),
       });
     }
 
@@ -362,7 +364,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
-          label: z.l10n.text(z.string.conversationsPopoverBlock),
+          label: t('conversationsPopoverBlock'),
         });
       }
     }
@@ -370,7 +372,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: z.l10n.text(z.string.conversationsPopoverLeave),
+        label: t('conversationsPopoverLeave'),
       });
     }
 

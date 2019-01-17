@@ -21,6 +21,7 @@ import poster from 'poster-image';
 
 import EventMapper from './EventMapper';
 import ConversationMapper from './ConversationMapper';
+import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -333,7 +334,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the conversation that was created
    */
   createGuestRoom() {
-    const groupName = z.l10n.text(z.string.guestRoomConversationName);
+    const groupName = t('guestRoomConversationName');
     return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
@@ -1234,8 +1235,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.error.BackendClientError.LABEL.SERVER_ERROR:
       case z.error.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.error.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
-        const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+        const messageText = t('modalServiceUnavailableMessage');
+        const titleText = t('modalServiceUnavailableHeadline');
 
         this._showModal(messageText, titleText);
         break;
@@ -1429,11 +1430,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendGif(conversationEntity, url, tag, quoteEntity) {
     if (!tag) {
-      tag = z.l10n.text(z.string.extensionsGiphyRandom);
+      tag = t('extensionsGiphyRandom');
     }
 
     return z.util.loadUrlBlob(url).then(blob => {
-      const textMessage = z.l10n.text(z.string.extensionsGiphyMessage, tag);
+      const textMessage = t('extensionsGiphyMessage', tag);
       this.sendText(conversationEntity, textMessage, null, quoteEntity);
       return this.upload_images(conversationEntity, [blob]);
     });
@@ -1621,8 +1622,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
 
-    const messageText = z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions);
-    const titleText = z.l10n.text(z.string.modalConversationTooManyMembersHeadline);
+    const messageText = t('modalConversationTooManyMembersMessage', substitutions);
+    const titleText = t('modalConversationTooManyMembersHeadline');
     this._showModal(messageText, titleText);
   }
 
@@ -1632,12 +1633,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     userPromise.then(userEntity => {
       const username = userEntity ? userEntity.first_name() : undefined;
-      const messageStringId = username
-        ? z.string.modalConversationNotConnectedMessageOne
-        : z.string.modalConversationNotConnectedMessageMany;
-
-      const messageText = z.l10n.text(messageStringId, username);
-      const titleText = z.l10n.text(z.string.modalConversationNotConnectedHeadline);
+      const messageText = username
+        ? t('modalConversationNotConnectedMessageOne', username)
+        : t('modalConversationNotConnectedMessageMany');
+      const titleText = t('modalConversationNotConnectedHeadline');
       this._showModal(messageText, titleText);
     });
   }
@@ -2595,20 +2594,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.user_repository
           .get_users_by_id(userIds)
           .then(userEntities => {
-            let actionStringId;
-            let messageStringId;
-            let titleStringId;
+            let actionString;
+            let messageString;
+            let titleString;
 
             const hasMultipleUsers = userEntities.length > 1;
+            const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
+
             if (hasMultipleUsers) {
-              titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
+              titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
             } else {
               const [userEntity] = userEntities;
 
               if (userEntity) {
-                titleStringId = userEntity.is_me
-                  ? z.string.modalConversationNewDeviceHeadlineYou
-                  : z.string.modalConversationNewDeviceHeadlineOne;
+                titleString = userEntity.is_me
+                  ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
+                  : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
               } else {
                 const conversationId = eventInfoEntity.conversationId;
                 const type = eventInfoEntity.getType();
@@ -2630,25 +2631,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
               }
             }
 
-            const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
-            const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
+            const userNames = joinNames(userEntities, Declension.NOMINATIVE);
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
-                actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
-                messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
+                actionString = t('modalConversationNewDeviceIncomingCallAction');
+                messageString = t('modalConversationNewDeviceIncomingCallMessage');
                 break;
               }
 
               case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
-                actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
-                messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
+                actionString = t('modalConversationNewDeviceOutgoingCallAction');
+                messageString = t('modalConversationNewDeviceOutgoingCallMessage');
                 break;
               }
 
               default: {
-                actionStringId = z.string.modalConversationNewDeviceAction;
-                messageStringId = z.string.modalConversationNewDeviceMessage;
+                actionString = t('modalConversationNewDeviceAction');
+                messageString = t('modalConversationNewDeviceMessage');
                 break;
               }
             }
@@ -2667,9 +2667,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 }
               },
               text: {
-                action: z.l10n.text(actionStringId),
-                message: z.l10n.text(messageStringId),
-                title: z.l10n.text(titleStringId, titleSubstitutions),
+                action: actionString,
+                message: messageString,
+                title: titleString,
               },
             });
           })
@@ -3113,7 +3113,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               };
               const progress = (this.init_handled / this.init_total) * 20 + 75;
 
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initEvents, content);
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
             }
           }
 

@@ -67,7 +67,7 @@ z.components.InputElement = class InputElement {
 ko.components.register('input-element', {
   template: `
     <span data-bind="visible: !editing(), text: value(), click: edit" data-uie-name="status-name"></span>
-    <textarea data-bind="visible: editing, value: value(), enter: change, event: {blur: change}, hasFocus: editing, resize, l10n_placeholder: placeholder" maxlength="64" data-uie-name="enter-name"></textarea>
+    <textarea data-bind="visible: editing, value: value(), enter: change, event: {blur: change}, hasFocus: editing, resize, attr: {placeholder: placeholder}" maxlength="64" data-uie-name="enter-name"></textarea>
   `,
   viewModel: {
     createViewModel(params, component_info) {
