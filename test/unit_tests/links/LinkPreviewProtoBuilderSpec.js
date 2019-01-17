@@ -17,17 +17,15 @@
  *
  */
 
-// KARMA_SPECS=links/LinkPreviewProtoBuilder yarn test:app
-
 describe('LinkPreviewProtoBuilder', () => {
   const compare_article_with_mock = function(url, offset, preview, mock) {
     expect(preview).toBeDefined();
     expect(preview.preview).toBe('article');
     expect(preview.url).toBe(url);
     expect(preview.url_offset).toBe(offset);
-    expect(preview.article.title).toBe(mock.title);
+    expect(preview.article.title).toBe(mock.title || '');
     expect(preview.article.permanent_url).toBe(mock.url);
-    expect(preview.article.summary).toEqual(mock.description || null);
+    expect(preview.article.summary).toEqual(mock.description || '');
     expect(() => preview.toArrayBuffer()).not.toThrow();
   };
 

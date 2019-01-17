@@ -17,10 +17,8 @@
  *
  */
 
-// KARMA_SPECS=properties/PropertiesRepository yarn test:app
-
-import PropertiesRepository from 'app/script/properties/PropertiesRepository';
-import PropertiesService from 'app/script/properties/PropertiesService';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import PropertiesService from 'src/script/properties/PropertiesService';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
@@ -37,7 +35,7 @@ describe('PropertiesRepository', () => {
 
   describe('deleteProperty', () => {
     it('resets a known property to its default value', () => {
-      const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+      const property = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE;
       const defaultValue = property.defaultValue;
 
       propertiesRepository.setProperty(property.key, !defaultValue);

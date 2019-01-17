@@ -17,7 +17,7 @@
  *
  */
 
-import ConversationMapper from 'app/script/conversation/ConversationMapper';
+import ConversationMapper from 'src/script/conversation/ConversationMapper';
 
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new ConversationMapper();

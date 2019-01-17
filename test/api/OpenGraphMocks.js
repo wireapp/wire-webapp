@@ -21,7 +21,7 @@ window.OpenGraphMocks = {
   getHeiseMock: function() {
     return {
       description:
-        'Eine Woche nach ihrer Ankunft im System hat die NASA-Sonde Juno ein erstes Bild aus dem Orbit um den Jupiter gemacht und zur Erde geschickt. Es zeigt den Gasriesen plus drei Monde und wie weit die Sonde auf ihrer Umlaufbahn ausschwenkt.',
+        'Eine Woche nach ihrer Ankunft im System hat die NASA-Sonde Juno ein erstes Bild aus dem Orbit um den Jupiter gemacht und zur Erde geschickt.',
       image: {
         url: 'http://www.heise.de/imgs/18/1/8/5/1/3/4/6/PIA20707-68c99730783b54fb.jpeg',
       },

@@ -1,0 +1,150 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+participant-item {
+  position: relative;
+  display: block;
+
+  &:not(.no-underline)::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: @left-list-item-left-width;
+    height: 1px;
+    background-color: currentColor;
+    content: '';
+    opacity: 0.06;
+  }
+
+  verified-icon,
+  guest-icon,
+  disclose-icon {
+    display: flex;
+    margin-left: 12px;
+  }
+
+  verified-icon + guest-icon,
+  verified-icon + camera-icon,
+  guest-icon + camera-icon {
+    margin-left: 16px;
+  }
+
+  guest-icon {
+    fill: currentColor;
+    opacity: 0.48;
+  }
+
+  camera-icon {
+    animation: camera-pulse 1s alternate ease-in-out infinite;
+  }
+
+  disclose-icon {
+    opacity: 0.25;
+  }
+
+  disclose-icon {
+    display: none;
+  }
+
+  &.show-arrow disclose-icon {
+    display: flex;
+  }
+
+  &.highlighted {
+    animation: fadeInUserHighlighting 1s @ease-out-quart;
+    background-color: var(--background-fade-8);
+  }
+
+  .participant-item {
+    display: flex;
+    overflow: hidden;
+    height: 56px;
+    align-items: center;
+    padding-right: 16px;
+    margin: 0;
+    cursor: pointer;
+
+    .participant-item-image {
+      position: relative;
+      display: flex;
+      width: 60px;
+      height: @avatar-diameter-m;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .participant-item-content {
+      display: flex;
+      min-width: 0; // this will ensure that ellipses is working
+      height: @avatar-diameter-m;
+      flex: 1 1;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 16px;
+
+      .participant-item-content-availability {
+        .availability-state-label {
+          .ellipsis;
+        }
+      }
+
+      .participant-item-content-name {
+        .ellipsis;
+
+        width: 100%;
+        padding-right: 8px;
+        white-space: nowrap;
+      }
+
+      .participant-item-content-info {
+        overflow: hidden;
+        max-width: 100%;
+        margin-top: 2px;
+        font-size: 12px;
+        line-height: 16px;
+        opacity: 0.56;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@keyframes fadeInUserHighlighting {
+  0%,
+  50% {
+    background-color: var(--background-fade-0);
+  }
+  100% {
+    background-color: var(--background-fade-8);
+  }
+}
+
+@keyframes camera-pulse {
+  0% {
+    opacity: 0.32;
+  }
+  100% {
+    opacity: 0.72;
+  }
+}

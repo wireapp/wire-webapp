@@ -1,9 +1,9 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
 /.idea/**/*.xml
-/app/ext
-/app/i18n/**/*
-!/app/i18n/**/*.json
+/src/ext
+/src/i18n/**/*
+!/src/i18n/**/*.json
 /doc
 /docs/auth-coverage
 /docs/coverage
@@ -16,3 +16,9 @@ aws-keys.json
 npm-debug.log
 yarn-error.log
 CHANGELOG.md
+**/.DS_Store
+
+# Configuration imported from https://github.com/wireapp/wire-web-config-default/
+.env
+/config
+/resource

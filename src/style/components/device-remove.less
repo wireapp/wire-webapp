@@ -1,0 +1,80 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// mixins
+.device-remove-placeholder() {
+  .label-xs;
+
+  color: var(--foreground);
+}
+
+device-remove {
+  display: block;
+  height: @button-medium-sm-height;
+  line-height: @button-medium-sm-height;
+}
+
+.device-remove-form {
+  display: flex;
+}
+
+.device-remove-input {
+  max-width: 128px;
+  height: @button-medium-sm-height;
+  flex: 1 1;
+  padding: 0 16px;
+  margin-right: 8px;
+  border: none;
+  background-color: fade(#8d989f, 24%);
+  border-radius: @button-border-radius;
+  color: var(--foreground);
+  line-height: @button-medium-sm-height;
+  outline: 0;
+
+  &::-ms-clear {
+    display: none;
+  }
+  &::placeholder {
+    .device-remove-placeholder;
+  }
+
+  &.device-remove-input-error {
+    border: 2px solid @w-yellow;
+    background-color: #fff;
+    color: var(--background);
+  }
+}
+
+.device-remove-button-remove {
+  .fill-red;
+
+  margin-right: 8px;
+}
+
+.device-remove-button {
+  .label-xs;
+
+  padding: 0;
+  border: 0;
+  -webkit-appearance: none;
+  background: none;
+  cursor: pointer;
+  line-height: 24px;
+  outline: 0;
+}

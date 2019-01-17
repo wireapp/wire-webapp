@@ -32,6 +32,32 @@ Run `yarn start` and Wire's web app will be available at: http://localhost:8080/
 
 To login with your existing Wire account use: http://localhost:8080/auth/?env=prod#login
 
+### Testing
+
+To launch the full test suite (types check + linting + server tests + app tests), simply run
+
+`yarn test`
+
+Alternatively, you can run specific parts of the app:
+
+`yarn test:(server|types|auth|app)`
+
+Since the test suite for the app is the biggest test suite, you might want to run a single test file, in which case, you can use the `--specs` option:
+
+`yarn test:app --specs spec1[,spec2...]`
+
+where `specN` is the path to the spec to run relative to `test/unit_tests` and without `Spec.js`.
+
+**Example**
+
+If you want to run the tests for the `ConversationRepository`, the file containing the test is:
+
+`test/unit_tests/conversation/ConversationRepositorySpec.js`
+
+The command to run is:
+
+`yarn test:app --spec conversation/ConversationRepository`
+
 ### Status
 
 [![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)

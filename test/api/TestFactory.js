@@ -20,9 +20,9 @@
 /* eslint no-undef: "off" */
 
 import ko from 'knockout';
-import PropertiesRepository from 'app/script/properties/PropertiesRepository';
-import PropertiesService from 'app/script/properties/PropertiesService';
-import StorageService from 'app/script/storage/StorageService';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import PropertiesService from 'src/script/properties/PropertiesService';
+import StorageService from 'src/script/storage/StorageService';
 
 /**
  * @param {function} [logger_level] - A function returning the logger level.
@@ -109,7 +109,9 @@ window.TestFactory.prototype.exposeStorageActors = function() {
   return Promise.resolve()
     .then(() => {
       TestFactory.storage_service = singleton(StorageService);
-      return TestFactory.storage_service.init(entities.user.john_doe.id);
+      if (!TestFactory.storage_service.db) {
+        TestFactory.storage_service.init(entities.user.john_doe.id, false);
+      }
     })
     .then(() => {
       TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);

@@ -21,7 +21,7 @@
 
 module.exports = {
   markup: {
-    files: ['<%= dir.app_ %>/**/*.htm*'],
+    files: ['<%= dir.src_ %>/**/*.htm*'],
     options: {
       debounceDelay: 250,
       spawn: false,
@@ -32,7 +32,7 @@ module.exports = {
     livereload: 32123,
   },
   style: {
-    files: ['<%= dir.app_ %>/**/*.less'],
+    files: ['<%= dir.src_ %>/**/*.less'],
     options: {
       debounceDelay: 250,
       spawn: false,

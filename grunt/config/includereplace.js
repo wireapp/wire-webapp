@@ -21,14 +21,14 @@
 
 module.exports = {
   prod_auth: {
-    cwd: '<%= dir.app.page %>',
+    cwd: '<%= dir.src.page %>',
     dest: '<%= dir.dist.static %>/auth',
     expand: true,
     options: {
       globals: {
         dest: '_prod',
       },
-      includesDir: '<%= dir.app.page %>/template',
+      includesDir: '<%= dir.src.page %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -38,14 +38,14 @@ module.exports = {
   },
 
   prod_demo: {
-    cwd: '<%= dir.app.demo %>',
+    cwd: '<%= dir.src.demo %>',
     dest: '<%= dir.dist.static %>/demo',
     expand: true,
     options: {
       globals: {
         dest: '_prod',
       },
-      includesDir: '<%= dir.app.demo %>/template',
+      includesDir: '<%= dir.src.demo %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -55,28 +55,28 @@ module.exports = {
   },
 
   prod_index: {
-    cwd: '<%= dir.app.page %>',
+    cwd: '<%= dir.src.page %>',
     dest: '<%= dir.dist.static %>',
     expand: true,
     options: {
       globals: {
         dest: '_prod',
       },
-      includesDir: '<%= dir.app.page %>/template',
+      includesDir: '<%= dir.src.page %>/template',
       prefix: '#',
     },
     src: 'index.html',
   },
 
   prod_login: {
-    cwd: '<%= dir.app.page %>',
+    cwd: '<%= dir.src.page %>',
     dest: '<%= dir.dist.static %>/login',
     expand: true,
     options: {
       globals: {
         dest: '_prod',
       },
-      includesDir: '<%= dir.app.page %>/template',
+      includesDir: '<%= dir.src.page %>/template',
       prefix: '#',
     },
     rename(dest, src) {

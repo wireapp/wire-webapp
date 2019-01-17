@@ -17,7 +17,9 @@
  *
  */
 
-// KARMA_SPECS=user/UserRepository yarn test:app
+import ConsentValue from 'src/script/user/ConsentValue';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import ReceiptMode from 'src/script/conversation/ReceiptMode';
 
 describe('z.user.UserRepository', () => {
   let server = null;
@@ -35,7 +37,110 @@ describe('z.user.UserRepository', () => {
     server.restore();
   });
 
-  describe('users', () => {
+  describe('Account preferences ', () => {
+    beforeEach(() => {
+      spyOn(TestFactory.user_repository.propertyRepository, '_publishProperties').and.callFake(properties => {
+        return properties;
+      });
+    });
+
+    describe('Data usage permissions', () => {
+      it('syncs the "Send anonymous data" preference through WebSocket events', () => {
+        const turnOnErrorReporting = {
+          key: 'webapp',
+          type: 'user.properties-set',
+          value: {
+            settings: {
+              privacy: {
+                improve_wire: true,
+              },
+            },
+            version: 1,
+          },
+        };
+
+        const turnOffErrorReporting = {
+          key: 'webapp',
+          type: 'user.properties-set',
+          value: {
+            settings: {
+              privacy: {
+                improve_wire: false,
+              },
+            },
+            version: 1,
+          },
+        };
+
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const errorReporting = () =>
+          TestFactory.user_repository.propertyRepository.properties.settings.privacy.improve_wire;
+
+        expect(errorReporting()).toBeUndefined();
+
+        TestFactory.user_repository.on_user_event(turnOnErrorReporting, source);
+
+        expect(errorReporting()).toBe(true);
+
+        TestFactory.user_repository.on_user_event(turnOffErrorReporting, source);
+
+        expect(errorReporting()).toBe(false);
+      });
+
+      it('syncs the "Receive newsletter" preference through WebSocket events', () => {
+        const giveOnMarketingConsent = {
+          key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+          type: 'user.properties-set',
+          value: ConsentValue.GIVEN,
+        };
+        const revokeMarketingConsent = {
+          key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+          type: 'user.properties-delete',
+        };
+
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const marketingConsent = TestFactory.user_repository.propertyRepository.marketingConsent;
+
+        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+
+        TestFactory.user_repository.on_user_event(giveOnMarketingConsent, source);
+
+        expect(marketingConsent()).toBe(ConsentValue.GIVEN);
+
+        TestFactory.user_repository.on_user_event(revokeMarketingConsent, source);
+
+        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+      });
+    });
+
+    describe('Privacy', () => {
+      it('syncs the "Read receipts" preference through WebSocket events', () => {
+        const turnOnReceiptMode = {
+          key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+          type: 'user.properties-set',
+          value: ReceiptMode.DELIVERY_AND_READ,
+        };
+        const turnOffReceiptMode = {
+          key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+          type: 'user.properties-delete',
+        };
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const receiptMode = TestFactory.user_repository.propertyRepository.receiptMode;
+
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
+
+        TestFactory.user_repository.on_user_event(turnOnReceiptMode, source);
+
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY_AND_READ);
+
+        TestFactory.user_repository.on_user_event(turnOffReceiptMode, source);
+
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
+      });
+    });
+  });
+
+  describe('User handling', () => {
     describe('fetchUsersById', () => {
       it('should handle malformed input', () => {
         return TestFactory.user_repository
