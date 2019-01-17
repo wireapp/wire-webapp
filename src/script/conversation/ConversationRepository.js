@@ -21,7 +21,7 @@ import poster from 'poster-image';
 
 import EventMapper from './EventMapper';
 import ConversationMapper from './ConversationMapper';
-import {t, Declension} from 'utils/LocalizerUtil';
+import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -2631,7 +2631,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               }
             }
 
-            const userNames = z.util.LocalizerUtil.joinNames(userEntities, Declension.NOMINATIVE);
+            const userNames = joinNames(userEntities, Declension.NOMINATIVE);
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {

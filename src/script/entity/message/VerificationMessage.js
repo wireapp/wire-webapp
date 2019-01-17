@@ -17,7 +17,7 @@
  *
  */
 
-import {t, Declension} from 'utils/LocalizerUtil';
+import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -51,7 +51,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     });
 
     this.captionUser = ko.pureComputed(() => {
-      const namesString = z.util.LocalizerUtil.joinNames(this.userEntities(), Declension.NOMINATIVE);
+      const namesString = joinNames(this.userEntities(), Declension.NOMINATIVE);
       return z.util.StringUtil.capitalizeFirstChar(namesString);
     });
 

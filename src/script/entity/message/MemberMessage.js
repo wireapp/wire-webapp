@@ -17,7 +17,7 @@
  *
  */
 
-import {t, Declension} from 'utils/LocalizerUtil';
+import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -231,7 +231,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd, true);
+    return joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
 
   isConnection() {

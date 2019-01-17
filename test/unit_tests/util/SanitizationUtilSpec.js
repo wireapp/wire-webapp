@@ -16,16 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import * as LocalizerUtil from 'utils/LocalizerUtil';
+
+import 'src/script/localization/Localizer';
+import LocalizerUtil, {Declension} from 'utils/LocalizerUtil';
 import SanitizationUtil from 'src/script/util/SanitizationUtil';
 
 describe('SanitizationUtil', () => {
-  beforeEach(() =>
-    LocalizerUtil.setStrings({
-      en: {conversationYouAccusative: 'you', conversationYouDative: 'you', conversationYouNominative: 'you'},
-    })
-  );
-
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {
       const escapedRegex = SanitizationUtil.escapeString(':)');
@@ -60,25 +56,25 @@ describe('SanitizationUtil', () => {
   });
 
   describe('getSelfName', () => {
-    xit('will return the self name in the given declension', () => { // eslint-disable-line
-      const escapedNominativeName = SanitizationUtil.getSelfName(LocalizerUtil.Declension.NOMINATIVE);
+    it('will return the self name in the given declension', () => { // eslint-disable-line
+      const escapedNominativeName = SanitizationUtil.getSelfName(Declension.NOMINATIVE);
 
       expect(escapedNominativeName).toEqual('you');
 
-      const unescapedNominativeName = SanitizationUtil.getSelfName(LocalizerUtil.Declension.NOMINATIVE, true);
+      const unescapedNominativeName = SanitizationUtil.getSelfName(Declension.NOMINATIVE, true);
 
       expect(unescapedNominativeName).toEqual('you');
 
-      const escapedDativeName = SanitizationUtil.getSelfName(LocalizerUtil.Declension.DATIVE);
+      const escapedDativeName = SanitizationUtil.getSelfName(Declension.DATIVE);
 
       expect(escapedDativeName).toEqual('you');
 
-      spyOn(LocalizerUtil, 't').and.returnValue('<script>you</script>');
-      const escapedAccusativeName = SanitizationUtil.getSelfName(LocalizerUtil.Declension.DATIVE);
+      spyOn(LocalizerUtil, 'translate').and.returnValue('<script>you</script>');
+      const escapedAccusativeName = SanitizationUtil.getSelfName(Declension.DATIVE);
 
       expect(escapedAccusativeName).toEqual('&lt;script&gt;you&lt;/script&gt;');
 
-      const unescapedAccusativeName = SanitizationUtil.getSelfName(LocalizerUtil.Declension.DATIVE, true);
+      const unescapedAccusativeName = SanitizationUtil.getSelfName(Declension.DATIVE, true);
 
       expect(unescapedAccusativeName).toEqual('<script>you</script>');
     });

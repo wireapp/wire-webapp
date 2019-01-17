@@ -482,7 +482,7 @@ describe('z.notification.NotificationRepository', () => {
         return verify_notification_system(conversation_et, message_et, expected_body);
       });
 
-      xit('with you being added to the conversation', () => {
+      it('with you being added to the conversation', () => {
         other_user_et.is_me = true;
         message_et.userEntities([other_user_et]);
 

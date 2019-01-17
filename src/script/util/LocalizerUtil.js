@@ -22,12 +22,6 @@ import SanitizationUtil from './SanitizationUtil';
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-export const Declension = {
-  ACCUSATIVE: 'accusative',
-  DATIVE: 'dative',
-  NOMINATIVE: 'nominative',
-};
-
 const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
 
 const replaceSubstitute = (string, regex, substitute) => {
@@ -37,32 +31,12 @@ const replaceSubstitute = (string, regex, substitute) => {
   return string.replace(regex, replacement);
 };
 
-export const DEFAULT_LOCALE = 'en';
+const DEFAULT_LOCALE = 'en';
+
 let locale = DEFAULT_LOCALE;
 let strings = {};
-export const setLocale = newLocale => (locale = newLocale);
-export const setStrings = newStrings => (strings = newStrings);
 
-export function t(identifier, substitutions = {}, dangerousSubstitutions = {}) {
-  const value = strings[locale][identifier] || strings[DEFAULT_LOCALE][identifier];
-  const replaceDangerously = Object.assign(
-    {
-      '/bold': '</b>',
-      '/italic': '</i>',
-      bold: '<b>',
-      italic: '<i>',
-    },
-    dangerousSubstitutions
-  );
-
-  const substituted = replaceSubstitute(value, /{{(.+?)}}/g, substitutions);
-  const escaped = SanitizationUtil.escapeString(substituted);
-  const dangerouslySubstituted = replaceSubstitute(escaped, /\[(.+?)\]/g, replaceDangerously);
-
-  return dangerouslySubstituted;
-}
-
-z.util.LocalizerUtil = {
+const LocalizerUtil = {
   joinNames: (userEntities, declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
@@ -94,6 +68,43 @@ z.util.LocalizerUtil = {
 
     return firstNames.join(', ');
   },
+
+  translate: (identifier, substitutions = {}, dangerousSubstitutions = {}) => {
+    const value = strings[locale][identifier] || strings[DEFAULT_LOCALE][identifier];
+    const replaceDangerously = Object.assign(
+      {
+        '/bold': '</b>',
+        '/italic': '</i>',
+        bold: '<b>',
+        italic: '<i>',
+      },
+      dangerousSubstitutions
+    );
+
+    const substituted = replaceSubstitute(value, /{{(.+?)}}/g, substitutions);
+    const escaped = SanitizationUtil.escapeString(substituted);
+    const dangerouslySubstituted = replaceSubstitute(escaped, /\[(.+?)\]/g, replaceDangerously);
+
+    return dangerouslySubstituted;
+  },
 };
 
-window.t = t;
+export const Declension = {
+  ACCUSATIVE: 'accusative',
+  DATIVE: 'dative',
+  NOMINATIVE: 'nominative',
+};
+
+export const setLocale = newLocale => (locale = newLocale);
+
+export const setStrings = newStrings => (strings = newStrings);
+
+export function t(identifier, substitutions, dangerousSubstitutions) {
+  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions);
+}
+
+export const joinNames = LocalizerUtil.joinNames;
+
+export default LocalizerUtil;
+
+window.t = LocalizerUtil.translate;

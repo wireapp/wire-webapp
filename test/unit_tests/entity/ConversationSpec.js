@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import 'src/script/localization/Localizer';
 import Conversation from 'src/script/entity/Conversation';
 import ContentMessage from 'src/script/entity/message/ContentMessage';
