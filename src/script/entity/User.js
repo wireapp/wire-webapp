@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {ROLE as TEAM_ROLE} from '../team/TeamPermission';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -164,11 +165,11 @@ class User {
     this.isGuest = ko.observable(false);
     this.isTemporaryGuest = ko.observable(false);
     this.isTeamMember = ko.observable(false);
-    this.teamRole = ko.observable(z.team.TeamRole.ROLE.NONE);
+    this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.isTeamManager = ko.pureComputed(() => {
-      return [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.teamRole());
+      return [TEAM_ROLE.ADMIN, TEAM_ROLE.OWNER].includes(this.teamRole());
     });
-    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.teamRole());
+    this.isTeamOwner = ko.pureComputed(() => TEAM_ROLE.OWNER === this.teamRole());
     this.teamId = undefined;
 
     this.isRequest = ko.pureComputed(() => this.connection().isRequest());

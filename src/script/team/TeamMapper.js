@@ -17,12 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.team = z.team || {};
+import {roleFromPermissions} from './TeamPermission';
 
-z.team.TeamMapper = class TeamMapper {
+export default class TeamMapper {
   constructor() {
-    this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
   mapTeamFromObject(data) {
@@ -67,7 +66,7 @@ z.team.TeamMapper = class TeamMapper {
 
   mapRole(userEntity, permissions) {
     if (permissions) {
-      const teamRole = z.team.TeamRole.checkRole(permissions);
+      const teamRole = roleFromPermissions(permissions);
       this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
       userEntity.teamRole(teamRole);
     }
@@ -87,4 +86,4 @@ z.team.TeamMapper = class TeamMapper {
       return memberEntity;
     }
   }
-};
+}
