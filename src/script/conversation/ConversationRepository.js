@@ -3013,12 +3013,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE:
         return this._onReceiptModeChanged(conversationEntity, eventJson);
 
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        const isMessageEdit = !!eventJson.edited_time;
+        if (isMessageEdit) {
+          // in case of an edition, the DB listner will take care of updating the local entity
+          return {conversationEntity};
+        }
+        return this._addEventToConversation(conversationEntity, eventJson);
+
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case z.event.Client.CONVERSATION.KNOCK:
       case z.event.Client.CONVERSATION.LOCATION:
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.VERIFICATION:
