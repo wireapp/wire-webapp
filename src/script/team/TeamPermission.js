@@ -17,26 +17,28 @@
  *
  */
 
+/* eslint-disable sort-keys */
 /**
  * Enum for different team permissions.
  * @returns {z.team.TeamPermission.PERMISSION} Enum of team permissions
  */
 const PERMISSION = {
-  ADD_CONVERSATION_MEMBER: 1 << 4,
-  ADD_TEAM_MEMBER: 1 << 2,
+  NONE: 0,
   CREATE_CONVERSATION: 1 << 0,
   DELETE_CONVERSATION: 1 << 1,
-  DELETE_TEAM: 1 << 11,
+  ADD_TEAM_MEMBER: 1 << 2,
+  REMOVE_TEAM_MEMBER: 1 << 3,
+  ADD_CONVERSATION_MEMBER: 1 << 4,
+  REMOVE_CONVERSATION_MEMBER: 1 << 5,
   GET_BILLING: 1 << 6,
+  SET_BILLING: 1 << 7,
+  SET_TEAM_DATA: 1 << 8,
   GET_MEMBER_PERMISSIONS: 1 << 9,
   GET_TEAM_CONVERSATIONS: 1 << 10,
-  NONE: 0,
-  REMOVE_CONVERSATION_MEMBER: 1 << 5,
-  REMOVE_TEAM_MEMBER: 1 << 3,
-  SET_BILLING: 1 << 7,
+  DELETE_TEAM: 1 << 11,
   SET_MEMBER_PERMISSIONS: 1 << 12,
-  SET_TEAM_DATA: 1 << 8,
 };
+/* eslint-enable sort-keys */
 
 function permissionsForRole(teamRole) {
   switch (teamRole) {
@@ -100,14 +102,11 @@ function combinePermissions(permissions) {
   return permissions.reduce((acc, permission) => acc | permission, 0);
 }
 
-function hasPermission(memberPermissions, expectedPermissions) {
-  if (Number.isSafeInteger(memberPermissions) && memberPermissions > 0) {
-    return (memberPermissions & expectedPermissions) === expectedPermissions;
-  }
-  return false;
+function hasPermissions(memberPermissions, expectedPermissions) {
+  return Number.isSafeInteger(memberPermissions) && (memberPermissions & expectedPermissions) === expectedPermissions;
 }
 
 function hasPermissionForRole(memberPermissions, role) {
   const rolePermissions = permissionsForRole(role);
-  return hasPermission(memberPermissions, rolePermissions);
+  return hasPermissions(memberPermissions, rolePermissions);
 }
