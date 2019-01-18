@@ -61,13 +61,15 @@ function permissionsForRole(teamRole) {
     }
     case ROLE.MEMBER: {
       return combinePermissions([
+        permissionsForRole(ROLE.COLLABORATOR),
         PERMISSION.ADD_CONVERSATION_MEMBER,
-        PERMISSION.CREATE_CONVERSATION,
         PERMISSION.DELETE_CONVERSATION,
         PERMISSION.GET_MEMBER_PERMISSIONS,
-        PERMISSION.GET_TEAM_CONVERSATIONS,
         PERMISSION.REMOVE_CONVERSATION_MEMBER,
       ]);
+    }
+    case ROLE.COLLABORATOR: {
+      return combinePermissions([PERMISSION.CREATE_CONVERSATION, PERMISSION.GET_TEAM_CONVERSATIONS]);
     }
     default: {
       return 0;
@@ -75,25 +77,35 @@ function permissionsForRole(teamRole) {
   }
 }
 
+/* eslint-disable sort-keys */
+/**
+ * Object descibing all the roles of a team member
+ * This object need to be sorted from the highest priorities to the lowest
+ */
 export const ROLE = {
-  ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
-  INVALID: 'z.team.TeamRole.ROLE.INVALID',
-  MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
-  NONE: 'z.team.TeamRole.ROLE.NONE',
   OWNER: 'z.team.TeamRole.ROLE.OWNER',
+  ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
+  MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
+  COLLABORATOR: 'z.team.TeamRole.ROLE.COLLABORATOR',
+  NONE: 'z.team.TeamRole.ROLE.NONE',
+  INVALID: 'z.team.TeamRole.ROLE.INVALID',
 };
+/* eslint-enable sort-keys */
 
 export function roleFromPermissions(permissions) {
   if (!permissions) {
     throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
   }
 
-  const detectedRole = [ROLE.OWNER, ROLE.ADMIN, ROLE.MEMBER].reduce((foundRole, role) => {
-    if (foundRole) {
-      return foundRole;
-    }
-    return hasPermissionForRole(permissions.self, role) ? role : undefined;
-  }, undefined);
+  const invalidRoles = [ROLE.INVALID, ROLE.NONE];
+  const detectedRole = Object.values(ROLE)
+    .filter(role => !invalidRoles.includes(role))
+    .reduce((foundRole, role) => {
+      if (foundRole) {
+        return foundRole;
+      }
+      return hasPermissionForRole(permissions.self, role) ? role : undefined;
+    }, undefined);
 
   return detectedRole || ROLE.INVALID;
 }

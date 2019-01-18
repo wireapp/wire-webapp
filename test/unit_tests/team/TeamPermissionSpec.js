@@ -19,6 +19,7 @@
 
 import {ROLE, roleFromPermissions} from 'src/script/team/TeamPermission';
 
+const collaboratorPermissionBitmask = 0b10000000001;
 const memberPermissionBitmask = 0b11000110011;
 const ownerPermissionBitmask = 0b1111111111111;
 const adminPermissionBitmask = 0b1011100111111;
@@ -31,14 +32,15 @@ describe('TeamPermission', () => {
 
     it('extracts a role from the given permissions', () => {
       const tests = [
-        {expected: ROLE.MEMBER, permission: {copy: memberPermissionBitmask, self: memberPermissionBitmask}},
-        {expected: ROLE.OWNER, permission: {copy: ownerPermissionBitmask, self: ownerPermissionBitmask}},
-        {expected: ROLE.ADMIN, permission: {copy: adminPermissionBitmask, self: adminPermissionBitmask}},
-        {expected: ROLE.INVALID, permission: {copy: 0, self: 0}},
+        {expected: ROLE.COLLABORATOR, permission: collaboratorPermissionBitmask},
+        {expected: ROLE.MEMBER, permission: memberPermissionBitmask},
+        {expected: ROLE.OWNER, permission: ownerPermissionBitmask},
+        {expected: ROLE.ADMIN, permission: adminPermissionBitmask},
+        {expected: ROLE.INVALID, permission: 0},
       ];
 
       tests.forEach(({expected, permission}) => {
-        const role = roleFromPermissions(permission);
+        const role = roleFromPermissions({copy: permission, self: permission});
 
         expect(role).toBe(expected);
       });
