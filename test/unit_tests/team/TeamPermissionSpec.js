@@ -20,7 +20,7 @@
 import {ROLE, roleFromPermissions} from 'src/script/team/TeamPermission';
 
 const memberPermissionBitmask = 0b11000110011;
-const ownerPermissionBitmask = 8191;
+const ownerPermissionBitmask = 0b1111111111111;
 const adminPermissionBitmask = 0b1011100111111;
 
 describe('TeamPermission', () => {
