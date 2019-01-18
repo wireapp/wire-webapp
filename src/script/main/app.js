@@ -22,6 +22,7 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
+import * as TeamPermission from '../team/TeamPermission';
 import DebugUtil from '../util/DebugUtil';
 
 import '../components/mentionSuggestions.js';
@@ -71,6 +72,8 @@ class App {
     this.repository = this._setupRepositories(authComponent);
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
+
+    this._publishGlobals();
 
     this.instanceId = z.util.createRandomUuid();
 
@@ -833,6 +836,16 @@ class App {
 
   _onExtraInstanceStarted() {
     return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+  }
+
+  _publishGlobals() {
+    // until we find a proper solution to give the view, and only the view, access to some globals, we publish them against the window root scope
+    window.z.team.permission = {
+      canCreateGroupConversation: () => {
+        const userRole = this.repository.user.self().teamRole();
+        return TeamPermission.hasAccessToFeature(TeamPermission.FEATURES.CREATE_GROUP_CONVERSATION, userRole);
+      },
+    };
   }
 }
 

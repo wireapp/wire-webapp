@@ -167,7 +167,7 @@
                 <div class="panel__info-text panel__info-text--margin" data-bind="l10n_text: z.string.conversationDetails1to1ReceiptsSecond"></div>
               </div>
             <!-- /ko -->
-            <!-- ko if: showActionCreateGroup() -->
+            <!-- ko if: z.team.permission.canCreateGroupConversation() && showActionCreateGroup() -->
               <div class="panel__action-item" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
                 <group-icon class="panel__action-item__icon"></group-icon>
                 <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCreateGroup"></div>
