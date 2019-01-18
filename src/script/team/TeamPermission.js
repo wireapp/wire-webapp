@@ -100,12 +100,7 @@ export function roleFromPermissions(permissions) {
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
   const detectedRole = Object.values(ROLE)
     .filter(role => !invalidRoles.includes(role))
-    .reduce((foundRole, role) => {
-      if (foundRole) {
-        return foundRole;
-      }
-      return hasPermissionForRole(permissions.self, role) ? role : undefined;
-    }, undefined);
+    .find(role => hasPermissionForRole(permissions.self, role));
 
   return detectedRole || ROLE.INVALID;
 }
