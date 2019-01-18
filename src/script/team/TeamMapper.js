@@ -17,7 +17,7 @@
  *
  */
 
-import {roleFromPermissions} from './TeamPermission';
+import {roleFromTeamPermissions} from './TeamPermission';
 
 export default class TeamMapper {
   constructor() {
@@ -66,7 +66,7 @@ export default class TeamMapper {
 
   mapRole(userEntity, permissions) {
     if (permissions) {
-      const teamRole = roleFromPermissions(permissions);
+      const teamRole = roleFromTeamPermissions(permissions);
       this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
       userEntity.teamRole(teamRole);
     }
