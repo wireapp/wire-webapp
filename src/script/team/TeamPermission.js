@@ -97,11 +97,7 @@ export function roleFromPermissions(permissions) {
 }
 
 function combinePermissions(permissions) {
-  let result = 0;
-  for (const permission of permissions) {
-    result = result | permission;
-  }
-  return result;
+  return permissions.reduce((acc, permission) => acc | permission, 0);
 }
 
 function hasPermission(memberPermissions, expectedPermissions) {
