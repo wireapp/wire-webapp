@@ -186,10 +186,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.1.tgz#f33588055b1fe856a4b43744974764974d6e4050"
-  integrity sha512-NKwO43qIrqN+NOBw25kyimi7eqvLLvR1EtKLwMxVE5kUUHDs+Po4SuzcZ9cENQNhCtQsQZW+ffE8ZeduGKhkBA==
+"@wireapp/commons@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.2.tgz#7d3a7f8b1b012551055c14edc6f04c42b801995c"
+  integrity sha512-lPBFo9MOLnQRIMIdn0trApLCCbEWQXWSIYDMiXiWIS1HRjTsB38o6qU2D105NslKgzZbwJSnPuoWFdu3e4tr5A==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/node" "10.12.18"
