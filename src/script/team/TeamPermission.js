@@ -88,23 +88,27 @@ function teamPermissionsForRole(teamRole) {
   }
 }
 
-function permissionsForRole(role) {
-  let allRolePermissions = teamPermissionsForRole(role);
-
+function publicPermissionsForRole(role) {
   switch (role) {
     case ROLE.ADMIN:
     case ROLE.OWNER:
     case ROLE.MEMBER:
-      allRolePermissions = combinePermissions([
-        allRolePermissions,
+      return combinePermissions([
+        publicPermissionsForRole(ROLE.NONE),
+        PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION,
         PUBLIC_FEATURES.CREATE_GUEST_ROOM,
-        PUBLIC_FEATURES.UPDATE_GROUP_PARTICIPANTS,
       ]);
     case ROLE.NONE:
-      allRolePermissions = combinePermissions([allRolePermissions, PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION]);
-  }
+      return combinePermissions([
+        PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION,
+        PUBLIC_FEATURES.UPDATE_CONVERSATION_SETTINGS,
+      ]);
+    case ROLE.COLLABORATOR:
+      return 0;
 
-  return allRolePermissions;
+    default:
+      return 0;
+  }
 }
 
 /* eslint-disable sort-keys */
@@ -136,7 +140,7 @@ export function roleFromTeamPermissions(permissions) {
 }
 
 export function hasAccessToFeature(feature, role) {
-  const permissions = permissionsForRole(role);
+  const permissions = combinePermissions([teamPermissionsForRole(role), publicPermissionsForRole(role)]);
   return !!(feature & permissions);
 }
 

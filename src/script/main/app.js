@@ -845,10 +845,10 @@ class App {
     };
     // until we find a proper solution to give the view, and only the view, access to some globals, we publish them against the window root scope
     window.z.team.permission = {
-      canCreateGroupConversation: canAccessFeature.bind(this, TeamPermission.FEATURES.CREATE_GROUP_CONVERSATION),
-      canCreateGuestRoom: canAccessFeature.bind(this, TeamPermission.FEATURES.CREATE_GUEST_ROOM),
-      canUpdateConversationSettings: canAccessFeature.bind(this, TeamPermission.FEATURES.UPDATE_CONVERSATION_SETTINGS),
-      canUpdateGroupParticipants: canAccessFeature.bind(this, TeamPermission.FEATURES.UPDATE_GROUP_PARTICIPANTS),
+      canCreateGroupConversation: () => canAccessFeature(TeamPermission.FEATURES.CREATE_GROUP_CONVERSATION),
+      canCreateGuestRoom: () => canAccessFeature(TeamPermission.FEATURES.CREATE_GUEST_ROOM),
+      canUpdateConversationSettings: () => canAccessFeature(TeamPermission.FEATURES.UPDATE_CONVERSATION_SETTINGS),
+      canUpdateGroupParticipants: () => canAccessFeature(TeamPermission.FEATURES.UPDATE_GROUP_PARTICIPANTS),
     };
   }
 }
