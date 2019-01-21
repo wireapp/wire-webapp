@@ -18,11 +18,21 @@
  */
 
 import Dexie from 'dexie';
-import 'dexie-observable';
+
+import StorageSchemata from '../storage/StorageSchemata';
 
 import * as StorageUtil from 'utils/StorageUtil';
 
 class StorageService {
+  static get CONFIG() {
+    return {
+      DEXIE_CRUD_EVENTS: {
+        DELETING: 'deleting',
+        UPDATING: 'updating',
+      },
+      LISTENABLE_TABLES: [StorageSchemata.OBJECT_STORE.EVENTS],
+    };
+  }
   // Construct an new StorageService.
   constructor() {
     this.logger = new z.util.Logger('StorageService', z.config.LOGGER.OPTIONS);
@@ -60,19 +70,12 @@ class StorageService {
         }
       });
 
-      this.db.on('changes', changes => {
-        changes.forEach(change => {
-          this.dbListeners
-            .filter(listener => listener.type === change.type && listener.store === change.table)
-            .forEach(listener => listener.callback(change));
-        });
-      });
-
       this._upgradeStores(this.db);
 
       return this.db
         .open()
         .then(() => {
+          this._initCrudHooks();
           this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
           return this.dbName;
         })
@@ -84,8 +87,31 @@ class StorageService {
     });
   }
 
+  _initCrudHooks() {
+    const config = StorageService.CONFIG;
+    const DEXIE_EVENTS = config.DEXIE_CRUD_EVENTS;
+
+    const callListener = (table, eventType, obj, updatedObj, transaction) => {
+      transaction.on('complete', () => {
+        this.dbListeners
+          .filter(listener => listener.store === table && listener.type === eventType)
+          .forEach(({callback}) => callback({obj: updatedObj, oldObj: obj}));
+      });
+    };
+
+    config.LISTENABLE_TABLES.forEach(table => {
+      this.db[table].hook(DEXIE_EVENTS.UPDATING, function(modifications, primaryKey, obj, transaction) {
+        this.onsuccess = updatedObj => callListener(table, DEXIE_EVENTS.UPDATING, obj, updatedObj, transaction);
+      });
+
+      this.db[table].hook(DEXIE_EVENTS.DELETING, function(primaryKey, obj, transaction) {
+        this.onsuccess = () => callListener(table, DEXIE_EVENTS.DELETING, obj, undefined, transaction);
+      });
+    });
+  }
+
   _upgradeStores(db) {
-    z.storage.StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
+    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionUpdate = db.version(version).stores(schema);
       if (upgrade) {
         versionUpdate.upgrade(transaction => {
@@ -98,13 +124,11 @@ class StorageService {
 
   // Hooks
   addUpdatedListener(storeName, callback) {
-    const dexieUpdateEventType = 2;
-    this.dbListeners.push({callback, store: storeName, type: dexieUpdateEventType});
+    this.dbListeners.push({callback, store: storeName, type: StorageService.CONFIG.DEXIE_CRUD_EVENTS.UPDATING});
   }
 
   addDeletedListener(storeName, callback) {
-    const dexieDeleteEventType = 3;
-    this.dbListeners.push({callback, store: storeName, type: dexieDeleteEventType});
+    this.dbListeners.push({callback, store: storeName, type: StorageService.CONFIG.DEXIE_CRUD_EVENTS.DELETING});
   }
 
   //##############################################################################
