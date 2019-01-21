@@ -88,31 +88,24 @@ class StorageService {
   }
 
   _initCrudHooks() {
-    const dbListeners = this.dbListeners;
     const config = StorageService.CONFIG;
     const DEXIE_EVENTS = config.DEXIE_CRUD_EVENTS;
 
+    const callListener = (table, eventType, obj, updatedObj, transaction) => {
+      transaction.on('complete', () => {
+        this.dbListeners
+          .filter(listener => listener.store === table && listener.type === eventType)
+          .forEach(({callback}) => callback({obj: updatedObj, oldObj: obj}));
+      });
+    };
+
     config.LISTENABLE_TABLES.forEach(table => {
       this.db[table].hook(DEXIE_EVENTS.UPDATING, function(modifications, primaryKey, obj, transaction) {
-        this.onsuccess = updatedObj =>
-          transaction.on('complete', () => {
-            dbListeners
-              .filter(listener => {
-                return listener.store === table && listener.type === DEXIE_EVENTS.UPDATING;
-              })
-              .forEach(({callback}) => callback({obj: updatedObj, oldObj: obj}));
-          });
+        this.onsuccess = updatedObj => callListener(table, DEXIE_EVENTS.UPDATING, obj, updatedObj, transaction);
       });
 
       this.db[table].hook(DEXIE_EVENTS.DELETING, function(primaryKey, obj, transaction) {
-        this.onsuccess = () =>
-          transaction.on('complete', () => {
-            dbListeners
-              .filter(listener => {
-                return listener.store === table && listener.type === DEXIE_EVENTS.DELETING;
-              })
-              .forEach(({callback}) => callback({oldObj: obj}));
-          });
+        this.onsuccess = () => callListener(table, DEXIE_EVENTS.DELETING, obj, undefined, transaction);
       });
     });
   }
