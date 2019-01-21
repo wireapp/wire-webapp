@@ -39,7 +39,7 @@ const replaceSubstitute = (string, regex, substitute) => {
   return string.replace(regex, replacement);
 };
 
-const DEFAULT_LOCALE = 'en';
+export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
 let strings = {};
