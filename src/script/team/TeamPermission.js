@@ -17,13 +17,13 @@
  *
  */
 
-/* eslint-disable sort-keys */
 let bitsCounter = 0;
 
 /**
  * Enum for different team permissions.
  * @returns {z.team.TeamPermission.TEAM_FEATURES} Enum of team permissions
  */
+/* eslint-disable sort-keys */
 const TEAM_FEATURES = {
   NONE: 0,
   CREATE_CONVERSATION: 1 << bitsCounter++,
@@ -40,11 +40,14 @@ const TEAM_FEATURES = {
   DELETE_TEAM: 1 << bitsCounter++,
   SET_MEMBER_PERMISSIONS: 1 << bitsCounter++,
 };
-/* eslint-enable sort-keys */
 
 const PUBLIC_FEATURES = {
   CREATE_GROUP_CONVERSATION: 1 << bitsCounter++,
+  CREATE_GUEST_ROOM: 1 << bitsCounter++,
+  UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
+  UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
 };
+/* eslint-enable sort-keys */
 
 export const FEATURES = Object.assign({}, TEAM_FEATURES, PUBLIC_FEATURES);
 
@@ -85,18 +88,27 @@ function teamPermissionsForRole(teamRole) {
   }
 }
 
-function permissionsForRole(role) {
-  const teamPermissions = teamPermissionsForRole(role);
-
+function publicPermissionsForRole(role) {
   switch (role) {
     case ROLE.ADMIN:
     case ROLE.OWNER:
     case ROLE.MEMBER:
+      return combinePermissions([
+        publicPermissionsForRole(ROLE.NONE),
+        PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION,
+        PUBLIC_FEATURES.CREATE_GUEST_ROOM,
+      ]);
     case ROLE.NONE:
-      return combinePermissions([teamPermissions, PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION]);
-  }
+      return combinePermissions([
+        PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION,
+        PUBLIC_FEATURES.UPDATE_CONVERSATION_SETTINGS,
+      ]);
+    case ROLE.COLLABORATOR:
+      return 0;
 
-  return teamPermissions;
+    default:
+      return 0;
+  }
 }
 
 /* eslint-disable sort-keys */
@@ -128,7 +140,7 @@ export function roleFromTeamPermissions(permissions) {
 }
 
 export function hasAccessToFeature(feature, role) {
-  const permissions = permissionsForRole(role);
+  const permissions = combinePermissions([teamPermissionsForRole(role), publicPermissionsForRole(role)]);
   return !!(feature & permissions);
 }
 
