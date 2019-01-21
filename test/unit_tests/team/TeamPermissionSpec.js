@@ -17,7 +17,7 @@
  *
  */
 
-import {ROLE, roleFromPermissions} from 'src/script/team/TeamPermission';
+import {ROLE, FEATURES, roleFromTeamPermissions, hasAccessToFeature} from 'src/script/team/TeamPermission';
 
 const collaboratorPermissionBitmask = 0b10000000001;
 const memberPermissionBitmask = 0b11000110011;
@@ -25,9 +25,9 @@ const ownerPermissionBitmask = 0b1111111111111;
 const adminPermissionBitmask = 0b1011100111111;
 
 describe('TeamPermission', () => {
-  describe('roleFromPermissions', () => {
+  describe('roleFromTeamPermissions', () => {
     it('throws an error if the permissions are not given', () => {
-      expect(() => roleFromPermissions()).toThrow();
+      expect(() => roleFromTeamPermissions()).toThrow();
     });
 
     it('extracts a role from the given permissions', () => {
@@ -40,9 +40,26 @@ describe('TeamPermission', () => {
       ];
 
       tests.forEach(({expected, permission}) => {
-        const role = roleFromPermissions({copy: permission, self: permission});
+        const role = roleFromTeamPermissions({copy: permission, self: permission});
 
         expect(role).toBe(expected);
+      });
+    });
+  });
+
+  describe('hasAccessToFeature', () => {
+    it('disallows collaborators to access the group creation feature', () => {
+      const tests = [
+        {expected: true, role: ROLE.ADMIN},
+        {expected: true, role: ROLE.NONE},
+        {expected: true, role: ROLE.OWNER},
+        {expected: true, role: ROLE.MEMBER},
+        {expected: true, role: ROLE.NONE},
+        {expected: false, role: ROLE.COLLABORATOR},
+      ];
+
+      tests.forEach(({expected, role}) => {
+        expect(hasAccessToFeature(FEATURES.CREATE_GROUP_CONVERSATION, role)).toBe(expected);
       });
     });
   });
