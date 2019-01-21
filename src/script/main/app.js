@@ -839,12 +839,16 @@ class App {
   }
 
   _publishGlobals() {
+    const canAccessFeature = feature => {
+      const userRole = this.repository.user.self().teamRole();
+      return TeamPermission.hasAccessToFeature(feature, userRole);
+    };
     // until we find a proper solution to give the view, and only the view, access to some globals, we publish them against the window root scope
     window.z.team.permission = {
-      canCreateGroupConversation: () => {
-        const userRole = this.repository.user.self().teamRole();
-        return TeamPermission.hasAccessToFeature(TeamPermission.FEATURES.CREATE_GROUP_CONVERSATION, userRole);
-      },
+      canCreateGroupConversation: canAccessFeature.bind(this, TeamPermission.FEATURES.CREATE_GROUP_CONVERSATION),
+      canCreateGuestRoom: canAccessFeature.bind(this, TeamPermission.FEATURES.CREATE_GUEST_ROOM),
+      canUpdateConversationSettings: canAccessFeature.bind(this, TeamPermission.FEATURES.UPDATE_CONVERSATION_SETTINGS),
+      canUpdateGroupParticipants: canAccessFeature.bind(this, TeamPermission.FEATURES.UPDATE_GROUP_PARTICIPANTS),
     };
   }
 }

@@ -44,14 +44,14 @@
               </ul>
             <!-- /ko -->
             <!-- ko if: z.team.permission.canCreateGroupConversation() -->
-            <ul class="start-ui-create-group left-list-items">
-              <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                <group-icon class="left-column-icon"></group-icon>
-                <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
-              </li>
-            </ul>
+              <ul class="start-ui-create-group left-list-items">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                  <group-icon class="left-column-icon"></group-icon>
+                  <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
+                </li>
+              </ul>
             <!-- /ko -->
-            <!-- ko if: showCreateGuestRoom() -->
+            <!-- ko if: z.team.permission.canCreateGuestRoom() && showCreateGuestRoom() -->
               <ul class="start-ui-create-guest-room left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
                   <guest-icon class="left-column-icon"></guest-icon>
