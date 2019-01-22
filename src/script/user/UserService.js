@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.user = z.user || {};
-
-z.user.UserService = class UserService {
+export default class UserService {
   static get URL() {
     return {
       PASSWORD_RESET: '/password-reset',
@@ -30,13 +27,13 @@ z.user.UserService = class UserService {
 
   /**
    * Construct a new User Service.
-   * @class z.user.UserService
+   * @class UserService
    * @param {z.service.BackendClient} backendClient - Client for the API calls
    * @param {StorageService} storageService - Service for all storage interactions
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.user.UserService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('UserService', z.config.LOGGER.OPTIONS);
     this.storageService = storageService;
 
     this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;
@@ -148,4 +145,4 @@ z.user.UserService = class UserService {
       url: `${UserService.URL.USERS}/${userId}`,
     });
   }
-};
+}

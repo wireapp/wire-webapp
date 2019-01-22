@@ -22,6 +22,9 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
+import UserService from '../user/UserService';
+import UserRepository from '../user/UserRepository';
+
 import DebugUtil from '../util/DebugUtil';
 
 import '../components/mentionSuggestions.js';
@@ -112,7 +115,7 @@ class App {
     );
     repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.media = new z.media.MediaRepository(repositories.permission);
-    repositories.user = new z.user.UserRepository(
+    repositories.user = new UserRepository(
       this.service.user,
       this.service.asset,
       this.service.self,
@@ -246,7 +249,7 @@ class App {
       self: new z.self.SelfService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
-      user: new z.user.UserService(this.backendClient, storageService),
+      user: new UserService(this.backendClient, storageService),
       webSocket: new z.event.WebSocketService(this.backendClient),
     };
   }

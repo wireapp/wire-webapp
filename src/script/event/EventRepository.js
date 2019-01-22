@@ -60,7 +60,7 @@ z.event.EventRepository = class EventRepository {
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
-   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
+   * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(
     eventService,

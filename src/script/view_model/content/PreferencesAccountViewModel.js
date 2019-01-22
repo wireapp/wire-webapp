@@ -24,6 +24,8 @@ import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
 
+import UserRepository from '../../user/UserRepository';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -123,7 +125,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return event.target.blur();
     }
 
-    const isValidName = newName.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
+    const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
     if (isValidName) {
       this.userRepository.change_name(newName).then(() => {
         this.nameSaved(true);
@@ -147,7 +149,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return event.target.blur();
     }
 
-    const isInvalidName = normalizedUsername.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    const isInvalidName = normalizedUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     if (isInvalidName) {
       return this.usernameState(null);
     }
@@ -319,8 +321,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return this._showUploadWarning(titleString, messageString);
     }
 
-    const minHeight = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
-    const minWidth = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
+    const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
+    const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
     return z.util.validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
       if (isValid) {
@@ -340,7 +342,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   verifyUsername(username, event) {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-    const usernameTooShort = enteredUsername.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === this.selfUser().username();
     if (usernameTooShort || usernameUnchanged) {
       return this.usernameState(null);
