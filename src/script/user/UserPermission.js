@@ -17,6 +17,8 @@
  *
  */
 
+import stringUtil from 'utils/StringUtil';
+
 let bitsCounter = 0;
 
 /* eslint-disable sort-keys */
@@ -45,6 +47,8 @@ const PUBLIC_FEATURES = {
   CREATE_GUEST_ROOM: 1 << bitsCounter++,
   UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
   UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
+  MANAGE_SERVICES: 1 << bitsCounter++,
+  INVITE_TEAM_MEMBERS: 1 << bitsCounter++,
 };
 /* eslint-enable sort-keys */
 
@@ -89,8 +93,10 @@ function teamPermissionsForRole(teamRole) {
 
 function publicPermissionsForRole(role) {
   switch (role) {
-    case ROLE.ADMIN:
     case ROLE.OWNER:
+      return combinePermissions([publicPermissionsForRole(ROLE.ADMIN), PUBLIC_FEATURES.INVITE_TEAM_MEMBERS]);
+    case ROLE.ADMIN:
+      return combinePermissions([publicPermissionsForRole(ROLE.MEMBER), PUBLIC_FEATURES.MANAGE_SERVICES]);
     case ROLE.MEMBER:
       return combinePermissions([
         publicPermissionsForRole(ROLE.NONE),
@@ -137,6 +143,27 @@ export function roleFromTeamPermissions(permissions) {
     .find(role => hasPermissionForRole(permissions.self, role));
 
   return detectedRole || ROLE.INVALID;
+}
+
+/**
+ * Will generate a bunch of helper functions that can be consumed to know what features this role has access to.
+ * The function generated will have the following format:
+ *   can<camel cased feature name>: () => boolean
+ *
+ * @param {ROLE} boundRole - Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
+ * @returns {Object<Function>} helpers
+ */
+export function generatePermissionHelpers(boundRole = ROLE.NONE) {
+  return Object.entries(FEATURES).reduce((helpers, [featureKey, featureValue]) => {
+    const camelCasedFeature = featureKey
+      .toLowerCase()
+      .split('_')
+      .map(stringUtil.capitalizeFirstChar)
+      .join('');
+    return Object.assign(helpers, {
+      [`can${camelCasedFeature}`]: (role = boundRole) => hasAccessToFeature(featureValue, role),
+    });
+  }, {});
 }
 
 export function hasAccessToFeature(feature, role) {

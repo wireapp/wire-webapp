@@ -17,7 +17,13 @@
  *
  */
 
-import {ROLE, FEATURES, roleFromTeamPermissions, hasAccessToFeature} from 'src/script/user/UserPermission';
+import {
+  ROLE,
+  FEATURES,
+  roleFromTeamPermissions,
+  hasAccessToFeature,
+  generatePermissionHelpers,
+} from 'src/script/user/UserPermission';
 
 const partnerPermissionBitmask = 0b10000000001;
 const memberPermissionBitmask = 0b11000110011;
@@ -61,6 +67,25 @@ describe('UserPermission', () => {
       tests.forEach(({expected, role}) => {
         expect(hasAccessToFeature(FEATURES.CREATE_GROUP_CONVERSATION, role)).toBe(expected);
       });
+    });
+  });
+
+  describe('generatePermissionHelpers', () => {
+    it('generates permission helpers with a bound role', () => {
+      const publicUserHelpers = generatePermissionHelpers(ROLE.NONE);
+
+      expect(publicUserHelpers.canInviteTeamMembers()).toBe(false);
+
+      const adminUserHelpers = generatePermissionHelpers(ROLE.OWNER);
+
+      expect(adminUserHelpers.canInviteTeamMembers()).toBe(true);
+    });
+
+    it('allows overriding the bound role when calling generated helpers', () => {
+      const publicUserHelpers = generatePermissionHelpers(ROLE.NONE);
+
+      expect(publicUserHelpers.canInviteTeamMembers()).toBe(false);
+      expect(publicUserHelpers.canInviteTeamMembers(ROLE.OWNER)).toBe(true);
     });
   });
 });

@@ -166,10 +166,6 @@ class User {
     this.isTemporaryGuest = ko.observable(false);
     this.isTeamMember = ko.observable(false);
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
-    this.isTeamManager = ko.pureComputed(() => {
-      return [TEAM_ROLE.ADMIN, TEAM_ROLE.OWNER].includes(this.teamRole());
-    });
-    this.isTeamOwner = ko.pureComputed(() => TEAM_ROLE.OWNER === this.teamRole());
     this.teamId = undefined;
 
     this.isRequest = ko.pureComputed(() => this.connection().isRequest());
