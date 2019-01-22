@@ -23,7 +23,7 @@
     "knockout": "3.4.2",
     "lint-staged": "8.1.0",
     "long": "4.0.0",
-    "moment": "2.23.0",
+    "moment": "2.24.0",
     "phoneformat.js": "1.0.7",
     "platform": "1.3.5",
     "protobufjs": "https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
