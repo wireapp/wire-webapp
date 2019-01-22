@@ -22,6 +22,8 @@ import {t} from 'utils/LocalizerUtil';
 import ConsentValue from './ConsentValue';
 import ConsentType from './ConsentType';
 
+import UserMapper from './UserMapper';
+
 window.z = window.z || {};
 window.z.user = z.user || {};
 
@@ -56,7 +58,7 @@ z.user.UserRepository = class UserRepository {
     this.selfService = selfService;
     this.user_service = user_service;
 
-    this.user_mapper = new z.user.UserMapper(serverTimeRepository);
+    this.user_mapper = new UserMapper(serverTimeRepository);
     this.should_set_username = false;
 
     this.self = ko.observable();
