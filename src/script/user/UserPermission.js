@@ -160,7 +160,7 @@ export function generatePermissionHelpers(boundRole = ROLE.NONE) {
       .split('_')
       .map(stringUtil.capitalizeFirstChar)
       .join('');
-    return Object.assign({}, helpers, {
+    return Object.assign(helpers, {
       [`can${camelCasedFeature}`]: role => hasAccessToFeature(featureValue, role || boundRole),
     });
   }, {});
