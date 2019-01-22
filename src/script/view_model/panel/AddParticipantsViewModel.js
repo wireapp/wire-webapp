@@ -62,8 +62,6 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
         return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }
     });
-    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
-
     this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 
     this.isStateAddPeople = ko.pureComputed(() => this.state() === AddParticipantsViewModel.STATE.ADD_PEOPLE);

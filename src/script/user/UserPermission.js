@@ -45,6 +45,7 @@ const PUBLIC_FEATURES = {
   CREATE_GUEST_ROOM: 1 << bitsCounter++,
   UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
   UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
+  MANAGE_SERVICES: 1 << bitsCounter++,
 };
 /* eslint-enable sort-keys */
 
@@ -91,6 +92,7 @@ function publicPermissionsForRole(role) {
   switch (role) {
     case ROLE.ADMIN:
     case ROLE.OWNER:
+      return combinePermissions([publicPermissionsForRole(ROLE.MEMBER), PUBLIC_FEATURES.MANAGE_SERVICES]);
     case ROLE.MEMBER:
       return combinePermissions([
         publicPermissionsForRole(ROLE.NONE),
