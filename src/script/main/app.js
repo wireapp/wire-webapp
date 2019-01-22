@@ -22,7 +22,7 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
-import * as TeamPermission from '../team/TeamPermission';
+import * as UserPermission from '../user/UserPermission';
 import DebugUtil from '../util/DebugUtil';
 
 import '../components/mentionSuggestions.js';
@@ -841,14 +841,14 @@ class App {
   _publishGlobals() {
     const canAccessFeature = feature => {
       const userRole = this.repository.user.self().teamRole();
-      return TeamPermission.hasAccessToFeature(feature, userRole);
+      return UserPermission.hasAccessToFeature(feature, userRole);
     };
     // until we find a proper solution to give the view, and only the view, access to some globals, we publish them against the window root scope
     window.z.team.permission = {
-      canCreateGroupConversation: () => canAccessFeature(TeamPermission.FEATURES.CREATE_GROUP_CONVERSATION),
-      canCreateGuestRoom: () => canAccessFeature(TeamPermission.FEATURES.CREATE_GUEST_ROOM),
-      canUpdateConversationSettings: () => canAccessFeature(TeamPermission.FEATURES.UPDATE_CONVERSATION_SETTINGS),
-      canUpdateGroupParticipants: () => canAccessFeature(TeamPermission.FEATURES.UPDATE_GROUP_PARTICIPANTS),
+      canCreateGroupConversation: () => canAccessFeature(UserPermission.FEATURES.CREATE_GROUP_CONVERSATION),
+      canCreateGuestRoom: () => canAccessFeature(UserPermission.FEATURES.CREATE_GUEST_ROOM),
+      canUpdateConversationSettings: () => canAccessFeature(UserPermission.FEATURES.UPDATE_CONVERSATION_SETTINGS),
+      canUpdateGroupParticipants: () => canAccessFeature(UserPermission.FEATURES.UPDATE_GROUP_PARTICIPANTS),
     };
   }
 }

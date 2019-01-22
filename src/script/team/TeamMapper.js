@@ -17,7 +17,7 @@
  *
  */
 
-import {roleFromTeamPermissions} from './TeamPermission';
+import {roleFromTeamPermissions} from './../user/UserPermission';
 
 export default class TeamMapper {
   constructor() {

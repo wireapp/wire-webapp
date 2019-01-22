@@ -17,14 +17,14 @@
  *
  */
 
-import {ROLE, FEATURES, roleFromTeamPermissions, hasAccessToFeature} from 'src/script/team/TeamPermission';
+import {ROLE, FEATURES, roleFromTeamPermissions, hasAccessToFeature} from 'src/script/user/UserPermission';
 
 const collaboratorPermissionBitmask = 0b10000000001;
 const memberPermissionBitmask = 0b11000110011;
 const ownerPermissionBitmask = 0b1111111111111;
 const adminPermissionBitmask = 0b1011100111111;
 
-describe('TeamPermission', () => {
+describe('UserPermission', () => {
   describe('roleFromTeamPermissions', () => {
     it('throws an error if the permissions are not given', () => {
       expect(() => roleFromTeamPermissions()).toThrow();

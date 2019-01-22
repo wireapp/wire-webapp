@@ -19,11 +19,10 @@
 
 let bitsCounter = 0;
 
+/* eslint-disable sort-keys */
 /**
  * Enum for different team permissions.
- * @returns {z.team.TeamPermission.TEAM_FEATURES} Enum of team permissions
  */
-/* eslint-disable sort-keys */
 const TEAM_FEATURES = {
   NONE: 0,
   CREATE_CONVERSATION: 1 << bitsCounter++,
