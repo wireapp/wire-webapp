@@ -43,7 +43,7 @@
                 </li>
               </ul>
             <!-- /ko -->
-            <!-- ko if: z.team.permission.canCreateGroupConversation() -->
+            <!-- ko if: z.user.permission.canCreateGroupConversation() -->
               <ul class="start-ui-create-group left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
                   <group-icon class="left-column-icon"></group-icon>
@@ -51,7 +51,7 @@
                 </li>
               </ul>
             <!-- /ko -->
-            <!-- ko if: z.team.permission.canCreateGuestRoom() && showCreateGuestRoom() -->
+            <!-- ko if: z.user.permission.canCreateGuestRoom() && showCreateGuestRoom() -->
               <ul class="start-ui-create-guest-room left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
                   <guest-icon class="left-column-icon"></guest-icon>

@@ -17,14 +17,14 @@
  *
  */
 
-import {ROLE, FEATURES, roleFromTeamPermissions, hasAccessToFeature} from 'src/script/team/TeamPermission';
+import {ROLE, FEATURES, roleFromTeamPermissions, hasAccessToFeature} from 'src/script/user/UserPermission';
 
-const collaboratorPermissionBitmask = 0b10000000001;
+const partnerPermissionBitmask = 0b10000000001;
 const memberPermissionBitmask = 0b11000110011;
 const ownerPermissionBitmask = 0b1111111111111;
 const adminPermissionBitmask = 0b1011100111111;
 
-describe('TeamPermission', () => {
+describe('UserPermission', () => {
   describe('roleFromTeamPermissions', () => {
     it('throws an error if the permissions are not given', () => {
       expect(() => roleFromTeamPermissions()).toThrow();
@@ -32,7 +32,7 @@ describe('TeamPermission', () => {
 
     it('extracts a role from the given permissions', () => {
       const tests = [
-        {expected: ROLE.COLLABORATOR, permission: collaboratorPermissionBitmask},
+        {expected: ROLE.PARTNER, permission: partnerPermissionBitmask},
         {expected: ROLE.MEMBER, permission: memberPermissionBitmask},
         {expected: ROLE.OWNER, permission: ownerPermissionBitmask},
         {expected: ROLE.ADMIN, permission: adminPermissionBitmask},
@@ -48,14 +48,14 @@ describe('TeamPermission', () => {
   });
 
   describe('hasAccessToFeature', () => {
-    it('disallows collaborators to access the group creation feature', () => {
+    it('disallows partners to access the group creation feature', () => {
       const tests = [
         {expected: true, role: ROLE.ADMIN},
         {expected: true, role: ROLE.NONE},
         {expected: true, role: ROLE.OWNER},
         {expected: true, role: ROLE.MEMBER},
         {expected: true, role: ROLE.NONE},
-        {expected: false, role: ROLE.COLLABORATOR},
+        {expected: false, role: ROLE.PARTNER},
       ];
 
       tests.forEach(({expected, role}) => {
