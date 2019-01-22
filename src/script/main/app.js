@@ -839,16 +839,10 @@ class App {
   }
 
   _publishGlobals() {
-    const userRole = ko.pureComputed(() => {
+    ko.pureComputed(() => {
       const selfUser = this.repository.user.self();
       return selfUser && selfUser.teamRole();
-    });
-
-    userRole.subscribe(role => {
-      if (role) {
-        window.z.user.permission = UserPermission.generatePermissionHelpers(role);
-      }
-    });
+    }).subscribe(role => (window.z.user.permission = UserPermission.generatePermissionHelpers(role)));
   }
 }
 
