@@ -71,14 +71,14 @@ function teamPermissionsForRole(teamRole) {
     }
     case ROLE.MEMBER: {
       return combinePermissions([
-        teamPermissionsForRole(ROLE.COLLABORATOR),
+        teamPermissionsForRole(ROLE.PARTNER),
         TEAM_FEATURES.ADD_CONVERSATION_MEMBER,
         TEAM_FEATURES.DELETE_CONVERSATION,
         TEAM_FEATURES.GET_MEMBER_PERMISSIONS,
         TEAM_FEATURES.REMOVE_CONVERSATION_MEMBER,
       ]);
     }
-    case ROLE.COLLABORATOR: {
+    case ROLE.PARTNER: {
       return combinePermissions([TEAM_FEATURES.CREATE_CONVERSATION, TEAM_FEATURES.GET_TEAM_CONVERSATIONS]);
     }
     default: {
@@ -103,7 +103,7 @@ function publicPermissionsForRole(role) {
         PUBLIC_FEATURES.UPDATE_CONVERSATION_SETTINGS,
         PUBLIC_FEATURES.UPDATE_GROUP_PARTICIPANTS,
       ]);
-    case ROLE.COLLABORATOR:
+    case ROLE.PARTNER:
       return 0;
 
     default:
@@ -120,7 +120,7 @@ export const ROLE = {
   OWNER: 'z.team.TeamRole.ROLE.OWNER',
   ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
   MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
-  COLLABORATOR: 'z.team.TeamRole.ROLE.COLLABORATOR',
+  PARTNER: 'z.team.TeamRole.ROLE.PARTNER',
   NONE: 'z.team.TeamRole.ROLE.NONE',
   INVALID: 'z.team.TeamRole.ROLE.INVALID',
 };
