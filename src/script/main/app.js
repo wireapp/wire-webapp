@@ -844,7 +844,7 @@ class App {
       return UserPermission.hasAccessToFeature(feature, userRole);
     };
     // until we find a proper solution to give the view, and only the view, access to some globals, we publish them against the window root scope
-    window.z.team.permission = {
+    window.z.user.permission = {
       canCreateGroupConversation: () => canAccessFeature(UserPermission.FEATURES.CREATE_GROUP_CONVERSATION),
       canCreateGuestRoom: () => canAccessFeature(UserPermission.FEATURES.CREATE_GUEST_ROOM),
       canUpdateConversationSettings: () => canAccessFeature(UserPermission.FEATURES.UPDATE_CONVERSATION_SETTINGS),
