@@ -102,6 +102,7 @@ function publicPermissionsForRole(role) {
       return combinePermissions([
         PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION,
         PUBLIC_FEATURES.UPDATE_CONVERSATION_SETTINGS,
+        PUBLIC_FEATURES.UPDATE_GROUP_PARTICIPANTS,
       ]);
     case ROLE.COLLABORATOR:
       return 0;
