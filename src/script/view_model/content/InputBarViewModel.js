@@ -160,16 +160,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const pieces = this.currentMentions()
         .slice()
         .reverse()
-        .reduce(
-          (currentPieces, mentionEntity) => {
-            const currentPiece = currentPieces.shift();
-            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
-            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
-            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
-            return currentPieces;
-          },
-          [this.input()]
-        );
+        .reduce((currentPieces, mentionEntity) => {
+          const currentPiece = currentPieces.shift();
+          currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
+          currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
+          currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
+          return currentPieces;
+        }, [this.input()]);
 
       return pieces
         .map((piece, index) => {
