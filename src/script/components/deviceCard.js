@@ -59,7 +59,7 @@ ko.components.register('device-card', {
       <!-- ko if: detailed -->
         <div class="label-xs device-label" data-bind="text: label"></div>
         <div class="label-xs">
-          <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
+          <span data-bind="text: t('preferencesDevicesId')"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
         <div class="label-xs" data-bind="text: z.util.TimeUtil.formatTimestamp(device.time)"></div>
@@ -67,10 +67,10 @@ ko.components.register('device-card', {
       <!-- ko ifnot: detailed -->
         <div class="label-xs">
           <span class="device-model" data-bind="text: model"></span>
-          <span class="text-background" data-bind="visible: isCurrentClient, l10n_text: z.string.authLimitDevicesCurrent"></span>
+          <span class="text-background" data-bind="visible: isCurrentClient, text: t('authLimitDevicesCurrent')"></span>
         </div>
         <div class="text-background label-xs">
-          <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
+          <span data-bind="text: t('preferencesDevicesId')"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
       <!-- /ko -->

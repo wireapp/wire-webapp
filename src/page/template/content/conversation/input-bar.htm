@@ -34,7 +34,7 @@
             <!-- ko if: replyAsset().is_audio()-->
               <div class="input-bar__reply__message" data-uie-name="media-audio-reply-box">
                 <audio-icon class="input-bar__reply__icon"></audio-icon>
-                <span data-bind="l10n_text: z.string.replyAudioMessage"></span>
+                <span data-bind="text: t('replyAudioMessage')"></span>
               </div>
             <!-- /ko -->
 
@@ -91,7 +91,7 @@
           <!-- ko ifnot: isEditing() -->
             <!-- ko if: showGiphyButton() -->
               <gif-icon class="controls-right-button button-icon-large"
-                    data-bind="click: clickToShowGiphy, l10n_tooltip: z.string.extensionsBubbleButtonGif"
+                    data-bind="click: clickToShowGiphy, attr: {title: t('extensionsBubbleButtonGif')}"
                     data-uie-name="do-giphy-popover">
               </gif-icon>
             <!-- /ko -->
@@ -104,7 +104,7 @@
                 <input data-bind="attr: {accept: z.viewModel.content.InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.join(',')}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
               </label>
 
-              <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="l10n_title: z.string.tooltipConversationFile">
+              <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
                 <attachment-icon></attachment-icon>
                 <input data-bind="file_select: uploadFiles" type="file" multiple="multiple"
                         accept="*" data-uie-name="do-share-file"/>

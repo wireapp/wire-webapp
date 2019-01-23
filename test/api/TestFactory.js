@@ -23,6 +23,8 @@ import ko from 'knockout';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import PropertiesService from 'src/script/properties/PropertiesService';
 import StorageService from 'src/script/storage/StorageService';
+import UserService from 'src/script/user/UserService';
+import UserRepository from 'src/script/user/UserRepository';
 
 /**
  * @param {function} [logger_level] - A function returning the logger level.
@@ -265,7 +267,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
 
 /**
  *
- * @returns {Promise<z.user.UserRepository>} The user repository.
+ * @returns {Promise<UserRepository>} The user repository.
  */
 window.TestFactory.prototype.exposeUserActors = function() {
   this.logger.info('- exposeUserActors');
@@ -278,10 +280,10 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.asset_service = new z.assets.AssetService(this.backendClient);
       TestFactory.connection_service = new z.connection.ConnectionService(this.backendClient);
       TestFactory.self_service = new z.self.SelfService(this.backendClient);
-      TestFactory.user_service = new z.user.UserService(this.backendClient);
+      TestFactory.user_service = new UserService(this.backendClient);
       TestFactory.propertyRepository = new PropertiesRepository(new PropertiesService(this.backendClient));
 
-      TestFactory.user_repository = new z.user.UserRepository(
+      TestFactory.user_repository = new UserRepository(
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.self_service,

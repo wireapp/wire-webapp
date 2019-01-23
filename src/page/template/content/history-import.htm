@@ -4,12 +4,12 @@
   <!-- /ko -->
   <!-- ko if: isImporting -->
     <loading-bar params="progress: loadingProgress, message: loadingMessage" class="with-cancel"></loading-bar>
-    <div class="cancel-button text-theme" data-bind="click: onCancel, l10n_text: z.string.backupCancel" data-uie-name="do-cancel-history-import"></div>
+    <div class="cancel-button text-theme" data-bind="click: onCancel, text: t('backupCancel')" data-uie-name="do-cancel-history-import"></div>
   <!-- /ko -->
   <!-- ko if: isDone -->
     <div class="history-message">
       <check-icon></check-icon>
-      <div class="history-message__headline" data-bind="l10n_text: z.string.backupImportSuccessHeadline" data-uie-name="status-history-import-success"></div>
+      <div class="history-message__headline" data-bind="text: t('backupImportSuccessHeadline')" data-uie-name="status-history-import-success"></div>
     </div>
   <!-- /ko -->
   <!-- ko if: error -->
@@ -17,7 +17,7 @@
       <div class="history-message__headline" data-bind="text: errorHeadline" data-uie-name="status-history-import-error-headline"></div>
       <div class="history-message__info" data-bind="text: errorSecondary" data-uie-name="status-history-import-error-info"></div>
       <div class="history-message__buttons">
-        <button class="button" data-bind="l10n_text: z.string.backupCancel, click: dismissImport" data-uie-name="do-dismiss-history-import-error"></button>
+        <button class="button" data-bind="text: t('backupCancel'), click: dismissImport" data-uie-name="do-dismiss-history-import-error"></button>
       </div>
     </div>
   <!-- /ko -->

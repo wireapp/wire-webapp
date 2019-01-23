@@ -20,6 +20,7 @@
 import platform from 'platform';
 
 import * as StorageUtil from 'utils/StorageUtil';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -336,15 +337,15 @@ z.client.ClientRepository = class ClientRepository {
     let deviceModel = platform.name;
 
     if (z.util.Environment.desktop) {
-      let identifier;
+      let modelString;
       if (z.util.Environment.os.mac) {
-        identifier = z.string.wireMacos;
+        modelString = t('wireMacos');
       } else if (z.util.Environment.os.win) {
-        identifier = z.string.wireWindows;
+        modelString = t('wireWindows');
       } else {
-        identifier = z.string.wireLinux;
+        modelString = t('wireLinux');
       }
-      deviceModel = z.l10n.text(identifier);
+      deviceModel = modelString;
       if (!z.util.Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
@@ -468,9 +469,9 @@ z.client.ClientRepository = class ClientRepository {
         },
         preventClose: true,
         text: {
-          action: z.l10n.text(z.string.modalAccountLogoutAction),
-          option: z.l10n.text(z.string.modalAccountLogoutOption),
-          title: z.l10n.text(z.string.modalAccountLogoutHeadline),
+          action: t('modalAccountLogoutAction'),
+          option: t('modalAccountLogoutOption'),
+          title: t('modalAccountLogoutHeadline'),
         },
         warning: false,
       });

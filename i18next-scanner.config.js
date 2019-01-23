@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,27 @@
  *
  */
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
-
-z.auth.ValidationError = class ValidationError extends Error {
-  constructor(types, errorMessage) {
-    super();
-
-    if (_.isString(types)) {
-      types = [types];
-    }
-
-    this.types = types;
-    this.message = errorMessage;
-  }
+module.exports = {
+  options: {
+    debug: true,
+    defaultLng: 'en-US',
+    defaultNs: 'translation',
+    func: {
+      extensions: ['.js', '.html', '.htm'],
+      list: ['t'],
+    },
+    interpolation: {
+      prefix: '{{',
+      suffix: '}}',
+    },
+    lngs: ['en-US'],
+    nsSeparator: false,
+    removeUnusedKeys: true,
+    resource: {
+      jsonIndent: 2,
+      lineEnding: '\n',
+      loadPath: 'resource/translation/{{lng}}.json',
+      savePath: 'resource/translation/{{lng}}.json',
+    },
+  },
 };

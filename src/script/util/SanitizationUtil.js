@@ -17,18 +17,20 @@
  *
  */
 
+import {t, Declension} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.SanitizationUtil = (() => {
-  const _getSelfName = (declension = z.string.Declension.NOMINATIVE, bypassSanitization = false) => {
+  const _getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
     const selfNameDeclensions = {
-      [z.string.Declension.NOMINATIVE]: z.string.conversationYouNominative,
-      [z.string.Declension.DATIVE]: z.string.conversationYouDative,
-      [z.string.Declension.ACCUSATIVE]: z.string.conversationYouAccusative,
+      [Declension.NOMINATIVE]: t('conversationYouNominative'),
+      [Declension.DATIVE]: t('conversationYouDative'),
+      [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
     };
 
-    const selfName = z.l10n.text(selfNameDeclensions[declension]);
+    const selfName = selfNameDeclensions[declension];
     return bypassSanitization ? selfName : z.util.SanitizationUtil.escapeString(selfName);
   };
 
@@ -83,3 +85,5 @@ z.util.SanitizationUtil = (() => {
     },
   };
 })();
+
+export default z.util.SanitizationUtil;

@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -281,24 +282,21 @@ class User {
     const remainingTime = z.util.NumberUtil.clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
     const remainingMinutes = Math.ceil(remainingTime / z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
-    let timeLeftText = z.string.userRemainingTimeHours;
-    let timeValue = 0;
-
     if (remainingMinutes <= 45) {
-      timeLeftText = z.string.userRemainingTimeMinutes;
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
-      timeValue = remainingQuarters * 15;
+      const timeValue = remainingQuarters * 15;
+      this.expirationText(t('userRemainingTimeMinutes', timeValue));
       this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
-      timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
+      const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
+      this.expirationText(t('userRemainingTimeHours', timeValue));
       this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 
     this.expirationIsUrgent(remainingMinutes < 120);
-    this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 }
 

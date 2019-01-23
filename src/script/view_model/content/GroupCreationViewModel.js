@@ -18,6 +18,7 @@
  */
 
 import ReceiptMode from '../../conversation/ReceiptMode';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -82,18 +83,16 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       }
       return [];
     });
-    this.participantsActionText = ko.pureComputed(() => {
-      const stringSelector = this.selectedContacts().length
-        ? z.string.groupCreationParticipantsActionCreate
-        : z.string.groupCreationParticipantsActionSkip;
-      return z.l10n.text(stringSelector);
-    });
-    this.participantsHeaderText = ko.pureComputed(() => {
-      const stringSelector = this.selectedContacts().length
-        ? z.string.groupCreationParticipantsHeaderWithCounter
-        : z.string.groupCreationParticipantsHeader;
-      return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
-    });
+    this.participantsActionText = ko.pureComputed(() =>
+      this.selectedContacts().length
+        ? t('groupCreationParticipantsActionCreate')
+        : t('groupCreationParticipantsActionSkip')
+    );
+    this.participantsHeaderText = ko.pureComputed(() =>
+      this.selectedContacts().length
+        ? t('groupCreationParticipantsHeaderWithCounter', this.selectedContacts().length)
+        : t('groupCreationParticipantsHeader')
+    );
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
@@ -193,11 +192,11 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
-        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
+        return this.nameError(t('groupCreationPreferencesErrorNameLong'));
       }
 
       if (nameTooShort) {
-        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
+        return this.nameError(t('groupCreationPreferencesErrorNameShort'));
       }
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {

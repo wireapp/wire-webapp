@@ -19,7 +19,6 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {IndexedDBEngine} from '@wireapp/store-engine';
-import 'dexie-observable';
 import * as config from './config';
 
 const configureClient = () => {

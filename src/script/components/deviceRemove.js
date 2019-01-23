@@ -64,21 +64,21 @@ ko.components.register('device-remove', {
   template: `
     <!-- ko ifnot: remove_form_visible() -->
       <span class="device-remove-button text-red"
-          data-bind="attr: {'data-uie-value': model}, click: click_on_remove_device, l10n_text: z.string.preferencesDevicesRemove"
+          data-bind="attr: {'data-uie-value': model}, click: click_on_remove_device, text: t('preferencesDevicesRemove')"
           data-uie-name="go-remove-device"></span>
     <!-- /ko -->
     <!-- ko if: remove_form_visible() -->
       <form class="device-remove-form" data-bind="submit: click_on_submit, attr: {'data-uie-value': model}" data-ui-name="device-remove-form">
         <input  class="device-remove-input"
                 type="password"
-                data-bind="hasfocus: true, textInput: password, l10n_placeholder: z.string.authPlaceholderPasswordPut, css: {'device-remove-input-error': device_remove_error}"
+                data-bind="hasfocus: true, textInput: password, attr: {placeholder: t('authPlaceholderPasswordPut')}, css: {'device-remove-input-error': device_remove_error}"
                 data-uie-name="remove-device-password" />
         <button class="device-remove-button-remove button button-medium button-fluid"
-                data-bind="attr: {'data-uie-value': model}, l10n_text: z.string.preferencesDevicesRemove"
+                data-bind="attr: {'data-uie-value': model}, text: t('preferencesDevicesRemove')"
                 data-uie-name="do-remove-device"
                 type="submit"></button>
         <button class="device-remove-button text-foreground text-underline"
-                data-bind="click: click_on_cancel, l10n_text: z.string.preferencesDevicesRemoveCancel"
+                data-bind="click: click_on_cancel, text: t('preferencesDevicesRemoveCancel')"
                 data-uie-name="remove-device-cancel"></button>
       </form>
     <!-- /ko -->

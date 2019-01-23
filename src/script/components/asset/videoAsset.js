@@ -133,7 +133,7 @@ ko.components.register('video-asset', {
                                   playing: on_video_playing}">
         </video>
         <!-- ko if: video_playback_error -->
-          <div class="video-playback-error label-xs" data-bind="l10n_text: z.string.conversationPlaybackError"></div>
+          <div class="video-playback-error label-xs" data-bind="text: t('conversationPlaybackError')"></div>
         <!-- /ko -->
         <!-- ko ifnot: video_playback_error -->
           <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_PENDING -->

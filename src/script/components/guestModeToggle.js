@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -25,14 +27,14 @@ z.components.GuestModeToggle = class GuestModeToggle {
     this.isChecked = params.isChecked;
     this.onToggle = params.onToggle;
     this.isDisabled = params.isDisabled;
-    this.infoText = params.extendedInfo ? z.string.guestRoomToggleInfoExtended : z.string.guestRoomToggleInfo;
+    this.infoText = params.extendedInfo ? t('guestRoomToggleInfoExtended') : t('guestRoomToggleInfo');
   }
 };
 
 ko.components.register('guest-mode-toggle', {
   template: `
     <div class="info-toggle__row">
-      <div data-bind="text: z.string.guestRoomToggleName"></div>
+      <div data-bind="text: t('guestRoomToggleName')"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
         <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isChecked">
         <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked() ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>

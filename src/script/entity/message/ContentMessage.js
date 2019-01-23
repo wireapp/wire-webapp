@@ -21,6 +21,7 @@ import moment from 'moment';
 import ko from 'knockout';
 
 import Message from './Message';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -48,7 +49,7 @@ class ContentMessage extends Message {
     this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
-      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp()).format('HH:mm'));
+      return t('conversationEditTimestamp', moment(this.edited_timestamp()).format('HH:mm'));
     };
 
     this.is_liked_provisional = ko.observable();
@@ -74,7 +75,7 @@ class ContentMessage extends Message {
           .map(user_et => user_et.first_name())
           .join(', ');
       }
-      return z.l10n.text(z.string.conversationLikesCaption, this.reactions_user_ets().length);
+      return t('conversationLikesCaption', this.reactions_user_ets().length);
     });
   }
 

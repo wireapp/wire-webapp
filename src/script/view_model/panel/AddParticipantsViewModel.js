@@ -19,6 +19,7 @@
 
 import BasePanelViewModel from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
+import {t} from 'utils/LocalizerUtil';
 
 export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -91,12 +92,11 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     });
 
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
-    this.headerText = ko.pureComputed(() => {
-      const stringSelector = this.selectedContacts().length
-        ? z.string.addParticipantsHeaderWithCounter
-        : z.string.addParticipantsHeader;
-      return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
-    });
+    this.headerText = ko.pureComputed(() =>
+      this.selectedContacts().length
+        ? t('addParticipantsHeaderWithCounter', this.selectedContacts().length)
+        : t('addParticipantsHeader')
+    );
 
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => {

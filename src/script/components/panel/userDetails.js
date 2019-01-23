@@ -37,7 +37,7 @@ ko.components.register('panel-user-details', {
       <!-- ko if: participant().isGuest() -->
         <div class="panel-participant__guest-label" data-uie-name="status-guest">
           <guest-icon></guest-icon>
-          <span data-bind="l10n_text: z.string.conversationGuestIndicator"></span>
+          <span data-bind="text: t('conversationGuestIndicator')"></span>
         </div>
       <!-- /ko -->
 
