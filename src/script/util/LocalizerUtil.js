@@ -78,14 +78,12 @@ const LocalizerUtil = {
   },
 
   translate: (identifier, substitutions = {}, dangerousSubstitutions = {}) => {
-    const foundValue = [locale, DEFAULT_LOCALE].reduce((translation, testedLocale) => {
-      if (translation) {
-        return translation;
-      }
-
-      return (strings[testedLocale] || {}).hasOwnProperty(identifier) ? strings[testedLocale][identifier] : undefined;
-    }, undefined);
-    const value = _.isString(foundValue) ? foundValue : identifier;
+    const localeValue = strings[locale] && strings[locale][identifier];
+    const defaultValue =
+      strings[DEFAULT_LOCALE] && strings[DEFAULT_LOCALE].hasOwnProperty(identifier)
+        ? strings[DEFAULT_LOCALE][identifier]
+        : identifier;
+    const value = localeValue || defaultValue;
 
     const replaceDangerously = Object.assign(
       {

@@ -236,8 +236,6 @@ import CallTelemetryGlobal from '../telemetry/calling/CallTelemetry.js';
 import CallLoggerGlobal from '../telemetry/calling/CallLogger.js';
 import AvailabilityMapperGlobal from '../user/AvailabilityMapper.js';
 import AvailabilityTypeGlobal from '../user/AvailabilityType.js';
-import UserServiceGlobal from '../user/UserService.js';
-import UserRepositoryGlobal from '../user/UserRepository.js';
 import UserHandleGeneratorGlobal from '../user/UserHandleGenerator.js';
 import ActionsViewModelGlobal from '../view_model/ActionsViewModel.js';
 import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
