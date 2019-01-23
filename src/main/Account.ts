@@ -35,7 +35,6 @@ import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-import * as Long from 'long';
 import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
@@ -208,7 +207,8 @@ class Account extends EventEmitter {
     }
     let registeredClient: RegisteredClient;
 
-    return this.service!.client.register(loginData, clientInfo)
+    return this.service.client
+      .register(loginData, clientInfo)
       .then((client: RegisteredClient) => (registeredClient = client))
       .then(() => {
         this.logger.log('Client is created');
@@ -272,7 +272,7 @@ class Account extends EventEmitter {
         if (genericMessage.ephemeral) {
           const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
           unwrappedMessage.messageTimer =
-            typeof expireAfterMillis === 'number' ? expireAfterMillis : (expireAfterMillis as Long).toNumber();
+            typeof expireAfterMillis === 'number' ? expireAfterMillis : expireAfterMillis.toNumber();
         }
         return unwrappedMessage;
       }

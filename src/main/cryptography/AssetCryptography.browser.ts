@@ -51,8 +51,8 @@ export const decryptAsset = async ({
 };
 
 export const encryptAsset = async (plaintext: ArrayBuffer): Promise<EncryptedAsset> => {
-  const initializationVector = <Uint8Array>crypto.getRandomValues(new Uint8Array(16));
-  const rawKeyBytes = <Uint8Array>crypto.getRandomValues(new Uint8Array(32));
+  const initializationVector = crypto.getRandomValues(new Uint8Array(16));
+  const rawKeyBytes = crypto.getRandomValues(new Uint8Array(32));
 
   const key = await crypto.subtle.importKey('raw', rawKeyBytes.buffer, 'AES-CBC', true, ['encrypt']);
   const cipherText = await crypto.subtle.encrypt({iv: initializationVector.buffer, name: 'AES-CBC'}, key, plaintext);
