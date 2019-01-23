@@ -248,7 +248,6 @@ import ModalsViewModelGlobal from '../view_model/ModalsViewModel.js';
 import ShortcutsViewModelGlobal from '../view_model/ShortcutsViewModel.js';
 import WarningsViewModelGlobal from '../view_model/WarningsViewModel.js';
 import VideoCallingViewModelGlobal from '../view_model/VideoCallingViewModel.js';
-import WindowTitleViewModelGlobal from '../view_model/WindowTitleViewModel.js';
 import CommonBindingsGlobal from '../view_model/bindings/CommonBindings.js';
 import ConversationListBindingsGlobal from '../view_model/bindings/ConversationListBindings.js';
 import ListBackgroundBindingsGlobal from '../view_model/bindings/ListBackgroundBindings.js';
