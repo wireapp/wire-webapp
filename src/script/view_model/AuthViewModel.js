@@ -22,6 +22,8 @@ import Cookies from 'js-cookie';
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import StorageService from '../storage/StorageService';
+import UserService from '../user/UserService';
+import UserRepository from '../user/UserRepository';
 import {t} from 'utils/LocalizerUtil';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
@@ -75,8 +77,8 @@ class AuthViewModel {
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
     this.selfService = new z.self.SelfService(backendClient);
-    this.user_service = new z.user.UserService(backendClient);
-    this.user_repository = new z.user.UserRepository(
+    this.user_service = new UserService(backendClient);
+    this.user_repository = new UserRepository(
       this.user_service,
       this.asset_service,
       new z.self.SelfService(backendClient),

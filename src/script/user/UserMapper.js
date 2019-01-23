@@ -17,17 +17,14 @@
  *
  */
 
-window.z = window.z || {};
-window.z.user = z.user || {};
-
-z.user.UserMapper = class UserMapper {
+export default class UserMapper {
   /**
    * Construct a new User Mapper.
-   * @class z.user.UserMapper
+   * @class UserMapper
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
   constructor(serverTimeRepository) {
-    this.logger = new z.util.Logger('z.user.UserMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('UserMapper', z.config.LOGGER.OPTIONS);
     this.serverTimeRepository = serverTimeRepository;
   }
 
@@ -170,4 +167,4 @@ z.user.UserMapper = class UserMapper {
 
     return userEntity;
   }
-};
+}

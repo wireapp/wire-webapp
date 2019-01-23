@@ -65,6 +65,19 @@ describe('LocalizerUtil', () => {
       expect(result).toBe('Hey Hey Tod');
     });
 
+    it('returns the identifier if translation or locale cannot be found', () => {
+      setStrings({});
+      const identifier = 'unfound';
+      const noLocaleResult = t(identifier, {greeting: 'Hey', name: 'Tod'});
+
+      expect(noLocaleResult).toBe(identifier);
+
+      setStrings({en: {found: 'found'}});
+      const noStringResult = t(identifier, {greeting: 'Hey', name: 'Tod'});
+
+      expect(noStringResult).toBe(identifier);
+    });
+
     it('should not escape the source string', () => {
       setStrings({
         en: {

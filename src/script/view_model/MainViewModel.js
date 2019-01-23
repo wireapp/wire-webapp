@@ -21,6 +21,7 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 import ThemeViewModel from '../view_model/ThemeViewModel';
+import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
 
 z.viewModel.MainViewModel = class MainViewModel {
   static get CONFIG() {
@@ -82,7 +83,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.loading = new z.viewModel.LoadingViewModel(this, repositories);
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
-    this.title = new z.viewModel.WindowTitleViewModel(this, repositories);
+    this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
     this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
     this.warnings = new z.viewModel.WarningsViewModel();

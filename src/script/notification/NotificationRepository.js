@@ -55,7 +55,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @param {z.calling.CallingRepository} callingRepository - Repository for all call interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
-   * @param {z.user.UserRepository} userRepository - Repository for users
+   * @param {UserRepository} userRepository - Repository for users
    */
   constructor(callingRepository, conversationRepository, permissionRepository, userRepository) {
     this.callingRepository = callingRepository;
