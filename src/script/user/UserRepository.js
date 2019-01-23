@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
 import ConsentValue from './ConsentValue';

@@ -18,11 +18,9 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
+export default class WindowTitleViewModel {
   static get TITLE_DEBOUNCE() {
     return 250;
   }
@@ -33,7 +31,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.contentState = mainViewModel.content.state;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.updateWindowTitle = ko.observable(false);
 
@@ -143,4 +141,4 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
       this.logger.debug(`Set window title update state to '${this.updateWindowTitle()}'`);
     }
   }
-};
+}

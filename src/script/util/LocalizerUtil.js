@@ -78,7 +78,7 @@ const LocalizerUtil = {
   },
 
   translate: (identifier, substitutions = {}, dangerousSubstitutions = {}) => {
-    const value = strings[locale][identifier] || strings[DEFAULT_LOCALE][identifier];
+    const value = (strings[locale] || {})[identifier] || (strings[DEFAULT_LOCALE] || {})[identifier] || '';
     const replaceDangerously = Object.assign(
       {
         '/bold': '</b>',
