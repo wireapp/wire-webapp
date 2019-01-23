@@ -44,7 +44,7 @@ const ignoreList = ['.DS_Store'];
 
 console.log(`Cleaning config directory "${configDir}"`);
 fs.removeSync(configDir);
-execSync(`git clone --single-branch -b ${gitConfigurationVersion} ${gitConfigurationUrl} ${configDirName}`, {
+execSync(`git clone --depth 1 -b ${gitConfigurationVersion} ${gitConfigurationUrl} ${configDirName}`, {
   stdio: [0, 1],
 });
 
