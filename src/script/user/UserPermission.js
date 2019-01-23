@@ -48,6 +48,7 @@ const PUBLIC_FEATURES = {
   UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
   UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
   MANAGE_SERVICES: 1 << bitsCounter++,
+  MANAGE_TEAM: 1 << bitsCounter++,
   INVITE_TEAM_MEMBERS: 1 << bitsCounter++,
 };
 /* eslint-enable sort-keys */
@@ -96,7 +97,11 @@ function publicPermissionsForRole(role) {
     case ROLE.OWNER:
       return combinePermissions([publicPermissionsForRole(ROLE.ADMIN), PUBLIC_FEATURES.INVITE_TEAM_MEMBERS]);
     case ROLE.ADMIN:
-      return combinePermissions([publicPermissionsForRole(ROLE.MEMBER), PUBLIC_FEATURES.MANAGE_SERVICES]);
+      return combinePermissions([
+        publicPermissionsForRole(ROLE.MEMBER),
+        PUBLIC_FEATURES.MANAGE_SERVICES,
+        PUBLIC_FEATURES.MANAGE_TEAM,
+      ]);
     case ROLE.MEMBER:
       return combinePermissions([
         publicPermissionsForRole(ROLE.NONE),
