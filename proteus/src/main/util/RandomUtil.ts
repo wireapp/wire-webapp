@@ -22,7 +22,7 @@ const random_bytes = (length: number): Uint8Array => {
     // browser
     const buffer = new ArrayBuffer(length);
     const buffer_view = new Uint8Array(buffer);
-    return <Uint8Array>window.crypto.getRandomValues(buffer_view);
+    return window.crypto.getRandomValues(buffer_view);
   } else {
     // node
     const crypto = require('crypto');

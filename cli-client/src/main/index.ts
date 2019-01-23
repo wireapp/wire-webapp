@@ -99,7 +99,7 @@ storeEngine
         }
       })
       .then(() => {
-        const {clientId, userId} = apiClient!.context!;
+        const {clientId, userId} = apiClient.context!;
         console.log(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
       })
       .then(() => {

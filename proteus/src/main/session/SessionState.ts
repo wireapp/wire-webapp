@@ -39,8 +39,6 @@ import Message from '../message/Message';
 import PreKeyMessage from '../message/PreKeyMessage';
 import SessionTag from '../message/SessionTag';
 
-import MessageKeys from '../session/MessageKeys';
-
 import ChainKey from './ChainKey';
 import RecvChain from './RecvChain';
 import RootKey from './RootKey';
@@ -81,12 +79,12 @@ class SessionState {
 
     const send_ratchet = await KeyPair.new();
     const [rok, chk] = rootkey.dh_ratchet(send_ratchet, bob_pkbundle.public_key);
-    const send_chain = SendChain.new(<ChainKey>chk, send_ratchet);
+    const send_chain = SendChain.new(chk, send_ratchet);
 
     const state = ClassUtil.new_instance(SessionState);
     state.recv_chains = recv_chains;
     state.send_chain = send_chain;
-    state.root_key = <RootKey>rok;
+    state.root_key = rok;
     state.prev_counter = 0;
     return state;
   }
@@ -123,12 +121,12 @@ class SessionState {
 
     const [recv_root_key, recv_chain_key] = this.root_key.dh_ratchet(this.send_chain.ratchet_key, ratchet_key);
 
-    const [send_root_key, send_chain_key] = (<RootKey>recv_root_key).dh_ratchet(new_ratchet, ratchet_key);
+    const [send_root_key, send_chain_key] = recv_root_key.dh_ratchet(new_ratchet, ratchet_key);
 
-    const recv_chain = RecvChain.new(<ChainKey>recv_chain_key, ratchet_key);
-    const send_chain = SendChain.new(<ChainKey>send_chain_key, new_ratchet);
+    const recv_chain = RecvChain.new(recv_chain_key, ratchet_key);
+    const send_chain = SendChain.new(send_chain_key, new_ratchet);
 
-    this.root_key = <RootKey>send_root_key;
+    this.root_key = send_root_key;
     this.prev_counter = this.send_chain.chain_key.idx;
     this.send_chain = send_chain;
 
@@ -204,7 +202,7 @@ class SessionState {
     } else {
       const [chk, mk, mks] = rc.stage_message_keys(msg);
 
-      if (!envelope.verify((<MessageKeys>mk).mac_key)) {
+      if (!envelope.verify(mk.mac_key)) {
         throw new DecryptError.InvalidSignature(
           `Envelope verification failed for message with counter ahead. Message index is '${
             msg.counter
@@ -213,10 +211,10 @@ class SessionState {
         );
       }
 
-      const plain = (<MessageKeys>mk).decrypt(msg.cipher_text);
+      const plain = mk.decrypt(msg.cipher_text);
 
-      rc.chain_key = (<ChainKey>chk).next();
-      rc.commit_message_keys(<MessageKeys[]>mks);
+      rc.chain_key = chk.next();
+      rc.commit_message_keys(mks);
 
       return plain;
     }

@@ -236,7 +236,7 @@ export class Session {
     return new Promise(resolve => {
       const msg = envelope.message;
       if (msg instanceof CipherMessage) {
-        return resolve(this._decrypt_cipher_message(envelope, <CipherMessage>msg));
+        return resolve(this._decrypt_cipher_message(envelope, msg));
       } else if (msg instanceof PreKeyMessage) {
         const actual_fingerprint = msg.identity_key.fingerprint();
         const expected_fingerprint = this.remote_identity.fingerprint();
@@ -245,7 +245,7 @@ export class Session {
           const message = `Fingerprints do not match: We expected '${expected_fingerprint}', but received '${actual_fingerprint}'.`;
           throw new DecryptError.RemoteIdentityChanged(message, DecryptError.CODE.CASE_204);
         }
-        return resolve(this._decrypt_prekey_message(envelope, <PreKeyMessage>msg, prekey_store));
+        return resolve(this._decrypt_prekey_message(envelope, msg, prekey_store));
       }
       throw new DecryptError('Unknown message type.', DecryptError.CODE.CASE_200);
     });
