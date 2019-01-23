@@ -1,0 +1,19 @@
+{
+  "all": false,
+  "branches": 100,
+  "check-coverage": true,
+  "exclude": [
+    "**/*.d.ts",
+    "test/**/*"
+  ],
+  "extension": [
+    ".ts"
+  ],
+  "functions": 100,
+  "lines": 100,
+  "per-file": false,
+  "reporter": [
+    "html"
+  ],
+  "statements": 100
+}
