@@ -94,9 +94,8 @@ class BackendErrorMapper {
 
   public static map(error: BackendError): BackendError {
     try {
-      const mappedError: BackendError | undefined = BackendErrorMapper.ERRORS[Number(error.code)][error.label][
-        error.message
-      ] as BackendError;
+      const mappedError: BackendError | undefined =
+        BackendErrorMapper.ERRORS[Number(error.code)][error.label][error.message];
       if (mappedError) {
         return mappedError;
       }
