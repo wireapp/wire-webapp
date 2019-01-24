@@ -124,7 +124,7 @@ function publicPermissionsForRole(role) {
 
 /* eslint-disable sort-keys */
 /**
- * Object descibing all the roles of a team member
+ * Object describing all the roles of a team member
  * This object need to be sorted from the highest priorities to the lowest
  */
 export const ROLE = {
