@@ -11,10 +11,12 @@
           <panel-service-details params="service: selectedService"></panel-service-details>
 
           <!-- ko if: showActions() -->
-            <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">
-              <message-icon class="panel__action-item__icon"></message-icon>
-              <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>
-            </div>
+            <!-- ko if: z.userPermission().canManageServices() -->
+              <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">
+                <message-icon class="panel__action-item__icon"></message-icon>
+                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>
+              </div>
+            <!-- /ko -->
             <!-- ko if: z.userPermission().canUpdateGroupParticipants() -->
               <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
                 <minus-icon class="panel__action-item__icon"></minus-icon>

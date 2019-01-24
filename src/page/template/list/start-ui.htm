@@ -8,7 +8,7 @@
                 params="input: searchInput, placeholder: t('searchPlaceholder'), enter: handleSearchInput"
                 data-uie-name="enter-search">
     </user-input>
-    <!-- ko if: isTeam() -->
+    <!-- ko if: isTeam() && z.userPermission().canManageServices() -->
       <div class="start-ui-list-tabs">
         <div class="start-ui-list-tab" data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, text: t('searchPeople')" data-uie-name="do-add-people"></div>
         <div class="start-ui-list-tab" data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, text: t('searchServices')" data-uie-name="do-add-services"></div>
