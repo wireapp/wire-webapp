@@ -15,10 +15,12 @@
               <message-icon class="panel__action-item__icon"></message-icon>
               <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>
             </div>
-            <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
-              <minus-icon class="panel__action-item__icon"></minus-icon>
-              <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionRemove')"></div>
-            </div>
+            <!-- ko if: z.userPermission().canUpdateGroupParticipants() -->
+              <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
+                <minus-icon class="panel__action-item__icon"></minus-icon>
+                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionRemove')"></div>
+              </div>
+            <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
       </div>

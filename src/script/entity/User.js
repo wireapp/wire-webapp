@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -165,11 +166,7 @@ class User {
     this.isGuest = ko.observable(false);
     this.isTemporaryGuest = ko.observable(false);
     this.isTeamMember = ko.observable(false);
-    this.teamRole = ko.observable(z.team.TeamRole.ROLE.NONE);
-    this.isTeamManager = ko.pureComputed(() => {
-      return [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.teamRole());
-    });
-    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.teamRole());
+    this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.teamId = undefined;
 
     this.isRequest = ko.pureComputed(() => this.connection().isRequest());

@@ -18,6 +18,7 @@
  */
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
+import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -124,7 +125,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    this.showInviteMember = ko.pureComputed(() => this.selfUser().isTeamOwner() && this.teamSize() === 1);
+    const {canInviteTeamMembers} = generatePermissionHelpers();
+    this.showInviteMember = ko.pureComputed(
+      () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1
+    );
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
@@ -182,7 +186,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.serviceConversations = ko.observable([]);
 
-    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.isInitialServiceSearch = ko.observable(true);
 
     this.userBubble = undefined;

@@ -22,6 +22,7 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
+import * as UserPermission from '../user/UserPermission';
 import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
 
@@ -79,6 +80,8 @@ class App {
     this.repository = this._setupRepositories(authComponent);
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
+
+    this._publishGlobals();
 
     this.instanceId = z.util.createRandomUuid();
 
@@ -829,6 +832,14 @@ class App {
 
   _onExtraInstanceStarted() {
     return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+  }
+
+  _publishGlobals() {
+    window.z.userPermission = ko.observable({});
+    ko.pureComputed(() => {
+      const selfUser = this.repository.user.self();
+      return selfUser && selfUser.teamRole();
+    }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
 }
 

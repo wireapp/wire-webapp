@@ -17,6 +17,8 @@
  *
  */
 
+import TeamMapper from './TeamMapper';
+
 window.z = window.z || {};
 window.z.team = z.team || {};
 
@@ -31,7 +33,7 @@ z.team.TeamRepository = class TeamRepository {
   constructor(teamService, userRepository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
 
-    this.teamMapper = new z.team.TeamMapper();
+    this.teamMapper = new TeamMapper();
     this.teamService = teamService;
     this.userRepository = userRepository;
 
