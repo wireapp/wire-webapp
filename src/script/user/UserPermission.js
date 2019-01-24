@@ -125,7 +125,7 @@ function publicPermissionsForRole(role) {
 /* eslint-disable sort-keys */
 /**
  * Object describing all the roles of a team member
- * This object need to be sorted from the highest priorities to the lowest
+ * This object needs to be sorted from the highest priority to the lowest
  */
 export const ROLE = {
   OWNER: 'z.team.TeamRole.ROLE.OWNER',
