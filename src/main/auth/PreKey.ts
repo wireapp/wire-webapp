@@ -19,7 +19,7 @@
 
 interface PreKey {
   id: number;
-  key: string; // Serialized PreKey
+  key: string;
 }
 
 export {PreKey};

@@ -28,11 +28,7 @@ interface NewClient {
   model?: string;
   location?: Location;
   password?: string;
-  prekeys: PreKey[]; // Serialized PreKey
-  sigkeys: {
-    enckey: string;
-    mackey: string;
-  };
+  prekeys: PreKey[];
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
 
