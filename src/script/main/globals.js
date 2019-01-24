@@ -280,7 +280,6 @@ import fullSearchGlobal from '../components/fullSearch.js';
 import groupListGlobal from '../components/groupList.js';
 import groupVideoGridGlobal from '../components/groupVideoGrid.js';
 import imageGlobal from '../components/image.js';
-import inputElementGlobal from '../components/inputElement.js';
 import inputLevelGlobal from '../components/inputLevel.js';
 import messageGlobal from '../components/message.js';
 import messageQuoteGlobal from '../components/messageQuote.js';
