@@ -19,13 +19,11 @@
 
 class AssetLoader {
   constructor(params) {
-    const scale = params.scale || 1;
+    const elementScale = params.scale || 1;
 
-    this.progress = ko.pureComputed(() => {
-      return `${params.loadProgress() * scale} ${100 * scale}`;
-    });
+    this.progress = ko.pureComputed(() => `${params.loadProgress() * elementScale} ${100 * elementScale}`);
 
-    const viewBoxSize = 32 * scale;
+    const viewBoxSize = 32 * elementScale;
     this.viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
   }
 }
