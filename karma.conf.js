@@ -98,7 +98,7 @@ module.exports = function(config) {
             test: /\.svg$/,
           },
           {
-            exclude: [path.resolve('node_modules/')],
+            exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
             include: [path.resolve('src/script/')],
             test: /\.js$/,
             use: {
@@ -177,10 +177,10 @@ module.exports = function(config) {
       thresholds: {
         emitWarning: false,
         global: {
-          branches: 30,
-          functions: 30,
-          lines: 35,
-          statements: 35,
+          branches: 35,
+          functions: 40,
+          lines: 45,
+          statements: 45,
         },
       },
     },
