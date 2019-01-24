@@ -82,12 +82,12 @@ class RecvChain {
     if (num > RecvChain.MAX_COUNTER_GAP) {
       if (this.chain_key.idx === 0) {
         throw new DecryptError.TooDistantFuture(
-          'Skipped too many message at the beginning of a receive chain.',
+          'Skipped too many messages at the beginning of a receive chain.',
           DecryptError.CODE.CASE_211
         );
       }
       throw new DecryptError.TooDistantFuture(
-        `Skipped too many message within a used receive chain. Receive chain counter is '${this.chain_key.idx}'`,
+        `Skipped too many messages within a used receive chain. Receive chain counter is '${this.chain_key.idx}'`,
         DecryptError.CODE.CASE_212
       );
     }
