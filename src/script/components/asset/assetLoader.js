@@ -19,7 +19,7 @@
 
 class AssetLoader {
   constructor(params) {
-    const elementScale = params.scale || 1;
+    const elementScale = params.large ? 2 : 1;
 
     this.progress = ko.pureComputed(() => `${params.loadProgress() * elementScale} ${100 * elementScale}`);
 

@@ -86,13 +86,13 @@ ko.components.register('media-button', {
     <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
       <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
         <div class='media-button-border-fill'></div>
-        <asset-loader params="scale: large ? 2 : 1, loadProgress: asset.downloadProgress"></asset-loader>
+        <asset-loader params="large: large, loadProgress: asset.downloadProgress"></asset-loader>
       </div>
     <!-- /ko -->
     <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
       <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
-        <asset-loader params="scale: large ? 2 : 1, loadProgress: asset.upload_progress"></asset-loader>
+        <asset-loader params="large: large, loadProgress: asset.upload_progress"></asset-loader>
       </div>
     <!-- /ko -->
 `,
