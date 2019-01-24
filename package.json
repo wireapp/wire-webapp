@@ -173,8 +173,6 @@
     ]
   },
   "scripts": {
-    "benny": "jasmine --config=jasmine.json",
-    "benny:karma": "karma start karma.benny.js",
     "build:server": "cd server && yarn build",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.prod.js",
