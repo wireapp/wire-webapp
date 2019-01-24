@@ -16,11 +16,11 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
+import './assetLoader';
 
-z.components.FileAssetComponent = class FileAssetComponent {
+class FileAssetComponent {
   /**
    * Construct a new file asset.
    *
@@ -32,22 +32,12 @@ z.components.FileAssetComponent = class FileAssetComponent {
     this.asset = this.message.get_first_asset();
     this.header = params.header || false;
 
-    this.circle_upload_progress = ko.pureComputed(() => {
-      const size = this.large ? '200' : '100';
-      return `${this.asset.upload_progress() * 2} ${size}`;
-    });
-
-    this.circle_download_progress = ko.pureComputed(() => {
-      const size = this.large ? '200' : '100';
-      return `${this.asset.downloadProgress() * 2} ${size}`;
-    });
-
     this.file_extension = ko.pureComputed(() => {
       const ext = z.util.getFileExtension(this.asset.file_name);
       return ext.length <= 3 ? ext : '';
     });
   }
-};
+}
 
 ko.components.register('file-asset', {
   template: `\
@@ -77,18 +67,14 @@ ko.components.register('file-asset', {
             <div class="media-button icon-close" data-bind="click: asset.cancel_download, clickBubble: false">
               <div class='media-button-border-file-fill'></div>
               <div class='media-button-border-fill'></div>
-              <svg class="svg-theme" viewBox="0 0 32 32">
-                <circle data-bind="style: {'stroke-dasharray': circle_download_progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>
-              </svg>
+              <asset-loader params="loadProgress: asset.downloadProgress"></asset-loader>
             </div>
           <!-- /ko -->
           <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
             <div class="media-button icon-close" data-bind="click: function() {asset.cancel(message)}, clickBubble: false">
               <div class='media-button-border-file-fill'></div>
               <div class='media-button-border-fill'></div>
-              <svg class="svg-theme" viewBox="0 0 32 32">
-                <circle data-bind="style: {'stroke-dasharray': circle_upload_progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>
-              </svg>
+              <asset-loader params="loadProgress: asset.upload_progress"></asset-loader>
             </div>
           <!-- /ko -->
           <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_FAILED -->
@@ -119,8 +105,8 @@ ko.components.register('file-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.FileAssetComponent(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new FileAssetComponent(params, componentInfo);
     },
   },
 });

@@ -77,7 +77,7 @@
                   <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionLeave')"></div>
                 </div>
               <!-- /ko -->
-              <!-- ko if: showActionRemove() -->
+              <!-- ko if: z.userPermission().canUpdateGroupParticipants() && showActionRemove() -->
                 <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
                   <minus-icon class="panel__action-item__icon"></minus-icon>
                   <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionRemove')"></div>

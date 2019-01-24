@@ -8,7 +8,7 @@
                 params="input: searchInput, placeholder: t('searchPlaceholder'), enter: handleSearchInput"
                 data-uie-name="enter-search">
     </user-input>
-    <!-- ko if: isTeam() -->
+    <!-- ko if: isTeam() && z.userPermission().canManageServices() -->
       <div class="start-ui-list-tabs">
         <div class="start-ui-list-tab" data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, text: t('searchPeople')" data-uie-name="do-add-people"></div>
         <div class="start-ui-list-tab" data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, text: t('searchServices')" data-uie-name="do-add-services"></div>
@@ -43,13 +43,15 @@
                 </li>
               </ul>
             <!-- /ko -->
-            <ul class="start-ui-create-group left-list-items">
-              <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                <group-icon class="left-column-icon"></group-icon>
-                <div class="center-column" data-bind="text: t('searchCreateGroup')"></div>
-              </li>
-            </ul>
-            <!-- ko if: showCreateGuestRoom() -->
+            <!-- ko if: z.userPermission().canCreateGroupConversation() -->
+              <ul class="start-ui-create-group left-list-items">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                  <group-icon class="left-column-icon"></group-icon>
+                  <div class="center-column" data-bind="text: t('searchCreateGroup')"></div>
+                </li>
+              </ul>
+            <!-- /ko -->
+            <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
               <ul class="start-ui-create-guest-room left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
                   <guest-icon class="left-column-icon"></guest-icon>
@@ -106,7 +108,7 @@
 
         <!-- ko ifnot: peopleTabActive() -->
           <!-- ko if: services().length -->
-            <!-- ko if: isTeamManager() && !!manageServicesUrl -->
+            <!-- ko if: z.userPermission().canManageServices() && !!manageServicesUrl -->
               <ul class="start-ui-manage-services left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOpenManageServices" data-uie-name="go-manage-services">
                   <service-icon class="left-column-icon"></service-icon>
@@ -119,11 +121,11 @@
           <!-- ko if: !services().length && !isInitialServiceSearch() -->
             <div class="search__no-services">
               <service-icon class="search__no-services__icon"></service-icon>
-              <!-- ko if: isTeamManager() && !!manageServicesUrl -->
+              <!-- ko if: z.userPermission().canManageServices() && !!manageServicesUrl -->
                 <div class="search__no-services__info" data-bind="text: t('searchNoServicesManager')" data-uie-name="label-no-services-enabled-manager"></div>
                 <div class="search__no-services__manage-button" data-bind="click: clickOpenManageServices, text: t('searchManageServicesNoResults')" data-uie-name="go-enable-services"></div>
               <!-- /ko -->
-              <!-- ko ifnot: isTeamManager() -->
+              <!-- ko ifnot: z.userPermission().canManageServices() -->
                 <div class="search__no-services__info" data-bind="text: t('searchNoServicesMember')" data-uie-name="label-no-services-enabled"></div>
               <!-- /ko -->
             </div>

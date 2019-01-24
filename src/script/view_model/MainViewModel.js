@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
-import ThemeViewModel from '../view_model/ThemeViewModel';
+import ThemeViewModel from './ThemeViewModel';
 import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
 
 z.viewModel.MainViewModel = class MainViewModel {
