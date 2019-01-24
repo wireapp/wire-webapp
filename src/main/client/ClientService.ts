@@ -101,10 +101,6 @@ export default class ClientService {
         model: clientInfo.model,
         password: loginData.password ? String(loginData.password) : undefined,
         prekeys: serializedPreKeys,
-        sigkeys: {
-          enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-          mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-        },
         type: loginData.clientType,
       };
     } else {
