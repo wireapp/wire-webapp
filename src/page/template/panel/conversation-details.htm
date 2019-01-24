@@ -28,9 +28,9 @@
         <!-- ko ifnot: isSingleUserMode() -->
           <div class="conversation-details__header">
             <!-- ko if: isActiveGroupParticipant() -->
-              <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: z.user.permission.canUpdateConversationSettings() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}" data-uie-name="status-name">
+              <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: z.userPermission().canUpdateConversationSettings() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}" data-uie-name="status-name">
                 <div class="conversation-details__name" data-bind="text: activeConversation() && activeConversation().display_name()"></div>
-                <!-- ko if: z.user.permission.canUpdateConversationSettings() -->
+                <!-- ko if: z.userPermission().canUpdateConversationSettings() -->
                   <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
                 <!-- /ko -->
               </div>
@@ -71,7 +71,7 @@
           </div>
           <!-- ko if: showTopActions() -->
             <div class="conversation-details-top-actions">
-              <!-- ko if: z.user.permission.canUpdateGroupParticipants() && showActionAddParticipants() -->
+              <!-- ko if: z.userPermission().canUpdateGroupParticipants() && showActionAddParticipants() -->
                 <div class="conversation-details__participant-options">
                   <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
                     <plus-icon class="panel__action-item__icon"></plus-icon>
@@ -94,7 +94,7 @@
                     </div>
                   </div>
                 <!-- /ko -->
-                <!-- ko if: z.user.permission.canUpdateConversationSettings() -->
+                <!-- ko if: z.userPermission().canUpdateConversationSettings() -->
                   <!-- ko if: showOptionTimedMessages() -->
                     <div class="conversation-details__timed-messages">
                       <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
@@ -171,7 +171,7 @@
                 <div class="panel__info-text panel__info-text--margin" data-bind="text: t('conversationDetails1to1ReceiptsSecond')"></div>
               </div>
             <!-- /ko -->
-            <!-- ko if: z.user.permission.canCreateGroupConversation() && showActionCreateGroup() -->
+            <!-- ko if: z.userPermission().canCreateGroupConversation() && showActionCreateGroup() -->
               <div class="panel__action-item" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
                 <group-icon class="panel__action-item__icon"></group-icon>
                 <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionCreateGroup')"></div>

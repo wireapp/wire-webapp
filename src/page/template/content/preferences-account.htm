@@ -135,7 +135,7 @@
       <section class="preferences-section preferences-section-account-security">
         <hr class="preferences-separator">
 
-        <!-- ko if: z.user.permission.canManageTeam() && !!manageTeamUrl -->
+        <!-- ko if: z.userPermission().canManageTeam() && !!manageTeamUrl -->
           <div class="preferences-link text-theme" data-bind="click: clickOpenManageTeam, text: t('preferencesAccountManageTeam')" data-uie-name="do-manage-team"></div>
         <!-- /ko -->
 

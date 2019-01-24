@@ -843,10 +843,11 @@ class App {
   }
 
   _publishGlobals() {
+    window.z.userPermission = ko.observable({});
     ko.pureComputed(() => {
       const selfUser = this.repository.user.self();
       return selfUser && selfUser.teamRole();
-    }).subscribe(role => (window.z.user.permission = UserPermission.generatePermissionHelpers(role)));
+    }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
 }
 
