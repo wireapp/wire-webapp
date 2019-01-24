@@ -80,7 +80,6 @@ module.exports = function(config) {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
       [`${SRC_PATH}/script/main/globals.js`]: ['webpack', 'sourcemap'],
-      // FIXME fails because of import statements 'src/script/**/*.js': ['coverage'],
     },
 
     webpack: {
@@ -100,7 +99,7 @@ module.exports = function(config) {
           },
           {
             exclude: [path.resolve('node_modules/')],
-            include: path.resolve('src/script/'),
+            include: [path.resolve('src/script/')],
             test: /\.js$/,
             use: {
               loader: 'istanbul-instrumenter-loader',
@@ -175,6 +174,15 @@ module.exports = function(config) {
         html: {outdir: 'html'},
       },
       reports: ['html', 'text-summary'],
+      thresholds: {
+        emitWarning: false,
+        global: {
+          branches: 30,
+          functions: 30,
+          lines: 35,
+          statements: 35,
+        },
+      },
     },
   });
 
