@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.29...@wireapp/proteus@8.0.30) (2019-01-24)
+
+
+### Bug Fixes
+
+* **proteus:** Typo in error message ([#1476](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/1476)) ([4a43d08](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/4a43d08))
+
+
+
+
+
 ## [8.0.29](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.28...@wireapp/proteus@8.0.29) (2019-01-17)
 
 **Note:** Version bump only for package @wireapp/proteus
