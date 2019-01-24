@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
+import '../assetLoader';
 
-z.components.MediaButtonComponent = class MediaButtonComponent {
+class MediaButtonComponent {
   /**
    * Construct a media button.
    *
@@ -41,21 +40,6 @@ z.components.MediaButtonComponent = class MediaButtonComponent {
     }
 
     this.media_is_playing = ko.observable(false);
-
-    this.svg_view_box = ko.pureComputed(() => {
-      const size = this.large ? 64 : 32;
-      return `0 0 ${size} ${size}`;
-    });
-
-    this.circle_upload_progress = ko.pureComputed(() => {
-      const size = this.large ? '200' : '100';
-      return `${this.asset.upload_progress() * 2} ${size}`;
-    });
-
-    this.circle_download_progress = ko.pureComputed(() => {
-      const size = this.large ? '200' : '100';
-      return `${this.asset.downloadProgress() * 2} ${size}`;
-    });
 
     this.on_play_button_clicked = function() {
       if (typeof params.play === 'function') {
@@ -91,7 +75,7 @@ z.components.MediaButtonComponent = class MediaButtonComponent {
     this.media_element.removeEventListener('playing', this.on_play);
     this.media_element.removeEventListener('pause', this.on_pause);
   }
-};
+}
 
 ko.components.register('media-button', {
   template: `
@@ -102,23 +86,19 @@ ko.components.register('media-button', {
     <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
       <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
         <div class='media-button-border-fill'></div>
-        <svg class="svg-theme" data-bind="attr: {viewBox: svg_view_box}">
-          <circle data-bind="style: {'stroke-dasharray': circle_download_progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>
-        </svg>
+        <asset-loader params="scale: large ? 2 : 1, loadProgress: asset.downloadProgress"></asset-loader>
       </div>
     <!-- /ko -->
     <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
       <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
-        <svg class="svg-theme" data-bind="attr: {viewBox: svg_view_box}">
-          <circle data-bind="style: {'stroke-dasharray': circle_upload_progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>
-        </svg>
+        <asset-loader params="scale: large ? 2 : 1, loadProgress: asset.upload_progress"></asset-loader>
       </div>
     <!-- /ko -->
 `,
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.MediaButtonComponent(params, component_info);
+      return new MediaButtonComponent(params, component_info);
     },
   },
 });
