@@ -21,6 +21,7 @@ import Cookies from 'js-cookie';
 
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
+import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
 import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
@@ -60,7 +61,7 @@ class AuthViewModel {
 
     const backendClient = authComponent.backendClient;
     // Cryptography
-    this.asset_service = new z.assets.AssetService(backendClient);
+    this.asset_service = new AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
     this.storageService = new StorageService();
     this.storage_repository = new z.storage.StorageRepository(this.storageService);
@@ -212,7 +213,7 @@ class AuthViewModel {
     // more engineering will be required to get rid of that global dependency
     window.wire.app = {
       service: {
-        asset: new z.assets.AssetService(backendClient),
+        asset: new AssetService(backendClient),
       },
     };
 

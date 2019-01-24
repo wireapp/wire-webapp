@@ -18,6 +18,7 @@
  */
 
 import platform from 'platform';
+import AssetService from '../assets/AssetService';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
@@ -231,7 +232,7 @@ class App {
       : new z.event.EventService(storageService);
 
     return {
-      asset: new z.assets.AssetService(this.backendClient),
+      asset: new AssetService(this.backendClient),
       auth: authComponent.service,
       backup: new z.backup.BackupService(storageService),
       broadcast: new z.broadcast.BroadcastService(this.backendClient),

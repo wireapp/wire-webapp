@@ -82,7 +82,6 @@ import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
 import AssetRetentionPolicyGlobal from '../assets/AssetRetentionPolicy.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetTypeGlobal from '../assets/AssetType.js';
-import AssetServiceGlobal from '../assets/AssetService.js';
 import AssetMapperGlobal from '../assets/AssetMapper.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import AssetCryptoGlobal from '../assets/AssetCrypto.js';
