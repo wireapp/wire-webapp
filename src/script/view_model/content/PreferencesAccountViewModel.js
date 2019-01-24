@@ -19,9 +19,12 @@
 
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
+import {t} from 'utils/LocalizerUtil';
 import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
+
+import UserRepository from '../../user/UserRepository';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -70,7 +73,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
       if (noStatusSet) {
-        label = z.l10n.text(z.string.preferencesAccountAvaibilityUnset);
+        label = t('preferencesAccountAvaibilityUnset');
       }
 
       return label;
@@ -85,9 +88,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameSaved = ko.observable();
 
     this.isTeam = this.teamRepository.isTeam;
-    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.team = this.teamRepository.team;
-    this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
+    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamRepository.teamName()));
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
@@ -122,7 +124,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return event.target.blur();
     }
 
-    const isValidName = newName.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
+    const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
     if (isValidName) {
       this.userRepository.change_name(newName).then(() => {
         this.nameSaved(true);
@@ -146,7 +148,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return event.target.blur();
     }
 
-    const isInvalidName = normalizedUsername.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    const isInvalidName = normalizedUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     if (isInvalidName) {
       return this.usernameState(null);
     }
@@ -248,9 +250,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
-        action: z.l10n.text(z.string.modalAccountDeletionAction),
-        message: z.l10n.text(z.string.modalAccountDeletionMessage),
-        title: z.l10n.text(z.string.modalAccountDeletionHeadline),
+        action: t('modalAccountDeletionAction'),
+        message: t('modalAccountDeletionMessage'),
+        title: t('modalAccountDeletionHeadline'),
       },
     });
   }
@@ -260,9 +262,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
-        action: z.l10n.text(z.string.modalAccountLeaveGuestRoomAction),
-        message: z.l10n.text(z.string.modalAccountLeaveGuestRoomMessage),
-        title: z.l10n.text(z.string.modalAccountLeaveGuestRoomHeadline),
+        action: t('modalAccountLeaveGuestRoomAction'),
+        message: t('modalAccountLeaveGuestRoomMessage'),
+        title: t('modalAccountLeaveGuestRoomHeadline'),
       },
       warning: false,
     });
@@ -304,30 +306,30 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const isTooLarge = newUserPicture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
       const maximumSizeInMB = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      const messageString = z.l10n.text(z.string.modalPictureTooLargeMessage, maximumSizeInMB);
-      const titleString = z.l10n.text(z.string.modalPictureTooLargeHeadline);
+      const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
+      const titleString = t('modalPictureTooLargeHeadline');
 
       return this._showUploadWarning(titleString, messageString);
     }
 
     const isWrongFormat = !PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.includes(newUserPicture.type);
     if (isWrongFormat) {
-      const titleString = z.l10n.text(z.string.modalPictureFileFormatHeadline);
-      const messageString = z.l10n.text(z.string.modalPictureFileFormatMessage);
+      const titleString = t('modalPictureFileFormatHeadline');
+      const messageString = t('modalPictureFileFormatMessage');
 
       return this._showUploadWarning(titleString, messageString);
     }
 
-    const minHeight = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
-    const minWidth = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
+    const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
+    const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
     return z.util.validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
       if (isValid) {
         return this.userRepository.change_picture(newUserPicture);
       }
 
-      const messageString = z.l10n.text(z.string.modalPictureTooSmallMessage);
-      const titleString = z.l10n.text(z.string.modalPictureTooSmallHeadline);
+      const messageString = t('modalPictureTooSmallMessage');
+      const titleString = t('modalPictureTooSmallHeadline');
       return this._showUploadWarning(titleString, messageString);
     });
   }
@@ -339,7 +341,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   verifyUsername(username, event) {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-    const usernameTooShort = enteredUsername.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === this.selfUser().username();
     if (usernameTooShort || usernameUnchanged) {
       return this.usernameState(null);

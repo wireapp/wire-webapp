@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -33,10 +35,10 @@ z.conversation.NotificationSetting = {
 
   getText(status) {
     const statusTexts = {
-      [z.conversation.NotificationSetting.STATE.EVERYTHING]: z.string.notificationSettingsEverything,
-      [z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES]: z.string.notificationSettingsMentionsAndReplies,
-      [z.conversation.NotificationSetting.STATE.NOTHING]: z.string.notificationSettingsNothing,
+      [z.conversation.NotificationSetting.STATE.EVERYTHING]: t('notificationSettingsEverything'),
+      [z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
+      [z.conversation.NotificationSetting.STATE.NOTHING]: t('notificationSettingsNothing'),
     };
-    return z.l10n.text(statusTexts[status]);
+    return statusTexts[status];
   },
 };

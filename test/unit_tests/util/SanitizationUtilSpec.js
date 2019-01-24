@@ -17,10 +17,14 @@
  *
  */
 
-describe('z.util.SanitizationUtil', () => {
+import 'src/script/localization/Localizer';
+import LocalizerUtil, {Declension} from 'utils/LocalizerUtil';
+import SanitizationUtil from 'src/script/util/SanitizationUtil';
+
+describe('SanitizationUtil', () => {
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {
-      const escapedRegex = z.util.SanitizationUtil.escapeString(':)');
+      const escapedRegex = SanitizationUtil.escapeString(':)');
 
       expect(escapedRegex).toEqual(':)');
     });
@@ -28,7 +32,7 @@ describe('z.util.SanitizationUtil', () => {
 
   describe('escapeString', () => {
     it('will return escaped strings', () => {
-      const escapedString = z.util.SanitizationUtil.escapeString(`<script>alert('Unsanitzed');</script>`);
+      const escapedString = SanitizationUtil.escapeString(`<script>alert('Unsanitzed');</script>`);
 
       expect(escapedString).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
     });
@@ -38,35 +42,39 @@ describe('z.util.SanitizationUtil', () => {
     it('will return the first name of the given user', () => {
       const userEntity = new z.entity.User();
       userEntity.name(`<script>alert('Unsanitzed');</script>`);
-      const escapedFirstName = z.util.SanitizationUtil.getFirstName(userEntity);
+      const escapedFirstName = SanitizationUtil.getFirstName(userEntity);
 
       expect(escapedFirstName).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
-      const unescapedFirstName = z.util.SanitizationUtil.getFirstName(userEntity, undefined, true);
+      const unescapedFirstName = SanitizationUtil.getFirstName(userEntity, undefined, true);
 
       expect(unescapedFirstName).toEqual(`<script>alert('Unsanitzed');</script>`);
       userEntity.is_me = true;
-      const escapedSelfName = z.util.SanitizationUtil.getFirstName(userEntity);
+      const escapedSelfName = SanitizationUtil.getFirstName(userEntity);
 
       expect(escapedSelfName).toEqual('you');
     });
   });
 
   describe('getSelfName', () => {
-    it('will return the self name in the given declension', () => {
-      const escapedNominativeName = z.util.SanitizationUtil.getSelfName(z.string.Declension.NOMINATIVE);
+    it('will return the self name in the given declension', () => { // eslint-disable-line
+      const escapedNominativeName = SanitizationUtil.getSelfName(Declension.NOMINATIVE);
 
       expect(escapedNominativeName).toEqual('you');
-      const unescapedNominativeName = z.util.SanitizationUtil.getSelfName(z.string.Declension.NOMINATIVE, true);
+
+      const unescapedNominativeName = SanitizationUtil.getSelfName(Declension.NOMINATIVE, true);
 
       expect(unescapedNominativeName).toEqual('you');
-      const escapedDativeName = z.util.SanitizationUtil.getSelfName(z.string.Declension.DATIVE);
+
+      const escapedDativeName = SanitizationUtil.getSelfName(Declension.DATIVE);
 
       expect(escapedDativeName).toEqual('you');
-      spyOn(z.l10n, 'text').and.returnValue('<script>you</script>');
-      const escapedAccusativeName = z.util.SanitizationUtil.getSelfName(z.string.Declension.DATIVE);
+
+      spyOn(LocalizerUtil, 'translate').and.returnValue('<script>you</script>');
+      const escapedAccusativeName = SanitizationUtil.getSelfName(Declension.DATIVE);
 
       expect(escapedAccusativeName).toEqual('&lt;script&gt;you&lt;/script&gt;');
-      const unescapedAccusativeName = z.util.SanitizationUtil.getSelfName(z.string.Declension.DATIVE, true);
+
+      const unescapedAccusativeName = SanitizationUtil.getSelfName(Declension.DATIVE, true);
 
       expect(unescapedAccusativeName).toEqual('<script>you</script>');
     });
@@ -81,7 +89,7 @@ describe('z.util.SanitizationUtil', () => {
     });
 
     it('does not contain a reference to the opening tab', () => {
-      newWindow = z.util.SanitizationUtil.safeWindowOpen('https://wire.com/');
+      newWindow = SanitizationUtil.safeWindowOpen('https://wire.com/');
 
       expect(newWindow.opener).toBeNull();
     });

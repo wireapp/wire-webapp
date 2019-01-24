@@ -1,13 +1,12 @@
-project_identifier: wire-cs
+project_identifier: wire-webapp
 base_path: .
 
 files:
+  # -
+  #   source: 'temp/i18n/webapp.pot'
+  #   translation: 'temp/i18n/webapp-%locale%.po'
+  #   update_option: 'update_as_unapproved'
   -
-    source: '/src/script/localization/webapp.js'
-    translation: '/src/script/localization/translations/webapp-%locale%.js'
-    type: 'properties_play'
-    update_option: 'update_as_unapproved'
-  -
-    source: 'temp/i18n/webapp.pot'
-    translation: 'temp/i18n/webapp-%locale%.po'
+    source: 'resource/translation/en-US.json'
+    translation: '%locale%.json'
     update_option: 'update_as_unapproved'

@@ -22,7 +22,7 @@ import getSlug from 'speakingurl';
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.StringUtil = {
+const stringUtil = {
   /**
    * @param {ArrayLike} bytes - bytes to convert
    * @returns {string} bytes as hex string
@@ -36,7 +36,7 @@ z.util.StringUtil = {
     return bytes
       .map(byte => {
         const stringByte = byte.toString(hexBase);
-        return z.util.StringUtil.padStart(stringByte, padIndex, '0');
+        return stringUtil.padStart(stringByte, padIndex, '0');
       })
       .join('');
   },
@@ -53,9 +53,9 @@ z.util.StringUtil = {
    * @returns {boolean} does the string matches the query
    */
   compareTransliteration: (string, query, excludedChars = {}, fromStart = false) => {
-    const nameSlug = z.util.StringUtil.computeTransliteration(string, excludedChars);
-    const querySlug = z.util.StringUtil.computeTransliteration(query, excludedChars);
-    return fromStart ? nameSlug.startsWith(querySlug) : z.util.StringUtil.includes(nameSlug, querySlug);
+    const nameSlug = stringUtil.computeTransliteration(string, excludedChars);
+    const querySlug = stringUtil.computeTransliteration(query, excludedChars);
+    return fromStart ? nameSlug.startsWith(querySlug) : stringUtil.includes(nameSlug, querySlug);
   },
 
   computeTransliteration: (string, excludedChars = {}) => {
@@ -153,12 +153,12 @@ z.util.StringUtil = {
     stringB = stringB.toLowerCase();
 
     if (query) {
-      if (z.util.StringUtil.startsWith(stringA, query)) {
-        if (!z.util.StringUtil.startsWith(stringB, query)) {
+      if (stringUtil.startsWith(stringA, query)) {
+        if (!stringUtil.startsWith(stringB, query)) {
           return -1;
         }
-      } else if (z.util.StringUtil.startsWith(stringB, query)) {
-        if (!z.util.StringUtil.startsWith(stringA, query)) {
+      } else if (stringUtil.startsWith(stringB, query)) {
+        if (!stringUtil.startsWith(stringA, query)) {
           return 1;
         }
       }
@@ -236,3 +236,6 @@ z.util.StringUtil = {
     return bytes;
   },
 };
+
+export default stringUtil;
+z.util.StringUtil = stringUtil;

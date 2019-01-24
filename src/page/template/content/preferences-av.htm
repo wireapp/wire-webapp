@@ -1,13 +1,13 @@
 <div id="preferences-av" class="preferences-page preferences-av" data-bind="with: $root.preferencesAV">
-  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesAV"></div>
+  <div class="preferences-titlebar" data-bind="text: t('preferencesAV')"></div>
   <div class="preferences-content" data-bind="fadingscrollbar">
 
     <!-- ko if: deviceSupport.audioInput() -->
       <section class="preferences-section">
-        <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVMicrophone"></header>
+        <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVMicrophone')"></header>
         <!-- ko if: permissionDenied() -->
           <div class="preferences-av-detail">
-            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferencesAVPermissionDetail, l10n_href: {support: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED}"></a>
+            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), l10n_href: {support: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED}"></a>
           </div>
         <!-- /ko -->
         <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permissionDenied}">
@@ -33,7 +33,7 @@
 
     <!-- ko if: supportsAudioOutput() -->
       <section class="preferences-section">
-        <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVSpeakers"></header>
+        <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVSpeakers')"></header>
         <div class="preferences-option">
           <div class="preferences-option-icon preferences-av-select-icon">
             <div class="icon-speaker"></div>
@@ -55,10 +55,10 @@
 
     <!-- ko if: deviceSupport.videoInput() -->
       <section class="preferences-section">
-        <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVCamera"></header>
+        <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVCamera')"></header>
         <!-- ko if: permissionDenied() -->
           <div class="preferences-av-detail">
-            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferencesAVPermissionDetail, l10n_href: {support: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED}"></a>
+            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), l10n_href: {support: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED}"></a>
           </div>
         <!-- /ko -->
         <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permissionDenied()}">
@@ -79,11 +79,11 @@
           </div>
         </div>
         <!-- ko if: isTemporaryGuest() -->
-          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAVTemporaryDisclaimer"></div>
+          <div class="preferences-detail" data-bind="text: t('preferencesAVTemporaryDisclaimer')"></div>
         <!-- /ko -->
         <!-- ko if: permissionDenied() -->
           <div class="preferences-av-video-disabled">
-              <div class="preferences-av-video-disabled__info" data-bind="l10nSafeHtml: {id: z.string.preferencesAVNoCamera, 'substitutions': {'replaceDangerously': {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'}}}"></div>
+              <div class="preferences-av-video-disabled__info" data-bind="html: t('preferencesAVNoCamera', {}, {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'})"></div>
               <div class="preferences-av-video-disabled__try-again" data-bind="click: tryAgain, text: z.string.preferencesAVTryAgain" data-uie-name="do-try-again-preferences-av"></div>
           </div>
         <!-- /ko -->

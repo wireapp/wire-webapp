@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -55,7 +57,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   _updateActivationTime(time) {
     const formattedTime = z.util.TimeUtil.formatTimestamp(time);
-    const stringTemplate = z.string.preferencesDevicesActivatedOn;
+    const stringTemplate = t('preferencesDevicesActivatedOn');
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
   }

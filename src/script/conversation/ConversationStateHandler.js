@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -72,17 +74,17 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
               amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
             })
             .catch(() => {
-              const messageStringId = changeToGuestRoom
-                ? z.string.modalConversationGuestOptionsAllowGuestMessage
-                : z.string.modalConversationGuestOptionsDisableGuestMessage;
+              const messageString = changeToGuestRoom
+                ? t('modalConversationGuestOptionsAllowGuestMessage')
+                : t('modalConversationGuestOptionsDisableGuestMessage');
 
-              this._showModal(messageStringId);
+              this._showModal(messageString);
             });
         }
       }
     }
 
-    this._showModal(z.string.modalConversationGuestOptionsToggleGuestsMessage);
+    this._showModal(t('modalConversationGuestOptionsToggleGuestsMessage'));
     return Promise.resolve();
   }
 
@@ -93,7 +95,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
       .catch(error => {
         const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
         if (!isNotFound) {
-          this._showModal(z.string.modalConversationGuestOptionsGetCodeMessage);
+          this._showModal(t('modalConversationGuestOptionsGetCodeMessage'));
         }
       });
   }
@@ -108,7 +110,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_CREATED);
         }
       })
-      .catch(() => this._showModal(z.string.modalConversationGuestOptionsRequestCodeMessage));
+      .catch(() => this._showModal(t('modalConversationGuestOptionsRequestCodeMessage')));
   }
 
   revokeAccessCode(conversationEntity) {
@@ -118,7 +120,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
         conversationEntity.accessCode(undefined);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_REVOKED);
       })
-      .catch(() => this._showModal(z.string.modalConversationGuestOptionsRevokeCodeMessage));
+      .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }
 
   _mapConversationAccessState(conversationEntity, eventJson) {
@@ -134,8 +136,8 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
     this.conversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }
 
-  _showModal(messageStringId) {
-    const modalOptions = {text: {message: z.l10n.text(messageStringId)}};
+  _showModal(message) {
+    const modalOptions = {text: {message}};
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };

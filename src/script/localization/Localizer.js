@@ -17,135 +17,107 @@
  *
  */
 
-import ko from 'knockout';
 import moment from 'moment';
 
 import * as StorageUtil from 'utils/StorageUtil';
+import URLUtil from 'utils/URLUtil';
+import URLParameter from '../auth/URLParameter';
+import StorageKey from '../storage/StorageKey';
 
-/* eslint-disable no-unused-vars */
-import cs from 'moment/locale/cs.js';
-import da from 'moment/locale/da.js';
-import de from 'moment/locale/de.js';
-import el from 'moment/locale/el.js';
-import es from 'moment/locale/es.js';
-import et from 'moment/locale/et.js';
-import fi from 'moment/locale/fi.js';
-import fr from 'moment/locale/fr.js';
-import hr from 'moment/locale/hr.js';
-import hu from 'moment/locale/hu.js';
-import it from 'moment/locale/it.js';
-import lt from 'moment/locale/lt.js';
-import nl from 'moment/locale/nl.js';
-import pl from 'moment/locale/pl.js';
-import pt from 'moment/locale/pt.js';
-import ro from 'moment/locale/ro.js';
-import ru from 'moment/locale/ru.js';
-import sk from 'moment/locale/sk.js';
-import sl from 'moment/locale/sl.js';
-import tr from 'moment/locale/tr.js';
-import uk from 'moment/locale/uk.js';
+import {DEFAULT_LOCALE, setLocale, setStrings} from 'utils/LocalizerUtil';
 
-import initGlobal from '../localization/strings-init.js';
-import webappGlobal from '../localization/webapp.js';
-import csGlobal from '../localization/translations/webapp-cs.js';
-import daGlobal from '../localization/translations/webapp-da.js';
-import deGlobal from '../localization/translations/webapp-de.js';
-import elGlobal from '../localization/translations/webapp-el.js';
-import esGlobal from '../localization/translations/webapp-es.js';
-import etGlobal from '../localization/translations/webapp-et.js';
-import fiGlobal from '../localization/translations/webapp-fi.js';
-import frGlobal from '../localization/translations/webapp-fr.js';
-import hrGlobal from '../localization/translations/webapp-hr.js';
-import huGlobal from '../localization/translations/webapp-hu.js';
-import itGlobal from '../localization/translations/webapp-it.js';
-import ltGlobal from '../localization/translations/webapp-lt.js';
-import nlGlobal from '../localization/translations/webapp-nl.js';
-import plGlobal from '../localization/translations/webapp-pl.js';
-import ptGlobal from '../localization/translations/webapp-pt.js';
-import roGlobal from '../localization/translations/webapp-ro.js';
-import ruGlobal from '../localization/translations/webapp-ru.js';
-import skGlobal from '../localization/translations/webapp-sk.js';
-import slGlobal from '../localization/translations/webapp-sl.js';
-import trGlobal from '../localization/translations/webapp-tr.js';
-import ukGlobal from '../localization/translations/webapp-uk.js';
-/* eslint-enable no-unused-vars */
+import 'moment/locale/cs.js';
+import 'moment/locale/da.js';
+import 'moment/locale/de.js';
+import 'moment/locale/el.js';
+import 'moment/locale/es.js';
+import 'moment/locale/et.js';
+import 'moment/locale/fi.js';
+import 'moment/locale/fr.js';
+import 'moment/locale/hr.js';
+import 'moment/locale/hu.js';
+import 'moment/locale/it.js';
+import 'moment/locale/lt.js';
+import 'moment/locale/nl.js';
+import 'moment/locale/pl.js';
+import 'moment/locale/pt.js';
+import 'moment/locale/ro.js';
+import 'moment/locale/ru.js';
+import 'moment/locale/sk.js';
+import 'moment/locale/sl.js';
+import 'moment/locale/tr.js';
+import 'moment/locale/uk.js';
+
+import cs from 'resource/translation/cs-CZ.json';
+import da from 'resource/translation/da-DK.json';
+import de from 'resource/translation/de-DE.json';
+import el from 'resource/translation/el-GR.json';
+import en from 'resource/translation/en-US.json';
+import es from 'resource/translation/es-ES.json';
+import et from 'resource/translation/et-EE.json';
+import fi from 'resource/translation/fi-FI.json';
+import fr from 'resource/translation/fr-FR.json';
+import hr from 'resource/translation/hr-HR.json';
+import hu from 'resource/translation/hu-HU.json';
+import it from 'resource/translation/it-IT.json';
+import lt from 'resource/translation/lt-LT.json';
+import nl from 'resource/translation/nl-NL.json';
+import pl from 'resource/translation/pl-PL.json';
+import pt from 'resource/translation/pt-BR.json';
+import ro from 'resource/translation/ro-RO.json';
+import ru from 'resource/translation/ru-RU.json';
+import sk from 'resource/translation/sk-SK.json';
+import sl from 'resource/translation/sl-SI.json';
+import tr from 'resource/translation/tr-TR.json';
+import uk from 'resource/translation/uk-UA.json';
 
 window.z = window.z || {};
 
+const strings = {
+  cs,
+  da,
+  de,
+  el,
+  en,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  sk,
+  sl,
+  tr,
+  uk,
+};
+
+window.z.string = strings;
+setStrings(strings);
+
 (function setAppLocale() {
-  const DEFAULT_LOCALE = 'en';
-  const queryParam = z.util.URLUtil.getParameter(z.auth.URLParameter.LOCALE);
+  const queryParam = URLUtil.getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2);
-  let storedLocale = StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
+  let storedLocale = StorageUtil.getValue(StorageKey.LOCALIZATION.LOCALE);
 
   if (queryParam) {
-    storedLocale = StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
+    storedLocale = StorageUtil.setValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
+  setLocale(locale);
 
   document.getElementsByTagName('html')[0].setAttribute('lang', locale);
 
   moment.locale([locale, DEFAULT_LOCALE]);
 
   if (z.string[locale]) {
-    Object.assign(z.string, z.string[locale]);
+    Object.assign(z.string, z.string[DEFAULT_LOCALE], z.string[locale]);
   }
 })();
-
-z.l10n = (() => {
-  const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
-
-  const replaceSubstitute = (string, regex, substitute) => {
-    const replacement = isStringOrNumber(substitute)
-      ? substitute
-      : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
-    return string.replace(regex, replacement);
-  };
-
-  return {
-    safeHtml(value, substitutions = {}) {
-      const replace = isStringOrNumber(substitutions) ? substitutions : substitutions.replace;
-
-      const defaultReplacements = {
-        '/bold': '</b>',
-        '/italic': '</i>',
-        bold: '<b>',
-        italic: '<i>',
-      };
-
-      const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
-
-      let string = ko.unwrap(value);
-
-      if (replace !== undefined) {
-        string = replaceSubstitute(string, /{{(.+?)}}/g, replace);
-      }
-
-      string = z.util.SanitizationUtil.escapeString(string);
-
-      string = replaceSubstitute(string, /\[(.+?)\]/g, replaceDangerously);
-
-      return string;
-    },
-
-    /**
-     * Retrieve localized string and replace placeholders
-     *
-     * This method give you two options to replace placeholders
-     *
-     * @example using a string as substitute
-     * z.l10.text('Hey {{name}}', 'Tod') // returns 'Hey Tod'
-     *
-     * @example using an object as substitute
-     * z.l10.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey'}) // returns 'Hey Tod'
-     *
-     * @param {Observable|string} value - localized string in our case usually z.string.foo
-     * @param {string|Object} [substitute] - data to fill all the placeholder with
-     * @returns {string} - string with substituted placeholders
-     */
-    text: (value, substitute) => replaceSubstitute(ko.unwrap(value), /{{(.+?)}}/g, substitute),
-  };
-})();
-
-export default z.l10n;

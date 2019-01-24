@@ -19,6 +19,7 @@
 
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -36,21 +37,15 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.client_id = '';
 
     this.htmlCaption = ko.pureComputed(() => {
-      const stringId = this.is_remote_identity_changed()
-        ? z.string.conversationUnableToDecrypt2
-        : z.string.conversationUnableToDecrypt1;
-
-      const substitutions = {
-        replace: {
-          user: this.user().first_name(),
-        },
-        replaceDangerously: {
-          '/highlight': '</span>',
-          highlight: '<span class="label-bold-xs">',
-        },
+      const userName = this.user().first_name();
+      const replaceHighlight = {
+        '/highlight': '</span>',
+        highlight: '<span class="label-bold-xs">',
       };
 
-      return z.l10n.safeHtml(stringId, substitutions);
+      return this.is_remote_identity_changed()
+        ? t('conversationUnableToDecrypt2', userName, replaceHighlight)
+        : t('conversationUnableToDecrypt1', userName, replaceHighlight);
     });
 
     this.link = ko.pureComputed(() => {
@@ -70,7 +65,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       const parts = [];
 
       if (this.error_code) {
-        const error_text = z.l10n.text(z.string.conversationUnableToDecryptErrorMessage);
+        const error_text = t('conversationUnableToDecryptErrorMessage');
         parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span> `);
       }
 

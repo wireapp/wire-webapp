@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.storage = z.storage || {};
 
-z.storage.StorageKey = {
+const StorageKey = {
   AUTH: {
     ACCESS_TOKEN: {
       EXPIRATION: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION',
@@ -43,3 +43,6 @@ z.storage.StorageKey = {
     SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS',
   },
 };
+
+export default StorageKey;
+z.storage.StorageKey = StorageKey;

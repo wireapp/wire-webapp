@@ -17,6 +17,8 @@
  *
  */
 
+import 'src/script/localization/Localizer';
+
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 

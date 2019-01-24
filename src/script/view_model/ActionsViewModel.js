@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -47,9 +49,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity),
         text: {
-          action: z.l10n.text(z.string.modalUserBlockAction),
-          message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
-          title: z.l10n.text(z.string.modalUserBlockHeadline, userEntity.first_name()),
+          action: t('modalUserBlockAction'),
+          message: t('modalUserBlockMessage', userEntity.first_name()),
+          title: t('modalUserBlockHeadline', userEntity.first_name()),
         },
       });
     }
@@ -60,10 +62,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity),
         text: {
-          action: z.l10n.text(z.string.modalConnectCancelAction),
-          message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
-          secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
-          title: z.l10n.text(z.string.modalConnectCancelHeadline),
+          action: t('modalConnectCancelAction'),
+          message: t('modalConnectCancelMessage', userEntity.first_name()),
+          secondary: t('modalConnectCancelSecondary'),
+          title: t('modalConnectCancelHeadline'),
         },
       });
     }
@@ -80,10 +82,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
         },
         text: {
-          action: z.l10n.text(z.string.modalConversationClearAction),
-          message: z.l10n.text(z.string.modalConversationClearMessage),
-          option: z.l10n.text(z.string.modalConversationClearOption),
-          title: z.l10n.text(z.string.modalConversationClearHeadline),
+          action: t('modalConversationClearAction'),
+          message: t('modalConversationClearMessage'),
+          option: t('modalConversationClearOption'),
+          title: t('modalConversationClearHeadline'),
         },
       });
     }
@@ -109,10 +111,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         },
         preventClose: true,
         text: {
-          action: z.l10n.text(z.string.modalAccountRemoveDeviceAction),
-          input: z.l10n.text(z.string.modalAccountRemoveDevicePlaceholder),
-          message: z.l10n.text(z.string.modalAccountRemoveDeviceMessage),
-          title: z.l10n.text(z.string.modalAccountRemoveDeviceHeadline, clientEntity.model),
+          action: t('modalAccountRemoveDeviceAction'),
+          input: t('modalAccountRemoveDevicePlaceholder'),
+          message: t('modalAccountRemoveDeviceMessage'),
+          title: t('modalAccountRemoveDeviceHeadline', clientEntity.model),
         },
         warning: false,
       });
@@ -128,9 +130,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             resolve();
           },
           text: {
-            action: z.l10n.text(z.string.modalConversationDeleteMessageAction),
-            message: z.l10n.text(z.string.modalConversationDeleteMessageMessage),
-            title: z.l10n.text(z.string.modalConversationDeleteMessageHeadline),
+            action: t('modalConversationDeleteMessageAction'),
+            message: t('modalConversationDeleteMessageMessage'),
+            title: t('modalConversationDeleteMessageHeadline'),
           },
         });
       });
@@ -146,9 +148,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             resolve();
           },
           text: {
-            action: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneAction),
-            message: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneMessage),
-            title: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneHeadline),
+            action: t('modalConversationDeleteMessageEveryoneAction'),
+            message: t('modalConversationDeleteMessageEveryoneMessage'),
+            title: t('modalConversationDeleteMessageEveryoneHeadline'),
           },
         });
       });
@@ -166,9 +168,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id),
         text: {
-          action: z.l10n.text(z.string.modalConversationLeaveAction),
-          message: z.l10n.text(z.string.modalConversationLeaveMessage),
-          title: z.l10n.text(z.string.modalConversationLeaveHeadline, conversationEntity.display_name()),
+          action: t('modalConversationLeaveAction'),
+          message: t('modalConversationLeaveMessage'),
+          title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
         },
       });
     }
@@ -223,9 +225,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             resolve();
           },
           text: {
-            action: z.l10n.text(z.string.modalConversationRemoveAction),
-            message: z.l10n.text(z.string.modalConversationRemoveMessage, userEntity.first_name()),
-            title: z.l10n.text(z.string.modalConversationRemoveHeadline),
+            action: t('modalConversationRemoveAction'),
+            message: t('modalConversationRemoveMessage', userEntity.first_name()),
+            title: t('modalConversationRemoveHeadline'),
           },
         });
       });
@@ -259,9 +261,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             });
         },
         text: {
-          action: z.l10n.text(z.string.modalUserUnblockAction),
-          message: z.l10n.text(z.string.modalUserUnblockMessage, userEntity.first_name()),
-          title: z.l10n.text(z.string.modalUserUnblockHeadline),
+          action: t('modalUserUnblockAction'),
+          message: t('modalUserUnblockMessage', userEntity.first_name()),
+          title: t('modalUserUnblockHeadline'),
         },
       });
     }

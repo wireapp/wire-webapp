@@ -34,7 +34,7 @@ class InfoToggle {
 ko.components.register('info-toggle', {
   template: `
     <div class="info-toggle__row">
-      <div data-bind="l10n_text: name"></div>
+      <div data-bind="text: name"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
         <input 
           class="slider-input" 
@@ -43,7 +43,7 @@ ko.components.register('info-toggle', {
         <label class="button-label" data-bind="attr: { for: inputId, 'data-uie-value': isChecked() ? 'checked': 'unchecked', 'data-uie-name': dataUieNameLabelText }"></label>
       </div>
     </div>
-    <div class="info-toggle__details" data-bind="attr: {'data-uie-name': dataUieNameInfoText }, l10n_text: info"></div>
+    <div class="info-toggle__details" data-bind="attr: {'data-uie-name': dataUieNameInfoText }, text: info"></div>
   `,
   viewModel: InfoToggle,
 });

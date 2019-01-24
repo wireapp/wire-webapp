@@ -1,32 +1,32 @@
 <div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
   <div class="left-list-header">
-    <span class="left-list-header-text" data-bind="l10n_text: z.string.preferencesHeadline"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClosePreferences, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close-preferences"></span>
+    <span class="left-list-header-text" data-bind="text: t('preferencesHeadline')"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClosePreferences, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close-preferences"></span>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items preferences-list-items">
       <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAccount, css: {'text-theme': selectedAccount, 'svg-theme': selectedAccount}" data-uie-name="go-account">
         <profile-icon class="left-column-icon"></profile-icon>
-        <div class="center-column" data-bind="l10n_text: z.string.preferencesAccount"></div>
+        <div class="center-column" data-bind="text: t('preferencesAccount')"></div>
       </li>
       <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnDevices, css: {'text-theme': selectedDevices}" data-uie-name="go-devices">
         <devices-icon class="left-column-icon"></devices-icon>
-        <div class="center-column" data-bind="l10n_text: z.string.preferencesDevices"></div>
+        <div class="center-column" data-bind="text: t('preferencesDevices')"></div>
       </li>
       <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnOptions, css: {'text-theme': selectedOptions}" data-uie-name="go-options">
         <options-icon class="left-column-icon"></options-icon>
-        <div class="center-column" data-bind="l10n_text: z.string.preferencesOptions"></div>
+        <div class="center-column" data-bind="text: t('preferencesOptions')"></div>
       </li>
       <!-- ko if: z.calling.CallingRepository.supportsCalling -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAV, css: {'text-theme': selectedAV}" data-uie-name="go-audio-video">
           <av-icon class="left-column-icon"></av-icon>
-          <div class="center-column" data-bind="l10n_text: z.string.preferencesAV"></div>
+          <div class="center-column" data-bind="text: t('preferencesAV')"></div>
         </li>
       <!-- /ko -->
       <!-- ko ifnot: z.util.Environment.desktop -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAbout, css: {'text-theme': selectedAbout}" data-uie-name="go-about">
           <about-icon class="left-column-icon"></about-icon>
-          <div class="center-column" data-bind="l10n_text: z.string.preferencesAbout"></div>
+          <div class="center-column" data-bind="text: t('preferencesAbout')"></div>
         </li>
       <!-- /ko -->
     </ul>

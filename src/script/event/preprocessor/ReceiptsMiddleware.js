@@ -27,7 +27,7 @@ export default class ReceiptsMiddleware {
    * It will update original messages when a confirmation is received
    *
    * @param {z.event.EventService} eventService - Repository that handles events
-   * @param {z.user.UserRepository} userRepository - Repository that handles users
+   * @param {UserRepository} userRepository - Repository that handles users
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    */
   constructor(eventService, userRepository, conversationRepository) {

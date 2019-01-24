@@ -17,6 +17,8 @@
  *
  */
 
+import UserService from 'src/script/user/UserService';
+
 describe('User Service', () => {
   let server = null;
   const urls = {
@@ -29,7 +31,7 @@ describe('User Service', () => {
     server = sinon.fakeServer.create();
 
     const backendClient = new z.service.BackendClient(urls);
-    userService = new z.user.UserService(backendClient);
+    userService = new UserService(backendClient);
   });
 
   afterEach(() => server.restore());

@@ -17,6 +17,7 @@
  *
  */
 
+import 'src/script/localization/Localizer';
 import Conversation from 'src/script/entity/Conversation';
 import ContentMessage from 'src/script/entity/message/ContentMessage';
 import Message from 'src/script/entity/message/Message';

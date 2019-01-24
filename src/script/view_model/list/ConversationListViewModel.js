@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};
@@ -61,12 +63,11 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.connectRequests = this.userRepository.connect_requests;
     this.connectRequestsText = ko.pureComputed(() => {
-      const hasMultipleRequests = this.connectRequests().length > 1;
-      const stringId = hasMultipleRequests
-        ? z.string.conversationsConnectionRequestMany
-        : z.string.conversationsConnectionRequestOne;
-
-      return z.l10n.text(stringId, this.connectRequests().length);
+      const reqCount = this.connectRequests().length;
+      const hasMultipleRequests = reqCount > 1;
+      return hasMultipleRequests
+        ? t('conversationsConnectionRequestMany', reqCount)
+        : t('conversationsConnectionRequestOne');
     });
     this.stateIsRequests = ko.pureComputed(() => {
       return this.contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
@@ -97,11 +98,11 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     });
 
     this.archiveTooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltipConversationsArchived, this.archivedConversations().length);
+      return t('tooltipConversationsArchived', this.archivedConversations().length);
     });
 
     const startShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.START);
-    this.startTooltip = z.l10n.text(z.string.tooltipConversationsStart, startShortcut);
+    this.startTooltip = t('tooltipConversationsStart', startShortcut);
 
     this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
 

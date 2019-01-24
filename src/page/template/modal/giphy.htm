@@ -34,15 +34,15 @@
         <!-- /ko -->
       </div>
       <div class="gif-container-error" data-bind="visible: isStateError()">
-        <span class="gif-container-error-message" data-bind="l10n_text: z.string.extensionsGiphyNoGifs"></span>
+        <span class="gif-container-error-message" data-bind="text: t('extensionsGiphyNoGifs')"></span>
       </div>
     </div>
     <div class="giphy-modal-footer modal-footer">
       <div class="button button-inverted"
-           data-bind="click: clickOnTryAnother, l10n_text: z.string.extensionsGiphyButtonMore, css: {'button-disabled': gifs().length === 0}"
+           data-bind="click: clickOnTryAnother, text: t('extensionsGiphyButtonMore'), css: {'button-disabled': gifs().length === 0}"
            data-uie-name="do-try-another"></div>
       <div class="button"
-           data-bind="click: clickToSend, l10n_text: z.string.extensionsGiphyButtonOk, css: {'button-disabled': !selectedGif()}"
+           data-bind="click: clickToSend, text: t('extensionsGiphyButtonOk'), css: {'button-disabled': !selectedGif()}"
            data-uie-name="do-send-gif"></div>
     </div>
   </div>

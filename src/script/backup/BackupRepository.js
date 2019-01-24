@@ -43,7 +43,7 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
    * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
-   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
+   * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
     this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);

@@ -129,7 +129,7 @@ ko.components.register('message-quote', {
   <!-- ko if: quotedMessage() || error() -->
     <div class="message-quote" data-uie-name="quote-item">
       <!-- ko if: error() -->
-        <div class="message-quote__error" data-bind="l10n_text: z.string.replyQuoteError" data-uie-name="label-error-quote"></div>
+        <div class="message-quote__error" data-bind="text: t('replyQuoteError')" data-uie-name="label-error-quote"></div>
       <!-- /ko -->
       <!-- ko ifnot: error() -->
         <div class="message-quote__sender">
@@ -153,7 +153,7 @@ ko.components.register('message-quote', {
               dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
-                <span data-bind="l10n_text: $parent.showFullText() ? z.string.replyQuoteShowLess : z.string.replyQuoteShowMore"></span>
+                <span data-bind="text: $parent.showFullText() ? t('replyQuoteShowLess') : t('replyQuoteShowMore')"></span>
                 <disclose-icon data-bind="css: {'upside-down': $parent.showFullText()}"></disclose-icon>
               </div>
             <!-- /ko -->
@@ -176,10 +176,9 @@ ko.components.register('message-quote', {
           <!-- /ko -->
         <!-- /ko -->
         <div class="message-quote__timestamp"
-          data-bind="l10n_text: {
-              id: quotedMessageIsBeforeToday() ? z.string.replyQuoteTimeStampDate : z.string.replyQuoteTimeStampTime,
-              substitute: moment(quotedMessage().timestamp()).format(quotedMessageIsBeforeToday() ? 'DD.MM.YYYY' : 'HH:mm')
-            },
+          data-bind="text: quotedMessageIsBeforeToday() 
+            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('DD.MM.YYYY')) 
+            : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('HH:mm')),
             click: focusMessage"
           data-uie-name="label-timestamp-quote">
         </div>

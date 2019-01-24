@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.app_init = z.telemetry.app_init || {};
+import AppInitTimingsStep from './AppInitTimingsStep';
 
-z.telemetry.app_init.AppInitTimings = class AppInitTimings {
+export default class AppInitTimings {
   static get CONFIG() {
     return {
       BUCKET_SIZE: 10,
@@ -31,7 +29,7 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
   }
 
   constructor() {
-    this.logger = new z.util.Logger('z.telemetry.AppInitTimings', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('AppInitTimings', z.config.LOGGER.OPTIONS);
     this.init = window.performance.now();
   }
 
@@ -49,7 +47,7 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
 
   get_app_load() {
     const CONFIG = AppInitTimings.CONFIG;
-    const appLoaded = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED];
+    const appLoaded = this[AppInitTimingsStep.APP_LOADED];
     const appLoadedInSeconds = appLoaded / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
 
     return (Math.floor(appLoadedInSeconds / CONFIG.BUCKET_SIZE) + 1) * CONFIG.BUCKET_SIZE;
@@ -75,4 +73,4 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
       return (this[step] = window.parseInt(window.performance.now() - this.init));
     }
   }
-};
+}

@@ -22,12 +22,12 @@ ko.components.register('read-receipt-toggle', {
   <div class="panel__action-item">
     <read-icon class="panel__action-item__icon"></read-icon>
     <div class="panel__action-item__summary">
-      <div class="panel__action-item__text" data-bind="l10n_text: z.string.receiptToggleLabel"></div>
+      <div class="panel__action-item__text" data-bind="text: t('receiptToggleLabel')"></div>
     </div>
     <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" data-bind="checked: conversation.receiptMode, event: {change: updateValue}" id="receipt-toggle-input"></input>
     <label for="receipt-toggle-input" data-uie-name="do-toggle-receipt-mode" data-bind="attr: {'data-uie-receipt-status': conversation.receiptMode}"></label>
   </div>
-  <div class="panel__info-text panel__info-text--margin" data-bind="l10n_text: z.string.receiptToggleInfo" data-uie-name="status-info-toggle-receipt-mode"></div>
+  <div class="panel__info-text panel__info-text--margin" data-bind="text: t('receiptToggleInfo')" data-uie-name="status-info-toggle-receipt-mode"></div>
   `,
 
   viewModel: function(params) {

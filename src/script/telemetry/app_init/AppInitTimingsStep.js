@@ -17,13 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.app_init = z.telemetry.app_init || {};
-
 /* eslint-disable sort-keys */
-
-z.telemetry.app_init.AppInitTimingsStep = {
+export default {
   RECEIVED_ACCESS_TOKEN: 'received_access_token',
   RECEIVED_SELF_USER: 'received_self_user',
   INITIALIZED_CRYPTOGRAPHY: 'initialized_cryptography',

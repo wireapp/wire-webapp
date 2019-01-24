@@ -21,6 +21,7 @@ import ConsentType from '../user/ConsentType';
 import ConsentValue from '../user/ConsentValue';
 import ReceiptMode from '../conversation/ReceiptMode';
 import WebappProperties from './WebappProperties';
+import {t} from 'utils/LocalizerUtil';
 
 class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -69,10 +70,10 @@ class PropertiesRepository {
               resolve();
             },
             text: {
-              action: z.l10n.text(z.string.modalImproveWireAction),
-              message: z.l10n.text(z.string.modalImproveWireMessage),
-              secondary: z.l10n.text(z.string.modalImproveWireSecondary),
-              title: z.l10n.text(z.string.modalImproveWireHeadline),
+              action: t('modalImproveWireAction'),
+              message: t('modalImproveWireMessage'),
+              secondary: t('modalImproveWireSecondary'),
+              title: t('modalImproveWireHeadline'),
             },
             warning: false,
           });

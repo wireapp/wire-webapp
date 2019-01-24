@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -58,7 +60,7 @@ z.event.EventRepository = class EventRepository {
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
-   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
+   * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(
     eventService,
@@ -505,7 +507,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = (this.notificationsHandled / this.notificationsTotal) * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
     }
   }
 

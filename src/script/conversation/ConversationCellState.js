@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -60,19 +62,19 @@ z.conversation.ConversationCellState = (() => {
         const messageEntity = mentionMessageEntity || replyMessageEntity;
 
         if (messageEntity.is_ephemeral()) {
-          let stringId;
+          let summary;
 
           if (hasSingleMention) {
-            stringId = conversationEntity.isGroup()
-              ? z.string.conversationsSecondaryLineEphemeralMentionGroup
-              : z.string.conversationsSecondaryLineEphemeralMention;
+            summary = conversationEntity.isGroup()
+              ? t('conversationsSecondaryLineEphemeralMentionGroup')
+              : t('conversationsSecondaryLineEphemeralMention');
           } else {
-            stringId = conversationEntity.isGroup()
-              ? z.string.conversationsSecondaryLineEphemeralReplyGroup
-              : z.string.conversationsSecondaryLineEphemeralReply;
+            summary = conversationEntity.isGroup()
+              ? t('conversationsSecondaryLineEphemeralReplyGroup')
+              : t('conversationsSecondaryLineEphemeralReply');
           }
 
-          return z.l10n.text(stringId);
+          return summary;
         }
 
         return conversationEntity.isGroup()
@@ -89,49 +91,41 @@ z.conversation.ConversationCellState = (() => {
       .map(([activity, activityCount]) => {
         if (activityCount) {
           const activityCountIsOne = activityCount === 1;
-          let stringId = undefined;
 
           switch (activity) {
             case ACTIVITY_TYPE.CALL: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineSummaryMissedCall
-                : z.string.conversationsSecondaryLineSummaryMissedCalls;
-              break;
+              return activityCountIsOne
+                ? t('conversationsSecondaryLineSummaryMissedCall', activityCount)
+                : t('conversationsSecondaryLineSummaryMissedCalls', activityCount);
             }
 
             case ACTIVITY_TYPE.MENTION: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineSummaryMention
-                : z.string.conversationsSecondaryLineSummaryMentions;
-              break;
+              return activityCountIsOne
+                ? t('conversationsSecondaryLineSummaryMention', activityCount)
+                : t('conversationsSecondaryLineSummaryMentions', activityCount);
             }
 
             case ACTIVITY_TYPE.MESSAGE: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineSummaryMessage
-                : z.string.conversationsSecondaryLineSummaryMessages;
-              break;
+              return activityCountIsOne
+                ? t('conversationsSecondaryLineSummaryMessage', activityCount)
+                : t('conversationsSecondaryLineSummaryMessages', activityCount);
             }
 
             case ACTIVITY_TYPE.PING: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineSummaryPing
-                : z.string.conversationsSecondaryLineSummaryPings;
-              break;
+              return activityCountIsOne
+                ? t('conversationsSecondaryLineSummaryPing', activityCount)
+                : t('conversationsSecondaryLineSummaryPings', activityCount);
             }
 
             case ACTIVITY_TYPE.REPLY: {
-              stringId = activityCountIsOne
-                ? z.string.conversationsSecondaryLineSummaryReply
-                : z.string.conversationsSecondaryLineSummaryReplies;
-              break;
+              return activityCountIsOne
+                ? t('conversationsSecondaryLineSummaryReply', activityCount)
+                : t('conversationsSecondaryLineSummaryReplies', activityCount);
             }
 
             default:
               throw new z.error.ConversationError();
           }
-
-          return z.l10n.text(stringId, activityCount);
         }
       })
       .filter(activityString => !!activityString)
@@ -185,7 +179,7 @@ z.conversation.ConversationCellState = (() => {
   const _getStateCall = {
     description: conversationEntity => {
       const creatorName = conversationEntity.call().creatingUser.first_name();
-      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, creatorName);
+      return t('conversationsSecondaryLineIncomingCall', creatorName);
     },
     icon: () => z.conversation.ConversationStatusIcon.NONE,
     match: conversationEntity => {
@@ -214,19 +208,19 @@ z.conversation.ConversationCellState = (() => {
           if (lastMessageEntity.isMemberJoin()) {
             if (userCountIsOne) {
               if (!lastMessageEntity.remoteUserEntities().length) {
-                return z.l10n.text(z.string.conversationsSecondaryLinePersonAddedYou, lastMessageEntity.user().name());
+                return t('conversationsSecondaryLinePersonAddedYou', lastMessageEntity.user().name());
               }
 
               const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
               const userSelfJoined = lastMessageEntity.user().id === remoteUserEntity.id;
-              const stringId = userSelfJoined
-                ? z.string.conversationsSecondaryLinePersonAddedSelf
-                : z.string.conversationsSecondaryLinePersonAdded;
+              const string = userSelfJoined
+                ? t('conversationsSecondaryLinePersonAddedSelf', remoteUserEntity.name())
+                : t('conversationsSecondaryLinePersonAdded', remoteUserEntity.name());
 
-              return z.l10n.text(stringId, remoteUserEntity.name());
+              return string;
             }
 
-            return z.l10n.text(z.string.conversationsSecondaryLinePeopleAdded, userCount);
+            return t('conversationsSecondaryLinePeopleAdded', userCount);
           }
 
           if (lastMessageEntity.isMemberRemoval()) {
@@ -236,26 +230,26 @@ z.conversation.ConversationCellState = (() => {
               if (remoteUserEntity) {
                 if (lastMessageEntity.isTeamMemberLeave()) {
                   const name = lastMessageEntity.name() || remoteUserEntity.name();
-                  return z.l10n.text(z.string.conversationsSecondaryLinePersonRemovedTeam, name);
+                  return t('conversationsSecondaryLinePersonRemovedTeam', name);
                 }
 
                 const userSelfLeft = remoteUserEntity.id === lastMessageEntity.user().id;
-                const stringId = userSelfLeft
-                  ? z.string.conversationsSecondaryLinePersonLeft
-                  : z.string.conversationsSecondaryLinePersonRemoved;
+                const string = userSelfLeft
+                  ? t('conversationsSecondaryLinePersonLeft', remoteUserEntity.name())
+                  : t('conversationsSecondaryLinePersonRemoved', remoteUserEntity.name());
 
-                return z.l10n.text(stringId, remoteUserEntity.name());
+                return string;
               }
             }
 
-            return z.l10n.text(z.string.conversationsSecondaryLinePeopleLeft, userCount);
+            return t('conversationsSecondaryLinePeopleLeft', userCount);
           }
         }
       }
 
       const isConversationRename = lastMessageEntity.is_system() && lastMessageEntity.is_conversation_rename();
       if (isConversationRename) {
-        return z.l10n.text(z.string.conversationsSecondaryLineRenamed, lastMessageEntity.user().name());
+        return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
       }
     },
     icon: conversationEntity => {
@@ -309,11 +303,7 @@ z.conversation.ConversationCellState = (() => {
       const wasSelfRemoved = isMemberRemoval && lastMessageEntity.userIds().includes(selfUserId);
       if (wasSelfRemoved) {
         const selfLeft = lastMessageEntity.user().id === selfUserId;
-        const stringId = selfLeft
-          ? z.string.conversationsSecondaryLineYouLeft
-          : z.string.conversationsSecondaryLineYouWereRemoved;
-
-        return z.l10n.text(stringId);
+        return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
       }
 
       return '';
@@ -327,41 +317,40 @@ z.conversation.ConversationCellState = (() => {
       const unreadMessages = conversationEntity.unreadState().allMessages;
 
       for (const messageEntity of unreadMessages) {
-        let stringId;
+        let string;
 
         if (messageEntity.is_ping()) {
-          stringId = z.string.notificationPing;
+          string = t('notificationPing');
         } else if (messageEntity.has_asset_text()) {
-          stringId = true;
+          string = true;
         } else if (messageEntity.has_asset()) {
           const assetEntity = messageEntity.get_first_asset();
           const isUploaded = assetEntity.status() === z.assets.AssetTransferState.UPLOADED;
 
           if (isUploaded) {
             if (assetEntity.is_audio()) {
-              stringId = z.string.notificationSharedAudio;
+              string = t('notificationSharedAudio');
             } else if (assetEntity.is_video()) {
-              stringId = z.string.notificationSharedVideo;
+              string = t('notificationSharedVideo');
             } else {
-              stringId = z.string.notificationSharedFile;
+              string = t('notificationSharedFile');
             }
           }
         } else if (messageEntity.has_asset_location()) {
-          stringId = z.string.notificationSharedLocation;
+          string = t('notificationSharedLocation');
         } else if (messageEntity.has_asset_image()) {
-          stringId = z.string.notificationAssetAdd;
+          string = t('notificationAssetAdd');
         }
 
-        if (!!stringId) {
+        if (!!string) {
           if (messageEntity.is_ephemeral()) {
-            stringId = conversationEntity.isGroup()
-              ? z.string.conversationsSecondaryLineEphemeralMessageGroup
-              : z.string.conversationsSecondaryLineEphemeralMessage;
-            return z.l10n.text(stringId);
+            return conversationEntity.isGroup()
+              ? t('conversationsSecondaryLineEphemeralMessageGroup')
+              : t('conversationsSecondaryLineEphemeralMessage');
           }
 
-          const hasStringId = stringId && stringId !== true;
-          const stateText = hasStringId ? z.l10n.text(stringId) : messageEntity.get_first_asset().text;
+          const hasString = string && string !== true;
+          const stateText = hasString ? string : messageEntity.get_first_asset().text;
           return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
         }
       }

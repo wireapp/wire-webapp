@@ -16,16 +16,14 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import AppInitStatistics from './AppInitStatistics';
+import AppInitTimings from './AppInitTimings';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.app_init = z.telemetry.app_init || {};
-
-z.telemetry.app_init.AppInitTelemetry = class AppInitTelemetry {
+export default class AppInitTelemetry {
   constructor() {
-    this.logger = new z.util.Logger('z.telemetry.app_init.AppInitTelemetry', z.config.LOGGER.OPTIONS);
-    this.timings = new z.telemetry.app_init.AppInitTimings();
-    this.statistics = new z.telemetry.app_init.AppInitStatistics();
+    this.logger = new z.util.Logger('AppInitTelemetry', z.config.LOGGER.OPTIONS);
+    this.timings = new AppInitTimings();
+    this.statistics = new AppInitStatistics();
   }
 
   add_statistic(statistic, value, bucket_size) {
@@ -64,4 +62,4 @@ z.telemetry.app_init.AppInitTelemetry = class AppInitTelemetry {
   time_step(step) {
     return this.timings.time_step(step);
   }
-};
+}
