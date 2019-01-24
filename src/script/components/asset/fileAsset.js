@@ -105,8 +105,8 @@ ko.components.register('file-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new FileAssetComponent(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new FileAssetComponent(params, componentInfo);
     },
   },
 });
