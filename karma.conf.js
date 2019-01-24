@@ -98,6 +98,17 @@ module.exports = function(config) {
             loader: 'svg-inline-loader?removeSVGTagAttrs=false',
             test: /\.svg$/,
           },
+          {
+            exclude: [path.resolve('node_modules/')],
+            include: path.resolve('src/script/'),
+            test: /\.js$/,
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              query: {
+                esModules: true,
+              },
+            },
+          },
         ],
       },
       plugins: [
@@ -123,7 +134,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['coverage', 'spec'],
+    reporters: ['spec', 'coverage-istanbul'],
     specReporter: {showSpecTiming: true, suppressPassed: true, suppressSkipped: true},
 
     // web server port
@@ -157,33 +168,13 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-
-    coverageReporter: {
-      reporters: [
-        {
-          dir: 'docs/coverage',
-          type: 'html',
-        },
-        {
-          dir: 'docs/coverage',
-          file: 'coverage-summary.txt',
-          type: 'text-summary',
-        },
-      ],
-      check: {
-        global: {
-          statements: 40,
-          branches: 25,
-          functions: 20,
-          lines: 40,
-        },
-        each: {
-          statements: 0,
-          branches: 0,
-          functions: 0,
-          lines: 0,
-        },
+    coverageIstanbulReporter: {
+      dir: path.resolve('docs/coverage/'),
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: {outdir: 'html'},
       },
+      reports: ['html', 'text-summary'],
     },
   });
 
