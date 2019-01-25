@@ -20,6 +20,8 @@
 import AudioRepository from '../audio/AudioRepository';
 import CacheRepository from '../cache/CacheRepository';
 import BackendClient from '../service/BackendClient';
+import GiphyService from '../extension/GiphyService';
+import GiphyRepository from '../extension/GiphyRepository';
 
 /** Dependencies is a Map that will contain all the dependencies of the app
  * The keys of the map are the identifiers of the app's classes and the values are an array of classes that need to be instanciated
@@ -29,5 +31,7 @@ const dependencies = new Map();
 dependencies.set(CacheRepository.identifier, []);
 dependencies.set(AudioRepository.identifier, []);
 dependencies.set(BackendClient.identifier, []);
+dependencies.set(GiphyService.identifier, [BackendClient]);
+dependencies.set(GiphyRepository.identifier, [GiphyService]);
 
 export default dependencies;

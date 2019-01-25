@@ -90,7 +90,6 @@ import BackupRepositoryGlobal from '../backup/BackupRepository.js';
 import BackupServiceGlobal from '../backup/BackupService.js';
 import BroadcastRepositoryGlobal from '../broadcast/BroadcastRepository.js';
 import BroadcastServiceGlobal from '../broadcast/BroadcastService.js';
-import CacheRepositoryGlobal from '../cache/CacheRepository.js';
 import EnumCallMessageTypeGlobal from '../calling/enum/CallMessageType.js';
 import CallStateGlobal from '../calling/enum/CallState.js';
 import CallStateGroupGlobal from '../calling/enum/CallStateGroup.js';
@@ -167,8 +166,6 @@ import QuotedMessageMiddlewareGlobal from '../event/preprocessor/QuotedMessageMi
 import ServiceMiddlewareGlobal from '../event/preprocessor/ServiceMiddleware.js';
 import WebAppGlobal from '../event/WebApp.js';
 import WebSocketServiceGlobal from '../event/WebSocketService.js';
-import GiphyServiceGlobal from '../extension/GiphyService.js';
-import GiphyRepositoryGlobal from '../extension/GiphyRepository.js';
 import GiphyContentSizesGlobal from '../extension/GiphyContentSizes.js';
 import IntegrationMapperGlobal from '../integration/IntegrationMapper.js';
 import IntegrationRepositoryGlobal from '../integration/IntegrationRepository.js';

@@ -17,12 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.audio = z.audio || {};
+const identifier = Symbol('AudioRepository');
 
-window.z.audio.AudioRepository = class AudioRepository {
-  constructor() {
-    this.logger = new z.util.Logger('z.audio.AudioRepository', z.config.LOGGER.OPTIONS);
+export default class AudioRepository {
+  static get identifier() {
+    return identifier;
+  }
+
+  constructor(logger) {
+    this.logger = logger;
     this.audioElements = {};
     this.currentlyLooping = {};
     this.audioPreference = ko.observable(z.audio.AudioPreference.ALL);
@@ -268,4 +271,4 @@ window.z.audio.AudioRepository = class AudioRepository {
   updatedProperties(properties) {
     this.setAudioPreference(properties.settings.sound.alerts);
   }
-};
+}
