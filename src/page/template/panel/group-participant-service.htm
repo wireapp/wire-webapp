@@ -11,7 +11,7 @@
           <panel-service-details params="service: selectedService"></panel-service-details>
 
           <!-- ko if: showActions() -->
-            <!-- ko if: z.userPermission().canManageServices() -->
+            <!-- ko if: z.userPermission().canChatWithServices() -->
               <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">
                 <message-icon class="panel__action-item__icon"></message-icon>
                 <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>

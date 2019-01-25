@@ -50,6 +50,7 @@ const PUBLIC_FEATURES = {
   MANAGE_SERVICES: 1 << bitsCounter++,
   MANAGE_TEAM: 1 << bitsCounter++,
   INVITE_TEAM_MEMBERS: 1 << bitsCounter++,
+  CHAT_WITH_SERVICES: 1 << bitsCounter++,
 };
 /* eslint-enable sort-keys */
 
@@ -113,6 +114,7 @@ function publicPermissionsForRole(role) {
         PUBLIC_FEATURES.CREATE_GROUP_CONVERSATION,
         PUBLIC_FEATURES.UPDATE_CONVERSATION_SETTINGS,
         PUBLIC_FEATURES.UPDATE_GROUP_PARTICIPANTS,
+        PUBLIC_FEATURES.CHAT_WITH_SERVICES,
       ]);
     case ROLE.PARTNER:
       return 0;
