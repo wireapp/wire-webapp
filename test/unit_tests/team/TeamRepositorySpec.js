@@ -17,6 +17,8 @@
  *
  */
 
+import {backendConfig} from '../../api/testResolver';
+
 describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();
 
@@ -59,13 +61,13 @@ describe('z.team.TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    server.respondWith('GET', `${test_factory.settings.connection.restUrl}/teams?size=100`, [
+    server.respondWith('GET', `${backendConfig.restUrl}/teams?size=100`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(teams_data),
     ]);
 
-    server.respondWith('GET', `${test_factory.settings.connection.restUrl}/teams/${team_metadata.id}/members`, [
+    server.respondWith('GET', `${backendConfig.restUrl}/teams/${team_metadata.id}/members`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(team_members),

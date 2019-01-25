@@ -17,18 +17,18 @@
  *
  */
 
-describe('User Service', () => {
+import resolveDependency, {backendConfig} from '../../api/testResolver';
+import BackendClient from 'src/script/service/BackendClient';
+
+describe('ConnectionService', () => {
   let server = null;
-  const urls = {
-    restUrl: 'http://localhost.com',
-    websocket_url: 'wss://localhost',
-  };
+  const urls = backendConfig;
   let connectionService = null;
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    const backendClient = new z.service.BackendClient(urls);
+    const backendClient = resolveDependency(BackendClient);
     connectionService = new z.connection.ConnectionService(backendClient);
   });
 

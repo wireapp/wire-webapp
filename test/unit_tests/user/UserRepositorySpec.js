@@ -17,6 +17,7 @@
  *
  */
 
+import {backendConfig} from '../../api/testResolver';
 import ConsentValue from 'src/script/user/ConsentValue';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import ReceiptMode from 'src/script/conversation/ReceiptMode';
@@ -251,7 +252,7 @@ describe('UserRepository', () => {
     describe('verify_usernames', () => {
       it('resolves with username when username is not taken', () => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
+        server.respondWith('POST', `${backendConfig.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(usernames),
@@ -264,7 +265,7 @@ describe('UserRepository', () => {
 
       it('rejects when username is taken', () => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
+        server.respondWith('POST', `${backendConfig.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify([]),
@@ -279,11 +280,7 @@ describe('UserRepository', () => {
     describe('verify_username', () => {
       it('resolves with username when username is not taken', () => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
-          404,
-          {},
-          '',
-        ]);
+        server.respondWith('HEAD', `${backendConfig.restUrl}/users/handles/${username}`, [404, {}, '']);
 
         return TestFactory.user_repository.verify_username(username).then(_username => {
           expect(_username).toBe(username);
@@ -292,11 +289,7 @@ describe('UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
-          200,
-          {},
-          '',
-        ]);
+        server.respondWith('HEAD', `${backendConfig.restUrl}/users/handles/${username}`, [200, {}, '']);
 
         TestFactory.user_repository
           .verify_username(username)

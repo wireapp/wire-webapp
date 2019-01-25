@@ -17,6 +17,7 @@
  *
  */
 
+import resolveDependency from '../../api/testResolver';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import PropertiesService from 'src/script/properties/PropertiesService';
 
@@ -24,12 +25,7 @@ describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
 
   beforeEach(() => {
-    const urls = {
-      restUrl: 'http://localhost.com',
-      websocket_url: 'wss://localhost',
-    };
-    const backendClient = new z.service.BackendClient(urls);
-    const propertiesService = new PropertiesService(backendClient);
+    const propertiesService = resolveDependency(PropertiesService);
     propertiesRepository = new PropertiesRepository(propertiesService);
   });
 

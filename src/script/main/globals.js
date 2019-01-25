@@ -352,7 +352,6 @@ import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';
 import authServiceGlobal from '../auth/AuthService.js';
 import authRepoGlobal from '../auth/AuthRepository.js';
-import audioRepoGlobal from '../audio/AudioRepository.js';
 import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 

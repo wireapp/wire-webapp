@@ -852,7 +852,7 @@ class App {
 
 $(() => {
   if ($('#wire-main-app').length !== 0) {
-    dependenciesResolver.init(dependenciesGraph);
+    dependenciesResolver.init(dependenciesGraph, z.config.LOGGER.OPTIONS);
     wire.app = new App(wire.auth);
   }
 });

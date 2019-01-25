@@ -20,6 +20,7 @@
 import {memoize} from 'underscore';
 
 let dependencyGraph;
+let loggerConfig;
 const logger = new z.util.Logger('dependenciesResolver');
 
 const resolver = {
@@ -27,10 +28,12 @@ const resolver = {
    * Will set the dependencies graph that will be used to resolve dependencies when `resolve` method is called
    *
    * @param {Map} dependencies - The dependencies graph of the app
+   * @param {Object} loggerConf - Configuration for the logger that will be passed to dependencies
    * @returns {void}
    */
-  init(dependencies) {
+  init(dependencies, loggerConf) {
     dependencyGraph = dependencies;
+    loggerConfig = loggerConf;
   },
 
   /**
@@ -53,7 +56,7 @@ const resolver = {
     }
     const graph = dependencyGraph.get(identifier) || [];
     const dependencies = graph.map(resolver.resolve);
-    const dependencyLogger = new z.util.Logger(identifier.toString(), z.config.LOGGER.OPTIONS);
+    const dependencyLogger = new z.util.Logger(identifier.toString(), loggerConfig);
     return new dependencyClass(...dependencies.concat(dependencyLogger));
   }),
 };
