@@ -137,12 +137,12 @@ ko.components.register('full-search', {
     <header class="full-search-header">
       <span class="full-search-header-icon icon-search"></span>
       <div class="full-search-header-input">
-        <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearchPlaceholder, textInput: input" data-uie-name="full-search-header-input"/>
+        <input type="text" data-bind="hasFocus: true, attr: {placeholder: t('fullsearchPlaceholder')}, textInput: input" data-uie-name="full-search-header-input"/>
         <span class="button-icon icon-dismiss" data-bind="click: clickOnDismiss, visible: input()" data-uie-name="full-search-dismiss"></span>
       </div>
     </header>
     <!-- ko if: showNoResultsText() -->
-      <div class="full-search-no-result" data-bind="l10n_text: z.string.fullsearchNoResults" data-uie-name="full-search-no-results"></div>
+      <div class="full-search-no-result" data-bind="text: t('fullsearchNoResults')" data-uie-name="full-search-no-results"></div>
     <!-- /ko -->
     <div class="full-search-list" data-bind="foreach: {data: visibleMessageEntities}" data-uie-name="full-search-list">
       <div class="full-search-item" data-bind="click: $parent.clickOnMessage" data-uie-name="full-search-item">

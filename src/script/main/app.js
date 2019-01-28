@@ -22,11 +22,20 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
+import * as UserPermission from '../user/UserPermission';
+import UserService from '../user/UserService';
+import UserRepository from '../user/UserRepository';
+
+import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
+import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
+import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+
 import DebugUtil from '../util/DebugUtil';
 
 import '../components/mentionSuggestions.js';
 
 import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
+import {t} from 'utils/LocalizerUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
@@ -64,13 +73,15 @@ class App {
     this.backendClient = authComponent.backendClient;
     this.logger = new z.util.Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
-    this.telemetry = new z.telemetry.app_init.AppInitTelemetry();
+    this.telemetry = new AppInitTelemetry();
     this.windowHandler = new z.ui.WindowHandler().init();
 
     this.service = this._setupServices(authComponent);
     this.repository = this._setupRepositories(authComponent);
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
+
+    this._publishGlobals();
 
     this.instanceId = z.util.createRandomUuid();
 
@@ -111,7 +122,7 @@ class App {
     );
     repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.media = new z.media.MediaRepository(repositories.permission);
-    repositories.user = new z.user.UserRepository(
+    repositories.user = new UserRepository(
       this.service.user,
       this.service.asset,
       this.service.self,
@@ -245,7 +256,7 @@ class App {
       self: new z.self.SelfService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
-      user: new z.user.UserService(this.backendClient, storageService),
+      user: new UserService(this.backendClient, storageService),
       webSocket: new z.event.WebSocketService(this.backendClient),
     };
   }
@@ -297,26 +308,26 @@ class App {
       .then(() => this._loadAccessToken())
       .then(() => {
         this.view.loading.updateProgress(2.5);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `/proto/messages.proto?${z.util.Environment.version(false)}`;
         return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(() => {
-        this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
+        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
+        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
-        this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+        this.view.loading.updateProgress(7.5, t('initValidatedClient'));
+        this.telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
+        this.telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         this.view.loading.updateProgress(10);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
+        this.telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
 
@@ -324,19 +335,11 @@ class App {
         return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {
-        this.view.loading.updateProgress(25, z.string.initReceivedUserData);
+        this.view.loading.updateProgress(25, t('initReceivedUserData'));
 
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
-        this.telemetry.add_statistic(
-          z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS,
-          conversationEntities.length,
-          50
-        );
-        this.telemetry.add_statistic(
-          z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS,
-          connectionEntities.length,
-          50
-        );
+        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
+        this.telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+        this.telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
         this.repository.conversation.map_connections(this.repository.connection.connectionEntities());
         this._subscribeToUnloadEvents();
@@ -346,18 +349,14 @@ class App {
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initializeFromStream())
       .then(notificationsCount => {
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-        this.telemetry.add_statistic(
-          z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS,
-          notificationsCount,
-          100
-        );
+        this.telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
+        this.telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
         this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
+        this.view.loading.updateProgress(97.5, t('initUpdatedFromNotifications'));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
@@ -365,8 +364,8 @@ class App {
       .then(clientEntities => {
         this.view.loading.updateProgress(99);
 
-        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, clientEntities.length);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
+        this.telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+        this.telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
 
         this.repository.user.self().devices(clientEntities);
         this.logger.info('App pre-loading completed');
@@ -376,11 +375,11 @@ class App {
         this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_LOADED);
+        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
+        this.telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
         this.repository.lifecycle.init();
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
@@ -781,7 +780,7 @@ class App {
         const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
         const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
         if (isLeavingGuestRoom) {
-          const path = z.l10n.text(z.string.urlWebsiteRoot);
+          const path = t('urlWebsiteRoot');
           const url = getWebsiteUrl(path);
           return window.location.replace(url);
         }
@@ -833,6 +832,14 @@ class App {
 
   _onExtraInstanceStarted() {
     return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+  }
+
+  _publishGlobals() {
+    window.z.userPermission = ko.observable({});
+    ko.pureComputed(() => {
+      const selfUser = this.repository.user.self();
+      return selfUser && selfUser.teamRole();
+    }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
 }
 

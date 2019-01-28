@@ -17,11 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.app_init = z.telemetry.app_init || {};
-
-z.telemetry.app_init.AppInitStatisticsValue = {
+export default {
   BACKEND_REQUESTS: 'backend_requests',
   CLIENT_TYPE: 'client_type',
   CLIENTS: 'clients',

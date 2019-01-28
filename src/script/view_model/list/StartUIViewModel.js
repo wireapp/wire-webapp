@@ -18,6 +18,8 @@
  */
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
+import {generatePermissionHelpers} from '../../user/UserPermission';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -123,7 +125,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    this.showInviteMember = ko.pureComputed(() => this.selfUser().isTeamOwner() && this.teamSize() === 1);
+    const {canInviteTeamMembers} = generatePermissionHelpers();
+    this.showInviteMember = ko.pureComputed(
+      () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1
+    );
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
@@ -149,19 +154,14 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.inviteBubble = null;
 
     this.inviteHint = ko.pureComputed(() => {
-      const metaKey = z.util.Environment.os.mac
-        ? z.l10n.text(z.string.inviteMetaKeyMac)
-        : z.l10n.text(z.string.inviteMetaKeyPc);
+      const metaKey = z.util.Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
 
-      const stringId = this.inviteMessageSelected() ? z.string.inviteHintSelected : z.string.inviteHintUnselected;
-      return z.l10n.text(stringId, metaKey);
+      return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
     });
     this.inviteMessage = ko.pureComputed(() => {
       if (this.selfUser()) {
         const username = this.selfUser().username();
-        return username
-          ? z.l10n.text(z.string.inviteMessage, `@${username}`)
-          : z.l10n.text(z.string.inviteMessageNoEmail);
+        return username ? t('inviteMessage', `@${username}`) : t('inviteMessageNoEmail');
       }
       return '';
     });
@@ -186,7 +186,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.serviceConversations = ko.observable([]);
 
-    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.isInitialServiceSearch = ko.observable(true);
 
     this.userBubble = undefined;
@@ -519,8 +518,8 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
             action: () => this.importContacts(source),
             text: {
-              action: z.l10n.text(z.string.modalUploadContactsAction),
-              message: z.l10n.text(z.string.modalUploadContactsMessage),
+              action: t('modalUploadContactsAction'),
+              message: t('modalUploadContactsMessage'),
             },
           });
         }

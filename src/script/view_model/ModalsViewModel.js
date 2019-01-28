@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -151,13 +153,13 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   _showModalAcknowledge(options, titleElement, messageElement, actionElement) {
     const {action: actionText, htmlMessage, message: messageText, title: titleText} = options.text;
 
-    actionElement.text(actionText || z.l10n.text(z.string.modalAcknowledgeAction));
+    actionElement.text(actionText || t('modalAcknowledgeAction'));
     if (htmlMessage) {
       messageElement.html(htmlMessage);
     } else {
       messageElement.text(messageText || '');
     }
-    titleElement.text(titleText || z.l10n.text(z.string.modalAcknowledgeHeadline));
+    titleElement.text(titleText || t('modalAcknowledgeHeadline'));
 
     if (options.warning !== false) {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
@@ -168,7 +170,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal-secondary');
     const {action: actionText, message: messageText, secondary, title: titleText} = options.text;
 
-    const secondaryText = secondary || z.l10n.text(z.string.modalConfirmSecondary);
+    const secondaryText = secondary || t('modalConfirmSecondary');
 
     actionElement.text(actionText || '');
     messageElement.text(messageText || '');
@@ -183,8 +185,8 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   _showModalAccountReadReceiptsChanged(newValue) {
     const titleContainer = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.modal-title');
     const title = newValue
-      ? z.string.modalAccountReadReceiptsChangedOnHeadline
-      : z.string.modalAccountReadReceiptsChangedOffHeadline;
+      ? t('modalAccountReadReceiptsChangedOnHeadline')
+      : t('modalAccountReadReceiptsChangedOffHeadline');
 
     titleContainer.text(title);
   }
@@ -200,7 +202,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         .appendTo(devicesElement);
 
       $('<div>')
-        .text(`${z.l10n.text(z.string.modalAccountNewDevicesFrom)} ${device.model}`)
+        .text(`${t('modalAccountNewDevicesFrom')} ${device.model}`)
         .appendTo(devicesElement);
     });
   }
@@ -210,7 +212,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     const optionElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-option-text');
     const {action: actionText, message: messageText, option: optionText, secondary, title: titleText} = options.text;
 
-    const secondaryText = secondary || z.l10n.text(z.string.modalOptionSecondary);
+    const secondaryText = secondary || t('modalOptionSecondary');
 
     actionElement.text(actionText || '');
     messageElement.text(messageText || '');

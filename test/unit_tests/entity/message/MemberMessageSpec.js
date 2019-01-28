@@ -19,6 +19,8 @@
 
 // KARMA_SPECS=entity/message/MemberMessage yarn test:app
 
+import 'src/script/localization/Localizer';
+
 describe('Member Message', () => {
   describe('generateNameString', () => {
     let message_et = null;
@@ -27,7 +29,7 @@ describe('Member Message', () => {
       message_et = new z.entity.MemberMessage();
     });
 
-    it('can return correct string for more than one user', () => {
+    it('can return correct string for one user', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
@@ -35,7 +37,7 @@ describe('Member Message', () => {
       expect(message_et._generateNameString()).toBe('[bold]John[/bold]');
     });
 
-    it('can return correct string for more than one user', () => {
+    it('can return correct string for two users', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       const user_b = new z.entity.User(z.util.createRandomUuid());
@@ -45,7 +47,7 @@ describe('Member Message', () => {
       expect(message_et._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
-    it('can return correct string for more than one user', () => {
+    it('can return correct string for more than two users', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       const user_b = new z.entity.User(z.util.createRandomUuid());

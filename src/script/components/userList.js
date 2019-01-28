@@ -105,11 +105,11 @@ ko.components.register('user-list', {
 
     <!-- ko if: typeof filter === 'function' -->
       <!-- ko if: userEntities().length === 0 -->
-        <div class="no-results" data-bind="l10n_text: z.string.searchListEveryoneParticipates"></div>
+        <div class="no-results" data-bind="text: t('searchListEveryoneParticipates')"></div>
       <!-- /ko -->
 
       <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
-        <div class="no-results" data-bind="l10n_text: z.string.searchListNoMatches" data-uie-name="status-no-matches"></div>
+        <div class="no-results" data-bind="text: t('searchListNoMatches')" data-uie-name="status-no-matches"></div>
       <!-- /ko -->
     <!-- /ko -->
   `,

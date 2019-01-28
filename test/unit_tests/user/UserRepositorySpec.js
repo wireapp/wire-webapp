@@ -21,7 +21,7 @@ import ConsentValue from 'src/script/user/ConsentValue';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import ReceiptMode from 'src/script/conversation/ReceiptMode';
 
-describe('z.user.UserRepository', () => {
+describe('UserRepository', () => {
   let server = null;
   const test_factory = new TestFactory();
 

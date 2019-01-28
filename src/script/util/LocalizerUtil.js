@@ -17,11 +17,35 @@
  *
  */
 
+import SanitizationUtil from './SanitizationUtil';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.LocalizerUtil = {
-  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
+const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
+
+const replaceSubstituteEscaped = (string, regex, substitute) => {
+  const replacement = isStringOrNumber(substitute)
+    ? SanitizationUtil.escapeString(substitute)
+    : (found, content) =>
+        substitute.hasOwnProperty(content) ? SanitizationUtil.escapeString(substitute[content]) : found;
+  return string.replace(regex, replacement);
+};
+
+const replaceSubstitute = (string, regex, substitute) => {
+  const replacement = isStringOrNumber(substitute)
+    ? substitute
+    : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
+  return string.replace(regex, replacement);
+};
+
+export const DEFAULT_LOCALE = 'en';
+
+let locale = DEFAULT_LOCALE;
+let strings = {};
+
+const LocalizerUtil = {
+  joinNames: (userEntities, declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
@@ -45,11 +69,55 @@ z.util.LocalizerUtil = {
 
       const exactlyTwoNames = numberOfNames === 2;
       const additionalNames = exactlyTwoNames
-        ? `${secondLastName} ${z.l10n.text(z.string.and)} ${lastName}`
-        : `${secondLastName}${z.l10n.text(z.string.enumerationAnd)}${lastName}`;
+        ? `${secondLastName} ${t('and')} ${lastName}`
+        : `${secondLastName}${t('enumerationAnd')}${lastName}`;
       firstNames.push(additionalNames);
     }
 
     return firstNames.join(', ');
   },
+
+  translate: (identifier, substitutions = {}, dangerousSubstitutions = {}) => {
+    const localeValue = strings[locale] && strings[locale][identifier];
+    const defaultValue =
+      strings[DEFAULT_LOCALE] && strings[DEFAULT_LOCALE].hasOwnProperty(identifier)
+        ? strings[DEFAULT_LOCALE][identifier]
+        : identifier;
+    const value = localeValue || defaultValue;
+
+    const replaceDangerously = Object.assign(
+      {
+        '/bold': '</b>',
+        '/italic': '</i>',
+        bold: '<b>',
+        italic: '<i>',
+      },
+      dangerousSubstitutions
+    );
+
+    const substitutedEscaped = replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
+    const substituted = replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
+
+    return substituted;
+  },
 };
+
+export const Declension = {
+  ACCUSATIVE: 'accusative',
+  DATIVE: 'dative',
+  NOMINATIVE: 'nominative',
+};
+
+export const setLocale = newLocale => (locale = newLocale);
+
+export const setStrings = newStrings => (strings = newStrings);
+
+export function t(identifier, substitutions, dangerousSubstitutions) {
+  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions);
+}
+
+export const joinNames = LocalizerUtil.joinNames;
+
+export default LocalizerUtil;
+
+window.t = LocalizerUtil.translate;

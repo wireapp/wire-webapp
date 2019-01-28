@@ -20,10 +20,13 @@
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
-z.auth.URLParameter = {
+const URLParameter = {
   ENVIRONMENT: 'env',
   LOCALE: 'hl',
   MODE: 'mode',
   REASON: 'reason',
   TRACKING: 'tracking',
 };
+
+export default URLParameter;
+z.auth.URLParameter = URLParameter;

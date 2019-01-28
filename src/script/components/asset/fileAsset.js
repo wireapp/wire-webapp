@@ -104,13 +104,13 @@ ko.components.register('file-asset', {
                 <li data-bind="text: z.util.getFileExtension(asset.file_name)" data-uie-name="file-type"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
-                <li data-bind="l10n_text: z.string.conversationAssetUploading" data-uie-name="file-status"></li>
+                <li data-bind="text: t('conversationAssetUploading')" data-uie-name="file-status"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_FAILED -->
-                <li data-bind="l10n_text: z.string.conversationAssetUploadFailed" class="text-red"  data-uie-name="file-status"></li>
+                <li data-bind="text: t('conversationAssetUploadFailed')" class="text-red"  data-uie-name="file-status"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
-                <li data-bind="l10n_text: z.string.conversationAssetDownloading" data-uie-name="file-status"></li>
+                <li data-bind="text: t('conversationAssetDownloading')" data-uie-name="file-status"></li>
               <!-- /ko -->
             </ul>
           </div>

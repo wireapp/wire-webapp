@@ -45,7 +45,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * Construct a new repository for user actions and errors reporting.
    *
    * @param {z.team.TeamRepository} teamRepository - Repository that handles teams
-   * @param {z.user.UserRepository} userRepository - Repository that handles users
+   * @param {UserRepository} userRepository - Repository that handles users
    * @returns {EventTrackingRepository} The new repository for user actions
    */
   constructor(teamRepository, userRepository) {

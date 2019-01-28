@@ -18,6 +18,7 @@
  */
 
 import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
+import {t} from 'utils/LocalizerUtil';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export default class EventMapper {
@@ -501,7 +502,7 @@ export default class EventMapper {
   _mapEventTeamMemberLeave(event) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
-    messageEntity.name(eventData.name || z.l10n.text(z.string.conversationSomeone));
+    messageEntity.name(eventData.name || t('conversationSomeone'));
     return messageEntity;
   }
 

@@ -17,8 +17,15 @@
  *
  */
 
-describe('z.viewModel.WindowTitleViewModel', () => {
-  const suffix = z.l10n.text(z.string.wire);
+import ko from 'knockout';
+
+import 'src/script/localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
+
+import WindowTitleViewModel from 'src/script/view_model/WindowTitleViewModel';
+
+describe('WindowTitleViewModel', () => {
+  const suffix = t('wire');
   let test_factory = undefined;
   let title_view_model = undefined;
 
@@ -26,7 +33,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     test_factory = new TestFactory();
 
     return test_factory.exposeConversationActors().then(conversationRepository => {
-      title_view_model = new z.viewModel.WindowTitleViewModel(
+      title_view_model = new WindowTitleViewModel(
         {
           content: {
             state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
@@ -196,40 +203,37 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('shows the number of connection requests when viewing the inbox', done => {
+    it('shows the number of connection requests when viewing the inbox', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      title_view_model.userRepository.connect_requests = ko.observableArray([]);
 
-      const pending_connection = new z.connection.ConnectionEntity();
-      pending_connection.status(z.connection.ConnectionStatus.PENDING);
+      const firstConnectedUser = new z.entity.User(z.util.createRandomUuid());
+      const secondConnectedUser = new z.entity.User(z.util.createRandomUuid());
+      const thirdConnectedUser = new z.entity.User(z.util.createRandomUuid());
 
-      const user_et = new z.entity.User(z.util.createRandomUuid());
-      user_et.connection(pending_connection);
+      const tests = [
+        {
+          connections: [firstConnectedUser],
+          expected: `(1) ${t('conversationsConnectionRequestOne')} · ${suffix}`,
+        },
+        {
+          connections: [firstConnectedUser, secondConnectedUser],
+          expected: `(2) ${t('conversationsConnectionRequestMany', 2)} · ${suffix}`,
+        },
+        {
+          connections: [firstConnectedUser, secondConnectedUser, thirdConnectedUser],
+          expected: `(3) ${t('conversationsConnectionRequestMany', 3)} · ${suffix}`,
+        },
+      ];
 
-      // Test one connect request message
-      title_view_model.userRepository.users.push(user_et);
-
-      let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
-      let expectedWaitingPeople = '1';
-      let expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
-      expect(window.document.title).toBe(expected_title);
+      tests.forEach(({connections, expected}) => {
+        title_view_model.userRepository.connect_requests(connections);
+        jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
 
-      // Test multiple connect request messages and observe the title change
-      title_view_model.userRepository.connect_requests.subscribe(() => {
-        jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
-        expectedWaitingPeople = '2';
-        message = z.l10n.text(z.string.conversationsConnectionRequestMany, expectedWaitingPeople);
-        expected_title = `(${expectedWaitingPeople}) ${message} · ${suffix}`;
-
-        expect(window.document.title).toBe(expected_title);
-        done();
+        expect(window.document.title).toBe(expected);
       });
-
-      const another_user_et = new z.entity.User(z.util.createRandomUuid());
-      another_user_et.connection(pending_connection);
-      title_view_model.userRepository.users.push(another_user_et);
-      jasmine.clock().tick(z.viewModel.WindowTitleViewModel.TITLE_DEBOUNCE);
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {

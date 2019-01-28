@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -25,10 +27,7 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
     super();
     this.super_type = z.message.SuperType.PING;
 
-    this.caption = ko.pureComputed(() => {
-      const stringId = this.user().is_me ? z.string.conversationPingYou : z.string.conversationPing;
-      return z.l10n.text(stringId);
-    });
+    this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationPingYou') : t('conversationPing')));
 
     this.get_icon_classes = ko.pureComputed(() => {
       const show_ping_animation = Date.now() - this.timestamp() < 2000;

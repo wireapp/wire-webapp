@@ -50,7 +50,7 @@ class SearchRepository {
   /**
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} searchService - Backend REST API search service implementation
-   * @param {z.user.UserRepository} userRepository - Repository for all user interactions
+   * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(searchService, userRepository) {
     this.searchService = searchService;

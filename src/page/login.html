@@ -30,7 +30,7 @@
         <div class="content">
           <div id="section-account" class="section">
             <div class="selector selector-mode">
-              <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.authAccountSignInPhone"></button>
+              <button class="button btn-mode btn-login" data-bind="text: t('authAccountSignInPhone')"></button>
             </div>
 
             <div id="form-account-login" class="form">
@@ -39,8 +39,8 @@
                   <select class="input phone" id="wire-login-country" name="select"
                           data-bind="event: {change: changed_country}, textInput: country"
                           data-uie-name="enter-country">
-                    <option value="X0" style="display:none;" data-bind="l10n_text: z.string.authAccountCountryCode"></option>
-                    <option value="X1" style="display:none;" data-bind="l10n_text: z.string.authErrorCountryCodeInvalid"></option>
+                    <option value="X0" style="display:none;" data-bind="text: t('authAccountCountryCode')"></option>
+                    <option value="X1" style="display:none;" data-bind="text: t('authErrorCountryCodeInvalid')"></option>
                     <!-- ko foreach: z.util.CountryCodes.COUNTRY_CODES -->
                       <option data-bind="value: iso, text: name"></option>
                     <!-- /ko -->
@@ -50,10 +50,10 @@
                 <div class="form-control">
                   <div class="input-group" data-bind="css: {'input-error': failed_validation_phone}">
                     <input class="input phone" id="wire-login-country-code" type="tel" autocomplete="off" maxlength="5" spellcheck="false"
-                           data-bind="event: {change: changed_country_code, input: clear_error}, l10n_tooltip: z.string.authAccountCountryCode, textInput: country_code"
+                           data-bind="event: {change: changed_country_code, input: clear_error}, attr: {title: t('authAccountCountryCode')}, textInput: country_code"
                            data-uie-name="enter-county-code">
                     <input class="input phone" id="wire-login-phone" type="tel" autocomplete="off" maxlength="15" spellcheck="false"
-                           data-bind="event: {change: changed_phone_number, input: clear_error}, l10n_tooltip: z.string.authPlaceholderPhone, l10n_placeholder: z.string.authPlaceholderPhone, textInput: phone_number"
+                           data-bind="event: {change: changed_phone_number, input: clear_error}, attr: {title: t('authPlaceholderPhone'), placeholder: t('authPlaceholderPhone')}, textInput: phone_number"
                            data-uie-name="enter-phone">
                   </div>
                 </div>
@@ -63,12 +63,12 @@
                 <div id="wire-login-phone-remember" data-bind="electron_remove">
                   <div class="checkbox checkbox-remember">
                     <input type="checkbox" id="checkbox-public-computer-phone" data-bind="checked: is_public_computer" data-uie-name="enter-public-computer-phone-sign-in">
-                    <label class="label-xs" for="checkbox-public-computer-phone" data-bind="l10n_text: z.string.authAccountPublicComputer"></label>
+                    <label class="label-xs" for="checkbox-public-computer-phone" data-bind="text: t('authAccountPublicComputer')"></label>
                   </div>
                 </div>
                 <div class="footer">
                     <input id="wire-phone-login" class="button button-white btn-action btn-sign-in-phone" type="submit"
-                           data-bind="enable: can_login_phone, l10n_input: z.string.authAccountSignIn"
+                           data-bind="enable: can_login_phone, attr: {value: t('authAccountSignIn')}"
                            data-uie-name="do-sign-in-phone">
                 </div>
               </form>
@@ -77,16 +77,16 @@
 
           <div id="section-verify" class="section">
             <form id="form-verify-account" class="form" data-bind="submit: verify_account">
-              <div class="auth-headline" data-bind="l10n_text: z.string.authVerifyAccountHeadline"></div>
-              <div class="auth-headline-sub" data-bind="l10n_text: z.string.authVerifyAccountDetail"></div>
+              <div class="auth-headline" data-bind="text: t('authVerifyAccountHeadline')"></div>
+              <div class="auth-headline-sub" data-bind="text: t('authVerifyAccountDetail')"></div>
               <div id="wire-verify-account-email-container" class="form-control">
                 <input class="input email" id="wire-verify-account-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
-                       data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.authPlaceholderEmail, l10n_placeholder: z.string.authPlaceholderEmail, textInput: username"
+                       data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, attr: {title: t('authPlaceholderEmail'), placeholder: t('authPlaceholderEmail')}, textInput: username"
                        data-uie-name="enter-email">
               </div>
               <div id="wire-verify-account-password-container" class="form-control">
                 <input class="input password" id="wire-verify-account-password" type="password" maxlength="1024"
-                       data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.authPlaceholderPasswordSet, l10n_placeholder: z.string.authPlaceholderPasswordSet, textInput: password"
+                       data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, attr: {title: t('authPlaceholderPasswordSet'), placeholder: t('authPlaceholderPasswordSet')}, textInput: password"
                        data-uie-name="enter-password">
               </div>
               <ul class="error-list" data-bind="foreach: validation_errors" data-uie-name="status-error">
@@ -95,12 +95,12 @@
               <div class="footer">
                 <div class="column">
                   <input id="wire-verify-account" class="button button-white btn-action" type="submit"
-                         data-bind="enable: can_verify_account, l10n_input: z.string.authVerifyAccountAdd"
+                         data-bind="enable: can_verify_account, attr: {value: t('authVerifyAccountAdd')}"
                          data-uie-name="do-verify-account">
                 </div>
                 <div class="column">
                   <a class="auth-link-button"
-                     data-bind="click: logout, l10n_text: z.string.authLimitButtonSignOut"
+                     data-bind="click: logout, text: t('authLimitButtonSignOut')"
                      data-uie-name="go-sign-out">
                   </a>
                 </div>
@@ -143,25 +143,25 @@
                 <!-- /ko -->
               </ul>
               <div class="footer">
-                <div class="verify-action-detail" data-bind="l10n_text: z.string.authVerifyCodeResend"></div>
+                <div class="verify-action-detail" data-bind="text: t('authVerifyCodeResend')"></div>
                 <!-- ko if: can_resend_code -->
                   <div id="wire-resend-code" class="auth-text-link verify-link verify-action-link"
-                       data-bind="click: clicked_on_resend_code, l10n_text: z.string.authVerifyCodeResendDetail"></div>
+                       data-bind="click: clicked_on_resend_code, text: t('authVerifyCodeResendDetail')"></div>
                 <!-- /ko -->
                 <!-- ko ifnot: can_resend_code -->
                   <div class="verify-action-detail" data-bind="text: verify_code_timer_text"></div>
                 <!-- /ko -->
                 <div id="verify-change-link" class="auth-text-link verify-link"
-                     data-bind="click: clicked_on_change_phone, l10n_text: z.string.authVerifyCodeChangePhone">
+                     data-bind="click: clicked_on_change_phone, text: t('authVerifyCodeChangePhone')">
                 </div>
               </div>
             </form>
 
             <form id="form-verify-phone-password" class="form" data-bind="submit: verify_password">
-              <div class="auth-headline verify-password-text" data-bind="l10n_text: z.string.authVerifyPasswordHeadline"></div>
+              <div class="auth-headline verify-password-text" data-bind="text: t('authVerifyPasswordHeadline')"></div>
               <div id="wire-verify-phone-password-container" class="form-control">
                 <input class="input password" id="wire-verify-password-input" type="password" maxlength="1024"
-                       data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.authPlaceholderPasswordPut, l10n_placeholder: z.string.authPlaceholderPasswordPut, textInput: password"
+                       data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, attr: {title: t('authPlaceholderPasswordPut'), placeholder: t('authPlaceholderPasswordPut')}, textInput: password"
                        data-uie-name="enter-password">
               </div>
               <ul class="error-list" data-bind="foreach: validation_errors" data-uie-name="status-error">
@@ -170,12 +170,12 @@
               <div class="footer">
                 <div class="column">
                   <input id="wire-verify-password" class="button button-white btn-action" type="submit"
-                         data-bind="enable: can_verify_password, l10n_input: z.string.authAccountSignIn"
+                         data-bind="enable: can_verify_password, attr: {value: t('authAccountSignIn')}"
                          data-uie-name="do-login-in">
                 </div>
                 <div class="column">
                   <a class="auth-link-button"
-                     data-bind="click: clicked_on_password, l10n_text: z.string.authAccountPasswordForgot"
+                     data-bind="click: clicked_on_password, text: t('authAccountPasswordForgot')"
                      data-uie-name="go-forgot-password">
                   </a>
                 </div>
@@ -184,16 +184,16 @@
           </div>
 
           <div id="section-limit" class="section">
-            <div class="auth-headline" data-bind="l10n_text: z.string.authLimitDescription"></div>
+            <div class="auth-headline" data-bind="text: t('authLimitDescription')"></div>
             <div class="footer">
               <div class="column">
                 <span class="button button-white button-fluid"
-                       data-bind="click: clicked_on_manage_devices, l10n_text: z.string.authLimitButtonManage"
+                       data-bind="click: clicked_on_manage_devices, text: t('authLimitButtonManage')"
                        data-uie-name="do-manage-devices"></span>
               </div>
               <div class="column">
                 <a class="auth-link-button"
-                   data-bind="click: logout, l10n_text: z.string.authLimitButtonSignOut"
+                   data-bind="click: logout, text: t('authLimitButtonSignOut')"
                    data-uie-name="go-sign-out">
                 </a>
               </div>
@@ -202,22 +202,22 @@
 
           <div id="section-history" class="section">
             <!-- ko if: deviceReused -->
-              <div class="auth-headline" data-bind="l10n_text: z.string.authHistoryReuseHeadline"></div>
-              <div class="auth-headline-sub" data-bind="l10n_text: z.string.authHistoryReuseDescription"></div>
+              <div class="auth-headline" data-bind="text: t('authHistoryReuseHeadline')"></div>
+              <div class="auth-headline-sub" data-bind="text: t('authHistoryReuseDescription')"></div>
             <!-- /ko -->
             <!-- ko ifnot: deviceReused -->
-              <div class="auth-headline" data-bind="l10n_text: z.string.authHistoryHeadline"></div>
-              <div class="auth-headline-sub" data-bind="l10n_text: z.string.authHistoryDescription"></div>
+              <div class="auth-headline" data-bind="text: t('authHistoryHeadline')"></div>
+              <div class="auth-headline-sub" data-bind="text: t('authHistoryDescription')"></div>
             <!-- /ko -->
             <div class="footer">
               <div class="button-group">
                 <!-- ko ifnot: deviceReused -->
                   <a class="button button-outline" rel="nofollow noopener noreferrer" target="_blank"
-                     data-bind="l10n_href: {support: z.config.SUPPORT.ID.HISTORY}, l10n_text: z.string.warningLearnMore"
+                     data-bind="l10n_href: {support: z.config.SUPPORT.ID.HISTORY}, text: t('warningLearnMore')"
                      data-uie-name="do-history-learn-more"></a>
                 <!-- /ko -->
                 <span class="button button-white"
-                    data-bind="click: click_on_history_confirm, l10n_text: z.string.authHistoryButton"
+                    data-bind="click: click_on_history_confirm, text: t('authHistoryButton')"
                     data-uie-name="do-history-confirm"></span>
               </div>
             </div>
@@ -231,9 +231,9 @@
             </div>
             <div class="form-posted">
               <div id="form-posted-verify" class="posted-content" data-bind="visible: posted_mode_verify">
-                <div class="auth-headline" data-bind="l10n_text: z.string.authPostedResendHeadline"></div>
-                <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.authPostedResendDetail"></div>
-                <div class="posted-action-detail" data-bind="l10n_text: z.string.authPostedResendAction"></div>
+                <div class="auth-headline" data-bind="text: t('authPostedResendHeadline')"></div>
+                <div class="auth-headline-sub posted-message-detail" data-bind="text: t('authPostedResendDetail')"></div>
+                <div class="posted-action-detail" data-bind="text: t('authPostedResendAction')"></div>
                 <span id="wire-verify" class="auth-text-link posted-link"
                      data-bind="click: clicked_on_resend_verification, enabled: can_register, text: posted_text" ></span>
               </div>
@@ -243,14 +243,14 @@
           <div id="section-blocked" class="section">
             <div class="form-blocked">
               <div id="form-blocked-cookies" class="blocked-content" data-bind="visible: blocked_mode_cookies">
-                <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedCookies"></div>
+                <div class="auth-headline" data-bind="text: t('authBlockedCookies')"></div>
               </div>
               <div id="form-blocked-database" class="blocked-content" data-bind="visible: blocked_mode_database">
-                <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedDatabase"></div>
+                <div class="auth-headline" data-bind="text: t('authBlockedDatabase')"></div>
               </div>
               <div id="form-blocked-tabs" class="blocked-content" data-bind="visible: blocked_mode_tabs">
-                <div class="auth-headline blocked-headline" data-bind="l10n_text: z.string.authBlockedTabs"></div>
-                <span class="auth-text-link" data-bind="click: clickOnHandover, l10n_text: z.string.authBlockedTabsAction"></span>
+                <div class="auth-headline blocked-headline" data-bind="text: t('authBlockedTabs')"></div>
+                <span class="auth-text-link" data-bind="click: clickOnHandover, text: t('authBlockedTabsAction')"></span>
               </div>
             </div>
           </div>
@@ -262,7 +262,7 @@
         <div class="modal-content">
           <header>
             <span class="modal-button-close button-icon icon-close" data-bind="click: close_model_manage_devices" data-uie-name="do-close"></span>
-            <div class="title" data-bind="l10n_text: z.string.authLimitDevicesHeadline"></div>
+            <div class="title" data-bind="text: t('authLimitDevicesHeadline')"></div>
           </header>
           <!-- ko foreach: permanent_devices -->
             <section class="modal-limit-section">

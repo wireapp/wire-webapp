@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -51,7 +53,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     });
   }
 
-  _updateActivationDate(time, template = z.string.preferencesDevicesActivatedOn) {
+  _updateActivationDate(time, template = t('preferencesDevicesActivatedOn')) {
     const formattedTime = z.util.TimeUtil.formatTimestamp(time);
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);

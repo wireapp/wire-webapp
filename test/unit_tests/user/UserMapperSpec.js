@@ -17,8 +17,10 @@
  *
  */
 
+import UserMapper from 'src/script/user/UserMapper';
+
 describe('User Mapper', () => {
-  const mapper = new z.user.UserMapper(new z.time.ServerTimeRepository());
+  const mapper = new UserMapper(new z.time.ServerTimeRepository());
 
   let self_user_payload = null;
 

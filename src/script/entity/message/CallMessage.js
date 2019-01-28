@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'utils/LocalizerUtil';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -27,13 +29,9 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
     this.call_message_type = '';
     this.finished_reason = '';
 
-    this.caption = ko.pureComputed(() => {
-      const stringId = this.user().is_me
-        ? z.string.conversationVoiceChannelDeactivateYou
-        : z.string.conversationVoiceChannelDeactivate;
-
-      return z.l10n.text(stringId);
-    });
+    this.caption = ko.pureComputed(() =>
+      this.user().is_me ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate')
+    );
   }
 
   /**

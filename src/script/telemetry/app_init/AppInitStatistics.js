@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.app_init = z.telemetry.app_init || {};
+import AppInitStatisticsValue from './AppInitStatisticsValue';
 
-z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
+export default class AppInitStatistics {
   static get CONFIG() {
     return {
       LOG_LENGTH_KEY: 17,
@@ -30,7 +28,7 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
   }
 
   constructor() {
-    this.logger = new z.util.Logger('z.telemetry.app_init.AppInitStatistics', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('AppInitStatistics', z.config.LOGGER.OPTIONS);
 
     amplify.subscribe(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }
@@ -73,6 +71,6 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
   }
 
   update_backend_requests(number_of_requests) {
-    this[z.telemetry.app_init.AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
+    this[AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
   }
-};
+}
