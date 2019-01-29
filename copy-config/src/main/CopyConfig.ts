@@ -18,7 +18,6 @@
  */
 
 import {exec} from 'child_process';
-import * as os from 'os';
 import * as path from 'path';
 import {promisify} from 'util';
 
@@ -48,6 +47,7 @@ export class CopyConfig {
   private readonly baseDir: string = 'config';
   private readonly noClone: boolean = false;
   private readonly noCleanup: boolean = false;
+  private readonly filterFiles: string[] = ['.DS_Store'];
 
   constructor(filesOrOptions: CopyConfigOptions) {
     this.options = {...defaultOptions, ...filesOrOptions};
@@ -58,7 +58,6 @@ export class CopyConfig {
       this.noCleanup = true;
       this.baseDir = this.options.externalDir;
     }
-
     this.baseDir = path.resolve(this.baseDir);
 
     this.logger = logdown('@wireapp/copy-config/CopyConfig', {
@@ -112,24 +111,38 @@ export class CopyConfig {
   }
 
   public async copyDirOrFile(source: string, destination: string): Promise<string[]> {
+    const filter = (src: string): boolean => {
+      for (const fileName in this.filterFiles) {
+        if (src.endsWith(fileName)) {
+          return false;
+        }
+      }
+      return true;
+    };
     const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
+    const isGlob = (path: string) => /\*$/.test(path);
 
     this.logger.info(`Copying "${source}" -> "${destination}"`);
-
-    await fs.ensureDir(destination);
 
     if (isFile(destination)) {
       if (!isFile(source)) {
         throw new Error('Cannot copy a directory into a file.');
       }
-
-      const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'copyconfig-'));
-      const result = await copyAsync(source, tempDir);
-      await fs.rename(result[0], destination);
-      return [destination];
+      await fs.ensureDir(path.dirname(destination));
+    } else {
+      await fs.ensureDir(destination);
     }
 
-    return copyAsync(source, destination);
+    if (isGlob(source)) {
+      return copyAsync(source, destination);
+    }
+
+    if (isFile(source) && !isFile(destination)) {
+      destination = path.join(destination, path.basename(source));
+    }
+
+    await fs.copy(source, destination, {filter, overwrite: true, recursive: true});
+    return [destination];
   }
 
   private async clone(): Promise<void> {
@@ -142,12 +155,12 @@ export class CopyConfig {
     }
 
     if (!this.noCleanup) {
-      this.logger.info(`Cleaning up configuration dir before cloning ...`);
-      await rimrafAsync(this.options.externalDir);
+      this.logger.info(`Removing clone directory before cloning ...`);
+      await rimrafAsync(this.baseDir);
     }
 
     this.logger.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
-    const command = `git clone --depth 1 -b ${bareUrl} ${branch} ${this.baseDir}`;
+    const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.baseDir}`;
 
     const {stderr: stderrClone} = await execAsync(command);
 

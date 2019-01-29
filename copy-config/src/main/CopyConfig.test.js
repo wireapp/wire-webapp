@@ -42,7 +42,7 @@ describe('CopyConfig', () => {
     expect(copiedResult.length).toBe(1);
 
     const copiedFiles = fs.readdirSync(TEMP_DIR);
-    expect(copiedFiles.includes('spec')).toBe(true);
+    expect(copiedFiles.includes('test1.txt')).toBe(true);
   });
 
   it('copies all files', async () => {
@@ -77,6 +77,22 @@ describe('CopyConfig', () => {
     } catch (error) {
       expect(error.errno).toBe(ERROR_NOTFOUND);
     }
+  });
+
+  it('overwrites destination files', async () => {
+    await fs.ensureDir(TEMP_DIR);
+    await fs.writeFile(path.join(TEMP_DIR, 'test1.txt'), '');
+
+    const copyConfig = new CopyConfig({
+      externalDir: '.',
+      files: {
+        './spec/helpers/test1.txt': TEMP_DIR,
+      },
+    });
+
+    const copiedResult = await copyConfig.copy();
+
+    expect(copiedResult.length).toBe(1);
   });
 
   it('reads environment variables', async () => {
