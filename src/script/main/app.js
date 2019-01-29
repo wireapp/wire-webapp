@@ -428,9 +428,9 @@ class App {
   _appInitFailure(error, isReload) {
     let logMessage = `Could not initialize app version '${z.util.Environment.version(false)}'`;
     if (z.util.Environment.desktop) {
-      logMessage = `${logMessage} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
+      logMessage += ` - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
     }
-    this.logger.info(logMessage, {error});
+    this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
     const {message, type} = error;
     const isAuthError = error instanceof z.error.AuthError;
