@@ -41,7 +41,7 @@ z.event.WebSocketService = class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
+      PING_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
       PING_INTERVAL_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
       RECONNECT_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
     };
@@ -64,7 +64,7 @@ z.event.WebSocketService = class WebSocketService {
     this.onNotification = undefined;
 
     this.pingIntervalId = undefined;
-    this.lastPingTime = undefined;
+    this.lastPongTime = undefined;
 
     this.reconnectTimeoutId = undefined;
     this.reconnectCount = 0;
@@ -117,13 +117,19 @@ z.event.WebSocketService = class WebSocketService {
 
       this.socket.onmessage = event => {
         if (this._pingHasExperiencedSuspiciousInactivity()) {
-          const secondsSinceLastPing = (Date.now() - this.lastPingTime) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
-          this.logger.warn(`Message received but ping was inactive for "${secondsSinceLastPing}" sec, reconnecting.`);
+          const secondsSinceLastPong = (Date.now() - this.lastPongTime) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+          this.logger.warn(`Message received but there was no pong for "${secondsSinceLastPong}" sec, reconnecting.`);
           return this.reconnect(WebSocketService.CHANGE_TRIGGER.LONG_INACTIVITY);
         }
         if (event.data instanceof Blob) {
           const blobReader = new FileReader();
-          blobReader.onload = () => onNotification(JSON.parse(blobReader.result));
+          blobReader.onload = () => {
+            if (blobReader.result === 'pong') {
+              this.lastPongTime = new Date();
+            } else {
+              onNotification(JSON.parse(blobReader.result));
+            }
+          };
           blobReader.readAsText(event.data);
         }
       };
@@ -199,7 +205,7 @@ z.event.WebSocketService = class WebSocketService {
       this.socket.close();
       window.clearInterval(this.pingIntervalId);
       window.clearTimeout(this.reconnectTimeoutId);
-      this.lastPingTime = undefined;
+      this.lastPongTime = undefined;
     }
 
     if (reconnect) {
@@ -220,8 +226,7 @@ z.event.WebSocketService = class WebSocketService {
         return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
       }
       this.logger.info('Sending ping to WebSocket');
-      this.lastPingTime = Date.now();
-      return this.socket.send('Wire is so much nicer with internet!');
+      return this.socket.send('ping');
     }
 
     this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
@@ -229,14 +234,14 @@ z.event.WebSocketService = class WebSocketService {
   }
 
   /**
-   * Returns true if the gap between the last ping and the current time is too big.
+   * Returns true if the gap between the last pong and the current time is too big.
    *
-   * @returns {boolean} Was the last ping too long ago
+   * @returns {boolean} Was the last pong too long ago
    */
   _pingHasExperiencedSuspiciousInactivity() {
     const currentTime = Date.now();
-    const lastPingTime = this.lastPingTime || currentTime;
-    const pingIntervalDifference = currentTime - lastPingTime;
+    const lastPongTime = this.lastPongTime || currentTime;
+    const pingIntervalDifference = currentTime - lastPongTime;
 
     const maxDifference = WebSocketService.CONFIG.PING_INTERVAL + WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD;
     return pingIntervalDifference > maxDifference;
