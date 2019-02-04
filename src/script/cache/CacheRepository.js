@@ -26,14 +26,7 @@ import * as StorageUtil from 'utils/StorageUtil';
  *  This happened when doing "@cache_repository.set_entity user_et"
  *
  */
-
-const identifier = Symbol('CacheRepository');
-
 export default class CacheRepository {
-  static get identifier() {
-    return identifier;
-  }
-
   constructor(logger) {
     this.logger = logger;
   }

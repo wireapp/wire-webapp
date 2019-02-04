@@ -19,13 +19,7 @@
 
 import GiphyContentSizes from './GiphyContentSizes';
 
-const identifier = Symbol('GiphyRepository');
-
 export default class GiphyRepository {
-  static get identifier() {
-    return identifier;
-  }
-
   static get CONFIG() {
     return {
       MAX_RETRIES: 3,

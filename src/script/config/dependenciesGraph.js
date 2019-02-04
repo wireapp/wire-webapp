@@ -30,12 +30,12 @@ import PropertiesService from '../properties/PropertiesService';
  */
 const dependencies = new Map();
 
-dependencies.set(CacheRepository.identifier, []);
-dependencies.set(AudioRepository.identifier, []);
-dependencies.set(BackendClient.identifier, []);
-dependencies.set(GiphyService.identifier, [BackendClient]);
-dependencies.set(GiphyRepository.identifier, [GiphyService]);
-dependencies.set(AssetService.identifier, [BackendClient]);
-dependencies.set(PropertiesService.identifier, [BackendClient]);
+dependencies.set(CacheRepository, {dependencies: [], name: 'AudioRepository'});
+dependencies.set(AudioRepository, {dependencies: [], name: 'BackendClient'});
+dependencies.set(BackendClient, {dependencies: [], name: 'GiphyService'});
+dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyRepository'});
+dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'AssetService'});
+dependencies.set(AssetService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'CacheRepository'});
 
 export default dependencies;

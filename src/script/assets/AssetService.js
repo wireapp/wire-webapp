@@ -17,16 +17,11 @@
  *
  */
 
-const identifier = Symbol('AssetService');
 // AssetService for all asset handling and the calls to the backend REST API.
 export default class AssetService {
-  static get identifier() {
-    return identifier;
-  }
-
   /**
    * Construct a new Asset Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;

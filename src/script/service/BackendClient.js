@@ -17,13 +17,7 @@
  *
  */
 
-const identifier = Symbol('BackendClient');
-
 export default class BackendClient {
-  static get identifier() {
-    return identifier;
-  }
-
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {

@@ -49,14 +49,12 @@ const resolver = {
       logger.error('Failed to resolve dependency: no dependency graph set');
       throw new Error('Cannot resolve dependency');
     }
-    const identifier = dependencyClass.identifier;
-    if (!identifier) {
-      logger.error(`Failed to resolve dependency: class ${dependencyClass} does not have an identifier`);
-      throw new Error('Cannot resolve dependency');
+    const config = dependencyGraph.get(dependencyClass);
+    if (!config) {
+      throw new Error(`No dependencies configuration for class: ${dependencyClass}`);
     }
-    const graph = dependencyGraph.get(identifier) || [];
-    const dependencies = graph.map(resolver.resolve);
-    const dependencyLogger = new z.util.Logger(identifier.toString(), loggerConfig);
+    const dependencies = config.dependencies.map(resolver.resolve);
+    const dependencyLogger = new z.util.Logger(config.name, loggerConfig);
     return new dependencyClass(...dependencies.concat(dependencyLogger));
   }),
 };

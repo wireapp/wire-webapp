@@ -17,13 +17,7 @@
  *
  */
 
-const identifier = Symbol('AudioRepository');
-
 export default class AudioRepository {
-  static get identifier() {
-    return identifier;
-  }
-
   constructor(logger) {
     this.logger = logger;
     this.audioElements = {};

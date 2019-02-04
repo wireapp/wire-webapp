@@ -26,43 +26,38 @@ describe('dependenciesResolver', () => {
     expect(() => dependenciesResolver.resolve(Test)).toThrow();
   });
 
-  it('throws if the requested class has no dependency identifier', () => {
+  it('throws an error if no config is found for a class', () => {
     class Test {}
+
     dependenciesResolver.init(new Map());
 
     expect(() => dependenciesResolver.resolve(Test)).toThrow();
   });
 
   it('injects a logger when building a dependency', done => {
-    const identifier = Symbol('Test');
     class Test {
-      static get identifier() {
-        return identifier;
-      }
-
       constructor(logger) {
         expect(logger.log).toBeDefined();
         done();
       }
     }
 
-    spyOn(Test.prototype, 'constructor');
+    const dependencies = new Map();
+    dependencies.set(Test, {dependencies: [], name: 'Test'});
 
-    dependenciesResolver.init(new Map());
+    dependenciesResolver.init(dependencies);
     const instance = dependenciesResolver.resolve(Test);
 
     expect(instance).toBeDefined();
   });
 
   it('intantiate a class only once', () => {
-    const identifier = Symbol('Test');
-    class Test {
-      static get identifier() {
-        return identifier;
-      }
-    }
+    class Test {}
 
-    dependenciesResolver.init(new Map());
+    const dependencies = new Map();
+    dependencies.set(Test, {dependencies: [], name: 'Test'});
+
+    dependenciesResolver.init(dependencies);
     const firstInstance = dependenciesResolver.resolve(Test);
     const secondInstance = dependenciesResolver.resolve(Test);
 

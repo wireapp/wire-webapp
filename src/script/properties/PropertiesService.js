@@ -17,12 +17,7 @@
  *
  */
 
-const identifier = Symbol('PropertiesService');
-
 class PropertiesService {
-  static get identifier() {
-    return identifier;
-  }
   static get CONFIG() {
     return {
       URL_PROPERTIES: '/properties',
