@@ -1170,10 +1170,10 @@
   dependencies:
     tweetnacl "^1.0.0"
 
-"@types/enzyme@3.1.15":
-  version "3.1.15"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.1.15.tgz#fc9a9695ba9f90cd50c4967e64a8c66ec96913d1"
-  integrity sha512-6b4JWgV+FNec1c4+8HauGbXg5gRc1oQK93t2+4W+bHjG/PzO+iPvagY6d6bXAZ+t+ps51Zb2F9LQ4vl0S0Epog==
+"@types/enzyme@3.1.16":
+  version "3.1.16"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.1.16.tgz#b29e1d7148e4e15a773a9b9f2149ea4c42d3a91d"
+  integrity sha512-j4IAiHw+g97PWbvFv+yk601zsHf2pCYe61JZi7XW38eiRM1Lgc2LwgB7Bjssd5xi7+JMqshNfKKUP6QjMiCJ0g==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "*"
