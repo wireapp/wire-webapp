@@ -168,10 +168,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.21.tgz#7e8a0c34cf29f4e17a36e9bd0ea72d45ba03908e"
   integrity sha512-CBgLNk4o3XMnqMc0rhb6lc77IwShMEglz05deDcn2lQxyXEZivfwgYJu7SMha9V5XcrP6qZuevTHV/QrN2vjKQ==
 
-"@types/node@10.12.18":
-  version "10.12.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
-  integrity sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==
+"@types/node@10.12.19":
+  version "10.12.19"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.19.tgz#ca1018c26be01f07e66ac7fefbeb6407e4490c61"
+  integrity sha512-2NVovndCjJQj6fUUn9jCgpP4WSqr+u1SoUZMZyJkhGeBFsm6dE46l31S7lPUYt9uQ28XI+ibrJA1f5XyH5HNtA==
 
 "@types/platform@1.3.1":
   version "1.3.1"
@@ -191,18 +191,18 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.2.tgz#7d3a7f8b1b012551055c14edc6f04c42b801995c"
-  integrity sha512-lPBFo9MOLnQRIMIdn0trApLCCbEWQXWSIYDMiXiWIS1HRjTsB38o6qU2D105NslKgzZbwJSnPuoWFdu3e4tr5A==
+"@wireapp/commons@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.4.tgz#42cb776179bb421cc5836987525eb17e2f062618"
+  integrity sha512-KMsAId9DrVFf2FEe4JyFTCXBLldsQqzk6c25v4GqdKXwYBW1YkaX9zHjlzWoM1TfrBU/qvI5IphkIpJ6XSfdow==
   dependencies:
     "@types/ansi-regex" "4.0.0"
-    "@types/node" "10.12.18"
+    "@types/node" "10.12.19"
     "@types/platform" "1.3.1"
     ansi-regex "4.0.0"
     fs-extra "7.0.1"
     logdown "3.2.7"
-    moment "2.23.0"
+    moment "2.24.0"
     platform "1.3.5"
 
 abbrev@1:
@@ -1991,10 +1991,10 @@ moment-timezone@^0.5.x:
   dependencies:
     moment ">= 2.9.0"
 
-moment@2.23.0, "moment@>= 2.9.0", moment@^2.21.0, moment@^2.22.2:
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.23.0.tgz#759ea491ac97d54bac5ad776996e2a58cc1bc225"
-  integrity sha512-3IE39bHVqFbWWaPOMHZF98Q9c3LDKGTmypMiTM2QygGXXElkFWIH7GxfmlwmY2vwa+wmNsoYZmG2iusf1ZjJoA==
+moment@2.24.0, "moment@>= 2.9.0", moment@^2.21.0, moment@^2.22.2:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 ms@2.0.0:
   version "2.0.0"
