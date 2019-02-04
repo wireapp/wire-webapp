@@ -21,14 +21,16 @@ import AssetService from '../assets/AssetService';
 import AudioRepository from '../audio/AudioRepository';
 import CacheRepository from '../cache/CacheRepository';
 import BackendClient from '../service/BackendClient';
+import BackupService from '../backup/BackupService';
 import GiphyService from '../extension/GiphyService';
 import GiphyRepository from '../extension/GiphyRepository';
 import PropertiesService from '../properties/PropertiesService';
+import StorageService from '../storage/StorageService';
 
 /** Dependencies is a Map that will contain all the dependencies of the app
- * The keys of the map are the identifiers of the app's classes and the values are an array of classes that need to be instanciated
+ * The keys of the map are the classes of services the app needs and the value are the name of the service and its dependencies
  */
-const dependencies = new Map();
+const dependencies = new WeakMap();
 
 dependencies.set(CacheRepository, {dependencies: [], name: 'AudioRepository'});
 dependencies.set(AudioRepository, {dependencies: [], name: 'BackendClient'});
@@ -37,5 +39,7 @@ dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyRepos
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'AssetService'});
 dependencies.set(AssetService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'CacheRepository'});
+dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
+dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
 
 export default dependencies;

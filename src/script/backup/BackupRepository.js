@@ -21,6 +21,8 @@ import JSZip from 'jszip';
 
 import StorageSchemata from '../storage/StorageSchemata';
 
+import BackupService from './BackupService';
+
 window.z = window.z || {};
 window.z.backup = z.backup || {};
 
@@ -39,7 +41,7 @@ z.backup.BackupRepository = class BackupRepository {
   /**
    * Construct a new Backup repository.
    * @class z.backup.BackupRepository
-   * @param {z.backup.BackupService} backupService - Backup service implementation
+   * @param {BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
    * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
@@ -226,7 +228,7 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = conversationEntities.length;
     let importedEntities = [];
 
-    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, z.backup.BackupService.CONFIG.BATCH_SIZE);
+    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
     const importConversationChunk = chunk =>
       this.conversationRepository.updateConversationStates(chunk).then(importedConversationEntities => {
@@ -243,7 +245,7 @@ z.backup.BackupRepository = class BackupRepository {
     let importedEntities = 0;
 
     const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
-    const entityChunks = z.util.ArrayUtil.chunk(entities, z.backup.BackupService.CONFIG.BATCH_SIZE);
+    const entityChunks = z.util.ArrayUtil.chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
     const importEventChunk = chunk =>
       this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {

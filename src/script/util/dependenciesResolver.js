@@ -42,7 +42,7 @@ const resolver = {
    * If the instance already exists, will just return this instance
    *
    * @param {class} dependencyClass - The class to instantiate
-   * @returns {OBject} instance - The instance of the class
+   * @returns {Object} instance - The instance of the class
    */
   resolve: memoize(dependencyClass => {
     if (!dependencyGraph) {

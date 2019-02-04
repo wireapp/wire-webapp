@@ -29,6 +29,7 @@ import UserRepository from 'src/script/user/UserRepository';
 import AssetService from 'src/script/assets/AssetService';
 import AudioRepository from 'src/script/audio/AudioRepository';
 import BackendClient from 'src/script/service/BackendClient';
+import BackupService from 'src/script/backup/BackupService';
 
 import resolveDependency, {backendConfig} from './testResolver';
 
@@ -99,7 +100,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
   this.logger.info('- exposeStorageActors');
   return Promise.resolve()
     .then(() => {
-      TestFactory.storage_service = singleton(StorageService);
+      TestFactory.storage_service = resolveDependency(StorageService);
       if (!TestFactory.storage_service.db) {
         TestFactory.storage_service.init(entities.user.john_doe.id, false);
       }
@@ -118,7 +119,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
-      TestFactory.backup_service = new z.backup.BackupService(TestFactory.storage_service, status);
+      TestFactory.backup_service = resolveDependency(BackupService);
 
       TestFactory.backup_repository = new z.backup.BackupRepository(
         TestFactory.backup_service,

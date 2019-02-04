@@ -29,6 +29,7 @@ import UserRepository from '../user/UserRepository';
 
 import CacheRepository from '../cache/CacheRepository';
 import BackendClient from '../service/BackendClient';
+import BackupService from '../backup/BackupService';
 import GiphyRepository from '../extension/GiphyRepository';
 
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
@@ -116,7 +117,6 @@ class App {
 
     repositories.audio = authComponent.audio;
     repositories.auth = authComponent.repository;
-    repositories.cache = dependenciesResolver.resolve(CacheRepository);
     repositories.giphy = dependenciesResolver.resolve(GiphyRepository);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
@@ -188,7 +188,7 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
-      this.service.backup,
+      dependenciesResolver.resolve(BackupService),
       repositories.client,
       repositories.connection,
       repositories.conversation,
@@ -233,15 +233,14 @@ class App {
    * @returns {Object} All services
    */
   _setupServices(authComponent) {
-    const storageService = new StorageService();
+    const storageService = dependenciesResolver.resolve(StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
     return {
-      asset: new AssetService(this.backendClient),
+      asset: dependenciesResolver.resolve(AssetService),
       auth: authComponent.service,
-      backup: new z.backup.BackupService(storageService),
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       calling: new z.calling.CallingService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
@@ -716,7 +715,7 @@ class App {
         });
 
         const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        this.repository.cache.clearCache(keepConversationInput, keysToKeep);
+        dependenciesResolver.resolve(CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
       // Clear IndexedDB
