@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -176,8 +176,8 @@ ko.components.register('message-quote', {
           <!-- /ko -->
         <!-- /ko -->
         <div class="message-quote__timestamp"
-          data-bind="text: quotedMessageIsBeforeToday() 
-            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('DD.MM.YYYY')) 
+          data-bind="text: quotedMessageIsBeforeToday()
+            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('DD.MM.YYYY'))
             : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('HH:mm')),
             click: focusMessage"
           data-uie-name="label-timestamp-quote">

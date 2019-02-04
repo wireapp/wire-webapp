@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
 (global => {
   'use strict';
 
+  /* eslint-disable no-undef */
   importScripts('/worker/sw-toolbox.js');
   importScripts('/worker/lru-cache-strategy.js');
+  /* eslint-enable no-undef */
 
   const ASSET_CACHE_MAX_ITEMS = 1000;
   const CACHE_VERSION = 2;

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@ ko.components.register('info-toggle', {
     <div class="info-toggle__row">
       <div data-bind="text: name"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
-        <input 
-          class="slider-input" 
-          data-bind="attr: { id: inputId, name: inputId }, checked: isChecked" 
+        <input
+          class="slider-input"
+          data-bind="attr: { id: inputId, name: inputId }, checked: isChecked"
           type="checkbox">
         <label class="button-label" data-bind="attr: { for: inputId, 'data-uie-value': isChecked() ? 'checked': 'unchecked', 'data-uie-name': dataUieNameLabelText }"></label>
       </div>
