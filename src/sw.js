@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*
  * Wire
  * Copyright (C) 2019 Wire Swiss GmbH
@@ -20,10 +21,8 @@
 (global => {
   'use strict';
 
-  /* eslint-disable no-undef */
   importScripts('/worker/sw-toolbox.js');
   importScripts('/worker/lru-cache-strategy.js');
-  /* eslint-enable no-undef */
 
   const ASSET_CACHE_MAX_ITEMS = 1000;
   const CACHE_VERSION = 2;
