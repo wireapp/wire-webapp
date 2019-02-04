@@ -1860,13 +1860,13 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@2.11.2:
-  version "2.11.2"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.11.2.tgz#57864a64d031ab92aaaf1ee89e1d534571a7a706"
-  integrity sha512-HtAjJ/imB1czSQ6Vx58J/PkWH7EROTqwOC5xNsxeEHKyKpPkQ7KXTFB7NeT5js1+z6N5rB5TzLcw2DbY7c4crg==
+maxmind@2.12.0:
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-2.12.0.tgz#b7d16b0ee2fff50061ead36b258577cb7d85fec5"
+  integrity sha512-gnLdeLg0GFYlrtPt2122RYrRUy8OWxrhYEDCORaUkr6AvKXnLfnNpsFmWUOBYkvZK17XX4NeuMwnjIQM9EcxTw==
   dependencies:
     big-integer "^1.6.31"
-    tiny-lru "^5.0.3"
+    tiny-lru "^6.0.0"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -2890,10 +2890,10 @@ thunkify@^2.1.2:
   resolved "https://registry.yarnpkg.com/thunkify/-/thunkify-2.1.2.tgz#faa0e9d230c51acc95ca13a361ac05ca7e04553d"
   integrity sha1-+qDp0jDFGsyVyhOjYawFyn4EVT0=
 
-tiny-lru@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-5.0.3.tgz#a375bef3c1efdce03f5a32af66dc9a05570cfe10"
-  integrity sha512-t5laEjOXP6Df3LHYhicS8y1OfkEsI8QYHh0/wc+zsR+hfxORx950UcL7WWLPHZE7hFOArXpKyL0CB7FStFxpUQ==
+tiny-lru@^6.0.0:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-6.0.1.tgz#558bd6b7232b8b9dfa482147539676fdd75a3a07"
+  integrity sha512-k/vdHz+bFALjmik0URLWBYNuO0hCABTL5dullbZBXvFDdlL8RrKaeLR6YuHfX+6ZXOLkHw+HpNLCUA7DtLMQmg==
 
 to-object-path@^0.3.0:
   version "0.3.0"
