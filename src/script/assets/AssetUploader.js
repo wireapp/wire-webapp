@@ -26,6 +26,15 @@ export default class AssetUploader {
     this.assetService = assetService;
   }
 
+  /**
+   * Starts uploading an asset.
+   *
+   * Will also keep track of this upload
+   * @param {string} messageId - id of the message the asset belongs to
+   * @param {Blob} file - file to upload
+   * @param {Object} options - upload options
+   * @returns {Promise<Asset>} Promise that resolves when the upload is done
+   */
   uploadAsset(messageId, file, options) {
     return this.assetService
       .uploadAsset(file, options, xhr => {
@@ -42,6 +51,12 @@ export default class AssetUploader {
       });
   }
 
+  /**
+   * Cancels an upload in progress
+   *
+   * @param {string} messageId - id the the message the asset belongs to
+   * @returns {void} nothing
+   */
   cancelUpload(messageId) {
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
@@ -50,10 +65,21 @@ export default class AssetUploader {
     }
   }
 
+  /**
+   * Returns the number of current uploads that are tracked
+   *
+   * @returns {number} the number of uploads
+   */
   getNumberOfOngoingUploads() {
     return uploadQueue().length;
   }
 
+  /**
+   * Get the current upload progress of an asset depending on the message id the asset belongs to.
+   *
+   * @param {string} messageId - the id of the message to which the asset belongs to
+   * @returns {Observable} an observable that contains the upload progress
+   */
   getUploadProgress(messageId) {
     return ko.pureComputed(() => {
       const uploadStatus = this._findUploadStatus(messageId);
