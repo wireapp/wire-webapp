@@ -7,7 +7,7 @@ const repositoryUrl = pkg.dependencies['wire-web-config-default'];
 module.exports = {
   files: {
     [`${source}/**`]: 'resource/',
-    [path.join(pkg.name, '.env')]: __dirname,
+    [path.join(pkg.name, '.env')]: path.join(__dirname, '.env'),
   },
   repositoryUrl,
 };
