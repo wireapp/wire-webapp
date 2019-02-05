@@ -21,11 +21,11 @@ import {amplify} from 'amplify';
 
 import AssetUploader from '../../assets/AssetUploader';
 import AssetTransferState from '../../assets/AssetTransferState';
-import dependenciesResolver from 'utils/dependenciesResolver';
+import resolveDependency from '../../config/appResolver';
 
 export default class AbstractAssetTransferStateTracker {
   constructor(message) {
-    this.assetUploader = dependenciesResolver.resolve(AssetUploader);
+    this.assetUploader = resolveDependency(AssetUploader);
     this.uploadProgress = this.assetUploader.getUploadProgress(message.id);
     this.AssetTransferState = AssetTransferState;
 

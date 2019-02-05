@@ -168,7 +168,7 @@ class App {
       repositories.team,
       repositories.user,
       repositories.properties,
-      dependenciesResolver.resolve(AssetUploader)
+      resolveDependency(AssetUploader)
     );
 
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
