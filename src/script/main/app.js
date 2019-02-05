@@ -27,6 +27,7 @@ import * as UserPermission from '../user/UserPermission';
 import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
 
+import AssetUploader from '../assets/AssetUploader';
 import CacheRepository from '../cache/CacheRepository';
 import BackendClient from '../service/BackendClient';
 import BackupService from '../backup/BackupService';
@@ -166,7 +167,8 @@ class App {
       repositories.serverTime,
       repositories.team,
       repositories.user,
-      repositories.properties
+      repositories.properties,
+      dependenciesResolver.resolve(AssetUploader)
     );
 
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);

@@ -678,17 +678,6 @@ class Conversation {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
 
-  /**
-   * Get Number of pending uploads for this conversation.
-   * @returns {number} Count of pending uploads
-   */
-  get_number_of_pending_uploads() {
-    return this.messages().filter(messageEntity => {
-      const [assetEntity] = (messageEntity.assets && messageEntity.assets()) || [];
-      return assetEntity && assetEntity.isUploading && assetEntity.isUploading();
-    }).length;
-  }
-
   updateGuests() {
     this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());
   }

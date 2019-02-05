@@ -19,8 +19,9 @@
 import ko from 'knockout';
 
 import './assetLoader';
+import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
-class FileAssetComponent {
+class FileAssetComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a new file asset.
    *
@@ -28,6 +29,7 @@ class FileAssetComponent {
    * @param {z.entity.Message} params.message - Message entity
    */
   constructor(params) {
+    super(ko.unwrap(params.message));
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
     this.header = params.header || false;
@@ -48,36 +50,36 @@ ko.components.register('file-asset', {
       <div class="file"
          data-uie-name="file"
          data-bind="attr: {'data-uie-value': asset.file_name},
-                    click: asset.status() === z.assets.AssetTransferState.UPLOADED ? asset.download : null,
-                    css: {'cursor-pointer': asset.status() === z.assets.AssetTransferState.UPLOADED}">
-        <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_PENDING -->
+                    click: transferState() === AssetTransferState.UPLOADED ? asset.download : null,
+                    css: {'cursor-pointer': transferState() === AssetTransferState.UPLOADED}">
+        <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING  -->
           <div class="asset-placeholder">
             <div class="three-dots">
               <span></span><span></span><span></span>
             </div>
           </div>
         <!-- /ko -->
-        <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
-          <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADED -->
+        <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko if: transferState() === AssetTransferState.UPLOADED -->
             <div class="file-icon icon-file" data-bind="click: asset.download, clickBubble: false" data-uie-name="file-icon">
               <span class="file-icon-ext icon-view"></span>
             </div>
           <!-- /ko -->
-          <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
+          <!-- ko if: transferState() === AssetTransferState.DOWNLOADING -->
             <div class="media-button icon-close" data-bind="click: asset.cancel_download, clickBubble: false">
               <div class='media-button-border-file-fill'></div>
               <div class='media-button-border-fill'></div>
               <asset-loader params="loadProgress: asset.downloadProgress"></asset-loader>
             </div>
           <!-- /ko -->
-          <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
-            <div class="media-button icon-close" data-bind="click: function() {asset.cancel(message)}, clickBubble: false">
+          <!-- ko if: transferState() === AssetTransferState.UPLOADING -->
+            <div class="media-button icon-close" data-bind="click: () => {cancelUpload(message)}, clickBubble: false">
               <div class='media-button-border-file-fill'></div>
               <div class='media-button-border-fill'></div>
-              <asset-loader params="loadProgress: asset.upload_progress"></asset-loader>
+              <asset-loader params="loadProgress: uploadProgress"></asset-loader>
             </div>
           <!-- /ko -->
-          <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_FAILED -->
+          <!-- ko if: transferState() === AssetTransferState.UPLOAD_FAILED -->
             <div class="media-button media-button-error"></div>
           <!-- /ko -->
           <div class="file-desc">
@@ -89,13 +91,13 @@ ko.components.register('file-asset', {
               <!-- ko if: z.util.getFileExtension(asset.file_name) -->
                 <li data-bind="text: z.util.getFileExtension(asset.file_name)" data-uie-name="file-type"></li>
               <!-- /ko -->
-              <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
+              <!-- ko if: transferState() === AssetTransferState.UPLOADING -->
                 <li data-bind="text: t('conversationAssetUploading')" data-uie-name="file-status"></li>
               <!-- /ko -->
-              <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_FAILED -->
+              <!-- ko if: transferState() === AssetTransferState.UPLOAD_FAILED -->
                 <li data-bind="text: t('conversationAssetUploadFailed')" class="text-red"  data-uie-name="file-status"></li>
               <!-- /ko -->
-              <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
+              <!-- ko if: transferState() === AssetTransferState.DOWNLOADING -->
                 <li data-bind="text: t('conversationAssetDownloading')" data-uie-name="file-status"></li>
               <!-- /ko -->
             </ul>

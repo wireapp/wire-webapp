@@ -21,7 +21,6 @@ import {memoize} from 'underscore';
 
 let dependencyGraph;
 let loggerConfig;
-const logger = new z.util.Logger('dependenciesResolver');
 
 const resolver = {
   /**
@@ -46,8 +45,7 @@ const resolver = {
    */
   resolve: memoize(dependencyClass => {
     if (!dependencyGraph) {
-      logger.error('Failed to resolve dependency: no dependency graph set');
-      throw new Error('Cannot resolve dependency');
+      throw new Error(`Cannot resolve dependency ${dependencyClass}`);
     }
     const config = dependencyGraph.get(dependencyClass);
     if (!config) {
