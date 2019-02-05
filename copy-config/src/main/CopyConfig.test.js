@@ -24,7 +24,6 @@ const fs = require('fs-extra');
 
 const {CopyConfig} = require('../../dist');
 const TEMP_DIR = path.resolve(__dirname, '..', '..', '.temp/');
-const ERROR_NOTFOUND = -2;
 
 describe('CopyConfig', () => {
   afterEach(() => fs.remove(TEMP_DIR));
@@ -75,7 +74,7 @@ describe('CopyConfig', () => {
       await copyConfig.copy();
       fail('Should throw');
     } catch (error) {
-      expect(error.errno).toBe(ERROR_NOTFOUND);
+      expect(error.code).toBe('ENOENT');
     }
   });
 
@@ -95,7 +94,7 @@ describe('CopyConfig', () => {
     expect(copiedResult.length).toBe(1);
   });
 
-  it('reads environment variables', async () => {
+  it('can be configured using environment variables', async () => {
     process.env.WIRE_CONFIGURATION_EXTERNAL_DIR = 'externalDir';
     process.env.WIRE_CONFIGURATION_FILES = `./spec/helpers/**:${TEMP_DIR};./spec/helpers/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
 
@@ -111,5 +110,17 @@ describe('CopyConfig', () => {
 
     delete process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
     delete process.env.WIRE_CONFIGURATION_FILES;
+  });
+
+  it('is compatible with Windows paths', () => {
+    const copyString = 'C:\\source:D:\\target';
+
+    const copyConfig = new CopyConfig({
+      files: {},
+    });
+
+    const resolvedPaths = copyConfig.getFilesFromString(copyString);
+    expect(Object.keys(resolvedPaths)[0]).toBe('C:\\source');
+    expect(Object.values(resolvedPaths)[0]).toBe('D:\\target');
   });
 });

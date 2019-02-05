@@ -69,26 +69,31 @@ export class CopyConfig {
     const setString = (variable: string | undefined, optionKey: keyof CopyConfigOptions) =>
       typeof variable !== 'undefined' && (this.options[optionKey] = String(variable));
 
-    const setFiles = (files: string | undefined) => {
-      const fileArrayRegex = /^\[(.*)\]$/;
-
-      if (typeof files !== 'undefined') {
-        files
-          .split(';')
-          .map(fileTuple => fileTuple.split(':'))
-          .forEach(([source, dest]) => {
-            let destination: string | string[] = dest;
-            if (fileArrayRegex.test(destination)) {
-              destination = dest.replace(fileArrayRegex, '$1').split(',');
-            }
-            this.options.files[source] = destination;
-          });
-      }
-    };
-
     setString(process.env.WIRE_CONFIGURATION_EXTERNAL_DIR, 'externalDir');
     setString(process.env.WIRE_CONFIGURATION_REPOSITORY, 'repositoryUrl');
-    setFiles(process.env.WIRE_CONFIGURATION_FILES);
+    if (typeof process.env.WIRE_CONFIGURATION_FILES !== 'undefined') {
+      const files = this.getFilesFromString(process.env.WIRE_CONFIGURATION_FILES);
+      Object.assign(this.options.files, files);
+    }
+  }
+
+  private getFilesFromString(files: string): {[source: string]: string | string[]} {
+    const resolvedPaths: {[source: string]: string | string[]} = {};
+
+    const fileArrayRegex = /^\[(.*)\]$/;
+
+    files
+      .split(';')
+      .map(fileTuple => String.raw`${fileTuple}`.split(/:(?!\\)/))
+      .forEach(([source, dest]) => {
+        let destination: string | string[] = dest;
+        if (fileArrayRegex.test(destination)) {
+          destination = dest.replace(fileArrayRegex, '$1').split(',');
+        }
+        resolvedPaths[source] = destination;
+      });
+
+    return resolvedPaths;
   }
 
   private resolveFiles(): void {
