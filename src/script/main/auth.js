@@ -17,8 +17,7 @@
  *
  */
 
-import dependenciesResolver from 'utils/dependenciesResolver';
-import dependenciesGraph from '../config/dependenciesGraph';
+import resolveDependency from '../config/appResolver';
 
 import AudioRepository from '../audio/AudioRepository';
 import BackendClient from '../service/BackendClient';
@@ -65,10 +64,8 @@ $(() => {
         webSocketUrl: window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com',
       };
 
-  dependenciesResolver.init(dependenciesGraph);
-
-  const audioRepository = dependenciesResolver.resolve(AudioRepository);
-  const backendClient = dependenciesResolver.resolve(BackendClient);
+  const audioRepository = resolveDependency(AudioRepository);
+  const backendClient = resolveDependency(BackendClient);
   backendClient.setSettings(settings);
 
   window.wire = Object.assign(window.wire || {}, {

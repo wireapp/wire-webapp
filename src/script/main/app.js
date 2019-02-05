@@ -49,8 +49,7 @@ import auth from './auth';
 import {getWebsiteUrl} from '../externalRoute';
 /* eslint-enable no-unused-vars */
 
-import dependenciesGraph from '../config/dependenciesGraph';
-import dependenciesResolver from 'utils/dependenciesResolver';
+import resolveDependency from '../config/appResolver';
 
 class App {
   static get CONFIG() {
@@ -117,7 +116,7 @@ class App {
 
     repositories.audio = authComponent.audio;
     repositories.auth = authComponent.repository;
-    repositories.giphy = dependenciesResolver.resolve(GiphyRepository);
+    repositories.giphy = resolveDependency(GiphyRepository);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
     repositories.properties = new PropertiesRepository(this.service.properties, this.service.self);
@@ -188,7 +187,7 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
-      dependenciesResolver.resolve(BackupService),
+      resolveDependency(BackupService),
       repositories.client,
       repositories.connection,
       repositories.conversation,
@@ -233,13 +232,13 @@ class App {
    * @returns {Object} All services
    */
   _setupServices(authComponent) {
-    const storageService = dependenciesResolver.resolve(StorageService);
+    const storageService = resolveDependency(StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
     return {
-      asset: dependenciesResolver.resolve(AssetService),
+      asset: resolveDependency(AssetService),
       auth: authComponent.service,
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       calling: new z.calling.CallingService(this.backendClient),
@@ -715,7 +714,7 @@ class App {
         });
 
         const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        dependenciesResolver.resolve(CacheRepository).clearCache(keepConversationInput, keysToKeep);
+        resolveDependency(CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
       // Clear IndexedDB
@@ -851,7 +850,6 @@ class App {
 
 $(() => {
   if ($('#wire-main-app').length !== 0) {
-    dependenciesResolver.init(dependenciesGraph, z.config.LOGGER.OPTIONS);
     wire.app = new App(wire.auth);
   }
 });
