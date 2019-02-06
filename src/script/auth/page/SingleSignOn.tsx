@@ -21,9 +21,9 @@ import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/cl
 import {
   ArrowIcon,
   Button,
+  COLOR,
   Checkbox,
   CheckboxLabel,
-  COLOR,
   Column,
   Columns,
   Container,
@@ -62,12 +62,10 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
-import * as URLUtil from '../util/urlUtil';
-import {getURLParameter, hasURLParameter} from '../util/urlUtil';
+import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {
-}
+interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   hasHistory: boolean;
@@ -79,7 +77,7 @@ interface ConnectedProps {
 interface DispatchProps {
   resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
-  doFinalizeSSOLogin: (options: { clientType: ClientType }) => Promise<void>;
+  doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
   doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
@@ -99,7 +97,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
   private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
   private ssoWindow: Window = undefined;
-  private readonly inputs: { code?: HTMLInputElement } = {};
+  private readonly inputs: {code?: HTMLInputElement} = {};
   state: State = {
     code: '',
     isOverlayOpen: false,
@@ -259,7 +257,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     }
     this.inputs.code.value = this.inputs.code.value.trim();
     const validationErrors: Error[] = [];
-    const validInputs: { [field: string]: boolean } = this.state.validInputs;
+    const validInputs: {[field: string]: boolean} = this.state.validInputs;
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.checkValidity()) {
@@ -324,7 +322,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      ? window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP))
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
@@ -530,7 +528,7 @@ export default withRouter(
       },
       (dispatch: ThunkDispatch): DispatchProps => {
         return {
-          doFinalizeSSOLogin: (options: { clientType: ClientType }) =>
+          doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
             dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
           doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
