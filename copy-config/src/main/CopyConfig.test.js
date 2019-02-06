@@ -28,99 +28,118 @@ const TEMP_DIR = path.resolve(__dirname, '..', '..', '.temp/');
 describe('CopyConfig', () => {
   afterEach(() => fs.remove(TEMP_DIR));
 
-  it('copies a single file', async () => {
-    const copyConfig = new CopyConfig({
-      externalDir: '.',
-      files: {
-        './spec/helpers/test1.txt': TEMP_DIR,
-      },
-    });
+  describe('constructor', () => {
+    it('can be configured using environment variables', async () => {
+      process.env.WIRE_CONFIGURATION_EXTERNAL_DIR = 'externalDir';
+      process.env.WIRE_CONFIGURATION_FILES = `./spec/helpers/**:${TEMP_DIR};./spec/helpers/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
 
-    const copiedResult = await copyConfig.copy();
+      const copyConfig = new CopyConfig({
+        files: {},
+      });
 
-    expect(copiedResult.length).toBe(1);
-
-    const copiedFiles = fs.readdirSync(TEMP_DIR);
-    expect(copiedFiles.includes('test1.txt')).toBe(true);
-  });
-
-  it('copies all files', async () => {
-    const copyConfig = new CopyConfig({
-      externalDir: '.',
-      files: {
+      expect(copyConfig.options.externalDir.endsWith('externalDir')).toBe(true);
+      expect(copyConfig.options.files).toEqual({
         './spec/helpers/**': TEMP_DIR,
-      },
+        './spec/helpers/test1.txt': [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
+      });
+
+      delete process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
+      delete process.env.WIRE_CONFIGURATION_FILES;
     });
-
-    const copiedResult = await copyConfig.copy();
-
-    expect(copiedResult.length).toBe(1 + 1);
-
-    const copiedFiles = fs.readdirSync(TEMP_DIR);
-
-    expect(copiedFiles.includes('test1.txt')).toBe(true);
-    expect(copiedFiles.includes('test2.txt')).toBe(true);
   });
 
-  it('reports errors', async () => {
-    const copyConfig = new CopyConfig({
-      externalDir: '.',
-      files: {
-        'non-existant': TEMP_DIR,
-      },
+  describe('copy', () => {
+    it('copies a single file', async () => {
+      const copyConfig = new CopyConfig({
+        externalDir: '.',
+        files: {
+          './spec/helpers/test1.txt': TEMP_DIR,
+        },
+      });
+
+      const copiedResult = await copyConfig.copy();
+
+      expect(copiedResult.length).toBe(1);
+
+      const copiedFiles = fs.readdirSync(TEMP_DIR);
+      expect(copiedFiles.includes('test1.txt')).toBe(true);
     });
 
-    try {
-      await copyConfig.copy();
-      fail('Should throw');
-    } catch (error) {
-      expect(error.code).toBe('ENOENT');
-    }
+    it('copies dot files', async () => {
+      const copyConfig = new CopyConfig({
+        externalDir: '.',
+        files: {
+          './spec/helpers/.env.test': `${TEMP_DIR}/.env`,
+        },
+      });
+
+      const copiedResult = await copyConfig.copy();
+
+      expect(copiedResult.length).toBe(1);
+    });
+
+    it('copies all files', async () => {
+      const copyConfig = new CopyConfig({
+        externalDir: '.',
+        files: {
+          './spec/helpers/**': TEMP_DIR,
+        },
+      });
+
+      const copiedResult = await copyConfig.copy();
+
+      expect(copiedResult.length).toBe(1 + 1);
+
+      const copiedFiles = fs.readdirSync(TEMP_DIR);
+
+      expect(copiedFiles.includes('test1.txt')).toBe(true);
+      expect(copiedFiles.includes('test2.txt')).toBe(true);
+    });
+
+    it('reports errors', async () => {
+      const copyConfig = new CopyConfig({
+        externalDir: '.',
+        files: {
+          'non-existant': TEMP_DIR,
+        },
+      });
+
+      try {
+        await copyConfig.copy();
+        fail('Should throw');
+      } catch (error) {
+        expect(error.code).toBe('ENOENT');
+      }
+    });
+
+    it('overwrites destination files', async () => {
+      await fs.ensureDir(TEMP_DIR);
+      await fs.writeFile(path.join(TEMP_DIR, 'test1.txt'), '');
+
+      const copyConfig = new CopyConfig({
+        externalDir: '.',
+        files: {
+          './spec/helpers/test1.txt': TEMP_DIR,
+        },
+      });
+
+      const copiedResult = await copyConfig.copy();
+
+      expect(copiedResult.length).toBe(1);
+    });
   });
 
-  it('overwrites destination files', async () => {
-    await fs.ensureDir(TEMP_DIR);
-    await fs.writeFile(path.join(TEMP_DIR, 'test1.txt'), '');
+  describe('getFilesFromString', () => {
+    it('is compatible with Windows paths', () => {
+      const copyString = 'C:\\source:D:\\target';
 
-    const copyConfig = new CopyConfig({
-      externalDir: '.',
-      files: {
-        './spec/helpers/test1.txt': TEMP_DIR,
-      },
+      const copyConfig = new CopyConfig({
+        files: {},
+      });
+
+      const resolvedPaths = copyConfig.getFilesFromString(copyString);
+      expect(Object.keys(resolvedPaths)[0]).toBe('C:\\source');
+      expect(Object.values(resolvedPaths)[0]).toBe('D:\\target');
     });
-
-    const copiedResult = await copyConfig.copy();
-
-    expect(copiedResult.length).toBe(1);
-  });
-
-  it('can be configured using environment variables', async () => {
-    process.env.WIRE_CONFIGURATION_EXTERNAL_DIR = 'externalDir';
-    process.env.WIRE_CONFIGURATION_FILES = `./spec/helpers/**:${TEMP_DIR};./spec/helpers/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
-
-    const copyConfig = new CopyConfig({
-      files: {},
-    });
-
-    expect(copyConfig.options.externalDir.endsWith('externalDir')).toBe(true);
-    expect(copyConfig.options.files).toEqual({
-      './spec/helpers/**': TEMP_DIR,
-      './spec/helpers/test1.txt': [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
-    });
-
-    delete process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
-    delete process.env.WIRE_CONFIGURATION_FILES;
-  });
-
-  it('is compatible with Windows paths', () => {
-    const copyString = 'C:\\source:D:\\target';
-
-    const copyConfig = new CopyConfig({
-      files: {},
-    });
-
-    const resolvedPaths = copyConfig.getFilesFromString(copyString);
-    expect(Object.keys(resolvedPaths)[0]).toBe('C:\\source');
-    expect(Object.values(resolvedPaths)[0]).toBe('D:\\target');
   });
 });

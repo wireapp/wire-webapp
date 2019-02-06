@@ -18,22 +18,29 @@
  */
 
 import {exec} from 'child_process';
+import * as fs from 'fs-extra';
+import * as logdown from 'logdown';
 import * as path from 'path';
+import * as rimraf from 'rimraf';
 import {promisify} from 'util';
 
 import copy = require('copy');
-import * as fs from 'fs-extra';
-import * as logdown from 'logdown';
-import * as rimraf from 'rimraf';
-
 import {CopyConfigOptions} from './CopyConfigOptions';
 
+const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
 const rimrafAsync = promisify(rimraf);
 const execAsync = promisify(exec);
-const copyAsync = (source: string, destination: string): Promise<string[]> =>
-  new Promise((resolve, reject) =>
+const copyAsync = async (source: string, destination: string): Promise<string[]> => {
+  if (isFile(destination)) {
+    await fs.ensureDir(path.dirname(destination));
+  } else {
+    await fs.ensureDir(destination);
+  }
+
+  return new Promise((resolve, reject) =>
     copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files.map(file => file.path))))
   );
+};
 
 const defaultOptions: Required<CopyConfigOptions> = {
   externalDir: '',
@@ -124,18 +131,13 @@ export class CopyConfig {
       }
       return true;
     };
-    const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
+
     const isGlob = (path: string) => /\*$/.test(path);
 
     this.logger.info(`Copying "${source}" -> "${destination}"`);
 
-    if (isFile(destination)) {
-      if (!isFile(source)) {
-        throw new Error('Cannot copy a directory into a file.');
-      }
-      await fs.ensureDir(path.dirname(destination));
-    } else {
-      await fs.ensureDir(destination);
+    if (isFile(destination) && !isFile(source)) {
+      throw new Error('Cannot copy a directory into a file.');
     }
 
     if (isGlob(source)) {
@@ -146,7 +148,10 @@ export class CopyConfig {
       destination = path.join(destination, path.basename(source));
     }
 
+    // Info: "fs.copy" creates all sub-folders which are needed along the way:
+    // @see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
     await fs.copy(source, destination, {filter, overwrite: true, recursive: true});
+
     return [destination];
   }
 
