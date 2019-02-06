@@ -18,6 +18,7 @@
  */
 
 import AssetService from '../assets/AssetService';
+import AssetUploader from '../assets/AssetUploader';
 import AudioRepository from '../audio/AudioRepository';
 import CacheRepository from '../cache/CacheRepository';
 import BackendClient from '../service/BackendClient';
@@ -38,6 +39,7 @@ dependencies.set(BackendClient, {dependencies: [], name: 'GiphyService'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyRepository'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'AssetService'});
 dependencies.set(AssetService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploader'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'CacheRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});

@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 import '../assetLoader';
 
 class MediaButtonComponent {
@@ -34,6 +36,8 @@ class MediaButtonComponent {
     this.media_element = params.src;
     this.large = params.large;
     this.asset = params.asset;
+    this.uploadProgress = params.uploadProgress;
+    this.transferState = params.transferState;
 
     if (this.large) {
       component_info.element.classList.add('media-button-lg');
@@ -79,20 +83,20 @@ class MediaButtonComponent {
 
 ko.components.register('media-button', {
   template: `
-    <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADED -->
+    <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOADED -->
       <div class='media-button media-button-play icon-play' data-bind="click: on_play_button_clicked, visible: !media_is_playing()" data-uie-name="do-play-media"></div>
       <div class='media-button media-button-pause icon-pause' data-bind="click: on_pause_button_clicked, visible: media_is_playing()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
-    <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
+    <!-- ko if: transferState() === z.assets.AssetTransferState.DOWNLOADING -->
       <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
         <div class='media-button-border-fill'></div>
         <asset-loader params="large: large, loadProgress: asset.downloadProgress"></asset-loader>
       </div>
     <!-- /ko -->
-    <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
+    <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOADING -->
       <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
-        <asset-loader params="large: large, loadProgress: asset.upload_progress"></asset-loader>
+        <asset-loader params="large: large, loadProgress: uploadProgress"></asset-loader>
       </div>
     <!-- /ko -->
 `,

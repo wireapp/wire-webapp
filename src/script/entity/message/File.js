@@ -51,28 +51,7 @@ z.entity.File = class File extends z.entity.Asset {
       return undefined;
     });
 
-    this.upload_id = ko.observable();
-    this.upload_progress = ko.observable();
     this.upload_failed_reason = ko.observable();
-    this.upload_cancel = undefined;
-    this.isUploading = ko.pureComputed(() => this.status() === z.assets.AssetTransferState.UPLOADING);
-
-    // update progress
-    this.upload_id.subscribe(upload_id => {
-      if (upload_id) {
-        return amplify.subscribe(`upload${upload_id}`, this.on_progress);
-      }
-    });
-
-    this.status.subscribe(status => {
-      if (status === z.assets.AssetTransferState.UPLOADED) {
-        return amplify.unsubscribe(`upload${this.upload_id}`, this.on_progress);
-      }
-    });
-  }
-
-  on_progress(progress) {
-    return this.upload_progress(progress);
   }
 
   /**
@@ -128,13 +107,6 @@ z.entity.File = class File extends z.entity.Asset {
   cancel_download() {
     this.status(z.assets.AssetTransferState.UPLOADED);
     return this.original_resource().cancelDownload();
-  }
-
-  cancel(message_et) {
-    if (typeof this.upload_cancel === 'function') {
-      this.upload_cancel();
-    }
-    amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message_et);
   }
 
   reload() {

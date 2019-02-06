@@ -113,6 +113,14 @@ export default class EventMapper {
           asset.previews(this._mapAssetLinkPreviews(eventData.previews));
         }
       }
+
+      const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
+      if (preview_otr_key) {
+        const remoteDataPreview = preview_key
+          ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+          : z.assets.AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
+        asset.preview_resource(remoteDataPreview);
+      }
     }
 
     if (event.reactions !== undefined) {

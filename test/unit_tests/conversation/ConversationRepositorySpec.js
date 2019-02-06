@@ -32,14 +32,6 @@ describe('ConversationRepository', () => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
   };
 
-  const _generate_asset_message = state => {
-    const file_et = new z.entity.File();
-    file_et.status(state);
-    const message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
-    message_et.assets.push(file_et);
-    return message_et;
-  };
-
   const _generate_conversation = (
     conversation_type = z.conversation.ConversationType.GROUP,
     connection_status = z.connection.ConnectionStatus.ACCEPTED
@@ -340,33 +332,6 @@ describe('ConversationRepository', () => {
       const result = TestFactory.conversation_repository.getGroupsByName('Removed');
 
       expect(result.length).toBe(0);
-    });
-  });
-
-  describe('get_number_of_pending_uploads', () => {
-    it('should return number of pending uploads if there are pending uploads', () => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOAD_PENDING));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-    });
-
-    it('should return 0 if there are no pending uploads', () => {
-      conversation_et.add_message(new z.entity.Message(z.util.createRandomUuid()));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(0);
     });
   });
 

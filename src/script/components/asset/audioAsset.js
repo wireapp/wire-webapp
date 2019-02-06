@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
+import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
-z.components.AudioAssetComponent = class AudioAssetComponent {
+class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a new link preview asset.
    *
@@ -29,6 +28,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
    * @param {Object} component_info - Component information
    */
   constructor(params, component_info) {
+    super(ko.unwrap(params.message));
     this.dispose = this.dispose.bind(this);
     this.logger = new z.util.Logger('AudioAssetComponent', z.config.LOGGER.OPTIONS);
 
@@ -84,7 +84,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
   dispose() {
     window.URL.revokeObjectURL(this.audio_src());
   }
-};
+}
 
 ko.components.register('audio-asset', {
   template: `
@@ -93,22 +93,25 @@ ko.components.register('audio-asset', {
       <!-- ko if: header -->
         <asset-header params="message: message"></asset-header>
       <!-- /ko -->
-      <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_PENDING -->
+      <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOAD_PENDING -->
         <div class="asset-placeholder">
           <div class="three-dots">
             <span></span><span></span><span></span>
           </div>
         </div>
       <!-- /ko -->
-      <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
+      <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
         <div class="audio-controls">
           <media-button params="src: audio_element,
                                 asset: asset,
                                 play: on_play_button_clicked,
                                 pause: on_pause_button_clicked,
-                                cancel: function() {asset.cancel(message)}">
+                                cancel: () => cancelUpload(message),
+                                transferState: transferState,
+                                uploadProgress: uploadProgress
+                                ">
           </media-button>
-          <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOADING -->
+          <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOADING -->
             <span class="audio-controls-time label-xs"
                   data-uie-name="status-audio-time"
                   data-bind="text: z.util.TimeUtil.formatSeconds(audio_time())">
@@ -128,7 +131,7 @@ ko.components.register('audio-asset', {
   `,
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.AudioAssetComponent(params, component_info);
+      return new AudioAssetComponent(params, component_info);
     },
   },
 });
