@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.2.1...@wireapp/copy-config@0.2.2) (2019-02-06)
+
+
+### Bug Fixes
+
+* **copy-config:** No more EPERM errors on Windows when copying single files ([#1502](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1502)) ([ba03b2b](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/ba03b2b))
+
+
+
+
+
 ## [0.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.2.0...@wireapp/copy-config@0.2.1) (2019-02-05)
 
 
