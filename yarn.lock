@@ -1319,10 +1319,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-intl@2.3.15":
-  version "2.3.15"
-  resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.15.tgz#4768425b6a9bd680c1076761244b2b96a337dfa7"
-  integrity sha512-a2D0gSDdj9lJjEZ/tGP+lS489uaJSuBxzlW1A/1JqVnadbB+/5ZbFK3QkWaesR/ROcSsLTJxAfPorhT4jn6CUA==
+"@types/react-intl@2.3.16":
+  version "2.3.16"
+  resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.16.tgz#d89c4ff754e8299865a3d15c33d38db859222eb2"
+  integrity sha512-9clR/whM7h5Lq7P6zgMuAERCY5T8z2o8i2soAc5itbVcPT/ir/dvZgZ91XLmTYG8lw6LGz9NVJoOURYZSjdAmA==
 
 "@types/react-redux@7.0.1":
   version "7.0.1"
