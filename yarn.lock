@@ -1596,10 +1596,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.117.tgz#25e44b4a6c2f5a567b75e026a344d26b303ba71e"
   integrity sha512-9PLbPEUikNUu09dplpHKkUPIEUtpgrX/xB3XIRanV0SXQVM2y6re0fDdyXQFwXRRnVFEEDcXpQ5G2DSzh8375Q==
 
-"@wireapp/copy-config@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.2.1.tgz#06514e7e56fdf5ffc8fb7e732781d0fa0575992f"
-  integrity sha512-OsdofSAIAjIICXYCWMiApXxDDy+pXADjOV5GN9RV/tmoDIalGqfbtTsqAqiQdT3pbHtqT5xxw8j5/jdn94wAKA==
+"@wireapp/copy-config@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.2.2.tgz#c623000073aa8ffacc043be66be9b33b224efde0"
+  integrity sha512-0wRA6zy1nY1Zjvex1dqKqPUohekXVGWAIoB85bxKgMkCs3VSLxH+0I2uhKtJPB9dQomBuiOaq8XUFvK7Rb767g==
   dependencies:
     copy "0.3.2"
     cosmiconfig "5.0.7"
