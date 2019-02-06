@@ -19,9 +19,6 @@
 
 import * as StorageUtil from 'utils/StorageUtil';
 
-window.z = window.z || {};
-window.z.cache = z.cache || {};
-
 /**
  * Cache repository for local storage interactions using amplify.
  *
@@ -29,9 +26,9 @@ window.z.cache = z.cache || {};
  *  This happened when doing "@cache_repository.set_entity user_et"
  *
  */
-z.cache.CacheRepository = class CacheRepository {
-  constructor() {
-    this.logger = new z.util.Logger('z.auth.CacheRepository', z.config.LOGGER.OPTIONS);
+export default class CacheRepository {
+  constructor(logger) {
+    this.logger = logger;
   }
 
   /**
@@ -59,4 +56,4 @@ z.cache.CacheRepository = class CacheRepository {
 
     return deletedKeys;
   }
-};
+}

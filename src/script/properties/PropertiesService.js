@@ -17,9 +17,6 @@
  *
  */
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
-
 class PropertiesService {
   static get CONFIG() {
     return {

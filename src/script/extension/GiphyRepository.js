@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.extension = z.extension || {};
+import GiphyContentSizes from './GiphyContentSizes';
 
-z.extension.GiphyRepository = class GiphyRepository {
+export default class GiphyRepository {
   static get CONFIG() {
     return {
       MAX_RETRIES: 3,
@@ -31,11 +30,12 @@ z.extension.GiphyRepository = class GiphyRepository {
 
   /**
    * Construct a new Giphy Repository.
-   * @param {z.extension.GiphyService} giphyService - Giphy REST API implementation
+   * @param {GiphyService} giphyService - Giphy REST API implementation
+   * @param {Logger} logger - Logger
    */
-  constructor(giphyService) {
+  constructor(giphyService, logger) {
     this.giphyService = giphyService;
-    this.logger = new z.util.Logger('z.extension.GiphyRepository', z.config.LOGGER.OPTIONS);
+    this.logger = logger;
     this.gifQueryCache = {};
   }
 
@@ -72,8 +72,8 @@ z.extension.GiphyRepository = class GiphyRepository {
           return this.giphyService.getById(randomGif.id);
         })
         .then(({data: {images, url}}) => {
-          const staticGif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animatedGif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+          const staticGif = images[GiphyContentSizes.FIXED_WIDTH_STILL];
+          const animatedGif = images[GiphyContentSizes.DOWNSIZED];
 
           const exceedsMaxSize = animatedGif.size > options.maxSize;
           if (exceedsMaxSize) {
@@ -148,8 +148,8 @@ z.extension.GiphyRepository = class GiphyRepository {
         this.gifQueryCache[options.query] = pagination.total_count;
 
         for (const {images, url} of gifs.slice(0, options.number)) {
-          const staticGif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animatedGif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+          const staticGif = images[GiphyContentSizes.FIXED_WIDTH_STILL];
+          const animatedGif = images[GiphyContentSizes.DOWNSIZED];
 
           const exceedsMaxSize = animatedGif.size > options.maxSize;
           if (!exceedsMaxSize) {
@@ -168,4 +168,4 @@ z.extension.GiphyRepository = class GiphyRepository {
         throw error;
       });
   }
-};
+}

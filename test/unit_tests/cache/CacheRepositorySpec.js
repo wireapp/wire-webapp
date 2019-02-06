@@ -17,8 +17,11 @@
  *
  */
 
-describe('z.cache.CacheRepository', () => {
-  const cache_repository = new z.cache.CacheRepository();
+import resolveDependency from '../../api/testResolver';
+import CacheRepository from 'src/script/cache/CacheRepository';
+
+describe('CacheRepository', () => {
+  const cache_repository = resolveDependency(CacheRepository);
   const TEMP_KEY = 'should_be_deleted';
 
   describe('clearCache', () => {

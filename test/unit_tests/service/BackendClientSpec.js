@@ -17,17 +17,15 @@
  *
  */
 
-describe('z.service.BackendClient', () => {
+import resolveDependency from '../../api/testResolver';
+import BackendClient from 'src/script/service/BackendClient';
+
+describe('BackendClient', () => {
   let backend_client = null;
   let server = null;
 
-  const urls = {
-    restUrl: 'http://localhost',
-    websocket_url: 'wss://localhost',
-  };
-
   beforeEach(() => {
-    backend_client = new z.service.BackendClient(urls);
+    backend_client = resolveDependency(BackendClient);
   });
 
   afterEach(() => {
