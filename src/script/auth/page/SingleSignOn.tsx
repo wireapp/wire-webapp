@@ -58,11 +58,11 @@ import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {ROUTE} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
-import * as URLUtil from '../util/urlUtil';
+import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
@@ -109,8 +109,19 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     validationErrors: [],
   };
 
+  readAndUpdateParamsFromUrl = () => {
+    const ssoCode = getURLParameter(QUERY_KEY.SSO_CODE);
+    const ssoCodeChanged = ssoCode !== this.state.code;
+
+    if (ssoCodeChanged) {
+      this.setState({code: ssoCode});
+    }
+  };
+
   componentDidMount = () => {
-    if (isDesktopApp() && isSupportingClipboard()) {
+    if (hasURLParameter(QUERY_KEY.SSO_CODE)) {
+      this.readAndUpdateParamsFromUrl();
+    } else if (isDesktopApp() && isSupportingClipboard()) {
       this.extractSSOLink(undefined, false);
     }
   };
@@ -311,7 +322,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      ? window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP))
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
