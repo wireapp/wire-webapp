@@ -45,7 +45,7 @@ const resolver = {
    */
   resolve: memoize(dependencyClass => {
     if (!dependencyGraph) {
-      throw new Error(`Cannot resolve dependency ${dependencyClass}`);
+      throw new Error(`Cannot resolve dependency "${dependencyClass}"`);
     }
     const config = dependencyGraph.get(dependencyClass);
     if (!config) {
