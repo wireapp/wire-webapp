@@ -17,18 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
 // AssetService for all asset handling and the calls to the backend REST API.
-z.assets.AssetService = class AssetService {
+export default class AssetService {
   /**
    * Construct a new Asset Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.assets.AssetService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('AssetService', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -297,4 +294,4 @@ z.assets.AssetService = class AssetService {
           .then(compressedImage => ({compressedBytes, compressedImage}));
       });
   }
-};
+}

@@ -17,6 +17,8 @@
  *
  */
 
+import BackendClient from '../service/BackendClient';
+
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
@@ -117,7 +119,7 @@ z.auth.AuthService = class AuthService {
           this.backendClient.clearQueueUnblockTimeout();
 
           return this.backendClient
-            .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+            .executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
             .then(() => {
               this.logger.info('Continuing to request access token after verifying connectivity');
               this.backendClient.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);

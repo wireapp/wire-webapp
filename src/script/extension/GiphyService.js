@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.extension = z.extension || {};
-
-z.extension.GiphyService = class GiphyService {
+export default class GiphyService {
   static get CONFIG() {
     return {
       ENDPOINT_BASE: '/proxy/giphy/v1/gifs',
@@ -29,7 +26,7 @@ z.extension.GiphyService = class GiphyService {
 
   /**
    * Construct a new Giphy Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
@@ -88,4 +85,4 @@ z.extension.GiphyService = class GiphyService {
       url: `${GiphyService.CONFIG.ENDPOINT_BASE}/search`,
     });
   }
-};
+}

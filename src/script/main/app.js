@@ -18,6 +18,7 @@
  */
 
 import platform from 'platform';
+import AssetService from '../assets/AssetService';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import StorageService from '../storage/StorageService';
@@ -25,6 +26,11 @@ import PreferenceNotificationRepository from '../notification/PreferenceNotifica
 import * as UserPermission from '../user/UserPermission';
 import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
+
+import CacheRepository from '../cache/CacheRepository';
+import BackendClient from '../service/BackendClient';
+import BackupService from '../backup/BackupService';
+import GiphyRepository from '../extension/GiphyRepository';
 
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
@@ -42,6 +48,8 @@ import globals from './globals';
 import auth from './auth';
 import {getWebsiteUrl} from '../externalRoute';
 /* eslint-enable no-unused-vars */
+
+import resolveDependency from '../config/appResolver';
 
 class App {
   static get CONFIG() {
@@ -108,8 +116,7 @@ class App {
 
     repositories.audio = authComponent.audio;
     repositories.auth = authComponent.repository;
-    repositories.cache = new z.cache.CacheRepository();
-    repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
+    repositories.giphy = resolveDependency(GiphyRepository);
     repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
     repositories.properties = new PropertiesRepository(this.service.properties, this.service.self);
@@ -180,7 +187,7 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
-      this.service.backup,
+      resolveDependency(BackupService),
       repositories.client,
       repositories.connection,
       repositories.conversation,
@@ -225,15 +232,14 @@ class App {
    * @returns {Object} All services
    */
   _setupServices(authComponent) {
-    const storageService = new StorageService();
+    const storageService = resolveDependency(StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
     return {
-      asset: new z.assets.AssetService(this.backendClient),
+      asset: resolveDependency(AssetService),
       auth: authComponent.service,
-      backup: new z.backup.BackupService(storageService),
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       calling: new z.calling.CallingService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
@@ -246,7 +252,6 @@ class App {
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
-      giphy: new z.extension.GiphyService(this.backendClient),
       integration: new z.integration.IntegrationService(this.backendClient),
       lifecycle: new z.lifecycle.LifecycleService(),
       location: new z.location.LocationService(this.backendClient),
@@ -406,13 +411,11 @@ class App {
    */
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.backendClient
-      .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
-      .then(() => {
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-        this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
-      });
+    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
+      amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
+    });
   }
 
   /**
@@ -463,8 +466,8 @@ class App {
       if (isAccessTokenError || isInvalidClient) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
         const triggerSource = isAccessTokenError
-          ? z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
-          : z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
+          ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
+          : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
         return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
       }
     }
@@ -711,7 +714,7 @@ class App {
         });
 
         const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        this.repository.cache.clearCache(keepConversationInput, keysToKeep);
+        resolveDependency(CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
       // Clear IndexedDB
@@ -774,30 +777,28 @@ class App {
    */
   _redirectToLogin(signOutReason) {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    this.backendClient
-      .executeOnConnectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
-      .then(() => {
-        const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-        const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
-        if (isLeavingGuestRoom) {
-          const path = t('urlWebsiteRoot');
-          const url = getWebsiteUrl(path);
-          return window.location.replace(url);
-        }
+    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
+      const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
+      const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+      if (isLeavingGuestRoom) {
+        const path = t('urlWebsiteRoot');
+        const url = getWebsiteUrl(path);
+        return window.location.replace(url);
+      }
 
-        let url = `/auth/${location.search}`;
-        const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-        if (isImmediateSignOutReason) {
-          url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
-        }
+      let url = `/auth/${location.search}`;
+      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+      if (isImmediateSignOutReason) {
+        url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
+      }
 
-        const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
-        if (redirectToLogin) {
-          url = `${url}#login`;
-        }
+      const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
+      if (redirectToLogin) {
+        url = `${url}#login`;
+      }
 
-        window.location.replace(url);
-      });
+      window.location.replace(url);
+    });
   }
 
   //##############################################################################

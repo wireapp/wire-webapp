@@ -17,24 +17,21 @@
  *
  */
 
+import resolveDependency, {backendConfig} from '../../api/testResolver';
+import GiphyRepository from 'src/script/extension/GiphyRepository';
+
 describe('Giphy Repository', () => {
   let server = null;
-  const urls = {
-    restUrl: 'http://localhost',
-    websocket_url: 'wss://localhost',
-  };
+  const urls = backendConfig;
 
-  let client = null;
   let giphy_repository = null;
   let giphy_service = null;
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    client = new z.service.BackendClient(urls);
-
-    giphy_service = new z.extension.GiphyService(client);
-    giphy_repository = new z.extension.GiphyRepository(giphy_service);
+    giphy_repository = resolveDependency(GiphyRepository);
+    giphy_service = giphy_repository.giphyService;
 
     spyOn(giphy_service, 'getRandom').and.callThrough();
     spyOn(giphy_service, 'getById').and.callThrough();

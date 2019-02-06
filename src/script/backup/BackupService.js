@@ -19,10 +19,7 @@
 
 import DexieBatch from 'dexie-batch';
 
-window.z = window.z || {};
-window.z.backup = z.backup || {};
-
-z.backup.BackupService = class BackupService {
+export default class BackupService {
   static get CONFIG() {
     return {
       BATCH_SIZE: 10000,
@@ -33,8 +30,8 @@ z.backup.BackupService = class BackupService {
     };
   }
 
-  constructor(storageService) {
-    this.logger = new z.util.Logger('z.backup.BackupService', z.config.LOGGER.OPTIONS);
+  constructor(storageService, logger) {
+    this.logger = logger;
     this.storageService = storageService;
 
     this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
@@ -69,4 +66,4 @@ z.backup.BackupService = class BackupService {
     const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
     return this.storageService.db[tableName].bulkPut(entities, primaryKeys);
   }
-};
+}

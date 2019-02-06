@@ -17,6 +17,8 @@
  *
  */
 
+import {backendConfig} from '../../api/testResolver';
+
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
   let connectionRepository = undefined;
@@ -94,7 +96,7 @@ describe('z.connection.ConnectionRepository', () => {
   describe('getConnections', () => {
     // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
     it('should return the connected users', () => {
-      server.respondWith('GET', `${testFactory.settings.connection.restUrl}/connections?size=500`, [
+      server.respondWith('GET', `${backendConfig.restUrl}/connections?size=500`, [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.connections.get),
@@ -102,9 +104,7 @@ describe('z.connection.ConnectionRepository', () => {
 
       server.respondWith(
         'GET',
-        `${testFactory.settings.connection.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${
-          entities.user.jane_roe.id
-        }`,
+        `${backendConfig.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${entities.user.jane_roe.id}`,
         [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
       );
 
