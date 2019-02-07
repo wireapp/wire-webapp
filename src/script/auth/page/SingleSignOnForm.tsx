@@ -152,10 +152,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
         if (errors.length) {
           throw errors[0];
         }
-        if (isDesktopApp()) {
-          return this.props.validateSSOCode(this.stripPrefix(this.state.code));
-        }
-        return undefined;
+        return this.props.validateSSOCode(this.stripPrefix(this.state.code));
       })
       .then(() => this.props.handleSSOWindow(this.stripPrefix(this.state.code)))
       .then(() => {
