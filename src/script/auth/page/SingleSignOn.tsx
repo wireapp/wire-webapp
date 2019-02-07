@@ -58,16 +58,17 @@ import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {QUERY_KEY, ROUTE} from '../route';
+import {ROUTE} from '../route';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
-import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
+import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{code?: string}> {}
 
 interface ConnectedProps {
+  code?: string;
   hasHistory: boolean;
   hasSelfHandle: boolean;
   isFetching: boolean;
@@ -109,8 +110,8 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     validationErrors: [],
   };
 
-  readAndUpdateParamsFromUrl = () => {
-    const ssoCode = getURLParameter(QUERY_KEY.SSO_CODE);
+  updateCodeFromProps = (props: ConnectedProps) => {
+    const ssoCode = props.code;
     const ssoCodeChanged = ssoCode !== this.state.code;
 
     if (ssoCodeChanged) {
@@ -119,10 +120,16 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
   };
 
   componentDidMount = () => {
-    if (hasURLParameter(QUERY_KEY.SSO_CODE)) {
-      this.readAndUpdateParamsFromUrl();
+    if (this.props.code) {
+      this.updateCodeFromProps(this.props);
     } else if (isDesktopApp() && isSupportingClipboard()) {
       this.extractSSOLink(undefined, false);
+    }
+  };
+
+  componentWillReceiveProps = (nextProps: ConnectedProps) => {
+    if (nextProps.code) {
+      this.updateCodeFromProps(nextProps);
     }
   };
 
@@ -518,8 +525,9 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
+      (state: RootState, ownProps: Props): ConnectedProps => {
         return {
+          code: ownProps.match.params.code,
           hasHistory: ClientSelector.hasHistory(state),
           hasSelfHandle: SelfSelector.hasSelfHandle(state),
           isFetching: AuthSelector.isFetching(state),
