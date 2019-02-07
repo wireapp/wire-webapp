@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-z.assets.AssetRemoteData = class AssetRemoteData {
+class AssetRemoteData {
   /**
-   * Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3 to initialize.
+   * Use either AssetRemoteData.v2 or AssetRemoteData.v3 to initialize.
    * @param {Uint8Array} otrKey - Encryption key
    * @param {Uint8Array} sha256 - Checksum
    * @param {string} identifier - The asset's idenfifier
@@ -38,7 +35,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
 
     this.loadPromise = undefined;
 
-    this.logger = new z.util.Logger('z.assets.AssetRemoteData', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('AssetRemoteData', z.config.LOGGER.OPTIONS);
   }
 
   generateUrl() {
@@ -61,10 +58,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @param {Uint8Array} [sha256] - Checksum
    * @param {string} [assetToken] - Token data
    * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
-   * @returns {z.assets.AssetRemoteData} V3 asset remote data
+   * @returns {AssetRemoteData} V3 asset remote data
    */
   static v3(assetKey, otrKey, sha256, assetToken, forceCaching = false) {
-    return new z.assets.AssetRemoteData(otrKey, sha256, assetKey, {
+    return new AssetRemoteData(otrKey, sha256, assetKey, {
       assetKey,
       assetToken,
       forceCaching,
@@ -80,10 +77,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @param {Uint8Array} otrKey - Encryption key
    * @param {Uint8Array} sha256 - Checksum
    * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
-   * @returns {z.assets.AssetRemoteData} V2 asset remote data
+   * @returns {AssetRemoteData} V2 asset remote data
    */
   static v2(conversationId, assetId, otrKey, sha256, forceCaching = false) {
-    return new z.assets.AssetRemoteData(otrKey, sha256, `${conversationId}${assetId}`, {
+    return new AssetRemoteData(otrKey, sha256, `${conversationId}${assetId}`, {
       assetId,
       conversationId,
       forceCaching,
@@ -98,10 +95,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @param {string} conversationId - ID of conversation
    * @param {string} assetId - ID to retrieve asset with
    * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
-   * @returns {z.assets.AssetRemoteData} V1 asset remote data
+   * @returns {AssetRemoteData} V1 asset remote data
    */
   static v1(conversationId, assetId, forceCaching = false) {
-    return new z.assets.AssetRemoteData(undefined, undefined, `${conversationId}${assetId}`, {
+    return new AssetRemoteData(undefined, undefined, `${conversationId}${assetId}`, {
       assetId,
       conversationId,
       forceCaching,
@@ -180,4 +177,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
         throw error;
       });
   }
-};
+}
+
+export default AssetRemoteData;
+
+window.z = window.z || {};
+window.z.assets = z.assets || {};
+z.assets.AssetRemoteData = AssetRemoteData;

@@ -23,7 +23,7 @@ export function instantiateComponent(componentName, viewModel, params) {
   return new Promise(resolve => {
     const destination = document.body;
     ko.cleanNode(destination);
-    destination.innerHTML = `<!-- ko component: {name: "${componentName}", params: {${params}}} --><!-- /ko -->`; // eslint-disable-line no-unsanitized/property
+    destination.innerHTML = `<div data-bind="component: {name: '${componentName}', params: {${params}}}"></div>`; // eslint-disable-line no-unsanitized/property
     ko.applyBindings(viewModel, destination);
     setImmediate(() => {
       resolve(destination);
