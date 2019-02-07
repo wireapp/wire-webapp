@@ -2,12 +2,16 @@ const pkg = require('./package.json');
 const path = require('path');
 
 const source = path.join(pkg.name, 'content');
-const repositoryUrl = pkg.dependencies['wire-web-config-default'];
+const currentBranch = execSync(`git rev-parse --abbrev-ref HEAD`)
+  .toString()
+  .trim();
+const configurationEntry = `wire-web-config-default-${currentBranch === 'master' ? 'master' : 'staging'}`;
+const repositoryUrl = pkg.dependencies[configurationEntry];
 
 module.exports = {
   files: {
     [`${source}/**`]: 'resource/',
-    [path.join(pkg.name, '.env')]: path.join(__dirname, '.env'),
+    [path.join(pkg.name, '.env.defaults')]: path.join(__dirname, '.env.defaults'),
   },
   repositoryUrl,
 };
