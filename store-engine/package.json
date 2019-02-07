@@ -18,7 +18,7 @@
     "rimraf": "2.6.3",
     "typescript": "3.3.1",
     "webpack": "4.29.2",
-    "webpack-cli": "3.2.1"
+    "webpack-cli": "3.2.3"
   },
   "description": "Provides a generic storage layer for File, FileSystem, IndexedDB, Memory & LocalStorage.",
   "files": [
