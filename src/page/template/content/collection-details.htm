@@ -11,7 +11,7 @@
     </div>
 
     <div class="content-list-wrapper">
-      <div class="content-list collection-list" data-bind="antiscroll: true">
+      <div class="content-list collection-list" data-bind="fadingscrollbar">
         <div class="collection-images" data-bind="foreach: {data: items(), as: 'messageEntity'}">
           <!-- ko if: $parent.shouldShowHeader(messageEntity) -->
             <header class="collection-date-separator" data-bind="text: $parent.getTitleForHeader(messageEntity)"></header>
