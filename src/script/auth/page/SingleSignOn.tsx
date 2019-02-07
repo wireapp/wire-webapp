@@ -158,7 +158,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
   };
 
   calculateChildPosition = (childHeight: number, childWidth: number) => {
-    const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    const screenLeft = window.screenLeft || window.screenX;
     const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
 
     const hasInnerMeasurements = window.innerHeight && window.innerWidth;
