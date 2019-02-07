@@ -22,12 +22,12 @@ import {
   Button,
   Checkbox,
   CheckboxLabel,
+  ErrorMessage,
   Form,
   ICON_NAME,
   Input,
   InputSubmitCombo,
   RoundIconButton,
-  ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
@@ -48,7 +48,8 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
 import {pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<SingleSignOnForm>, RouteComponentProps<{ code?: string }> {
+interface Props extends React.HTMLAttributes<SingleSignOnForm>, RouteComponentProps<{code?: string}> {
+  handleSSOWindow: (code: string) => {};
 }
 
 interface ConnectedProps {
@@ -62,7 +63,7 @@ interface ConnectedProps {
 interface DispatchProps {
   resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
-  doFinalizeSSOLogin: (options: { clientType: ClientType }) => Promise<void>;
+  doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
   doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
@@ -81,7 +82,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
   private static readonly SSO_CODE_PREFIX = 'wire-';
   private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
-  private readonly inputs: { code: React.RefObject<HTMLInputElement> } = {code: React.createRef()};
+  private readonly inputs: {code: React.RefObject<HTMLInputElement>} = {code: React.createRef()};
   state: State = {
     code: '',
     isOverlayOpen: false,
@@ -136,7 +137,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
     }
     this.inputs.code.current.value = this.inputs.code.current.value.trim();
     const validationErrors: Error[] = [];
-    const validInputs: { [field: string]: boolean } = this.state.validInputs;
+    const validInputs: {[field: string]: boolean} = this.state.validInputs;
 
     Object.entries(this.inputs).forEach(([inputKey, {current}]) => {
       if (!current.checkValidity()) {
@@ -156,7 +157,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
         }
         return undefined;
       })
-      .then(() => this.handleSSOWindow(this.stripPrefix(this.state.code)))
+      .then(() => this.props.handleSSOWindow(this.stripPrefix(this.state.code)))
       .then(() => {
         const clientType = this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         return this.props.doFinalizeSSOLogin({clientType});
@@ -229,7 +230,8 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
   containsSSOCode = (text: string) =>
     text && new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
-  isSSOCode = (text: string) => text && new RegExp(`^${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
+  isSSOCode = (text: string) =>
+    text && new RegExp(`^${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
 
   extractCode = (text: string) => {
     return this.containsSSOCode(text)
@@ -312,9 +314,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
         {!isDesktopApp() && (
           <Checkbox
             tabIndex={3}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              this.setState({persist: !event.target.checked})
-            }
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.setState({persist: !event.target.checked})}
             checked={!persist}
             data-uie-name="enter-public-computer-sso-sign-in"
             style={{justifyContent: 'center', marginTop: '36px'}}
@@ -341,7 +341,7 @@ export default withRouter(
       },
       (dispatch: ThunkDispatch): DispatchProps => {
         return {
-          doFinalizeSSOLogin: (options: { clientType: ClientType }) =>
+          doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
             dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
           doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),

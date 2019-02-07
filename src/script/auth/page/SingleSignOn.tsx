@@ -38,27 +38,23 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {BACKEND} from '../Environment';
+import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import Page from './Page';
-import SingleSignOnForm from "./SingleSignOnForm";
-import {BACKEND} from "../Environment";
-import BackendError from "../module/action/BackendError";
+import SingleSignOnForm from './SingleSignOnForm';
 
-interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {
-}
+interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
-interface ConnectedProps {
-}
+interface ConnectedProps {}
 
-interface DispatchProps {
-}
+interface DispatchProps {}
 
 interface State {
   isOverlayOpen: boolean;
 }
 
 class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-
   private ssoWindow: Window = undefined;
   state: State = {
     isOverlayOpen: false,
@@ -248,7 +244,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
                 <div>
                   <H1 center>{_(ssoLoginStrings.headline)}</H1>
                   <Muted>{_(ssoLoginStrings.subhead)}</Muted>
-                  <SingleSignOnForm />
+                  <SingleSignOnForm handleSSOWindow={this.handleSSOWindow} />
                 </div>
               </ContainerXS>
             </Column>
@@ -260,6 +256,4 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
   }
 }
 
-export default withRouter(
-  injectIntl(SingleSignOn)
-);
+export default withRouter(injectIntl(SingleSignOn));
