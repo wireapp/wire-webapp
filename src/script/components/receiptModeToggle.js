@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 ko.components.register('read-receipt-toggle', {
   template: `
   <div class="panel__action-item">
@@ -31,7 +33,7 @@ ko.components.register('read-receipt-toggle', {
   `,
 
   viewModel: function(params) {
-    this.conversation = params.conversation();
+    this.conversation = ko.unwrap(params.conversation);
 
     this.updateValue = (data, event) => {
       const intValue = event.target.checked ? 1 : 0;
