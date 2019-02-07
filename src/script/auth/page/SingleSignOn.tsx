@@ -20,26 +20,17 @@
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
   ArrowIcon,
-  Button,
   COLOR,
-  Checkbox,
-  CheckboxLabel,
   Column,
   Columns,
   Container,
   ContainerXS,
-  ErrorMessage,
-  Form,
   H1,
-  ICON_NAME,
-  Input,
-  InputSubmitCombo,
   IsMobile,
   Link,
   Logo,
   Muted,
   Overlay,
-  RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
 import * as React from 'react';
@@ -47,28 +38,23 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
-import {loginStrings, ssoLoginStrings} from '../../strings';
+import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import {BACKEND} from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import ValidationError from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {isDesktopApp, isSupportingClipboard} from '../Runtime';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {UUID_REGEX} from '../util/stringUtil';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
+import SingleSignOnForm from "./SingleSignOnForm";
 
-interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{code?: string}> {}
+interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {
+}
 
 interface ConnectedProps {
-  code?: string;
   hasHistory: boolean;
   hasSelfHandle: boolean;
   isFetching: boolean;
@@ -78,7 +64,7 @@ interface ConnectedProps {
 interface DispatchProps {
   resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
-  doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
+  doFinalizeSSOLogin: (options: { clientType: ClientType }) => Promise<void>;
   doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
@@ -95,10 +81,8 @@ interface State {
 
 class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   private static readonly SSO_CODE_PREFIX = 'wire-';
-  private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
   private ssoWindow: Window = undefined;
-  private readonly inputs: {code?: HTMLInputElement} = {};
   state: State = {
     code: '',
     isOverlayOpen: false,
@@ -108,33 +92,6 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
       code: true,
     },
     validationErrors: [],
-  };
-
-  updateCodeFromProps = (props: ConnectedProps) => {
-    const ssoCode = props.code;
-    const ssoCodeChanged = ssoCode !== this.state.code;
-
-    if (ssoCodeChanged) {
-      this.setState({code: ssoCode});
-    }
-  };
-
-  componentDidMount = () => {
-    if (this.props.code) {
-      this.updateCodeFromProps(this.props);
-    } else if (isDesktopApp() && isSupportingClipboard()) {
-      this.extractSSOLink(undefined, false);
-    }
-  };
-
-  componentWillReceiveProps = (nextProps: ConnectedProps) => {
-    if (nextProps.code) {
-      this.updateCodeFromProps(nextProps);
-    }
-  };
-
-  componentWillUnmount = () => {
-    this.props.resetAuthError();
   };
 
   calculateChildPosition = (childHeight: number, childWidth: number) => {
@@ -155,177 +112,6 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     return {left, top};
   };
 
-  handleSSOWindow = (code: string) => {
-    const POPUP_HEIGHT = 520;
-    const POPUP_WIDTH = 480;
-    const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
-
-    return new Promise((resolve, reject) => {
-      let timerId: number = undefined;
-      let onReceiveChildWindowMessage: (event: MessageEvent) => void = undefined;
-      let onParentWindowClose: (event: Event) => void = undefined;
-
-      const onChildWindowClose = () => {
-        clearInterval(timerId);
-        window.removeEventListener('message', onReceiveChildWindowMessage);
-        window.removeEventListener('unload', onParentWindowClose);
-        this.setState({isOverlayOpen: false});
-      };
-
-      onReceiveChildWindowMessage = (event: MessageEvent) => {
-        const isExpectedOrigin = event.origin === BACKEND.rest;
-        if (!isExpectedOrigin) {
-          onChildWindowClose();
-          this.ssoWindow.close();
-          return reject(
-            new BackendError({
-              code: 500,
-              label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${BACKEND.rest}"`,
-            })
-          );
-        }
-
-        const eventType = event.data && event.data.type;
-        switch (eventType) {
-          case 'AUTH_SUCCESS': {
-            onChildWindowClose();
-            this.ssoWindow.close();
-            return resolve();
-          }
-          case 'AUTH_ERROR': {
-            onChildWindowClose();
-            this.ssoWindow.close();
-            return reject(
-              new BackendError({
-                code: 401,
-                label: event.data.payload.label,
-                message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
-              })
-            );
-          }
-          default: {
-            onChildWindowClose();
-            this.ssoWindow.close();
-            return reject(
-              new BackendError({
-                code: 500,
-                label: BackendError.LABEL.SSO_GENERIC_ERROR,
-                message: `Unmatched event type: "${JSON.stringify(event)}"`,
-              })
-            );
-          }
-        }
-      };
-      window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
-
-      const childPosition = this.calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
-
-      this.ssoWindow = window.open(
-        `${BACKEND.rest}/sso/initiate-login/${code}`,
-        'WIRE_SSO',
-        `
-          height=${POPUP_HEIGHT},
-          left=${childPosition.left}
-          location=no,
-          menubar=no,
-          resizable=no,
-          status=no,
-          toolbar=no,
-          top=${childPosition.top},
-          width=${POPUP_WIDTH}
-        `
-      );
-
-      this.setState({isOverlayOpen: true});
-
-      if (this.ssoWindow) {
-        timerId = window.setInterval(() => {
-          if (this.ssoWindow && this.ssoWindow.closed) {
-            onChildWindowClose();
-            reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
-          }
-        }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
-
-        onParentWindowClose = () => {
-          this.ssoWindow.close();
-          reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
-        };
-        window.addEventListener('unload', onParentWindowClose);
-      }
-    });
-  };
-
-  handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    this.props.resetAuthError();
-    if (this.props.isFetching) {
-      return undefined;
-    }
-    this.inputs.code.value = this.inputs.code.value.trim();
-    const validationErrors: Error[] = [];
-    const validInputs: {[field: string]: boolean} = this.state.validInputs;
-
-    Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
-      if (!currentInput.checkValidity()) {
-        validationErrors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
-      }
-      validInputs[inputKey] = currentInput.validity.valid;
-    });
-
-    this.setState({validInputs, validationErrors});
-    return Promise.resolve(validationErrors)
-      .then(errors => {
-        if (errors.length) {
-          throw errors[0];
-        }
-        if (isDesktopApp()) {
-          return this.props.validateSSOCode(this.stripPrefix(this.state.code));
-        }
-        return undefined;
-      })
-      .then(() => this.handleSSOWindow(this.stripPrefix(this.state.code)))
-      .then(() => {
-        const clientType = this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-        return this.props.doFinalizeSSOLogin({clientType});
-      })
-      .then(this.navigateChooseHandleOrWebapp)
-      .catch(error => {
-        switch (error.label) {
-          case BackendError.LABEL.NEW_CLIENT: {
-            this.props.resetAuthError();
-            /**
-             * Show history screen if:
-             *   1. database contains at least one event
-             *   2. there is at least one previously registered client
-             *   3. new local client is temporary
-             */
-            return this.props.doGetAllClients().then(clients => {
-              const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
-              return shouldShowHistoryInfo
-                ? this.props.history.push(ROUTE.HISTORY_INFO)
-                : this.navigateChooseHandleOrWebapp();
-            });
-          }
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            this.props.resetAuthError();
-            return this.props.history.push(ROUTE.CLIENTS);
-          }
-          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
-            return;
-          }
-          default: {
-            this.setState({ssoError: error});
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType)
-            );
-            if (!isValidationError) {
-              throw error;
-            }
-          }
-        }
-      });
-  };
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
@@ -333,53 +119,14 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
-  focusChildWindow = () => this.ssoWindow && this.ssoWindow.focus();
 
-  extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
-    if (event) {
-      event.preventDefault();
-    }
-    if (isSupportingClipboard()) {
-      this.readFromClipboard()
-        .then(text => {
-          const isContainingValidSSOLink = this.containsSSOCode(text);
-          if (isContainingValidSSOLink) {
-            const code = this.extractCode(text);
-            this.setState({code});
-          } else if (shouldEmitError) {
-            throw new BackendError({code: 400, label: BackendError.SSO_ERRORS.SSO_NO_SSO_CODE});
-          }
-        })
-        .catch(error => this.setState({ssoError: error}));
-    }
-  };
 
-  readFromClipboard = () => window.navigator.clipboard.readText();
-
-  containsSSOCode = (text: string) =>
-    text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
-
-  isSSOCode = (text: string) => text && new RegExp(`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
-
-  extractCode = (text: string) => {
-    return this.containsSSOCode(text)
-      ? text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
-      : '';
-  };
-
-  stripPrefix = (code: string) =>
-    code &&
-    code
-      .trim()
-      .toLowerCase()
-      .replace(SingleSignOn.SSO_CODE_PREFIX, '');
 
   render() {
     const {
       intl: {formatMessage: _},
-      loginError,
     } = this.props;
-    const {persist, code, isOverlayOpen, validInputs, validationErrors, ssoError} = this.state;
+    const {isOverlayOpen} = this.state;
     const backArrow = (
       <Link to={ROUTE.LOGIN} component={RRLink} data-uie-name="go-login">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -438,79 +185,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
                 <div>
                   <H1 center>{_(ssoLoginStrings.headline)}</H1>
                   <Muted>{_(ssoLoginStrings.subhead)}</Muted>
-                  <Form style={{marginTop: 30}} data-uie-name="sso">
-                    <InputSubmitCombo>
-                      {isSupportingClipboard() && !code && (
-                        <Button
-                          style={{
-                            borderRadius: '4px',
-                            fontSize: '11px',
-                            lineHeight: '16px',
-                            margin: '0 0 0 12px',
-                            maxHeight: '32px',
-                            minWidth: '100px',
-                            padding: '0 12px',
-                          }}
-                          onClick={this.extractSSOLink}
-                          data-uie-name="do-paste-sso-code"
-                        >
-                          {_(ssoLoginStrings.pasteButton)}
-                        </Button>
-                      )}
-                      <Input
-                        name="sso-code"
-                        tabIndex={1}
-                        onChange={event =>
-                          this.setState({
-                            code: event.target.value,
-                            validInputs: {...validInputs, code: true},
-                          })
-                        }
-                        innerRef={node => (this.inputs.code = node)}
-                        markInvalid={!validInputs.code}
-                        placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
-                        value={code}
-                        autoComplete="section-login sso-code"
-                        maxLength={1024}
-                        pattern={`${SingleSignOn.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
-                        autoFocus
-                        type="text"
-                        required
-                        data-uie-name="enter-code"
-                      />
-                      <RoundIconButton
-                        tabIndex={2}
-                        disabled={!code}
-                        type="submit"
-                        formNoValidate
-                        icon={ICON_NAME.ARROW}
-                        onClick={this.handleSubmit}
-                        data-uie-name="do-sso-sign-in"
-                      />
-                    </InputSubmitCombo>
-                    {validationErrors.length ? (
-                      parseValidationErrors(validationErrors)
-                    ) : loginError ? (
-                      <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                    ) : ssoError ? (
-                      <ErrorMessage data-uie-name="error-message">{parseError(ssoError)}</ErrorMessage>
-                    ) : (
-                      <span style={{marginBottom: '4px'}}>&nbsp;</span>
-                    )}
-                    {!isDesktopApp() && (
-                      <Checkbox
-                        tabIndex={3}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                          this.setState({persist: !event.target.checked})
-                        }
-                        checked={!persist}
-                        data-uie-name="enter-public-computer-sso-sign-in"
-                        style={{justifyContent: 'center', marginTop: '36px'}}
-                      >
-                        <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
-                      </Checkbox>
-                    )}
-                  </Form>
+                  <SingleSignOnForm />
                 </div>
               </ContainerXS>
             </Column>
@@ -527,7 +202,6 @@ export default withRouter(
     connect(
       (state: RootState, ownProps: Props): ConnectedProps => {
         return {
-          code: ownProps.match.params.code,
           hasHistory: ClientSelector.hasHistory(state),
           hasSelfHandle: SelfSelector.hasSelfHandle(state),
           isFetching: AuthSelector.isFetching(state),
@@ -536,7 +210,7 @@ export default withRouter(
       },
       (dispatch: ThunkDispatch): DispatchProps => {
         return {
-          doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
+          doFinalizeSSOLogin: (options: { clientType: ClientType }) =>
             dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
           doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
