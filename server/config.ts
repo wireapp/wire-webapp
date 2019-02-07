@@ -32,9 +32,7 @@ const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 const VERSION_FILE = path.join(__dirname, 'version');
 
-if (nodeEnvironment === 'development') {
-  dotenv.load();
-}
+dotenv.load();
 
 const defaultCSP: HelmetCSP = {
   connectSrc: [
