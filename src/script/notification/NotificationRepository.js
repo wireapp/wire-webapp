@@ -217,9 +217,9 @@ z.notification.NotificationRepository = class NotificationRepository {
           let notificationText;
 
           if (assetEntity.isUserMentioned(this.selfUser().id)) {
-            notificationText = t('notificationMention', assetEntity.text);
+            notificationText = t('notificationMention', assetEntity.text, {}, true);
           } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
-            notificationText = t('notificationReply', assetEntity.text);
+            notificationText = t('notificationReply', assetEntity.text, {}, true);
           } else {
             notificationText = assetEntity.text;
           }
@@ -271,15 +271,15 @@ z.notification.NotificationRepository = class NotificationRepository {
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
-        return t('notificationMemberJoinSelf', nameOfJoinedUser);
+        return t('notificationMemberJoinSelf', nameOfJoinedUser, {}, true);
       }
 
       const substitutions = {user1: messageEntity.user().first_name(), user2: nameOfJoinedUser};
-      return t('notificationMemberJoinOne', substitutions);
+      return t('notificationMemberJoinOne', substitutions, {}, true);
     }
 
     const substitutions = {number: messageEntity.userIds().length, user: messageEntity.user().first_name()};
-    return t('notificationMemberJoinMany', substitutions);
+    return t('notificationMemberJoinMany', substitutions, {}, true);
   }
 
   /**
@@ -293,7 +293,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createBodyMemberLeave(messageEntity) {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
-      return t('notificationMemberLeaveRemovedYou', messageEntity.user().first_name());
+      return t('notificationMemberLeaveRemovedYou', messageEntity.user().first_name(), {}, true);
     }
   }
 
@@ -327,7 +327,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       case z.message.SystemMessageType.CONNECTION_REQUEST:
         return t('notificationConnectionRequest');
       case z.message.SystemMessageType.CONVERSATION_CREATE:
-        return t('notificationConversationCreate', messageEntity.user().first_name());
+        return t('notificationConversationCreate', messageEntity.user().first_name(), {}, true);
       default:
         const conversationId = this._getConversationId(connectionEntity, conversationEntity);
         const message = `No notification for '${messageEntity.id} in '${conversationId}'.`;
@@ -393,14 +393,14 @@ z.notification.NotificationRepository = class NotificationRepository {
       if (messageTimer) {
         const timeString = z.util.TimeUtil.formatDuration(messageTimer).text;
         const substitutions = {time: timeString, user: messageEntity.user().first_name()};
-        return t('notificationConversationMessageTimerUpdate', substitutions);
+        return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }
-      return t('notificationConversationMessageTimerReset', messageEntity.user().first_name());
+      return t('notificationConversationMessageTimerReset', messageEntity.user().first_name(), {}, true);
     };
 
     const createBodyRename = () => {
       const substitutions = {name: messageEntity.name, user: messageEntity.user().first_name()};
-      return t('notificationConversationRename', substitutions);
+      return t('notificationConversationRename', substitutions, {}, true);
     };
 
     switch (messageEntity.system_message_type) {
@@ -559,7 +559,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     let title;
     if (conversationName) {
       title = conversationEntity.isGroup()
-        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.first_name()})
+        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.first_name()}, {}, true)
         : conversationName;
     }
 
