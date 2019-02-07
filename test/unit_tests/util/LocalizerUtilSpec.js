@@ -127,6 +127,21 @@ describe('LocalizerUtil', () => {
       expect(result3).toBe('Hello Rick, you are &lt;script&gt;a pickle&lt;/script&gt;');
     });
 
+    it("doesn't escape substitutions when it should skip the escaping", () => {
+      setStrings({
+        en: {
+          test: 'Hello {{user}}',
+        },
+      });
+
+      const result1 = t('test', 'Huey, Dewey, & Louie', {}, true);
+      const result2 = t('test', {user: 'Huey, Dewey, & Louie'}, {}, true);
+
+      expect(result1).toBe('Hello Huey, Dewey, & Louie');
+
+      expect(result2).toBe('Hello Huey, Dewey, & Louie');
+    });
+
     it("doesn't escape substitutions acknowledged as dangerous", () => {
       setStrings({
         en: {
