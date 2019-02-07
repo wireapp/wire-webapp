@@ -46,15 +46,11 @@ import SingleSignOnForm from './SingleSignOnForm';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
-interface ConnectedProps {}
-
-interface DispatchProps {}
-
 interface State {
   isOverlayOpen: boolean;
 }
 
-class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State> {
   private ssoWindow: Window = undefined;
   state: State = {
     isOverlayOpen: false,
