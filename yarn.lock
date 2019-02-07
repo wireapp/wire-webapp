@@ -13013,9 +13013,15 @@ window-size@^0.1.4:
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.4.tgz#f8e1aa1ee5a53ec5bf151ffa09742a6ad7697876"
   integrity sha1-+OGqHuWlPsW/FR/6CXQqatdpeHY=
 
-"wire-web-config-default@https://github.com/wireapp/wire-web-config-default#v0.9.0":
+"wire-web-config-default-master@https://github.com/wireapp/wire-web-config-default#v0.9.0":
   version "0.9.0"
   resolved "https://github.com/wireapp/wire-web-config-default#80d1c4f0f34673d0810e00c41ad4432733b5d4cd"
+  dependencies:
+    adm-zip "0.4.13"
+
+"wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.9.1-staging.1":
+  version "0.9.1-staging.1"
+  resolved "https://github.com/wireapp/wire-web-config-default#fe6675b968036ea216e422381e7fe8084e290433"
   dependencies:
     adm-zip "0.4.13"
 

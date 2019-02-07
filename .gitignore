@@ -20,5 +20,6 @@ CHANGELOG.md
 
 # Configuration imported from https://github.com/wireapp/wire-web-config-default/
 .env
+.env.defaults
 /config
 /resource

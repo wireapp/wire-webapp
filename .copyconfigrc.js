@@ -1,4 +1,5 @@
 const pkg = require('./package.json');
+const {execSync} = require('child_process');
 const path = require('path');
 
 const source = path.join(pkg.name, 'content');
