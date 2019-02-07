@@ -28,7 +28,6 @@ const QUERY_KEY = {
   LOCALE: 'hl',
   LOGOUT_REASON: 'reason',
   PWA_AWARE: 'pwa_aware',
-  SSO_CODE: 'sso_code',
   TRACKING: 'tracking',
 };
 
@@ -52,7 +51,7 @@ const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
-  SSO: '/sso',
+  SSO: '/sso/:code?',
   VERIFY: '/verify',
 };
 
