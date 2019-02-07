@@ -17,22 +17,10 @@
  *
  */
 
-import ko from 'knockout';
+import {instantiateComponent} from '../../api/knockoutHelpers';
 
 import Conversation from 'src/script/entity/Conversation';
 import 'src/script/components/receiptModeToggle';
-
-function instantiateComponent(componentName, viewModel, params) {
-  return new Promise(resolve => {
-    const destination = document.body;
-    ko.cleanNode(destination);
-    destination.innerHTML = `<!-- ko component: {name: "${componentName}", params: {${params}}} --><!-- /ko -->`; // eslint-disable-line no-unsanitized/property
-    ko.applyBindings(viewModel, destination);
-    setTimeout(() => {
-      resolve(destination);
-    });
-  });
-}
 
 describe('read-receipt-toggle', () => {
   it('renders the toggle according to the conversation read receipt mode', () => {
