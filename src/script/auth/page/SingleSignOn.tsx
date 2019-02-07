@@ -17,7 +17,6 @@
  *
  */
 
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
   ArrowIcon,
   COLOR,
@@ -35,63 +34,135 @@ import {
 } from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
-import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 import SingleSignOnForm from "./SingleSignOnForm";
+import {BACKEND} from "../Environment";
+import BackendError from "../module/action/BackendError";
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {
 }
 
 interface ConnectedProps {
-  hasHistory: boolean;
-  hasSelfHandle: boolean;
-  isFetching: boolean;
-  loginError: Error;
 }
 
 interface DispatchProps {
-  resetAuthError: () => Promise<void>;
-  validateSSOCode: (code: string) => Promise<void>;
-  doFinalizeSSOLogin: (options: { clientType: ClientType }) => Promise<void>;
-  doGetAllClients: () => Promise<RegisteredClient[]>;
 }
 
 interface State {
-  code: string;
   isOverlayOpen: boolean;
-  persist: boolean;
-  ssoError: Error;
-  validInputs: {
-    [field: string]: boolean;
-  };
-  validationErrors: Error[];
 }
 
 class SingleSignOn extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  private static readonly SSO_CODE_PREFIX = 'wire-';
 
   private ssoWindow: Window = undefined;
   state: State = {
-    code: '',
     isOverlayOpen: false,
-    persist: true,
-    ssoError: null,
-    validInputs: {
-      code: true,
-    },
-    validationErrors: [],
+  };
+
+  handleSSOWindow = (code: string) => {
+    const POPUP_HEIGHT = 520;
+    const POPUP_WIDTH = 480;
+    const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
+
+    return new Promise((resolve, reject) => {
+      let timerId: number = undefined;
+      let onReceiveChildWindowMessage: (event: MessageEvent) => void = undefined;
+      let onParentWindowClose: (event: Event) => void = undefined;
+
+      const onChildWindowClose = () => {
+        clearInterval(timerId);
+        window.removeEventListener('message', onReceiveChildWindowMessage);
+        window.removeEventListener('unload', onParentWindowClose);
+        this.setState({isOverlayOpen: false});
+      };
+
+      onReceiveChildWindowMessage = (event: MessageEvent) => {
+        const isExpectedOrigin = event.origin === BACKEND.rest;
+        if (!isExpectedOrigin) {
+          onChildWindowClose();
+          this.ssoWindow.close();
+          return reject(
+            new BackendError({
+              code: 500,
+              label: BackendError.LABEL.SSO_GENERIC_ERROR,
+              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${BACKEND.rest}"`,
+            })
+          );
+        }
+
+        const eventType = event.data && event.data.type;
+        switch (eventType) {
+          case 'AUTH_SUCCESS': {
+            onChildWindowClose();
+            this.ssoWindow.close();
+            return resolve();
+          }
+          case 'AUTH_ERROR': {
+            onChildWindowClose();
+            this.ssoWindow.close();
+            return reject(
+              new BackendError({
+                code: 401,
+                label: event.data.payload.label,
+                message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
+              })
+            );
+          }
+          default: {
+            onChildWindowClose();
+            this.ssoWindow.close();
+            return reject(
+              new BackendError({
+                code: 500,
+                label: BackendError.LABEL.SSO_GENERIC_ERROR,
+                message: `Unmatched event type: "${JSON.stringify(event)}"`,
+              })
+            );
+          }
+        }
+      };
+      window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
+
+      const childPosition = this.calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
+
+      this.ssoWindow = window.open(
+        `${BACKEND.rest}/sso/initiate-login/${code}`,
+        'WIRE_SSO',
+        `
+          height=${POPUP_HEIGHT},
+          left=${childPosition.left}
+          location=no,
+          menubar=no,
+          resizable=no,
+          status=no,
+          toolbar=no,
+          top=${childPosition.top},
+          width=${POPUP_WIDTH}
+        `
+      );
+
+      this.setState({isOverlayOpen: true});
+
+      if (this.ssoWindow) {
+        timerId = window.setInterval(() => {
+          if (this.ssoWindow && this.ssoWindow.closed) {
+            onChildWindowClose();
+            reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+          }
+        }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
+
+        onParentWindowClose = () => {
+          this.ssoWindow.close();
+          reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+        };
+        window.addEventListener('unload', onParentWindowClose);
+      }
+    });
   };
 
   calculateChildPosition = (childHeight: number, childWidth: number) => {
@@ -112,15 +183,7 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
     return {left, top};
   };
 
-
-  navigateChooseHandleOrWebapp = () => {
-    return this.props.hasSelfHandle
-      ? window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : this.props.history.push(ROUTE.CHOOSE_HANDLE);
-  };
-
-
-
+  focusChildWindow = () => this.ssoWindow && this.ssoWindow.focus();
 
   render() {
     const {
@@ -198,25 +261,5 @@ class SingleSignOn extends React.PureComponent<Props & ConnectedProps & Dispatch
 }
 
 export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState, ownProps: Props): ConnectedProps => {
-        return {
-          hasHistory: ClientSelector.hasHistory(state),
-          hasSelfHandle: SelfSelector.hasSelfHandle(state),
-          isFetching: AuthSelector.isFetching(state),
-          loginError: AuthSelector.getError(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          doFinalizeSSOLogin: (options: { clientType: ClientType }) =>
-            dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
-          doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-          validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
-        };
-      }
-    )(SingleSignOn)
-  )
+  injectIntl(SingleSignOn)
 );
