@@ -29,7 +29,7 @@
     "protobufjs": "https://github.com/gregor/protobuf.js#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "raygun4js": "2.13.4",
     "react": "16.7.0",
-    "react-dom": "16.7.0",
+    "react-dom": "16.8.1",
     "react-intl": "2.8.0",
     "react-intl-po": "2.2.2",
     "react-redux": "6.0.0",
