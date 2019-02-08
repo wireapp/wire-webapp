@@ -19,12 +19,13 @@
 
 import ko from 'knockout';
 
-export function instantiateComponent(componentName, viewModel, params) {
+export function instantiateComponent(componentName, params = {}) {
   return new Promise(resolve => {
     const destination = document.body;
     ko.cleanNode(destination);
-    destination.innerHTML = `<div data-bind="component: {name: '${componentName}', params: {${params}}}"></div>`; // eslint-disable-line no-unsanitized/property
-    ko.applyBindings(viewModel, destination);
+    const paramsStr = `{${Object.keys(params).join(',')}}`;
+    destination.innerHTML = `<div data-bind="component: {name: '${componentName}', params: ${paramsStr}}"></div>`; // eslint-disable-line no-unsanitized/property
+    ko.applyBindings(params, destination);
     setImmediate(() => {
       resolve(destination);
     });

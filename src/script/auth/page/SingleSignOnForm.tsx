@@ -184,6 +184,9 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
           case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
             return;
           }
+          case BackendError.LABEL.SSO_NOT_FOUND: {
+            return;
+          }
           default: {
             this.setState({ssoError: error});
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>

@@ -26,21 +26,21 @@ import 'src/script/components/participantAvatar';
 describe('participant-avatar', () => {
   it("displays user's initials if no avatar is defined", () => {
     const testInitials = 'PA';
-    const viewModel = {user: new User()};
-    spyOn(viewModel.user, 'initials').and.returnValue(testInitials);
-    return instantiateComponent('participant-avatar', viewModel, 'participant: user').then(domContainer => {
+    const viewModel = {participant: new User()};
+    spyOn(viewModel.participant, 'initials').and.returnValue(testInitials);
+    return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
       expect(domContainer.querySelector('.avatar-initials').innerText).toBe(testInitials);
     });
   });
 
   it("loads user's avatar when element is visible", () => {
-    const viewModel = {user: new User()};
+    const viewModel = {participant: new User()};
     const avatarPreview = AssetRemoteData.v3();
-    viewModel.user.previewPictureResource(avatarPreview);
+    viewModel.participant.previewPictureResource(avatarPreview);
 
     spyOn(avatarPreview, 'getObjectUrl').and.returnValue(Promise.resolve('/avatar'));
 
-    return instantiateComponent('participant-avatar', viewModel, 'participant: user').then(domContainer => {
+    return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
       return new Promise(resolve => {
         setTimeout(() => {
           expect(avatarPreview.getObjectUrl).toHaveBeenCalled();
