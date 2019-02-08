@@ -20,10 +20,12 @@
 import {Store, applyMiddleware, combineReducers, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import thunk from 'redux-thunk';
+import * as Environment from './Environment';
+import {LOGGER_NAMESPACE} from './LogProvider';
 import {runtimeAction} from './module/action/RuntimeAction';
 import reducers, {RootState, ThunkDispatch} from './module/reducer';
-const {createLogger} = require('redux-logger');
-import * as Environment from './Environment';
+
+const reduxLogdown = require('redux-logdown');
 
 const configureStore = (thunkArguments: object = {}) => {
   const store: Store<RootState> = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
@@ -44,9 +46,7 @@ const configureStore = (thunkArguments: object = {}) => {
   return store;
 };
 
-const createMiddleware = (thunkArguments: object) => {
-  const middlewares = [thunk.withExtraArgument(thunkArguments)];
-
+const createLoggerMiddleware = () => {
   let localStorage;
   try {
     localStorage = window.localStorage;
@@ -55,24 +55,17 @@ const createMiddleware = (thunkArguments: object) => {
   if (localStorage) {
     localStorage.removeItem('debug');
   }
-  if (!Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION)) {
-    if (localStorage) {
-      localStorage.setItem('debug', '@wireapp/*');
-    }
 
-    middlewares.push(
-      createLogger({
-        collapsed: true,
-        diff: true,
-        duration: true,
-        level: {
-          action: 'info',
-          nextState: 'info',
-          prevState: false,
-        },
-      })
-    );
+  if (!Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION) && localStorage) {
+    localStorage.setItem('debug', '@wireapp/*');
   }
+
+  return reduxLogdown(LOGGER_NAMESPACE, {diff: true});
+};
+
+const createMiddleware = (thunkArguments: object) => {
+  const middlewares = [thunk.withExtraArgument(thunkArguments), createLoggerMiddleware()];
+
   // Note: Redux DevTools will only be applied when NODE_ENV is NOT production
   // https://github.com/zalmoxisus/redux-devtools-extension/blob/master/npm-package/developmentOnly.js
   return composeWithDevTools(applyMiddleware(...middlewares));

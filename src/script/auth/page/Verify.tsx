@@ -25,6 +25,7 @@ import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {verifyStrings} from '../../strings';
+import {getLogger} from '../LogProvider';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
@@ -61,13 +62,14 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
   intl: {formatMessage: _},
   ...connected
 }) => {
+  const logger = getLogger('Verify');
   const createAccount = (email_code: string) => {
     switch (currentFlow) {
       case AuthSelector.REGISTER_FLOW.TEAM: {
         connected
           .doRegisterTeam({...account, email_code})
           .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-          .catch(error => console.error('Failed to create team account', error));
+          .catch(error => logger.error('Failed to create team account', error));
         break;
       }
 
@@ -76,7 +78,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
         connected
           .doRegisterPersonal({...account, email_code})
           .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-          .catch(error => console.error('Failed to create personal account', error));
+          .catch(error => logger.error('Failed to create personal account', error));
       }
     }
   };
@@ -85,7 +87,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
     event.preventDefault();
     return connected
       .doSendActivationCode(account.email)
-      .catch(error => console.error('Failed to send email code', error));
+      .catch(error => logger.error('Failed to send email code', error));
   };
   return (
     <Page hasAccountData>
