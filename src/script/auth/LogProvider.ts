@@ -1,11 +1,13 @@
 import {LogFactory} from '@wireapp/commons';
 import * as logdown from 'logdown';
 
+const LOGGER_NAMESPACE = '@wireapp/webapp';
+
 function getLogger(name: string): logdown.Logger {
   return LogFactory.getLogger(name, {
-    namespace: '@wireapp/webapp',
+    namespace: LOGGER_NAMESPACE,
     separator: '/',
   });
 }
 
-export {getLogger};
+export {getLogger, LOGGER_NAMESPACE};
