@@ -424,7 +424,7 @@ class Login extends React.Component<CombinedProps, State> {
                     </Link>
                     <Columns style={{marginTop: '36px'}}>
                       <Column>
-                        <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
+                        <Link to="/sso" component={RRLink} data-uie-name="go-sign-in-sso">
                           {_(loginStrings.ssoLogin)}
                         </Link>
                       </Column>
