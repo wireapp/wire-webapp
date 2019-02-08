@@ -94,6 +94,12 @@ module.exports = function(config) {
       module: {
         rules: [
           {
+            exclude: /node_modules/,
+            include: path.resolve('src/script/'),
+            loader: 'babel-loader',
+            test: /\.[tj]sx?$/,
+          },
+          {
             loader: 'svg-inline-loader?removeSVGTagAttrs=false',
             test: /\.svg$/,
           },
