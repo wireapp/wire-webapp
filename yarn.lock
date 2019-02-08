@@ -1295,10 +1295,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.90.tgz#0ed74833fa1b73dcdb9409dcb1c97ec0a8b13b02"
   integrity sha512-tXoGRVdi7wZX7P1VWoV9Wfk0uYDOAHdEYXAttuWgSrN76Q32wQlSrMX0Rgyv3RTEaQY2ZLQrzYHVM2e8rfo8sA==
 
-"@types/platform@1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.1.tgz#5a66616693e39f311b3f2c64c77cf2249e3d8325"
-  integrity sha512-XI6JKLFNBmkADRd2FtUYtEuq5LDKTNXwUIodV3ZfTNkA+g4yo+rXXXdZL3fTE24S92BjpiEVaL3f64Fxm2JOgg==
+"@types/platform@1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.2.tgz#c0404c4e2a08e04295ab3d1241a856c2a3cab06e"
+  integrity sha512-Tn6OuJDAG7bJbyi4R7HqcxXp1w2lmIxVXqyNhPt1Bm0FO2EWIi3CI87JVzF7ncqK0ZMPuUycS3wTMIk85EeF1Q==
 
 "@types/prop-types@*":
   version "15.5.5"
