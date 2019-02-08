@@ -25,7 +25,7 @@ import 'src/script/components/receiptModeToggle';
 describe('read-receipt-toggle', () => {
   it('renders the toggle according to the conversation read receipt mode', () => {
     const viewModel = {conversation: new Conversation()};
-    return instantiateComponent('read-receipt-toggle', viewModel, 'conversation: conversation').then(domContainer => {
+    return instantiateComponent('read-receipt-toggle', viewModel).then(domContainer => {
       const toggle = domContainer.querySelector('.slider-input');
 
       expect(toggle.checked).toBe(false);
@@ -37,14 +37,10 @@ describe('read-receipt-toggle', () => {
   });
 
   it('updates the conversation receipt mode when toggle is clicked', () => {
-    const viewModel = {conversation: new Conversation(), handleReceiptModeChanged: () => {}};
-    spyOn(viewModel, 'handleReceiptModeChanged');
+    const viewModel = {conversation: new Conversation(), onReceiptModeChanged: () => {}};
+    spyOn(viewModel, 'onReceiptModeChanged');
 
-    return instantiateComponent(
-      'read-receipt-toggle',
-      viewModel,
-      'conversation: conversation, onReceiptModeChanged: handleReceiptModeChanged'
-    ).then(domContainer => {
+    return instantiateComponent('read-receipt-toggle', viewModel).then(domContainer => {
       const toggle = domContainer.querySelector('.slider-input');
 
       expect(toggle.checked).toBe(false);
@@ -53,13 +49,13 @@ describe('read-receipt-toggle', () => {
 
       expect(toggle.checked).toBe(true);
       expect(viewModel.conversation.receiptMode()).toBe(1);
-      expect(viewModel.handleReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, 1);
+      expect(viewModel.onReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, 1);
 
       toggle.click();
 
       expect(toggle.checked).toBe(false);
       expect(viewModel.conversation.receiptMode()).toBe(0);
-      expect(viewModel.handleReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, 0);
+      expect(viewModel.onReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, 0);
     });
   });
 });
