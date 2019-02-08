@@ -19,12 +19,12 @@
 
 import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
-import marked from './marked.js';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
+import marked from './marked.js';
 import StringUtilGlobal from './StringUtil';
 /* eslint-enable no-unused-vars */
 
@@ -332,7 +332,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       );
     }, message);
 
-  mentionlessText = marked(mentionlessText, {
+  mentionlessText = window.marked(mentionlessText, {
     highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
