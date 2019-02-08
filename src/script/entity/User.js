@@ -128,6 +128,8 @@ class User {
       return firstName || '';
     });
 
+    this.canEditProfile = ko.observable(true);
+
     this.last_name = ko.pureComputed(() => {
       const nameParts = this.name().split(' ');
       if (nameParts.length > 1) {

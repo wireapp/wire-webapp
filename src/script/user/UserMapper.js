@@ -97,6 +97,7 @@ export default class UserMapper {
       assets,
       email,
       expires_at: expirationDate,
+      can_edit_profile,
       handle,
       name,
       phone,
@@ -123,6 +124,8 @@ export default class UserMapper {
     if (email) {
       userEntity.email(email);
     }
+
+    userEntity.canEditProfile(can_edit_profile);
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);

@@ -168,11 +168,12 @@
     font-size: 12px;
   }
 
-  &:focus,
-  &:hover {
+  &:not([^readonly]):focus,
+  &:not([^readonly]):hover {
     background-color: var(--preference-account-input-bg);
   }
 
+  &[readonly] + .preferences-account-input-icon-edit::after,
   &:focus + .preferences-account-input-icon-edit::after {
     display: none;
     content: '';
@@ -200,7 +201,7 @@
 .preferences-account-username {
   padding-left: 22px;
 
-  &:focus ~ .preferences-account-username-hint {
+  &:not([readonly]):focus ~ .preferences-account-username-hint {
     display: block;
   }
 }
