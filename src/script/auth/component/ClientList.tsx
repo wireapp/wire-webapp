@@ -24,6 +24,7 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import EXTERNAL_ROUTE from '../externalRoute';
+import {getLogger} from '../LogProvider';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
@@ -56,7 +57,11 @@ interface State {
   showLoading: boolean;
 }
 
-class ClientList extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+
+class ClientList extends React.Component<CombinedProps, State> {
+  private static readonly LOGGER = getLogger('ClientList');
+
   state: State = {
     currentlySelectedClient: null,
     loadingTimeoutId: undefined,
@@ -87,7 +92,7 @@ class ClientList extends React.Component<Props & ConnectedProps & DispatchProps 
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
           this.props.history.push(ROUTE.HISTORY_INFO);
         } else {
-          console.error(error);
+          ClientList.LOGGER.error(error);
         }
       });
   };

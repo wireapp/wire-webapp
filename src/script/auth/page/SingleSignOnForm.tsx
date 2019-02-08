@@ -100,7 +100,6 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
 
     if (ssoCodeChanged) {
       this.setState({code: ssoCode}, () => {
-        console.dir(this.inputs.code.current);
         if (this.inputs.code.current) {
           this.handleSubmit();
         }
@@ -127,7 +126,6 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
   };
 
   handleSubmit = (event?: React.FormEvent) => {
-    console.dir(event);
     if (event) {
       event.preventDefault();
     }
