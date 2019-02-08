@@ -26,7 +26,7 @@ ko.components.register('extended-action', {
         <div data-bind="component: firstAction.icon" class="panel__action-item__icon"></div>
         <div class="panel__action-item__text" data-bind="text: firstAction.label"></div>
         <!-- ko if: contextActions.length -->
-        <ellipsis-icon class="panel__action-item__context" data-bind="click:openContext" data-uie-name="do-open-extended-action-context"></ellipsis-icon>
+          <ellipsis-icon class="panel__action-item__context" data-bind="click: openContext" data-uie-name="do-open-extended-action-context"></ellipsis-icon>
         <!-- /ko -->
       </div>
     <!-- /ko -->

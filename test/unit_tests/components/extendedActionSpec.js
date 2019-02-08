@@ -25,7 +25,7 @@ import 'src/script/components/panel/extendedAction';
 const contextualMenuSelector = '.panel__action-item__context';
 const mainActionLabelSelector = '.panel__action-item__text';
 
-describe('participant-avatar', () => {
+describe('extended-action', () => {
   it('displays a single action and no extra menu', () => {
     const params = {
       items: [{click: () => {}, icon: 'edit-icon', label: 'test', uie: 'test'}],
@@ -65,7 +65,7 @@ describe('participant-avatar', () => {
       // open the contextual menu
       contextualMenu.click();
       // click on the secondary item
-      const secondaryActionButton = domContainer.querySelector('[data-uie-name=secondary]');
+      const secondaryActionButton = domContainer.querySelector('[title=secondary]');
 
       expect(secondaryActionButton).not.toBe(null);
       secondaryActionButton.click();
