@@ -218,13 +218,17 @@
       transform: translateX(0);
     }
 
-    &__icon {
+    &__icon,
+    &__context {
       display: flex;
       width: 40px;
       margin-left: 4px;
       path {
         fill: var(--background);
       }
+    }
+    &__context {
+      width: auto;
     }
 
     &__text {
