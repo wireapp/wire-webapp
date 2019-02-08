@@ -17,7 +17,7 @@
     "karma-spec-reporter": "0.0.32",
     "rimraf": "2.6.3",
     "typescript": "3.3.3",
-    "webpack": "4.29.2",
+    "webpack": "4.29.3",
     "webpack-cli": "3.2.3"
   },
   "description": "Provides a generic storage layer for File, FileSystem, IndexedDB, Memory & LocalStorage.",

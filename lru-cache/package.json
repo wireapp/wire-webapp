@@ -6,7 +6,7 @@
     "nyc": "13.2.0",
     "rimraf": "2.6.3",
     "typescript": "3.3.3",
-    "webpack": "4.29.2",
+    "webpack": "4.29.3",
     "webpack-cli": "3.2.3"
   },
   "files": [
