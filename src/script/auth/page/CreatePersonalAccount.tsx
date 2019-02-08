@@ -59,7 +59,6 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 const logger = getLogger('CreatePersonalAccount');
 
 class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
-
   componentDidMount() {
     logger.log('Hello World!');
     return this.props.enterPersonalCreationFlow();

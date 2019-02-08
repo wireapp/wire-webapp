@@ -62,7 +62,6 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 const logger = getLogger('ClientList');
 
 class ClientList extends React.Component<CombinedProps, State> {
-
   state: State = {
     currentlySelectedClient: null,
     loadingTimeoutId: undefined,
