@@ -59,8 +59,9 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
+const logger = getLogger('ClientList');
+
 class ClientList extends React.Component<CombinedProps, State> {
-  private static readonly LOGGER = getLogger('ClientList');
 
   state: State = {
     currentlySelectedClient: null,
@@ -92,7 +93,7 @@ class ClientList extends React.Component<CombinedProps, State> {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
           this.props.history.push(ROUTE.HISTORY_INFO);
         } else {
-          ClientList.LOGGER.error(error);
+          logger.error(error);
         }
       });
   };

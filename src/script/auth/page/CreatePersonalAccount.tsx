@@ -56,11 +56,12 @@ interface State {}
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
+const logger = getLogger('CreatePersonalAccount');
+
 class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
-  private static readonly LOGGER = getLogger('CreatePersonalAccount');
 
   componentDidMount() {
-    CreatePersonalAccount.LOGGER.log('Hello World!');
+    logger.log('Hello World!');
     return this.props.enterPersonalCreationFlow();
   }
 
@@ -68,7 +69,7 @@ class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
     const {account, history, doRegisterPersonal, match} = this.props;
     doRegisterPersonal({...account, invitation_code: match.params.invitationCode})
       .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-      .catch(error => CreatePersonalAccount.LOGGER.error('Failed to create personal account from invite', error));
+      .catch(error => logger.error('Failed to create personal account from invite', error));
   };
 
   handleSubmit = () => {
