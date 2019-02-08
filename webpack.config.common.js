@@ -41,7 +41,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        include: srcScript,
+        include: src,
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },

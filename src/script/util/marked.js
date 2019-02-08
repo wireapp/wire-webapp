@@ -5,7 +5,7 @@
  */
 /*global define*/
 
-// Need to keep those imporst as commonjs flavor because this file uses `module.exports`
+// Need to keep those import as commonjs flavor because this file uses `module.exports`
 const _ = require('underscore');
 require('./linkify');
 
