@@ -332,7 +332,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       );
     }, message);
 
-  mentionlessText = window.marked(mentionlessText, {
+  mentionlessText = marked(mentionlessText, {
     highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
