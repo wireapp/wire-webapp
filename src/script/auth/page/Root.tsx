@@ -24,6 +24,7 @@ import * as de from 'react-intl/locale-data/de';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import {APP_INSTANCE_ID, FEATURE} from '../config';
+import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
@@ -42,8 +43,6 @@ import Login from './Login';
 import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
-
-const SUPPORTED_LOCALE = require('../supportedLocales');
 
 addLocaleData([...de]);
 
@@ -71,13 +70,13 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
   };
 
   loadLanguage = (language: string) => {
-    return SUPPORTED_LOCALE.includes(language) ? require(`../../../i18n/webapp-${language}.json`) : {};
+    return require(`resource/translation/${mapLanguage(language)}.json`);
   };
 
   render = () => {
     const {language} = this.props;
     return (
-      <IntlProvider locale={language} messages={this.loadLanguage(language)}>
+      <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
         <StyledApp>
           <Router hashType="noslash">
             <Switch>

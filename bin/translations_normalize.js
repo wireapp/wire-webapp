@@ -1,6 +1,8 @@
+#!/usr/bin/env node
+
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +19,18 @@
  *
  */
 
-const {join, resolve} = require('path');
-const {execSync} = require('child_process');
+const fs = require('fs-extra');
+const previousJson = require('../temp/i18n/src/script/strings');
+const targetJson = require('../resource/translation/en-US.json');
 
-const root = resolve(__dirname, '..');
+const modifiedJson = previousJson.reduce(
+  (accumulator, object) => ({
+    ...accumulator,
+    [object.id]: object.defaultMessage,
+  }),
+  {}
+);
 
-const downloadFromCrowdin = () => {
-  const crowdinYaml = join(root, 'keys', 'crowdin.yaml');
-  execSync(`crowdin download --identity="${crowdinYaml}"`, {stdio: [0, 1]});
-};
+const mergedJson = Object.assign(targetJson, modifiedJson);
 
-downloadFromCrowdin();
+fs.outputJson('resource/translation/en-US.json', mergedJson, {spaces: 2}).catch(err => console.error(err));
