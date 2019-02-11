@@ -24,6 +24,7 @@ import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
 
+import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
 
 window.z = window.z || {};
@@ -104,6 +105,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.createTeamUrl = getCreateTeamUrl('client');
 
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
+    this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
     this._initSubscriptions();
   }
