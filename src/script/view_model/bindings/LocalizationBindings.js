@@ -17,10 +17,9 @@
  *
  */
 
-ko.bindingHandlers.l10n_href = {
+ko.bindingHandlers.supportLink = {
   update(element, valueAccessor) {
-    const {support, type, path} = valueAccessor();
-    const href = support ? z.util.URLUtil.buildSupportUrl(support) : z.util.URLUtil.buildUrl(type, path);
-    element.setAttribute('href', href);
+    const supportId = valueAccessor();
+    element.setAttribute('href', z.util.URLUtil.buildSupportUrl(supportId));
   },
 };
