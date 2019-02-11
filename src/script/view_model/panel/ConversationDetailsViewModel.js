@@ -89,11 +89,9 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       return this.activeConversation() && this.activeConversation().firstUserEntity();
     });
 
-    this.isSingleUserMode = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().is1to1() || this.activeConversation().isRequest()
-        : false;
-    });
+    this.isSingleUserMode = conversationEntity => {
+      return conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
+    };
 
     this.isActiveGroupParticipant = ko.pureComputed(() => {
       return this.activeConversation()
@@ -118,30 +116,14 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.isServiceMode = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
+      return (
+        this.isSingleUserMode(this.activeConversation()) && this.firstParticipant() && this.firstParticipant().isService
+      );
     });
 
     this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
 
     this.showActionAddParticipants = this.isActiveGroupParticipant;
-
-    this.showActionBlock = ko.pureComputed(() => {
-      if (this.isSingleUserMode() && this.firstParticipant()) {
-        return this.firstParticipant().isConnected() || this.firstParticipant().isRequest();
-      }
-    });
-
-    this.showActionCreateGroup = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is1to1() && !this.isServiceMode();
-    });
-
-    this.showActionCancelRequest = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isRequest();
-    });
-
-    this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
-
-    this.showActionLeave = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isLeavable());
 
     this.showActionMute = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
@@ -229,64 +211,75 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     });
   }
 
-  getPossibleActions() {
-    const allItems = [
+  getPossibleActions(conversationEntity) {
+    if (!conversationEntity) {
+      return [];
+    }
+
+    const is1to1 = conversationEntity.is1to1();
+    const isSingleUserMode = this.isSingleUserMode(conversationEntity);
+
+    const allMenuElements = [
       {
+        condition: () => z.userPermission().canCreateGroupConversation() && is1to1 && !this.isServiceMode(),
         item: {
           click: this.clickOnCreateGroup,
           icon: 'group-icon',
           identifier: 'go-create-group',
           label: t('conversationDetailsActionCreateGroup'),
         },
-        shouldDisplay: () => {},
       },
       {
+        condition: () => true,
         item: {
           click: this.clickToArchive,
           icon: 'archive-icon',
           identifier: 'do-archive',
           label: t('conversationDetailsActionArchive'),
         },
-        shouldDisplay: () => {},
       },
       {
+        condition: () => conversationEntity.isRequest(),
         item: {
           click: this.clickToCancelRequest,
           icon: 'close-icon',
           identifier: 'do-cancel-request',
           label: t('conversationDetailsActionCancelRequest'),
         },
-        shouldDisplay: () => {},
       },
       {
+        condition: () => conversationEntity.isClearable(),
         item: {
           click: this.clickToClear,
           icon: 'delete-icon',
           identifier: 'do-clear',
           label: t('conversationDetailsActionClear'),
         },
-        shouldDisplay: () => {},
       },
       {
+        condition: () => {
+          const firstUser = conversationEntity.firstUserEntity();
+          return isSingleUserMode && firstUser && (firstUser.isConnected() || firstUser.isRequest());
+        },
         item: {
           click: this.clickToBlock,
           icon: 'block-icon',
           identifier: 'do-block',
           label: t('conversationDetailsActionBlock'),
         },
-        shouldDisplay: () => {},
       },
       {
+        condition: () => conversationEntity.isLeavable(),
         item: {
           click: this.clickToLeave,
           icon: 'leave-icon',
           identifier: 'do-leave',
           label: t('conversationDetailsActionLeave'),
         },
-        shouldDisplay: () => {},
       },
     ];
-    return allItems.map(i => i.item);
+
+    return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
   }
 
   getElementId() {

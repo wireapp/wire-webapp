@@ -7,7 +7,7 @@
       <!-- /ko -->
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
-      <!-- ko if: isSingleUserMode() -->
+      <!-- ko if: isSingleUserMode(activeConversation()) -->
         <!-- ko if: isServiceMode() -->
           <panel-service-details params="service: selectedService"></panel-service-details>
         <!-- /ko -->
@@ -23,7 +23,7 @@
         <!-- /ko -->
       <!-- /ko -->
 
-      <!-- ko ifnot: isSingleUserMode() -->
+      <!-- ko ifnot: isSingleUserMode(activeConversation()) -->
         <div class="conversation-details__header">
           <!-- ko if: isActiveGroupParticipant() -->
             <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: z.userPermission().canUpdateConversationSettings() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}" data-uie-name="status-name">
@@ -162,7 +162,7 @@
             </div>
           <!-- /ko -->
 
-          <!-- ko if: isSingleUserMode() -->
+          <!-- ko if: isSingleUserMode(activeConversation()) -->
             <div class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
               <div class="panel__info-text panel__info-text--head panel__info-text--margin-bottom" data-bind="text: hasReceiptsEnabled() ? t('conversationDetails1to1ReceiptsHeadEnabled') : t('conversationDetails1to1ReceiptsHeadDisabled')"></div>
               <div class="panel__info-text panel__info-text--margin-bottom" data-bind="text: t('conversationDetails1to1ReceiptsFirst')"></div>
@@ -173,7 +173,7 @@
       <!-- /ko -->
     </div>
     <div class="panel__content" style="flex-shrink: 0">
-      <extended-action params="items: getPossibleActions()"></extended-action>
+      <extended-action params="items: getPossibleActions(activeConversation())"></extended-action>
     </div>
   <!-- /ko -->
 </div>
