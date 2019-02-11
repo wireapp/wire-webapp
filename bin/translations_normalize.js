@@ -20,10 +20,10 @@
  */
 
 const fs = require('fs-extra');
-const previousJson = require('../temp/i18n/src/script/strings');
-const targetJson = require('../resource/translation/en-US.json');
+const authTranslations = require('../temp/i18n/src/script/strings');
+const webappTranslations = require('../resource/translation/en-US.json');
 
-const modifiedJson = previousJson.reduce(
+const normalizedAuthTranslations = authTranslations.reduce(
   (accumulator, object) => ({
     ...accumulator,
     [object.id]: object.defaultMessage,
@@ -31,6 +31,6 @@ const modifiedJson = previousJson.reduce(
   {}
 );
 
-const mergedJson = Object.assign(targetJson, modifiedJson);
+const mergedTranslations = Object.assign({}, webappTranslations, normalizedAuthTranslations);
 
-fs.outputJson('resource/translation/en-US.json', mergedJson, {spaces: 2}).catch(err => console.error(err));
+fs.outputJson('resource/translation/en-US.json', mergedTranslations, {spaces: 2}).catch(err => console.error(err));
