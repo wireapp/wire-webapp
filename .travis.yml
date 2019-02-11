@@ -88,8 +88,8 @@ deploy:
     env: wire-webapp-rc
     bucket_name: wire-webapp-builds
     on:
-      repo: wireapp/wire-webapp
-      branch: staging
+      tags: true
+      condition: $TRAVIS_TAG =~ *-staging*
 
   # https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
@@ -104,8 +104,8 @@ deploy:
     env: wire-webapp-staging
     bucket_name: wire-webapp-builds
     on:
-      repo: wireapp/wire-webapp
-      branch: staging
+      tags: true
+      condition: $TRAVIS_TAG =~ *-staging*
 
   # https://wire-webapp-prod.wire.com/
   - provider: elasticbeanstalk
