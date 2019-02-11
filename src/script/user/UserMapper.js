@@ -125,7 +125,9 @@ export default class UserMapper {
       userEntity.email(email);
     }
 
-    userEntity.canEditProfile(can_edit_profile);
+    if (can_edit_profile !== undefined) {
+      userEntity.canEditProfile(can_edit_profile);
+    }
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
