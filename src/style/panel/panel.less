@@ -103,15 +103,11 @@
     position: relative;
     display: flex;
     overflow: hidden;
+    width: @panel-width;
     flex-direction: column;
-    flex-grow: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
     transform: translateX(0);
-
-    &__scroll {
-      width: @panel-width;
-      overflow-x: hidden;
-      overflow-y: scroll;
-    }
   }
 
   &__info-text {
@@ -144,6 +140,7 @@
     user-select: none;
 
     &__option {
+      flex-shrink: 0;
       font-size: 14px;
 
       input {

@@ -12,49 +12,45 @@
         data-uie-name="do-close"
       ></close-icon>
     </div>
-    <div class="panel__content">
-      <!-- ko if: showTabs() -->
-        <div class="panel__tabs">
-          <div
-            class="panel__tab"
-            data-bind="css: {'panel__tab--active': isReceiptsOpen()}, click: clickOnReceipts, text: receiptsTitle()"
-            data-uie-name="message-details-read-tab"
-            ></div>
-          <div
-            class="panel__tab"
-            data-bind="css: {'panel__tab--active': !isReceiptsOpen()}, click: clickOnLikes, text: likesTitle()"
-            data-uie-name="message-details-like-tab"
+    <!-- ko if: showTabs() -->
+      <div class="panel__tabs">
+        <div
+          class="panel__tab"
+          data-bind="css: {'panel__tab--active': isReceiptsOpen()}, click: clickOnReceipts, text: receiptsTitle()"
+          data-uie-name="message-details-read-tab"
           ></div>
+        <div
+          class="panel__tab"
+          data-bind="css: {'panel__tab--active': !isReceiptsOpen()}, click: clickOnLikes, text: likesTitle()"
+          data-uie-name="message-details-like-tab"
+        ></div>
+      </div>
+    <!-- /ko -->
+    <div class="panel__content" data-bind="fadingscrollbar" style="flex-grow: 1">
+      <!-- ko if: state() === states.RECEIPTS -->
+        <user-list class="user-list-light" params="user: receiptUsers, infos: receiptTimes, noUnderline: true" data-uie-name="read-list"></user-list>
+      <!-- /ko -->
+      <!-- ko if: state() === states.LIKES -->
+        <user-list class="user-list-light" params="user: likeUsers, noUnderline: true" data-uie-name="like-list"></user-list>
+      <!-- /ko -->
+      <!-- ko if: state() === states.NO_RECEIPTS -->
+        <div class="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
+          <read-icon class="message-details__empty__icon"></read-icon>
+          <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoReceipts')"></div>
         </div>
       <!-- /ko -->
-      <div class="panel__content">
-        <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
-          <!-- ko if: state() === states.RECEIPTS -->
-            <user-list class="user-list-light" params="user: receiptUsers, infos: receiptTimes, noUnderline: true" data-uie-name="read-list"></user-list>
-          <!-- /ko -->
-          <!-- ko if: state() === states.LIKES -->
-            <user-list class="user-list-light" params="user: likeUsers, noUnderline: true" data-uie-name="like-list"></user-list>
-          <!-- /ko -->
-          <!-- ko if: state() === states.NO_RECEIPTS -->
-            <div class="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
-              <read-icon class="message-details__empty__icon"></read-icon>
-              <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoReceipts')"></div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: state() === states.NO_LIKES -->
-            <div class="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
-              <like-icon class="message-details__empty__icon"></like-icon>
-              <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoLikes')"></div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: state() === states.RECEIPTS_OFF -->
-            <div class="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
-              <read-icon class="message-details__empty__icon"></read-icon>
-              <div class="message-details__empty__text" data-bind="text: t('messageDetailsReceiptsOff')"></div>
-            </div>
-          <!-- /ko -->
+      <!-- ko if: state() === states.NO_LIKES -->
+        <div class="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
+          <like-icon class="message-details__empty__icon"></like-icon>
+          <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoLikes')"></div>
         </div>
-      </div>
+      <!-- /ko -->
+      <!-- ko if: state() === states.RECEIPTS_OFF -->
+        <div class="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
+          <read-icon class="message-details__empty__icon"></read-icon>
+          <div class="message-details__empty__text" data-bind="text: t('messageDetailsReceiptsOff')"></div>
+        </div>
+      <!-- /ko -->
     </div>
     <div class="panel__footer">
       <div
