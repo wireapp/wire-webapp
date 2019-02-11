@@ -40,6 +40,10 @@ class User {
 
   static get CONFIG() {
     return {
+      MANAGED_BY: {
+        SCIM: 'scim',
+        WIRE: 'wire',
+      },
       TEMPORARY_GUEST: {
         EXPIRATION_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
         EXPIRATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
@@ -128,7 +132,7 @@ class User {
       return firstName || '';
     });
 
-    this.canEditProfile = ko.observable(true);
+    this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 
     this.last_name = ko.pureComputed(() => {
       const nameParts = this.name().split(' ');

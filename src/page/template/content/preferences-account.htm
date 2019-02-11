@@ -7,7 +7,7 @@
           <div class="preferences-account-name-wrapper">
             <input class="preferences-account-name preferences-account-input"
                    id="name" type="text"
-                   data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder'), readonly: !selfUser().canEditProfile()}"
+                   data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder'), readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
@@ -30,7 +30,7 @@
                      event: {input: verifyUsername, keypress: checkUsernameInput, blur: resetUsernameInput},
                      enter: changeUsername,
                      hasFocus: shouldFocusUsername(),
-                     attr: {readonly: !selfUser().canEditProfile()}"
+                     attr: {readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-username"
                    maxlength="21"
                    spellcheck="false"
@@ -72,7 +72,7 @@
       <!-- ko if: isActivatedAccount() -->
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
           <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-          <!-- ko if: selfUser().canEditProfile() -->
+          <!-- ko if: canEditProfile(selfUser()) -->
             <input id="self-upload-file-input"
                   type="file"
                   data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
