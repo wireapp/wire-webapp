@@ -34,6 +34,9 @@ declare global {
           TEAMS_BASE: string;
           WEBSITE_BASE: string;
           SUPPORT_BASE: string;
+          PRIVACY_POLICY: string;
+          TERMS_OF_USE_PERSONAL: string;
+          TERMS_OF_USE_TEAMS: string;
         };
         VERSION: string;
         FEATURE: {

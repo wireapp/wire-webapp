@@ -74,7 +74,7 @@
             <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="text: t('preferencesOptionsEmojiReplaceCheckbox')"></label>
           </div>
         </div>
-        <div class="preferences-detail preferences-detail-emoji" data-bind="l10nSafeHtml: {'id': z.string.preferencesOptionsEmojiReplaceDetail, 'substitutions': {'replaceDangerously': {'icon': '<span class=\'font-size-xs icon-emoji\'></span>'}}}"></div>
+        <div class="preferences-detail preferences-detail-emoji" data-bind="html: t('preferencesOptionsEmojiReplaceDetail', {}, {'icon': '<span class=\'font-size-xs icon-emoji\'></span>'})"></div>
         <!-- ko if: z.util.Environment.desktop -->
           <div class="preferences-option preferences-options-multiple">
             <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
