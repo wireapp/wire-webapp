@@ -32,12 +32,6 @@ Additionally, some parameters can be set via environment variables (which then t
 | `files`         | `WIRE_CONFIGURATION_FILES`        | `/path/to/source.txt:/path/to/destination.txt;/path/to/source/:/path/to/destination/` |
 | `repositoryUrl` | `WIRE_CONFIGURATION_REPOSITORY`   | `/path/to/anotherDir/*:[/path/to/thirdDir/,/path/to/destinationDir/]`                 |
 
-If you need logging, set the `NODE_DEBUG` environment variable:
-
-```sh
-export NODE_DEBUG="@wireapp/copy-config/*"
-```
-
 ### CLI Usage
 
 ```

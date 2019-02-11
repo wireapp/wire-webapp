@@ -28,6 +28,7 @@ const configExplorer = cosmiconfig('copyconfig');
 const logger = logdown('@wireapp/copy-config/cli', {
   markdown: false,
 });
+logger.state.isEnabled = true;
 
 configExplorer
   .search()

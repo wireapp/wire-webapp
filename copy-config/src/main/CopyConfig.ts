@@ -70,6 +70,7 @@ export class CopyConfig {
     this.logger = logdown('@wireapp/copy-config/CopyConfig', {
       markdown: false,
     });
+    this.logger.state.isEnabled = true;
   }
 
   private readEnvVars(): void {
