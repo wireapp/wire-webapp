@@ -22,7 +22,7 @@ import ko from 'knockout';
 ko.components.register('extended-action', {
   template: `
     <!-- ko if: firstAction -->
-      <div class="panel__action-item" data-bind="click: firstAction.click, attr: {'data-uie-name': firstAction.uie}">
+      <div class="panel__action-item" data-bind="click: firstAction.click, attr: {'data-uie-name': firstAction.identifier}">
         <div data-bind="component: firstAction.icon" class="panel__action-item__icon"></div>
         <div class="panel__action-item__text" data-bind="text: firstAction.label"></div>
         <!-- ko if: contextActions.length -->

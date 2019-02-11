@@ -28,11 +28,11 @@ const mainActionLabelSelector = '.panel__action-item__text';
 describe('extended-action', () => {
   it('displays a single action and no extra menu', () => {
     const params = {
-      items: [{click: () => {}, icon: 'edit-icon', label: 'test', uie: 'test'}],
+      items: [{click: () => {}, icon: 'edit-icon', identifier: 'test', label: 'test'}],
     };
 
     spyOn(params.items[0], 'click');
-    return instantiateComponent('extended-action', params, 'participant: user').then(domContainer => {
+    return instantiateComponent('extended-action', params).then(domContainer => {
       const mainActionLabel = domContainer.querySelector(mainActionLabelSelector);
       const mainAction = domContainer.querySelector('[data-uie-name=test]');
       const contextualMenu = domContainer.querySelector(contextualMenuSelector);
@@ -50,14 +50,14 @@ describe('extended-action', () => {
   it('displays an extra menu when there are more than one action', () => {
     const params = {
       items: [
-        {click: () => {}, icon: 'copy-icon', label: 'main', uie: 'main'},
-        {click: () => {}, icon: 'pickup-icon', label: 'secondary', uie: 'secondary'},
+        {click: () => {}, icon: 'copy-icon', identifier: 'main', label: 'main'},
+        {click: () => {}, icon: 'pickup-icon', identifier: 'secondary', label: 'secondary'},
       ],
     };
 
     spyOn(params.items[1], 'click');
 
-    return instantiateComponent('extended-action', params, 'participant: user').then(domContainer => {
+    return instantiateComponent('extended-action', params).then(domContainer => {
       const contextualMenu = domContainer.querySelector(contextualMenuSelector);
 
       expect(contextualMenu).not.toBe(null);
@@ -65,7 +65,7 @@ describe('extended-action', () => {
       // open the contextual menu
       contextualMenu.click();
       // click on the secondary item
-      const secondaryActionButton = domContainer.querySelector('[title=secondary]');
+      const secondaryActionButton = domContainer.querySelector('[data-uie-name=secondary]');
 
       expect(secondaryActionButton).not.toBe(null);
       secondaryActionButton.click();

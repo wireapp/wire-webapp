@@ -171,40 +171,7 @@
                 <div class="panel__info-text panel__info-text--margin" data-bind="text: t('conversationDetails1to1ReceiptsSecond')"></div>
               </div>
             <!-- /ko -->
-            <!-- ko if: z.userPermission().canCreateGroupConversation() && showActionCreateGroup() -->
-              <div class="panel__action-item" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                <group-icon class="panel__action-item__icon"></group-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionCreateGroup')"></div>
-              </div>
-            <!-- /ko -->
-            <div class="panel__action-item" data-bind="click: clickToArchive" data-uie-name="do-archive">
-              <archive-icon class="panel__action-item__icon"></archive-icon>
-              <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionArchive')"></div>
-            </div>
-            <!-- ko if: showActionCancelRequest() -->
-              <div class="panel__action-item" data-bind="click: clickToCancelRequest" data-uie-name="do-cancel-request">
-                <close-icon class="panel__action-item__icon"></close-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionCancelRequest')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionClear() -->
-              <div class="panel__action-item" data-bind="click: clickToClear" data-uie-name="do-clear">
-                <delete-icon class="panel__action-item__icon"></delete-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionClear')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionBlock() -->
-              <div class="panel__action-item" data-bind="click: clickToBlock" data-uie-name="do-block">
-                <block-icon class="panel__action-item__icon"></block-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionBlock')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionLeave() -->
-              <div class="panel__action-item" data-bind="click: clickToLeave" data-uie-name="do-leave">
-                <leave-icon class="panel__action-item__icon"></leave-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionLeave')"></div>
-              </div>
-            <!-- /ko -->
+            <extended-action params="items: getPossibleActions()"></extended-action>
           </div>
         <!-- /ko -->
       </div>

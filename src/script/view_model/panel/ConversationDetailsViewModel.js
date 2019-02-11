@@ -23,6 +23,8 @@ import receiptModeToggle from 'components/receiptModeToggle';
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 
+import '../../components/panel/extendedAction';
+
 export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
@@ -225,6 +227,66 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
         });
       }
     });
+  }
+
+  getPossibleActions() {
+    const allItems = [
+      {
+        item: {
+          click: this.clickOnCreateGroup,
+          icon: 'group-icon',
+          identifier: 'go-create-group',
+          label: t('conversationDetailsActionCreateGroup'),
+        },
+        shouldDisplay: () => {},
+      },
+      {
+        item: {
+          click: this.clickToArchive,
+          icon: 'archive-icon',
+          identifier: 'do-archive',
+          label: t('conversationDetailsActionArchive'),
+        },
+        shouldDisplay: () => {},
+      },
+      {
+        item: {
+          click: this.clickToCancelRequest,
+          icon: 'close-icon',
+          identifier: 'do-cancel-request',
+          label: t('conversationDetailsActionCancelRequest'),
+        },
+        shouldDisplay: () => {},
+      },
+      {
+        item: {
+          click: this.clickToClear,
+          icon: 'delete-icon',
+          identifier: 'do-clear',
+          label: t('conversationDetailsActionClear'),
+        },
+        shouldDisplay: () => {},
+      },
+      {
+        item: {
+          click: this.clickToBlock,
+          icon: 'block-icon',
+          identifier: 'do-block',
+          label: t('conversationDetailsActionBlock'),
+        },
+        shouldDisplay: () => {},
+      },
+      {
+        item: {
+          click: this.clickToLeave,
+          icon: 'leave-icon',
+          identifier: 'do-leave',
+          label: t('conversationDetailsActionLeave'),
+        },
+        shouldDisplay: () => {},
+      },
+    ];
+    return allItems.map(i => i.item);
   }
 
   getElementId() {
