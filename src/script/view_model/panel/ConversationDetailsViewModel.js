@@ -211,7 +211,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     });
   }
 
-  getPossibleActions(conversationEntity) {
+  getConversationActions(conversationEntity) {
     if (!conversationEntity) {
       return [];
     }
