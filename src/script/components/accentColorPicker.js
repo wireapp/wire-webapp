@@ -21,14 +21,14 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.AccentColorPicker = class AccentColorPicker {
-  constructor(params) {
-    this.user = ko.unwrap(params.user);
+  constructor({user, selected, disabled}) {
+    this.user = ko.unwrap(user);
 
     this.accentColorIds = [1, 2, 4, 5, 6, 7];
-    this.disabled = params.disabled;
+    this.disabled = disabled;
 
     this.onSelect = function(id) {
-      params.selected(id);
+      selected(id);
       return true;
     };
 
