@@ -20,26 +20,23 @@
 import {instantiateComponent} from '../../api/knockoutHelpers';
 
 import 'src/script/components/icons';
-import 'src/script/components/panel/extendedAction';
+import 'src/script/components/panel/panelActions';
 
-const contextualMenuSelector = '.panel__action-item__context';
 const mainActionLabelSelector = '.panel__action-item__text';
 
-describe('extended-action', () => {
-  it('displays a single action and no extra menu', () => {
+describe('panel-actions', () => {
+  it('displays a single action', () => {
     const params = {
       items: ko.observable([{click: () => {}, icon: 'edit-icon', identifier: 'test', label: 'test'}]),
     };
 
     spyOn(params.items()[0], 'click');
-    return instantiateComponent('extended-action', params).then(domContainer => {
+    return instantiateComponent('panel-actions', params).then(domContainer => {
       const mainActionLabel = domContainer.querySelector(mainActionLabelSelector);
       const mainAction = domContainer.querySelector('[data-uie-name=test]');
-      const contextualMenu = domContainer.querySelector(contextualMenuSelector);
 
       expect(mainActionLabel.innerText).toBe(params.items()[0].label);
       expect(mainAction).not.toBe(null);
-      expect(contextualMenu).toBe(null);
 
       mainAction.click();
 
@@ -47,30 +44,22 @@ describe('extended-action', () => {
     });
   });
 
-  it('displays an extra menu when there are more than one action', () => {
+  it('displays more than one action', () => {
     const params = {
       items: ko.observable([
-        {click: () => {}, icon: 'copy-icon', identifier: 'main', label: 'main'},
-        {click: () => {}, icon: 'pickup-icon', identifier: 'secondary', label: 'secondary'},
+        {click: () => {}, icon: 'copy-icon', identifier: 'main', label: 'mainlabel'},
+        {click: () => {}, icon: 'pickup-icon', identifier: 'secondary', label: 'secondarylabel'},
       ]),
     };
 
-    spyOn(params.items()[1], 'click');
+    return instantiateComponent('panel-actions', params).then(domContainer => {
+      const mainActionLabel = domContainer.querySelector(`[data-uie-name=main] ${mainActionLabelSelector}`);
+      const mainAction = domContainer.querySelector('[data-uie-name=main]');
+      const secondaryAction = domContainer.querySelector('[data-uie-name=secondary]');
 
-    return instantiateComponent('extended-action', params).then(domContainer => {
-      const contextualMenu = domContainer.querySelector(contextualMenuSelector);
-
-      expect(contextualMenu).not.toBe(null);
-
-      // open the contextual menu
-      contextualMenu.click();
-      // click on the secondary item
-      const secondaryActionButton = domContainer.querySelector('[data-uie-name=secondary]');
-
-      expect(secondaryActionButton).not.toBe(null);
-      secondaryActionButton.click();
-
-      expect(params.items()[1].click).toHaveBeenCalled();
+      expect(mainActionLabel.innerText).toBe(params.items()[0].label);
+      expect(mainAction).not.toBe(null);
+      expect(secondaryAction).not.toBe(null);
     });
   });
 });
