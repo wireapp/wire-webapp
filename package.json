@@ -205,8 +205,9 @@
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:server": "cd server && yarn test",
     "test:types": "yarn tsc --noEmit",
-    "translate:upload": "yarn translate:extract && node ./bin/translations_upload.js",
-    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}' && yarn webpack && node ./bin/translations_normalize.js"
+    "translate:upload": "yarn translate:merge && node ./bin/translations_upload.js",
+    "translate:merge": "yarn bundle:prod && node ./bin/translations_normalize.js",
+    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'"
   },
   "private": true,
   "repository": {

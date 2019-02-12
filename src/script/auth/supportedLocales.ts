@@ -1,4 +1,4 @@
- const supportedLocales:string[] = [
+const supportedLocales: string[] = [
   'cs-CZ',
   'da-DK',
   'de-DE',

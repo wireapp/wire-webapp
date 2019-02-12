@@ -18,8 +18,8 @@
  */
 
 import {QUERY_KEY} from './route';
-import {getURLParameter} from './util/urlUtil';
 import Locales from './supportedLocales';
+import {getURLParameter} from './util/urlUtil';
 
 // TODO: Use "Currency.EUR" here once core v6 is in.
 export const DEFAULT_CURRENCY = 'EUR';
