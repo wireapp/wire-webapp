@@ -39,8 +39,6 @@ export default class NotificationsViewModel extends BasePanelViewModel {
     }).subscribe(setting => {
       this.currentNotificationSetting(setting);
     });
-
-    this.isRendered = ko.observable(false).extend({notify: 'always'});
   }
 
   notificationChanged(viewModel, event) {

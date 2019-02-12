@@ -11,7 +11,7 @@
         <span data-bind="text: t('ephemeralUnitsNone')"></span>
       </label>
 
-      <!-- ko foreach: {data: messageTimes, afterRender: () => isRendered(true)} -->
+      <!-- ko foreach: {data: messageTimes} -->
         <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
           <input type="radio" name="timed-message-settings" data-bind="checked: $parent.currentMessageTimer, value: value, disabled: isCustom, event: {change: $parent.timedMessageChange}"/>
           <span data-bind="text: text"></span>

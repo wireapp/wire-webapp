@@ -6,7 +6,7 @@
       <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
-      <!-- ko foreach: {data: settings, afterRender: () => isRendered(true)} -->
+      <!-- ko foreach: {data: settings} -->
         <label class="panel__action-item panel__action-item__option" data-uie-name="item-notification-option">
           <input type="radio" name="notification-settings" data-bind="checked: $parent.currentNotificationSetting, value: value, event: {change: $parent.notificationChanged}"/>
           <span data-bind="text: text"></span>
