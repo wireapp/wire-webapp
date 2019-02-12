@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,18 @@
  *
  */
 
-.group-participant {
-  .panel__content {
-    padding-bottom: 5px;
-  }
+import ko from 'knockout';
 
-  .panel__footer {
-    padding: 8px;
-  }
-}
+ko.components.register('panel-actions', {
+  template: `
+    <!-- ko foreach: items -->
+      <div class="panel__action-item" data-bind="click: click, attr: {'data-uie-name': identifier}">
+        <div data-bind="component: icon" class="panel__action-item__icon"></div>
+        <div class="panel__action-item__text" data-bind="text: label"></div>
+      </div> 
+    <!-- /ko -->
+  `,
+  viewModel: function({items = ko.observable([])}) {
+    this.items = items;
+  },
+});

@@ -16,75 +16,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: isActivatedAccount() || showActionSelfProfile() -->
-        <div class="group-participant__bottom-actions">
-          <!-- ko if: showActionSelfProfile() -->
-            <div class="panel__action-item" data-bind="click: clickOnShowProfile" data-uie-name="go-profile">
-              <profile-icon class="panel__action-item__icon"></profile-icon>
-              <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionSelfProfile')"></div>
-            </div>
-          <!-- /ko -->
-
-          <!-- ko if: isActivatedAccount() -->
-            <!-- ko if: showActionOpenConversation() -->
-              <div class="panel__action-item" data-bind="click: clickOnOpenConversation" data-uie-name="go-conversation">
-                <message-icon class="panel__action-item__icon"></message-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionsIncomingRequest() -->
-              <div class="panel__action-item" data-bind="click: clickToAcceptRequest" data-uie-name="do-accept-request">
-                <check-icon class="panel__action-item__icon"></check-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionIncomingRequest')"></div>
-              </div>
-              <div class="panel__action-item" data-bind="click: clickToIgnoreRequest" data-uie-name="do-ignore-request">
-                <close-icon class="panel__action-item__icon"></close-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionIgnoreRequest')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionsOutgoingRequest() -->
-              <div class="panel__action-item" data-bind="click: clickOnOpenConversation" data-uie-name="go-conversation">
-                <message-icon class="panel__action-item__icon"></message-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionPending')"></div>
-              </div>
-              <div class="panel__action-item" data-bind="click: clickToCancelRequest" data-uie-name="do-cancel-request">
-                <undo-icon class="panel__action-item__icon"></undo-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionCancelRequest')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionSendRequest() -->
-              <div class="panel__action-item" data-bind="click: clickToSendRequest" data-uie-name="do-send-request">
-                <plus-icon class="panel__action-item__icon"></plus-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionSendRequest')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionBlock() -->
-              <div class="panel__action-item" data-bind="click: clickToBlock" data-uie-name="do-block">
-                <block-icon class="panel__action-item__icon"></block-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionBlock')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionUnblock() -->
-              <div class="panel__action-item" data-bind="click: clickToUnblock" data-uie-name="do-unblock">
-                <block-icon class="panel__action-item__icon"></block-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionUnblock')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showActionLeave() -->
-              <div class="panel__action-item" data-bind="click: clickToLeave" data-uie-name="do-leave">
-                <leave-icon class="panel__action-item__icon"></leave-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionLeave')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: z.userPermission().canUpdateGroupParticipants() && showActionRemove() -->
-              <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
-                <minus-icon class="panel__action-item__icon"></minus-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionRemove')"></div>
-              </div>
-            <!-- /ko -->
-          <!-- /ko -->
-        </div>
-      <!-- /ko -->
+      <panel-actions params="items: getParticipantActions(selectedParticipant(), activeConversation())"></panel-actions>
     </div>
   <!-- /ko -->
 </div>
