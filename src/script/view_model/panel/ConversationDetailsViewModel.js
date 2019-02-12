@@ -196,10 +196,6 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       return t('tooltipConversationDetailsAddPeople', addPeopleShortcut);
     });
 
-    this.shouldUpdateScrollbar = ko
-      .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
-
     this.isServiceMode.subscribe(isService => {
       if (isService) {
         const entity = this.firstParticipant();

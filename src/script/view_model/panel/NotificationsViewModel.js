@@ -41,10 +41,6 @@ export default class NotificationsViewModel extends BasePanelViewModel {
     });
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
-
-    this.shouldUpdateScrollbar = ko
-      .pureComputed(() => this.isRendered())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   notificationChanged(viewModel, event) {

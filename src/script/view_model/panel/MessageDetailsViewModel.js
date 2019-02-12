@@ -148,15 +148,6 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       }
       return t('messageDetailsTitle');
     });
-
-    this.shouldUpdateScrollbar = ko
-      .computed(() => {
-        this.receiptUsers();
-        this.likeUsers();
-        this.isReceiptsOpen();
-        this.isVisible();
-      })
-      .extend({notify: 'always', rateLimit: 100});
   }
 
   clickOnReceipts() {
