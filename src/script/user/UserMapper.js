@@ -105,6 +105,7 @@ export default class UserMapper {
       service,
       sso_id: ssoId,
       team,
+      extended_fields,
     } = userData;
 
     if (accentId) {
@@ -128,6 +129,16 @@ export default class UserMapper {
     if (managed_by !== undefined) {
       userEntity.managedBy(managed_by);
     }
+
+    userEntity.extendedFields(
+      extended_fields || [
+        {
+          anotherstuff: 'His designs are awesome',
+          sidenote: 'We should take him in the team',
+          stuff: 'He applied for the design team',
+        },
+      ]
+    );
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
