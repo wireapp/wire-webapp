@@ -60,12 +60,6 @@ export default class TimedMessagesViewModel extends BasePanelViewModel {
 
       return mappedTimes;
     });
-
-    this.isRendered = ko.observable(false).extend({notify: 'always'});
-
-    this.shouldUpdateScrollbar = ko
-      .pureComputed(() => this.isRendered())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   timedMessageChange(viewModel, event) {

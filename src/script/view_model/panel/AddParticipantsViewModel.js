@@ -98,15 +98,6 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
         : t('addParticipantsHeader')
     );
 
-    this.shouldUpdateScrollbar = ko
-      .pureComputed(() => {
-        if (this.isVisible()) {
-          this.contacts();
-          this.searchInput();
-        }
-      })
-      .extend({notify: 'always', rateLimit: 500});
-
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
 

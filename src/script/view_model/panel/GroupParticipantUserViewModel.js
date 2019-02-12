@@ -70,10 +70,6 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
       return this.selectedParticipant().is_me && isActiveParticipant;
     });
     this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().isBlocked());
-
-    this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedParticipant() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
   }
 
   getElementId() {

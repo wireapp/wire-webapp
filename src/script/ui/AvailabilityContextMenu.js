@@ -28,22 +28,18 @@ z.ui.AvailabilityContextMenu = {
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.NONE, method),
         label: t('userAvailabilityNone'),
-        title: t('userAvailabilityNone'),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AVAILABLE, method),
         label: t('userAvailabilityAvailable'),
-        title: t('userAvailabilityAvailable'),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.BUSY, method),
         label: t('userAvailabilityBusy'),
-        title: t('userAvailabilityBusy'),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AWAY, method),
         label: t('userAvailabilityAway'),
-        title: t('userAvailabilityAway'),
       },
     ];
 
