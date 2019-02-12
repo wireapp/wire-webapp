@@ -131,13 +131,11 @@ export default class UserMapper {
     }
 
     userEntity.extendedFields(
-      extended_fields || [
-        {
-          anotherstuff: 'His designs are awesome',
-          sidenote: 'We should take him in the team',
-          stuff: 'He applied for the design team',
-        },
-      ]
+      extended_fields || {
+        anotherstuff: 'His designs are awesome',
+        sidenote: 'We should take him in the team, this is also a quite long text',
+        stuff: 'He applied for the design team',
+      }
     );
 
     if (expirationDate) {
