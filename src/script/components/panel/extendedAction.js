@@ -21,25 +21,22 @@ import ko from 'knockout';
 
 ko.components.register('extended-action', {
   template: `
-    <!-- ko if: firstAction -->
-      <div class="panel__action-item" data-bind="click: firstAction.click, attr: {'data-uie-name': firstAction.identifier}">
-        <div data-bind="component: firstAction.icon" class="panel__action-item__icon"></div>
-        <div class="panel__action-item__text" data-bind="text: firstAction.label"></div>
-        <!-- ko if: contextActions.length -->
+    <!-- ko if: firstAction() -->
+      <div class="panel__action-item" data-bind="click: firstAction().click, attr: {'data-uie-name': firstAction().identifier}">
+        <div data-bind="component: firstAction().icon" class="panel__action-item__icon"></div>
+        <div class="panel__action-item__text" data-bind="text: firstAction().label"></div>
+        <!-- ko if: contextActions().length -->
           <ellipsis-icon class="panel__action-item__context" data-bind="click: openContext" data-uie-name="do-open-extended-action-context"></ellipsis-icon>
         <!-- /ko -->
       </div>
     <!-- /ko -->
   `,
-  viewModel: class {
-    constructor({items = []}) {
-      const actionItems = ko.unwrap(items);
-      this.firstAction = actionItems[0];
-      this.contextActions = actionItems.slice(1);
-    }
+  viewModel: function({items = ko.observable([])}) {
+    this.firstAction = ko.pureComputed(() => items()[0]);
+    this.contextActions = ko.pureComputed(() => items().slice(1));
 
-    openContext(data, event) {
-      z.ui.Context.from(event, this.contextActions, 'extended-action-menu');
-    }
+    this.openContext = (data, event) => {
+      z.ui.Context.from(event, this.contextActions(), 'extended-action-menu');
+    };
   },
 });

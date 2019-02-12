@@ -28,34 +28,34 @@ const mainActionLabelSelector = '.panel__action-item__text';
 describe('extended-action', () => {
   it('displays a single action and no extra menu', () => {
     const params = {
-      items: [{click: () => {}, icon: 'edit-icon', identifier: 'test', label: 'test'}],
+      items: ko.observable([{click: () => {}, icon: 'edit-icon', identifier: 'test', label: 'test'}]),
     };
 
-    spyOn(params.items[0], 'click');
+    spyOn(params.items()[0], 'click');
     return instantiateComponent('extended-action', params).then(domContainer => {
       const mainActionLabel = domContainer.querySelector(mainActionLabelSelector);
       const mainAction = domContainer.querySelector('[data-uie-name=test]');
       const contextualMenu = domContainer.querySelector(contextualMenuSelector);
 
-      expect(mainActionLabel.innerText).toBe(params.items[0].label);
+      expect(mainActionLabel.innerText).toBe(params.items()[0].label);
       expect(mainAction).not.toBe(null);
       expect(contextualMenu).toBe(null);
 
       mainAction.click();
 
-      expect(params.items[0].click).toHaveBeenCalled();
+      expect(params.items()[0].click).toHaveBeenCalled();
     });
   });
 
   it('displays an extra menu when there are more than one action', () => {
     const params = {
-      items: [
+      items: ko.observable([
         {click: () => {}, icon: 'copy-icon', identifier: 'main', label: 'main'},
         {click: () => {}, icon: 'pickup-icon', identifier: 'secondary', label: 'secondary'},
-      ],
+      ]),
     };
 
-    spyOn(params.items[1], 'click');
+    spyOn(params.items()[1], 'click');
 
     return instantiateComponent('extended-action', params).then(domContainer => {
       const contextualMenu = domContainer.querySelector(contextualMenuSelector);
@@ -70,7 +70,7 @@ describe('extended-action', () => {
       expect(secondaryActionButton).not.toBe(null);
       secondaryActionButton.click();
 
-      expect(params.items[1].click).toHaveBeenCalled();
+      expect(params.items()[1].click).toHaveBeenCalled();
     });
   });
 });
