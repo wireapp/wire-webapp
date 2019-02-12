@@ -219,7 +219,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       {
         condition: () => z.userPermission().canCreateGroupConversation() && is1to1 && !this.isServiceMode(),
         item: {
-          click: this.clickOnCreateGroup,
+          click: () => this.clickOnCreateGroup(),
           icon: 'group-icon',
           identifier: 'go-create-group',
           label: t('conversationDetailsActionCreateGroup'),
@@ -228,7 +228,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       {
         condition: () => true,
         item: {
-          click: this.clickToArchive,
+          click: () => this.clickToArchive(),
           icon: 'archive-icon',
           identifier: 'do-archive',
           label: t('conversationDetailsActionArchive'),
@@ -237,7 +237,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       {
         condition: () => conversationEntity.isRequest(),
         item: {
-          click: this.clickToCancelRequest,
+          click: () => this.clickToCancelRequest(),
           icon: 'close-icon',
           identifier: 'do-cancel-request',
           label: t('conversationDetailsActionCancelRequest'),
@@ -246,7 +246,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       {
         condition: () => conversationEntity.isClearable(),
         item: {
-          click: this.clickToClear,
+          click: () => this.clickToClear(),
           icon: 'delete-icon',
           identifier: 'do-clear',
           label: t('conversationDetailsActionClear'),
@@ -258,7 +258,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
           return isSingleUserMode && firstUser && (firstUser.isConnected() || firstUser.isRequest());
         },
         item: {
-          click: this.clickToBlock,
+          click: () => this.clickToBlock(),
           icon: 'block-icon',
           identifier: 'do-block',
           label: t('conversationDetailsActionBlock'),
@@ -267,7 +267,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       {
         condition: () => conversationEntity.isLeavable(),
         item: {
-          click: this.clickToLeave,
+          click: () => this.clickToLeave(),
           icon: 'leave-icon',
           identifier: 'do-leave',
           label: t('conversationDetailsActionLeave'),
