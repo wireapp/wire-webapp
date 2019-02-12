@@ -30,7 +30,7 @@ function getLocale() {
 }
 
 export function currentLanguage() {
-  return mapLanguage(getURLParameter(QUERY_KEY.LANGUAGE)) || getLocale();
+  return mapLanguage(getURLParameter(QUERY_KEY.LANGUAGE) || getLocale());
 }
 
 export function currentCurrency() {
