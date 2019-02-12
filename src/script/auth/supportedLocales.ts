@@ -1,0 +1,26 @@
+const supportedLocales: string[] = [
+  'cs-CZ',
+  'da-DK',
+  'de-DE',
+  'el-GR',
+  'en-US',
+  'es-ES',
+  'et-EE',
+  'fi-FI',
+  'fr-FR',
+  'hr-HR',
+  'hu-HU',
+  'it-IT',
+  'lt-LT',
+  'nl-NL',
+  'pl-PL',
+  'pt-PT',
+  'ro-RO',
+  'ru-RU',
+  'sk-SK',
+  'sl-SI',
+  'tr-TR',
+  'uk-UA',
+];
+
+export default supportedLocales;

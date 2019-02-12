@@ -2,10 +2,6 @@ project_identifier: wire-webapp
 base_path: .
 
 files:
-  # -
-  #   source: 'temp/i18n/webapp.pot'
-  #   translation: 'temp/i18n/webapp-%locale%.po'
-  #   update_option: 'update_as_unapproved'
   -
     source: 'resource/translation/en-US.json'
     translation: '%locale%.json'

@@ -48,8 +48,8 @@
     "url-search-params-polyfill": "5.0.0",
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
-    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.10.2-0",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.10.1"
+    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.11.0",
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.11.0"
   },
   "devDependencies": {
     "@babel/core": "7.2.2",
@@ -205,13 +205,9 @@
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:server": "cd server && yarn test",
     "test:types": "yarn tsc --noEmit",
-    "translate": "yarn translate:upload && yarn translate:download",
-    "translate:buildpot": "rip json2pot \"temp/i18n/**/*.json\" -o \"temp/i18n/webapp.pot\"",
-    "translate:download": "node ./bin/translations_download.js && yarn translate:postprocess && yarn translate:extractpo && yarn fix:assets",
-    "translate:upload": "yarn translate:buildpot && node ./bin/translations_upload.js",
-    "translate:extractpo": "rip po2json \"temp/i18n/*.po\" -m \"temp/i18n/**/*.json\" -o \"src/i18n\"",
-    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:postprocess": "node ./bin/translations_post_processing.js src/script/localization/translations && node ./bin/translations_post_processing.js temp/i18n"
+    "translate:upload": "yarn translate:merge && node ./bin/translations_upload.js",
+    "translate:merge": "yarn bundle:prod && node ./bin/translations_normalize.js",
+    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'"
   },
   "private": true,
   "repository": {
