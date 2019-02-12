@@ -36,34 +36,16 @@ const URLUtil = (() => {
     return `${url}${separator}${parameter}`;
   };
 
-  const _buildSupportUrl = support_id => {
-    const urlPath = _.isNumber(support_id) ? t('urlSupportArticles') : t('urlSupportRequests');
-    return `${_getDomain(TYPE.SUPPORT)}${urlPath}${support_id}`;
+  const _buildSupportUrl = supportId => {
+    return _.isNumber(supportId)
+      ? `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportArticles')}${supportId}`
+      : `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportRequests')}`;
   };
-
-  const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;
 
   const _forwardParameter = (url, parameterName, locationSearch = window.location.search) => {
     const parameterValue = _getParameter(parameterName, locationSearch);
     const hasValue = parameterValue != null;
     return hasValue ? _appendParameter(url, `${parameterName}=${parameterValue}`) : url;
-  };
-
-  const _getDomain = urlType => {
-    switch (urlType) {
-      case TYPE.ACCOUNT:
-        return window.wire.env.URL.ACCOUNT_BASE;
-      case TYPE.SUPPORT:
-        return window.wire.env.URL.SUPPORT_BASE;
-      case TYPE.TEAM_SETTINGS:
-        return window.wire.env.URL.TEAMS_BASE;
-      case TYPE.WEBAPP:
-        return window.wire.env.APP_BASE;
-      case TYPE.WEBSITE:
-        return window.wire.env.URL.WEBSITE_BASE;
-      default:
-        throw new Error('Unknown URL type');
-    }
   };
 
   /**
@@ -132,7 +114,6 @@ const URLUtil = (() => {
     TYPE: TYPE,
     appendParameter: _appendParameter,
     buildSupportUrl: _buildSupportUrl,
-    buildUrl: _buildUrl,
     forwardParameter: _forwardParameter,
     getDomainName: _getDomainName,
     getLinksFromHtml: _getLinksFromHtml,

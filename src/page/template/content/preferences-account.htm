@@ -7,11 +7,11 @@
           <div class="preferences-account-name-wrapper">
             <input class="preferences-account-name preferences-account-input"
                    id="name" type="text"
-                   data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder')}"
+                   data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder'), readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
-            <span class="preferences-account-input-icon" data-bind="css: nameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+              <span class="preferences-account-input-icon" data-bind="css: nameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
           </div>
 
           <!-- ko if: isTeam() -->
@@ -26,7 +26,11 @@
             <span class="preferences-account-username-atsign">@</span>
             <input class="preferences-account-username preferences-account-input"
                    id="username" type="text"
-                   data-bind="textInput: username, event: {input: verifyUsername, keypress: checkUsernameInput, blur: resetUsernameInput}, enter: changeUsername, hasFocus: shouldFocusUsername()"
+                   data-bind="textInput: username,
+                     event: {input: verifyUsername, keypress: checkUsernameInput, blur: resetUsernameInput},
+                     enter: changeUsername,
+                     hasFocus: shouldFocusUsername(),
+                     attr: {readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-username"
                    maxlength="21"
                    spellcheck="false"
@@ -68,11 +72,13 @@
       <!-- ko if: isActivatedAccount() -->
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
           <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-          <input id="self-upload-file-input"
-                type="file"
-                data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
-                data-uie-name="do-select-picture"/>
-          <span class="icon-camera"></span>
+          <!-- ko if: canEditProfile(selfUser()) -->
+            <input id="self-upload-file-input"
+                  type="file"
+                  data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                  data-uie-name="do-select-picture"/>
+            <span class="icon-camera"></span>
+          <!-- /ko -->
         </label>
       <!-- /ko -->
 

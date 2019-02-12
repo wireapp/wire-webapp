@@ -97,6 +97,7 @@ export default class UserMapper {
       assets,
       email,
       expires_at: expirationDate,
+      managed_by,
       handle,
       name,
       phone,
@@ -122,6 +123,10 @@ export default class UserMapper {
 
     if (email) {
       userEntity.email(email);
+    }
+
+    if (managed_by !== undefined) {
+      userEntity.managedBy(managed_by);
     }
 
     if (expirationDate) {
