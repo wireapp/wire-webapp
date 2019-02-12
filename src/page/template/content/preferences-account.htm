@@ -13,7 +13,7 @@
                    spellcheck="false" />
             <!-- ko if: canEditProfile(selfUser()) -->
               <!-- ko if: nameSaved() -->
-                <span class="checkmark" data-uie-name="enter-name-icon-check"></span>
+                <animated-check-icon data-uie-name="enter-name-icon-check"></animated-check-icon>
               <!-- /ko -->
               <!-- ko ifnot: nameSaved() -->
                 <edit-icon data-uie-name="enter-name-icon"></edit-icon>
@@ -44,7 +44,7 @@
                    autocomplete="off" />
             <!-- ko if: canEditProfile(selfUser()) -->
               <!-- ko if: usernameSaved() -->
-                <span class="checkmark" data-uie-name="enter-username-icon-check"></span>
+                <animated-check-icon data-uie-name="enter-username-icon-check"></animated-check-icon>
               <!-- /ko -->
               <!-- ko ifnot: usernameSaved() -->
                 <edit-icon data-uie-name="enter-username-icon"></edit-icon>

@@ -146,12 +146,9 @@
   width: 256px;
   min-height: @line-height-xl * 2;
 
-  edit-icon {
+  edit-icon,
+  animated-check-icon {
     height: 50%;
-  }
-
-  .checkmark {
-    height: 25%;
   }
 }
 
@@ -181,28 +178,23 @@
 }
 
 edit-icon,
-.checkmark {
+animated-check-icon {
   position: absolute;
+  top: 0;
   right: 12px;
   display: flex;
+  height: 100%;
   align-items: center;
   pointer-events: none;
-}
-
-.checkmark {
-  top: 4px;
-  height: 50%;
-}
-
-edit-icon {
-  top: 0;
-  height: 100%;
-  opacity: 0;
   transition: opacity @animation-timing-faster;
 
   svg {
     width: 12px;
   }
+}
+
+edit-icon {
+  opacity: 0;
 }
 
 .preferences-account-name {
