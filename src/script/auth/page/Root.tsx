@@ -20,7 +20,28 @@
 import {StyledApp} from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {IntlProvider, addLocaleData} from 'react-intl';
+import * as cs from 'react-intl/locale-data/cs';
+import * as da from 'react-intl/locale-data/da';
 import * as de from 'react-intl/locale-data/de';
+import * as el from 'react-intl/locale-data/el';
+import * as en from 'react-intl/locale-data/en';
+import * as es from 'react-intl/locale-data/es';
+import * as et from 'react-intl/locale-data/et';
+import * as fi from 'react-intl/locale-data/fi';
+import * as fr from 'react-intl/locale-data/fr';
+import * as hr from 'react-intl/locale-data/hr';
+import * as hu from 'react-intl/locale-data/hu';
+import * as it from 'react-intl/locale-data/it';
+import * as lt from 'react-intl/locale-data/lt';
+import * as nl from 'react-intl/locale-data/nl';
+import * as pl from 'react-intl/locale-data/pl';
+import * as pt from 'react-intl/locale-data/pt';
+import * as ro from 'react-intl/locale-data/ro';
+import * as ru from 'react-intl/locale-data/ru';
+import * as sk from 'react-intl/locale-data/sk';
+import * as sl from 'react-intl/locale-data/sl';
+import * as tr from 'react-intl/locale-data/tr';
+import * as uk from 'react-intl/locale-data/uk';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import {APP_INSTANCE_ID, FEATURE} from '../config';
@@ -44,7 +65,30 @@ import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
 
-addLocaleData([...de]);
+addLocaleData([
+  ...cs,
+  ...da,
+  ...de,
+  ...el,
+  ...en,
+  ...es,
+  ...et,
+  ...fi,
+  ...fr,
+  ...hr,
+  ...hu,
+  ...it,
+  ...lt,
+  ...nl,
+  ...pl,
+  ...pt,
+  ...ro,
+  ...ru,
+  ...sk,
+  ...sl,
+  ...tr,
+  ...uk,
+]);
 
 interface Props extends React.HTMLAttributes<Root> {}
 

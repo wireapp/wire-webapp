@@ -43,8 +43,12 @@ export function normalizeLanguage(language: string = DEFAULT_LANGUAGE) {
 }
 
 export function findLanguage(language: string = DEFAULT_LANGUAGE) {
+  console.log('lang input', language);
   language = normalizeLanguage(language);
-  return Locales.find(locale => locale.startsWith(language));
+  console.log('lang normalized', language);
+  const lang = Locales.find(locale => locale.startsWith(language));
+  console.log('lang mapped', lang);
+  return lang;
 }
 
 export function mapLanguage(language: string = DEFAULT_LANGUAGE) {
