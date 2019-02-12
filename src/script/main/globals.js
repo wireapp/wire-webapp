@@ -308,7 +308,6 @@ import conversationListCellGlobal from '../components/list/conversationListCell.
 import groupAvatarGlobal from '../components/list/groupAvatar.js';
 import userDetailsGlobal from '../components/panel/userDetails.js';
 import serviceDetailsGlobal from '../components/panel/serviceDetails.js';
-import extendedActionGlobal from '../components/panel/extendedAction.js';
 import CallMessageTypeGlobal from '../message/CallMessageType.js';
 import MessageCategoryGlobal from '../message/MessageCategory.js';
 import MessageCategorizationGlobal from '../message/MessageCategorization.js';

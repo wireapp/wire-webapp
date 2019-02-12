@@ -20,7 +20,7 @@
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 
-import '../../components/panel/extendedAction';
+import '../../components/panel/panelActions';
 
 export default class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {

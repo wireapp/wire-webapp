@@ -23,7 +23,7 @@ import receiptModeToggle from 'components/receiptModeToggle';
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 
-import '../../components/panel/extendedAction';
+import '../../components/panel/panelActions';
 
 export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {

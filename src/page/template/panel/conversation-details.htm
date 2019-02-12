@@ -169,11 +169,9 @@
               <div class="panel__info-text panel__info-text--margin" data-bind="text: t('conversationDetails1to1ReceiptsSecond')"></div>
             </div>
           <!-- /ko -->
+          <panel-actions params="items: getConversationActions(activeConversation())"></panel-actions>
         </div>
       <!-- /ko -->
-    </div>
-    <div class="panel__content" style="flex-shrink: 0">
-      <extended-action params="items: getConversationActions(activeConversation())"></extended-action>
     </div>
   <!-- /ko -->
 </div>
