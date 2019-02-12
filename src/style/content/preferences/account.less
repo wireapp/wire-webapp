@@ -145,6 +145,11 @@
   position: relative;
   width: 256px;
   min-height: @line-height-xl * 2;
+
+  edit-icon,
+  animated-check-icon {
+    height: 50%;
+  }
 }
 
 .preferences-account-input {
@@ -162,28 +167,34 @@
     .label-xs;
   }
 
-  &:hover + .preferences-account-input-icon-edit::after {
-    .icon-mixin('\e177'); // icon-edit
-
-    font-size: 12px;
+  &:hover + edit-icon {
+    opacity: 1;
   }
 
   &:not([readonly]):focus,
   &:not([readonly]):hover {
     background-color: var(--preference-account-input-bg);
   }
-
-  &[readonly] + .preferences-account-input-icon-edit::after,
-  &:focus + .preferences-account-input-icon-edit::after {
-    display: none;
-    content: '';
-  }
 }
 
-.preferences-account-input-icon {
+edit-icon,
+animated-check-icon {
   position: absolute;
   top: 0;
   right: 12px;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  pointer-events: none;
+  transition: opacity @animation-timing-faster;
+
+  svg {
+    width: 12px;
+  }
+}
+
+edit-icon {
+  opacity: 0;
 }
 
 .preferences-account-name {

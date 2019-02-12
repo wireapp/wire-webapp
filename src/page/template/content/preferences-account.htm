@@ -11,7 +11,14 @@
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
-              <span class="preferences-account-input-icon" data-bind="css: nameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+            <!-- ko if: canEditProfile(selfUser()) -->
+              <!-- ko if: nameSaved() -->
+                <animated-check-icon data-uie-name="enter-name-icon-check"></animated-check-icon>
+              <!-- /ko -->
+              <!-- ko ifnot: nameSaved() -->
+                <edit-icon data-uie-name="enter-name-icon"></edit-icon>
+              <!-- /ko -->
+            <!-- /ko -->
           </div>
 
           <!-- ko if: isTeam() -->
@@ -35,7 +42,14 @@
                    maxlength="21"
                    spellcheck="false"
                    autocomplete="off" />
-            <span class="preferences-account-input-icon" data-bind="css: usernameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+            <!-- ko if: canEditProfile(selfUser()) -->
+              <!-- ko if: usernameSaved() -->
+                <animated-check-icon data-uie-name="enter-username-icon-check"></animated-check-icon>
+              <!-- /ko -->
+              <!-- ko ifnot: usernameSaved() -->
+                <edit-icon data-uie-name="enter-username-icon"></edit-icon>
+              <!-- /ko -->
+            <!-- /ko -->
             <!-- ko ifnot: usernameState() -->
               <div class="preferences-account-username-hint text-foreground font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameHint')"></div>
