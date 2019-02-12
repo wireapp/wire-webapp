@@ -50,124 +50,140 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
     if (!userEntity) {
       return [];
     }
-    const isMe = userEntity.is_me;
-    //TODO const selfIsActivatedAccount = this.userRepository.isActivatedAccount();
 
-    const allMenuElements = [
-      {
-        condition: () => isMe,
-        item: {
-          click: () => this.clickOnShowProfile(),
-          icon: 'profile-icon',
-          identifier: 'go-profile',
-          label: t('groupParticipantActionSelfProfile'),
-        },
+    const openProfile = {
+      condition: () => true,
+      item: {
+        click: () => this.clickOnShowProfile(),
+        icon: 'profile-icon',
+        identifier: 'go-profile',
+        label: t('groupParticipantActionSelfProfile'),
       },
-      {
-        condition: () => !isMe && (userEntity.isConnected() || userEntity.isTeamMember()),
-        item: {
-          click: () => this.clickOnOpenConversation(),
-          icon: 'message-icon',
-          identifier: 'go-conversation',
-          label: t('groupParticipantActionOpenConversation'),
-        },
+    };
+    const openConversation = {
+      condition: () => userEntity.isConnected() || userEntity.isTeamMember(),
+      item: {
+        click: () => this.clickOnOpenConversation(),
+        icon: 'message-icon',
+        identifier: 'go-conversation',
+        label: t('groupParticipantActionOpenConversation'),
       },
-      {
-        condition: () => !isMe && userEntity.isIncomingRequest(),
-        item: {
-          click: () => this.clickToAcceptRequest(),
-          icon: 'check-icon',
-          identifier: 'do-accept-request',
-          label: t('groupParticipantActionIncomingRequest'),
-        },
+    };
+    const acceptRequest = {
+      condition: () => userEntity.isIncomingRequest(),
+      item: {
+        click: () => this.clickToAcceptRequest(),
+        icon: 'check-icon',
+        identifier: 'do-accept-request',
+        label: t('groupParticipantActionIncomingRequest'),
       },
-      {
-        condition: () => !isMe && userEntity.isIncomingRequest(),
-        item: {
-          click: () => this.clickToIgnoreRequest(),
-          icon: 'close-icon',
-          identifier: 'do-ignore-request',
-          label: t('groupParticipantActionIgnoreRequest'),
-        },
+    };
+    const ignoreRequest = {
+      condition: () => userEntity.isIncomingRequest(),
+      item: {
+        click: () => this.clickToIgnoreRequest(),
+        icon: 'close-icon',
+        identifier: 'do-ignore-request',
+        label: t('groupParticipantActionIgnoreRequest'),
       },
-      {
-        condition: () => !isMe && userEntity.isOutgoingRequest(),
-        item: {
-          click: () => this.clickOnOpenConversation(),
-          icon: 'message-icon',
-          identifier: 'go-conversation',
-          label: t('groupParticipantActionPending'),
-        },
+    };
+    const openRequest = {
+      condition: () => userEntity.isOutgoingRequest(),
+      item: {
+        click: () => this.clickOnOpenConversation(),
+        icon: 'message-icon',
+        identifier: 'go-conversation',
+        label: t('groupParticipantActionPending'),
       },
-      {
-        condition: () => !isMe && userEntity.isOutgoingRequest(),
-        item: {
-          click: () => this.clickToCancelRequest(),
-          icon: 'undo-icon',
-          identifier: 'do-cancel-request',
-          label: t('groupParticipantActionCancelRequest'),
-        },
+    };
+    const cancelRequest = {
+      condition: () => userEntity.isOutgoingRequest(),
+      item: {
+        click: () => this.clickToCancelRequest(),
+        icon: 'undo-icon',
+        identifier: 'do-cancel-request',
+        label: t('groupParticipantActionCancelRequest'),
       },
-      {
-        condition: () => {
-          const isNotConnectedUser = userEntity.isCanceled() || userEntity.isUnknown();
-          const canConnect = !userEntity.isTeamMember() && !userEntity.isTemporaryGuest();
-          return !isMe && isNotConnectedUser && canConnect;
-        },
-        item: {
-          click: () => this.clickToSendRequest(),
-          icon: 'plus-icon',
-          identifier: 'do-send-request',
-          label: t('groupParticipantActionSendRequest'),
-        },
+    };
+    const sendRequest = {
+      condition: () => {
+        const isNotConnectedUser = userEntity.isCanceled() || userEntity.isUnknown();
+        const canConnect = !userEntity.isTeamMember() && !userEntity.isTemporaryGuest();
+        return isNotConnectedUser && canConnect;
       },
-      {
-        condition: () => !isMe && (userEntity.isConnected() || userEntity.isRequest()),
-        item: {
-          click: () => this.clickToBlock(),
-          icon: 'block-icon',
-          identifier: 'do-block',
-          label: t('groupParticipantActionBlock'),
-        },
+      item: {
+        click: () => this.clickToSendRequest(),
+        icon: 'plus-icon',
+        identifier: 'do-send-request',
+        label: t('groupParticipantActionSendRequest'),
       },
-      {
-        condition: () => !isMe && userEntity.isBlocked(),
-        item: {
-          click: () => this.clickToUnblock(),
-          icon: 'block-icon',
-          identifier: 'do-unblock',
-          label: t('groupParticipantActionUnblock'),
-        },
+    };
+    const block = {
+      condition: () => userEntity.isConnected() || userEntity.isRequest(),
+      item: {
+        click: () => this.clickToBlock(),
+        icon: 'block-icon',
+        identifier: 'do-block',
+        label: t('groupParticipantActionBlock'),
       },
-      {
-        condition: () => {
-          const isActiveParticipant = conversationEntity && !conversationEntity.removed_from_conversation();
-          return isMe && conversationEntity.isGroup() && isActiveParticipant;
-        },
-        item: {
-          click: () => this.clickToLeave(),
-          icon: 'leave-icon',
-          identifier: 'do-leave',
-          label: t('groupParticipantActionLeave'),
-        },
+    };
+    const unblock = {
+      condition: () => userEntity.isBlocked(),
+      item: {
+        click: () => this.clickToUnblock(),
+        icon: 'block-icon',
+        identifier: 'do-unblock',
+        label: t('groupParticipantActionUnblock'),
       },
-      {
-        condition: () => {
-          const isActive = this.isVisible() && conversationEntity.isActiveParticipant();
-          const isInConversation = conversationEntity.participating_user_ids().some(id => userEntity.id === id);
+    };
+    const leave = {
+      condition: () => {
+        const isActiveParticipant = conversationEntity && !conversationEntity.removed_from_conversation();
+        return conversationEntity.isGroup() && isActiveParticipant;
+      },
+      item: {
+        click: () => this.clickToLeave(),
+        icon: 'leave-icon',
+        identifier: 'do-leave',
+        label: t('groupParticipantActionLeave'),
+      },
+    };
+    const remove = {
+      condition: () => {
+        const isActive = this.isVisible() && conversationEntity.isActiveParticipant();
+        const isInConversation = conversationEntity.participating_user_ids().some(id => userEntity.id === id);
 
-          return isActive && isInConversation && z.userPermission().canUpdateGroupParticipants();
-        },
-        item: {
-          click: () => this.clickToRemove(),
-          icon: 'minus-icon',
-          identifier: 'do-remove',
-          label: t('groupParticipantActionRemove'),
-        },
+        return isActive && isInConversation && z.userPermission().canUpdateGroupParticipants();
       },
-    ];
+      item: {
+        click: () => this.clickToRemove(),
+        icon: 'minus-icon',
+        identifier: 'do-remove',
+        label: t('groupParticipantActionRemove'),
+      },
+    };
 
-    return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
+    const selfIsActivatedAccount = this.userRepository.isActivatedAccount();
+
+    let allItems = [];
+    if (userEntity.is_me) {
+      allItems = selfIsActivatedAccount ? [openProfile, leave] : [openProfile];
+    } else {
+      allItems = selfIsActivatedAccount
+        ? [
+            openConversation,
+            acceptRequest,
+            ignoreRequest,
+            openRequest,
+            cancelRequest,
+            sendRequest,
+            block,
+            unblock,
+            remove,
+          ]
+        : [];
+    }
+    return allItems.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
   }
 
   clickOnDevices() {
