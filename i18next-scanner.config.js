@@ -32,7 +32,7 @@ module.exports = {
     },
     lngs: ['en-US'],
     nsSeparator: false,
-    removeUnusedKeys: true,
+    removeUnusedKeys: false,
     resource: {
       jsonIndent: 2,
       lineEnding: '\n',
