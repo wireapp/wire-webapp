@@ -21,33 +21,29 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.AccentColorPicker = class AccentColorPicker {
-  /**
-   * Construct a audio seek bar that renders audio levels.
-   *
-   * @param {Object} params - Component parameters
-   * @param {z.entity.User} params.user - User entity
-   * @param {z.entity.File} params.asset - Asset file
-   * @param {ko.observable} params.selected - Selected accent collor
-   */
   constructor(params) {
     this.user = ko.unwrap(params.user);
 
-    this.accent_color_ids = [1, 2, 4, 5, 6, 7];
+    this.accentColorIds = [1, 2, 4, 5, 6, 7];
+    this.disabled = params.disabled;
 
-    this.on_select = function(id) {
+    this.onSelect = function(id) {
       params.selected(id);
       return true;
     };
+
+    this.getId = id => `accent${id}`;
+    this.getClass = id => `accent-color-${id}`;
   }
 };
 
 // Knockout registration of the accent color picker component.
 ko.components.register('accent-color-picker', {
   template: `
-    <!-- ko foreach: accent_color_ids -->
+    <!-- ko foreach: {data: accentColorIds, as: 'id'} -->
       <input type="radio" name="accent"
-             data-bind="attr: {'id': 'accent' + $data, 'checked': $parent.user.accent_id() === $data}, click: $parent.on_select">
-      <label data-bind="attr: {'for': 'accent' + $data},css: 'accent-color-' + $data"></label>
+             data-bind="attr: {id: $parent.getId(id), checked: $parent.user.accent_id() === id, disabled: $parent.disabled}, click: $parent.onSelect">
+      <label data-bind="attr: {for: $parent.getId(id)}, css: $parent.getClass(id)"></label>
     <!-- /ko -->
   `,
   viewModel: z.components.AccentColorPicker,
