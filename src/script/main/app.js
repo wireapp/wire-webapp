@@ -118,7 +118,6 @@ class App {
     repositories.audio = authComponent.audio;
     repositories.auth = authComponent.repository;
     repositories.giphy = resolveDependency(GiphyRepository);
-    repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
     repositories.properties = new PropertiesRepository(this.service.properties, this.service.self);
     repositories.serverTime = new z.time.ServerTimeRepository();
@@ -256,7 +255,6 @@ class App {
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
       lifecycle: new z.lifecycle.LifecycleService(),
-      location: new z.location.LocationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
       properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
