@@ -70,7 +70,10 @@
 
           <div class="preferences-account-mail" data-bind="text: selfUser().email()" data-uie-name="enter-email"></div>
           <div class="preferences-account-phone" data-bind="text: selfUser().phone()" data-uie-name="enter-phone"></div>
-          <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: selfUser(), selected: changeAccentColor, disabled: !canEditProfile(selfUser())" data-uie-name="enter-accent-color"></accent-color-picker>
+
+          <!-- ko if: canEditProfile(selfUser()) -->
+            <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: selfUser(), selected: changeAccentColor" data-uie-name="enter-accent-color"></accent-color-picker>
+          <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko ifnot: isActivatedAccount() -->
