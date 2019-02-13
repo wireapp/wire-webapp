@@ -356,8 +356,7 @@ const unableToDecryptTemplate = `
     <div class="message-header-decrypt-error-label" data-bind="html: message.htmlErrorMessage()"></div>
     <!-- ko if: message.is_recoverable -->
       <div class="message-header-decrypt-reset-session">
-        <!-- TODO equivalent of class="fill-theme" on inner path of svg -->
-        <loading-icon class="message-header-decrypt-reset-session-spinner svg-theme spin" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
+        <loading-icon class="svg-accent-color" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
               data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>

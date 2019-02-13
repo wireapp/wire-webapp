@@ -66,8 +66,7 @@
               <label class="button-label" for="toggle" data-bind="click: clickToToggleDeviceVerification, text: t('participantDevicesDetailVerify')"></label>
             </div>
             <div class="participant-devices__actions">
-              <!-- TODO equivalent of class="fill-theme" on inner path of svg -->
-              <loading-icon class="svg-theme spin" data-bind="style: {display : isResettingSession() ? 'initial' : 'none'}" data-uie-name="status-loading">
+              <loading-icon class="svg-accent-color" data-bind="style: {display : isResettingSession() ? 'initial' : 'none'}" data-uie-name="status-loading"></loading-icon>
               <span class="button-label text-theme ellipsis"
                     data-bind="click: clickToResetSession, style: {display: isResettingSession() ? 'none' : 'initial'}, text: t('participantDevicesDetailResetSession')"
                     data-uie-name="do-reset-session"></span>
