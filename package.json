@@ -48,8 +48,8 @@
     "url-search-params-polyfill": "5.0.0",
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
-    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.10.2-0",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.10.1"
+    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.12.1",
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.12.1"
   },
   "devDependencies": {
     "@babel/core": "7.2.2",
@@ -62,13 +62,13 @@
     "@types/express-useragent": "0.2.21",
     "@types/hbs": "4.0.0",
     "@types/helmet": "0.0.42",
-    "@types/js-cookie": "2.2.0",
+    "@types/js-cookie": "2.2.1",
     "@types/node": "11.9.0",
     "@types/platform": "1.3.2",
     "@types/react-dom": "16.8.0",
     "@types/react-intl": "2.3.16",
     "@types/react-redux": "7.0.1",
-    "@types/react-router": "4.4.3",
+    "@types/react-router": "4.4.4",
     "@types/react-router-dom": "4.3.1",
     "@types/redux-mock-store": "1.0.0",
     "@types/speakingurl": "13.0.2",
@@ -82,7 +82,7 @@
     "concurrently": "4.1.0",
     "copy-webpack-plugin": "4.6.0",
     "cross-env": "5.2.0",
-    "cssnano": "4.1.8",
+    "cssnano": "4.1.9",
     "enzyme": "3.8.0",
     "enzyme-adapter-react-16": "1.9.1",
     "enzyme-to-json": "3.3.5",
@@ -205,13 +205,9 @@
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:server": "cd server && yarn test",
     "test:types": "yarn tsc --noEmit",
-    "translate": "yarn translate:upload && yarn translate:download",
-    "translate:buildpot": "rip json2pot \"temp/i18n/**/*.json\" -o \"temp/i18n/webapp.pot\"",
-    "translate:download": "node ./bin/translations_download.js && yarn translate:postprocess && yarn translate:extractpo && yarn fix:assets",
-    "translate:upload": "yarn translate:buildpot && node ./bin/translations_upload.js",
-    "translate:extractpo": "rip po2json \"temp/i18n/*.po\" -m \"temp/i18n/**/*.json\" -o \"src/i18n\"",
-    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:postprocess": "node ./bin/translations_post_processing.js src/script/localization/translations && node ./bin/translations_post_processing.js temp/i18n"
+    "translate:upload": "yarn translate:merge && node ./bin/translations_upload.js",
+    "translate:merge": "yarn bundle:prod && node ./bin/translations_normalize.js",
+    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'"
   },
   "private": true,
   "repository": {
