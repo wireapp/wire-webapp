@@ -105,6 +105,7 @@ export default class UserMapper {
       service,
       sso_id: ssoId,
       team,
+      extended_fields,
     } = userData;
 
     if (accentId) {
@@ -128,6 +129,8 @@ export default class UserMapper {
     if (managed_by !== undefined) {
       userEntity.managedBy(managed_by);
     }
+
+    userEntity.extendedFields(extended_fields);
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);

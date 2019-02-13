@@ -21,6 +21,8 @@ import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 
 import '../../components/panel/panelActions';
+import '../../components/panel/enrichedFields';
+import '../../components/panel/userDetails';
 
 export default class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {
