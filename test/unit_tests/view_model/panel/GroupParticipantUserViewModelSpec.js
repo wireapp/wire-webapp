@@ -19,6 +19,7 @@
 
 import GroupParticipantUserViewModel from 'src/script/view_model/panel/GroupParticipantUserViewModel';
 import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
 
 describe('GroupParticipantUserViewModel', () => {
   const testFactory = new window.TestFactory();
@@ -47,7 +48,7 @@ describe('GroupParticipantUserViewModel', () => {
       {
         expected: ['go-profile', 'do-leave'],
         getParams: () => {
-          const user = new z.entity.User();
+          const user = new User();
           user.is_me = true;
 
           const conversation = new Conversation();
@@ -60,7 +61,7 @@ describe('GroupParticipantUserViewModel', () => {
       {
         expected: ['go-profile'],
         getParams: () => {
-          const user = new z.entity.User();
+          const user = new User();
           user.is_me = true;
           return {conversation: new Conversation(), user};
         },
@@ -70,7 +71,7 @@ describe('GroupParticipantUserViewModel', () => {
       {
         expected: ['go-conversation', 'do-block'],
         getParams: () => {
-          const user = new z.entity.User();
+          const user = new User();
           const conversation = new Conversation();
           user.connection().status(z.connection.ConnectionStatus.ACCEPTED);
           spyOn(conversation, 'isGroup').and.returnValue(true);
