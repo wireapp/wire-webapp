@@ -52,12 +52,6 @@ ko.components.register('panel-user-details', {
           params="availability: participant().availability(), label: availabilityLabel()">
         </availability-state>
       <!-- /ko -->
-      <!-- ko foreach: Object.entries(participant().extendedFields()) -->
-        <div class="panel-participant__extended">
-          <div data-bind="text: $data[0]" class="panel-participant__extended__key"></div>
-          <div data-bind="text: $data[1]" class="panel-participant__extended__value"></div>
-        </div>
-      <!-- /ko -->
     </div>
   `,
   viewModel: class {
