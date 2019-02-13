@@ -21,11 +21,10 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.AccentColorPicker = class AccentColorPicker {
-  constructor({user, selected, disabled}) {
+  constructor({user, selected}) {
     this.user = ko.unwrap(user);
 
     this.accentColorIds = [1, 2, 4, 5, 6, 7];
-    this.disabled = disabled;
 
     this.onSelect = function(id) {
       selected(id);
@@ -42,7 +41,7 @@ ko.components.register('accent-color-picker', {
   template: `
     <!-- ko foreach: {data: accentColorIds, as: 'id'} -->
       <input type="radio" name="accent"
-             data-bind="attr: {id: $parent.getId(id), checked: $parent.user.accent_id() === id, disabled: $parent.disabled}, click: $parent.onSelect">
+             data-bind="attr: {id: $parent.getId(id), checked: $parent.user.accent_id() === id}, click: $parent.onSelect">
       <label data-bind="attr: {for: $parent.getId(id)}, css: $parent.getClass(id)"></label>
     <!-- /ko -->
   `,
