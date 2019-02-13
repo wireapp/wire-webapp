@@ -206,7 +206,7 @@ ko.components.register('participant-avatar', {
       <!-- /ko -->
       <!-- ko if: isService -->
         <div class="avatar-service-placeholder">
-            <avatar-service-icon></avatar-service-icon>
+            <service-icon></service-icon>
         </div>
       <!-- /ko -->
       <div class="avatar-image"></div>
