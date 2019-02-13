@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,21 @@
  *
  */
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+/**
+ * Return link to Google Maps.
+ *
+ * @param {number} latitude - Latitude of location
+ * @param {number} longitude - Longitude of location
+ * @param {string} name - Name of location
+ * @param {string} zoom - Map zoom level
+ * @returns {string} URL to location in Google Maps
+ */
+export function getMapsUrl(latitude, longitude, name, zoom) {
+  const baseUrl = 'https://google.com/maps/';
 
-z.error.LocationError = class LocationError extends z.error.BaseError {
-  constructor(type, message) {
-    super('LocationError', type, message);
-  }
+  const nameParam = name ? `place/${name}/` : '';
+  const locationParam = `@${latitude},${longitude}`;
+  const zoomParam = zoom ? `,${zoom}z` : '';
 
-  static get MESSAGE() {
-    return {
-      REQUEST_FAILED: 'Location related request failed',
-    };
-  }
-
-  static get TYPE() {
-    return {
-      REQUEST_FAILED: 'REQUEST_FAILED',
-    };
-  }
-};
+  return `${baseUrl}${nameParam}${locationParam}${zoomParam}`;
+}
