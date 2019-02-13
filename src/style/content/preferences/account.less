@@ -22,6 +22,26 @@
   display: flex;
   width: 536px;
   justify-content: space-between;
+
+  edit-icon,
+  animated-check-icon {
+    position: absolute;
+    top: 0;
+    right: 12px;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    pointer-events: none;
+    transition: opacity @animation-timing-faster;
+
+    svg {
+      width: 12px;
+    }
+  }
+
+  edit-icon {
+    opacity: 0;
+  }
 }
 
 .preferences-section-data-usage {
@@ -175,26 +195,6 @@
   &:not([readonly]):hover {
     background-color: var(--preference-account-input-bg);
   }
-}
-
-edit-icon,
-animated-check-icon {
-  position: absolute;
-  top: 0;
-  right: 12px;
-  display: flex;
-  height: 100%;
-  align-items: center;
-  pointer-events: none;
-  transition: opacity @animation-timing-faster;
-
-  svg {
-    width: 12px;
-  }
-}
-
-edit-icon {
-  opacity: 0;
 }
 
 .preferences-account-name {
