@@ -24,8 +24,7 @@ import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {historyInfoStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
@@ -39,23 +38,18 @@ interface ConnectedProps {
   hasSelfHandle: boolean;
 }
 
-interface DispatchProps {
-  resetHistoryCheck: () => Promise<void>;
-}
+interface DispatchProps {}
 
 const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
   hasHistory,
   hasSelfHandle,
   history,
   intl: {formatMessage: _},
-  ...connected
 }) => {
   const onContinue = () => {
-    connected.resetHistoryCheck().then(() => {
-      return hasSelfHandle
-        ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-        : history.push(ROUTE.CHOOSE_HANDLE);
-    });
+    return hasSelfHandle
+      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      : history.push(ROUTE.CHOOSE_HANDLE);
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
@@ -101,11 +95,6 @@ export default withRouter(
         return {
           hasHistory: ClientSelector.hasHistory(state),
           hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          resetHistoryCheck: () => dispatch(ROOT_ACTIONS.notificationAction.resetHistoryCheck()),
         };
       }
     )(HistoryInfo)
