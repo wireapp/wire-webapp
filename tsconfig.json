@@ -4,6 +4,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "strict": false,
+    "types": [],
     "declaration": true,
     "noImplicitAny": false,
     "noEmitOnError": false,
