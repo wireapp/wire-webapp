@@ -17,6 +17,8 @@
  *
  */
 
+import User from '../entity/User';
+
 export default class UserMapper {
   /**
    * Construct a new User Mapper.
@@ -31,19 +33,19 @@ export default class UserMapper {
   /**
    * Converts JSON user into user entity.
    * @param {Object} userData - User data
-   * @returns {z.entity.User} Mapped user entity
+   * @returns {User} Mapped user entity
    */
   mapUserFromJson(userData) {
-    return this.updateUserFromObject(new z.entity.User(), userData);
+    return this.updateUserFromObject(new User(), userData);
   }
 
   /**
    * Converts JSON self user into user entity.
    * @param {Object} userData - User data
-   * @returns {z.entity.User} Mapped user entity
+   * @returns {User} Mapped user entity
    */
   mapSelfUserFromJson(userData) {
-    const userEntity = this.updateUserFromObject(new z.entity.User(), userData);
+    const userEntity = this.updateUserFromObject(new User(), userData);
     userEntity.is_me = true;
 
     if (userData.locale) {
@@ -58,7 +60,7 @@ export default class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    *
    * @param {Array<Object>} usersData - Users data
-   * @returns {Array<z.entity.User>} Mapped user entities
+   * @returns {Array<User>} Mapped user entities
    */
   mapUsersFromJson(usersData) {
     if (usersData && usersData.length) {
@@ -71,9 +73,9 @@ export default class UserMapper {
   /**
    * Maps JSON user into a blank user entity or updates an existing one.
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
-   * @param {z.entity.User} userEntity - User entity that the info shall be mapped to
+   * @param {User} userEntity - User entity that the info shall be mapped to
    * @param {Object} userData - User data
-   * @returns {z.entity.User} Mapped user entity
+   * @returns {User} Mapped user entity
    */
   updateUserFromObject(userEntity, userData) {
     if (!userData) {

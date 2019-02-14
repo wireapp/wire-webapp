@@ -17,8 +17,7 @@
  *
  */
 
-// KARMA_SPECS=entity/message/MemberMessage yarn test:app
-
+import User from 'src/script/entity/User';
 import 'src/script/localization/Localizer';
 
 describe('Member Message', () => {
@@ -30,7 +29,7 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for one user', () => {
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+      const user_a = new User(z.util.createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
 
@@ -38,9 +37,9 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for two users', () => {
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+      const user_a = new User(z.util.createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.createRandomUuid());
+      const user_b = new User(z.util.createRandomUuid());
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
 
@@ -48,11 +47,11 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for more than two users', () => {
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+      const user_a = new User(z.util.createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.createRandomUuid());
+      const user_b = new User(z.util.createRandomUuid());
       user_b.name('Jim');
-      const user_c = new z.entity.User(z.util.createRandomUuid());
+      const user_c = new User(z.util.createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
 
@@ -60,15 +59,15 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for more than one user without sender', () => {
-      const user_sender = new z.entity.User(z.util.createRandomUuid());
+      const user_sender = new User(z.util.createRandomUuid());
       user_sender.name('Sender');
       message_et.user(user_sender);
 
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+      const user_a = new User(z.util.createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.createRandomUuid());
+      const user_b = new User(z.util.createRandomUuid());
       user_b.name('Jim');
-      const user_c = new z.entity.User(z.util.createRandomUuid());
+      const user_c = new User(z.util.createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
 

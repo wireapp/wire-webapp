@@ -18,6 +18,7 @@
  */
 
 import {backendConfig} from '../../api/testResolver';
+import User from 'src/script/entity/User';
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
@@ -45,7 +46,7 @@ describe('z.connection.ConnectionRepository', () => {
       const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
       connectionEntity.userId = userId;
 
-      userEntity = new z.entity.User(userId);
+      userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
       connectionRepository.connectionEntities.push(connectionEntity);

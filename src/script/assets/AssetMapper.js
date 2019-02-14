@@ -63,7 +63,7 @@ z.assets.AssetMapper = {
   /**
    * Updates the user entity's assets.
    *
-   * @param {z.entity.User} userEntity - the user entity to update
+   * @param {User} userEntity - the user entity to update
    * @param {MappedAssets} mappedAssets - the assets to add to the user entity
    * @returns {void}
    */

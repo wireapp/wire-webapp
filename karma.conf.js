@@ -139,8 +139,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['spec', 'coverage-istanbul'],
-    specReporter: {showSpecTiming: true, suppressPassed: true, suppressSkipped: true},
+    reporters: ['progress', 'coverage-istanbul'],
 
     // web server port
     port: 9876,

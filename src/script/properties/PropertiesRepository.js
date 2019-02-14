@@ -103,7 +103,7 @@ class PropertiesRepository {
 
   /**
    * Initialize properties on app startup.
-   * @param {z.entity.User} selfUserEntity - Self user
+   * @param {User} selfUserEntity - Self user
    * @returns {Promise} Resolves when repository has been initialized
    */
   init(selfUserEntity) {
