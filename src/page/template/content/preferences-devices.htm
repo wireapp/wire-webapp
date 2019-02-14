@@ -22,14 +22,14 @@
         <!-- ko foreach: devices -->
           <div class="preferences-devices-card" data-bind="click: $parent.clickOnShowDevice">
             <div class="preferences-devices-card-data">
-              <svg class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}" data-uie-name="device-id">
+              <div class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}" data-uie-name="device-id">
                 <!-- ko if: meta.isVerified()-->
-                  <use xlink:href="#icon-verified" data-uie-name="user-device-verified"></use>
+                  <verified-icon data-uie-name="user-device-verified"></verified-icon>
                 <!-- /ko -->
                 <!-- ko ifnot: meta.isVerified()-->
-                  <use xlink:href="#icon-not-verified" data-uie-name="user-device-not-verified"></use>
+                  <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
                 <!-- /ko -->
-              </svg>
+              </div>
               <div class="preferences-devices-card-info">
                 <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
                 <div class="preferences-devices-id">

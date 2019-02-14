@@ -29,14 +29,12 @@
 
           <div class="participant-devices__device-list" data-bind="foreach: clientEntities()">
             <div class="participant-devices__device-item" data-bind="click: $parent.clickOnDevice" data-uie-name="item-device">
-              <svg class="participant-devices__device-item__icon" width="16" height="16">
-                <!-- ko if: meta.isVerified()-->
-                  <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
-                <!-- /ko -->
-                <!-- ko ifnot: meta.isVerified()-->
-                  <use data-uie-name="user-device-not-verified" xlink:href="#icon-not-verified"></use>
-                <!-- /ko -->
-              </svg>
+              <!-- ko if: meta.isVerified()-->
+                <verified-icon data-uie-name="user-device-verified"></verified-icon>
+              <!-- /ko -->
+              <!-- ko ifnot: meta.isVerified()-->
+                <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
+              <!-- /ko -->
               <device-card params="device: $data, click: $parent.clickOnDevice"></device-card>
             </div>
           </div>
