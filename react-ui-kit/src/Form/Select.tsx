@@ -31,7 +31,7 @@ const ArrowDown = `
   </svg>
 `;
 
-const Select = styled<SelectProps & React.HTMLAttributes<HTMLSelectElement>>(Input.withComponent('select'))`
+const Select = styled(Input.withComponent('select'))<SelectProps & React.HTMLAttributes<HTMLSelectElement>>`
   background-color: ${props => (props.disabled ? COLOR.GRAY_LIGHTEN_92 : COLOR.WHITE)};
   ${props =>
     !props.disabled &&

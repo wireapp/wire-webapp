@@ -18,7 +18,7 @@
  */
 
 import {defaultProps} from 'recompose';
-import styled from 'styled-components';
+import styled, {StyledComponent} from 'styled-components';
 import media from '../mediaQueries';
 import {GUTTER, WIDTH} from './sizes';
 

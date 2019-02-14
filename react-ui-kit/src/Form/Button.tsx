@@ -32,7 +32,7 @@ interface ButtonProps extends TextProps {
 type HTMLButtonProps = ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const darkenAmount = 0.06;
-const Button = styled<HTMLButtonProps>(Text.withComponent(styled.button<HTMLButtonProps>``))<HTMLButtonProps>`
+const Button = styled(Text.withComponent(styled.button<HTMLButtonProps>``))<HTMLButtonProps>`
   background-color: ${props => (props.disabled ? COLOR.DISABLED : props.backgroundColor)};
   border-radius: 8px;
   border: 0;

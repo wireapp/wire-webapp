@@ -2,7 +2,8 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "dist",
-    "rootDir": "src/main"
+    "rootDir": "src/main",
+    "types": ["node", "@types/long"]
   },
   "exclude": ["dist", "node_modules"],
   "extends": "../../tsconfig.json"

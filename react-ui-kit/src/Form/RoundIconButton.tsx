@@ -51,9 +51,9 @@ export interface ButtonProps {
 
 const darkenAmount = 0.08;
 
-const Button = styled<ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  RoundContainer.withComponent(styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>``)
-)`
+const Button = styled(RoundContainer.withComponent(styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>``))<
+  ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>
+>`
   background-color: ${props => (props.disabled ? COLOR.DISABLED : props.color)};
   min-width: ${props => props.size}px;
   outline: none;

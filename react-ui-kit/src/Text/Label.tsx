@@ -22,7 +22,7 @@ import {COLOR} from '../Identity';
 import {Link} from './Link';
 import {Text} from './Text';
 
-const Label = Text.withComponent<React.HTMLAttributes<HTMLSpanElement>>(styled.span``);
+const Label = Text.withComponent(styled.span<React.HTMLAttributes<HTMLSpanElement>>``);
 
 Label.defaultProps = {
   ...Text.defaultProps,
