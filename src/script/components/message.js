@@ -419,9 +419,7 @@ const verificationTemplate = `
         <verified-icon></verified-icon>
       <!-- /ko -->
       <!-- ko ifnot: message.isTypeVerified() -->
-        <svg width="16" height="16">
-          <use xlink:href="#icon-not-verified"></use>
-        </svg>
+        <not-verified-icon></not-verified-icon>
       <!-- /ko -->
     </div>
     <div class="message-header-label">
