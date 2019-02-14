@@ -23,6 +23,7 @@ import ko from 'knockout';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import PropertiesService from 'src/script/properties/PropertiesService';
 import StorageService from 'src/script/storage/StorageService';
+import User from 'src/script/entity/User';
 import UserService from 'src/script/user/UserService';
 import UserRepository from 'src/script/user/UserRepository';
 
@@ -181,7 +182,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
         id: '60aee26b7f55a99f',
       });
 
-      const user = new z.entity.User(entities.user.john_doe.id);
+      const user = new User(entities.user.john_doe.id);
       user.devices.push(clientEntity);
       user.email(entities.user.john_doe.email);
       user.is_me = true;

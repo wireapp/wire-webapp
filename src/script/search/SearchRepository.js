@@ -63,10 +63,10 @@ class SearchRepository {
    * Doesn't sort the results and keep the initial order of the given user list.
    *
    * @param {string} term - the search term
-   * @param {Array<z.entity.User>} userEntities - entities to match the search term against
+   * @param {Array<User>} userEntities - entities to match the search term against
    * @param {Array<z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
    *    the order of the properties in the array indicates the priorities by which results will be sorted
-   * @returns {Array<z.entity.User>} the filtered list of users
+   * @returns {Array<User>} the filtered list of users
    */
   searchUserInSet(term, userEntities, properties) {
     if (term === '') {

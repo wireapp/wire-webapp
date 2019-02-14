@@ -17,6 +17,7 @@
  *
  */
 
+import User from 'src/script/entity/User';
 import UserMapper from 'src/script/user/UserMapper';
 
 describe('User Mapper', () => {
@@ -109,7 +110,7 @@ describe('User Mapper', () => {
 
   describe('updateUserFromObject', () => {
     it('can update the accent color', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
@@ -118,7 +119,7 @@ describe('User Mapper', () => {
     });
 
     it('can update the user name', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
@@ -127,7 +128,7 @@ describe('User Mapper', () => {
     });
 
     it('can update the user handle', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
@@ -136,7 +137,7 @@ describe('User Mapper', () => {
     });
 
     it("converts user's expiration date to local timestamp", () => {
-      const userEntity = new z.entity.User();
+      const userEntity = new User();
       userEntity.id = entities.user.john_doe.id;
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
@@ -156,7 +157,7 @@ describe('User Mapper', () => {
     });
 
     it('cannot update the user name of a wrong user', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
       const functionCall = () => mapper.updateUserFromObject(user_et, data);
@@ -165,7 +166,7 @@ describe('User Mapper', () => {
     });
 
     it('can update user with v3 assets', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [

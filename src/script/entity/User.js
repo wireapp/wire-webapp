@@ -21,9 +21,6 @@ import ko from 'knockout';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
 // Please note: The own user has a "locale"
 class User {
   static get ACCENT_COLOR() {
@@ -77,21 +74,21 @@ class User {
       () => {
         switch (this.accent_id()) {
           case z.config.ACCENT_ID.BLUE:
-            return z.entity.User.THEME.BLUE;
+            return User.THEME.BLUE;
           case z.config.ACCENT_ID.GREEN:
-            return z.entity.User.THEME.GREEN;
+            return User.THEME.GREEN;
           case z.config.ACCENT_ID.ORANGE:
-            return z.entity.User.THEME.ORANGE;
+            return User.THEME.ORANGE;
           case z.config.ACCENT_ID.PINK:
-            return z.entity.User.THEME.PINK;
+            return User.THEME.PINK;
           case z.config.ACCENT_ID.PURPLE:
-            return z.entity.User.THEME.PURPLE;
+            return User.THEME.PURPLE;
           case z.config.ACCENT_ID.RED:
-            return z.entity.User.THEME.RED;
+            return User.THEME.RED;
           case z.config.ACCENT_ID.YELLOW:
-            return z.entity.User.THEME.YELLOW;
+            return User.THEME.YELLOW;
           default:
-            return z.entity.User.THEME.BLUE;
+            return User.THEME.BLUE;
         }
       },
       this,
@@ -102,21 +99,21 @@ class User {
       () => {
         switch (this.accent_id()) {
           case z.config.ACCENT_ID.BLUE:
-            return z.entity.User.ACCENT_COLOR.BLUE;
+            return User.ACCENT_COLOR.BLUE;
           case z.config.ACCENT_ID.GREEN:
-            return z.entity.User.ACCENT_COLOR.GREEN;
+            return User.ACCENT_COLOR.GREEN;
           case z.config.ACCENT_ID.ORANGE:
-            return z.entity.User.ACCENT_COLOR.ORANGE;
+            return User.ACCENT_COLOR.ORANGE;
           case z.config.ACCENT_ID.PINK:
-            return z.entity.User.ACCENT_COLOR.PINK;
+            return User.ACCENT_COLOR.PINK;
           case z.config.ACCENT_ID.PURPLE:
-            return z.entity.User.ACCENT_COLOR.PURPLE;
+            return User.ACCENT_COLOR.PURPLE;
           case z.config.ACCENT_ID.RED:
-            return z.entity.User.ACCENT_COLOR.RED;
+            return User.ACCENT_COLOR.RED;
           case z.config.ACCENT_ID.YELLOW:
-            return z.entity.User.ACCENT_COLOR.YELLOW;
+            return User.ACCENT_COLOR.YELLOW;
           default:
-            return z.entity.User.ACCENT_COLOR.BLUE;
+            return User.ACCENT_COLOR.BLUE;
         }
       },
       this,
@@ -308,4 +305,3 @@ class User {
 }
 
 export default User;
-z.entity.User = User;

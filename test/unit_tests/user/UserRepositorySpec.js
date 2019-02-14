@@ -21,6 +21,7 @@ import {backendConfig} from '../../api/testResolver';
 import ConsentValue from 'src/script/user/ConsentValue';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 import ReceiptMode from 'src/script/conversation/ReceiptMode';
+import User from 'src/script/entity/User';
 
 describe('UserRepository', () => {
   let server = null;
@@ -160,7 +161,7 @@ describe('UserRepository', () => {
       let user = null;
 
       beforeEach(() => {
-        user = new z.entity.User(entities.user.john_doe.id);
+        user = new User(entities.user.john_doe.id);
         return TestFactory.user_repository.save_user(user);
       });
 
@@ -189,7 +190,7 @@ describe('UserRepository', () => {
       afterEach(() => TestFactory.user_repository.users.removeAll());
 
       it('saves a user', () => {
-        const user = new z.entity.User();
+        const user = new User();
         user.id = entities.user.jane_roe.id;
 
         return TestFactory.user_repository.save_user(user).then(() => {
@@ -199,7 +200,7 @@ describe('UserRepository', () => {
       });
 
       it('saves self user', () => {
-        const user = new z.entity.User();
+        const user = new User();
         user.id = entities.user.jane_roe.id;
 
         return TestFactory.user_repository.save_user(user, true).then(() => {
@@ -215,8 +216,9 @@ describe('UserRepository', () => {
       let user_john_doe = null;
 
       beforeEach(() => {
-        user_jane_roe = new z.entity.User(entities.user.jane_roe.id);
-        user_john_doe = new z.entity.User(entities.user.john_doe.id);
+        TestFactory.user_repository.users.removeAll();
+        user_jane_roe = new User(entities.user.jane_roe.id);
+        user_john_doe = new User(entities.user.john_doe.id);
 
         return TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]).then(() => {
           const permanent_client = TestFactory.client_repository.clientMapper.mapClient(

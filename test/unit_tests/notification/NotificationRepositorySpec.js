@@ -18,6 +18,7 @@
  */
 
 import 'src/script/localization/Localizer';
+import User from 'src/script/entity/User';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -44,7 +45,7 @@ describe('z.notification.NotificationRepository', () => {
       user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
       [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
-      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const selfUserEntity = new User(z.util.createRandomUuid());
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
@@ -624,7 +625,7 @@ describe('z.notification.NotificationRepository', () => {
     }
 
     beforeEach(() => {
-      const selfUserEntity = new z.entity.User(userId);
+      const selfUserEntity = new User(userId);
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
 

@@ -39,7 +39,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
    *
    * @class z.calling.entities.ParticipantEntity
    * @param {z.calling.entities.CallEntity} callEntity - Call entity
-   * @param {z.entity.User} user - User entity to base the participant on
+   * @param {User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
   constructor(callEntity, user, timings) {

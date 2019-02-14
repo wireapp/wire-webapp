@@ -278,7 +278,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Create a group conversation.
    * @note Do not include the requestor among the users
    *
-   * @param {Array<z.entity.User>} userEntities - Users (excluding the creator) to be part of the conversation
+   * @param {Array<User>} userEntities - Users (excluding the creator) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
    * @param {string} [accessState] - State for conversation access
    * @param {Object} [options] - Additional conversation creation options (like "receipt_mode")
@@ -1181,7 +1181,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Add users to an existing conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to add users to
-   * @param {Array<z.entity.User>} userEntities - Users to be added to the conversation
+   * @param {Array<User>} userEntities - Users to be added to the conversation
    * @returns {Promise} Resolves when members were added
    */
   addMembers(conversationEntity, userEntities) {
@@ -1340,7 +1340,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Remove service from conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to remove service from
-   * @param {z.entity.User} userId - ID of service user to be removed from the conversation
+   * @param {User} userId - ID of service user to be removed from the conversation
    * @returns {Promise} Resolves when service was removed from the conversation
    */
   removeService(conversationEntity, userId) {

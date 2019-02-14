@@ -20,6 +20,7 @@
 import 'src/script/localization/Localizer';
 import LocalizerUtil, {Declension} from 'utils/LocalizerUtil';
 import SanitizationUtil from 'src/script/util/SanitizationUtil';
+import User from 'src/script/entity/User';
 
 describe('SanitizationUtil', () => {
   describe('escapeRegex', () => {
@@ -40,7 +41,7 @@ describe('SanitizationUtil', () => {
 
   describe('getFirstName', () => {
     it('will return the first name of the given user', () => {
-      const userEntity = new z.entity.User();
+      const userEntity = new User();
       userEntity.name(`<script>alert('Unsanitzed');</script>`);
       const escapedFirstName = SanitizationUtil.getFirstName(userEntity);
 

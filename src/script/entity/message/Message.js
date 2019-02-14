@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import AssetTransferState from '../../assets/AssetTransferState';
+import User from '../User';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -80,7 +81,7 @@ class Message {
     this.primary_key = undefined;
     this.status = ko.observable(z.message.StatusType.UNSPECIFIED);
     this.type = '';
-    this.user = ko.observable(new z.entity.User());
+    this.user = ko.observable(new User());
     this.visible = ko.observable(true);
     this.version = 1;
 

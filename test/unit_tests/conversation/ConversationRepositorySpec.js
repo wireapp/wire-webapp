@@ -19,6 +19,7 @@
 
 import {backendConfig} from '../../api/testResolver';
 import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -138,7 +139,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should not delete other users messages', done => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.is_me = false;
       const message_to_delete_et = new z.entity.Message(z.util.createRandomUuid());
       message_to_delete_et.user(user_et);
@@ -156,7 +157,7 @@ describe('ConversationRepository', () => {
 
     it('should send delete and deletes message for own messages', () => {
       spyOn(TestFactory.event_service, 'deleteEvent');
-      const userEntity = new z.entity.User();
+      const userEntity = new User();
       userEntity.is_me = true;
       const messageEntityToDelete = new z.entity.Message();
       messageEntityToDelete.id = z.util.createRandomUuid();
@@ -257,7 +258,7 @@ describe('ConversationRepository', () => {
 
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
-      const userEntity = new z.entity.User(teamMemberId);
+      const userEntity = new User(teamMemberId);
       userEntity.inTeam(true);
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
@@ -277,7 +278,7 @@ describe('ConversationRepository', () => {
       group_b.name('René, Benny, Gregor, Lipis');
 
       const group_c = _generate_conversation(z.conversation.ConversationType.GROUP);
-      self_user_et = new z.entity.User();
+      self_user_et = new User();
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
@@ -337,7 +338,7 @@ describe('ConversationRepository', () => {
 
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', () => {
-      spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
+      spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new User()));
 
       conversation_et = new Conversation(z.util.createRandomUuid());
       // prettier-ignore
@@ -991,7 +992,7 @@ describe('ConversationRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.selfUser(new z.entity.User(z.util.createRandomUuid()));
+        conversation.selfUser(new User(z.util.createRandomUuid()));
         const messageText = 'hello there';
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });
@@ -1011,22 +1012,22 @@ describe('ConversationRepository', () => {
     let lara = undefined;
 
     beforeEach(() => {
-      anne = new z.entity.User();
+      anne = new User();
       anne.name('Anne');
 
-      bob = new z.entity.User('532af01e-1e24-4366-aacf-33b67d4ee376');
+      bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376');
       bob.name('Bob');
 
-      jane = new z.entity.User(entities.user.jane_roe.id);
+      jane = new User(entities.user.jane_roe.id);
       jane.name('Jane');
 
-      john = new z.entity.User(entities.user.john_doe.id);
+      john = new User(entities.user.john_doe.id);
       john.name('John');
 
       const johns_computer = new z.client.ClientEntity({id: '83ad5d3c31d3c76b', class: 'tabconst'});
       john.devices.push(johns_computer);
 
-      lara = new z.entity.User();
+      lara = new User();
       lara.name('Lara');
 
       const bobs_computer = new z.client.ClientEntity({id: '74606e4c02b2c7f9', class: 'desktop'});
@@ -1065,7 +1066,6 @@ describe('ConversationRepository', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
       return TestFactory.conversation_repository.get_all_users_in_conversation(dudes.id).then(user_ets => {
         expect(user_ets.length).toBe(3);
-        expect(user_ets[0] instanceof z.entity.User).toBeTruthy();
         expect(TestFactory.conversation_repository.conversations().length).toBe(4);
       });
     });

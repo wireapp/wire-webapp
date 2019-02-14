@@ -47,7 +47,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   /**
    * Called after each connection request is rendered.
    * @param {Object} elements - rendered objects
-   * @param {z.entity.User} request - Rendered connection request
+   * @param {User} request - Rendered connection request
    * @returns {undefined} No return value
    */
   afterRender(elements, request) {
@@ -58,7 +58,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
   /**
    * Click on accept.
-   * @param {z.entity.User} userEntity - User to accept connection request from
+   * @param {User} userEntity - User to accept connection request from
    * @returns {undefined} No return value
    */
   clickOnAccept(userEntity) {
@@ -68,7 +68,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
   /**
    * Click on ignore.
-   * @param {z.entity.User} userEntity - User to ignore connection request from
+   * @param {User} userEntity - User to ignore connection request from
    * @returns {undefined} No return value
    */
   clickOnIgnore(userEntity) {
