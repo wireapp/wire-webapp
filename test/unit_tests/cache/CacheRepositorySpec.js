@@ -17,11 +17,10 @@
  *
  */
 
-import resolveDependency from '../../api/testResolver';
-import CacheRepository from 'src/script/cache/CacheRepository';
+import {resolve, graph} from './../../api/testResolver';
 
 describe('CacheRepository', () => {
-  const cache_repository = resolveDependency(CacheRepository);
+  const cache_repository = resolve(graph.CacheRepository);
   const TEMP_KEY = 'should_be_deleted';
 
   describe('clearCache', () => {

@@ -17,15 +17,14 @@
  *
  */
 
-import resolveDependency from '../../api/testResolver';
-import BackendClient from 'src/script/service/BackendClient';
+import {resolve, graph} from './../../api/testResolver';
 
 describe('BackendClient', () => {
   let backend_client = null;
   let server = null;
 
   beforeEach(() => {
-    backend_client = resolveDependency(BackendClient);
+    backend_client = resolve(graph.BackendClient);
   });
 
   afterEach(() => {

@@ -21,6 +21,8 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
+import MediaRepository from '../../media/MediaRepository';
+
 z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
   /**
    * Create a new flow audio.
@@ -165,7 +167,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
    * @returns {AudioContext} Active AudioContext
    */
   _getAudioContext() {
-    if (!this.audioContext || this.audioContext.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
+    if (!this.audioContext || this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
       this.audioContext = this.mediaRepository.getAudioContext();
     }
     return this.audioContext;

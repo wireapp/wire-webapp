@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.self = z.self || {};
-
-z.self.SelfService = class SelfService {
+export default class SelfService {
   static get URL() {
     return {
       SELF: '/self',
@@ -29,12 +26,13 @@ z.self.SelfService = class SelfService {
 
   /**
    * Construct a new Self Service.
-   * @class z.self.SelfService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @class SelfService
+   * @param {BackendClient} backendClient - Client for the API calls
+   * @param {Logger} logger - Logger configured for this class
    */
-  constructor(backendClient) {
+  constructor(backendClient, logger) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.self.SelfService', z.config.LOGGER.OPTIONS);
+    this.logger = logger;
   }
 
   /**
@@ -207,4 +205,4 @@ z.self.SelfService = class SelfService {
       url: `${SelfService.URL.SELF}/phone`,
     });
   }
-};
+}

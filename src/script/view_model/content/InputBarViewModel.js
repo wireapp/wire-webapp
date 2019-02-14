@@ -18,8 +18,7 @@
  */
 
 import * as StorageUtil from 'utils/StorageUtil';
-import resolveDependency from '../../config/appResolver';
-import AssetUploader from '../../assets/AssetUploader';
+import {resolve, graph} from '../../config/appResolver';
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -51,7 +50,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this.assetUploader = resolveDependency(AssetUploader);
+    this.assetUploader = resolve(graph.AssetUploader);
 
     this.messageHasher = messageHasher;
 

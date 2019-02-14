@@ -25,23 +25,50 @@ import BackendClient from '../service/BackendClient';
 import BackupService from '../backup/BackupService';
 import GiphyService from '../extension/GiphyService';
 import GiphyRepository from '../extension/GiphyRepository';
+import MediaRepository from '../media/MediaRepository';
+import PermissionRepository from '../permission/PermissionRepository';
 import PropertiesService from '../properties/PropertiesService';
+import PropertiesRepository from '../properties/PropertiesRepository';
 import StorageService from '../storage/StorageService';
+import SelfService from '../self/SelfService';
+import UserService from '../user/UserService';
 
 /** Dependencies is a Map that will contain all the dependencies of the app
  * The keys of the map are the classes of services the app needs and the value are the name of the service and its dependencies
  */
 const dependencies = new WeakMap();
 
-dependencies.set(CacheRepository, {dependencies: [], name: 'AudioRepository'});
-dependencies.set(AudioRepository, {dependencies: [], name: 'BackendClient'});
-dependencies.set(BackendClient, {dependencies: [], name: 'GiphyService'});
-dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyRepository'});
-dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'AssetService'});
-dependencies.set(AssetService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(CacheRepository, {dependencies: [], name: 'CacheRepository'});
+dependencies.set(AudioRepository, {dependencies: [], name: 'AudioRepository'});
+dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
+dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
+dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
+dependencies.set(AssetService, {dependencies: [BackendClient], name: 'AssetService'});
 dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploader'});
-dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'CacheRepository'});
+dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
+dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
+dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
+dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
+dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
-export default dependencies;
+export {
+  dependencies,
+  CacheRepository,
+  AudioRepository,
+  BackendClient,
+  GiphyService,
+  GiphyRepository,
+  AssetService,
+  AssetUploader,
+  MediaRepository,
+  PropertiesService,
+  PropertiesRepository,
+  PermissionRepository,
+  StorageService,
+  SelfService,
+  BackupService,
+  UserService,
+};

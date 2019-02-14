@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
+export default class MediaConstraintsHandler {
   static get CONFIG() {
     return {
       DEFAULT_DEVICE_ID: 'default',
@@ -66,7 +63,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
   /**
    * Construct a new MediaConstraints handler.
-   * @param {z.media.MediaRepository} mediaRepository - Media repository with with references to all other handlers
+   * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
@@ -183,4 +180,4 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
     return streamConstraints;
   }
-};
+}
