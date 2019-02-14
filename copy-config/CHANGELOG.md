@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.2.3...@wireapp/copy-config@0.2.4) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/4c82a79))
+
+
+
+
+
 ## [0.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.2.2...@wireapp/copy-config@0.2.3) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/copy-config

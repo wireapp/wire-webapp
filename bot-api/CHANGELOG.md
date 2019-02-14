@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.1.14...@wireapp/bot-api@3.1.15) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/4c82a79))
+
+
+
+
+
 ## [3.1.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.1.13...@wireapp/bot-api@3.1.14) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/bot-api

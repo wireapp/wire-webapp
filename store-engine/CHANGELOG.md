@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.21...@wireapp/store-engine@1.1.22) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/4c82a79))
+
+
+
+
+
 ## [1.1.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.20...@wireapp/store-engine@1.1.21) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/store-engine

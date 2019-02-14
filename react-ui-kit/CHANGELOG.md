@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.44](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.43...@wireapp/react-ui-kit@4.3.44) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/4c82a79))
+
+
+
+
+
 ## [4.3.43](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.42...@wireapp/react-ui-kit@4.3.43) (2019-02-14)
 
 

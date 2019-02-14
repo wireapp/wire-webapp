@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.61](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.60...@wireapp/priority-queue@0.2.61) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/4c82a79))
+
+
+
+
+
 ## [0.2.60](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.59...@wireapp/priority-queue@0.2.60) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/priority-queue

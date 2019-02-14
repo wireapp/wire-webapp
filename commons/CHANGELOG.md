@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.0.5...@wireapp/commons@1.0.6) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/4c82a79))
+
+
+
+
+
 ## [1.0.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.0.4...@wireapp/commons@1.0.5) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/commons

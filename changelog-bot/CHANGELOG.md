@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@2.1.5...@wireapp/changelog-bot@2.1.6) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/4c82a79))
+
+
+
+
+
 ## [2.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@2.1.4...@wireapp/changelog-bot@2.1.5) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

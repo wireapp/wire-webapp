@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@4.1.14...@wireapp/cli-client@4.1.15) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/4c82a79))
+
+
+
+
+
 ## [4.1.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@4.1.13...@wireapp/cli-client@4.1.14) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/cli-client

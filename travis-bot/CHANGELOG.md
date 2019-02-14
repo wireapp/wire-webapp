@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@3.1.14...@wireapp/travis-bot@3.1.15) (2019-02-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update style-components types ([#1523](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/1523)) ([4c82a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/4c82a79))
+
+
+
+
+
 ## [3.1.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@3.1.13...@wireapp/travis-bot@3.1.14) (2019-02-14)
 
 **Note:** Version bump only for package @wireapp/travis-bot
