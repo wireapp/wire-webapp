@@ -20,7 +20,7 @@
 import styled from 'styled-components';
 import {Input} from './';
 
-const InputSubmitCombo = styled<React.HTMLAttributes<HTMLDivElement>>(Input.withComponent('div'))`
+const InputSubmitCombo = styled(Input.withComponent('div'))<React.HTMLAttributes<HTMLDivElement>>`
   display: flex;
   align-items: center;
   justify-content: space-between;
