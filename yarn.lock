@@ -1249,10 +1249,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-intl@2.3.16":
-  version "2.3.16"
-  resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.16.tgz#d89c4ff754e8299865a3d15c33d38db859222eb2"
-  integrity sha512-9clR/whM7h5Lq7P6zgMuAERCY5T8z2o8i2soAc5itbVcPT/ir/dvZgZ91XLmTYG8lw6LGz9NVJoOURYZSjdAmA==
+"@types/react-intl@2.3.17":
+  version "2.3.17"
+  resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.17.tgz#e1fc6e46e8af58bdef9531259d509380a8a99e8e"
+  integrity sha512-FGd6J1GQ7zvl1GZ3BBev83B7nfak8dqoR2PZ+l5MoisKMpd4xOLhZJC1ugpmk3Rz5F85t6HbOg9mYqXW97BsNA==
 
 "@types/react-redux@7.0.1":
   version "7.0.1"
