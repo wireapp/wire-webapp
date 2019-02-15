@@ -22,7 +22,10 @@ import {resolve, graph} from '../../api/testResolver';
 
 describe('MediaDevicesHandler', () => {
   const screens = [{id: 'screen1', name: 'Screen 1'}, {id: 'screen2', name: 'Screen 2'}];
-  const cameras = [{deviceId: 'camera1', label: 'Camera 1'}, {deviceId: 'camera2', label: 'Camera 2'}];
+  const cameras = [
+    {deviceId: 'camera1', kind: z.media.MediaDeviceType.VIDEO_INPUT, label: 'Camera 1'},
+    {deviceId: 'camera2', kind: z.media.MediaDeviceType.VIDEO_INPUT, label: 'Camera 2'},
+  ];
   let devicesHandler;
 
   beforeEach(() => {
@@ -31,10 +34,7 @@ describe('MediaDevicesHandler', () => {
       devicesHandler.availableDevices.screenInput(screens);
       return Promise.resolve();
     });
-    spyOn(devicesHandler, 'getMediaDevices').and.callFake(() => {
-      devicesHandler.availableDevices.videoInput(cameras);
-      return Promise.resolve();
-    });
+    spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(Promise.resolve(cameras));
   });
 
   describe('toggleNextScreen', () => {
