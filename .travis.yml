@@ -19,6 +19,8 @@ node_js:
 
 # http://docs.travis-ci.com/user/gui-and-headless-browsers/
 before_install:
+  - echo $TRAVIS_PULL_REQUEST
+  - echo $TRAVIS_EVENT_TYPE
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
