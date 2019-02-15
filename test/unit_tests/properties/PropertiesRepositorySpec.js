@@ -17,15 +17,14 @@
  *
  */
 
-import resolveDependency from '../../api/testResolver';
+import {resolve, graph} from './../../api/testResolver';
 import PropertiesRepository from 'src/script/properties/PropertiesRepository';
-import PropertiesService from 'src/script/properties/PropertiesService';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
 
   beforeEach(() => {
-    const propertiesService = resolveDependency(PropertiesService);
+    const propertiesService = resolve(graph.PropertiesService);
     propertiesRepository = new PropertiesRepository(propertiesService);
   });
 

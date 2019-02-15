@@ -23,7 +23,6 @@ import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
-import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
 import {t} from 'utils/LocalizerUtil';
 /* eslint-disable no-unused-vars */
@@ -31,6 +30,7 @@ import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';
 import validationError from '../auth/ValidationError';
 /* eslint-enable no-unused-vars */
+import {resolve as resolveDependency, graph} from '../config/appResolver';
 
 // @formatter:off
 class AuthViewModel {
@@ -73,12 +73,11 @@ class AuthViewModel {
     this.client_service = new z.client.ClientService(backendClient, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.selfService = new z.self.SelfService(backendClient);
-    this.user_service = new UserService(backendClient);
+    this.selfService = resolveDependency(graph.SelfService);
     this.user_repository = new UserRepository(
-      this.user_service,
+      resolveDependency(graph.UserService),
       this.asset_service,
-      new z.self.SelfService(backendClient),
+      this.selfService,
       this.client_repository,
       new z.time.ServerTimeRepository()
     );

@@ -18,20 +18,13 @@
  */
 
 import platform from 'platform';
-import AssetService from '../assets/AssetService';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
-import StorageService from '../storage/StorageService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
-import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
 
-import AssetUploader from '../assets/AssetUploader';
-import CacheRepository from '../cache/CacheRepository';
 import BackendClient from '../service/BackendClient';
-import BackupService from '../backup/BackupService';
-import GiphyRepository from '../extension/GiphyRepository';
 
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
@@ -50,7 +43,7 @@ import auth from './auth';
 import {getWebsiteUrl} from '../externalRoute';
 /* eslint-enable no-unused-vars */
 
-import resolveDependency from '../config/appResolver';
+import {resolve, graph} from '../config/appResolver';
 
 class App {
   static get CONFIG() {
@@ -117,9 +110,8 @@ class App {
 
     repositories.audio = authComponent.audio;
     repositories.auth = authComponent.repository;
-    repositories.giphy = resolveDependency(GiphyRepository);
-    repositories.permission = new z.permission.PermissionRepository();
-    repositories.properties = new PropertiesRepository(this.service.properties, this.service.self);
+    repositories.giphy = resolve(graph.GiphyRepository);
+    repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
     repositories.serverTime = new z.time.ServerTimeRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -128,11 +120,11 @@ class App {
       repositories.storage
     );
     repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
-    repositories.media = new z.media.MediaRepository(repositories.permission);
+    repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
-      this.service.user,
+      resolve(graph.UserService),
       this.service.asset,
-      this.service.self,
+      resolve(graph.SelfService),
       repositories.client,
       repositories.serverTime,
       repositories.properties
@@ -167,7 +159,7 @@ class App {
       repositories.team,
       repositories.user,
       repositories.properties,
-      resolveDependency(AssetUploader)
+      resolve(graph.AssetUploader)
     );
 
     const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
@@ -188,7 +180,7 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new z.backup.BackupRepository(
-      resolveDependency(BackupService),
+      resolve(graph.BackupService),
       repositories.client,
       repositories.connection,
       repositories.conversation,
@@ -218,7 +210,7 @@ class App {
     repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
       repositories.conversation,
-      repositories.permission,
+      resolve(graph.PermissionRepository),
       repositories.user
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
@@ -233,13 +225,13 @@ class App {
    * @returns {Object} All services
    */
   _setupServices(authComponent) {
-    const storageService = resolveDependency(StorageService);
+    const storageService = resolve(graph.StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
     return {
-      asset: resolveDependency(AssetService),
+      asset: resolve(graph.AssetService),
       auth: authComponent.service,
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       calling: new z.calling.CallingService(this.backendClient),
@@ -258,10 +250,8 @@ class App {
       notification: new z.event.NotificationService(this.backendClient, storageService),
       properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
-      self: new z.self.SelfService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
-      user: new UserService(this.backendClient, storageService),
       webSocket: new z.event.WebSocketService(this.backendClient),
     };
   }
@@ -714,7 +704,7 @@ class App {
         });
 
         const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        resolveDependency(CacheRepository).clearCache(keepConversationInput, keysToKeep);
+        resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
       // Clear IndexedDB
