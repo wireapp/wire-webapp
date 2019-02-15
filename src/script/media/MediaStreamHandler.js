@@ -88,7 +88,7 @@ export default class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();
