@@ -207,6 +207,7 @@ class App {
       repositories.conversation,
       repositories.team
     );
+    repositories.permission = resolve(graph.PermissionRepository);
     repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
       repositories.conversation,

@@ -17,6 +17,8 @@
  *
  */
 
+import MediaStreamHandler from '../../media/MediaStreamHandler';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
@@ -545,7 +547,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       videoTracks: mediaStream.getVideoTracks(),
     });
 
-    const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
+    const mediaType = MediaStreamHandler.detectMediaStreamType(mediaStream);
     const isTypeAudio = mediaType === z.media.MediaType.AUDIO;
     if (isTypeAudio) {
       mediaStream = this.audio.wrapAudioOutputStream(mediaStream);
@@ -1340,8 +1342,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _addMediaStream(mediaStream) {
     if (mediaStream) {
-      const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
-      const containsAudio = z.media.MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_AUDIO.includes(mediaType);
+      const mediaType = MediaStreamHandler.detectMediaStreamType(mediaStream);
+      const containsAudio = MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_AUDIO.includes(mediaType);
       if (containsAudio) {
         mediaStream = this.audio.wrapAudioInputStream(mediaStream);
       }
@@ -1447,7 +1449,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const supportsRemoveStream = typeof this.peerConnection.removeStream === 'function';
       if (!isSignalingStateClosed && supportsRemoveStream) {
         this.peerConnection.removeStream(mediaStream);
-        const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
+        const mediaType = MediaStreamHandler.detectMediaStreamType(mediaStream);
         this.callLogger.debug(`Removed local '${mediaType}' MediaStream from PeerConnection`, {
           audioTracks: mediaStream.getAudioTracks(),
           stream: mediaStream,
