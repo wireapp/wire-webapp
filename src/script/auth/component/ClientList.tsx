@@ -80,29 +80,36 @@ class ClientList extends React.Component<CombinedProps, State> {
   };
 
   removeClient = (clientId: string, password?: string) => {
-    this.setState({showLoading: true, loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner.bind(this), 1000)});
+    this.setState({showLoading: true});
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
       .then(() => {
         const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
         return this.props.doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
       })
+      .then(() =>
+        this.setState({
+          loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner, 1000),
+          showLoading: true,
+        })
+      )
       .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
           this.props.history.push(ROUTE.HISTORY_INFO);
         } else {
+          this.resetLoadingSpinner();
           logger.error(error);
         }
       });
   };
 
-  resetLoadingSpinner() {
+  resetLoadingSpinner = () => {
     if (this.state.loadingTimeoutId) {
       window.clearTimeout(this.state.loadingTimeoutId);
     }
     this.setState({showLoading: false, loadingTimeoutId: undefined});
-  }
+  };
 
   isSelectedClient = (clientId: string) => clientId === this.state.currentlySelectedClient;
 
