@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -78,7 +80,7 @@ z.event.EventRepository = class EventRepository {
     this.cryptographyRepository = cryptographyRepository;
     this.serverTimeRepository = serverTimeRepository;
     this.userRepository = userRepository;
-    this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
     this.currentClient = undefined;
 

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t, Declension} from 'utils/LocalizerUtil';
 import SanitizationUtil from 'utils/SanitizationUtil';
 
@@ -63,7 +65,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.permissionRepository = permissionRepository;
     this.userRepository = userRepository;
 
-    this.logger = new z.util.Logger('z.notification.NotificationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.notification.NotificationRepository', z.config.LOGGER.OPTIONS);
 
     this.notifications = [];
 

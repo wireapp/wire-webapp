@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 window.z.event.preprocessor = z.event.preprocessor || {};
@@ -33,7 +35,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
     this.messageHasher = messageHasher;
-    this.logger = new z.util.Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   /**

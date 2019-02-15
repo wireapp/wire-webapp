@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
@@ -45,7 +47,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   constructor(cryptographyService, storageRepository) {
     this.cryptographyService = cryptographyService;
     this.storageRepository = storageRepository;
-    this.logger = new z.util.Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
 
     this.cryptographyMapper = new CryptographyMapper();
 

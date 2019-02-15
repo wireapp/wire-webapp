@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -32,7 +34,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
-    this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
     this.panelViewModel = mainViewModel.panel;
 

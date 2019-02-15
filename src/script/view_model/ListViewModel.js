@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -62,7 +64,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
-    this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);

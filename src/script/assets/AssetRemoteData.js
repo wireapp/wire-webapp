@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 class AssetRemoteData {
   /**
    * Use either AssetRemoteData.v2 or AssetRemoteData.v3 to initialize.
@@ -35,7 +37,7 @@ class AssetRemoteData {
 
     this.loadPromise = undefined;
 
-    this.logger = new z.util.Logger('AssetRemoteData', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('AssetRemoteData', z.config.LOGGER.OPTIONS);
   }
 
   generateUrl() {

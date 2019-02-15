@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -29,7 +31,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
   }
 
   acceptConnectionRequest(userEntity, showConversation) {

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
@@ -44,7 +46,7 @@ class Conversation {
   constructor(conversation_id = '') {
     this.id = conversation_id;
 
-    this.logger = new z.util.Logger(`Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new Logger(`Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
 
     this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
     this.accessCode = ko.observable();

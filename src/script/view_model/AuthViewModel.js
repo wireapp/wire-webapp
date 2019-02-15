@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import Cookies from 'js-cookie';
 
 import App from '../main/app';
@@ -53,7 +55,7 @@ class AuthViewModel {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
     this.elementId = 'auth-page';
-    this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
     this.authRepository = authComponent.repository;
     this.audio_repository = authComponent.audio;

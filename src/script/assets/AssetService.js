@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 // AssetService for all asset handling and the calls to the backend REST API.
 export default class AssetService {
   /**
@@ -25,7 +27,7 @@ export default class AssetService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('AssetService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('AssetService', z.config.LOGGER.OPTIONS);
   }
 
   /**

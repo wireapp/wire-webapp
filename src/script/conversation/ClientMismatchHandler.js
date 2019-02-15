@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -28,7 +30,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.serverTimeRepository = serverTimeRepository;
     this.userRepository = userRepository;
 
-    this.logger = new z.util.Logger('z.conversation.ClientMismatchHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.conversation.ClientMismatchHandler', z.config.LOGGER.OPTIONS);
   }
 
   /**

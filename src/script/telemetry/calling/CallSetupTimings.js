@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
@@ -27,7 +29,7 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
     this.log = this.log.bind(this);
     this.call_id = call_id;
 
-    this.logger = new z.util.Logger('z.telemetry.calling.CallSetupTimings', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.telemetry.calling.CallSetupTimings', z.config.LOGGER.OPTIONS);
 
     this.is_answer = false;
     this.flowId = undefined;

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -39,7 +41,7 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
     this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
 
-    this.logger = new z.util.Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
 
     this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;

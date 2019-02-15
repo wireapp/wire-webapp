@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
@@ -52,7 +54,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.changeAccentColor = this.changeAccentColor.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
 
-    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;

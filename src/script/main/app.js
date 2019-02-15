@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import platform from 'platform';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
@@ -73,7 +75,7 @@ class App {
    */
   constructor(authComponent) {
     this.backendClient = authComponent.backendClient;
-    this.logger = new z.util.Logger('z.main.App', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
     this.telemetry = new AppInitTelemetry();
     this.windowHandler = new z.ui.WindowHandler().init();

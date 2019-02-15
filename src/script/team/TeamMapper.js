@@ -17,11 +17,13 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {roleFromTeamPermissions} from './../user/UserPermission';
 
 export default class TeamMapper {
   constructor() {
-    this.logger = new z.util.Logger('TeamMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
   mapTeamFromObject(data) {

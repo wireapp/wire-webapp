@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -43,7 +45,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
-    this.logger = new z.util.Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
 
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
