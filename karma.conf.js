@@ -176,9 +176,9 @@ module.exports = function(config) {
       dir: path.resolve('docs/coverage/'),
       fixWebpackSourcePaths: true,
       'report-config': {
-        html: {outdir: 'html'},
+        html: {subdir: 'html'},
       },
-      reports: ['html', 'text-summary'],
+      reports: ['html', 'lcovonly'],
       thresholds: {
         emitWarning: false,
         global: {
