@@ -118,7 +118,9 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
       }
 
-      return this.messageHasher.validateHash(quotedMessage, quote.quotedMessageSha256.buffer).then(isValid => {
+      const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
+
+      return this.messageHasher.validateHash(quotedMessage, quotedMessageHash).then(isValid => {
         let quoteData;
 
         if (!isValid) {
