@@ -20,6 +20,7 @@
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
+import User from '../../entity/User';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -247,7 +248,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnOther(participantEntity, event) {
-    const isUser = participantEntity instanceof z.entity.User;
+    const isUser = participantEntity instanceof User;
     if (isUser && participantEntity.isOutgoingRequest()) {
       return this.clickOnContact(participantEntity);
     }

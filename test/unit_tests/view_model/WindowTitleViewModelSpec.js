@@ -21,6 +21,7 @@ import ko from 'knockout';
 
 import 'src/script/localization/Localizer';
 import {t} from 'utils/LocalizerUtil';
+import User from 'src/script/entity/User';
 
 import WindowTitleViewModel from 'src/script/view_model/WindowTitleViewModel';
 
@@ -80,7 +81,7 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.add_message(message);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(z.conversation.ConversationType.GROUP);
-      conversationEntity.selfUser(new z.entity.User(z.util.createRandomUuid()));
+      conversationEntity.selfUser(new User(z.util.createRandomUuid()));
 
       title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
       title_view_model.conversationRepository.active_conversation(conversationEntity);
@@ -92,7 +93,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('does not change the title if muted conversations receive messages', () => {
-      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const selfUserEntity = new User(z.util.createRandomUuid());
       selfUserEntity.inTeam(true);
 
       const selected_conversation = new z.entity.Conversation(z.util.createRandomUuid());
@@ -207,9 +208,9 @@ describe('WindowTitleViewModel', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
       title_view_model.userRepository.connect_requests = ko.observableArray([]);
 
-      const firstConnectedUser = new z.entity.User(z.util.createRandomUuid());
-      const secondConnectedUser = new z.entity.User(z.util.createRandomUuid());
-      const thirdConnectedUser = new z.entity.User(z.util.createRandomUuid());
+      const firstConnectedUser = new User(z.util.createRandomUuid());
+      const secondConnectedUser = new User(z.util.createRandomUuid());
+      const thirdConnectedUser = new User(z.util.createRandomUuid());
 
       const tests = [
         {
@@ -245,7 +246,7 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.add_message(contentMessage);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(z.conversation.ConversationType.GROUP);
-      conversationEntity.selfUser(new z.entity.User(z.util.createRandomUuid()));
+      conversationEntity.selfUser(new User(z.util.createRandomUuid()));
 
       amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
         expect(badgeCount).toBe(1);

@@ -511,7 +511,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {boolean} shouldObfuscateSender - Sender visible in notification
-   * @param {z.entity.User} userEntity - Sender of message
+   * @param {User} userEntity - Sender of message
    * @returns {Promise} Resolves with the icon URL
    */
   _createOptionsIcon(shouldObfuscateSender, userEntity) {

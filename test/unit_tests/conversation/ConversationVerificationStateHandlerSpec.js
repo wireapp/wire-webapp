@@ -47,8 +47,11 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       conversation_b = new Conversation(z.util.createRandomUuid());
       conversation_c = new Conversation(z.util.createRandomUuid());
 
-      selfUserEntity = conversation_repository.selfUser();
+      selfUserEntity = new User(z.util.createRandomUuid());
+      selfUserEntity.is_me = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
+
+      spyOn(conversation_repository, 'selfUser').and.returnValue(selfUserEntity);
 
       user_a = new User(z.util.createRandomUuid());
       user_b = new User(z.util.createRandomUuid());
@@ -149,7 +152,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(z.conversation.EventBuilder.buildDegraded.calls.count()).toEqual(3);
+      expect(z.conversation.EventBuilder.buildDegraded).toHaveBeenCalledTimes(3);
       expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
       selfUserEntity.devices.remove(new_client);
@@ -158,7 +161,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(z.conversation.EventBuilder.buildAllVerified.calls.count()).toEqual(3);
+      expect(z.conversation.EventBuilder.buildAllVerified).toHaveBeenCalledTimes(3);
       expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(verifiedEvent);
     });
   });

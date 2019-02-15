@@ -19,72 +19,70 @@
       <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
     </div>
 
-    <div class="panel__content">
-      <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
-        <!-- ko if: showDevicesFound() -->
-          <div class="participant-devices__header">
-            <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText"></div>
-            <a class="participant-devices__link" data-bind="attr: {href: privacyWhyUrl}, text: t('participantDevicesWhyVerify')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
-          </div>
+    <div class="panel__content" data-bind="fadingscrollbar">
+      <!-- ko if: showDevicesFound() -->
+        <div class="participant-devices__header">
+          <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText"></div>
+          <a class="participant-devices__link" data-bind="attr: {href: privacyWhyUrl}, text: t('participantDevicesWhyVerify')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+        </div>
 
-          <div class="participant-devices__device-list" data-bind="foreach: clientEntities()">
-            <div class="participant-devices__device-item" data-bind="click: $parent.clickOnDevice" data-uie-name="item-device">
-              <!-- ko if: meta.isVerified()-->
-                <verified-icon data-uie-name="user-device-verified"></verified-icon>
-              <!-- /ko -->
-              <!-- ko ifnot: meta.isVerified()-->
-                <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
-              <!-- /ko -->
-              <device-card params="device: $data, click: $parent.clickOnDevice"></device-card>
-            </div>
-          </div>
-        <!-- /ko -->
-
-        <!-- ko if: showDevicesNotFound() -->
-          <div class="participant-devices__header">
-            <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
-            <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: window.wire.env.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
-          </div>
-        <!-- /ko -->
-
-        <!-- ko if: showDeviceDetails() -->
-          <div class="participant-devices__header">
-            <div class="participant-devices__link participant-devices__show-self-fingerprint text-theme" data-bind="click: clickToShowSelfFingerprint, text: t('participantDevicesDetailShowMyDevice')"></div>
-            <div data-bind="foreach: detailMessage"><span class="participant-devices__text-block panel__info-text" data-bind="css: {'participant-devices__text-block--highlight': $data.isStyled}, text: $data.text"></span></div>
-            <a class="participant-devices__link" data-bind="attr: {href: privacyHowUrl}, text: t('participantDevicesDetailHowTo')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
-
-          <device-card class="participant-devices__single-client" params="device: selectedClient()"></device-card>
-          <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintRemote()" data-uie-name="status-fingerprint">
-            <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
-          </div>
-
-          <div class="participant-devices__verify">
-            <div class="slider" data-uie-name="do-toggle-verified">
-              <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selectedClient().meta.isVerified">
-              <label class="button-label" for="toggle" data-bind="click: clickToToggleDeviceVerification, text: t('participantDevicesDetailVerify')"></label>
-            </div>
-            <div class="participant-devices__actions">
-              <loading-icon class="svg-accent-color" data-bind="style: {display : isResettingSession() ? 'initial' : 'none'}" data-uie-name="status-loading"></loading-icon>
-              <span class="button-label text-theme ellipsis"
-                    data-bind="click: clickToResetSession, style: {display: isResettingSession() ? 'none' : 'initial'}, text: t('participantDevicesDetailResetSession')"
-                    data-uie-name="do-reset-session"></span>
-            </div>
+        <div class="participant-devices__device-list" data-bind="foreach: clientEntities()">
+          <div class="participant-devices__device-item" data-bind="click: $parent.clickOnDevice" data-uie-name="item-device">
+            <!-- ko if: meta.isVerified()-->
+              <verified-icon data-uie-name="user-device-verified"></verified-icon>
+            <!-- /ko -->
+            <!-- ko ifnot: meta.isVerified()-->
+              <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
+            <!-- /ko -->
+            <device-card params="device: $data, click: $parent.clickOnDevice"></device-card>
           </div>
         </div>
-        <!-- /ko -->
+      <!-- /ko -->
 
-        <!-- ko if: showSelfFingerprint()-->
-          <div class="participant-devices__header">
-            <device-card params="device: selfClient()"></device-card>
-            <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintLocal()">
-              <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
-            </div>
-            <div>
-              <span class="participant-devices__link text-theme" data-bind="click: clickOnShowSelfDevices, text: t('participantDevicesSelfAllDevices')"></span>
-            </div>
+      <!-- ko if: showDevicesNotFound() -->
+        <div class="participant-devices__header">
+          <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
+          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: window.wire.env.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: showDeviceDetails() -->
+        <div class="participant-devices__header">
+          <div class="participant-devices__link participant-devices__show-self-fingerprint text-theme" data-bind="click: clickToShowSelfFingerprint, text: t('participantDevicesDetailShowMyDevice')"></div>
+          <div data-bind="foreach: detailMessage"><span class="participant-devices__text-block panel__info-text" data-bind="css: {'participant-devices__text-block--highlight': $data.isStyled}, text: $data.text"></span></div>
+          <a class="participant-devices__link" data-bind="attr: {href: privacyHowUrl}, text: t('participantDevicesDetailHowTo')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+
+        <device-card class="participant-devices__single-client" params="device: selectedClient()"></device-card>
+        <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintRemote()" data-uie-name="status-fingerprint">
+          <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
+        </div>
+
+        <div class="participant-devices__verify">
+          <div class="slider" data-uie-name="do-toggle-verified">
+            <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selectedClient().meta.isVerified">
+            <label class="button-label" for="toggle" data-bind="click: clickToToggleDeviceVerification, text: t('participantDevicesDetailVerify')"></label>
           </div>
-        <!-- /ko -->
+          <div class="participant-devices__actions">
+            <loading-icon class="svg-accent-color" data-bind="style: {display : isResettingSession() ? 'initial' : 'none'}" data-uie-name="status-loading"></loading-icon>
+            <span class="button-label text-theme ellipsis"
+                  data-bind="click: clickToResetSession, style: {display: isResettingSession() ? 'none' : 'initial'}, text: t('participantDevicesDetailResetSession')"
+                  data-uie-name="do-reset-session"></span>
+          </div>
+        </div>
       </div>
+      <!-- /ko -->
+
+      <!-- ko if: showSelfFingerprint()-->
+        <div class="participant-devices__header">
+          <device-card params="device: selfClient()"></device-card>
+          <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintLocal()">
+            <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
+          </div>
+          <div>
+            <span class="participant-devices__link text-theme" data-bind="click: clickOnShowSelfDevices, text: t('participantDevicesSelfAllDevices')"></span>
+          </div>
+        </div>
+      <!-- /ko -->
     </div>
   <!-- /ko -->
 </div>

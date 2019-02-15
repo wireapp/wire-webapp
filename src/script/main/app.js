@@ -492,8 +492,8 @@ class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {z.entity.User} userEntity - Self user entity
-   * @returns {z.entity.User} Checked user entity
+   * @param {User} userEntity - Self user entity
+   * @returns {User} Checked user entity
    */
   _checkUserInformation(userEntity) {
     if (userEntity.hasActivatedIdentity()) {
@@ -510,7 +510,7 @@ class App {
 
   /**
    * Initiate the self user by getting it from the backend.
-   * @returns {Promise<z.entity.User>} Resolves with the self user entity
+   * @returns {Promise<User>} Resolves with the self user entity
    */
   _initiateSelfUser() {
     return this.repository.user.getSelf().then(userEntity => {

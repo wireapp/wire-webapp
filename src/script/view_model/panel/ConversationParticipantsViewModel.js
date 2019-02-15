@@ -39,10 +39,6 @@ export default class ConversationParticipantsViewModel extends BasePanelViewMode
     this.highlightedUsers = ko.observable([]);
 
     this.searchInput = ko.observable('');
-
-    this.shouldUpdateScrollbar = ko
-      .computed(() => (this.participants() || this.searchInput()) && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
   }
 
   getElementId() {

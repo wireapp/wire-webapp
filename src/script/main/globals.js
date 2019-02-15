@@ -329,7 +329,6 @@ import PingMessageGlobal from '../entity/message/PingMessage.js';
 import CallMessageGlobal from '../entity/message/CallMessage.js';
 import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
 import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
-import UserGlobal from '../entity/User.js';
 import ConversationGlobal from '../entity/Conversation.js';
 import AvailabilityContextMenuGlobal from '../ui/AvailabilityContextMenu.js';
 import ContextMenuGlobal from '../ui/ContextMenu.js';

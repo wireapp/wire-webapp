@@ -463,7 +463,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Triggered when user clicks on an avatar in the message list.
-   * @param {z.entity.User} userEntity - User entity of the selected user
+   * @param {User} userEntity - User entity of the selected user
    * @returns {undefined} No return value
    */
   showUserDetails(userEntity) {

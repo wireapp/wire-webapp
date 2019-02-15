@@ -51,10 +51,6 @@ export default class GroupParticipantServiceViewModel extends BasePanelViewModel
     this.showActions = ko.pureComputed(() => {
       return this.selfIsActiveParticipant() && this.selectedInConversation() && this.conversationInTeam();
     });
-
-    this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedService() && this.selectedService().providerName() && this.isVisible())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   getElementId() {

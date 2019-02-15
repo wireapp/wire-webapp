@@ -78,7 +78,7 @@ class ParticipantAvatar {
     this.timerOffset = ko.pureComputed(() => {
       if (this.isTemporaryGuest()) {
         const remainingTime = this.participant().expirationRemaining();
-        const normalizedRemainingTime = remainingTime / z.entity.User.CONFIG.TEMPORARY_GUEST.LIFETIME;
+        const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
         return this.timerLength * (normalizedRemainingTime - 1);
       }
       return 0;

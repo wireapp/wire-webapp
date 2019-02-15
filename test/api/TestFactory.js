@@ -22,6 +22,7 @@
 import ko from 'knockout';
 
 import {resolve, graph, backendConfig} from './testResolver';
+import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 
 window.testConfig = {
@@ -160,7 +161,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
         id: '60aee26b7f55a99f',
       });
 
-      const user = new z.entity.User(entities.user.john_doe.id);
+      const user = new User(entities.user.john_doe.id);
       user.devices.push(clientEntity);
       user.email(entities.user.john_doe.email);
       user.is_me = true;
