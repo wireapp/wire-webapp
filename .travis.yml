@@ -31,6 +31,9 @@ cache:
 before_script:
   - npm rebuild node-sass
 
+after_script:
+  - "cat ./docs/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+
 notifications:
   email: false
 
