@@ -28,11 +28,9 @@ export default class SelfService {
    * Construct a new Self Service.
    * @class SelfService
    * @param {BackendClient} backendClient - Client for the API calls
-   * @param {Logger} logger - Logger configured for this class
    */
-  constructor(backendClient, logger) {
+  constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = logger;
   }
 
   /**

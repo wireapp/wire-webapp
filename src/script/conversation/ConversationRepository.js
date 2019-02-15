@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import poster from 'poster-image';
 
+import PromiseQueue from 'utils/PromiseQueue';
 import EventMapper from './EventMapper';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
@@ -159,8 +160,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this.filtered_conversations().sort(z.util.sortGroupsByLastEvent);
     });
 
-    this.receiving_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Receiving'});
-    this.sending_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
+    this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
+    this.sending_queue = new PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     this.conversation_service.backendClient.queueState.subscribe(queueState => {

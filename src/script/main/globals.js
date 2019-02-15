@@ -26,7 +26,6 @@ import htmlGlobal from '../util/linkify-html.js';
 import MessageComparatorGlobal from '../util/MessageComparator.js';
 import NumberUtilGlobal from '../util/NumberUtil.js';
 import PeerConnectionUtilGlobal from '../util/PeerConnectionUtil.js';
-import PromiseQueueGlobal from '../util/PromiseQueue.js';
 import helpersGlobal from '../util/scroll-helpers.js';
 import StorageUtilGlobal from '../util/StorageUtil.js';
 import StringUtilGlobal from '../util/StringUtil.js';
