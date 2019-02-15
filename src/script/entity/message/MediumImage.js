@@ -36,6 +36,7 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
 
     // z.assets.AssetRemoteData
     this.resource = ko.observable();
+    this.logger = new z.util.Logger('z.entity.MediumImage', z.config.LOGGER.OPTIONS);
   }
 
   /**
