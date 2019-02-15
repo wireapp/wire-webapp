@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.broadcast = z.broadcast || {};
 
@@ -34,7 +36,7 @@ z.broadcast.BroadcastService = class BroadcastService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.broadcast.BroadcastService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.broadcast.BroadcastService', z.config.LOGGER.OPTIONS);
   }
 
   /**

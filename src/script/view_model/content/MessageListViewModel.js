@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
@@ -57,7 +59,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.integrationRepository = repositories.integration;
     this.locationRepository = repositories.location;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;

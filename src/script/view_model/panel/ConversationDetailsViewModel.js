@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 /* eslint-disable no-unused-vars */
 import receiptModeToggle from 'components/receiptModeToggle';
 /* eslint-enable no-unused-vars */
@@ -50,7 +52,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;

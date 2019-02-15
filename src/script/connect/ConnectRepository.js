@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.connect = z.connect || {};
 
@@ -24,7 +26,7 @@ z.connect.ConnectRepository = class ConnectRepository {
   constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
     this.propertiesRepository = propertiesRepository;
-    this.logger = new z.util.Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
   }
 
   /**

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 export default class CryptographyMapper {
   static get CONFIG() {
     return {
@@ -26,7 +28,7 @@ export default class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**

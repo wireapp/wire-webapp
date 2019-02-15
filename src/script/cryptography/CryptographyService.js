@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
@@ -34,7 +36,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
   }
 
   /**

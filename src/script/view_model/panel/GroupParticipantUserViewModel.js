@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 
@@ -33,7 +35,7 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = new z.util.Logger('GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
 
     this.selectedParticipant = ko.observable(undefined);
 

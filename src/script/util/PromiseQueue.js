@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
@@ -41,7 +43,7 @@ z.util.PromiseQueue = class PromiseQueue {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
     const loggerName = `z.util.PromiseQueue${name ? ` (${name})` : ''}`;
-    this.logger = new z.util.Logger(loggerName, z.config.LOGGER.OPTIONS);
+    this.logger = new Logger(loggerName, z.config.LOGGER.OPTIONS);
 
     this._blocked = false;
     this._concurrent = concurrent;

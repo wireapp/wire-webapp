@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import AppInitStatisticsValue from './AppInitStatisticsValue';
 
 export default class AppInitStatistics {
@@ -28,7 +30,7 @@ export default class AppInitStatistics {
   }
 
   constructor() {
-    this.logger = new z.util.Logger('AppInitStatistics', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('AppInitStatistics', z.config.LOGGER.OPTIONS);
 
     amplify.subscribe(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }

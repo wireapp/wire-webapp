@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.connect = z.connect || {};
 
@@ -27,7 +29,7 @@ z.connect.ConnectService = class ConnectService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
   }
 
   /**

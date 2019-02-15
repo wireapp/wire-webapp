@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import JSZip from 'jszip';
 
 import {t} from 'utils/LocalizerUtil';
@@ -37,7 +39,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.backupRepository = repositories.backup;
 
-    this.logger = new z.util.Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
 
     this.error = ko.observable(null);
     this.errorHeadline = ko.observable('');

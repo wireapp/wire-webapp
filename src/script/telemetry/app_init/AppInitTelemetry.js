@@ -17,11 +17,13 @@
  *
  */
 import AppInitStatistics from './AppInitStatistics';
+import Logger from 'utils/Logger';
+
 import AppInitTimings from './AppInitTimings';
 
 export default class AppInitTelemetry {
   constructor() {
-    this.logger = new z.util.Logger('AppInitTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('AppInitTelemetry', z.config.LOGGER.OPTIONS);
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }

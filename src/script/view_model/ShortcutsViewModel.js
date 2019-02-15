@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -26,7 +28,7 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
     this.onRejectCall = this.onRejectCall.bind(this);
 
     this.callingRepository = repositories.calling;
-    this.logger = new z.util.Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.joinedCall.subscribe(callEntity => this._updateShortcutSubscription(callEntity));

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -66,7 +68,7 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.elementId = 'wire-main';
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
 

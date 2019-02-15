@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import AppInitTimingsStep from './AppInitTimingsStep';
 
 export default class AppInitTimings {
@@ -29,7 +31,7 @@ export default class AppInitTimings {
   }
 
   constructor() {
-    this.logger = new z.util.Logger('AppInitTimings', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('AppInitTimings', z.config.LOGGER.OPTIONS);
     this.init = window.performance.now();
   }
 

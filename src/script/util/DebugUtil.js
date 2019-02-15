@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
@@ -37,7 +39,7 @@ export default class DebugUtil {
     this.sodium = sodium;
     this.Dexie = Dexie;
 
-    this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
 
   blockAllConnections() {

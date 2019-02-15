@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.connection = z.connection || {};
 
@@ -36,7 +38,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
-    this.logger = new z.util.Logger('z.connection.ConnectionRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.connection.ConnectionRepository', z.config.LOGGER.OPTIONS);
 
     this.connectionMapper = new z.connection.ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);

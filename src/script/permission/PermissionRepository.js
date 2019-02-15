@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 /**
  * Permission repository to check browser permissions.
  *
@@ -34,7 +36,7 @@ export default class PermissionRepository {
    * @param {z.conversation.ConversationService} conversationRepository - Repository for all conversation interactions
    */
   constructor(callingRepository, conversationRepository) {
-    this.logger = new z.util.Logger('z.permission.PermissionRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.permission.PermissionRepository', z.config.LOGGER.OPTIONS);
 
     this.permissionState = {
       [z.permission.PermissionType.CAMERA]: ko.observable(undefined),

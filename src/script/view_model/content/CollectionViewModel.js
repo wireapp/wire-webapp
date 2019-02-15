@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -36,7 +38,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
     this.collectionDetails = contentViewModel.collectionDetails;
     this.conversation_repository = repositories.conversation;
-    this.logger = new z.util.Logger('z.viewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = ko.observable();
 

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 export default class UserService {
   static get URL() {
     return {
@@ -33,7 +35,7 @@ export default class UserService {
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('UserService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('UserService', z.config.LOGGER.OPTIONS);
     this.storageService = storageService;
 
     this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;

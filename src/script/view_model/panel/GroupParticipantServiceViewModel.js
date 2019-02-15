@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
 
 export default class GroupParticipantServiceViewModel extends BasePanelViewModel {
@@ -28,7 +30,7 @@ export default class GroupParticipantServiceViewModel extends BasePanelViewModel
     this.integrationRepository = repositories.integration;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.GroupParticipantServiceViewModel', z.config.LOGGER.OPTIONS);
 
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);

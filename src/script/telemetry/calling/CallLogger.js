@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import sdpTransform from 'sdp-transform';
+import Logger from 'utils/Logger';
 
 z.telemetry.calling.CallLogger = class CallLogger {
   static get CONFIG() {
@@ -51,7 +52,7 @@ z.telemetry.calling.CallLogger = class CallLogger {
   constructor(name, id, options, messageLog) {
     name = id ? this._createName(name, id) : name;
 
-    this.logger = new z.util.Logger(name, options);
+    this.logger = new Logger(name, options);
     this.levels = this.logger.levels;
 
     this.messageLog = messageLog;

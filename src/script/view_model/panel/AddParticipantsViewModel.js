@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
@@ -39,7 +41,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.teamRepository = team;
     this.userRepository = user;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.isTeam = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;

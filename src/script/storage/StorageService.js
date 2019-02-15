@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import Dexie from 'dexie';
 
 import StorageSchemata from '../storage/StorageSchemata';
@@ -35,7 +37,7 @@ class StorageService {
   }
   // Construct an new StorageService.
   constructor() {
-    this.logger = new z.util.Logger('StorageService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('StorageService', z.config.LOGGER.OPTIONS);
 
     this.db = undefined;
     this.dbName = undefined;

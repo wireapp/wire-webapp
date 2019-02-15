@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import ReceiptMode from '../../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
 
@@ -34,7 +36,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = new z.util.Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
     this.clickOnCreate = this.clickOnCreate.bind(this);
     this.clickOnToggleGuestMode = this.clickOnToggleGuestMode.bind(this);

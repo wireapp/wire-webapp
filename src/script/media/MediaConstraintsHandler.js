@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 export default class MediaConstraintsHandler {
   static get CONFIG() {
     return {
@@ -67,7 +69,7 @@ export default class MediaConstraintsHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
   }
 
   //##############################################################################

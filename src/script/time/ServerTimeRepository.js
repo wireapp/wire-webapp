@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import ko from 'knockout';
 
 window.z = window.z || {};
@@ -24,7 +26,7 @@ window.z.time = z.time || {};
 
 z.time.ServerTimeRepository = class ServerTimeRepository {
   constructor() {
-    this.logger = new z.util.Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
     this.timeOffset = ko.observable(undefined);
   }
 

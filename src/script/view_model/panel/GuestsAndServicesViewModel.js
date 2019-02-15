@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 
@@ -39,7 +41,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
     const conversationRepository = repositories.conversation;
     this.stateHandler = conversationRepository.stateHandler;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.GuestsAndServicesViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.GuestsAndServicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import * as StorageUtil from 'utils/StorageUtil';
 
 window.z = window.z || {};
@@ -46,7 +48,7 @@ z.auth.AuthRepository = class AuthRepository {
   constructor(authService) {
     this.accessTokenRefresh = undefined;
     this.authService = authService;
-    this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
 
     this.queueState = this.authService.backendClient.queueState;
 
