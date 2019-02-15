@@ -63,7 +63,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
 
   /**
    * Creates link preview for given link. This will upload associated image as asset and will
-   * resolve with an z.proto.LinkPreview instance
+   * resolve with a LinkPreview instance
    *
    * @param {string} url - URL found to generate link preview from
    * @param {number} [offset=0] - starting index of the link
@@ -112,7 +112,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * Fetch and upload open graph images.
    *
    * @private
-   * @param {z.proto.LinkPreview} linkPreview - Link preview proto message
+   * @param {LinkPreview} linkPreview - Link preview proto message
    * @param {Object} [openGraphImage={}] - Open graph image URL
    * @returns {Promise} Resolves with the link preview proto message
    */

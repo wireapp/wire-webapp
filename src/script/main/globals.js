@@ -20,7 +20,6 @@ import EmojiUtilGlobal from '../util/EmojiUtil.js';
 import utilGlobal from '../util/util.js';
 import SanitizationUtilGlobal from '../util/SanitizationUtil.js';
 import TimeUtilGlobal from '../util/TimeUtil.js';
-import protobufGlobal from '../util/protobuf.js';
 import KeyboardUtilGlobal from '../util/KeyboardUtil.js';
 import LocalizerUtilGlobal from '../util/LocalizerUtil.js';
 import linkifyGlobal from '../util/linkify.js';

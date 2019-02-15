@@ -17,6 +17,8 @@
  *
  */
 
+import {Asset} from '@wireapp/protocol-messaging';
+
 /**
  * Constructs corresponding asset metadata depending on the given file type
  * @param {File|Blob} file - the file to generate metadata for
@@ -49,7 +51,8 @@ const buildMetadataAudio = audioFile => {
     })
     .then(audioBuffer => {
       const durationInMillis = audioBuffer.duration * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
-      return new z.proto.Asset.AudioMetaData(durationInMillis, normaliseLoudness(audioBuffer));
+      const normalizedLoudness = normaliseLoudness(audioBuffer);
+      return new Asset.AudioMetaData({durationInMillis, normalizedLoudness});
     });
 };
 
@@ -58,7 +61,7 @@ const buildMetadataImage = imageFile => {
     const url = window.URL.createObjectURL(imageFile);
     const image = new Image();
     image.onload = () => {
-      resolve(new z.proto.Asset.ImageMetaData(image.width, image.height));
+      resolve(new Asset.ImageMetaData({height: image.height, width: image.width}));
       window.URL.revokeObjectURL(url);
     };
     image.onerror = error => {
@@ -74,7 +77,13 @@ const buildMetadataVideo = videoFile => {
     const url = window.URL.createObjectURL(videoFile);
     const video = document.createElement('video');
     video.onloadedmetadata = () => {
-      resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
+      resolve(
+        new Asset.VideoMetaData({
+          durationInMillis: video.duration,
+          height: video.videoHeight,
+          width: video.videoWidth,
+        })
+      );
       window.URL.revokeObjectURL(url);
     };
     video.addEventListener(

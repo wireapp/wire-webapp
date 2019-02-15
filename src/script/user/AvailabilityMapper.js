@@ -17,6 +17,8 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -62,7 +64,7 @@ z.user.AvailabilityMapper = (() => {
     },
     protoFromType: availabilityType => {
       const typeValue = valueFromType(availabilityType).toUpperCase();
-      return z.proto.Availability.Type[typeValue];
+      return Availability.Type[typeValue];
     },
     valueFromType,
   };

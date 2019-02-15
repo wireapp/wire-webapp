@@ -47,12 +47,6 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      {
-        included: false,
-        nocache: true,
-        pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
-        served: true,
-      },
       {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
       {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
 
