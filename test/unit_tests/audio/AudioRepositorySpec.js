@@ -17,11 +17,10 @@
  *
  */
 
-import resolveDependency from '../../api/testResolver';
-import AudioRepository from 'src/script/audio/AudioRepository';
+import {resolve, graph} from './../../api/testResolver';
 
 describe('AudioRepository', () => {
-  const audioRepository = resolveDependency(AudioRepository);
+  const audioRepository = resolve(graph.AudioRepository);
   audioRepository.init(true);
 
   describe('_checkSoundSetting', () => {

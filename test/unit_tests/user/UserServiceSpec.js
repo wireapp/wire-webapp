@@ -17,19 +17,16 @@
  *
  */
 
-import resolveDependency, {backendConfig} from '../../api/testResolver';
-import UserService from 'src/script/user/UserService';
-import BackendClient from 'src/script/service/BackendClient';
+import {resolve, graph, backendConfig} from './../../api/testResolver';
 
-describe('User Service', () => {
+describe('UserService', () => {
   let server = null;
   let userService = null;
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    const backendClient = resolveDependency(BackendClient);
-    userService = new UserService(backendClient);
+    userService = resolve(graph.UserService);
   });
 
   afterEach(() => server.restore());

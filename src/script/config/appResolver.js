@@ -18,8 +18,10 @@
  */
 
 import resolver from 'utils/dependenciesResolver';
-import graph from './dependenciesGraph';
+import * as graph from './dependenciesGraph';
 
-resolver.init(graph);
+resolver.init(graph.dependencies);
 
-export default resolver.resolve;
+const resolve = resolver.resolve;
+
+export {resolve, graph};

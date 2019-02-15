@@ -17,15 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.permission = z.permission || {};
-
 /**
  * Permission repository to check browser permissions.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
  */
-z.permission.PermissionRepository = class PermissionRepository {
+export default class PermissionRepository {
   static get CONFIG() {
     return {
       MEDIA_TYPES: [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE],
@@ -89,4 +86,4 @@ z.permission.PermissionRepository = class PermissionRepository {
 
     return Promise.all(permissionPromises);
   }
-};
+}

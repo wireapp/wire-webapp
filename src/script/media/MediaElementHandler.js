@@ -17,17 +17,14 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaElementHandler = class MediaElementHandler {
+export default class MediaElementHandler {
   /**
    * Construct an new MediaElement handler.
-   * @param {z.media.MediaRepository} mediaRepository - Repository for media interactions
+   * @param {MediaRepository} mediaRepository - Repository for media interactions
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger('z.media.MediaElementHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('MediaElementHandler', z.config.LOGGER.OPTIONS);
 
     this.currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
     this.remoteMediaElements = ko.observableArray([]);
@@ -144,4 +141,4 @@ z.media.MediaElementHandler = class MediaElementHandler {
         });
     }
   }
-};
+}

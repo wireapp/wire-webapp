@@ -17,21 +17,17 @@
  *
  */
 
-describe('z.storage.StorageRepository', () => {
-  const test_factory = new TestFactory();
+import {resolve, graph} from '../../api/testResolver';
 
-  beforeAll(() => test_factory.exposeStorageActors());
-
-  beforeEach(() => TestFactory.storage_repository.clearStores());
-
+describe('StorageRepository', () => {
   describe('save', () => {
-    it('does not save "null" values', done => {
-      TestFactory.storage_service
+    it('does not save "null" values', () => {
+      const storageService = resolve(graph.StorageService);
+      return storageService
         .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(done.fail)
+        .then(fail)
         .catch(error => {
           expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-          done();
         });
     });
   });
