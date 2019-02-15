@@ -17,6 +17,8 @@
  *
  */
 
+import PromiseQueue from 'utils/PromiseQueue';
+
 describe('PromiseQueue', () => {
   describe('push', () => {
     it('should process promises', () => {
@@ -28,7 +30,7 @@ describe('PromiseQueue', () => {
         return Promise.resolve();
       };
 
-      const queue = new z.util.PromiseQueue();
+      const queue = new PromiseQueue();
       queue.push(promiseFn);
       queue.push(promiseFn);
       return queue.push(promiseFn).then(() => {
@@ -53,7 +55,7 @@ describe('PromiseQueue', () => {
 
       spyOn(promise, 'fn').and.callThrough();
 
-      const queue = new z.util.PromiseQueue();
+      const queue = new PromiseQueue();
       queue.push(promise.fn);
 
       window.setTimeout(() => {
@@ -73,7 +75,7 @@ describe('PromiseQueue', () => {
 
       const rejectingPromise = () => Promise.reject(new Error('Unit test error'));
 
-      const queue = new z.util.PromiseQueue();
+      const queue = new PromiseQueue();
       queue.push(rejectingPromise);
       return queue.push(resolvingPromise);
     });
@@ -91,7 +93,7 @@ describe('PromiseQueue', () => {
         });
       };
 
-      const queue = new z.util.PromiseQueue({timeout: 100});
+      const queue = new PromiseQueue({timeout: 100});
       queue.push(timeout_promise);
       return queue.push(resolvingPromise);
     });
