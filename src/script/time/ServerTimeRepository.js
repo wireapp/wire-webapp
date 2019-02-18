@@ -20,9 +20,6 @@
 import Logger from 'utils/Logger';
 import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.time = z.time || {};
-
 class ServerTimeRepository {
   constructor() {
     this.logger = new Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
@@ -63,4 +60,3 @@ class ServerTimeRepository {
 }
 
 export default ServerTimeRepository;
-z.time.ServerTimeRepository = ServerTimeRepository;

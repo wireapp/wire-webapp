@@ -190,7 +190,6 @@ import PropertiesTypeGlobal from '../properties/PropertiesType.js';
 import FullTextSearchGlobal from '../search/FullTextSearch.js';
 import SearchServiceGlobal from '../search/SearchService.js';
 import SearchRepositoryGlobal from '../search/SearchRepository.js';
-import ServerTimeRepositoryGlobal from '../time/ServerTimeRepository.js';
 import TeamEntityGlobal from '../team/TeamEntity.js';
 import TeamMemberEntityGlobal from '../team/TeamMemberEntity.js';
 import TeamRepositoryGlobal from '../team/TeamRepository.js';
