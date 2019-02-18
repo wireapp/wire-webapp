@@ -46,7 +46,7 @@ module.exports = function(config) {
       },
     },
     files: [
-      `${test}/config.test.js`,
+      `${test}/api/environment.js`,
       `${test}/main.test.js`,
       `${dist}/runtime.js`,
       `${dist}/dexie.js`,

@@ -49,6 +49,16 @@ Since the test suite for the app is the biggest test suite, you might want to ru
 
 where `specN` is the path to the spec to run relative to `test/unit_tests` and without `Spec.js`.
 
+#### Speed up testing for files fully migrated to the module system
+
+When a file (and all its dependencies) do not rely on **any** global dependency, then you can use the `--nolegacy` flag to run the tests on that single file.
+
+`yarn test:app --specs spec1 --nolegacy`
+
+The test should start very quickly (webpack won't have to resolve all the global dependencies).
+
+If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending, somehow, on, at least, one thing that should be on the global scope.
+
 **Example**
 
 If you want to run the tests for the `ConversationRepository`, the file containing the test is:
@@ -57,7 +67,7 @@ If you want to run the tests for the `ConversationRepository`, the file containi
 
 The command to run is:
 
-`yarn test:app --spec conversation/ConversationRepository`
+`yarn test:app --specs conversation/ConversationRepository`
 
 ### Status
 

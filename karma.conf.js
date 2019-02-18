@@ -32,6 +32,30 @@ function getSpecs(specList) {
   return ['test/unit_tests/**/*.js'];
 }
 
+/**
+ * Returns the files to load in Karma before running the tests.
+ * If the 'nolegacy' param is given, it will skip all the globals import
+ *
+ * @param {boolean} noLegacy - Prevents loading globals dependencies which slows down the load time
+ * @returns {Array} - The files to load in Karma
+ */
+function getIncludedFiles(noLegacy) {
+  const commonFiles = [
+    {
+      included: false,
+      nocache: true,
+      pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
+      served: true,
+    },
+    {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
+    {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
+    'node_modules/sinon/pkg/sinon.js',
+    'test/api/environment.js',
+    'test/api/payloads.js',
+  ];
+  return noLegacy ? commonFiles : commonFiles.concat([`${SRC_PATH}/script/main/globals.js`, 'test/api/TestFactory.js']);
+}
+
 module.exports = function(config) {
   config.set({
     basePath: './',
@@ -46,27 +70,7 @@ module.exports = function(config) {
     },
 
     // list of files / patterns to load in the browser
-    files: [
-      {
-        included: false,
-        nocache: true,
-        pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
-        served: true,
-      },
-      {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
-      {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
-
-      'node_modules/jasmine-ajax/lib/mock-ajax.js',
-      'node_modules/sinon/pkg/sinon.js',
-      'test/api/environment.js',
-      'test/api/payloads.js',
-      'test/api/SDP_payloads.js',
-      'test/config.test.js',
-      `${SRC_PATH}/script/main/globals.js`,
-      'test/api/OpenGraphMocks.js',
-      'test/js/calling/CallRequestResponseMock.js',
-      'test/api/TestFactory.js',
-    ].concat(getSpecs(config.specs)),
+    files: getIncludedFiles(config.nolegacy).concat(getSpecs(config.specs)),
 
     proxies: {
       '/audio/': '/base/audio/',
