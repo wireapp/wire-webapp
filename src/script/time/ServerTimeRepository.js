@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-class ServerTimeRepository {
+export default class ServerTimeRepository {
   constructor(logger) {
     this.logger = logger;
     this.timeOffset = ko.observable(undefined);
@@ -57,5 +57,3 @@ class ServerTimeRepository {
     return serverTimestamp + this.getTimeOffset();
   }
 }
-
-export default ServerTimeRepository;
