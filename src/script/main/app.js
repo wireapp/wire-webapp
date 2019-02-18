@@ -196,7 +196,7 @@ class App {
       repositories.user
     );
     repositories.calling = new z.calling.CallingRepository(
-      this.service.calling,
+      resolve(graph.CallingService),
       repositories.client,
       repositories.conversation,
       repositories.event,
@@ -237,7 +237,6 @@ class App {
       asset: resolve(graph.AssetService),
       auth: authComponent.service,
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
-      calling: new z.calling.CallingService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
       // Can be removed once desktop version with the following PR has been published (probably v3.5):
