@@ -49,7 +49,6 @@ function getIncludedFiles(noLegacy) {
     },
     {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
     {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
-
     'node_modules/jasmine-ajax/lib/mock-ajax.js',
     'node_modules/sinon/pkg/sinon.js',
     'test/api/environment.js',
