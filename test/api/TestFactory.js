@@ -363,10 +363,8 @@ window.TestFactory.prototype.exposeConversationActors = function() {
  */
 window.TestFactory.prototype.exposeCallingActors = function() {
   return this.exposeConversationActors().then(() => {
-    TestFactory.calling_service = new z.calling.CallingService(resolve(graph.BackendClient));
-
     TestFactory.calling_repository = new z.calling.CallingRepository(
-      TestFactory.calling_service,
+      resolve(graph.CallingService),
       TestFactory.client_repository,
       TestFactory.conversation_repository,
       TestFactory.event_repository,

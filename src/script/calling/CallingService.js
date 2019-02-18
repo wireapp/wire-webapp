@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-
-z.calling.CallingService = class CallingService {
+export default class CallingService {
   /**
    * Construct an new CallingService.
    * @param {BackendClient} backendClient - Client for the API calls
@@ -48,4 +45,4 @@ z.calling.CallingService = class CallingService {
       url: '/calls/config/v2',
     });
   }
-};
+}
