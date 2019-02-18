@@ -17,14 +17,13 @@
  *
  */
 
-describe('z.time.ServerTimeRepository', () => {
+import {resolve, graph} from './../../api/testResolver';
+
+describe('ServerTimeRepository', () => {
   let serverTimeRepository;
-  const testFactory = new window.TestFactory();
 
   beforeEach(() => {
-    return testFactory.exposeServerActors().then(_serverTimeRepository => {
-      serverTimeRepository = _serverTimeRepository;
-    });
+    serverTimeRepository = resolve(graph.ServerTimeRepository);
   });
 
   describe('getTimeOffset', () => {

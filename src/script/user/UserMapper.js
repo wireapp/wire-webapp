@@ -18,8 +18,8 @@
  */
 
 import Logger from 'utils/Logger';
-
 import User from '../entity/User';
+import '../view_model/bindings/CommonBindings';
 
 export default class UserMapper {
   /**

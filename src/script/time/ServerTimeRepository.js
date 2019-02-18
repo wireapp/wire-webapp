@@ -17,12 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
 import ko from 'knockout';
 
 class ServerTimeRepository {
-  constructor() {
-    this.logger = new Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
+  constructor(logger) {
+    this.logger = logger;
     this.timeOffset = ko.observable(undefined);
   }
 

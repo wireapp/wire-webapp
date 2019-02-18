@@ -22,7 +22,6 @@
 import ko from 'knockout';
 
 import {resolve, graph, backendConfig} from './testResolver';
-import ServerTimeRepository from '../time/ServerTimeRepository';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 
@@ -47,13 +46,6 @@ window.TestFactory = function(logger_level) {
   initialLoggerOptions.level = logger_level;
 
   return this;
-};
-
-window.TestFactory.prototype.exposeServerActors = function() {
-  return Promise.resolve().then(() => {
-    TestFactory.serverTimeRepository = new ServerTimeRepository();
-    return TestFactory.serverTimeRepository;
-  });
 };
 
 /**
@@ -216,7 +208,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        TestFactory.serverTimeRepository,
+        resolve(graph.ServerTimeRepository),
         TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
@@ -230,27 +222,24 @@ window.TestFactory.prototype.exposeEventActors = function() {
  * @returns {Promise<UserRepository>} The user repository.
  */
 window.TestFactory.prototype.exposeUserActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeClientActors())
-    .then(() => this.exposeServerActors())
-    .then(() => {
-      TestFactory.asset_service = resolve(graph.AssetService);
-      TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
-      TestFactory.user_service = resolve(graph.UserService);
-      TestFactory.propertyRepository = resolve(graph.PropertiesRepository);
+  return this.exposeClientActors().then(() => {
+    TestFactory.asset_service = resolve(graph.AssetService);
+    TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
+    TestFactory.user_service = resolve(graph.UserService);
+    TestFactory.propertyRepository = resolve(graph.PropertiesRepository);
 
-      TestFactory.user_repository = new UserRepository(
-        TestFactory.user_service,
-        TestFactory.asset_service,
-        resolve(graph.SelfService),
-        TestFactory.client_repository,
-        TestFactory.serverTimeRepository,
-        TestFactory.propertyRepository
-      );
-      TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
+    TestFactory.user_repository = new UserRepository(
+      TestFactory.user_service,
+      TestFactory.asset_service,
+      resolve(graph.SelfService),
+      TestFactory.client_repository,
+      resolve(graph.ServerTimeRepository),
+      TestFactory.propertyRepository
+    );
+    TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
-      return TestFactory.user_repository;
-    });
+    return TestFactory.user_repository;
+  });
 };
 
 /**
@@ -348,7 +337,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.event_repository,
         undefined,
         undefined,
-        TestFactory.serverTimeRepository,
+        resolve(graph.ServerTimeRepository),
         TestFactory.team_repository,
         TestFactory.user_repository,
         TestFactory.propertyRepository

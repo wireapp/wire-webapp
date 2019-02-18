@@ -17,12 +17,12 @@
  *
  */
 
-import ServerTimeRepository from '../time/ServerTimeRepository';
+import {resolve, graph} from './../../api/testResolver';
 import User from 'src/script/entity/User';
 import UserMapper from 'src/script/user/UserMapper';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(new ServerTimeRepository());
+  const mapper = new UserMapper(resolve(graph.ServerTimeRepository));
 
   let self_user_payload = null;
 
