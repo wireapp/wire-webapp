@@ -11,7 +11,6 @@ import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
 import configGlobal from '../config.js';
 import envGlobal from '../util/Environment.js';
 import ArrayUtilGlobal from '../util/ArrayUtil.js';
-import ClipboardUtilGlobal from '../util/ClipboardUtil.js';
 import CryptoGlobal from '../util/Crypto.js';
 import DebugUtilGlobal from '../util/DebugUtil.js';
 import EmojiUtilGlobal from '../util/EmojiUtil.js';

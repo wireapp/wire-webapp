@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
-z.util.ClipboardUtil = {
+const ClipboardUtil = {
   copyText: text => {
     if (z.util.Environment.browser.supports.clipboard) {
       return navigator.clipboard.writeText(text);
@@ -58,3 +55,5 @@ z.util.ClipboardUtil = {
     }
   },
 };
+
+export default ClipboardUtil;
