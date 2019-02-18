@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.CopyToClipboard = class CopyToClipboard {
+class CopyToClipboard {
   constructor(params) {
     this.text = params.text;
   }
@@ -33,11 +30,9 @@ z.components.CopyToClipboard = class CopyToClipboard {
       window.getSelection().addRange(selectionRange);
     }
   }
-};
+}
 
 ko.components.register('copy-to-clipboard', {
-  template: `
-    <div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>
-  `,
-  viewModel: z.components.CopyToClipboard,
+  template: `<div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>`,
+  viewModel: CopyToClipboard,
 });
