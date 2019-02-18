@@ -86,6 +86,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.enteredUsername = ko.observable();
     this.submittedUsername = ko.observable();
     this.usernameState = ko.observable();
+    this.showInfoSection = ko.pureComputed(() => this.selfUser().extendedFields());
 
     this.nameSaved = ko.observable();
     this.usernameSaved = ko.observable();
