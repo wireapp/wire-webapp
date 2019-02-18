@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "copy": "0.3.2",
-    "cosmiconfig": "5.0.7",
+    "cosmiconfig": "5.1.0",
     "fs-extra": "7.0.1",
     "logdown": "3.2.7",
     "rimraf": "2.6.3"
