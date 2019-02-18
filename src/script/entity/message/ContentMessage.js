@@ -20,7 +20,7 @@
 import moment from 'moment';
 import ko from 'knockout';
 
-import ClipboardUtil from 'utils/ClipboardUtil';
+import {copyText} from 'utils/ClipboardUtil';
 import Message from './Message';
 import {t} from 'utils/LocalizerUtil';
 
@@ -90,7 +90,7 @@ class ContentMessage extends Message {
   }
 
   copy() {
-    ClipboardUtil.copyText(this.get_first_asset().text);
+    copyText(this.get_first_asset().text);
   }
 
   /**

@@ -20,7 +20,7 @@
 import Logger from 'utils/Logger';
 
 import BasePanelViewModel from './BasePanelViewModel';
-import ClipboardUtil from 'utils/ClipboardUtil';
+import {copyText} from 'utils/ClipboardUtil';
 import {t} from 'utils/LocalizerUtil';
 
 export default class GuestsAndServicesViewModel extends BasePanelViewModel {
@@ -63,7 +63,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
 
   copyLink() {
     if (!this.isLinkCopied() && this.activeConversation()) {
-      ClipboardUtil.copyText(this.activeConversation().accessCode()).then(() => {
+      copyText(this.activeConversation().accessCode()).then(() => {
         this.isLinkCopied(true);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
         window.setTimeout(() => this.isLinkCopied(false), GuestsAndServicesViewModel.CONFIG.CONFIRM_DURATION);

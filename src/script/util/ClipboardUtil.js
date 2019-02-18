@@ -17,43 +17,34 @@
  *
  */
 
-const ClipboardUtil = {
-  copyText: text => {
-    if (z.util.Environment.browser.supports.clipboard) {
-      return navigator.clipboard.writeText(text);
+export function copyText(text) {
+  if (z.util.Environment.browser.supports.clipboard) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  try {
+    const fallbackSource = document.createElement('textarea');
+    fallbackSource.value = text;
+
+    let selectedRange;
+
+    if (window.getSelection) {
+      selectedRange = window.getSelection().rangeCount ? window.getSelection().getRangeAt(0) : false;
     }
 
-    try {
-      const fallbackSource = document.createElement('textarea');
-      fallbackSource.value = text;
+    document.body.appendChild(fallbackSource);
+    fallbackSource.select();
+    document.execCommand('copy');
+    document.body.removeChild(fallbackSource);
 
-      let selectedRange;
-
-      if (window.getSelection) {
-        selectedRange = window.getSelection().rangeCount ? window.getSelection().getRangeAt(0) : false;
-      }
-
-      document.body.appendChild(fallbackSource);
-      fallbackSource.select();
-      document.execCommand('copy');
-      document.body.removeChild(fallbackSource);
-
-      if (window.getSelection && selectedRange) {
-        const currentSelection = window.getSelection();
-        currentSelection.removeAllRanges();
-        currentSelection.addRange(selectedRange);
-      }
-
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
+    if (window.getSelection && selectedRange) {
+      const currentSelection = window.getSelection();
+      currentSelection.removeAllRanges();
+      currentSelection.addRange(selectedRange);
     }
-  },
-  pasteText: () => {
-    if (z.util.Environment.browser.supports.clipboard) {
-      return navigator.clipboard.readText();
-    }
-  },
-};
 
-export default ClipboardUtil;
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
