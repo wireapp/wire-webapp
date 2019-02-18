@@ -2122,7 +2122,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the location
    */
   sendLocation(conversationEntity, longitude, latitude, name, zoom) {
-    const protoLocation = new Location(longitude, latitude, name, zoom, this.expectReadReceipt(conversationEntity));
+    const protoLocation = new Location({
+      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+      latitude,
+      longitude,
+      name,
+      zoom,
+    });
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
       messageId: z.util.createRandomUuid(),
