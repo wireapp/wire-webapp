@@ -17,11 +17,12 @@
  *
  */
 
+import ServerTimeRepository from '../time/ServerTimeRepository';
 import User from 'src/script/entity/User';
 import UserMapper from 'src/script/user/UserMapper';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(new z.time.ServerTimeRepository());
+  const mapper = new UserMapper(new ServerTimeRepository());
 
   let self_user_payload = null;
 

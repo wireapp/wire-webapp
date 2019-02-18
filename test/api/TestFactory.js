@@ -22,6 +22,7 @@
 import ko from 'knockout';
 
 import {resolve, graph, backendConfig} from './testResolver';
+import ServerTimeRepository from '../time/ServerTimeRepository';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 
@@ -50,7 +51,7 @@ window.TestFactory = function(logger_level) {
 
 window.TestFactory.prototype.exposeServerActors = function() {
   return Promise.resolve().then(() => {
-    TestFactory.serverTimeRepository = new z.time.ServerTimeRepository();
+    TestFactory.serverTimeRepository = new ServerTimeRepository();
     return TestFactory.serverTimeRepository;
   });
 };
