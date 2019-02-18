@@ -84,7 +84,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences

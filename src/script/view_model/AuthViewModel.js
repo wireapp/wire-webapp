@@ -24,6 +24,7 @@ import Cookies from 'js-cookie';
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import AssetService from '../assets/AssetService';
+import ServerTimeRepository from '../time/ServerTimeRepository';
 import StorageService from '../storage/StorageService';
 import UserRepository from '../user/UserRepository';
 import {t} from 'utils/LocalizerUtil';
@@ -81,7 +82,7 @@ class AuthViewModel {
       this.asset_service,
       this.selfService,
       this.client_repository,
-      new z.time.ServerTimeRepository()
+      new ServerTimeRepository()
     );
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
