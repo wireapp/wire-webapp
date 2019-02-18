@@ -24,7 +24,6 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
-import ServerTimeRepository from '../time/ServerTimeRepository';
 import UserRepository from '../user/UserRepository';
 
 import BackendClient from '../service/BackendClient';
@@ -115,7 +114,7 @@ class App {
     repositories.auth = authComponent.repository;
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
-    repositories.serverTime = new ServerTimeRepository();
+    repositories.serverTime = resolve(graph.ServerTimeRepository);
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
