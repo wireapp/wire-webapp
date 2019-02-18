@@ -23,6 +23,11 @@ import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 
+function downloadText(text, filename = 'default.txt') {
+  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+  return z.util.downloadFile(url, filename);
+}
+
 export default class DebugUtil {
   constructor(repositories) {
     const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
@@ -159,7 +164,7 @@ export default class DebugUtil {
 
     this.cryptographyRepository.cryptobox
       .serialize()
-      .then(cryptobox => z.util.downloadText(JSON.stringify(cryptobox), fileName));
+      .then(cryptobox => downloadText(JSON.stringify(cryptobox), fileName));
   }
 
   getNotificationFromStream(notificationId, notificationIdSince) {
