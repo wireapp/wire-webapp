@@ -20,7 +20,7 @@
 import Logger from 'utils/Logger';
 
 import BasePanelViewModel from './BasePanelViewModel';
-import ClipboardUtil from '../../util/ClipboardUtil';
+import ClipboardUtil from 'utils/ClipboardUtil';
 import {t} from 'utils/LocalizerUtil';
 
 export default class GuestsAndServicesViewModel extends BasePanelViewModel {
