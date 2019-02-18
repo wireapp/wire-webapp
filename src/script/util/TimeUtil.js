@@ -40,7 +40,7 @@ import {t} from 'utils/LocalizerUtil';
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.TimeUtil = {
+const TimeUtil = {
   UNITS_IN_MILLIS: {
     DAY: 1000 * 60 * 60 * 24,
     HOUR: 1000 * 60 * 60,
@@ -210,3 +210,6 @@ z.util.TimeUtil = {
     return mappedUnits;
   },
 };
+
+export default TimeUtil;
+z.util.TimeUtil = TimeUtil;
