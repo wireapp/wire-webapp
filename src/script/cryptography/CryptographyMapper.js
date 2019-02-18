@@ -315,10 +315,9 @@ export default class CryptographyMapper {
    * @returns {Promise} Resolves with generic message
    */
   _unwrapExternal(external, event) {
-    return Promise.resolve()
-      .then(() => {
+    return Promise.resolve(external)
+      .then(({otrKey, sha256}) => {
         const eventData = event.data;
-        const {otrKey, sha256} = external;
 
         if (!eventData.data || !otrKey || !sha256) {
           throw new Error('Not all expected properties defined');
