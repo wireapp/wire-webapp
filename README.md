@@ -23,8 +23,9 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 ### Installation
 
 1.  Install [Node.js](https://nodejs.org/)
-2.  Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
-3.  Run `yarn`
+1.  Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
+1.  Run `yarn`
+1.  Rename `.env.localhost` to `.env` in order to run the app in a local environment
 
 ### Execution
 

@@ -17,12 +17,11 @@
  *
  */
 
+import ko from 'knockout';
 import viewportObserver from '../ui/viewportObserver';
+import User from '../entity/User';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ParticipantAvatar = class ParticipantAvatar {
+class ParticipantAvatar {
   static get SIZE() {
     return {
       LARGE: 'avatar-l',
@@ -56,7 +55,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     });
 
     this.isUser = ko.pureComputed(() => {
-      return this.participant() instanceof z.entity.User && !this.participant().isService;
+      return this.participant() instanceof User && !this.participant().isService;
     });
 
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
@@ -196,7 +195,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.participantSubscription.dispose();
     this.pictureSubscription.dispose();
   }
-};
+}
 
 ko.components.register('participant-avatar', {
   template: `
@@ -228,7 +227,13 @@ ko.components.register('participant-avatar', {
     `,
   viewModel: {
     createViewModel(params, componentInfo) {
-      return new z.components.ParticipantAvatar(params, componentInfo);
+      return new ParticipantAvatar(params, componentInfo);
     },
   },
 });
+
+export default ParticipantAvatar;
+
+window.z = window.z || {};
+window.z.components = z.components || {};
+z.components.ParticipantAvatar = ParticipantAvatar;

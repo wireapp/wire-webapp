@@ -77,7 +77,7 @@ const LocalizerUtil = {
     return firstNames.join(', ');
   },
 
-  translate: (identifier, substitutions = {}, dangerousSubstitutions = {}) => {
+  translate: (identifier, substitutions = {}, dangerousSubstitutions = {}, skipEscape = false) => {
     const localeValue = strings[locale] && strings[locale][identifier];
     const defaultValue =
       strings[DEFAULT_LOCALE] && strings[DEFAULT_LOCALE].hasOwnProperty(identifier)
@@ -95,7 +95,9 @@ const LocalizerUtil = {
       dangerousSubstitutions
     );
 
-    const substitutedEscaped = replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
+    const substitutedEscaped = skipEscape
+      ? replaceSubstitute(value, /{{(.+?)}}/g, substitutions)
+      : replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
     const substituted = replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
 
     return substituted;
@@ -112,8 +114,8 @@ export const setLocale = newLocale => (locale = newLocale);
 
 export const setStrings = newStrings => (strings = newStrings);
 
-export function t(identifier, substitutions, dangerousSubstitutions) {
-  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions);
+export function t(identifier, substitutions, dangerousSubstitutions, skipEscape = false) {
+  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
 }
 
 export const joinNames = LocalizerUtil.joinNames;

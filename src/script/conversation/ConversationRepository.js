@@ -23,6 +23,8 @@ import EventMapper from './EventMapper';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 
+import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -62,6 +64,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
+   * @param {AssetUploader} assetUploader - Manages uploading assets and keeping track of current uploads
    */
   constructor(
     conversation_service,
@@ -75,7 +78,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     serverTimeRepository,
     team_repository,
     user_repository,
-    propertyRepository
+    propertyRepository,
+    assetUploader
   ) {
     this.eventRepository = eventRepository;
     this.eventService = eventRepository.eventService;
@@ -90,6 +94,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
+    this.assetUploader = assetUploader;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversationMapper = new ConversationMapper();
@@ -1705,18 +1710,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.get_message_in_conversation_by_id(conversationEntity, messageId)
       .then(messageEntity => {
-        const assetEntity = messageEntity.get_first_asset();
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
           retention,
         };
 
-        assetEntity.status(z.assets.AssetTransferState.UPLOADING);
-        return this.asset_service.uploadAsset(file, options, xhr => {
-          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round((event.loaded / event.total) * 100));
-          assetEntity.upload_cancel = () => xhr.abort();
-        });
+        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options);
+        return uploadPromise;
       })
       .then(asset => {
         genericMessage = new z.proto.GenericMessage(messageId);
@@ -1759,7 +1760,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversation_et, file) {
-    return z.assets.AssetMetaDataBuilder.buildMetadata(file)
+    return AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
         this.logger.warn(logMessage, error);
@@ -1769,11 +1770,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const protoAsset = new z.proto.Asset();
 
         let assetOriginal = undefined;
-        if (z.assets.AssetMetaDataBuilder.isAudio(file)) {
+        if (AssetMetaDataBuilder.isAudio(file)) {
           assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata);
-        } else if (z.assets.AssetMetaDataBuilder.isVideo(file)) {
+        } else if (AssetMetaDataBuilder.isVideo(file)) {
           assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata);
-        } else if (z.assets.AssetMetaDataBuilder.isImage(file)) {
+        } else if (AssetMetaDataBuilder.isImage(file)) {
           assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, metadata);
         } else {
           assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name);
@@ -1829,11 +1830,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const messageEntityPromise = this.get_message_in_conversation_by_id(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
-          const assetEntity = messageEntity.get_first_asset();
-          assetEntity.status(z.assets.AssetTransferState.UPLOADING);
-          const onUploadStarted = xhr => (assetEntity.upload_cancel = () => xhr.abort());
-
-          return this.asset_service.uploadAsset(imageBlob, options, onUploadStarted).then(uploadedImageAsset => {
+          return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
             const protoAsset = new z.proto.Asset();
             const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
             protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
@@ -2023,9 +2020,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
+   * @param {z.message.QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
-  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities) {
+  sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.message_id;
 
@@ -2037,7 +2035,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             messageId,
             textMessage,
             mentionEntities,
-            undefined,
+            quoteEntity,
             [linkPreview],
             this.expectReadReceipt(conversationEntity)
           );
@@ -2246,7 +2244,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity)
       .then(genericMessage => {
         if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
         }
       })
       .catch(error => {
@@ -2837,16 +2835,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _can_upload_assets_to_conversation(conversation_et) {
     return !!conversation_et && !conversation_et.isRequest() && !conversation_et.removed_from_conversation();
-  }
-
-  /**
-   * Count number of pending uploads
-   * @returns {number} Number of pending uploads
-   */
-  get_number_of_pending_uploads() {
-    return this.conversations().reduce((sum, conversationEntity) => {
-      return sum + conversationEntity.get_number_of_pending_uploads();
-    }, 0);
   }
 
   //##############################################################################
@@ -3747,15 +3735,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Cancel asset upload.
-   * @param {Message} message_et - Message on which the cancel was initiated
+   * @param {string} messageId - Id of the message which upload has been cancelled
    * @returns {undefined} No return value
    */
-  cancel_asset_upload(message_et) {
-    this.send_asset_upload_failed(
-      this.active_conversation(),
-      message_et.id,
-      z.assets.AssetUploadFailedReason.CANCELLED
-    );
+  cancel_asset_upload(messageId) {
+    this.send_asset_upload_failed(this.active_conversation(), messageId, z.assets.AssetUploadFailedReason.CANCELLED);
   }
 
   /**

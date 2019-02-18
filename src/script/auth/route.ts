@@ -51,7 +51,7 @@ const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
-  SSO: '/sso',
+  SSO: '/sso/:code?',
   VERIFY: '/verify',
 };
 

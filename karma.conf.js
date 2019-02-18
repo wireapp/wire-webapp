@@ -80,7 +80,6 @@ module.exports = function(config) {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
       [`${SRC_PATH}/script/main/globals.js`]: ['webpack', 'sourcemap'],
-      // FIXME fails because of import statements 'src/script/**/*.js': ['coverage'],
     },
 
     webpack: {
@@ -95,8 +94,25 @@ module.exports = function(config) {
       module: {
         rules: [
           {
+            exclude: /node_modules/,
+            include: path.resolve('src/script/'),
+            loader: 'babel-loader',
+            test: /\.[tj]sx?$/,
+          },
+          {
             loader: 'svg-inline-loader?removeSVGTagAttrs=false',
             test: /\.svg$/,
+          },
+          {
+            exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
+            include: [path.resolve('src/script/')],
+            test: /\.js$/,
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              query: {
+                esModules: true,
+              },
+            },
           },
         ],
       },
@@ -123,7 +139,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['coverage', 'spec'],
+    reporters: ['spec', 'coverage-istanbul'],
     specReporter: {showSpecTiming: true, suppressPassed: true, suppressSkipped: true},
 
     // web server port
@@ -157,31 +173,20 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-
-    coverageReporter: {
-      reporters: [
-        {
-          dir: 'docs/coverage',
-          type: 'html',
-        },
-        {
-          dir: 'docs/coverage',
-          file: 'coverage-summary.txt',
-          type: 'text-summary',
-        },
-      ],
-      check: {
+    coverageIstanbulReporter: {
+      dir: path.resolve('docs/coverage/'),
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: {outdir: 'html'},
+      },
+      reports: ['html', 'text-summary'],
+      thresholds: {
+        emitWarning: false,
         global: {
-          statements: 40,
-          branches: 25,
-          functions: 20,
-          lines: 40,
-        },
-        each: {
-          statements: 0,
-          branches: 0,
-          functions: 0,
-          lines: 0,
+          branches: 35,
+          functions: 40,
+          lines: 45,
+          statements: 45,
         },
       },
     },

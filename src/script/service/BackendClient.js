@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.service = z.service || {};
-
-z.service.BackendClient = class BackendClient {
+export default class BackendClient {
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {
@@ -70,18 +67,10 @@ z.service.BackendClient = class BackendClient {
 
   /**
    * Construct a new client.
-   *
-   * @param {Object} settings - Settings for different backend environments
-   * @param {string} settings.environment - Backend environment used
-   * @param {string} settings.restUrl - Backend REST URL
-   * @param {string} settings.webSocketUrl - Backend WebSocket URL
+   * @param {Logger} logger - app logger
    */
-  constructor(settings) {
-    this.logger = new z.util.Logger('z.service.BackendClient', z.config.LOGGER.OPTIONS);
-
-    z.util.Environment.backend.current = settings.environment;
-    this.restUrl = settings.restUrl;
-    this.webSocketUrl = settings.webSocketUrl;
+  constructor(logger) {
+    this.logger = logger;
 
     this.connectivityTimeout = undefined;
     this.connectivityQueue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
@@ -110,6 +99,20 @@ z.service.BackendClient = class BackendClient {
         requestId: this.numberOfRequests(),
       };
     });
+  }
+
+  /**
+   *
+   * @param {Object} settings - Settings for different backend environments
+   * @param {string} settings.environment - Backend environment used
+   * @param {string} settings.restUrl - Backend REST URL
+   * @param {string} settings.webSocketUrl - Backend WebSocket URL
+   * @returns {void}
+   */
+  setSettings(settings) {
+    z.util.Environment.backend.current = settings.environment;
+    this.restUrl = settings.restUrl;
+    this.webSocketUrl = settings.webSocketUrl;
   }
 
   /**
@@ -363,4 +366,4 @@ z.service.BackendClient = class BackendClient {
         });
     });
   }
-};
+}

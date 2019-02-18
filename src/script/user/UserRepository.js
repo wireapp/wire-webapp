@@ -42,7 +42,7 @@ export default class UserRepository {
    * Construct a new User repository.
    * @class UserRepository
    * @param {UserService} user_service - Backend REST API user service implementation
-   * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
+   * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client

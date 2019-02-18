@@ -16,29 +16,31 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+import resolveDependency from '../config/appResolver';
+
+import AudioRepository from '../audio/AudioRepository';
+import BackendClient from '../service/BackendClient';
+
 window.z = window.z || {};
 window.z.main = z.main || {};
 
-z.main.Auth = class Auth {
+class Auth {
   /**
    * Constructs objects needed for app authentication.
    *
-   * @param {Object} settings - Collection of URL settings
-   * @param {string} settings.environment - Handle of the backend environment (staging, etc.)
-   * @param {string} settings.webSocketUrl - URL to the backend's WebSocket
-   * @param {string} settings.restUrl - URL to the backend's REST service
-   * @param {string} settings.parameter - Additional parameters for the webapp's login URL
+   * @param {AudioRepository} audioRepository - Audio repository
+   * @param {BackendClient} backendClient - Client for the API calls
    * @returns {Auth} New authentication object
    */
-  constructor(settings) {
-    this.settings = settings;
-    this.audio = new z.audio.AudioRepository();
-    this.backendClient = new z.service.BackendClient(this.settings);
+  constructor(audioRepository, backendClient) {
+    this.audio = audioRepository;
+    this.backendClient = backendClient;
     this.service = new z.auth.AuthService(this.backendClient);
     this.repository = new z.auth.AuthRepository(this.service);
     return this;
   }
-};
+}
 
 //##############################################################################
 // Setting up the Environment (DIST)
@@ -62,7 +64,11 @@ $(() => {
         webSocketUrl: window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com',
       };
 
+  const audioRepository = resolveDependency(AudioRepository);
+  const backendClient = resolveDependency(BackendClient);
+  backendClient.setSettings(settings);
+
   window.wire = Object.assign(window.wire || {}, {
-    auth: new z.main.Auth(settings),
+    auth: new Auth(audioRepository, backendClient),
   });
 });

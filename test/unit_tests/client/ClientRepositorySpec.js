@@ -17,6 +17,8 @@
  *
  */
 
+import {backendConfig} from '../../api/testResolver';
+
 describe('z.client.ClientRepository', () => {
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
@@ -54,7 +56,7 @@ describe('z.client.ClientRepository', () => {
   describe('getValidLocalClient', () => {
     let server = undefined;
 
-    const clientUrl = `${testFactory.settings.connection.restUrl}/clients/${clientId}`;
+    const clientUrl = `${backendConfig.restUrl}/clients/${clientId}`;
     const clientPayloadServer = {
       address: '62.96.148.44',
       class: 'desktop',

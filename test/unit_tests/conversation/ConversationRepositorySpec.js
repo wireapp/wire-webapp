@@ -17,6 +17,7 @@
  *
  */
 
+import {backendConfig} from '../../api/testResolver';
 import Conversation from 'src/script/entity/Conversation';
 
 describe('ConversationRepository', () => {
@@ -29,14 +30,6 @@ describe('ConversationRepository', () => {
 
   const _find_conversation = (conversation, conversations) => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
-  };
-
-  const _generate_asset_message = state => {
-    const file_et = new z.entity.File();
-    file_et.status(state);
-    const message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
-    message_et.assets.push(file_et);
-    return message_et;
   };
 
   const _generate_conversation = (
@@ -69,14 +62,14 @@ describe('ConversationRepository', () => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
       conversation_et.id = payload.conversations.knock.post.conversation;
 
-      const ping_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/knock`;
+      const ping_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/knock`;
       server.respondWith('POST', ping_url, [
         201,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.conversations.knock.post),
       ]);
 
-      const mark_as_read_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/self`;
+      const mark_as_read_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/self`;
       server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
 
       return conversation_repository.save_conversation(conversation_et);
@@ -342,33 +335,6 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_number_of_pending_uploads', () => {
-    it('should return number of pending uploads if there are pending uploads', () => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOAD_PENDING));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADING));
-      conversation_et.add_message(_generate_asset_message(z.assets.AssetTransferState.UPLOADED));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(1);
-    });
-
-    it('should return 0 if there are no pending uploads', () => {
-      conversation_et.add_message(new z.entity.Message(z.util.createRandomUuid()));
-
-      expect(conversation_et.get_number_of_pending_uploads()).toBe(0);
-    });
-  });
-
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', () => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
@@ -473,7 +439,7 @@ describe('ConversationRepository', () => {
 
     describe('"conversation.asset-add"', () => {
       beforeEach(() => {
-        const matchUsers = new RegExp(`${test_factory.settings.connection.restUrl}/users\\?ids=([a-z0-9-,]+)`);
+        const matchUsers = new RegExp(`${backendConfig.restUrl}/users\\?ids=([a-z0-9-,]+)`);
         server.respondWith('GET', matchUsers, (xhr, ids) => {
           const users = [];
           for (const userId of ids.split(',')) {
@@ -523,7 +489,7 @@ describe('ConversationRepository', () => {
           xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(`${test_factory.settings.connection.restUrl}/conversations/([a-z0-9-]+)`);
+        const matchConversations = new RegExp(`${backendConfig.restUrl}/conversations/([a-z0-9-]+)`);
         server.respondWith('GET', matchConversations, (xhr, conversationId) => {
           const conversation = {
             access: ['private'],

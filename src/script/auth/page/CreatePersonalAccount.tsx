@@ -26,6 +26,7 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {createPersonalAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
+import {getLogger} from '../LogProvider';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
@@ -53,11 +54,13 @@ interface DispatchProps {
 
 interface State {}
 
-class CreatePersonalAccount extends React.PureComponent<
-  Props & ConnectedProps & DispatchProps & InjectedIntlProps,
-  State
-> {
+type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+
+const logger = getLogger('CreatePersonalAccount');
+
+class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
   componentDidMount() {
+    logger.log('Hello World!');
     return this.props.enterPersonalCreationFlow();
   }
 
@@ -65,7 +68,7 @@ class CreatePersonalAccount extends React.PureComponent<
     const {account, history, doRegisterPersonal, match} = this.props;
     doRegisterPersonal({...account, invitation_code: match.params.invitationCode})
       .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-      .catch(error => console.error('Failed to create personal account from invite', error));
+      .catch(error => logger.error('Failed to create personal account from invite', error));
   };
 
   handleSubmit = () => {

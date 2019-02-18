@@ -16,12 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-window.z = window.z || {};
-window.z.extension = z.extension || {};
-
 // Enum of different Giphy content sizes.
-z.extension.GiphyContentSizes = {
+export default {
   DOWNSIZED: 'downsized',
   DOWNSIZED_LARGE: 'downsized_large',
   DOWNSIZED_STILL: 'downsized_still',

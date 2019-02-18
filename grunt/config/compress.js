@@ -25,7 +25,7 @@ module.exports = {
       {
         cwd: '<%= dir.dist_ %>',
         expand: true,
-        src: ['../package.json', '**/*', '.**/*', '!<%= dir.dist.s3 %>'],
+        src: ['../package.json', '../../.env.defaults', '**/*', '.**/*', '!<%= dir.dist.s3 %>'],
       },
     ],
     options: {

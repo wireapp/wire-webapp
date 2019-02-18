@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
+import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
-z.components.VideoAssetComponent = class VideoAssetComponent {
+class VideoAssetComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a new video asset.
    *
@@ -29,12 +28,11 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
    * @param {Object} component_info - Component information
    */
   constructor(params, component_info) {
+    super(ko.unwrap(params.message));
     this.logger = new z.util.Logger('VideoAssetComponent', z.config.LOGGER.OPTIONS);
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
-
-    this.preview_subscription = undefined;
 
     this.video_element = $(component_info.element).find('video')[0];
     this.video_src = ko.observable();
@@ -45,24 +43,17 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
     this.video_time_rest = ko.pureComputed(() => this.video_element.duration - this.video_time());
 
-    if (this.asset.preview_resource()) {
-      this._load_video_preview();
-    } else {
-      this.preview_subscription = this.asset.preview_resource.subscribe(this._load_video_preview.bind(this));
-    }
+    this.preview = ko.observable();
+
+    ko.computed(() => {
+      if (this.asset.preview_resource()) {
+        this.asset.load_preview().then(blob => this.preview(window.URL.createObjectURL(blob)));
+      }
+    });
 
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
     this.displaySmall = ko.observable(!!params.isQuote);
-  }
-
-  _load_video_preview() {
-    this.asset.load_preview().then(blob => {
-      if (blob) {
-        this.video_element.setAttribute('poster', window.URL.createObjectURL(blob));
-        this.video_element.style.backgroundColor = '#000';
-      }
-    });
   }
 
   on_loadedmetadata() {
@@ -109,12 +100,10 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
   }
 
   dispose() {
-    if (this.preview_subscription) {
-      this.preview_subscription.dispose();
-    }
     window.URL.revokeObjectURL(this.video_src());
+    window.URL.revokeObjectURL(this.preview());
   }
-};
+}
 
 ko.components.register('video-asset', {
   template: `
@@ -125,8 +114,9 @@ ko.components.register('video-asset', {
                    css: {'video-asset-container--small': displaySmall()}"
         data-uie-name="video-asset">
         <video playsinline
-               data-bind="attr: {src: video_src},
-                          css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
+               data-bind="attr: {src: video_src, poster: preview},
+                          css: {hidden: transferState() === z.assets.AssetTransferState.UPLOADING},
+                          style: {backgroundColor: preview() ? '#000': ''},
                           event: {loadedmetadata: on_loadedmetadata,
                                   timeupdate: on_timeupdate,
                                   error: on_error,
@@ -136,7 +126,7 @@ ko.components.register('video-asset', {
           <div class="video-playback-error label-xs" data-bind="text: t('conversationPlaybackError')"></div>
         <!-- /ko -->
         <!-- ko ifnot: video_playback_error -->
-          <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOAD_PENDING -->
             <div class="asset-placeholder">
               <div class="three-dots">
                 <span></span><span></span><span></span>
@@ -144,13 +134,16 @@ ko.components.register('video-asset', {
             </div>
           <!-- /ko -->
 
-          <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
             <div class="video-controls-center">
               <!-- ko if: displaySmall() -->
                 <media-button params="src: video_element,
                                       large: false,
                                       asset: asset,
-                                      play: onPlayButtonClicked">
+                                      play: onPlayButtonClicked,
+                                      transferState: transferState,
+                                      uploadProgress: uploadProgress
+                                      ">
                 </media-button>
               <!-- /ko -->
               <!-- ko ifnot: displaySmall() -->
@@ -159,7 +152,10 @@ ko.components.register('video-asset', {
                                       asset: asset,
                                       play: onPlayButtonClicked,
                                       pause: on_pause_button_clicked,
-                                      cancel: () => asset.cancel(message)">
+                                      cancel: () => cancelUpload(message),
+                                      transferState: transferState,
+                                      uploadProgress: uploadProgress
+                                      ">
                 </media-button>
               <!-- /ko -->
             </div>
@@ -175,7 +171,7 @@ ko.components.register('video-asset', {
   `,
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.VideoAssetComponent(params, component_info);
+      return new VideoAssetComponent(params, component_info);
     },
   },
 });

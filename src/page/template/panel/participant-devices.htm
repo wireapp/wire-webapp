@@ -45,7 +45,7 @@
         <!-- ko if: showDevicesNotFound() -->
           <div class="participant-devices__header">
             <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
-            <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: t('urlWebsitePrivacy')}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+            <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: window.wire.env.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           </div>
         <!-- /ko -->
 
