@@ -94,13 +94,13 @@ z.ui.Context = (() => {
     _removeListeners();
   };
 
-  const _build = entries => {
+  const _build = (entries, defaultIdentifier) => {
     const menu = document.createElement('div');
     menu.classList.add('ctx-menu');
 
     entries.forEach(({title, label, click, identifier}) => {
       const element = document.createElement('div');
-      element.setAttribute('data-uie-name', identifier || 'ctx-menu-item');
+      element.setAttribute('data-uie-name', identifier || defaultIdentifier || 'ctx-menu-item');
       element.setAttribute('title', title || label || '');
       element.classList.add('ctx-menu-item');
       element.innerText = label;
@@ -144,7 +144,7 @@ z.ui.Context = (() => {
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
 
-      const menu = _build(entries);
+      const menu = _build(entries, identifier);
       menu.style.visibility = 'hidden';
       document.body.appendChild(menu);
 
