@@ -20,7 +20,7 @@
 import moment from 'moment';
 import ko from 'knockout';
 
-import ClipboardUtil from '../../util/ClipboardUtil';
+import ClipboardUtil from 'utils/ClipboardUtil';
 import Message from './Message';
 import {t} from 'utils/LocalizerUtil';
 
