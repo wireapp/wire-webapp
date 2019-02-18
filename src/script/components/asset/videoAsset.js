@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
 class VideoAssetComponent extends AbstractAssetTransferStateTracker {
@@ -29,7 +31,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
    */
   constructor(params, component_info) {
     super(ko.unwrap(params.message));
-    this.logger = new z.util.Logger('VideoAssetComponent', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('VideoAssetComponent', z.config.LOGGER.OPTIONS);
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();

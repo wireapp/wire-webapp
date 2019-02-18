@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import User from '../entity/User';
 
 export default class UserMapper {
@@ -26,7 +28,7 @@ export default class UserMapper {
    * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
   constructor(serverTimeRepository) {
-    this.logger = new z.util.Logger('UserMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('UserMapper', z.config.LOGGER.OPTIONS);
     this.serverTimeRepository = serverTimeRepository;
   }
 

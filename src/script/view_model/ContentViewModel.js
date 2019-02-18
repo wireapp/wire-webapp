@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -48,7 +50,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);

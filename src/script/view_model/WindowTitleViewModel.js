@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 import ko from 'knockout';
 
@@ -31,7 +33,7 @@ export default class WindowTitleViewModel {
     this.contentState = mainViewModel.content.state;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('WindowTitleViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.updateWindowTitle = ko.observable(false);
 

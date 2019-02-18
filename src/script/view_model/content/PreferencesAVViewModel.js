@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -37,7 +39,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
 
-    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
 
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -33,7 +35,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = mainViewModel.actions;
     this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -36,6 +38,7 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
 
     // z.assets.AssetRemoteData
     this.resource = ko.observable();
+    this.logger = new Logger('z.entity.MediumImage', z.config.LOGGER.OPTIONS);
   }
 
   /**

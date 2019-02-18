@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -46,7 +48,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;
 
-    this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
     this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable(false);

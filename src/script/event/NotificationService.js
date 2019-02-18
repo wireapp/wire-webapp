@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -40,7 +42,7 @@ z.event.NotificationService = class NotificationService {
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
-    this.logger = new z.util.Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
 
     this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

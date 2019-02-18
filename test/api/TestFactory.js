@@ -45,13 +45,10 @@ window.TestFactory = function(logger_level) {
   });
   initialLoggerOptions.level = logger_level;
 
-  this.logger = new z.util.Logger('TestFactory', z.config.LOGGER.OPTIONS);
-
   return this;
 };
 
 window.TestFactory.prototype.exposeServerActors = function() {
-  this.logger.info('- exposeServerActors');
   return Promise.resolve().then(() => {
     TestFactory.serverTimeRepository = new z.time.ServerTimeRepository();
     return TestFactory.serverTimeRepository;
@@ -63,7 +60,6 @@ window.TestFactory.prototype.exposeServerActors = function() {
  * @returns {Promise<z.auth.AuthRepository>} The authentication repository.
  */
 window.TestFactory.prototype.exposeAuthActors = function() {
-  this.logger.info('- exposeAuthActors');
   return Promise.resolve().then(() => {
     TestFactory.authService = new z.auth.AuthService(resolve(graph.BackendClient));
 
@@ -77,7 +73,6 @@ window.TestFactory.prototype.exposeAuthActors = function() {
  * @returns {Promise<z.storage.StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function() {
-  this.logger.info('- exposeStorageActors');
   return Promise.resolve()
     .then(() => {
       TestFactory.storage_service = resolve(graph.StorageService);
@@ -92,13 +87,10 @@ window.TestFactory.prototype.exposeStorageActors = function() {
 };
 
 window.TestFactory.prototype.exposeBackupActors = function() {
-  this.logger.info('- exposeBackupActors');
   return Promise.resolve()
     .then(() => this.exposeStorageActors())
     .then(() => this.exposeConversationActors())
     .then(() => {
-      this.logger.info('✓ exposedUserActors');
-
       TestFactory.backup_service = resolve(graph.BackupService);
 
       TestFactory.backup_repository = new z.backup.BackupRepository(
@@ -119,12 +111,9 @@ window.TestFactory.prototype.exposeBackupActors = function() {
  * @returns {Promise<z.cryptography.CryptographyRepository>} The cryptography repository.
  */
 window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox = true) {
-  this.logger.info('- exposeCryptographyActors');
   return Promise.resolve()
     .then(() => this.exposeStorageActors())
     .then(() => {
-      this.logger.info('✓ exposedStorageActors');
-
       const currentClient = new z.client.ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
       TestFactory.cryptography_service = new z.cryptography.CryptographyService(resolve(graph.BackendClient));
@@ -149,12 +138,9 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
  * @returns {Promise<z.client.ClientRepository>} The client repository.
  */
 window.TestFactory.prototype.exposeClientActors = function() {
-  this.logger.info('- exposeClientActors');
   return Promise.resolve()
     .then(() => this.exposeCryptographyActors())
     .then(() => {
-      this.logger.info('✓ exposedCryptographyActors');
-
       const clientEntity = new z.client.ClientEntity({
         address: '192.168.0.1',
         class: 'desktop',
@@ -203,13 +189,10 @@ window.TestFactory.prototype.exposeClientActors = function() {
  * @returns {Promise<z.event.EventRepository>} The event repository.
  */
 window.TestFactory.prototype.exposeEventActors = function() {
-  this.logger.info('- exposeEventActors');
   return Promise.resolve()
     .then(() => this.exposeCryptographyActors())
     .then(() => this.exposeUserActors())
     .then(() => {
-      this.logger.info('✓ exposedCryptographyActors');
-
       TestFactory.web_socket_service = new z.event.WebSocketService(
         resolve(graph.BackendClient),
         TestFactory.storage_service
@@ -246,13 +229,10 @@ window.TestFactory.prototype.exposeEventActors = function() {
  * @returns {Promise<UserRepository>} The user repository.
  */
 window.TestFactory.prototype.exposeUserActors = function() {
-  this.logger.info('- exposeUserActors');
   return Promise.resolve()
     .then(() => this.exposeClientActors())
     .then(() => this.exposeServerActors())
     .then(() => {
-      this.logger.info('✓ exposedClientActors');
-
       TestFactory.asset_service = resolve(graph.AssetService);
       TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
       TestFactory.user_service = resolve(graph.UserService);
@@ -277,12 +257,9 @@ window.TestFactory.prototype.exposeUserActors = function() {
  * @returns {Promise<z.connection.ConnectionRepository>} The connection repository.
  */
 window.TestFactory.prototype.exposeConnectionActors = function() {
-  this.logger.info('- exposeConnectionActors');
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      this.logger.info('✓ exposedConnectionActors');
-
       TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
 
       TestFactory.connection_repository = new z.connection.ConnectionRepository(
@@ -299,12 +276,9 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
  * @returns {Promise<z.connect.ConnectRepository>} The connect repository.
  */
 window.TestFactory.prototype.exposeConnectActors = function() {
-  this.logger.info('- exposeConnectActors');
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      this.logger.info('✓ exposedUserActors');
-
       TestFactory.connectService = new z.connect.ConnectService(resolve(graph.BackendClient));
 
       TestFactory.connect_repository = new z.connect.ConnectRepository(
@@ -321,12 +295,9 @@ window.TestFactory.prototype.exposeConnectActors = function() {
  * @returns {Promise<z.search.SearchRepository>} The search repository.
  */
 window.TestFactory.prototype.exposeSearchActors = function() {
-  this.logger.info('- exposeSearchActors');
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      this.logger.info('✓ exposedTeamActors');
-
       TestFactory.search_service = new z.search.SearchService(resolve(graph.BackendClient));
 
       TestFactory.search_repository = new z.search.SearchRepository(
@@ -339,12 +310,9 @@ window.TestFactory.prototype.exposeSearchActors = function() {
 };
 
 window.TestFactory.prototype.exposeTeamActors = function() {
-  this.logger.info('- exposeTeamActors');
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      this.logger.info('✓ exposedUserActors');
-
       TestFactory.teamService = new z.team.TeamService(resolve(graph.BackendClient));
       return TestFactory.teamService;
     })
@@ -359,14 +327,11 @@ window.TestFactory.prototype.exposeTeamActors = function() {
  * @returns {Promise<z.conversation.ConversationRepository>} The conversation repository.
  */
 window.TestFactory.prototype.exposeConversationActors = function() {
-  this.logger.info('- exposeConversationActors');
   return Promise.resolve()
     .then(() => this.exposeConnectionActors())
     .then(() => this.exposeTeamActors())
     .then(() => this.exposeEventActors())
     .then(() => {
-      this.logger.info('✓ exposedTeamActors');
-
       TestFactory.conversation_service = new z.conversation.ConversationService(
         resolve(graph.BackendClient),
         TestFactory.event_service,
@@ -397,10 +362,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
  * @returns {Promise<z.calling.CallCenter>} The call center.
  */
 window.TestFactory.prototype.exposeCallingActors = function() {
-  this.logger.info('- exposeCallingActors');
   return this.exposeConversationActors().then(() => {
-    this.logger.info('✓ exposedConversationActors');
-
     TestFactory.calling_service = new z.calling.CallingService(resolve(graph.BackendClient));
 
     TestFactory.calling_repository = new z.calling.CallingRepository(
@@ -422,15 +384,11 @@ window.TestFactory.prototype.exposeCallingActors = function() {
  * @returns {Promise<z.notification.NotificationRepository>} The repository for system notifications.
  */
 window.TestFactory.prototype.exposeNotificationActors = function() {
-  this.logger.info('- exposeNotificationActors');
   return this.exposeConversationActors()
     .then(() => {
-      this.logger.info('✓ exposedConversationActors');
       return this.exposeCallingActors();
     })
     .then(() => {
-      this.logger.info('✓ exposedCallingActors');
-
       TestFactory.notification_repository = new z.notification.NotificationRepository(
         TestFactory.calling_repository,
         TestFactory.conversation_repository,
@@ -447,12 +405,9 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
  * @returns {Promise<z.tracking.EventTrackingRepository>} The event tracking repository.
  */
 window.TestFactory.prototype.exposeTrackingActors = function() {
-  this.logger.info('- exposeTrackingActors');
   return Promise.resolve()
     .then(() => this.exposeTeamActors())
     .then(() => {
-      this.logger.info('✓ exposesTeamActors');
-
       TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(
         TestFactory.team_repository,
         TestFactory.user_repository
@@ -467,11 +422,9 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
  * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
  */
 window.TestFactory.prototype.exposeLifecycleActors = function() {
-  this.logger.info('- exposeLifecycleActors');
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      this.logger.info('✓ exposedConversationActors');
       TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
 
       TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(

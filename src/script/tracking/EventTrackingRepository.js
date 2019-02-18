@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 
@@ -51,7 +53,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(teamRepository, userRepository) {
     this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
-    this.logger = new z.util.Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
 
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;

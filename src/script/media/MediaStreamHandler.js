@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 export default class MediaStreamHandler {
   /**
    * Detect whether a MediaStream has a video MediaStreamTrack attached
@@ -88,7 +90,7 @@ export default class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = new z.util.Logger('MediaStreamHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();

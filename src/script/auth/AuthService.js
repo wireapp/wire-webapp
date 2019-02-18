@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BackendClient from '../service/BackendClient';
 
 window.z = window.z || {};
@@ -37,7 +39,7 @@ z.auth.AuthService = class AuthService {
 
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.auth.AuthService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.auth.AuthService', z.config.LOGGER.OPTIONS);
   }
 
   /**

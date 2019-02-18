@@ -18,6 +18,7 @@
  */
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
+import Logger from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.broadcast = z.broadcast || {};
@@ -39,7 +40,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.userRepository = userRepository;
-    this.logger = new z.util.Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 

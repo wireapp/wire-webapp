@@ -17,6 +17,8 @@
  *
  */
 
+import PromiseQueue from 'utils/PromiseQueue';
+
 export default class BackendClient {
   static get CONFIG() {
     return {
@@ -73,9 +75,9 @@ export default class BackendClient {
     this.logger = logger;
 
     this.connectivityTimeout = undefined;
-    this.connectivityQueue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
+    this.connectivityQueue = new PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.requestQueue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
+    this.requestQueue = new PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
     this.queueState = ko.observable(z.service.QUEUE_STATE.READY);
     this.queueTimeout = undefined;
 

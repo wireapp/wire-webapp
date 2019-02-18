@@ -18,6 +18,7 @@
  */
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
+import Logger from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -55,7 +56,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
     this.timedMessages = ko.observableArray([]);
 

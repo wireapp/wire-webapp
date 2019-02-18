@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.search = z.search || {};
 
@@ -55,7 +57,7 @@ class SearchRepository {
   constructor(searchService, userRepository) {
     this.searchService = searchService;
     this.userRepository = userRepository;
-    this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
   }
 
   /**

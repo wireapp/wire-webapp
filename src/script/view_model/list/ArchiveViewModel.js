@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};
@@ -36,7 +38,7 @@ z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
 
     this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
-    this.logger = new z.util.Logger('z.viewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import * as StorageUtil from 'utils/StorageUtil';
 import MediaRepository from './MediaRepository';
 
@@ -34,7 +36,7 @@ export default class MediaDevicesHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger('MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('MediaDevicesHandler', z.config.LOGGER.OPTIONS);
 
     this.availableDevices = {
       audioInput: ko.observableArray([]),

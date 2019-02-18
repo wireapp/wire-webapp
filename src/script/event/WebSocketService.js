@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import * as StorageUtil from 'utils/StorageUtil';
 
 window.z = window.z || {};
@@ -53,7 +55,7 @@ z.event.WebSocketService = class WebSocketService {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
 
     this.clientId = undefined;
     this.connectionUrl = '';

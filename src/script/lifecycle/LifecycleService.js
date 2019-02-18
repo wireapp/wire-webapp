@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.lifecycle = z.lifecycle || {};
 
@@ -30,7 +32,7 @@ z.lifecycle.LifecycleService = class LifecycleService {
   }
 
   constructor() {
-    this.logger = new z.util.Logger('z.lifecycle.LifecycleService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.lifecycle.LifecycleService', z.config.LOGGER.OPTIONS);
   }
 
   getVersion() {

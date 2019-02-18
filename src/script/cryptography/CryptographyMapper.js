@@ -18,6 +18,7 @@
  */
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
+import Logger from 'utils/Logger';
 
 export default class CryptographyMapper {
   static get CONFIG() {
@@ -28,7 +29,7 @@ export default class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**

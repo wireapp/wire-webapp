@@ -19,6 +19,7 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
+import Logger from 'utils/Logger';
 import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
 import {t} from 'utils/LocalizerUtil';
 
@@ -28,7 +29,7 @@ export default class EventMapper {
    * Construct a new Event Mapper.
    */
   constructor() {
-    this.logger = new z.util.Logger('EventMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('EventMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**

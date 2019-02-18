@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
+import Logger from 'utils/Logger';
 
-z.util.PromiseQueue = class PromiseQueue {
+export default class PromiseQueue {
   static get CONFIG() {
     return {
       UNBLOCK_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
@@ -40,8 +39,8 @@ z.util.PromiseQueue = class PromiseQueue {
   constructor(options = {}) {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
-    const loggerName = `z.util.PromiseQueue${name ? ` (${name})` : ''}`;
-    this.logger = new z.util.Logger(loggerName, z.config.LOGGER.OPTIONS);
+    const loggerName = `PromiseQueue${name ? ` (${name})` : ''}`;
+    this.logger = new Logger(loggerName, z.config.LOGGER.OPTIONS);
 
     this._blocked = false;
     this._concurrent = concurrent;
@@ -112,7 +111,7 @@ z.util.PromiseQueue = class PromiseQueue {
   /**
    * Pause or resume the execution.
    * @param {boolean} [shouldPause=true] - Pause queue
-   * @returns {z.util.PromiseQueue} PromiseQueue
+   * @returns {PromiseQueue} PromiseQueue
    */
   pause(shouldPause = true) {
     this._paused = shouldPause;
@@ -175,4 +174,4 @@ z.util.PromiseQueue = class PromiseQueue {
       this._interval = undefined;
     }
   }
-};
+}

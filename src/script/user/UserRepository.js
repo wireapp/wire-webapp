@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
@@ -51,7 +53,7 @@ export default class UserRepository {
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
-    this.logger = new z.util.Logger('UserRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('UserRepository', z.config.LOGGER.OPTIONS);
 
     this.asset_service = asset_service;
     this.client_repository = client_repository;

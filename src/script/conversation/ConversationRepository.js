@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import poster from 'poster-image';
 import {
   Asset,
@@ -36,6 +38,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
+import PromiseQueue from 'utils/PromiseQueue';
 import EventMapper from './EventMapper';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
@@ -112,7 +115,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
@@ -174,8 +177,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this.filtered_conversations().sort(z.util.sortGroupsByLastEvent);
     });
 
-    this.receiving_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Receiving'});
-    this.sending_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
+    this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
+    this.sending_queue = new PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     this.conversation_service.backendClient.queueState.subscribe(queueState => {

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -61,7 +63,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = new z.util.Logger('z.viewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
 
     // Array of warning banners
     this.warnings = ko.observableArray();
