@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import AssetType from '../../assets/AssetType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -27,7 +28,7 @@ z.entity.File = class File extends z.entity.Asset {
     super(id);
     this.cancel_download = this.cancel_download.bind(this);
 
-    this.type = z.assets.AssetType.FILE;
+    this.type = AssetType.FILE;
     this.logger = new Logger('z.entity.File', z.config.LOGGER.OPTIONS);
 
     // z.assets.AssetTransferState
