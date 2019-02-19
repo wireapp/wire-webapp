@@ -45,6 +45,8 @@ import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import trackingHelpers from '../tracking/Helpers';
 
+import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
+
 import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
 window.z = window.z || {};
@@ -2150,8 +2152,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
-    const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
-    const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
+    const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
+    const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {

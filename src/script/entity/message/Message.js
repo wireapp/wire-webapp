@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import AssetTransferState from '../../assets/AssetTransferState';
+import AssetType from '../../assets/AssetType';
 import User from '../User';
 
 window.z = window.z || {};
@@ -114,7 +115,7 @@ class Message {
    * @returns {boolean} Message contains any file type asset
    */
   has_asset() {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === z.assets.AssetType.FILE) : false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
   }
 
   /**

@@ -21,6 +21,7 @@ import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import Conversation from 'src/script/entity/Conversation';
 import EventMapper from 'src/script/conversation/EventMapper';
+import AssetType from 'src/script/assets/AssetType';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
@@ -143,7 +144,7 @@ describe('Event Mapper', () => {
         expect(messageEntity.get_first_asset().height).toBe(event.data.info.height);
         expect(messageEntity.get_first_asset().file_size).toBe(event.data.content_length);
         expect(messageEntity.get_first_asset().file_type).toBe(event.data.content_type);
-        expect(messageEntity.get_first_asset().type).toBe(z.assets.AssetType.IMAGE);
+        expect(messageEntity.get_first_asset().type).toBe(AssetType.IMAGE);
         expect(messageEntity.get_first_asset().resource().otrKey).toBe(event.data.otr_key);
         expect(messageEntity.get_first_asset().resource().sha256).toBe(event.data.sha256);
         expect(messageEntity).toBeDefined();

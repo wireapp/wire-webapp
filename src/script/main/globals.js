@@ -21,7 +21,6 @@ import KeyboardUtilGlobal from '../util/KeyboardUtil.js';
 import LocalizerUtilGlobal from '../util/LocalizerUtil.js';
 import linkifyGlobal from '../util/linkify.js';
 import htmlGlobal from '../util/linkify-html.js';
-import MessageComparatorGlobal from '../util/MessageComparator.js';
 import NumberUtilGlobal from '../util/NumberUtil.js';
 import PeerConnectionUtilGlobal from '../util/PeerConnectionUtil.js';
 import helpersGlobal from '../util/scroll-helpers.js';

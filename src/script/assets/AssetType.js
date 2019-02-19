@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-z.assets.AssetType = {
+export default {
   FILE: 'File',
   IMAGE: 'Image',
   LOCATION: 'Location',
