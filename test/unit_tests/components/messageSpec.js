@@ -1,0 +1,72 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import UUID from 'uuidjs';
+import {instantiateComponent} from '../../api/knockoutHelpers';
+
+import ContentMessage from 'src/script/entity/message/ContentMessage';
+import Text from 'src/script/entity/message/Text';
+import User from 'src/script/entity/User';
+import 'src/script/components/message';
+
+describe('message', () => {
+  const testFactory = new TestFactory();
+  let defaultParams;
+
+  beforeEach(() => {
+    return testFactory.exposeConversationActors().then(conversationRepository => {
+      spyOn(conversationRepository, 'expectReadReceipt').and.returnValue(false);
+      defaultParams = {
+        actionsViewModel: {},
+        conversation: () => ({}),
+        conversationRepository: conversationRepository,
+        isLastDeliveredMessage: () => false,
+        isSelfTemporaryGuest: false,
+        locationRepository: {},
+        message: {},
+        onClickAvatar: () => {},
+        onClickCancelRequest: () => {},
+        onClickInvitePeople: () => {},
+        onClickLikes: () => {},
+        onClickMessage: () => {},
+        onClickParticipants: () => {},
+        onClickReceipts: () => {},
+        onClickTimestamp: () => {},
+        onLike: () => {},
+        selfId: () => UUID.genV4().hexString,
+        shouldShowAvatar: true,
+        shouldShowInvitePeople: true,
+      };
+    });
+  });
+
+  it('displays a message', () => {
+    const textValue = 'hello there';
+    const message = new ContentMessage();
+    message.user(new User());
+    const textAsset = new Text('', textValue);
+    spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
+    message.assets.push(textAsset);
+    const params = Object.assign({}, defaultParams, {message});
+
+    return instantiateComponent('message', params).then(domContainer => {
+      expect(domContainer.querySelector('.text').innerText).toBe(textValue);
+    });
+  });
+});
