@@ -56,37 +56,37 @@ const TimeUtil = {
         plural: t('ephemeralUnitsYears'),
         singular: t('ephemeralUnitsYear'),
         symbol: 'y',
-        value: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
+        value: TimeUtil.UNITS_IN_MILLIS.YEAR,
       },
       {
         plural: t('ephemeralUnitsWeeks'),
         singular: t('ephemeralUnitsWeek'),
         symbol: 'w',
-        value: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
+        value: TimeUtil.UNITS_IN_MILLIS.WEEK,
       },
       {
         plural: t('ephemeralUnitsDays'),
         singular: t('ephemeralUnitsDay'),
         symbol: 'd',
-        value: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+        value: TimeUtil.UNITS_IN_MILLIS.DAY,
       },
       {
         plural: t('ephemeralUnitsHours'),
         singular: t('ephemeralUnitsHour'),
         symbol: 'h',
-        value: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
+        value: TimeUtil.UNITS_IN_MILLIS.HOUR,
       },
       {
         plural: t('ephemeralUnitsMinutes'),
         singular: t('ephemeralUnitsMinute'),
         symbol: 'm',
-        value: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        value: TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       {
         plural: t('ephemeralUnitsSeconds'),
         singular: t('ephemeralUnitsSecond'),
         symbol: 's',
-        value: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+        value: TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     ];
   },
@@ -97,7 +97,7 @@ const TimeUtil = {
    * @returns {DurationUnit} Unit, value and localized string
    */
   formatDuration: duration => {
-    const mappedUnits = z.util.TimeUtil.mapUnits(duration, true);
+    const mappedUnits = TimeUtil.mapUnits(duration, true);
     const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
     return {
       symbol: firstNonZeroUnit.symbol,
@@ -112,7 +112,7 @@ const TimeUtil = {
    * @returns {string} readable representation of the remaining time
    */
   formatDurationCaption: duration => {
-    const mappedUnits = z.util.TimeUtil.mapUnits(duration, false);
+    const mappedUnits = TimeUtil.mapUnits(duration, false);
     const hours = mappedUnits.find(unit => unit.symbol === 'h');
     const minutes = mappedUnits.find(unit => unit.symbol === 'm');
     const hasHours = hours.value > 0;
@@ -183,7 +183,7 @@ const TimeUtil = {
 
   getCurrentDate: () => new Date().toISOString().substring(0, 10),
 
-  getUnixTimestamp: () => Math.floor(Date.now() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
+  getUnixTimestamp: () => Math.floor(Date.now() / TimeUtil.UNITS_IN_MILLIS.SECOND),
 
   /**
    * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
@@ -193,7 +193,7 @@ const TimeUtil = {
    * @returns {DiscreteTimeUnit[]} calculated time units
    */
   mapUnits: (duration, rounded) => {
-    const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index, units) => {
+    const mappedUnits = TimeUtil.durationUnits().map((unit, index, units) => {
       let value = duration;
       if (index > 0) {
         value %= units[index - 1].value;
