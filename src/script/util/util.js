@@ -114,6 +114,28 @@ z.util.loadUrlBuffer = (url, xhrAccessorFunction) => {
   });
 };
 
+z.util.loadImage = function(blob) {
+  return new Promise((resolve, reject) => {
+    const object_url = window.URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = function() {
+      resolve(this);
+      window.URL.revokeObjectURL(object_url);
+    };
+    img.onerror = reject;
+    img.src = object_url;
+  });
+};
+
+z.util.loadFileBuffer = file => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+};
+
 z.util.loadUrlBlob = url => {
   return z.util.loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
