@@ -4,7 +4,7 @@
       <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-group-participant"></arrow-left-icon>
       <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
     </div>
-    <div class="panel__content" data-bind="fadingscrollbar">
+    <div class="panel__content panel__content--fill" data-bind="fadingscrollbar">
       <!-- ko if: selectedService() -->
         <panel-service-details params="service: selectedService"></panel-service-details>
 
