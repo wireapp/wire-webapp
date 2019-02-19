@@ -135,7 +135,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * Display browser notification and play sound notification.
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
@@ -305,7 +305,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @param {z.entity.MemberMessage} messageEntity - Member message entity
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message body
    */
   _createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity) {
@@ -422,7 +422,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves with the notification content
    */
   _createNotificationContent(messageEntity, connectionEntity, conversationEntity) {
@@ -463,7 +463,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @returns {Promise} Resolves with the notification message body
    */
   _createOptionsBody(messageEntity, connectionEntity, conversationEntity) {
@@ -495,7 +495,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Object} Notification message data
    */
   _createOptionsData(messageEntity, connectionEntity, conversationEntity) {
@@ -539,7 +539,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message tag
    */
   _createOptionsTag(connectionEntity, conversationEntity) {
@@ -551,7 +551,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message title
    */
   _createTitle(messageEntity, conversationEntity) {
@@ -584,7 +584,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Function} Function to be called when notification is clicked
    */
   _createTrigger(messageEntity, connectionEntity, conversationEntity) {
@@ -611,7 +611,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} ID of conversation
    */
   _getConversationId(connectionEntity, conversationEntity) {
@@ -648,7 +648,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @see https://developer.mozilla.org/en/docs/Web/API/notification#Parameters
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification was handled
    */
   _notifyBanner(messageEntity, connectionEntity, conversationEntity) {
@@ -741,7 +741,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * Should hide notification.
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
+   * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves if the notification should be shown
    */
   _shouldShowNotification(messageEntity, conversationEntity) {
@@ -837,7 +837,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   /**
    * Check whether conversation is in state to trigger notitication.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation to notify in .
+   * @param {Conversation} conversationEntity - Conversation to notify in .
    * @param {z.entity.Message} messageEntity - The message to filter from.
    * @param {string} userId - The user id to check mentions for.
    * @returns {boolean} True if the conversation should show notification.

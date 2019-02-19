@@ -40,8 +40,10 @@ import {
 
 import PromiseQueue from 'utils/PromiseQueue';
 import EventMapper from './EventMapper';
+import Conversation from '../entity/Conversation';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import trackingHelpers from '../tracking/Helpers';
 
 import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
@@ -1071,7 +1073,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {JSON} payload - Payload to map
    * @param {number} [initialTimestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
-   * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
+   * @returns {Conversation|Array<Conversation>} Mapped conversation/s
    */
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
@@ -1318,7 +1320,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _updateClearedTimestamp(conversationEntity) {
     const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
 
-    if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED)) {
+    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new Cleared({
         clearedTimestamp: timestamp,
         conversationId: conversationEntity.id,
@@ -1495,7 +1497,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Set the notification state of a conversation.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation to change notification state off
+   * @param {Conversation} conversationEntity - Conversation to change notification state off
    * @param {z.conversation.NotificationSetting} notificationState - New notification state
    * @returns {Promise} Resolves when the notification stated was change
    */
@@ -1691,7 +1693,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
     const conversationId = conversationEntity.id;
 
-    if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ)) {
+    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const protoLeastRead = new LastRead({
         conversationId,
         lastReadTimestamp: conversationEntity.last_read_timestamp(),
@@ -2141,7 +2143,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send edited message in specified conversation.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
@@ -4006,7 +4008,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (actionType) {
       const attributes = {
         action: actionType,
-        conversation_type: z.tracking.helpers.getConversationType(conversationEntity),
+        conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
@@ -4016,7 +4018,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+        Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
       }
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);

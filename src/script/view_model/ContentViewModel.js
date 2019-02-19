@@ -159,7 +159,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
    *  Conversation_et can also just be the conversation ID
    *
-   * @param {z.entity.Conversation|string} conversation - Conversation entity or conversation ID
+   * @param {Conversation|string} conversation - Conversation entity or conversation ID
    * @param {Object} options - State to open conversation in
    * @param {z.entity.Message} [options.exposeMessage] - Scroll to message and highlight it
    * @param {boolean} [options.openFirstSelfMention=false] - Open first self mention instead of passed message

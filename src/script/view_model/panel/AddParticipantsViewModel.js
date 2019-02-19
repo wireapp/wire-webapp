@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import BasePanelViewModel from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
+import trackingHelpers from '../../tracking/Helpers';
 
 export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -167,7 +168,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
 
       const isTeamConversation = !!this.activeConversation().team_id;
       if (isTeamConversation) {
-        const participants = z.tracking.helpers.getParticipantTypes(userEntities, false);
+        const participants = trackingHelpers.getParticipantTypes(userEntities, false);
 
         Object.assign(attributes, {
           guest_num: participants.guests,

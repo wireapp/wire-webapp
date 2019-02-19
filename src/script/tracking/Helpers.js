@@ -17,20 +17,18 @@
  *
  */
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
+import Conversation from '../entity/Conversation';
+import {ConversationType, UserType, PlatformType} from './attribute';
 
-z.tracking.helpers = {
+export default {
   /**
    * Get corresponding tracking attribute for conversation type.
-   * @param {z.entity.Conversation} conversationEntity - Conversation to map type of
-   * @returns {z.tracking.attribute.ConversationType} Mapped conversation type
+   * @param {Conversation} conversationEntity - Conversation to map type of
+   * @returns {ConversationType} Mapped conversation type
    */
   getConversationType(conversationEntity) {
-    if (conversationEntity instanceof z.entity.Conversation) {
-      return conversationEntity.is1to1()
-        ? z.tracking.attribute.ConversationType.ONE_TO_ONE
-        : z.tracking.attribute.ConversationType.GROUP;
+    if (conversationEntity instanceof Conversation) {
+      return conversationEntity.is1to1() ? ConversationType.ONE_TO_ONE : ConversationType.GROUP;
     }
   },
 
@@ -40,10 +38,10 @@ z.tracking.helpers = {
       const isAllowGuests = !conversationEntity.isTeamOnly();
       const _getUserType = _conversationEntity => {
         if (_conversationEntity.selfUser().isTemporaryGuest()) {
-          return z.tracking.attribute.UserType.TEMPORARY_GUEST;
+          return UserType.TEMPORARY_GUEST;
         }
 
-        return _conversationEntity.isGuest() ? z.tracking.attribute.UserType.GUEST : z.tracking.attribute.UserType.USER;
+        return _conversationEntity.isGuest() ? UserType.GUEST : UserType.USER;
       };
 
       return {
@@ -54,7 +52,7 @@ z.tracking.helpers = {
 
     return {
       is_allow_guests: false,
-      user_type: z.tracking.attribute.UserType.USER,
+      user_type: UserType.USER,
     };
   },
 
@@ -75,18 +73,16 @@ z.tracking.helpers = {
 
   /**
    * Get the platform identifier.
-   * @returns {z.tracking.attribute.PlatformType} Mapped platform type
+   * @returns {PlatformType} Mapped platform type
    */
   getPlatform() {
     if (!z.util.Environment.desktop) {
-      return z.tracking.attribute.PlatformType.BROWSER_APP;
+      return PlatformType.BROWSER_APP;
     }
 
     if (z.util.Environment.os.win) {
-      return z.tracking.attribute.PlatformType.DESKTOP_WINDOWS;
+      return PlatformType.DESKTOP_WINDOWS;
     }
-    return z.util.Environment.os.mac
-      ? z.tracking.attribute.PlatformType.DESKTOP_MACOS
-      : z.tracking.attribute.PlatformType.DESKTOP_LINUX;
+    return z.util.Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
   },
 };

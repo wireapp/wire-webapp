@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import trackingHelpers from '../tracking/Helpers';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -205,14 +206,14 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
             const conversationEntity = this.joinedCall().conversationEntity;
 
             const attributes = {
-              conversation_type: z.tracking.helpers.getConversationType(conversationEntity),
+              conversation_type: trackingHelpers.getConversationType(conversationEntity),
               kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
               num_screens: screenSources.length,
             };
 
             const isTeamConversation = !!conversationEntity.team_id;
             if (isTeamConversation) {
-              Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+              Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
             }
 
             amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);

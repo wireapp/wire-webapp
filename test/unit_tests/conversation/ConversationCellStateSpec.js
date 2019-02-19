@@ -17,6 +17,7 @@
  *
  */
 
+import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
 
 describe('z.conversation.ConversationCellState', () => {
@@ -24,7 +25,7 @@ describe('z.conversation.ConversationCellState', () => {
   const NOTIFICATION_STATES = z.conversation.NotificationSetting.STATE;
 
   describe('Notification state icon', () => {
-    const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+    const conversationEntity = new Conversation(z.util.createRandomUuid());
 
     const selfUserEntity = new User(z.util.createRandomUuid());
     selfUserEntity.is_me = true;
@@ -61,7 +62,7 @@ describe('z.conversation.ConversationCellState', () => {
       selfReplies: [],
     };
 
-    const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+    const conversationEntity = new Conversation(z.util.createRandomUuid());
 
     const selfUserEntity = new User(z.util.createRandomUuid());
     selfUserEntity.is_me = true;

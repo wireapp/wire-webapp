@@ -384,7 +384,7 @@ export default class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {Conversation} conversationEntity - Conversation entity the event belong to
    * @returns {MemberMessage} Member message entity
    */
   _mapEventMemberJoin(event, conversationEntity) {

@@ -26,6 +26,8 @@ import {groupBy} from 'underscore';
 import mousewheel from 'jquery-mousewheel';
 /* eslint-enable no-unused-vars */
 
+import Conversation from '../../entity/Conversation';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -64,7 +66,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
 
-    this.conversation = ko.observable(new z.entity.Conversation());
+    this.conversation = ko.observable(new Conversation());
     this.verticallyCenterMessage = ko.pureComputed(() => {
       if (this.conversation().messages_visible().length === 1) {
         const [messageEntity] = this.conversation().messages_visible();
@@ -165,7 +167,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Mark conversation as read if window has focus
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to mark as read
+   * @param {Conversation} conversation_et - Conversation entity to mark as read
    * @returns {undefined} No return value
    */
   _mark_conversation_as_read_on_focus(conversation_et) {
@@ -177,7 +179,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Remove all subscriptions and reset states.
-   * @param {z.entity.Conversation} [conversation_et] - Conversation entity to change to
+   * @param {Conversation} [conversation_et] - Conversation entity to change to
    * @returns {undefined} No return value
    */
   release_conversation(conversation_et) {
@@ -220,7 +222,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Change conversation.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity to change to
+   * @param {Conversation} conversationEntity - Conversation entity to change to
    * @param {z.entity.Message} messageEntity - message to be focused
    * @returns {Promise} Resolves when conversation was changed
    */
@@ -277,7 +279,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Sets the conversation and waits for further processing until knockout has rendered the messages.
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity to set
+   * @param {Conversation} conversationEntity - Conversation entity to set
    * @param {z.entity.Message} messageEntity - Message that should be in focus when the conversation loads
    * @returns {Promise} Resolves when conversation was rendered
    */
@@ -596,7 +598,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Message appeared in viewport.
-   * @param {z.entity.Conversation} conversationEntity - Conversation the message belongs to
+   * @param {Conversation} conversationEntity - Conversation the message belongs to
    * @param {z.entity.Message} messageEntity - Message to check
    * @returns {Function|null} Callback or null
    */

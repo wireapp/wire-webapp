@@ -19,6 +19,7 @@
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
+import Conversation from 'src/script/entity/Conversation';
 import EventMapper from 'src/script/conversation/EventMapper';
 
 describe('Event Mapper', () => {
@@ -37,7 +38,7 @@ describe('Event Mapper', () => {
   });
 
   beforeEach(() => {
-    conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
+    conversation_et = new Conversation(z.util.createRandomUuid());
     event_mapper = new EventMapper();
   });
 
@@ -170,7 +171,7 @@ describe('Event Mapper', () => {
       const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
       const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, z.util.createRandomUuid());
 
-      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(z.util.createRandomUuid());
 
       const event = {
         category: 16,
@@ -211,7 +212,7 @@ describe('Event Mapper', () => {
       const overlappingStart = mandyStart + mandy.length - 1;
       const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, z.util.createRandomUuid());
 
-      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(z.util.createRandomUuid());
 
       const event = {
         category: 16,
