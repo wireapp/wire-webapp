@@ -25,12 +25,13 @@ import * as rimraf from 'rimraf';
 import {promisify} from 'util';
 
 import copy = require('copy');
+import File = require('vinyl');
 import {CopyConfigOptions} from './CopyConfigOptions';
 
 const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
 const rimrafAsync = promisify(rimraf);
 const execAsync = promisify(exec);
-const copyAsync = async (source: string, destination: string): Promise<string[]> => {
+const copyAsync = async (source: string, destination: string): Promise<File[]> => {
   if (isFile(destination)) {
     await fs.ensureDir(path.dirname(destination));
   } else {
@@ -38,7 +39,7 @@ const copyAsync = async (source: string, destination: string): Promise<string[]>
   }
 
   return new Promise((resolve, reject) =>
-    copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files.map(file => file.path))))
+    copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files)))
   );
 };
 
@@ -135,19 +136,28 @@ export class CopyConfig {
 
     const isGlob = (path: string) => /\*$/.test(path);
 
-    this.logger.info(`Copying "${source}" -> "${destination}"`);
-
     if (isFile(destination) && !isFile(source)) {
       throw new Error('Cannot copy a directory into a file.');
     }
 
     if (isGlob(source)) {
-      return copyAsync(source, destination);
+      this.logger.info(`Resolving "${source}"`);
+
+      const copiedFiles = await copyAsync(source, destination);
+
+      for (const copiedFile of copiedFiles) {
+        const [copiedFrom, copiedTo] = copiedFile.history;
+        this.logger.info(`Copying "${copiedFrom}" -> "${copiedTo}"`);
+      }
+
+      return copiedFiles.map(file => file.path);
     }
 
     if (isFile(source) && !isFile(destination)) {
       destination = path.join(destination, path.basename(source));
     }
+
+    this.logger.info(`Copying "${source}" -> "${destination}"`);
 
     // Info: "fs.copy" creates all sub-folders which are needed along the way:
     // @see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
