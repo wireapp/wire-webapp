@@ -306,9 +306,7 @@ class App {
       .then(() => {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-
-        const protoFile = `/proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
+        return this._initiateSelfUser();
       })
       .then(() => {
         this.view.loading.updateProgress(5, t('initReceivedSelfUser'));

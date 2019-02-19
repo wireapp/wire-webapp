@@ -17,6 +17,8 @@
  *
  */
 
+import {Mention} from '@wireapp/protocol-messaging';
+
 window.z = window.z || {};
 window.z.message = z.message || {};
 
@@ -117,10 +119,10 @@ z.message.MentionEntity = class MentionEntity {
   }
 
   toProto() {
-    const protoMention = new z.proto.Mention(this.startIndex, this.length);
+    const protoMention = new Mention({length: this.length, start: this.startIndex});
     const isUserIdMention = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     if (isUserIdMention) {
-      protoMention.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID, this.userId);
+      protoMention[z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID] = this.userId;
     }
     return protoMention;
   }

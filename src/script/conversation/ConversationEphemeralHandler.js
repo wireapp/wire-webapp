@@ -17,6 +17,7 @@
  *
  */
 
+import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import Logger from 'utils/Logger';
 
 window.z = window.z || {};
@@ -202,8 +203,15 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const obfuscatedAsset = new z.entity.Text(messageEntity.id);
     const obfuscatedPreviews = assetEntity.previews().map(linkPreview => {
       linkPreview.obfuscate();
-      const protoArticle = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
-      return new z.proto.LinkPreview(linkPreview.url, 0, protoArticle, linkPreview.url, linkPreview.title).encode64();
+      const protoArticle = new Article({permanentUrl: linkPreview.url, title: linkPreview.title}); // deprecated format
+      const linkPreviewProto = new LinkPreview({
+        article: protoArticle,
+        permanentUrl: linkPreview.url,
+        title: linkPreview.title,
+        url: linkPreview.url,
+        urlOffset: 0,
+      });
+      return z.util.arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
     obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);

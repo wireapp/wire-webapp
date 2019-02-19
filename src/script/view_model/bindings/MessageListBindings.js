@@ -90,14 +90,11 @@ ko.bindingHandlers.background_image = {
     let objectUrl;
 
     const loadImage = () => {
-      assetLoader
-        .load()
-        .then(blob => {
-          $(element).removeClass('image-loading');
-          objectUrl = window.URL.createObjectURL(blob);
-          imageElement[0].src = objectUrl;
-        })
-        .catch(() => {});
+      assetLoader.load().then(blob => {
+        $(element).removeClass('image-loading');
+        objectUrl = window.URL.createObjectURL(blob);
+        imageElement[0].src = objectUrl;
+      });
     };
 
     viewportObserver.addElement(element, loadImage);

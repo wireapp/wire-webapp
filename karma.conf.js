@@ -41,12 +41,6 @@ function getSpecs(specList) {
  */
 function getIncludedFiles(noLegacy) {
   const commonFiles = [
-    {
-      included: false,
-      nocache: true,
-      pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
-      served: true,
-    },
     {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
     {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
     'node_modules/sinon/pkg/sinon.js',

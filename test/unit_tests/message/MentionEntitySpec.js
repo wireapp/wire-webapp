@@ -17,10 +17,10 @@
  *
  */
 
+import {Mention} from '@wireapp/protocol-messaging';
+
 describe('MentionEntity', () => {
   const userId = '7bec1483-5b11-429d-9759-ec71369654b5';
-
-  beforeAll(() => z.util.protobuf.loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto'));
 
   describe('validate', () => {
     const textMessage = 'Hello, World! @test_user Please read!';
@@ -86,8 +86,8 @@ describe('MentionEntity', () => {
 
     it('supports line breaks in texts with mentions', () => {
       const encodedMention = 'CAEQCBokNDRiZDc3NmUtODcxOS00MzIwLWIxYTAtMzU0Y2NkOGU5ODNh';
-      const protoMention = z.proto.Mention.decode64(encodedMention);
-      const mentionEntity = new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
+      const protoMention = Mention.decode(z.util.base64ToArray(encodedMention));
+      const mentionEntity = new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       const messageText = '\n@Firefox';
 
       expect(mentionEntity.validate(messageText)).toBe(true);
