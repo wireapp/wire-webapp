@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import trackingHelpers from './Helpers';
 
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
@@ -178,7 +179,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _setSuperProperties() {
     this._setSuperProperty(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
     this._setSuperProperty(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
-    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.getPlatform());
+    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
     if (z.util.Environment.desktop) {
       this._setSuperProperty(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
     }

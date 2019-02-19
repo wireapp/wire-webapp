@@ -18,6 +18,7 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import Conversation from 'src/script/entity/Conversation';
 
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();
@@ -26,7 +27,7 @@ describe('ClientMismatchHandler', () => {
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(conversationRepository => {
-      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity = new Conversation(z.util.createRandomUuid());
       return conversationRepository.save_conversation(conversationEntity);
     });
   });

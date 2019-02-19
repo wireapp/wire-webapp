@@ -688,7 +688,7 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Send a call event.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation to send message in
+   * @param {Conversation} conversationEntity - Conversation to send message in
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity
    * @returns {Promise} Resolves when the event has been sent
    */

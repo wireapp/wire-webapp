@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import trackingHelpers from '../../tracking/Helpers';
 
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
@@ -142,7 +143,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           started_as_video: videoTypes.includes(this.mediaType),
           with_service: conversationEntity.hasService(),
         },
-        z.tracking.helpers.getGuestAttributes(conversationEntity),
+        trackingHelpers.getGuestAttributes(conversationEntity),
         attributes
       );
     }

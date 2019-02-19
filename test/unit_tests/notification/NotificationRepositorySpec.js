@@ -18,6 +18,7 @@
  */
 
 import 'src/script/localization/Localizer';
+import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
 
 window.wire = window.wire || {};
@@ -629,7 +630,7 @@ describe('z.notification.NotificationRepository', () => {
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
 
-      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity = new Conversation(z.util.createRandomUuid());
       conversationEntity.selfUser(selfUserEntity);
 
       messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());

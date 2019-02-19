@@ -118,7 +118,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    *
    * @param {User} userEntity - User to block
    * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
+   * @param {Conversation} [nextConversationEntity] - Conversation to be switched to
    * @returns {Promise} Promise that resolves when the user was blocked
    */
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
@@ -134,7 +134,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    *
    * @param {User} userEntity - User to cancel the sent connection request
    * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
+   * @param {Conversation} [nextConversationEntity] - Conversation to be switched to
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancelRequest(userEntity, hideConversation = false, nextConversationEntity) {
