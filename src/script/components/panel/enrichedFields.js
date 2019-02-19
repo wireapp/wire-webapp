@@ -25,8 +25,8 @@ ko.components.register('enriched-fields', {
       <div class="enriched-fields">
         <!-- ko foreach: fields() -->
           <div class="enriched-fields__entry">
-            <div data-bind="text: $data[0]" class="enriched-fields__entry__key"></div>
-            <div data-bind="text: $data[1]" class="enriched-fields__entry__value"></div>
+            <div data-bind="text: $data[0]" class="enriched-fields__entry__key" data-uie-name="item-enriched-key"></div>
+            <div data-bind="text: $data[1]" class="enriched-fields__entry__value" data-uie-name="item-enriched-value"></div>
           </div>
         <!-- /ko -->
       </div>
