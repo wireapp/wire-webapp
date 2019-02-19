@@ -17,6 +17,7 @@
  *
  */
 
+import {t, setStrings} from 'utils/LocalizerUtil';
 import 'src/script/localization/Localizer';
 import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
@@ -25,6 +26,9 @@ window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 
 describe('z.notification.NotificationRepository', () => {
+  setStrings({
+    ephemeralUnitsSeconds: 'seconds',
+  });
   const test_factory = new TestFactory();
   let conversation_et = null;
   let message_et = null;
@@ -443,7 +447,7 @@ describe('z.notification.NotificationRepository', () => {
       message_et = new z.entity.MessageTimerUpdateMessage(5000);
       message_et.user(user_et);
 
-      const expectedBody = `${first_name} set the message timer to 5 seconds`;
+      const expectedBody = `${first_name} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
       return verify_notification_system(conversation_et, message_et, expectedBody);
     });
 

@@ -114,7 +114,7 @@ class App {
     repositories.auth = authComponent.repository;
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
-    repositories.serverTime = new z.time.ServerTimeRepository();
+    repositories.serverTime = resolve(graph.ServerTimeRepository);
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
