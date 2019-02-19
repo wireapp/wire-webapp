@@ -235,18 +235,6 @@ describe('z.util.arrayToMd5Base64', () => {
   });
 });
 
-describe('z.util.encodeBase64', () => {
-  it('encodes text', () => {
-    expect(z.util.encodeBase64('Hello, world!')).toBe('SGVsbG8sIHdvcmxkIQ==');
-  });
-
-  it('encodes symbols', () => {
-    expect(z.util.encodeBase64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
-      'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI='
-    );
-  });
-});
-
 describe('z.util.encode_base64_sha256', () => {
   it('encodes Base64 and SHA-256 empty string', () => {
     expect(z.util.encodeSha256Base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
@@ -4110,17 +4098,6 @@ describe('z.util.getContentTypeFromDataUrl', () =>
     expect(actual).toEqual('image/gif');
   }));
 
-describe('z.util.isIsoString', () => {
-  it('validates date', () => {
-    expect(z.util.isIsoString()).toBeFalsy();
-    expect(z.util.isIsoString(new Date().getTime())).toBeFalsy();
-    expect(z.util.isIsoString('2011-90-05T14:48:00.000Z')).toBeFalsy();
-    expect(z.util.isIsoString('2011-10-05T14:48:00.000')).toBeFalsy();
-    expect(z.util.isIsoString(new Date().toISOString())).toBeTruthy();
-    expect(z.util.isIsoString('2011-10-05T14:48:00.000Z')).toBeTruthy();
-  });
-});
-
 describe('z.util.sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
     const groupA = new Conversation();
@@ -4494,24 +4471,5 @@ describe('z.util.is_same_location', () => {
 
   it('returns true if page was reloaded with parameters', () => {
     expect(z.util.isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
-  });
-});
-
-describe('bucketValues', () => {
-  it('returns correct value for zero', () => {
-    expect(z.util.bucketValues(0, [0, 5, 10, 15, 20, 25])).toBe('0');
-  });
-
-  it('returns the correct bucket if value is inside the given limits', () => {
-    expect(z.util.bucketValues(0.1, [0, 5, 10, 15, 20, 25])).toBe('0');
-    expect(z.util.bucketValues(1, [0, 5, 10, 15, 20, 25])).toBe('1-5');
-    expect(z.util.bucketValues(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
-    expect(z.util.bucketValues(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
-    expect(z.util.bucketValues(1023, [0, 100, 200, 500, 1000, 2000])).toBe('1001-2000');
-  });
-
-  it('returns the correct bucket if value is above the given limits', () => {
-    expect(z.util.bucketValues(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
-    expect(z.util.bucketValues(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
   });
 });

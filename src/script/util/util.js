@@ -83,34 +83,12 @@ z.util.isSameLocation = (pastLocation, currentLocation) => {
   return pastLocation !== '' && currentLocation.startsWith(pastLocation);
 };
 
-z.util.loadImage = function(blob) {
-  return new Promise((resolve, reject) => {
-    const object_url = window.URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = function() {
-      resolve(this);
-      window.URL.revokeObjectURL(object_url);
-    };
-    img.onerror = reject;
-    img.src = object_url;
-  });
-};
-
 z.util.loadDataUrl = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
-  });
-};
-
-z.util.loadFileBuffer = file => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
   });
 };
 
@@ -255,11 +233,6 @@ z.util.downloadBlob = (blob, filename, mimeType) => {
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-z.util.downloadText = (text, filename = 'default.txt') => {
-  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-  return z.util.downloadFile(url, filename);
-};
-
 z.util.downloadFile = (url, fileName, mimeType) => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
@@ -287,8 +260,6 @@ z.util.phoneNumberToE164 = (phoneNumber, countryCode) => {
 };
 
 z.util.createRandomUuid = () => UUID.genV4().hexString;
-
-z.util.encodeBase64 = text => window.btoa(text);
 
 z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
@@ -405,15 +376,6 @@ z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
 z.util.zeroPadding = (value, length = 2) => {
   const zerosNeeded = Math.max(0, length - value.toString().length);
   return `${'0'.repeat(zerosNeeded)}${value}`;
-};
-
-/**
- * Test whether the given string is ISO 8601 format equally to date.toISOString()
- * @param {string} dateString - String with data
- * @returns {boolean} True, if input string follows ISO 8601
- */
-z.util.isIsoString = dateString => {
-  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(dateString);
 };
 
 z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
@@ -538,30 +500,6 @@ z.util.printDevicesId = id => {
   const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
 
   return prettifiedId.join('');
-};
-
-/**
- * Returns bucket for given value based on the specified bucket limits
- * @example z.util.bucketValues(13, [0, 5, 10, 15, 20, 25]) will return '11-15')
- * @param {number} value - Numeric value
- * @param {Array<number>} bucketLimits - Array with numeric values that define the upper limit of the bucket
- * @returns {string} Bucket
- */
-z.util.bucketValues = (value, bucketLimits) => {
-  if (value < bucketLimits[0] + 1) {
-    return '0';
-  }
-
-  for (let index = 0; index < bucketLimits.length; index++) {
-    const limit = bucketLimits[index];
-    if (value < limit + 1) {
-      const previous_limit = bucketLimits[index - 1];
-      return `${previous_limit + 1}-${limit}`;
-    }
-  }
-
-  const last_limit = bucketLimits[bucketLimits.length - 1];
-  return `${last_limit + 1}-`;
 };
 
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
