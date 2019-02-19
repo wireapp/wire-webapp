@@ -23,6 +23,7 @@ import AudioRepository from '../audio/AudioRepository';
 import BackendClient from '../service/BackendClient';
 import BackupService from '../backup/BackupService';
 import CacheRepository from '../cache/CacheRepository';
+import CallingService from '../calling/CallingService';
 import GiphyRepository from '../extension/GiphyRepository';
 import GiphyService from '../extension/GiphyService';
 import MediaRepository from '../media/MediaRepository';
@@ -44,6 +45,7 @@ dependencies.set(AudioRepository, {dependencies: [], name: 'AudioRepository'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
 dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
 dependencies.set(CacheRepository, {dependencies: [], name: 'CacheRepository'});
+dependencies.set(CallingService, {dependencies: [BackendClient], name: 'CallingService'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
@@ -62,6 +64,7 @@ export {
   BackendClient,
   BackupService,
   CacheRepository,
+  CallingService,
   GiphyRepository,
   GiphyService,
   MediaRepository,
