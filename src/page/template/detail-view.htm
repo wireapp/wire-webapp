@@ -2,11 +2,11 @@
   <!-- ko if: messageEntity() && conversationEntity() -->
     <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': imageVisible()}">
       <header class="detail-view-header">
-          <div class="text-center">
-            <div class="label-bold-xs" data-bind="text: messageEntity().unsafeSenderName(), attr: {'data-uie-uid': messageEntity().user().id, 'data-uie-value': messageEntity().user().name}" data-uie-name="fullscreen-picture-sender"></div>
-            <div class="label-xs" data-bind="text: moment(messageEntity().timestamp()).format('DD/MM/YYYY H:mm'), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
-          </div>
-        <span class="detail-view-header-close-button icon-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close-detail-view"></span>
+        <div class="text-center">
+          <div class="label-bold-xs" data-bind="text: messageEntity().unsafeSenderName(), attr: {'data-uie-uid': messageEntity().user().id, 'data-uie-value': messageEntity().user().name}" data-uie-name="fullscreen-picture-sender"></div>
+          <div class="label-xs" data-bind="text: moment(messageEntity().timestamp()).format('DD/MM/YYYY H:mm'), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
+        </div>
+        <close-icon class="detail-view-header-close-button icon-button" data-bind="click: clickOnClose" data-uie-name="do-close-detail-view"></close-icon>
       </header>
       <div class="detail-view-main" data-bind="click: clickOnClose">
         <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture"/>
