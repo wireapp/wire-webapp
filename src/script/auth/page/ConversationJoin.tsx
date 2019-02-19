@@ -94,7 +94,7 @@ interface State {
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class ConversationJoin extends React.Component<CombinedProps, State> {
-  nameInput: HTMLInputElement;
+  nameInput: React.RefObject<any> = React.createRef();
   state: State = {
     accentColor: AccentColor.random(),
     conversationCode: null,
@@ -174,14 +174,14 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
 
   handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    this.nameInput.value = this.nameInput.value.trim();
-    if (!this.nameInput.checkValidity()) {
+    this.nameInput.current.value = this.nameInput.current.value.trim();
+    if (!this.nameInput.current.checkValidity()) {
       this.setState({
-        error: ValidationError.handleValidationState('name', this.nameInput.validity),
+        error: ValidationError.handleValidationState('name', this.nameInput.current.validity),
         isValidName: false,
       });
     } else {
-      Promise.resolve(this.nameInput.value)
+      Promise.resolve(this.nameInput.current.value)
         .then(name => name.trim())
         .then(name => {
           const registrationData = {
@@ -215,7 +215,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
           }
         });
     }
-    this.nameInput.focus();
+    this.nameInput.current.focus();
   };
 
   isConversationFullError = (error: BackendError) =>
@@ -289,7 +289,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
               name="name"
               autoComplete="username"
               value={enteredName}
-              innerRef={node => (this.nameInput = node)}
+              ref={this.nameInput}
               onChange={event => {
                 this.resetErrors();
                 this.setState({enteredName: event.target.value});

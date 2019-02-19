@@ -58,7 +58,7 @@ interface State {
 type CombinedProps = Props & InjectedIntlProps;
 
 class ClientItem extends React.Component<CombinedProps, State> {
-  private passwordInput: HTMLInputElement;
+  private passwordInput: React.RefObject<any>;
   state: State;
 
   static CONFIG = {
@@ -160,10 +160,13 @@ class ClientItem extends React.Component<CombinedProps, State> {
   handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     let validationError = null;
-    if (!this.passwordInput.checkValidity()) {
-      validationError = ValidationError.handleValidationState(this.passwordInput.name, this.passwordInput.validity);
+    if (!this.passwordInput.current.checkValidity()) {
+      validationError = ValidationError.handleValidationState(
+        this.passwordInput.current.name,
+        this.passwordInput.current.validity
+      );
     }
-    this.setState({validPassword: this.passwordInput.validity.valid, validationError});
+    this.setState({validPassword: this.passwordInput.current.validity.valid, validationError});
     return Promise.resolve(validationError)
       .then(error => {
         if (error) {
@@ -256,7 +259,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
                     autoComplete="section-login password"
                     autoFocus
                     data-uie-name="remove-device-password"
-                    innerRef={node => (this.passwordInput = node)}
+                    ref={this.passwordInput}
                     maxLength={1024}
                     minLength={8}
                     name="password"
