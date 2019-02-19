@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 import trackingHelpers from '../../tracking/Helpers';
+import {ConversationType} from '../../tracking/attribute';
 
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
@@ -130,9 +131,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           conversation_participants_in_call_max: this.maxNumberOfParticipants
             ? this.maxNumberOfParticipants
             : undefined,
-          conversation_type: isGroup
-            ? z.tracking.attribute.ConversationType.GROUP
-            : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          conversation_type: isGroup ? ConversationType.GROUP : ConversationType.ONE_TO_ONE,
           direction: this.direction,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
