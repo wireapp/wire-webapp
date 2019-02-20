@@ -186,7 +186,7 @@ export default class CryptographyMapper {
       data.info.tag = 'medium';
     }
 
-    if (uploaded !== null) {
+    if (asset.hasOwnProperty('uploaded') && uploaded !== null) {
       data = Object.assign(data, {
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
@@ -194,7 +194,9 @@ export default class CryptographyMapper {
         status: z.assets.AssetTransferState.UPLOADED,
         token: uploaded.assetToken,
       });
-    } else {
+    }
+
+    if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED,
