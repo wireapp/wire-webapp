@@ -27,44 +27,44 @@ class MediaButtonComponent {
    * Construct a media button.
    *
    * @param {Object} params - Component parameters
-   * @param {HTMLElement} params.media_src - Media source
+   * @param {HTMLElement} params.src - Media source
    * @param {boolean} params.large - Display large button
    * @param {z.entity.File} params.asset - Asset file
-   * @param {Object} component_info - Component information
+   * @param {Object} componentInfo - Component information
    */
-  constructor(params, component_info) {
-    this.media_element = params.src;
+  constructor(params, componentInfo) {
+    this.mediaElement = params.src;
     this.large = params.large;
     this.asset = params.asset;
     this.uploadProgress = params.uploadProgress;
     this.transferState = params.transferState;
 
     this.dispose = this.dispose.bind(this);
-    this.on_play = this.on_play.bind(this);
-    this.on_pause = this.on_pause.bind(this);
+    this.onPlay = this.onPlay.bind(this);
+    this.onPause = this.onPause.bind(this);
 
     if (this.large) {
-      component_info.element.classList.add('media-button-lg');
+      componentInfo.element.classList.add('media-button-lg');
     }
 
-    this.media_is_playing = ko.observable(false);
+    this.isPlaying = ko.observable(false);
 
     const noop = () => {};
 
-    this.on_play_button_clicked = typeof params.play === 'function' ? () => params.play() : noop;
-    this.on_pause_button_clicked = typeof params.pause === 'function' ? () => params.pause() : noop;
-    this.on_cancel_button_clicked = typeof params.cancel === 'function' ? () => params.cancel() : noop;
+    this.onClickPlay = typeof params.play === 'function' ? () => params.play() : noop;
+    this.onClickPause = typeof params.pause === 'function' ? () => params.pause() : noop;
+    this.onClickCancel = typeof params.cancel === 'function' ? () => params.cancel() : noop;
 
-    this.media_element.addEventListener('playing', this.on_play);
-    this.media_element.addEventListener('pause', this.on_pause);
+    this.mediaElement.addEventListener('playing', this.onPlay);
+    this.mediaElement.addEventListener('pause', this.onPause);
   }
 
-  on_play() {
-    this.media_is_playing(true);
+  onPlay() {
+    this.isPlaying(true);
   }
 
-  on_pause() {
-    this.media_is_playing(false);
+  onPause() {
+    this.isPlaying(false);
   }
 
   isUploaded(transferState) {
@@ -80,16 +80,16 @@ class MediaButtonComponent {
   }
 
   dispose() {
-    this.media_element.removeEventListener('playing', this.on_play);
-    this.media_element.removeEventListener('pause', this.on_pause);
+    this.mediaElement.removeEventListener('playing', this.onPlay);
+    this.mediaElement.removeEventListener('pause', this.onPause);
   }
 }
 
 ko.components.register('media-button', {
   template: `
     <!-- ko if: isUploaded(transferState()) -->
-      <div class='media-button media-button-play icon-play' data-bind="click: on_play_button_clicked, visible: !media_is_playing()" data-uie-name="do-play-media"></div>
-      <div class='media-button media-button-pause icon-pause' data-bind="click: on_pause_button_clicked, visible: media_is_playing()" data-uie-name="do-pause-media"></div>
+      <div class='media-button media-button-play icon-play' data-bind="click: onClickPlay, visible: !isPlaying()" data-uie-name="do-play-media"></div>
+      <div class='media-button media-button-pause icon-pause' data-bind="click: onClickPause, visible: isPlaying()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
     <!-- ko if: isDownloading(transferState()) -->
       <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
@@ -98,15 +98,15 @@ ko.components.register('media-button', {
       </div>
     <!-- /ko -->
       <!-- ko if: isUploading(transferState()) -->
-      <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
+      <div class="media-button icon-close" data-bind="click: onClickCancel" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
         <asset-loader params="large: large, loadProgress: uploadProgress"></asset-loader>
       </div>
     <!-- /ko -->
 `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new MediaButtonComponent(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new MediaButtonComponent(params, componentInfo);
     },
   },
 });
