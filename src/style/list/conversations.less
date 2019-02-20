@@ -39,7 +39,7 @@
   color: #fff;
 
   svg {
-    fill: currentColor;
+    fill: #fff;
   }
 
   .conversations-footer-contacts-label {
@@ -52,6 +52,16 @@
 
 .conversations-settings {
   position: relative;
+
+  &--badge::after {
+    .dot-md;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: currentColor;
+    color: inherit;
+    content: '';
+  }
 }
 
 .conversations-settings-badge {
