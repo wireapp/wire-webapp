@@ -43,7 +43,7 @@ z.event.EventService = class EventService {
    */
   loadEvents(conversationId, eventIds) {
     if (!conversationId || !eventIds) {
-      this.logger.error(`Cannot get event '${eventIds}' in conversation '${conversationId}' without IDs`);
+      this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 

@@ -132,7 +132,7 @@ export default class CryptographyMapper {
       }
 
       default: {
-        const logMessage = `Skipped event '${genericMessage.message_id}' of unhandled type '${genericMessage.content}'`;
+        const logMessage = `Skipped event '${genericMessage.messageId}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
         throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
       }
@@ -298,7 +298,7 @@ export default class CryptographyMapper {
 
   _mapEphemeral(genericMessage, event) {
     const messageTimer = genericMessage.ephemeral[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
-    genericMessage.ephemeral.message_id = genericMessage.messageId;
+    genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
     embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
