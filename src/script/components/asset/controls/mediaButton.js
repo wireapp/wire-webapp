@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import AssetTransferState from '../../../assets/AssetTransferState';
 
 import '../assetLoader';
 
@@ -26,83 +27,86 @@ class MediaButtonComponent {
    * Construct a media button.
    *
    * @param {Object} params - Component parameters
-   * @param {HTMLElement} params.media_src - Media source
+   * @param {HTMLElement} params.src - Media source
    * @param {boolean} params.large - Display large button
    * @param {z.entity.File} params.asset - Asset file
-   * @param {Object} component_info - Component information
+   * @param {Object} componentInfo - Component information
    */
-  constructor(params, component_info) {
-    this.dispose = this.dispose.bind(this);
-    this.media_element = params.src;
+  constructor(params, componentInfo) {
+    this.mediaElement = params.src;
     this.large = params.large;
     this.asset = params.asset;
     this.uploadProgress = params.uploadProgress;
     this.transferState = params.transferState;
 
+    this.dispose = this.dispose.bind(this);
+    this.onPlay = this.onPlay.bind(this);
+    this.onPause = this.onPause.bind(this);
+
     if (this.large) {
-      component_info.element.classList.add('media-button-lg');
+      componentInfo.element.classList.add('media-button-lg');
     }
 
-    this.media_is_playing = ko.observable(false);
+    this.isPlaying = ko.observable(false);
 
-    this.on_play_button_clicked = function() {
-      if (typeof params.play === 'function') {
-        params.play();
-      }
-    };
-    this.on_pause_button_clicked = function() {
-      if (typeof params.pause === 'function') {
-        params.pause();
-      }
-    };
-    this.on_cancel_button_clicked = function() {
-      if (typeof params.cancel === 'function') {
-        params.cancel();
-      }
-    };
+    const noop = () => {};
 
-    this.on_play = this.on_play.bind(this);
-    this.on_pause = this.on_pause.bind(this);
-    this.media_element.addEventListener('playing', this.on_play);
-    this.media_element.addEventListener('pause', this.on_pause);
+    this.onClickPlay = typeof params.play === 'function' ? () => params.play() : noop;
+    this.onClickPause = typeof params.pause === 'function' ? () => params.pause() : noop;
+    this.onClickCancel = typeof params.cancel === 'function' ? () => params.cancel() : noop;
+
+    this.mediaElement.addEventListener('playing', this.onPlay);
+    this.mediaElement.addEventListener('pause', this.onPause);
   }
 
-  on_play() {
-    this.media_is_playing(true);
+  onPlay() {
+    this.isPlaying(true);
   }
 
-  on_pause() {
-    this.media_is_playing(false);
+  onPause() {
+    this.isPlaying(false);
+  }
+
+  isUploaded(transferState) {
+    return transferState === AssetTransferState.UPLOADED;
+  }
+
+  isDownloading(transferState) {
+    return transferState === AssetTransferState.DOWNLOADING;
+  }
+
+  isUploading(transferState) {
+    return transferState === AssetTransferState.UPLOADING;
   }
 
   dispose() {
-    this.media_element.removeEventListener('playing', this.on_play);
-    this.media_element.removeEventListener('pause', this.on_pause);
+    this.mediaElement.removeEventListener('playing', this.onPlay);
+    this.mediaElement.removeEventListener('pause', this.onPause);
   }
 }
 
 ko.components.register('media-button', {
   template: `
-    <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOADED -->
-      <div class='media-button media-button-play icon-play' data-bind="click: on_play_button_clicked, visible: !media_is_playing()" data-uie-name="do-play-media"></div>
-      <div class='media-button media-button-pause icon-pause' data-bind="click: on_pause_button_clicked, visible: media_is_playing()" data-uie-name="do-pause-media"></div>
+    <!-- ko if: isUploaded(transferState()) -->
+      <div class='media-button media-button-play icon-play' data-bind="click: onClickPlay, visible: !isPlaying()" data-uie-name="do-play-media"></div>
+      <div class='media-button media-button-pause icon-pause' data-bind="click: onClickPause, visible: isPlaying()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
-    <!-- ko if: transferState() === z.assets.AssetTransferState.DOWNLOADING -->
+    <!-- ko if: isDownloading(transferState()) -->
       <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
         <div class='media-button-border-fill'></div>
         <asset-loader params="large: large, loadProgress: asset.downloadProgress"></asset-loader>
       </div>
     <!-- /ko -->
-    <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOADING -->
-      <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
+      <!-- ko if: isUploading(transferState()) -->
+      <div class="media-button icon-close" data-bind="click: onClickCancel" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
         <asset-loader params="large: large, loadProgress: uploadProgress"></asset-loader>
       </div>
     <!-- /ko -->
 `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new MediaButtonComponent(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new MediaButtonComponent(params, componentInfo);
     },
   },
 });
