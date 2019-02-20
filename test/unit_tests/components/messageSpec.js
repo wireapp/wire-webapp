@@ -28,11 +28,19 @@ import 'src/script/components/message';
 
 describe('message', () => {
   const testFactory = new TestFactory();
+  const textValue = 'hello there';
   let defaultParams;
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(conversationRepository => {
       spyOn(conversationRepository, 'expectReadReceipt').and.returnValue(false);
+      const message = new ContentMessage();
+
+      message.user(new User());
+      const textAsset = new Text('', textValue);
+      spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
+      message.assets.push(textAsset);
+
       defaultParams = {
         actionsViewModel: {},
         conversation: () => new Conversation(),
@@ -40,7 +48,7 @@ describe('message', () => {
         isLastDeliveredMessage: () => false,
         isSelfTemporaryGuest: false,
         locationRepository: {},
-        message: new ContentMessage(),
+        message,
         onClickAvatar: () => {},
         onClickCancelRequest: () => {},
         onClickInvitePeople: () => {},
@@ -58,19 +66,23 @@ describe('message', () => {
   });
 
   it('displays a message', () => {
-    const textValue = 'hello there';
-    const message = defaultParams.message;
-    message.user(new User());
-    const textAsset = new Text('', textValue);
-    spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
-    message.assets.push(textAsset);
-
     return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(domContainer.querySelector('.text').innerText).toBe(textValue);
+    });
+  });
 
+  it('displays the contextual menu', () => {
+    spyOn(defaultParams, 'onLike');
+    return instantiateComponent('message', defaultParams).then(domContainer => {
+      expect(document.querySelector('.ctx-menu')).toBe(null);
       domContainer.querySelector('.context-menu').click();
 
-      expect(document.querySelector('.ctx-menu')).toBeDefined();
+      const menu = document.querySelector('.ctx-menu');
+
+      expect(menu).toBeDefined();
+      menu.querySelector('[title=conversationContextMenuLike]').click();
+
+      expect(defaultParams.onLike).toHaveBeenCalled();
     });
   });
 });
