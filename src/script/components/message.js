@@ -252,16 +252,16 @@ const normalTemplate = `
       <!-- ko if: asset.is_image() -->
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
+            attr: {'data-uie-visible': $parent.message.visible() && !message.isObfuscated()},
             background_image: asset.resource(),
             click: (data, event) => $parent.onClickImage(message, event),
-            css: {'bg-color-ephemeral': message.isObfuscated()},
+            css: {'bg-color-ephemeral': $parent.message.isObfuscated()},
             " data-uie-name="go-image-detail">
-            <!-- ko if: message.isObfuscated() -->
+            <!-- ko if: $parent.message.isObfuscated() -->
               <div class="icon-library flex-center full-screen text-white"></div>
             <!-- /ko -->
-            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': message.isObfuscated()}"/>
-            <!-- ko ifnot: message.isObfuscated() -->
+            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': $parent.message.isObfuscated()}"/>
+            <!-- ko ifnot: $parent.message.isObfuscated() -->
               <span class="image-placeholder-icon">
                 <div class="three-dots">
                   <span></span>
@@ -275,20 +275,20 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render($parent.selfId(), $parent.accentColor()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render($parent.selfId(), $parent.accentColor()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': $parent.message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': $parent.message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></link-preview-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
+        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': $parent.message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': $parent.message.isObfuscated()}" params="message: message"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
+        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': $parent.message.isObfuscated()}" params="message: message"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset, locationRepository: $parent.locationRepository"></location-asset>
