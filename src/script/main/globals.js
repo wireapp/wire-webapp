@@ -81,7 +81,6 @@ import CallStateGlobal from '../calling/enum/CallState.js';
 import CallStateGroupGlobal from '../calling/enum/CallStateGroup.js';
 import PropertyStateGlobal from '../calling/enum/PropertyState.js';
 import SDPNegotiationModeGlobal from '../calling/enum/SDPNegotiationMode.js';
-import SDPSourceGlobal from '../calling/enum/SDPSource.js';
 import TerminationReasonGlobal from '../calling/enum/TerminationReason.js';
 import DataChannelStateGlobal from '../calling/rtc/DataChannelState.js';
 import ICEConnectionStateGlobal from '../calling/rtc/ICEConnectionState.js';

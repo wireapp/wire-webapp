@@ -18,6 +18,7 @@
  */
 
 import MediaStreamHandler from '../../media/MediaStreamHandler';
+import SDP_SOURCE from '../enum/SDPSource';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -807,7 +808,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     let skipNegotiation = false;
 
     return z.calling.SDPMapper.mapCallMessageToObject(callMessageEntity)
-      .then(rtcSdp => z.calling.SDPMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
+      .then(rtcSdp => z.calling.SDPMapper.rewriteSdp(rtcSdp, SDP_SOURCE.REMOTE, this))
       .then(({sdp: remoteSdp}) => {
         const isRemoteOffer = remoteSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
         if (isRemoteOffer) {
@@ -860,7 +861,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     const rawSdp = this.peerConnection.localDescription;
 
-    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rawSdp, z.calling.enum.SDP_SOURCE.LOCAL, this);
+    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rawSdp, SDP_SOURCE.LOCAL, this);
 
     Promise.resolve(mappedSdp)
       .then(({iceCandidates, sdp: transformedSdp}) => {
@@ -1099,7 +1100,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         this.sdpStateChanging(false);
         this._setSendSdpTimeout();
       })
-      .catch(error => this._setSdpFailure(error, z.calling.enum.SDP_SOURCE.LOCAL, localSdp.type));
+      .catch(error => this._setSdpFailure(error, SDP_SOURCE.LOCAL, localSdp.type));
   }
 
   /**
@@ -1122,7 +1123,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         this.shouldSetRemoteSdp(false);
         this.sdpStateChanging(false);
       })
-      .catch(error => this._setSdpFailure(error, z.calling.enum.SDP_SOURCE.REMOTE, remoteSdp.type));
+      .catch(error => this._setSdpFailure(error, SDP_SOURCE.REMOTE, remoteSdp.type));
   }
 
   /**
@@ -1130,15 +1131,15 @@ z.calling.entities.FlowEntity = class FlowEntity {
    *
    * @private
    * @param {Error} error - Error that was thrown
-   * @param {z.calling.enum.SDP_SOURCE} sdpSource - Source of SDP
+   * @param {SDP_SOURCE} sdpSource - Source of SDP
    * @param {z.calling.rtc.SDP_TYPE} sdpType - SDP type
    * @returns {undefined} No return value
    */
   _setSdpFailure(error, sdpSource, sdpType) {
     const {message, name} = error;
 
-    const failedLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL && !this.properLocalSdpState();
-    const failedRemoteSdp = sdpSource === z.calling.enum.SDP_SOURCE.REMOTE && !this.properRemoteSdpState();
+    const failedLocalSdp = sdpSource === SDP_SOURCE.LOCAL && !this.properLocalSdpState();
+    const failedRemoteSdp = sdpSource === SDP_SOURCE.REMOTE && !this.properRemoteSdpState();
 
     const shouldSolveCollision = failedLocalSdp || failedRemoteSdp;
     if (shouldSolveCollision) {
