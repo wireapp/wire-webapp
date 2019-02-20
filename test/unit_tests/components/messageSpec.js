@@ -20,6 +20,7 @@
 import UUID from 'uuidjs';
 import {instantiateComponent} from '../../api/knockoutHelpers';
 
+import Conversation from 'src/script/entity/Conversation';
 import ContentMessage from 'src/script/entity/message/ContentMessage';
 import Text from 'src/script/entity/message/Text';
 import User from 'src/script/entity/User';
@@ -34,12 +35,12 @@ describe('message', () => {
       spyOn(conversationRepository, 'expectReadReceipt').and.returnValue(false);
       defaultParams = {
         actionsViewModel: {},
-        conversation: () => ({}),
+        conversation: () => new Conversation(),
         conversationRepository: conversationRepository,
         isLastDeliveredMessage: () => false,
         isSelfTemporaryGuest: false,
         locationRepository: {},
-        message: {},
+        message: new ContentMessage(),
         onClickAvatar: () => {},
         onClickCancelRequest: () => {},
         onClickInvitePeople: () => {},
@@ -58,15 +59,18 @@ describe('message', () => {
 
   it('displays a message', () => {
     const textValue = 'hello there';
-    const message = new ContentMessage();
+    const message = defaultParams.message;
     message.user(new User());
     const textAsset = new Text('', textValue);
     spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
     message.assets.push(textAsset);
-    const params = Object.assign({}, defaultParams, {message});
 
-    return instantiateComponent('message', params).then(domContainer => {
+    return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(domContainer.querySelector('.text').innerText).toBe(textValue);
+
+      domContainer.querySelector('.context-menu').click();
+
+      expect(document.querySelector('.ctx-menu')).toBeDefined();
     });
   });
 });
