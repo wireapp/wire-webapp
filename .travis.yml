@@ -32,7 +32,7 @@ before_script:
   - npm rebuild node-sass
 
 after_script:
-  - "cat ./docs/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+  - "bash <(curl -s https://codecov.io/bash) -f ./docs/coverage/lcov.info"
 
 notifications:
   email: false
