@@ -1767,10 +1767,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           : genericMessage.asset;
 
         const data = {
-          key: assetData.asset_id,
-          otr_key: assetData.otr_key,
+          key: assetData.assetId,
+          otr_key: assetData.otrKey,
           sha256: assetData.sha256,
-          token: assetData.asset_token,
+          token: assetData.assetToken,
         };
 
         const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
@@ -1798,16 +1798,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return undefined;
       })
       .then(metadata => {
-        let assetOriginal = undefined;
+        const assetOriginal = new Asset.Original({mimeType: file.type, name: file.name, size: file.size});
 
         if (AssetMetaDataBuilder.isAudio(file)) {
-          assetOriginal = new Asset.Original({audio: metadata, mimeType: file.type, name: file.name, size: file.size});
+          assetOriginal.audio = metadata;
         } else if (AssetMetaDataBuilder.isVideo(file)) {
-          assetOriginal = new Asset.Original({mimeType: file.type, name: file.name, size: file.size, video: metadata});
+          assetOriginal.video = metadata;
         } else if (AssetMetaDataBuilder.isImage(file)) {
-          assetOriginal = new Asset.Original({image: metadata, mimeType: file.type, name: file.name, size: file.size});
-        } else {
-          assetOriginal = new Asset.Original({mimeType: file.type, name: file.name, size: file.size});
+          assetOriginal.image = metadata;
         }
 
         const protoAsset = new Asset({
