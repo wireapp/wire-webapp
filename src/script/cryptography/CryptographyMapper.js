@@ -194,9 +194,7 @@ export default class CryptographyMapper {
         status: z.assets.AssetTransferState.UPLOADED,
         token: uploaded.assetToken,
       });
-    }
-
-    if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
+    } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED,
