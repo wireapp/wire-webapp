@@ -48,7 +48,7 @@
     "underscore": "1.9.1",
     "url-search-params-polyfill": "5.0.0",
     "uuidjs": "4.2.1",
-    "webrtc-adapter": "6.4.8",
+    "webrtc-adapter": "7.2.0",
     "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.12.6",
     "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.13.0"
   },
