@@ -72,14 +72,10 @@
     <!-- /ko -->
   </div>
   <div class="conversations-footer">
-    <span class="button-icon-large icon-people" data-bind="attr: {title: startTooltip}, click: clickOnPeopleButton" data-uie-name="go-people"></span>
+    <people-icon class="button-icon-large" data-bind="attr: {title: startTooltip}, click: clickOnPeopleButton" data-uie-name="go-people"></people-icon>
     <!-- ko if: archivedConversations().length > 0 -->
       <archive-icon class="svg-button" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></archive-icon >
     <!-- /ko -->
-    <span class="conversations-settings button-icon-large icon-settings" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}" data-uie-name="go-preferences">
-      <!-- ko if: showBadge() -->
-        <span class="conversations-settings-badge bg-theme"></span>
-      <!-- /ko -->
-    </span>
+    <settings-icon class="conversations-settings button-icon-large text-theme" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>
