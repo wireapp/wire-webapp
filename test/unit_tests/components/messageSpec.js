@@ -85,4 +85,11 @@ describe('message', () => {
       expect(defaultParams.onLike).toHaveBeenCalled();
     });
   });
+
+  it('displays link preview', () => {
+    defaultParams.message.get_first_asset().previews([{}]);
+    return instantiateComponent('message', defaultParams).then(domContainer => {
+      expect(domContainer.querySelector('link-preview-asset')).not.toBe(null);
+    });
+  });
 });
