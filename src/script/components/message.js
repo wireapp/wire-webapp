@@ -42,7 +42,6 @@ class Message {
     onClickCancelRequest,
     onLike,
     conversationRepository,
-    locationRepository,
     actionsViewModel,
   }) {
     this.message = message;
@@ -68,7 +67,6 @@ class Message {
     this.onLike = onLike;
 
     this.conversationRepository = conversationRepository;
-    this.locationRepository = locationRepository;
 
     this.actionsViewModel = actionsViewModel;
 
@@ -235,7 +233,6 @@ const normalTemplate = `
         quote: message.quote(),
         selfId: selfId,
         conversationRepository: conversationRepository,
-        locationRepository: locationRepository,
         showDetail: onClickImage,
         focusMessage: onClickTimestamp,
         handleClickOnMessage: onClickMessage,
@@ -291,7 +288,7 @@ const normalTemplate = `
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': $parent.message.isObfuscated()}" params="message: message"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
-        <location-asset params="asset: asset, locationRepository: $parent.locationRepository"></location-asset>
+        <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
     <!-- /ko -->
 

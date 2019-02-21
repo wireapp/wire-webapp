@@ -59,7 +59,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
-    this.locationRepository = repositories.location;
     this.userRepository = repositories.user;
     this.logger = new Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
