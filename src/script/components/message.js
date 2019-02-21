@@ -21,6 +21,13 @@ import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
 
+import './asset/audioAsset';
+import './asset/fileAsset';
+import './asset/imageAsset';
+import './asset/linkPreviewAsset';
+import './asset/locationAsset';
+import './asset/videoAsset';
+
 class Message {
   constructor({
     message,
@@ -247,28 +254,7 @@ const normalTemplate = `
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_image() -->
-        <div class="message-asset-image">
-          <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': $parent.message.visible() && !message.isObfuscated()},
-            background_image: asset.resource(),
-            click: (data, event) => $parent.onClickImage(message, event),
-            css: {'bg-color-ephemeral': $parent.message.isObfuscated()},
-            " data-uie-name="go-image-detail">
-            <!-- ko if: $parent.message.isObfuscated() -->
-              <div class="icon-library flex-center full-screen text-white"></div>
-            <!-- /ko -->
-            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': $parent.message.isObfuscated()}"/>
-            <!-- ko ifnot: $parent.message.isObfuscated() -->
-              <span class="image-placeholder-icon">
-                <div class="three-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </span>
-            <!-- /ko -->
-          </div>
-        </div>
+        <image-asset params="asset: asset, message: $parent.message, onClick: $parent.onClickImage"></image-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->

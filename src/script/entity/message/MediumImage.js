@@ -18,12 +18,13 @@
  */
 
 import Logger from 'utils/Logger';
+import Asset from './Asset';
 import AssetType from '../../assets/AssetType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MediumImage = class MediumImage extends z.entity.Asset {
+z.entity.MediumImage = class MediumImage extends Asset {
   constructor(id) {
     super(id);
 
