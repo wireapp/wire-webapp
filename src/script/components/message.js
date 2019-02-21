@@ -278,7 +278,7 @@ const normalTemplate = `
           <div class="text" data-bind="html: asset.render($parent.selfId(), $parent.accentColor()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': $parent.message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': $parent.message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: message"></link-preview-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parents[1].message.isObfuscated()}" params="message: $parents[1].message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
