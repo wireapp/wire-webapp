@@ -1,0 +1,32 @@
+{
+  "bin": {
+    "collect-licenses": "dist/cli.js"
+  },
+  "dependencies": {
+    "fs-extra": "7.0.1",
+    "logdown": "3.2.7",
+    "npm-license-crawler": "0.1.9",
+    "npm-registry-package-info": "1.0.5"
+  },
+  "description": "Wire's internal license collection tool",
+  "devDependencies": {
+    "@types/node": "11.9.4",
+    "@types/npm-registry-package-info": "1.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "name": "@wireapp/license-collector",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector",
+  "scripts": {
+    "build": "yarn build:node",
+    "build:node": "tsc",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
+    "test": "exit 0"
+  },
+  "types": "./dist/index.d.ts",
+  "version": "0.0.1"
+}
