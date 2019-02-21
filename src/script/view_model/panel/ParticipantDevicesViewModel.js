@@ -67,24 +67,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     });
 
     this.detailMessage = ko.pureComputed(() => {
-      if (!this.userEntity()) {
-        return '';
-      }
-
-      const text = t('participantDevicesDetailHeadline', this.userEntity().first_name());
-
-      const textWithHtmlTags = /\{\{[^\}]+\}\}[^\{]+\{\{[^\}]+\}\}/;
-      const textWithinHtmlTags = /\{\{[^\}]+\}\}/gm;
-
-      const [pivot] = text.match(textWithHtmlTags) || [];
-      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
-
-      return sanitizedText.map(element => {
-        if (element.isStyled) {
-          element.text = element.text.replace(textWithinHtmlTags, '');
-        }
-        return element;
-      });
+      return this.userEntity() ? t('participantDevicesDetailHeadline', {user: this.userEntity().first_name()}) : '';
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {

@@ -49,7 +49,7 @@
       <!-- ko if: showDeviceDetails() -->
         <div class="participant-devices__header">
           <div class="participant-devices__link participant-devices__show-self-fingerprint text-theme" data-bind="click: clickToShowSelfFingerprint, text: t('participantDevicesDetailShowMyDevice')"></div>
-          <div data-bind="foreach: detailMessage"><span class="participant-devices__text-block panel__info-text" data-bind="css: {'participant-devices__text-block--highlight': $data.isStyled}, text: $data.text"></span></div>
+          <div class="panel__info-text" data-bind="html: detailMessage()"></div>
           <a class="participant-devices__link" data-bind="attr: {href: privacyHowUrl}, text: t('participantDevicesDetailHowTo')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
 
         <device-card class="participant-devices__single-client" params="device: selectedClient()"></device-card>
