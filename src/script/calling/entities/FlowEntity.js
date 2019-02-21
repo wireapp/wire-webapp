@@ -28,7 +28,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
-      MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS: 5,
+      MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS: 10,
       NEGOTIATION_THRESHOLD: 0.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RECONNECTION_TIMEOUT: 2.5 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       RENEGOTIATION_TIMEOUT: 30 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
