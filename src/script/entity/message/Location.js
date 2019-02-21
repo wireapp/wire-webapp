@@ -17,12 +17,13 @@
  *
  */
 
+import Asset from './Asset';
 import AssetType from '../../assets/AssetType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.Location = class Location extends z.entity.Asset {
+z.entity.Location = class Location extends Asset {
   constructor() {
     super();
 
