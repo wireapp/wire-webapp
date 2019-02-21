@@ -21,7 +21,7 @@
     "@types/recompose": "0.30.4",
     "babel-loader": "8.0.5",
     "react-helmet": "5.2.0",
-    "react-hot-loader": "4.7.0",
+    "react-hot-loader": "4.7.1",
     "rimraf": "2.6.3",
     "typescript": "3.3.3",
     "webpack": "4.29.5",
