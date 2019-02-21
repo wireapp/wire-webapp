@@ -47,7 +47,6 @@ describe('message', () => {
         conversationRepository: conversationRepository,
         isLastDeliveredMessage: () => false,
         isSelfTemporaryGuest: false,
-        locationRepository: {},
         message,
         onClickAvatar: () => {},
         onClickCancelRequest: () => {},
