@@ -43,7 +43,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
 
-    this.activationDate = ko.observableArray([]);
+    this.activationDate = ko.observable();
     this.device = ko.observable();
     this.fingerprint = ko.observableArray([]);
     this.sessionResetState = ko.observable(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
@@ -52,16 +52,10 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       if (clientEntity) {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this._updateFingerprint();
-        this._updateActivationTime(clientEntity.time);
+        const date = z.util.TimeUtil.formatTimestamp(clientEntity.time);
+        this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       }
     });
-  }
-
-  _updateActivationTime(time) {
-    const formattedTime = z.util.TimeUtil.formatTimestamp(time);
-    const stringTemplate = t('preferencesDevicesActivatedOn');
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
-    this.activationDate(sanitizedText);
   }
 
   _updateFingerprint() {

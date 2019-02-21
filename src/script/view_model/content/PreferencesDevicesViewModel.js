@@ -42,7 +42,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.currentClient = this.clientRepository.currentClient;
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
-    this.activationDate = ko.observable([]);
+    this.activationDate = ko.observable();
     this.devices = ko.observableArray();
     this.localFingerprint = ko.observableArray([]);
     this.selfUser = this.userRepository.self;
@@ -53,12 +53,6 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
       const devices = clientEntities.filter(clientEntity => clientEntity.id !== this.currentClient().id);
       this.devices(devices);
     });
-  }
-
-  _updateActivationDate(time, template = t('preferencesDevicesActivatedOn')) {
-    const formattedTime = z.util.TimeUtil.formatTimestamp(time);
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
-    this.activationDate(sanitizedText);
   }
 
   clickOnShowDevice(clientEntity) {
@@ -73,7 +67,8 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   updateDeviceInfo() {
     if (this.currentClient() && !this.localFingerprint().length) {
-      this._updateActivationDate(this.currentClient().time);
+      const date = z.util.TimeUtil.formatTimestamp(this.currentClient().time);
+      this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
