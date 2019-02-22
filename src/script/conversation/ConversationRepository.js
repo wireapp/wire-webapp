@@ -45,6 +45,7 @@ import Conversation from '../entity/Conversation';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import trackingHelpers from '../tracking/Helpers';
+import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
 
 import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
@@ -1976,10 +1977,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
       })
       .then(() => {
-        const initiatingCallMessage = [
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
-          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
-        ];
+        const initiatingCallMessage = [CALL_MESSAGE_TYPE.GROUP_START, CALL_MESSAGE_TYPE.SETUP];
 
         const isCallInitiation = initiatingCallMessage.includes(callMessageEntity.type);
         if (isCallInitiation) {

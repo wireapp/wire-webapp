@@ -20,6 +20,7 @@
 import MediaStreamHandler from '../../media/MediaStreamHandler';
 import SDP_SOURCE from '../enum/SDPSource';
 import TimeUtil from 'utils/TimeUtil';
+import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -802,7 +803,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * Save the remote SDP received via a call message within the flow.
    *
    * @note The resolving value indicates whether negotiation should be skipped for the current state.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves when the remote SDP was saved
    */
   saveRemoteSdp(callMessageEntity) {
@@ -823,7 +824,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
             case z.calling.rtc.SIGNALING_STATE.NEW:
             case z.calling.rtc.SIGNALING_STATE.STABLE: {
-              const isUpdate = callMessageEntity.type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
+              const isUpdate = callMessageEntity.type === CALL_MESSAGE_TYPE.UPDATE;
 
               if (isUpdate) {
                 this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);

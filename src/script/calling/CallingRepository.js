@@ -22,6 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -29,7 +30,7 @@ window.z.calling = z.calling || {};
 z.calling.CallingRepository = class CallingRepository {
   static get CONFIG() {
     return {
-      DATA_CHANNEL_MESSAGE_TYPES: [z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC],
+      DATA_CHANNEL_MESSAGE_TYPES: [CALL_MESSAGE_TYPE.HANGUP, CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,
       MAX_VIDEO_PARTICIPANTS: 4,
@@ -200,43 +201,43 @@ z.calling.CallingRepository = class CallingRepository {
     const messageType = callMessageEntity.type;
 
     switch (messageType) {
-      case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
+      case CALL_MESSAGE_TYPE.CANCEL: {
         return this._onCancel(callMessageEntity, source);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK: {
+      case CALL_MESSAGE_TYPE.GROUP_CHECK: {
         return this._onGroupCheck(callMessageEntity, source);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE: {
+      case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
         return this._onGroupLeave(callMessageEntity);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP: {
+      case CALL_MESSAGE_TYPE.GROUP_SETUP: {
         return this._onGroupSetup(callMessageEntity);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START: {
+      case CALL_MESSAGE_TYPE.GROUP_START: {
         return this._onGroupStart(callMessageEntity, source);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP: {
+      case CALL_MESSAGE_TYPE.HANGUP: {
         return this._onHangup(callMessageEntity);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
+      case CALL_MESSAGE_TYPE.PROP_SYNC: {
         return this._onPropSync(callMessageEntity);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
+      case CALL_MESSAGE_TYPE.REJECT: {
         return this._onReject(callMessageEntity);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
+      case CALL_MESSAGE_TYPE.SETUP: {
         return this._onSetup(callMessageEntity, source);
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
+      case CALL_MESSAGE_TYPE.UPDATE: {
         return this._onUpdate(callMessageEntity);
       }
 
@@ -259,7 +260,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     if (!response) {
       switch (type) {
-        case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
+        case CALL_MESSAGE_TYPE.SETUP: {
           this.injectActivateEvent(callMessageEntity, source);
           this.userRepository.get_user_by_id(userId).then(userEntity => {
             const warningOptions = {name: userEntity.name()};
@@ -270,7 +271,7 @@ z.calling.CallingRepository = class CallingRepository {
           break;
         }
 
-        case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
+        case CALL_MESSAGE_TYPE.CANCEL: {
           amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
@@ -286,7 +287,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call cancel message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.CANCEL
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.CANCEL
    * @returns {undefined} No return value
    */
   _onCancel(callMessageEntity) {
@@ -318,7 +319,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call group check message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_CHECK
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -332,7 +333,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call group leave message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_LEAVE
    * @param {z.calling.enum.TERMINATION_REASON} [terminationReason=z.calling.enum.TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
    * @returns {undefined} No return value
    */
@@ -361,7 +362,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call group setup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - call message entity of type CALL_MESSAGE_TYPE.GROUP_SETUP
    * @returns {undefined} No return value
    */
   _onGroupSetup(callMessageEntity) {
@@ -382,7 +383,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call group start message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_START
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -413,7 +414,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call hangup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.HANGUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.HANGUP
    * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for the participant to hangup
    * @returns {undefined} No return value
    */
@@ -434,7 +435,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call prop-sync message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _onPropSync(callMessageEntity) {
@@ -451,7 +452,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call reject message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.REJECT
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.REJECT
    * @returns {undefined} No return value
    */
   _onReject(callMessageEntity) {
@@ -476,7 +477,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call setup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -506,7 +507,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Call setup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _onUpdate(callMessageEntity) {
@@ -588,7 +589,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     const {conversationId, response, type, userId} = callMessageEntity;
 
-    const isTypeGroupCheck = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK;
+    const isTypeGroupCheck = type === CALL_MESSAGE_TYPE.GROUP_CHECK;
     const isSelfUser = userId === this.selfUserId();
     const validMessage = response === isTypeGroupCheck;
 
@@ -657,17 +658,17 @@ z.calling.CallingRepository = class CallingRepository {
     return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
       if (conversationEntity.is1to1()) {
         const groupMessageTypes = [
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
+          CALL_MESSAGE_TYPE.GROUP_CHECK,
+          CALL_MESSAGE_TYPE.GROUP_LEAVE,
+          CALL_MESSAGE_TYPE.GROUP_SETUP,
+          CALL_MESSAGE_TYPE.GROUP_START,
         ];
 
         if (groupMessageTypes.includes(type)) {
           throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
       } else if (conversationEntity.isGroup()) {
-        const one2oneMessageTypes = [z.calling.enum.CALL_MESSAGE_TYPE.SETUP];
+        const one2oneMessageTypes = [CALL_MESSAGE_TYPE.SETUP];
 
         if (one2oneMessageTypes.includes(type)) {
           throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
@@ -716,13 +717,13 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         return this._limitMessageRecipients(callMessageEntity).then(({precondition, recipients}) => {
-          const isTypeHangup = type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP;
+          const isTypeHangup = type === CALL_MESSAGE_TYPE.HANGUP;
           if (isTypeHangup) {
             if (response) {
               throw error;
             }
 
-            callMessageEntity.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
+            callMessageEntity.type = CALL_MESSAGE_TYPE.CANCEL;
           }
 
           this._logMessage(true, callMessageEntity);
@@ -784,7 +785,7 @@ z.calling.CallingRepository = class CallingRepository {
       let recipients;
 
       switch (type) {
-        case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
+        case CALL_MESSAGE_TYPE.CANCEL: {
           if (response) {
             // Send to remote client that initiated call
             precondition = true;
@@ -801,10 +802,10 @@ z.calling.CallingRepository = class CallingRepository {
           break;
         }
 
-        case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
-        case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
-        case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
-        case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
+        case CALL_MESSAGE_TYPE.GROUP_SETUP:
+        case CALL_MESSAGE_TYPE.HANGUP:
+        case CALL_MESSAGE_TYPE.PROP_SYNC:
+        case CALL_MESSAGE_TYPE.UPDATE: {
           // Send to remote client that call is connected with
           if (remoteClientId) {
             precondition = true;
@@ -815,7 +816,7 @@ z.calling.CallingRepository = class CallingRepository {
           break;
         }
 
-        case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
+        case CALL_MESSAGE_TYPE.REJECT: {
           // Send to all clients of self user
           precondition = [selfUserEntity.id];
           recipients = {
@@ -824,7 +825,7 @@ z.calling.CallingRepository = class CallingRepository {
           break;
         }
 
-        case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
+        case CALL_MESSAGE_TYPE.SETUP: {
           if (response) {
             // Send to remote client that initiated call and all clients of self user
             precondition = [selfUserEntity.id];
@@ -1326,7 +1327,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Constructs a call entity.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {User} creatingUserEntity - User that created call
    * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @returns {Promise} Resolves with the new call entity
@@ -1350,7 +1351,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Constructs an incoming call entity.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {boolean} [silent=false] - Start call in rejected mode
    * @returns {Promise} Resolves with the new call entity
@@ -1415,7 +1416,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Constructs an outgoing call entity.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.PROP_SYNC
    * @returns {Promise} Resolves with the new call entity
    */
   _createOutgoingCall(callMessageEntity) {

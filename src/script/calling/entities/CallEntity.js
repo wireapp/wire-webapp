@@ -18,6 +18,7 @@
  */
 
 import TimeUtil from 'utils/TimeUtil';
+import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -561,12 +562,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
     let callMessageEntity;
     switch (type) {
-      case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP: {
+      case CALL_MESSAGE_TYPE.HANGUP: {
         callMessageEntity = z.calling.CallMessageBuilder.buildHangup(true, this.sessionId, payload);
         break;
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
+      case CALL_MESSAGE_TYPE.PROP_SYNC: {
         const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, payload);
 
         callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(true, this.sessionId, propSyncPayload);

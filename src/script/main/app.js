@@ -727,7 +727,12 @@ class App {
     };
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
-      return _logout();
+      try {
+        _logout();
+      } catch (error) {
+        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
+        _redirectToLogin();
+      }
     }
 
     if (navigator.onLine) {
