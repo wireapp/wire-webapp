@@ -18,8 +18,8 @@
  */
 
 import Logger from 'utils/Logger';
-
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -115,7 +115,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   downloadArchiveFile() {
     const userName = this.userRepository.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    const filename = `Wire-${userName}-Backup_${z.util.TimeUtil.getCurrentDate()}.${fileExtension}`;
+    const filename = `Wire-${userName}-Backup_${TimeUtil.getCurrentDate()}.${fileExtension}`;
 
     this.dismissExport();
     z.util.downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');

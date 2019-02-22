@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import {t, Declension} from 'utils/LocalizerUtil';
 import SanitizationUtil from 'utils/SanitizationUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.notification = z.notification || {};
@@ -36,7 +37,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
       TITLE_LENGTH: 38,
     };
   }
@@ -393,7 +394,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       const messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
 
       if (messageTimer) {
-        const timeString = z.util.TimeUtil.formatDuration(messageTimer).text;
+        const timeString = TimeUtil.formatDuration(messageTimer).text;
         const substitutions = {time: timeString, user: messageEntity.user().first_name()};
         return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }

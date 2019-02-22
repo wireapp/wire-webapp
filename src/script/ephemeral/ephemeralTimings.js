@@ -17,18 +17,20 @@
  *
  */
 
+import TimeUtil from 'utils/TimeUtil';
+
 window.z = window.z || {};
 window.z.ephemeral = z.ephemeral || {};
 
 z.ephemeral.timings = class {
   static get VALUES() {
     return [
-      z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-      z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
-      z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
-      z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
-      z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
-      z.util.TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
+      TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+      TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
+      TimeUtil.UNITS_IN_MILLIS.HOUR,
+      TimeUtil.UNITS_IN_MILLIS.DAY,
+      TimeUtil.UNITS_IN_MILLIS.WEEK,
+      TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
     ];
   }
 };

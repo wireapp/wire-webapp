@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import BackendClient from '../service/BackendClient';
 
@@ -29,7 +30,7 @@ z.auth.AuthService = class AuthService {
     return {
       POST_ACCESS_RETRY: {
         LIMIT: 10,
-        TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+        TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
       },
       URL_ACCESS: '/access',
       URL_COOKIES: '/cookies',

@@ -18,6 +18,9 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+/* eslint-disable no-unused-vars */
+import TimeUtil from 'utils/TimeUtil';
+/* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -182,7 +185,7 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: isConnected() -->
-          <span class="conversation-list-cell-description" data-bind="text: z.util.TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
+          <span class="conversation-list-cell-description" data-bind="text: TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
 

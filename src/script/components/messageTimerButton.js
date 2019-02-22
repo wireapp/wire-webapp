@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -30,7 +31,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
     });
     this.isTimerDisabled = ko.pureComputed(() => this.conversationEntity().hasGlobalMessageTimer());
     this.duration = ko.pureComputed(() => {
-      return this.hasMessageTimer() ? z.util.TimeUtil.formatDuration(this.conversationEntity().messageTimer()) : {};
+      return this.hasMessageTimer() ? TimeUtil.formatDuration(this.conversationEntity().messageTimer()) : {};
     });
   }
 
@@ -52,7 +53,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
       },
     ].concat(
       z.ephemeral.timings.VALUES.map(milliseconds => {
-        const {text} = z.util.TimeUtil.formatDuration(milliseconds);
+        const {text} = TimeUtil.formatDuration(milliseconds);
 
         return {
           click: () => this.conversationEntity().localMessageTimer(milliseconds),

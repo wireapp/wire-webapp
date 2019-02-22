@@ -33,6 +33,7 @@ import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
 
 import DebugUtil from '../util/DebugUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
 
@@ -53,7 +54,7 @@ class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+      NOTIFICATION_CHECK: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
         IMMEDIATE: [
           z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,

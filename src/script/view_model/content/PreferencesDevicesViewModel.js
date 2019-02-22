@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -67,7 +68,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   updateDeviceInfo() {
     if (this.currentClient() && !this.localFingerprint().length) {
-      const date = z.util.TimeUtil.formatTimestamp(this.currentClient().time);
+      const date = TimeUtil.formatTimestamp(this.currentClient().time);
       this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }

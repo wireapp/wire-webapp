@@ -37,9 +37,6 @@ import {t} from 'utils/LocalizerUtil';
  * @property {number} value
  */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
 const TimeUtil = {
   UNITS_IN_MILLIS: {
     DAY: 1000 * 60 * 60 * 24,
@@ -212,4 +209,3 @@ const TimeUtil = {
 };
 
 export default TimeUtil;
-z.util.TimeUtil = TimeUtil;

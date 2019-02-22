@@ -24,6 +24,7 @@ import receiptModeToggle from 'components/receiptModeToggle';
 /* eslint-enable no-unused-vars */
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 import '../../components/panel/panelActions';
 
@@ -187,7 +188,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       if (this.activeConversation()) {
         const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
         if (hasTimer) {
-          return z.util.TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
+          return TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
         }
       }
       return t('ephemeralUnitsNone');

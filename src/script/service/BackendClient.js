@@ -18,16 +18,17 @@
  */
 
 import PromiseQueue from 'utils/PromiseQueue';
+import TimeUtil from 'utils/TimeUtil';
 
 export default class BackendClient {
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {
         INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
-        REQUEST_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+        RECHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+        REQUEST_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
       },
-      QUEUE_CHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      QUEUE_CHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 

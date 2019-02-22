@@ -21,6 +21,7 @@ import moment from 'moment';
 
 import viewportObserver from '../../ui/viewportObserver';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
@@ -174,11 +175,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   };
 
   // should be fine to update every minute
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp, is_day) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const date = moment.unix(timestamp / TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     if (is_day) {
       return $(element).text(calculate_timestamp_day(date));

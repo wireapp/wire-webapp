@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import AppInitTimingsStep from './AppInitTimingsStep';
 
@@ -50,7 +51,7 @@ export default class AppInitTimings {
   get_app_load() {
     const CONFIG = AppInitTimings.CONFIG;
     const appLoaded = this[AppInitTimingsStep.APP_LOADED];
-    const appLoadedInSeconds = appLoaded / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const appLoadedInSeconds = appLoaded / TimeUtil.UNITS_IN_MILLIS.SECOND;
 
     return (Math.floor(appLoadedInSeconds / CONFIG.BUCKET_SIZE) + 1) * CONFIG.BUCKET_SIZE;
   }

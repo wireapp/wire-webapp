@@ -20,6 +20,8 @@
 'use strict';
 import {amplify} from 'amplify';
 
+import TimeUtil from 'utils/TimeUtil';
+
 export function getValue(key) {
   return amplify.store(key);
 }
@@ -29,6 +31,6 @@ export function resetValue(key) {
 }
 
 export function setValue(key, value, secondsToExpire) {
-  const config = secondsToExpire ? {expires: secondsToExpire * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND} : undefined;
+  const config = secondsToExpire ? {expires: secondsToExpire * TimeUtil.UNITS_IN_MILLIS.SECOND} : undefined;
   return amplify.store(key, value, config);
 }

@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 import trackingHelpers from './Helpers';
 
 window.z = window.z || {};
@@ -28,7 +29,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return {
       ERROR_REPORTING: {
         API_KEY: window.wire.env.RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        REPORTING_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
