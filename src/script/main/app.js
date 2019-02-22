@@ -726,7 +726,11 @@ class App {
     };
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
-      return _logout();
+      try {
+        _logout();
+      } catch (error) {
+        _redirectToLogin();
+      }
     }
 
     if (navigator.onLine) {
