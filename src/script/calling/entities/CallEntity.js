@@ -18,7 +18,7 @@
  */
 
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
-import CALL_STATE from './enum/CallState';
+import CALL_STATE from '../enum/CallState';
 import CALL_STATE_GROUP from '../enum/CallStateGroup';
 
 window.z = window.z || {};
