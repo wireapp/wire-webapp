@@ -19,6 +19,7 @@
 
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import PROPERTY_STATE from '../enum/PropertyState';
+import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -120,7 +121,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
 
       const isGroupStart = type === CALL_MESSAGE_TYPE.GROUP_START;
       if (isGroupStart && this.flowEntity.pcInitialized()) {
-        this.flowEntity.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
+        this.flowEntity.restartNegotiation(SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
       }
 
       return rtcSdp ? this.flowEntity.saveRemoteSdp(callMessageEntity) : false;

@@ -23,6 +23,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {t} from 'utils/LocalizerUtil';
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
+import CALL_STATE from './enum/CallState';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -302,7 +303,7 @@ z.calling.CallingRepository = class CallingRepository {
           const fromSelf = userId === this.selfUserId();
           return callEntity.deactivateCall(callMessageEntity, fromSelf, terminationReason).then(wasDeleted => {
             if (!wasDeleted && fromSelf) {
-              callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
+              callEntity.state(CALL_STATE.REJECTED);
             }
           });
         })
@@ -400,7 +401,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         if (callEntity.isOutgoing()) {
-          callEntity.state(z.calling.enum.CALL_STATE.CONNECTING);
+          callEntity.state(CALL_STATE.CONNECTING);
         }
 
         // Add the correct participant, start negotiating
@@ -496,7 +497,7 @@ z.calling.CallingRepository = class CallingRepository {
         const shouldNegotiate = response !== true;
         return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity).then(() => {
           if (response) {
-            callEntity.state(z.calling.enum.CALL_STATE.CONNECTING);
+            callEntity.state(CALL_STATE.CONNECTING);
           }
         });
       })
@@ -879,7 +880,7 @@ z.calling.CallingRepository = class CallingRepository {
       .then(callEntity => ({callEntity, callState: callEntity.state()}))
       .catch(error => {
         this._handleNotFoundError(error);
-        return {callState: z.calling.enum.CALL_STATE.OUTGOING};
+        return {callState: CALL_STATE.OUTGOING};
       })
       .then(({callEntity, callState}) => this._joinCall(conversationId, mediaType, callState, callEntity))
       .catch(error => this._handleJoinCallError(error, conversationId));
@@ -970,7 +971,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @param {string} conversationId - ID of conversation to join call in
    * @param {z.media.MediaType} mediaType - Media type for this call
-   * @param {z.calling.enum.CALL_STATE} callState - Current state of call
+   * @param {CALL_STATE} callState - Current state of call
    * @returns {Promise} Resolves when conversation supports calling
    */
   _checkCallingSupport(conversationId, mediaType, callState) {
@@ -981,7 +982,7 @@ z.calling.CallingRepository = class CallingRepository {
         throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
 
-      const isOutgoingCall = callState === z.calling.enum.CALL_STATE.OUTGOING;
+      const isOutgoingCall = callState === CALL_STATE.OUTGOING;
       if (isOutgoingCall && !z.calling.CallingRepository.supportsCalling) {
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
@@ -1000,7 +1001,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {string} newCallId - Conversation ID of call about to be joined
-   * @param {z.calling.enum.CALL_STATE} callState - Call state of new call
+   * @param {CALL_STATE} callState - Call state of new call
    * @returns {Promise} Resolves when the new call was joined
    */
   _checkConcurrentJoinedCall(newCallId, callState) {
@@ -1015,22 +1016,22 @@ z.calling.CallingRepository = class CallingRepository {
         let titleString;
 
         switch (callState) {
-          case z.calling.enum.CALL_STATE.INCOMING:
-          case z.calling.enum.CALL_STATE.REJECTED: {
+          case CALL_STATE.INCOMING:
+          case CALL_STATE.REJECTED: {
             actionString = t('modalCallSecondIncomingAction');
             messageString = t('modalCallSecondIncomingMessage');
             titleString = t('modalCallSecondIncomingHeadline');
             break;
           }
 
-          case z.calling.enum.CALL_STATE.ONGOING: {
+          case CALL_STATE.ONGOING: {
             actionString = t('modalCallSecondOngoingAction');
             messageString = t('modalCallSecondOngoingMessage');
             titleString = t('modalCallSecondOngoingHeadline');
             break;
           }
 
-          case z.calling.enum.CALL_STATE.OUTGOING: {
+          case CALL_STATE.OUTGOING: {
             actionString = t('modalCallSecondOutgoingAction');
             messageString = t('modalCallSecondOutgoingMessage');
             titleString = t('modalCallSecondOutgoingHeadline');
@@ -1050,7 +1051,7 @@ z.calling.CallingRepository = class CallingRepository {
             window.setTimeout(resolve, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
           close: () => {
-            const isIncomingCall = callState === z.calling.enum.CALL_STATE.INCOMING;
+            const isIncomingCall = callState === CALL_STATE.INCOMING;
             if (isIncomingCall) {
               amplify.publish(z.event.WebApp.CALL.STATE.REJECT, newCallId);
             }
@@ -1210,7 +1211,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @param {string} conversationId - ID of conversation to join call in
    * @param {z.media.MediaType} mediaType - Media type of the call
-   * @param {z.calling.enum.CALL_STATE} callState - State of call
+   * @param {CALL_STATE} callState - State of call
    * @param {CallEntity} [callEntity] - Retrieved call entity
    * @returns {undefined} No return value
    */
@@ -1329,7 +1330,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {User} creatingUserEntity - User that created call
-   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @returns {Promise} Resolves with the new call entity
    */
   _createCall(callMessageEntity, creatingUserEntity, direction) {
@@ -1362,7 +1363,7 @@ z.calling.CallingRepository = class CallingRepository {
     return this.userRepository
       .get_user_by_id(userId)
       .then(remoteUserEntity => {
-        return this._createCall(callMessageEntity, remoteUserEntity, z.calling.enum.CALL_STATE.INCOMING);
+        return this._createCall(callMessageEntity, remoteUserEntity, CALL_STATE.INCOMING);
       })
       .then(callEntity => {
         const mediaType = this._getMediaTypeFromProperties(properties);
@@ -1383,7 +1384,7 @@ z.calling.CallingRepository = class CallingRepository {
           silent = true;
         }
 
-        const callState = silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING;
+        const callState = silent ? CALL_STATE.REJECTED : CALL_STATE.INCOMING;
         callEntity.state(callState);
 
         return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
@@ -1422,7 +1423,7 @@ z.calling.CallingRepository = class CallingRepository {
   _createOutgoingCall(callMessageEntity) {
     const properties = callMessageEntity.properties;
 
-    const direction = z.calling.enum.CALL_STATE.OUTGOING;
+    const direction = CALL_STATE.OUTGOING;
     return this._createCall(callMessageEntity, this.userRepository.self(), direction).then(callEntity => {
       const mediaType = this._getMediaTypeFromProperties(properties);
       const conversationName = callEntity.conversationEntity.display_name();
@@ -1437,7 +1438,7 @@ z.calling.CallingRepository = class CallingRepository {
       };
       this.callLogger.info(logMessage, callEntity);
 
-      callEntity.state(z.calling.enum.CALL_STATE.OUTGOING);
+      callEntity.state(CALL_STATE.OUTGOING);
 
       this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, callEntity);
       return callEntity;

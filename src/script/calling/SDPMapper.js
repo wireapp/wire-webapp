@@ -18,6 +18,7 @@
  */
 
 import SDP_SOURCE from './enum/SDPSource';
+import SDP_NEGOTIATION_MODE from './enum/SDPNegotiationMode';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -76,7 +77,7 @@ z.calling.SDPMapper = {
 
     const isFirefox = z.util.Environment.browser.firefox;
 
-    const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+    const isIceRestart = flowEntity.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
     const isLocalSdp = sdpSource === SDP_SOURCE.LOCAL;
     const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
     const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;

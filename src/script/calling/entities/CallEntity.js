@@ -18,6 +18,8 @@
  */
 
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import CALL_STATE from './enum/CallState';
+import CALL_STATE_GROUP from '../enum/CallStateGroup';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -86,7 +88,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.selfClientJoined = ko.observable(false);
     this.selfUserJoined = ko.observable(false);
-    this.state = ko.observable(z.calling.enum.CALL_STATE.UNKNOWN);
+    this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.previousState = undefined;
 
     this.participants = ko.observableArray([]);
@@ -101,17 +103,17 @@ z.calling.entities.CallEntity = class CallEntity {
     this._resetTimer();
 
     // Computed values
-    this.isConnecting = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.CONNECTING);
-    this.isDeclined = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.REJECTED);
-    this.isDisconnecting = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.DISCONNECTING);
-    this.isIncoming = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.INCOMING);
-    this.isOngoing = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.ONGOING);
-    this.isOutgoing = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.OUTGOING);
+    this.isConnecting = ko.pureComputed(() => this.state() === CALL_STATE.CONNECTING);
+    this.isDeclined = ko.pureComputed(() => this.state() === CALL_STATE.REJECTED);
+    this.isDisconnecting = ko.pureComputed(() => this.state() === CALL_STATE.DISCONNECTING);
+    this.isIncoming = ko.pureComputed(() => this.state() === CALL_STATE.INCOMING);
+    this.isOngoing = ko.pureComputed(() => this.state() === CALL_STATE.ONGOING);
+    this.isOutgoing = ko.pureComputed(() => this.state() === CALL_STATE.OUTGOING);
 
-    this.canConnectState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state()));
-    this.canJoinState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.state()));
-    this.isActiveState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(this.state()));
-    this.isEndedState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
+    this.canConnectState = ko.pureComputed(() => CALL_STATE_GROUP.CAN_CONNECT.includes(this.state()));
+    this.canJoinState = ko.pureComputed(() => CALL_STATE_GROUP.CAN_JOIN.includes(this.state()));
+    this.isActiveState = ko.pureComputed(() => CALL_STATE_GROUP.IS_ACTIVE.includes(this.state()));
+    this.isEndedState = ko.pureComputed(() => CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
 
     this.isOngoingOnAnotherClient = ko.pureComputed(() => this.selfUserJoined() && !this.selfClientJoined());
     this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
@@ -196,18 +198,18 @@ z.calling.entities.CallEntity = class CallEntity {
 
       this._clearStateTimeout();
 
-      const hasState = state !== z.calling.enum.CALL_STATE.UNKNOWN;
+      const hasState = state !== CALL_STATE.UNKNOWN;
       if (hasState) {
-        const isUnansweredState = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(state);
+        const isUnansweredState = CALL_STATE_GROUP.UNANSWERED.includes(state);
         if (isUnansweredState) {
-          const isIncomingCall = state === z.calling.enum.CALL_STATE.INCOMING;
+          const isIncomingCall = state === CALL_STATE.INCOMING;
           this._onStateStartRinging(isIncomingCall);
         } else {
           this._onStateStopRinging();
         }
       }
 
-      const isConnectingCall = state === z.calling.enum.CALL_STATE.CONNECTING;
+      const isConnectingCall = state === CALL_STATE.CONNECTING;
       if (isConnectingCall) {
         this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
       }
@@ -280,7 +282,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   deleteCall() {
-    this.state(z.calling.enum.CALL_STATE.ENDED);
+    this.state(CALL_STATE.ENDED);
     this._resetCall();
   }
 
@@ -291,7 +293,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   joinCall(mediaType) {
     if (this.canConnectState()) {
-      this.state(z.calling.enum.CALL_STATE.CONNECTING);
+      this.state(CALL_STATE.CONNECTING);
     }
 
     return this.isGroup ? this._joinGroupCall(mediaType) : this._join1to1Call();
@@ -332,7 +334,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   leaveCall(terminationReason) {
     if (this.isOngoing() && !this.isGroup) {
-      this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
+      this.state(CALL_STATE.DISCONNECTING);
     }
 
     let callMessageEntity = this.isConnected()
@@ -367,7 +369,7 @@ z.calling.entities.CallEntity = class CallEntity {
       })
       .then(wasDeleted => {
         if (!wasDeleted) {
-          this.state(z.calling.enum.CALL_STATE.REJECTED);
+          this.state(CALL_STATE.REJECTED);
         }
       });
   }
@@ -393,7 +395,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   rejectCall(shareRejection = false) {
-    this.state(z.calling.enum.CALL_STATE.REJECTED);
+    this.state(CALL_STATE.REJECTED);
     if (this.isRemoteVideoCall()) {
       this.callingRepository.mediaStreamHandler.resetMediaStream();
     }
@@ -634,9 +636,9 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _onStateStopRinging() {
-    const wasUnanswered = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(this.previousState);
+    const wasUnanswered = CALL_STATE_GROUP.UNANSWERED.includes(this.previousState);
     if (wasUnanswered) {
-      const wasIncomingCall = this.previousState === z.calling.enum.CALL_STATE.INCOMING;
+      const wasIncomingCall = this.previousState === CALL_STATE.INCOMING;
       this._stopRingTone(wasIncomingCall);
     }
   }
@@ -955,7 +957,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Initiate the call telemetry.
-   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */

@@ -77,7 +77,6 @@ import BackupRepositoryGlobal from '../backup/BackupRepository.js';
 import BroadcastRepositoryGlobal from '../broadcast/BroadcastRepository.js';
 import BroadcastServiceGlobal from '../broadcast/BroadcastService.js';
 import CallStateGlobal from '../calling/enum/CallState.js';
-import CallStateGroupGlobal from '../calling/enum/CallStateGroup.js';
 import SDPNegotiationModeGlobal from '../calling/enum/SDPNegotiationMode.js';
 import TerminationReasonGlobal from '../calling/enum/TerminationReason.js';
 import DataChannelStateGlobal from '../calling/rtc/DataChannelState.js';

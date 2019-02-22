@@ -18,6 +18,7 @@
  */
 
 import SDP_SOURCE from 'src/script/calling/enum/SDPSource';
+import SDP_NEGOTIATION_MODE from 'src/script/calling/enum/SDPNegotiationMode';
 
 describe('z.calling.SDPMapper', () => {
   const envInitialState = Object.assign({}, z.util.Environment);
@@ -210,7 +211,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       };
 
       const restartedICEFlowEntity = {
-        negotiationMode: () => z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART,
+        negotiationMode: () => SDP_NEGOTIATION_MODE.ICE_RESTART,
       };
 
       const rtcSdp = {
