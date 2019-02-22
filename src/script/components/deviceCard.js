@@ -17,9 +17,7 @@
  *
  */
 
-/* eslint-disable no-unused-vars */
 import TimeUtil from 'utils/TimeUtil';
-/* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -47,6 +45,8 @@ z.components.DeviceCard = class DeviceCard {
     if (this.detailed) {
       $(componentInfo.element).addClass('device-card-detailed');
     }
+
+    this.TimeUtil = TimeUtil;
   }
 
   clickOnDevice() {

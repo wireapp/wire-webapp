@@ -18,9 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
-/* eslint-disable no-unused-vars */
 import TimeUtil from 'utils/TimeUtil';
-/* eslint-enable no-unused-vars */
 
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
@@ -59,6 +57,8 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
     this.displaySmall = ko.observable(!!params.isQuote);
+
+    this.TimeUtil = TimeUtil;
   }
 
   on_loadedmetadata() {

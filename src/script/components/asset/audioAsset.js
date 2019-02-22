@@ -18,9 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
-/* eslint-disable no-unused-vars */
 import TimeUtil from 'utils/TimeUtil';
-/* eslint-enable no-unused-vars */
 
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
@@ -63,6 +61,8 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
 
     this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
+
+    this.TimeUtil = TimeUtil;
   }
 
   on_timeupdate() {
