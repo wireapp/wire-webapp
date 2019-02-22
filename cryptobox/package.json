@@ -34,7 +34,7 @@
     "pure-uuid": "1.5.6",
     "rimraf": "2.6.3",
     "run-sequence": "2.2.1",
-    "typescript": "3.3.3",
+    "typescript": "3.3.3333",
     "webpack": "4.29.5",
     "webpack-cli": "3.2.3"
   },

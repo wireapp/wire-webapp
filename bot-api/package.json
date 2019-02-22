@@ -7,7 +7,7 @@
     "cross-env": "5.2.0",
     "jasmine": "3.3.1",
     "rimraf": "2.6.3",
-    "typescript": "3.3.3"
+    "typescript": "3.3.3333"
   },
   "files": [
     "dist"

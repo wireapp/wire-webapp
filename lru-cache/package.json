@@ -5,7 +5,7 @@
     "jasmine": "3.3.1",
     "nyc": "13.3.0",
     "rimraf": "2.6.3",
-    "typescript": "3.3.3",
+    "typescript": "3.3.3333",
     "webpack": "4.29.5",
     "webpack-cli": "3.2.3"
   },
