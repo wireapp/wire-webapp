@@ -4,7 +4,7 @@
     "@types/styled-components": "4.1.10",
     "bazinga64": "5.3.42",
     "color": "3.1.0",
-    "react": "16.8.2",
+    "react": "16.8.3",
     "react-dom": "16.8.3",
     "react-transition-group": "2.5.3",
     "recompose": "0.30.0",
