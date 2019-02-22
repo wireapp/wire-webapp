@@ -34,6 +34,14 @@ export default class AbstractAssetTransferStateTracker {
     });
   }
 
+  isUploading(transferState) {
+    return transferState === AssetTransferState.UPLOADING;
+  }
+
+  isUploaded(transferState) {
+    return transferState === AssetTransferState.UPLOADED;
+  }
+
   cancelUpload(message) {
     this.assetUploader.cancelUpload(message.id);
     amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message.id);

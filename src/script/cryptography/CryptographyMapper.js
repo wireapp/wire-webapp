@@ -181,7 +181,7 @@ export default class CryptographyMapper {
       });
     }
 
-    const isImage = uploaded && uploaded.assetId && original && original.image;
+    const isImage = original && original.image;
     if (isImage) {
       data.info.tag = 'medium';
     }

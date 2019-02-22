@@ -17,32 +17,59 @@
  *
  */
 
+import ko from 'knockout';
+
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+
+import './assetLoader';
 
 class ImageAssetComponent extends AbstractAssetTransferStateTracker {
   constructor({asset, message, onClick}) {
     super(message);
     this.asset = asset;
     this.message = message;
+    this.isVisible = ko.observable(false);
     this.onClick = (data, event) => onClick(message, event);
-    //this.transferState.subscribe(console.log.bind(console, 'felix'));
+
+    const dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${
+      asset.width
+    } ${asset.height}' width='${asset.width}' height='${asset.height}'></svg>`;
+    this.imageUrl = ko.observable(dummyImageUrl);
+
+    ko.computed(() => {
+      if (this.isVisible() && asset.resource()) {
+        asset
+          .resource()
+          .load()
+          .then(blob => {
+            this.imageUrl(window.URL.createObjectURL(blob));
+          });
+      }
+    });
+  }
+
+  isIdle() {
+    return this.uploadProgress() === -1 && !this.asset.resource() && !this.message.isObfuscated();
   }
 }
 
 ko.components.register('image-asset', {
   template: `
-    <div class="message-asset-image">
+    <div class="message-asset-image" style="background: grey">
       <div class="image image-loading" data-bind="
         attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-        background_image: asset.resource(),
+        in_viewport: {onVisible: () => isVisible(true)},
         click: onClick,
         css: {'bg-color-ephemeral': message.isObfuscated()},
         " data-uie-name="go-image-detail">
+        <!-- ko if: uploadProgress() > -1 -->
+          <asset-loader params="loadProgress: uploadProgress, onCancel: () => cancelUpload(message)"></asset-loader>
+        <!-- /ko -->
         <!-- ko if: message.isObfuscated() -->
           <div class="icon-library flex-center full-screen text-white"></div>
         <!-- /ko -->
-        <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': message.isObfuscated()}"/>
-        <!-- ko ifnot: message.isObfuscated() -->
+        <img class="image-element" data-bind="attr: {src: imageUrl}, css: {'image-ephemeral': message.isObfuscated()}"/>
+        <!-- ko if: isIdle() -->
           <span class="image-placeholder-icon">
             <div class="three-dots">
               <span></span>
