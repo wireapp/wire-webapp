@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.LinkPreview = class LinkPreview {
+export default class LinkPreview {
   constructor(title, url) {
     this.title = title || '';
     this.url = url || '';
@@ -38,4 +35,9 @@ z.entity.LinkPreview = class LinkPreview {
     this.meta_data = undefined;
     this.meta_data_type = undefined;
   }
-};
+}
+
+window.z = window.z || {};
+window.z.entity = z.entity || {};
+
+z.entity.LinkPreview = LinkPreview;
