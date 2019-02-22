@@ -17,6 +17,8 @@
  *
  */
 
+import PROPERTY_STATE from '../calling/enum/PropertyState';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -76,7 +78,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
       const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const shouldBeContain = isVeryDifferent || isScreenSend === z.calling.enum.PROPERTY_STATE.TRUE;
+      const shouldBeContain = isVeryDifferent || isScreenSend === PROPERTY_STATE.TRUE;
       const forceClass = hasFitSet ? streamInfo.fitContain : shouldBeContain;
       videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, forceClass);
     };
@@ -162,7 +164,7 @@ ko.components.register('group-video-grid', {
                   <micoff-icon></micoff-icon>
                 </div>
               <!-- /ko -->
-              <!-- ko if: streamInfo.videoSend() === z.calling.enum.PROPERTY_STATE.PAUSED -->
+              <!-- ko if: streamInfo.videoSend() === PROPERTY_STATE.PAUSED -->
                 <div class="group-video-grid__pause-overlay" data-bind="switchBackground: streamInfo.picture()">
                   <div class="background">
                     <div class="background-image"></div>

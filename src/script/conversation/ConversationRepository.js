@@ -45,6 +45,7 @@ import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import trackingHelpers from '../tracking/Helpers';
 import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
+import PROPERTY_STATE from '../calling/enum/PropertyState';
 
 import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
@@ -3973,7 +3974,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'calling': {
         const properties = callMessageEntity.properties;
-        const isVideoCall = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+        const isVideoCall = properties.videosend === PROPERTY_STATE.TRUE;
         actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;
       }

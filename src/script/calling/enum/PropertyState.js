@@ -17,12 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.PROPERTY_STATE = {
+const PROPERTY_STATE = {
   FALSE: 'false',
   PAUSED: 'paused',
   TRUE: 'true',
 };
+
+export default PROPERTY_STATE;
