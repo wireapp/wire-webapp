@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import AssetTransferState from '../../assets/AssetTransferState';
 import AssetType from '../../assets/AssetType';
-import EphemeralStatusType from '../message/EphemeralStatusType';
+import EphemeralStatusType from '../../message/EphemeralStatusType';
 import User from '../User';
 
 window.z = window.z || {};
