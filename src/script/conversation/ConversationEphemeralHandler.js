@@ -18,6 +18,8 @@
  */
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
+
+import EphemeralStatusType from '../message/EphemeralStatusType';
 import Logger from 'utils/Logger';
 
 window.z = window.z || {};
@@ -92,17 +94,17 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     }
 
     switch (messageEntity.ephemeral_status()) {
-      case z.message.EphemeralStatusType.TIMED_OUT: {
+      case EphemeralStatusType.TIMED_OUT: {
         this._timeoutEphemeralMessage(messageEntity);
         break;
       }
 
-      case z.message.EphemeralStatusType.ACTIVE: {
+      case EphemeralStatusType.ACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
         break;
       }
 
-      case z.message.EphemeralStatusType.INACTIVE: {
+      case EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
 
         const changes = {
@@ -120,7 +122,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   validateMessage(messageEntity) {
-    const isEphemeralMessage = messageEntity.ephemeral_status() !== z.message.EphemeralStatusType.NONE;
+    const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
     if (!isEphemeralMessage) {
       return messageEntity;
     }
