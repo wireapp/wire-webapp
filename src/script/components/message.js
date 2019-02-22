@@ -19,7 +19,9 @@
 
 import moment from 'moment';
 
+/* eslint-disable no-unused-vars */
 import EphemeralStatusType from '../message/EphemeralStatusType';
+/* eslint-enable no-unused-vars */
 import {t} from 'utils/LocalizerUtil';
 
 class Message {
@@ -242,7 +244,7 @@ const normalTemplate = `
   <!-- /ko -->
 
   <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
-    <!-- ko if: message.ephemeral_status() === ${EphemeralStatusType.ACTIVE} -->
+    <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
       <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
     <!-- /ko -->
 
@@ -304,10 +306,10 @@ const normalTemplate = `
 
     <div class="message-body-actions">
       <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(message, event)"></span>
-      <!-- ko if: message.ephemeral_status() === ${EphemeralStatusType.ACTIVE} -->
+      <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === ${EphemeralStatusType.ACTIVE} -->
+      <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
       <!-- /ko -->
       ${receiptStatusTemplate}
