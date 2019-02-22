@@ -22,6 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+import PROPERTY_STATE from './enum/PropertyState';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -1514,8 +1515,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {z.media.MediaType} MediaType of call
    */
   _getMediaTypeFromProperties(properties) {
-    const isVideoSend = properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
-    const isScreenSend = properties && properties.screensend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isVideoSend = properties && properties.videosend === PROPERTY_STATE.TRUE;
+    const isScreenSend = properties && properties.screensend === PROPERTY_STATE.TRUE;
     const isTypeVideo = isVideoSend || isScreenSend;
     return isTypeVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
   }
