@@ -729,6 +729,7 @@ class App {
       try {
         _logout();
       } catch (error) {
+        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
         _redirectToLogin();
       }
     }
