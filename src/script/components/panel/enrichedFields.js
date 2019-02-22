@@ -18,23 +18,41 @@
  */
 
 import ko from 'knockout';
+import {resolve, graph} from '../../config/appResolver';
 
 ko.components.register('enriched-fields', {
   template: `
     <!-- ko if: fields() -->
       <div class="enriched-fields">
-        <!-- ko foreach: fields() -->
+        <!-- ko foreach: {data: fields(), as: 'field'} -->
           <div class="enriched-fields__entry">
-            <div data-bind="text: $data[0]" class="enriched-fields__entry__key" data-uie-name="item-enriched-key"></div>
-            <div data-bind="text: $data[1]" class="enriched-fields__entry__value" data-uie-name="item-enriched-value"></div>
+            <div data-bind="text: field.type" class="enriched-fields__entry__key" data-uie-name="item-enriched-key"></div>
+            <div data-bind="text: field.value" class="enriched-fields__entry__value" data-uie-name="item-enriched-value"></div>
           </div>
         <!-- /ko -->
       </div>
     <!-- /ko -->
   `,
-  viewModel: function({participant}) {
-    this.fields = ko.pureComputed(
-      () => participant().extendedFields() && Object.entries(participant().extendedFields())
-    );
+  viewModel: function({userId, onFieldsLoaded = () => {}}) {
+    this.richProfileRepository = resolve(graph.RichProfileRepository);
+    this.fields = ko.observable([]);
+
+    this.richProfileRepository
+      .getUserRichProfile(ko.unwrap(userId))
+      .then(richProfile => {
+        if (richProfile.fields) {
+          this.fields(richProfile.fields);
+          onFieldsLoaded(this.fields());
+        }
+      })
+      .catch(() => {
+        this.fields([
+          {type: 'Title', value: 'Chief Design Officer'},
+          {type: 'Phone', value: ' 0172 987 65 43'},
+          {type: 'Entity', value: 'Orange/OBS/EQUANT/CSO/IBO/OEC/SERVICE OP/CS MGT/CSM EEMEA'},
+          {type: 'Email', value: 'michelle@acme.com'},
+        ]);
+        onFieldsLoaded(this.fields());
+      });
   },
 });

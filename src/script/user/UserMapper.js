@@ -109,7 +109,6 @@ export default class UserMapper {
       service,
       sso_id: ssoId,
       team,
-      extended_fields,
     } = userData;
 
     if (accentId) {
@@ -133,17 +132,6 @@ export default class UserMapper {
     if (managed_by !== undefined) {
       userEntity.managedBy(managed_by);
     }
-
-    userEntity.extendedFields(
-      extended_fields || {
-        /* eslint-disable sort-keys */
-        Title: 'Chief Design Officer',
-        Phone: ' 0172 987 65 43',
-        Entity: 'Orange/OBS/EQUANT/CSO/IBO/OEC/SERVICE OP/CS MGT/CSM EEMEA',
-        Email: 'michelle@acme.com',
-        /* eslint-enable sort-keys */
-      }
-    );
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);

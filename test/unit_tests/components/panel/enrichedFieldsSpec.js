@@ -18,16 +18,19 @@
  */
 
 import {instantiateComponent} from '../../../api/knockoutHelpers';
+import UUID from 'uuidjs';
+import {resolve, graph} from '../../../api/testResolver';
 
 import 'src/script/components/panel/enrichedFields';
 
 const entriesListSelector = '.enriched-fields__entry';
 
 describe('enriched-fields', () => {
+  const richProfileRepository = resolve(graph.RichProfileRepository);
+
   it('displays all the given fields', () => {
-    const params = {
-      participant: () => ({extendedFields: () => ({field1: 'value1', field2: 'value2'})}),
-    };
+    const params = {userId: UUID.genV4().hexString};
+    spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(Promise.resolve([{}, {}]));
 
     return instantiateComponent('enriched-fields', params).then(domContainer => {
       const fields = domContainer.querySelectorAll(entriesListSelector);
@@ -38,9 +41,7 @@ describe('enriched-fields', () => {
 
   it('updates live if the fields are updated', () => {
     const extendedFields = ko.observable({field1: 'value1', field2: 'value2'});
-    const params = {
-      participant: () => ({extendedFields}),
-    };
+    const params = {userId: UUID.genV4().hexString};
 
     return instantiateComponent('enriched-fields', params).then(domContainer => {
       expect(domContainer.querySelectorAll(entriesListSelector).length).toBe(2);
