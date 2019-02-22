@@ -288,7 +288,6 @@ import CallMessageTypeGlobal from '../message/CallMessageType.js';
 import MessageCategoryGlobal from '../message/MessageCategory.js';
 import MessageCategorizationGlobal from '../message/MessageCategorization.js';
 import MessageHasherGlobal from '../message/MessageHasher.js';
-import EphemeralStatusTypeGlobal from '../message/EphemeralStatusType.js';
 import MentionEntityGlobal from '../message/MentionEntity.js';
 import QuoteEntityGlobal from '../message/QuoteEntity.js';
 import StatusTypeGlobal from '../message/StatusType.js';
