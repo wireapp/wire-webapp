@@ -96,10 +96,7 @@ ko.components.register('audio-asset', {
         <asset-header params="message: message"></asset-header>
       <!-- /ko -->
       <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOAD_PENDING -->
-        <div class="asset-placeholder">
-          <div class="three-dots">
-            <span></span><span></span><span></span>
-          </div>
+        <div class="asset-placeholder loading-dots">
         </div>
       <!-- /ko -->
       <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOAD_PENDING -->

@@ -62,8 +62,7 @@ ko.components.register('image-component', {
       <img data-bind="attr:{src: assetSrc}, click: onClick"/>
     <!-- /ko -->
     <!-- ko ifnot: assetSrc() -->
-      <div data-bind="css: {'three-dots': assetIsLoading()}">
-        <span></span><span></span><span></span>
+      <div data-bind="css: {'loading-dots': assetIsLoading()}">
       </div>
     <!-- /ko -->
   `,

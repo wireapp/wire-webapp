@@ -129,10 +129,7 @@ ko.components.register('video-asset', {
         <!-- /ko -->
         <!-- ko ifnot: video_playback_error -->
           <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOAD_PENDING -->
-            <div class="asset-placeholder">
-              <div class="three-dots">
-                <span></span><span></span><span></span>
-              </div>
+            <div class="asset-placeholder loading-dots">
             </div>
           <!-- /ko -->
 
