@@ -18,13 +18,13 @@
  */
 
 import Logger from 'utils/Logger';
-import Asset from './Asset';
+import File from './File';
 import AssetType from '../../assets/AssetType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MediumImage = class MediumImage extends Asset {
+z.entity.MediumImage = class MediumImage extends File {
   constructor(id) {
     super(id);
 
@@ -33,10 +33,6 @@ z.entity.MediumImage = class MediumImage extends Asset {
 
     this.width = '0px';
     this.height = '0px';
-
-    this.file_name = '';
-    this.file_size = '';
-    this.file_type = '';
 
     // z.assets.AssetRemoteData
     this.resource = ko.observable();

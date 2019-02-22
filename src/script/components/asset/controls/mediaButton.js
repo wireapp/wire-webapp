@@ -92,16 +92,10 @@ ko.components.register('media-button', {
       <div class='media-button media-button-pause icon-pause' data-bind="click: onClickPause, visible: isPlaying()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
     <!-- ko if: isDownloading(transferState()) -->
-      <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
-        <div class='media-button-border-fill'></div>
-        <asset-loader params="large: large, loadProgress: asset.downloadProgress"></asset-loader>
-      </div>
+      <asset-loader params="large: large, loadProgress: asset.downloadProgress, onCancel: asset.cancel_download"></asset-loader>
     <!-- /ko -->
-      <!-- ko if: isUploading(transferState()) -->
-      <div class="media-button icon-close" data-bind="click: onClickCancel" data-uie-name="do-cancel-media">
-        <div class='media-button-border-fill'></div>
-        <asset-loader params="large: large, loadProgress: uploadProgress"></asset-loader>
-      </div>
+    <!-- ko if: isUploading(transferState()) -->
+      <asset-loader params="large: large, loadProgress: uploadProgress, onCancel: onClickCancel"></asset-loader>
     <!-- /ko -->
 `,
   viewModel: {

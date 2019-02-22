@@ -37,17 +37,16 @@ export default class EventMapper {
    *
    * @param {Array} events - Event data
    * @param {Conversation} conversationEntity - Conversation entity the events belong to
-   * @param {boolean} [createDummyImage] - Create a dummy image
    * @returns {Promise<Array<Message>>} Resolves with the mapped message entities
    */
-  mapJsonEvents(events, conversationEntity, createDummyImage) {
+  mapJsonEvents(events, conversationEntity) {
     return Promise.resolve().then(() => {
       return events
         .filter(event => event)
         .reverse()
         .map(event => {
           try {
-            return this._mapJsonEvent(event, conversationEntity, createDummyImage);
+            return this._mapJsonEvent(event, conversationEntity);
           } catch (error) {
             const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
             this.logger.error(errorMessage, {error, event});
@@ -65,12 +64,11 @@ export default class EventMapper {
    *
    * @param {Object} event - Event data
    * @param {Conversation} conversationEntity - Conversation entity the event belong to
-   * @param {boolean} [createDummyImage] - Create a dummy image
    * @returns {Promise} Resolves with the mapped message entity
    */
-  mapJsonEvent(event, conversationEntity, createDummyImage) {
+  mapJsonEvent(event, conversationEntity) {
     return Promise.resolve()
-      .then(() => this._mapJsonEvent(event, conversationEntity, createDummyImage))
+      .then(() => this._mapJsonEvent(event, conversationEntity))
       .catch(error => {
         const isMessageNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (isMessageNotFound) {
@@ -107,7 +105,7 @@ export default class EventMapper {
       }
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
-      if (eventData.status && asset.status && eventData.status !== asset.status()) {
+      if (eventData.status && asset.status) {
         const assetEntity = this._mapAsset(event);
         originalEntity.assets([assetEntity]);
       }
@@ -150,10 +148,9 @@ export default class EventMapper {
    *
    * @param {Object} event - Event data
    * @param {Conversation} conversationEntity - Conversation entity the event belong to
-   * @param {boolean} createDummyImage - Create a dummy image
    * @returns {Message} Mapped message entity
    */
-  _mapJsonEvent(event, conversationEntity, createDummyImage) {
+  _mapJsonEvent(event, conversationEntity) {
     let messageEntity;
 
     switch (event.type) {
@@ -183,7 +180,7 @@ export default class EventMapper {
       }
 
       case z.event.Client.CONVERSATION.ASSET_ADD: {
-        messageEntity = addReadReceiptData(this._mapEventAssetAdd(event, createDummyImage), event);
+        messageEntity = addReadReceiptData(this._mapEventAssetAdd(event), event);
         break;
       }
 
@@ -316,13 +313,12 @@ export default class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {boolean} createDummyImage - Create a dummy image
    * @returns {ContentMessage} Content message entity
    */
-  _mapEventAssetAdd(event, createDummyImage) {
+  _mapEventAssetAdd(event) {
     const messageEntity = new z.entity.ContentMessage();
 
-    const assetEntity = this._mapAsset(event, createDummyImage);
+    const assetEntity = this._mapAsset(event);
     messageEntity.assets.push(assetEntity);
 
     return messageEntity;
@@ -590,15 +586,11 @@ export default class EventMapper {
   // Asset mappers
   //##############################################################################
 
-  _createDummyImage(width, height) {
-    return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
-  }
-
-  _mapAsset(event, createDummyImage) {
+  _mapAsset(event) {
     const eventData = event.data;
     const assetInfo = eventData.info;
     const isMediumImage = assetInfo && assetInfo.tag === 'medium';
-    return isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
+    return isMediumImage ? this._mapAssetImage(event) : this._mapAssetFile(event);
   }
 
   /**
@@ -654,10 +646,9 @@ export default class EventMapper {
    *
    * @private
    * @param {Object} event - Asset data received as JSON
-   * @param {boolean} createDummyImage - Create a dummy image
    * @returns {z.entity.MediumImage} Medium image asset entity
    */
-  _mapAssetImage(event, createDummyImage) {
+  _mapAssetImage(event) {
     const {data: eventData, conversation: conversationId} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new z.entity.MediumImage(assetId);
@@ -669,10 +660,6 @@ export default class EventMapper {
     if (info) {
       assetEntity.width = info.width;
       assetEntity.height = info.height;
-    }
-
-    if (createDummyImage) {
-      assetEntity.dummy_url = this._createDummyImage(assetEntity.width, assetEntity.height);
     }
 
     const {key, otr_key, sha256, token} = eventData;

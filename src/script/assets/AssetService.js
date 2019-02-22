@@ -111,11 +111,12 @@ export default class AssetService {
    * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
+   * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  uploadImageAsset(image, options) {
+  uploadImageAsset(image, options, xhrAccessorFunction) {
     return this._compressImage(image).then(({compressedBytes, compressedImage}) => {
-      return this._uploadAsset(compressedBytes, options).then(({key, keyBytes, sha256, token}) => {
+      return this._uploadAsset(compressedBytes, options, xhrAccessorFunction).then(({key, keyBytes, sha256, token}) => {
         keyBytes = new Uint8Array(keyBytes);
         sha256 = new Uint8Array(sha256);
 

@@ -66,18 +66,10 @@ ko.components.register('file-asset', {
             </div>
           <!-- /ko -->
           <!-- ko if: transferState() === AssetTransferState.DOWNLOADING -->
-            <div class="media-button icon-close" data-bind="click: asset.cancel_download, clickBubble: false">
-              <div class='media-button-border-file-fill'></div>
-              <div class='media-button-border-fill'></div>
-              <asset-loader params="loadProgress: asset.downloadProgress"></asset-loader>
-            </div>
+            <asset-loader params="loadProgress: asset.downloadProgress, onCancel: asset.cancel_download"></asset-loader>
           <!-- /ko -->
           <!-- ko if: transferState() === AssetTransferState.UPLOADING -->
-            <div class="media-button icon-close" data-bind="click: () => {cancelUpload(message)}, clickBubble: false">
-              <div class='media-button-border-file-fill'></div>
-              <div class='media-button-border-fill'></div>
-              <asset-loader params="loadProgress: uploadProgress"></asset-loader>
-            </div>
+            <asset-loader params="loadProgress: uploadProgress, onCancel: () => {cancelUpload(message)}"></asset-loader>
           <!-- /ko -->
           <!-- ko if: transferState() === AssetTransferState.UPLOAD_FAILED -->
             <div class="media-button media-button-error"></div>

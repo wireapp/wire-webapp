@@ -100,10 +100,6 @@ describe('media-button', () => {
       expect(pauseButton).toBe(null);
 
       expect(domContainer.querySelector('asset-loader')).not.toBe(null);
-
-      domContainer.querySelector('[data-uie-name=do-cancel-media]').click();
-
-      expect(params.cancel).toHaveBeenCalledTimes(1);
     });
   });
 });
