@@ -289,7 +289,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _onCancel(callMessageEntity, source) {
+  _onCancel(callMessageEntity) {
     const {clientId, conversationId, response, userId} = callMessageEntity;
 
     if (!response) {
@@ -524,10 +524,9 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {z.calling.entities.CallEntity} callEntity - Call entity
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity from remote self client
    * @returns {Promise} Resolves when self join was handled
    */
-  _remoteSelfJoin(callEntity, callMessageEntity) {
+  _remoteSelfJoin(callEntity) {
     const conversationEntity = callEntity.conversationEntity;
 
     if (callEntity.selfClientJoined()) {
@@ -1165,10 +1164,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @param {string} conversationId - ID of conversation to join call in
    * @param {z.media.MediaType} mediaType - Media type for this call
-   * @param {z.calling.enum.CALL_STATE} callState - State of call
    * @returns {Promise} Resolves with a call entity
    */
-  _initiateOutgoingCall(conversationId, mediaType, callState) {
+  _initiateOutgoingCall(conversationId, mediaType) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
     const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
@@ -1690,10 +1688,9 @@ ${turnServersConfig}`;
    * @private
    * @param {boolean} isOutgoing - Is message outgoing
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be logged in the sequence
-   * @param {string} [date] - Date of message as ISO string
    * @returns {undefined} No return value
    */
-  _logMessage(isOutgoing, callMessageEntity, date = new Date().toISOString()) {
+  _logMessage(isOutgoing, callMessageEntity) {
     const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
 
     let log;

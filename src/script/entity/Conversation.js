@@ -388,10 +388,9 @@ export default class Conversation {
   /**
    * Adds a single message to the conversation.
    * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
-   * @param {boolean} replaceDuplicate - If a duplicate (or a message that should be replaced) already exists, replace it with the new entity.
    * @returns {z.entity.Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
    */
-  add_message(messageEntity, replaceDuplicate = false) {
+  add_message(messageEntity) {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);

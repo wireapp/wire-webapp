@@ -597,7 +597,7 @@ class App {
     return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
   }
 
-  _registerSingleInstanceCleaning(singleInstanceCheckIntervalId) {
+  _registerSingleInstanceCleaning() {
     $(window).on('beforeunload', () => {
       this.singleInstanceHandler.deregisterInstance();
     });

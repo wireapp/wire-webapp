@@ -148,7 +148,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.isInitialServiceSearch(true);
   }
 
-  searchServices(query) {
+  searchServices() {
     if (this.isStateAddService()) {
       this.integrationRepository
         .searchForServices(this.searchInput(), this.searchInput)

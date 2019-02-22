@@ -516,7 +516,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @param {string} eventType - Event type
    * @returns {undefined} No return value
    */
-  _reportDecryptionFailure(error, {data: eventData, type: eventType}) {
+  _reportDecryptionFailure(error, {type: eventType}) {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: error.code || error.message,
     });

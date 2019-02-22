@@ -448,7 +448,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
         spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
         spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(result => {
+        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(() => {
           expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
           expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
         });

@@ -75,7 +75,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {undefined} No return value
    */
   onClientRemoved(userId) {
-    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
+    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this._checkChangeToVerified(conversationEntity);
     });
   }

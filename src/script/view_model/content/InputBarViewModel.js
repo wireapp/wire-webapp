@@ -748,7 +748,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  sendMessageEdit(messageText, messageEntity, replyMessageEntity) {
+  sendMessageEdit(messageText, messageEntity) {
     const mentionEntities = this.currentMentions.slice();
     this.cancelMessageEditing();
 

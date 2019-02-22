@@ -79,7 +79,7 @@ ko.bindingHandlers.showAllTimestamps = {
  * Start loading image once they are in the viewport.
  */
 ko.bindingHandlers.background_image = {
-  init(element, valueAccessor, allBindingsAccessor) {
+  init(element, valueAccessor) {
     const assetLoader = valueAccessor();
 
     if (!assetLoader) {

@@ -261,7 +261,7 @@ z.backup.BackupRepository = class BackupRepository {
 
   _chunkImport(importFunction, chunks) {
     return chunks.reduce((promise, chunk) => {
-      return promise.then(result => {
+      return promise.then(() => {
         if (this.isCanceled) {
           return Promise.reject(new z.backup.CancelError());
         }

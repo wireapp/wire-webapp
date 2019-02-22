@@ -32,10 +32,8 @@ export default class PermissionRepository {
   }
   /**
    * Construct a new Permission Repository.
-   * @param {z.calling.CallingRepository} callingRepository - Repository for all call interactions
-   * @param {z.conversation.ConversationService} conversationRepository - Repository for all conversation interactions
    */
-  constructor(callingRepository, conversationRepository) {
+  constructor() {
     this.logger = new Logger('z.permission.PermissionRepository', z.config.LOGGER.OPTIONS);
 
     this.permissionState = {
