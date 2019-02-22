@@ -1738,7 +1738,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let genericMessage;
 
     return this.get_message_in_conversation_by_id(conversationEntity, messageId)
-      .then(messageEntity => {
+      .then(() => {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
@@ -2193,10 +2193,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation entity
    * @param {Message} message_et - Message to react to
-   * @param {boolean} button - Source of toggle
    * @returns {undefined} No return value
    */
-  toggle_like(conversation_et, message_et, button) {
+  toggle_like(conversation_et, message_et) {
     if (!conversation_et.removed_from_conversation()) {
       const reaction = message_et.is_liked() ? z.message.ReactionType.NONE : z.message.ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());

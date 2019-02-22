@@ -26,7 +26,7 @@ describe('GroupParticipantUserViewModel', () => {
   let groupParticipantUserViewModel;
 
   beforeEach(() => {
-    return testFactory.exposeConversationActors().then(conversationRepository => {
+    return testFactory.exposeConversationActors().then(() => {
       const noop = () => {};
       groupParticipantUserViewModel = new GroupParticipantUserViewModel({
         isVisible: noop,

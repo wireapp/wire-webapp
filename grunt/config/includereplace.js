@@ -31,7 +31,7 @@ module.exports = {
       includesDir: '<%= dir.src.page %>/template',
       prefix: '#',
     },
-    rename(dest, src) {
+    rename(dest) {
       return `${dest}/index.html`;
     },
     src: 'auth.html',
@@ -48,7 +48,7 @@ module.exports = {
       includesDir: '<%= dir.src.demo %>/template',
       prefix: '#',
     },
-    rename(dest, src) {
+    rename(dest) {
       return `${dest}/index.html`;
     },
     src: 'demo.html',
@@ -79,7 +79,7 @@ module.exports = {
       includesDir: '<%= dir.src.page %>/template',
       prefix: '#',
     },
-    rename(dest, src) {
+    rename(dest) {
       return `${dest}/index.html`;
     },
     src: 'login.html',

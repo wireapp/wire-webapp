@@ -21,7 +21,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.DeviceRemove = class DeviceRemove {
-  constructor(params, component_info) {
+  constructor(params) {
     this.dispose = this.dispose.bind(this);
 
     this.device = ko.unwrap(params.device);

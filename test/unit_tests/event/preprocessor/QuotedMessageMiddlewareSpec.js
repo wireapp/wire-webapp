@@ -185,7 +185,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
       jasmine.clock().install();
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+      return quotedMessageMiddleware.processEvent(event).then(() => {
         jasmine.clock().tick();
 
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
@@ -235,7 +235,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+      return quotedMessageMiddleware.processEvent(event).then(() => {
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
             data: jasmine.objectContaining({quote: {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),

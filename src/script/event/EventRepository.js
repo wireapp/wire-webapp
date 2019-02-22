@@ -660,10 +660,9 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved event
    */
-  _handleEventSaving(event, source) {
+  _handleEventSaving(event) {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 

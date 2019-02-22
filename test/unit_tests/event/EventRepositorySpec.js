@@ -492,7 +492,7 @@ describe('Event Repository', () => {
       return TestFactory.event_repository
         ._handleEventSaving(linkPreviewEvent)
         .then(() => fail('Should have thrown an error'))
-        .catch(error => {
+        .catch(() => {
           expect(TestFactory.event_service.replaceEvent).not.toHaveBeenCalled();
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });

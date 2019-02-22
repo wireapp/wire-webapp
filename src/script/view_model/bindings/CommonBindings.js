@@ -177,7 +177,7 @@ ko.bindingHandlers.resize = {
 };
 
 ko.bindingHandlers.heightSync = {
-  init(element, valueAccessor, allBindings, data, context) {
+  init(element, valueAccessor) {
     const params = ko.unwrap(valueAccessor()) || {};
 
     const resizeCallback = params.callback;

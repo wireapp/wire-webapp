@@ -421,11 +421,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (last_message && this._conversationHasExtraMessages(this.conversation())) {
       this.capture_scrolling_event = false;
-      return this.conversation_repository
-        .getSubsequentMessages(this.conversation(), last_message, false)
-        .then(message_ets => {
-          this.capture_scrolling_event = true;
-        });
+      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(() => {
+        this.capture_scrolling_event = true;
+      });
     }
     return Promise.resolve();
   }

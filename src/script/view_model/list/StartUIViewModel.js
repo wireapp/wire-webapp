@@ -527,7 +527,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
           });
         }
       })
-      .then(error => {
+      .then(() => {
         this.showSpinner(false);
       });
   }
