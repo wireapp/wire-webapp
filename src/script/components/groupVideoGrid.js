@@ -56,6 +56,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
+
+    this.PROPERTY_STATE = PROPERTY_STATE;
   }
 
   scaleVideos(rootElement) {
