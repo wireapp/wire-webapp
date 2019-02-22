@@ -286,7 +286,6 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.CANCEL
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onCancel(callMessageEntity) {

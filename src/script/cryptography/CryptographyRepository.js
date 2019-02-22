@@ -512,8 +512,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {Error} error - Error from event decryption
    * @param {Object} eventData - Event data
-   * @param {string} userId - Remote user ID
-   * @param {string} eventType - Event type
+   * @param {string} eventData.type - Event type
    * @returns {undefined} No return value
    */
   _reportDecryptionFailure(error, {type: eventType}) {
