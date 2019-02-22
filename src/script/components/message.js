@@ -19,9 +19,7 @@
 
 import moment from 'moment';
 
-/* eslint-disable no-unused-vars */
 import EphemeralStatusType from '../message/EphemeralStatusType';
-/* eslint-enable no-unused-vars */
 import {t} from 'utils/LocalizerUtil';
 
 class Message {
@@ -70,6 +68,7 @@ class Message {
     this.onLike = onLike;
 
     this.conversationRepository = conversationRepository;
+    this.EphemeralStatusType = EphemeralStatusType;
 
     this.actionsViewModel = actionsViewModel;
 
