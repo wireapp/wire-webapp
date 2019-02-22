@@ -17,6 +17,8 @@
  *
  */
 
+import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
@@ -119,7 +121,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
       this.sessionId = sessionId;
       this.flowEntity.setRemoteClientId(clientId);
 
-      const isGroupStart = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START;
+      const isGroupStart = type === CALL_MESSAGE_TYPE.GROUP_START;
       if (isGroupStart && this.flowEntity.pcInitialized()) {
         this.flowEntity.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
       }

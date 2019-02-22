@@ -76,7 +76,6 @@ import ErrorGlobal from '../backup/Error.js';
 import BackupRepositoryGlobal from '../backup/BackupRepository.js';
 import BroadcastRepositoryGlobal from '../broadcast/BroadcastRepository.js';
 import BroadcastServiceGlobal from '../broadcast/BroadcastService.js';
-import EnumCallMessageTypeGlobal from '../calling/enum/CallMessageType.js';
 import CallStateGlobal from '../calling/enum/CallState.js';
 import CallStateGroupGlobal from '../calling/enum/CallStateGroup.js';
 import PropertyStateGlobal from '../calling/enum/PropertyState.js';

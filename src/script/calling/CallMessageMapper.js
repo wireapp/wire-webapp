@@ -17,6 +17,8 @@
  *
  */
 
+import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
@@ -35,8 +37,8 @@ z.calling.CallMessageMapper = {
 
     let content = undefined;
     switch (callMessage.type) {
-      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
-      case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
+      case CALL_MESSAGE_TYPE.GROUP_SETUP:
+      case CALL_MESSAGE_TYPE.UPDATE: {
         const {
           dest_clientid: destinationClientId,
           dest_userid: destinationUserId,
@@ -48,15 +50,15 @@ z.calling.CallMessageMapper = {
         break;
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
+      case CALL_MESSAGE_TYPE.PROP_SYNC: {
         const properties = callMessage.props;
 
         content = {properties};
         break;
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
-      case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
+      case CALL_MESSAGE_TYPE.GROUP_START:
+      case CALL_MESSAGE_TYPE.SETUP: {
         const {props: properties, sdp} = callMessage;
 
         content = {properties, sdp};

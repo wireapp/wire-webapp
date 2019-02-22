@@ -17,6 +17,8 @@
  *
  */
 
+import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
@@ -26,22 +28,14 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
     return {
       PAYLOAD_TYPES: {
         PROPS: [
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
-          z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
-          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
+          CALL_MESSAGE_TYPE.GROUP_SETUP,
+          CALL_MESSAGE_TYPE.GROUP_START,
+          CALL_MESSAGE_TYPE.PROP_SYNC,
+          CALL_MESSAGE_TYPE.SETUP,
+          CALL_MESSAGE_TYPE.UPDATE,
         ],
-        SDP: [
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
-        ],
-        TARGETED: [
-          z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
-        ],
+        SDP: [CALL_MESSAGE_TYPE.GROUP_SETUP, CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.UPDATE],
+        TARGETED: [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_SETUP, CALL_MESSAGE_TYPE.UPDATE],
       },
       SESSION_ID_LENGTH: 4,
       VERSION: '3.0',
@@ -52,7 +46,7 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
    * Construct a new call message entity.
    *
    * @class z.calling.entities.CallMessageEntity
-   * @param {z.calling.enum.CALL_MESSAGE_TYPE} type - Type of call message
+   * @param {CALL_MESSAGE_TYPE} type - Type of call message
    * @param {boolean} [response=false] - Is message a response, defaults to false
    * @param {string} sessionId - Optional session ID
    */
@@ -73,7 +67,7 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
 
   /**
    * Cast call message to JSON.
-   * @returns {{version: string, resp: boolean, sessid: string, type: z.calling.enum.CALL_MESSAGE_TYPE}} - JSON representation of call message
+   * @returns {{version: string, resp: boolean, sessid: string, type: CALL_MESSAGE_TYPE}} - JSON representation of call message
    */
   toJSON() {
     const json_payload = {
@@ -86,7 +80,7 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
     const isPropsMessageType = CallMessageEntity.CONFIG.PAYLOAD_TYPES.PROPS.includes(this.type);
     if (isPropsMessageType) {
       json_payload.props = this.properties;
-      const isTypePropSync = this.type === z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC;
+      const isTypePropSync = this.type === CALL_MESSAGE_TYPE.PROP_SYNC;
       if (!isTypePropSync) {
         json_payload.sdp = this.sdp;
       }

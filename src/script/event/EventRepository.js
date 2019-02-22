@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -916,7 +917,7 @@ z.event.EventRepository = class EventRepository {
    */
   _validateCallEventLifetime(event) {
     const {content = {}, conversation: conversationId, time, type} = event;
-    const forcedEventTypes = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
+    const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
     const correctedTimestamp = this.serverTimeRepository.toServerTimestamp();
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;

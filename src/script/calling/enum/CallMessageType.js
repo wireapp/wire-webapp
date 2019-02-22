@@ -17,11 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.CALL_MESSAGE_TYPE = {
+const CALL_MESSAGE_TYPE = {
   CANCEL: 'CANCEL',
   GROUP_CHECK: 'GROUPCHECK',
   GROUP_LEAVE: 'GROUPLEAVE',
@@ -33,3 +29,5 @@ z.calling.enum.CALL_MESSAGE_TYPE = {
   SETUP: 'SETUP',
   UPDATE: 'UPDATE',
 };
+
+export default CALL_MESSAGE_TYPE;
