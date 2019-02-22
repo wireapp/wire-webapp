@@ -20,8 +20,10 @@
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import Logger from 'utils/Logger';
-import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
 import {t} from 'utils/LocalizerUtil';
+
+import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export default class EventMapper {
@@ -581,7 +583,7 @@ export default class EventMapper {
 
     messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
     messageEntity.finished_reason = eventData.reason;
-    messageEntity.visible(messageEntity.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED);
+    messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
 
     return messageEntity;
   }
