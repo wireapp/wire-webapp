@@ -39,8 +39,8 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {teamNameStrings} from '../../strings';
+import {RouterLink} from '../component/RouterLink';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import ValidationError from '../module/action/ValidationError';
@@ -120,9 +120,9 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
     } = this.props;
     const {enteredTeamName, isValidTeamName, error} = this.state;
     const backArrow = (
-      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
+      <RouterLink to={ROUTE.INDEX} data-uie-name="go-register-team">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
+      </RouterLink>
     );
     return (
       <Page>

@@ -21,9 +21,9 @@ import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile,
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {createAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
+import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
 import Page from './Page';
 
@@ -31,9 +31,9 @@ interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProp
 
 const CreateAccount: React.SFC<Props & InjectedIntlProps> = ({history, intl: {formatMessage: _}}) => {
   const backArrow = (
-    <Link to={ROUTE.CREATE_TEAM} component={RRLink} data-uie-name="go-register-team">
+    <RouterLink to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </Link>
+    </RouterLink>
   );
   return (
     <Page hasTeamData>

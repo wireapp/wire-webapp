@@ -35,9 +35,9 @@ import {
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
 import {BACKEND} from '../Environment';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
@@ -183,9 +183,9 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
     } = this.props;
     const {isOverlayOpen} = this.state;
     const backArrow = (
-      <Link to={ROUTE.LOGIN} component={RRLink} data-uie-name="go-login">
+      <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
+      </RouterLink>
     );
     return (
       <Page>
@@ -208,7 +208,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
                 style={{
                   color: COLOR.WHITE,
                   fontSize: '14px',
-                  fontWeight: '600',
+                  fontWeight: 600,
                   marginTop: '24px',
                   textDecoration: 'underline',
                   textTransform: 'none',

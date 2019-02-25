@@ -23,8 +23,8 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {verifyStrings} from '../../strings';
+import {RouterLink} from '../component/RouterLink';
 import {getLogger} from '../LogProvider';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
@@ -108,14 +108,9 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
           <Link onClick={resendCode} data-uie-name="do-resend-code">
             {_(verifyStrings.resendCode)}
           </Link>
-          <Link
-            to={changeEmailRedirect[currentFlow]}
-            component={RRLink}
-            style={{marginLeft: 35}}
-            data-uie-name="go-change-email"
-          >
+          <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
             {_(verifyStrings.changeEmail)}
-          </Link>
+          </RouterLink>
         </div>
       </ContainerXS>
     </Page>

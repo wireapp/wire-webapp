@@ -23,9 +23,9 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {createPersonalAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
+import {RouterLink} from '../component/RouterLink';
 import {getLogger} from '../LogProvider';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
@@ -90,9 +90,9 @@ class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
       </ContainerXS>
     );
     const backArrow = (
-      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+      <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
+      </RouterLink>
     );
     return (
       <Page>

@@ -46,9 +46,9 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
 import * as config from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
@@ -311,9 +311,9 @@ class Login extends React.Component<CombinedProps, State> {
     } = this.props;
     const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     const backArrow = (
-      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+      <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
+      </RouterLink>
     );
     const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
@@ -431,9 +431,9 @@ class Login extends React.Component<CombinedProps, State> {
                     </Link>
                     <Columns style={{marginTop: '36px'}}>
                       <Column>
-                        <Link to="/sso" component={RRLink} data-uie-name="go-sign-in-sso">
+                        <RouterLink to="/sso" data-uie-name="go-sign-in-sso">
                           {_(loginStrings.ssoLogin)}
-                        </Link>
+                        </RouterLink>
                       </Column>
                       {config.FEATURE.ENABLE_PHONE_LOGIN && (
                         <Column>

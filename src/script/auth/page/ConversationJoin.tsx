@@ -38,9 +38,9 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {conversationJoinStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
 import WirelessContainer from '../component/WirelessContainer';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import * as Environment from '../Environment';
@@ -318,14 +318,13 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
         {!this.isPwaSupportedBrowser() && (
           <Small block>
             {`${_(conversationJoinStrings.hasAccount)} `}
-            <Link
-              component={RRLink}
+            <RouterLink
               to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
               textTransform={'none'}
               data-uie-name="go-login"
             >
               {_(conversationJoinStrings.loginLink)}
-            </Link>
+            </RouterLink>
           </Small>
         )}
       </ContainerXS>

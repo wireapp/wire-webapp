@@ -23,13 +23,11 @@ import {
   Column,
   Columns,
   ContainerXS,
+  ICON_NAME,
   Link,
   Logo,
-  ProfileIcon,
-  TeamIcon,
-  Text,
   RoundIconButton,
-  ICON_NAME,
+  Text,
 } from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
