@@ -289,7 +289,6 @@ import TextGlobal from '../entity/message/Text.js';
 import LinkPreviewGlobal from '../entity/message/LinkPreview.js';
 import FileGlobal from '../entity/message/File.js';
 import LocationGlobal from '../entity/message/Location.js';
-import MediumImageGlobal from '../entity/message/MediumImage.js';
 import MessageGlobal from '../entity/message/Message.js';
 import DeleteMessageGlobal from '../entity/message/DeleteMessage.js';
 import SystemMessageGlobal from '../entity/message/SystemMessage.js';

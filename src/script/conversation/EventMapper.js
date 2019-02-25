@@ -19,6 +19,7 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
+import MediumImage from '../entity/message/MediumImage';
 import Logger from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 
@@ -648,12 +649,12 @@ export default class EventMapper {
    *
    * @private
    * @param {Object} event - Asset data received as JSON
-   * @returns {z.entity.MediumImage} Medium image asset entity
+   * @returns {MediumImage} Medium image asset entity
    */
   _mapAssetImage(event) {
     const {data: eventData, conversation: conversationId} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
-    const assetEntity = new z.entity.MediumImage(assetId);
+    const assetEntity = new MediumImage(assetId);
 
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;

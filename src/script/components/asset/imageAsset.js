@@ -31,7 +31,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
     this.isVisible = ko.observable(false);
     this.onClick = (data, event) => onClick(message, event);
 
-    this.dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' 
+    this.dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
       viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 
     this.imageUrl = ko.observable();
@@ -57,7 +57,7 @@ ko.components.register('image-asset', {
       attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
       in_viewport: {onVisible: () => isVisible(true)},
       click: onClick,
-      css: {'bg-color-ephemeral': message.isObfuscated(), 'loading-dots': isIdle(), 'image-asset--no-image': !imageUrl()}" 
+      css: {'bg-color-ephemeral': message.isObfuscated(), 'loading-dots': isIdle(), 'image-asset--no-image': !imageUrl()}"
       data-uie-name="go-image-detail">
       <!-- ko if: uploadProgress() > -1 -->
         <asset-loader params="loadProgress: uploadProgress, onCancel: () => cancelUpload(message)"></asset-loader>

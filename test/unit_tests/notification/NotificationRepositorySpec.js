@@ -21,6 +21,7 @@ import {t, setStrings} from 'utils/LocalizerUtil';
 import 'src/script/localization/Localizer';
 
 import Conversation from 'src/script/entity/Conversation';
+import MediumImage from 'src/script/entity/message/MediumImage';
 import User from 'src/script/entity/User';
 import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
 
@@ -341,7 +342,7 @@ describe('z.notification.NotificationRepository', () => {
 
     describe('for a picture', () => {
       beforeEach(() => {
-        message_et.assets.push(new z.entity.MediumImage());
+        message_et.assets.push(new MediumImage());
         expected_body = z.string.notificationAssetAdd;
       });
 
@@ -411,7 +412,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('that contains a location', () => {
-        message_et.assets.push(new z.entity.MediumImage());
+        message_et.assets.push(new MediumImage());
         return verify_notification_ephemeral(conversation_et, message_et);
       });
     });
