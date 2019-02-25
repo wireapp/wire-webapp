@@ -19,18 +19,10 @@
 
 import {instantiateComponent} from '../../../api/knockoutHelpers';
 
-import ko from 'knockout';
-
+import viewportObserver from 'src/script/ui/viewportObserver';
 import ContentMessage from 'src/script/entity/message/ContentMessage';
 import MediumImage from 'src/script/entity/message/MediumImage';
 import 'src/script/components/asset/imageAsset';
-
-ko.bindingHandlers.in_viewport = {
-  init(element, valueAccessor) {
-    const {onVisible = valueAccessor()} = valueAccessor();
-    onVisible();
-  },
-};
 
 describe('image-asset', () => {
   const defaultParams = {
@@ -38,6 +30,12 @@ describe('image-asset', () => {
     message: new ContentMessage(),
     onClick: () => {},
   };
+
+  beforeEach(() => {
+    spyOn(viewportObserver, 'addElement').and.callFake((element, callback) => {
+      callback();
+    });
+  });
 
   it('displays a dummy image when resource is not loaded', () => {
     const image = new MediumImage();

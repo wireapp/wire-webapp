@@ -20,11 +20,12 @@
 import ko from 'knockout';
 
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import viewportObserver from '../../ui/viewportObserver';
 
 import './assetLoader';
 
 class ImageAssetComponent extends AbstractAssetTransferStateTracker {
-  constructor({asset, message, onClick}) {
+  constructor({asset, message, onClick}, {element}) {
     super(message);
     this.asset = asset;
     this.message = message;
@@ -48,6 +49,13 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
           });
       }
     });
+
+    this.container = element;
+    viewportObserver.addElement(this.container, () => this.isVisible(true));
+  }
+
+  dispose() {
+    viewportObserver.removeElement(this.container);
   }
 }
 
@@ -55,7 +63,6 @@ ko.components.register('image-asset', {
   template: `
     <div class="image-asset" data-bind="
       attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-      in_viewport: {onVisible: () => isVisible(true)},
       click: onClick,
       css: {'bg-color-ephemeral': message.isObfuscated(), 'loading-dots': isIdle(), 'image-asset--no-image': !imageUrl()}"
       data-uie-name="go-image-detail">
@@ -67,5 +74,9 @@ ko.components.register('image-asset', {
       <!-- /ko -->
       <img class="image-element" data-bind="attr: {src: imageUrl() || dummyImageUrl}, css: {'image-ephemeral': message.isObfuscated()}"/>
     </div>`,
-  viewModel: ImageAssetComponent,
+  viewModel: {
+    createViewModel(params, componentInfo) {
+      return new ImageAssetComponent(params, componentInfo);
+    },
+  },
 });
