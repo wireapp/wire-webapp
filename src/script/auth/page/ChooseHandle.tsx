@@ -124,7 +124,9 @@ class ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatch
                 name="handle"
                 placeholder={_(chooseHandleStrings.handlePlaceholder)}
                 type="text"
-                onChange={event => this.setState({error: null, handle: event.target.value})}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  this.setState({error: null, handle: event.target.value})
+                }
                 value={this.state.handle}
                 autoFocus
                 data-uie-name="enter-handle"

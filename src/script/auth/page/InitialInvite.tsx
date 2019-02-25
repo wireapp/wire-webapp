@@ -71,7 +71,7 @@ interface State {
 }
 
 class InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  emailInput: HTMLInputElement;
+  emailInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredEmail: '',
     error: null,
@@ -103,11 +103,11 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
   handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    this.emailInput.value = this.emailInput.value.trim();
-    if (!this.emailInput.checkValidity()) {
-      this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
+    this.emailInput.current.value = this.emailInput.current.value.trim();
+    if (!this.emailInput.current.checkValidity()) {
+      this.setState({error: ValidationError.handleValidationState('email', this.emailInput.current.validity)});
     } else {
-      this.props.invite({email: this.emailInput.value}).catch(error => {
+      this.props.invite({email: this.emailInput.current.value}).catch(error => {
         if (error.label) {
           switch (error.label) {
             case BackendError.LABEL.EMAIL_EXISTS:
@@ -128,9 +128,9 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
         }
       });
       this.setState({enteredEmail: ''});
-      this.emailInput.value = '';
+      this.emailInput.current.value = '';
     }
-    this.emailInput.focus();
+    this.emailInput.current.focus();
   };
 
   resetErrors = () => {
@@ -165,11 +165,11 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
                   name="email"
                   placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
-                  onChange={event => {
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     this.resetErrors();
                     this.setState({enteredEmail: event.target.value});
                   }}
-                  innerRef={node => (this.emailInput = node)}
+                  ref={this.emailInput}
                   autoFocus
                   data-uie-name="enter-invite-email"
                 />
