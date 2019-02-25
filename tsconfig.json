@@ -5,7 +5,6 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "lib": ["dom", "es2017"],
-    "types": ["webpack-env", "@types/long", "react"],
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
