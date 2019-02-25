@@ -166,7 +166,7 @@ ko.components.register('group-video-grid', {
                   <micoff-icon></micoff-icon>
                 </div>
               <!-- /ko -->
-              <!-- ko if: streamInfo.videoSend() === PROPERTY_STATE.PAUSED -->
+              <!-- ko if: streamInfo.videoSend() === $parent.PROPERTY_STATE.PAUSED -->
                 <div class="group-video-grid__pause-overlay" data-bind="switchBackground: streamInfo.picture()">
                   <div class="background">
                     <div class="background-image"></div>
