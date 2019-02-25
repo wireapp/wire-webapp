@@ -61,6 +61,23 @@
     transform-origin: center;
   }
 
+  &__icon {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      position: relative;
+      width: 16px;
+      height: 16px;
+
+      path {
+        fill: #fff;
+      }
+    }
+  }
+
   &.media-button-error {
     background-color: fade(@w-red, 24%);
   }
