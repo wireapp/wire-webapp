@@ -53,10 +53,7 @@ ko.components.register('file-asset', {
                     click: transferState() === AssetTransferState.UPLOADED ? asset.download : null,
                     css: {'cursor-pointer': transferState() === AssetTransferState.UPLOADED}">
         <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING  -->
-          <div class="asset-placeholder">
-            <div class="three-dots">
-              <span></span><span></span><span></span>
-            </div>
+          <div class="asset-placeholder loading-dots">
           </div>
         <!-- /ko -->
         <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->

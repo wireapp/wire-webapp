@@ -31,10 +31,12 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
     this.isVisible = ko.observable(false);
     this.onClick = (data, event) => onClick(message, event);
 
-    const dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${
-      asset.width
-    } ${asset.height}' width='${asset.width}' height='${asset.height}'></svg>`;
-    this.imageUrl = ko.observable(dummyImageUrl);
+    this.dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' 
+      viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
+
+    this.imageUrl = ko.observable();
+
+    this.isIdle = () => this.uploadProgress() === -1 && !this.asset.resource() && !this.message.isObfuscated();
 
     ko.computed(() => {
       if (this.isVisible() && asset.resource()) {
@@ -47,39 +49,23 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
       }
     });
   }
-
-  isIdle() {
-    return this.uploadProgress() === -1 && !this.asset.resource() && !this.message.isObfuscated();
-  }
 }
 
 ko.components.register('image-asset', {
   template: `
-    <div class="message-asset-image" style="background: grey">
-      <div class="image image-loading" data-bind="
-        attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-        in_viewport: {onVisible: () => isVisible(true)},
-        click: onClick,
-        css: {'bg-color-ephemeral': message.isObfuscated()},
-        " data-uie-name="go-image-detail">
-        <!-- ko if: uploadProgress() > -1 -->
-          <asset-loader params="loadProgress: uploadProgress, onCancel: () => cancelUpload(message)"></asset-loader>
-        <!-- /ko -->
-        <!-- ko if: message.isObfuscated() -->
-          <div class="icon-library flex-center full-screen text-white"></div>
-        <!-- /ko -->
-        <img class="image-element" data-bind="attr: {src: imageUrl}, css: {'image-ephemeral': message.isObfuscated()}"/>
-        <!-- ko if: isIdle() -->
-          <span class="image-placeholder-icon">
-            <div class="three-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </span>
-        <!-- /ko -->
-      </div>
+    <div class="image-asset" data-bind="
+      attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
+      in_viewport: {onVisible: () => isVisible(true)},
+      click: onClick,
+      css: {'bg-color-ephemeral': message.isObfuscated(), 'loading-dots': isIdle(), 'image-asset--no-image': !imageUrl()}" 
+      data-uie-name="go-image-detail">
+      <!-- ko if: uploadProgress() > -1 -->
+        <asset-loader params="loadProgress: uploadProgress, onCancel: () => cancelUpload(message)"></asset-loader>
+      <!-- /ko -->
+      <!-- ko if: message.isObfuscated() -->
+        <image-icon class="flex-center full-screen"></image-icon>
+      <!-- /ko -->
+      <img class="image-element" data-bind="attr: {src: imageUrl() || dummyImageUrl}, css: {'image-ephemeral': message.isObfuscated()}"/>
     </div>`,
-
   viewModel: ImageAssetComponent,
 });
