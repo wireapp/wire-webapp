@@ -1792,9 +1792,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation that should receive the file
    * @param {File} file - File to send
+   * @param {boolean} allowImageDetection - allow images to be treated as images (not files)
    * @returns {Promise} Resolves when the asset metadata was sent
    */
-  send_asset_metadata(conversation_et, file) {
+  send_asset_metadata(conversation_et, file, allowImageDetection) {
     return AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
@@ -1808,7 +1809,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           assetOriginal.audio = metadata;
         } else if (AssetMetaDataBuilder.isVideo(file)) {
           assetOriginal.video = metadata;
-        } else if (AssetMetaDataBuilder.isImage(file)) {
+        } else if (allowImageDetection && AssetMetaDataBuilder.isImage(file)) {
           assetOriginal.image = metadata;
         }
 
@@ -2764,7 +2765,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let message_id;
     const upload_started = Date.now();
 
-    return this.send_asset_metadata(conversation_et, file)
+    return this.send_asset_metadata(conversation_et, file, asImage)
       .then(({id}) => {
         message_id = id;
         return this.sendAssetPreview(conversation_et, file, message_id);

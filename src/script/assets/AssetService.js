@@ -59,16 +59,25 @@ export default class AssetService {
    * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
-   * @returns {Promise} Resolves when asset has been uploaded
+   * @returns {Promise<Asset>} Resolves when asset has been uploaded
    */
   _uploadAsset(bytes, options, xhrAccessorFunction) {
     return z.assets.AssetCrypto.encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
-      return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => ({
-        key,
-        keyBytes,
-        sha256,
-        token,
-      }));
+      return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => {
+        const assetRemoteData = new Asset.RemoteData({
+          assetId: key,
+          assetToken: token,
+          otrKey: new Uint8Array(keyBytes),
+          sha256: new Uint8Array(sha256),
+        });
+
+        const protoAsset = new Asset({
+          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation || false,
+        });
+
+        return protoAsset;
+      });
     });
   }
 
@@ -85,21 +94,7 @@ export default class AssetService {
    * @returns {Promise} Resolves when asset has been uploaded
    */
   uploadAsset(file, options, xhrAccessorFunction) {
-    return z.util
-      .loadFileBuffer(file)
-      .then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction))
-      .then(({key, keyBytes, sha256, token}) => {
-        keyBytes = new Uint8Array(keyBytes);
-        sha256 = new Uint8Array(sha256);
-
-        const assetRemoteData = new Asset.RemoteData({assetId: key, assetToken: token, otrKey: keyBytes, sha256});
-        const protoAsset = new Asset({
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation || false,
-        });
-
-        return protoAsset;
-      });
+    return z.util.loadFileBuffer(file).then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction));
   }
 
   /**
@@ -116,10 +111,7 @@ export default class AssetService {
    */
   uploadImageAsset(image, options, xhrAccessorFunction) {
     return this._compressImage(image).then(({compressedBytes, compressedImage}) => {
-      return this._uploadAsset(compressedBytes, options, xhrAccessorFunction).then(({key, keyBytes, sha256, token}) => {
-        keyBytes = new Uint8Array(keyBytes);
-        sha256 = new Uint8Array(sha256);
-
+      return this._uploadAsset(compressedBytes, options, xhrAccessorFunction).then(protoAsset => {
         const assetImageMetadata = new Asset.ImageMetaData({
           height: compressedImage.height,
           width: compressedImage.width,
@@ -131,14 +123,7 @@ export default class AssetService {
           size: compressedBytes.length,
         });
 
-        const assetRemoteData = new Asset.RemoteData({assetId: key, assetToken: token, otrKey: keyBytes, sha256});
-
-        const protoAsset = new Asset({
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation || false,
-        });
-
+        protoAsset[z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
         return protoAsset;
       });
     });

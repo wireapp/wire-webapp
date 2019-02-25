@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import AssetTransferState from '../../../assets/AssetTransferState';
 
 import '../assetLoader';
 
@@ -65,18 +64,6 @@ class MediaButtonComponent {
 
   onPause() {
     this.isPlaying(false);
-  }
-
-  isUploaded(transferState) {
-    return transferState === AssetTransferState.UPLOADED;
-  }
-
-  isDownloading(transferState) {
-    return transferState === AssetTransferState.DOWNLOADING;
-  }
-
-  isUploading(transferState) {
-    return transferState === AssetTransferState.UPLOADING;
   }
 
   dispose() {

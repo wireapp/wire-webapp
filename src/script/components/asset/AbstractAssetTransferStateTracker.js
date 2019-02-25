@@ -34,6 +34,10 @@ export default class AbstractAssetTransferStateTracker {
     });
   }
 
+  isDownloading(transferState) {
+    return transferState === AssetTransferState.DOWNLOADING;
+  }
+
   isUploading(transferState) {
     return transferState === AssetTransferState.UPLOADING;
   }
