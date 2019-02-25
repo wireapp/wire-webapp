@@ -20,6 +20,7 @@
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import CALL_STATE_GROUP from '../enum/CallStateGroup';
+import TERMINATION_REASON from '../enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -233,14 +234,14 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message for deactivation
    * @param {boolean} fromSelf - Deactivation triggered by self user change
-   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason=z.calling.enum.TERMINATION_REASON.SELF_USER] - Call termination reason
+   * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {Promise<boolean>} Resolves with a boolean whether the call was deleted
    */
-  deactivateCall(callMessageEntity, fromSelf, terminationReason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
+  deactivateCall(callMessageEntity, fromSelf, terminationReason = TERMINATION_REASON.SELF_USER) {
     this._clearTimeouts();
 
     const everyoneLeft = this.participants().length <= 0 + fromSelf ? 1 : 0;
-    const onGroupCheck = terminationReason === z.calling.enum.TERMINATION_REASON.GROUP_CHECK;
+    const onGroupCheck = terminationReason === TERMINATION_REASON.GROUP_CHECK;
 
     const shouldDeleteCall = everyoneLeft || onGroupCheck;
     if (shouldDeleteCall) {
@@ -258,9 +259,7 @@ z.calling.entities.CallEntity = class CallEntity {
   }
 
   _deleteCall(callMessageEntity, everyoneLeft, onGroupCheck) {
-    const reason = !this.wasConnected
-      ? z.calling.enum.TERMINATION_REASON.MISSED
-      : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const reason = !this.wasConnected ? TERMINATION_REASON.MISSED : TERMINATION_REASON.COMPLETED;
 
     if (onGroupCheck && !everyoneLeft) {
       const userIds = this.participants().map(participantEntity => participantEntity.id);
@@ -329,7 +328,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Leave the call.
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Call termination reason
+   * @param {TERMINATION_REASON} terminationReason - Call termination reason
    * @returns {undefined} No return value
    */
   leaveCall(terminationReason) {
@@ -378,7 +377,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * Check if group call should continue after participant left.
    *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Last member leaving call
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for call participant to leave
+   * @param {TERMINATION_REASON} terminationReason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
   participantLeft(callMessageEntity, terminationReason) {
@@ -419,7 +418,7 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Set the self state.
    * @param {boolean} joinedState - Self joined state
-   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason] - Call termination reason
+   * @param {TERMINATION_REASON} [terminationReason] - Call termination reason
    * @returns {undefined} No return value
    */
   setSelfState(joinedState, terminationReason) {
@@ -499,7 +498,7 @@ z.calling.entities.CallEntity = class CallEntity {
       return this.scheduleGroupCheck();
     }
 
-    this.leaveCall(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+    this.leaveCall(TERMINATION_REASON.OTHER_USER);
   }
 
   /**
@@ -516,7 +515,7 @@ z.calling.entities.CallEntity = class CallEntity {
     );
     const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
 
-    this.deactivateCall(callMessageEntity, false, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
+    this.deactivateCall(callMessageEntity, false, TERMINATION_REASON.GROUP_CHECK);
   }
 
   /**
@@ -670,7 +669,7 @@ z.calling.entities.CallEntity = class CallEntity {
         return this.isGroup ? this.rejectCall(false) : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
       }
 
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
+      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
     }, CallEntity.CONFIG.STATE_TIMEOUT);
   }
 
@@ -739,7 +738,7 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {string} userId - ID of user to be removed from the call
    * @param {string} clientId - ID of client that requested the removal from the call
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Call termination reason
+   * @param {TERMINATION_REASON} terminationReason - Call termination reason
    * @returns {Promise} Resolves with the call entity
    */
   deleteParticipant(userId, clientId, terminationReason) {
@@ -758,13 +757,13 @@ z.calling.entities.CallEntity = class CallEntity {
 
         if (this.selfClientJoined()) {
           switch (terminationReason) {
-            case z.calling.enum.TERMINATION_REASON.OTHER_USER: {
+            case TERMINATION_REASON.OTHER_USER: {
               amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
               break;
             }
 
-            case z.calling.enum.TERMINATION_REASON.CONNECTION_DROP:
-            case z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE: {
+            case TERMINATION_REASON.CONNECTION_DROP:
+            case TERMINATION_REASON.MEMBER_LEAVE: {
               amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
               break;
             }

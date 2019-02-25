@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import TERMINATION_REASON from '../../calling/enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -51,10 +52,10 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
   }
 
   was_completed() {
-    return this.finished_reason === z.calling.enum.TERMINATION_REASON.COMPLETED;
+    return this.finished_reason === TERMINATION_REASON.COMPLETED;
   }
 
   was_missed() {
-    return this.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED;
+    return this.finished_reason === TERMINATION_REASON.MISSED;
   }
 };
