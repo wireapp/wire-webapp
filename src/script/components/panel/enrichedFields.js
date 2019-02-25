@@ -50,8 +50,8 @@ ko.components.register('enriched-fields', {
         this.fields([
           {type: 'Title', value: 'Chief Design Officer'},
           {type: 'Phone', value: ' 0172 987 65 43'},
-          {type: 'Entity', value: 'Orange/OBS/EQUANT/CSO/IBO/OEC/SERVICE OP/CS MGT/CSM EEMEA'},
-          {type: 'Email', value: 'michelle@acme.com'},
+          {type: 'Entity', value: 'STUFF/DATA/WORK/MOREWORK'},
+          {type: 'Email', value: 'michelle@example.com'},
         ]);
         onFieldsLoaded(this.fields());
       });

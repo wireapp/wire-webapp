@@ -28,7 +28,7 @@ describe('RichProfileRepository', () => {
   });
 
   describe('getUserRichProfile', () => {
-    it("fetches the user's rich profile is not in cache", () => {
+    it("fetches the user's rich profile if it is not already in cache", () => {
       const userId = UUID.genV4().hexString;
       const response = [];
       spyOn(richProfileRepository.backendClient, 'sendRequest').and.returnValue(Promise.resolve(response));
