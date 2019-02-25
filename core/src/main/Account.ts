@@ -66,8 +66,8 @@ import {SelfService} from './self/';
 import {TeamService} from './team/';
 
 import {APIClient} from '@wireapp/api-client';
-import * as EventEmitter from 'events';
-import * as logdown from 'logdown';
+import EventEmitter from 'events';
+import logdown from 'logdown';
 import {UserService} from './user/';
 
 class Account extends EventEmitter {

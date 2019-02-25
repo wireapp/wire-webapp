@@ -26,7 +26,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Decoder, Encoder} from 'bazinga64';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 import {SessionPayloadBundle} from '../cryptography/';
 import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
 

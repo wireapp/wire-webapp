@@ -17,12 +17,12 @@
  *
  */
 
-import * as EventEmitter from 'events';
-import * as logdown from 'logdown';
+import EventEmitter from 'events';
+import logdown from 'logdown';
 import {IncomingNotification} from '../conversation/';
 import {HttpClient, NetworkError} from '../http/';
 
-import * as Html5WebSocket from 'html5-websocket';
+import Html5WebSocket from 'html5-websocket';
 import * as buffer from '../shims/node/buffer';
 const ReconnectingWebsocket = require('reconnecting-websocket');
 

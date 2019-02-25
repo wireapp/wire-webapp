@@ -22,7 +22,7 @@ import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 import {Account} from '@wireapp/core';
 import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {MemoryEngine} from '@wireapp/store-engine';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 import UUID from 'pure-uuid';
 
 import {BotConfig, BotCredentials} from './Interfaces';

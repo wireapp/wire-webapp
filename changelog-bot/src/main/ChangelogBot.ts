@@ -19,7 +19,7 @@
 
 import {exec} from 'child_process';
 import * as Changelog from 'generate-changelog';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 import {promisify} from 'util';
 
 import {APIClient} from '@wireapp/api-client';

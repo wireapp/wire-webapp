@@ -20,7 +20,7 @@
  */
 
 import * as program from 'commander';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 
 import {Parameters} from './Interfaces';
 import {start as startChangelogBot} from './Start';

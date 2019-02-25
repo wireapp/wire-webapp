@@ -18,7 +18,7 @@
  */
 
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 
 import {AssetAPI} from './asset/';
 import {AccessTokenStore, AuthAPI, Context, LoginData, RegisterData} from './auth/';

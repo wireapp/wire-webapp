@@ -1,18 +1,15 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "outDir": "dist",
-    "rootDir": "src",
-    "module": "commonjs",
-    "esModuleInterop": true,
     "emitDeclarationOnly": true,
-    "strict": false,
-    "declaration": true,
-    "noImplicitAny": false,
+    "esModuleInterop": true,
     "noEmitOnError": false,
+    "noImplicitAny": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": false
   },
   "exclude": ["dist", "node_modules"],
   "extends": "../../tsconfig.json"
