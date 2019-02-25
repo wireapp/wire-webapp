@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.0...@wireapp/react-ui-kit@5.0.1) (2019-02-25)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Animation, Footer & MatchMedia types ([#1554](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1554)) ([797ee50](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/797ee50))
+
+
+
+
+
 # [5.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.46...@wireapp/react-ui-kit@5.0.0) (2019-02-25)
 
 
