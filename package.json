@@ -11,7 +11,7 @@
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "1.0.6",
     "@wireapp/core": "8.1.15",
-    "@wireapp/react-ui-kit": "4.3.44",
+    "@wireapp/react-ui-kit": "5.0.0",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "coveralls": "3.0.2",
     "crypto-js": "3.1.9-1",
