@@ -46,6 +46,7 @@ ko.components.register('enriched-fields', {
         }
       })
       .catch(() => {
+        // XXX remove me when the backend endpoint is available
         this.fields([
           {type: 'Title', value: 'Chief Design Officer'},
           {type: 'Phone', value: ' 0172 987 65 43'},
