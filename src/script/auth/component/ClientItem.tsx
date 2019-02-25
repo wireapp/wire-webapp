@@ -58,7 +58,7 @@ interface State {
 type CombinedProps = Props & InjectedIntlProps;
 
 class ClientItem extends React.Component<CombinedProps, State> {
-  private passwordInput: React.RefObject<any>;
+  private readonly passwordInput: React.RefObject<any>;
   state: State;
 
   static CONFIG = {
