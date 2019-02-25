@@ -20,11 +20,36 @@
 import Logger from 'utils/Logger';
 
 import poster from 'poster-image';
+import {
+  Asset,
+  Cleared,
+  ClientAction,
+  Confirmation,
+  Ephemeral,
+  External,
+  GenericMessage,
+  Knock,
+  LastRead,
+  Location,
+  MessageDelete,
+  MessageEdit,
+  MessageHide,
+  Reaction,
+  Text,
+} from '@wireapp/protocol-messaging';
 
 import PromiseQueue from 'utils/PromiseQueue';
 import EventMapper from './EventMapper';
+import Conversation from '../entity/Conversation';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import trackingHelpers from '../tracking/Helpers';
+
+import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
+import PROPERTY_STATE from '../calling/enum/PropertyState';
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
+
+import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
 import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
@@ -63,7 +88,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
@@ -1054,7 +1079,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {JSON} payload - Payload to map
    * @param {number} [initialTimestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
-   * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
+   * @returns {Conversation|Array<Conversation>} Mapped conversation/s
    */
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
@@ -1301,10 +1326,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _updateClearedTimestamp(conversationEntity) {
     const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
 
-    if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.CLEARED)) {
-      const protoCleared = new z.proto.Cleared(conversationEntity.id, timestamp);
-      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, protoCleared);
+    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
+      const protoCleared = new Cleared({
+        clearedTimestamp: timestamp,
+        conversationId: conversationEntity.id,
+      });
+      const genericMessage = new GenericMessage({
+        [z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
+        messageId: z.util.createRandomUuid(),
+      });
 
       const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
@@ -1473,7 +1503,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Set the notification state of a conversation.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation to change notification state off
+   * @param {Conversation} conversationEntity - Conversation to change notification state off
    * @param {z.conversation.NotificationSetting} notificationState - New notification state
    * @returns {Promise} Resolves when the notification stated was change
    */
@@ -1669,10 +1699,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
     const conversationId = conversationEntity.id;
 
-    if (timestamp && conversationEntity.setTimestamp(timestamp, z.entity.Conversation.TIMESTAMP_TYPE.LAST_READ)) {
-      const protoLeastRead = new z.proto.LastRead(conversationId, conversationEntity.last_read_timestamp());
-      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, protoLeastRead);
+    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ)) {
+      const protoLeastRead = new LastRead({
+        conversationId,
+        lastReadTimestamp: conversationEntity.last_read_timestamp(),
+      });
+      const genericMessage = new GenericMessage({
+        [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLeastRead,
+        messageId: z.util.createRandomUuid(),
+      });
 
       const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
       this.sendGenericMessageToConversation(eventInfoEntity)
@@ -1696,12 +1731,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = []) {
-    this._sendConfirmationStatus(
-      conversationEntity,
-      messageEntity,
-      z.proto.Confirmation.Type.READ,
-      moreMessageEntities
-    );
+    this._sendConfirmationStatus(conversationEntity, messageEntity, Confirmation.Type.READ, moreMessageEntities);
   }
 
   //##############################################################################
@@ -1712,7 +1742,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let genericMessage;
 
     return this.get_message_in_conversation_by_id(conversationEntity, messageId)
-      .then(messageEntity => {
+      .then(() => {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
@@ -1723,8 +1753,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return uploadPromise;
       })
       .then(asset => {
-        genericMessage = new z.proto.GenericMessage(messageId);
-        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+        genericMessage = new GenericMessage({
+          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          messageId,
+        });
 
         if (conversationEntity.messageTimer()) {
           genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
@@ -1739,10 +1771,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           : genericMessage.asset;
 
         const data = {
-          key: assetData.asset_id,
-          otr_key: assetData.otr_key,
+          key: assetData.assetId,
+          otr_key: assetData.otrKey,
           sha256: assetData.sha256,
-          token: assetData.asset_token,
+          token: assetData.assetToken,
         };
 
         const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
@@ -1770,35 +1802,34 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return undefined;
       })
       .then(metadata => {
-        const protoAsset = new z.proto.Asset();
+        const assetOriginal = new Asset.Original({mimeType: file.type, name: file.name, size: file.size});
 
-        let assetOriginal = undefined;
         if (AssetMetaDataBuilder.isAudio(file)) {
-          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata);
+          assetOriginal.audio = metadata;
         } else if (AssetMetaDataBuilder.isVideo(file)) {
-          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata);
+          assetOriginal.video = metadata;
         } else if (AssetMetaDataBuilder.isImage(file)) {
-          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name, metadata);
-        } else {
-          assetOriginal = new z.proto.Asset.Original(file.type, file.size, file.name);
+          assetOriginal.image = metadata;
         }
-        protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL, assetOriginal);
-        protoAsset.set(
-          z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
-          this.expectReadReceipt(conversation_et)
-        );
+
+        const protoAsset = new Asset({
+          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
+          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+        });
 
         return protoAsset;
       })
       .then(asset => {
-        let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+        let genericMessage = new GenericMessage({
+          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          messageId: z.util.createRandomUuid(),
+        });
 
         if (conversation_et.messageTimer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversation_et.messageTimer());
         }
 
-        return this._send_and_inject_generic_message(conversation_et, generic_message);
+        return this._send_and_inject_generic_message(conversation_et, genericMessage);
       })
       .catch(error => {
         const log = `Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`;
@@ -1834,16 +1865,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const messageEntityPromise = this.get_message_in_conversation_by_id(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
           return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
-            const protoAsset = new z.proto.Asset();
-            const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-            protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW, assetPreview);
-            protoAsset.set(
-              z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
-              options.expectsReadConfirmation
-            );
+            const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+            const protoAsset = new Asset({
+              [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
+              [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+            });
 
-            const genericMessage = new z.proto.GenericMessage(messageId);
-            genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
+            const genericMessage = new GenericMessage({
+              [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+              messageId,
+            });
 
             return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
           });
@@ -1865,16 +1896,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_asset_upload_failed(conversation_et, messageId, reason = z.assets.AssetUploadFailedReason.FAILED) {
     const wasCancelled = reason === z.assets.AssetUploadFailedReason.CANCELLED;
-    const protoReason = wasCancelled ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
-    const protoAsset = new z.proto.Asset();
-    protoAsset.set(z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED, protoReason);
-    protoAsset.set(
-      z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION,
-      this.expectReadReceipt(conversation_et)
-    );
+    const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
+    const protoAsset = new Asset({
+      [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
+      [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+    });
 
-    const generic_message = new z.proto.GenericMessage(messageId);
-    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, protoAsset);
+    const generic_message = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+      messageId,
+    });
 
     return this._send_and_inject_generic_message(conversation_et, generic_message);
   }
@@ -1884,7 +1915,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that content message was received in
    * @param {Message} messageEntity - Message for which to acknowledge receipt
-   * @param {z.proto.Confirmation.Type} type - The type of confirmation to send
+   * @param {Confirmation.Type} type - The type of confirmation to send
    * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
    * @returns {undefined} No return value
    */
@@ -1895,7 +1926,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return;
     }
 
-    if (type === z.proto.Confirmation.Type.DELIVERED) {
+    if (type === Confirmation.Type.DELIVERED) {
       const otherUserIn1To1 = conversationEntity.is1to1();
       const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
       const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
@@ -1906,9 +1937,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoConfirmation = new z.proto.Confirmation(type, messageEntity.id, moreMessageIds);
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, protoConfirmation);
+    const protoConfirmation = new Confirmation({
+      firstMessageId: messageEntity.id,
+      moreMessageIds,
+      type,
+    });
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
+      messageId: z.util.createRandomUuid(),
+    });
 
     this.sending_queue.push(() => {
       return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
@@ -1942,10 +1979,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
       })
       .then(() => {
-        const initiatingCallMessage = [
-          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
-          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
-        ];
+        const initiatingCallMessage = [CALL_MESSAGE_TYPE.GROUP_START, CALL_MESSAGE_TYPE.SETUP];
 
         const isCallInitiation = initiatingCallMessage.includes(callMessageEntity.type);
         if (isCallInitiation) {
@@ -1978,8 +2012,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.asset_service
       .uploadImageAsset(image, options)
       .then(asset => {
-        let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+        let genericMessage = new GenericMessage({
+          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          messageId: z.util.createRandomUuid(),
+        });
 
         if (conversationEntity.messageTimer()) {
           genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
@@ -2000,9 +2036,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the knock
    */
   sendKnock(conversationEntity) {
-    let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoKnock = new z.proto.Knock(false, this.expectReadReceipt(conversationEntity));
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, protoKnock);
+    const protoKnock = new Knock({
+      [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
+      hotKnock: false,
+    });
+
+    let genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+      messageId: z.util.createRandomUuid(),
+    });
 
     if (conversationEntity.messageTimer()) {
       genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
@@ -2021,14 +2063,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message that possibly contains link
-   * @param {z.proto.GenericMessage} genericMessage - GenericMessage of containing text or edited message
+   * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
    * @param {z.message.QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
     const conversationId = conversationEntity.id;
-    const messageId = genericMessage.message_id;
+    const messageId = genericMessage.messageId;
 
     return this.link_repository
       .getLinkPreviewFromString(textMessage)
@@ -2042,7 +2084,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             [linkPreview],
             this.expectReadReceipt(conversationEntity)
           );
-          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
+          genericMessage[z.cryptography.GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
         }
@@ -2083,15 +2125,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the location
    */
   sendLocation(conversationEntity, longitude, latitude, name, zoom) {
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoLocation = new z.proto.Location(
-      longitude,
+    const protoLocation = new Location({
+      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       latitude,
+      longitude,
       name,
       zoom,
-      this.expectReadReceipt(conversationEntity)
-    );
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, protoLocation);
+    });
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
+      messageId: z.util.createRandomUuid(),
+    });
 
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
     return this.sendGenericMessageToConversation(eventInfoEntity);
@@ -2100,32 +2144,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send edited message in specified conversation.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
-    const hasDifferentText = z.util.MessageComparator.isTextDifferent(originalMessageEntity, textMessage);
-    const hasDifferentMentions = z.util.MessageComparator.areMentionsDifferent(originalMessageEntity, mentionEntities);
+    const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
+    const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
       return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES));
     }
 
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+    const messageId = z.util.createRandomUuid();
+
     const protoText = this._createTextProto(
-      genericMessage.message_id,
+      messageId,
       textMessage,
       mentionEntities,
       undefined,
       undefined,
       this.expectReadReceipt(conversationEntity)
     );
-    const protoMessageEdit = new z.proto.MessageEdit(originalMessageEntity.id, protoText);
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, protoMessageEdit);
+    const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
+      messageId,
+    });
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage, false)
       .then(() => {
@@ -2146,10 +2194,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation entity
    * @param {Message} message_et - Message to react to
-   * @param {boolean} button - Source of toggle
    * @returns {undefined} No return value
    */
-  toggle_like(conversation_et, message_et, button) {
+  toggle_like(conversation_et, message_et) {
     if (!conversation_et.removed_from_conversation()) {
       const reaction = message_et.is_liked() ? z.message.ReactionType.NONE : z.message.ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
@@ -2166,9 +2213,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the reaction
    */
   sendReaction(conversationEntity, messageEntity, reaction) {
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoReaction = new z.proto.Reaction(reaction, messageEntity.id);
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.REACTION, protoReaction);
+    const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
+      messageId: z.util.createRandomUuid(),
+    });
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage);
   }
@@ -2186,8 +2235,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the session reset
    */
   sendSessionReset(userId, clientId, conversationId) {
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION, z.proto.ClientAction.RESET_SESSION);
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
+      messageId: z.util.createRandomUuid(),
+    });
 
     const options = {
       precondition: true,
@@ -2216,16 +2267,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the message
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
-    let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+    const messageId = z.util.createRandomUuid();
+
     const protoText = this._createTextProto(
-      genericMessage.message_id,
+      messageId,
       textMessage,
       mentionEntities,
       quoteEntity,
       undefined,
       this.expectReadReceipt(conversationEntity)
     );
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, protoText);
+    let genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: protoText,
+      messageId,
+    });
 
     if (conversationEntity.messageTimer()) {
       genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
@@ -2259,7 +2314,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews, expectsReadConfirmation) {
-    const protoText = new z.proto.Text(textMessage);
+    const protoText = new Text({content: textMessage});
 
     if (mentionEntities && mentionEntities.length) {
       const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
@@ -2278,22 +2333,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         })
         .map(mentionEntity => mentionEntity.toProto());
-      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS, protoMentions);
+
+      protoText[z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
     }
 
     if (quoteEntity) {
       const protoQuote = quoteEntity.toProto();
       this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.QUOTE, protoQuote);
+      protoText[z.cryptography.PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
     }
 
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS, linkPreviews);
+      protoText[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
     }
 
     if (expectsReadConfirmation) {
-      protoText.set(z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION, expectsReadConfirmation);
+      protoText[z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
     }
 
     return protoText;
@@ -2302,19 +2358,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Wraps generic message in ephemeral message.
    *
-   * @param {z.proto.GenericMessage} genericMessage - Message to be wrapped
+   * @param {GenericMessage} genericMessage - Message to be wrapped
    * @param {number} millis - Expire time in milliseconds
-   * @returns {z.proto.Message} New proto message
+   * @returns {Message} New proto message
    */
   _wrap_in_ephemeral_message(genericMessage, millis) {
-    const protoEphemeral = new z.proto.Ephemeral();
     const ephemeralExpiration = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
 
-    protoEphemeral.set(z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION, ephemeralExpiration);
-    protoEphemeral.set(genericMessage.content, genericMessage[genericMessage.content]);
+    const protoEphemeral = new Ephemeral({
+      [genericMessage.content]: genericMessage[genericMessage.content],
+      [z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
+    });
 
-    genericMessage = new z.proto.GenericMessage(genericMessage.message_id);
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL, protoEphemeral);
+    genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
+      messageId: z.util.createRandomUuid(),
+    });
+
     return genericMessage;
   }
 
@@ -2443,11 +2503,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
 
-    return z.assets.AssetCrypto.encryptAesAsset(genericMessage.toArrayBuffer())
+    return z.assets.AssetCrypto.encryptAesAsset(GenericMessage.encode(genericMessage).finish())
       .then(({cipherText, keyBytes, sha256}) => {
-        const genericMessageExternal = new z.proto.GenericMessage(z.util.createRandomUuid());
-        const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
-        genericMessageExternal.set(z.cryptography.GENERIC_MESSAGE_TYPE.EXTERNAL, externalMessage);
+        keyBytes = new Uint8Array(keyBytes);
+        sha256 = new Uint8Array(sha256);
+
+        const externalMessage = new External({otrKey: keyBytes, sha256});
+
+        const genericMessageExternal = new GenericMessage({
+          [z.cryptography.GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
+          messageId: z.util.createRandomUuid(),
+        });
 
         return this.cryptography_repository
           .encryptGenericMessage(options.recipients, genericMessageExternal)
@@ -2507,7 +2573,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _sendEncryptedMessage(eventInfoEntity, payload) {
     const {conversationId, genericMessage, options} = eventInfoEntity;
-    const messageId = genericMessage.message_id;
+    const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
     if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
@@ -2689,7 +2755,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {conversationId, genericMessage} = eventInfoEntity;
 
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
-      const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
+      const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
       const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
 
       return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
@@ -2732,6 +2798,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   upload_file(conversation_et, file) {
     let message_id;
     const upload_started = Date.now();
+
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
         message_id = id;
@@ -2773,9 +2840,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_USER);
         }
 
-        const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-        const protoMessageDelete = new z.proto.MessageDelete(messageId);
-        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, protoMessageDelete);
+        const protoMessageDelete = new MessageDelete({messageId});
+        const genericMessage = new GenericMessage({
+          [z.cryptography.GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
+          messageId: z.util.createRandomUuid(),
+        });
 
         return this.sending_queue.push(() => {
           return this.create_recipients(conversationId, false, precondition).then(recipients => {
@@ -2811,9 +2880,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
   deleteMessage(conversationEntity, messageEntity) {
     return Promise.resolve()
       .then(() => {
-        const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-        const protoMessageHide = new z.proto.MessageHide(conversationEntity.id, messageEntity.id);
-        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN, protoMessageHide);
+        const protoMessageHide = new MessageHide({
+          conversationId: conversationEntity.id,
+          messageId: messageEntity.id,
+        });
+        const genericMessage = new GenericMessage({
+          [z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
+          messageId: z.util.createRandomUuid(),
+        });
 
         const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
         return this.sendGenericMessageToConversation(eventInfoEntity);
@@ -3063,7 +3137,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
-          this._sendConfirmationStatus(conversationEntity, messageEntity, z.proto.Confirmation.Type.DELIVERED);
+          this._sendConfirmationStatus(conversationEntity, messageEntity, Confirmation.Type.DELIVERED);
         }
 
         if (!eventFromStream) {
@@ -3312,7 +3386,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       if (conversationEntity.call()) {
-        const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        const reason = TERMINATION_REASON.MEMBER_LEAVE;
         amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
 
@@ -3874,7 +3948,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation entity
-   * @param {z.proto.GenericMessage} genericMessage - Protobuf message
+   * @param {GenericMessage} genericMessage - Protobuf message
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Optional call message
    * @returns {undefined} No return value
    */
@@ -3884,7 +3958,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;
-      messageTimer = genericMessage.expire_after_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+      messageTimer =
+        genericMessage[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -3901,7 +3976,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'calling': {
         const properties = callMessageEntity.properties;
-        const isVideoCall = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+        const isVideoCall = properties.videosend === PROPERTY_STATE.TRUE;
         actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;
       }
@@ -3918,7 +3993,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        if (!protoText.link_preview.length) {
+        const length = protoText[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
+        if (!length) {
           actionType = 'text';
           numberOfMentions = protoText.mentions.length;
         }
@@ -3932,7 +4008,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (actionType) {
       const attributes = {
         action: actionType,
-        conversation_type: z.tracking.helpers.getConversationType(conversationEntity),
+        conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
         is_ephemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
@@ -3942,7 +4018,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+        Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
       }
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);

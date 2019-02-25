@@ -17,16 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.time = z.time || {};
-
-z.time.ServerTimeRepository = class ServerTimeRepository {
-  constructor() {
-    this.logger = new Logger('z.time.ServerTimeRepository', z.config.LOGGER.OPTIONS);
+export default class ServerTimeRepository {
+  constructor(logger) {
+    this.logger = logger;
     this.timeOffset = ko.observable(undefined);
   }
 
@@ -61,4 +56,4 @@ z.time.ServerTimeRepository = class ServerTimeRepository {
   toLocalTimestamp(serverTimestamp = Date.now()) {
     return serverTimestamp + this.getTimeOffset();
   }
-};
+}

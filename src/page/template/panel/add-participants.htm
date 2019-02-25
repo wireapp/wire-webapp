@@ -5,7 +5,7 @@
       <div class="panel__header__title" data-bind="text: headerText" data-uie-name="status-people-selected"></div>
       <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
     </div>
-    <div class="panel__content">
+    <div class="panel__content panel__content--fill">
       <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: t('addParticipantsSearchPlaceholder'), focusDelay: z.motion.MotionDuration.LONG" spellcheck="false"></user-input>
       <!-- ko if: showIntegrations() -->
         <div class="panel__tabs">

@@ -26,6 +26,7 @@ import {debounce} from 'underscore';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
+import TimeUtil from 'utils/TimeUtil';
 import overlayedObserver from '../../ui/overlayedObserver';
 import viewportObserver from '../../ui/viewportObserver';
 import {t} from 'utils/LocalizerUtil';
@@ -176,7 +177,7 @@ ko.bindingHandlers.resize = {
 };
 
 ko.bindingHandlers.heightSync = {
-  init(element, valueAccessor, allBindings, data, context) {
+  init(element, valueAccessor) {
     const params = ko.unwrap(valueAccessor()) || {};
 
     const resizeCallback = params.callback;
@@ -259,7 +260,7 @@ ko.bindingHandlers.file_select = {
         // wait before clearing to fix autotests
         window.setTimeout(() => {
           $(event.target).val(null);
-        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
       }
     };
 
@@ -519,11 +520,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const date = moment.unix(timestamp / TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     const now = moment().local();
     const today = now.format('YYMMDD');

@@ -18,14 +18,14 @@
  */
 
 import Logger from 'utils/Logger';
-
 import User from '../entity/User';
+import '../view_model/bindings/CommonBindings';
 
 export default class UserMapper {
   /**
    * Construct a new User Mapper.
    * @class UserMapper
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
   constructor(serverTimeRepository) {
     this.logger = new Logger('UserMapper', z.config.LOGGER.OPTIONS);
@@ -109,7 +109,6 @@ export default class UserMapper {
       service,
       sso_id: ssoId,
       team,
-      extended_fields,
     } = userData;
 
     if (accentId) {
@@ -133,8 +132,6 @@ export default class UserMapper {
     if (managed_by !== undefined) {
       userEntity.managedBy(managed_by);
     }
-
-    userEntity.extendedFields(extended_fields);
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);

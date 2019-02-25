@@ -17,10 +17,13 @@
  *
  */
 
+import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
+
 import Logger from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
 
 import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
-import {t} from 'utils/LocalizerUtil';
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export default class EventMapper {
@@ -131,9 +134,11 @@ export default class EventMapper {
     }
 
     originalEntity.id = id;
+
     if (originalEntity.is_content() || originalEntity.is_ping()) {
       originalEntity.status(event.status || z.message.StatusType.SENT);
     }
+
     originalEntity.replacing_message_id = eventData.replacing_message_id;
     if (editedTime || eventData.edited_time) {
       originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
@@ -381,7 +386,7 @@ export default class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {Conversation} conversationEntity - Conversation entity the event belong to
    * @returns {MemberMessage} Member message entity
    */
   _mapEventMemberJoin(event, conversationEntity) {
@@ -578,7 +583,7 @@ export default class EventMapper {
 
     messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
     messageEntity.finished_reason = eventData.reason;
-    messageEntity.visible(messageEntity.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED);
+    messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
 
     return messageEntity;
   }
@@ -664,9 +669,8 @@ export default class EventMapper {
     assetEntity.ratio = assetEntity.height / assetEntity.width;
 
     if (info) {
-      const {height, width} = info;
-      assetEntity.width = width;
-      assetEntity.height = height;
+      assetEntity.width = info.width;
+      assetEntity.height = info.height;
     }
 
     if (createDummyImage) {
@@ -691,13 +695,15 @@ export default class EventMapper {
    * Map link preview from proto message.
    *
    * @private
-   * @param {z.proto.LinkPreview} linkPreview - Link preview proto message
+   * @param {LinkPreview} linkPreview - Link preview proto message
    * @returns {LinkPreview} Mapped link preview
    */
   _mapAssetLinkPreview(linkPreview) {
     if (linkPreview) {
-      const {image, title, url, meta_data} = linkPreview;
+      const {image, title, url} = linkPreview;
       const {image: article_image, title: article_title} = linkPreview.article || {};
+
+      const meta_data = linkPreview.metaData || linkPreview.meta_data;
 
       const linkPreviewEntity = new z.entity.LinkPreview(title || article_title, url);
       linkPreviewEntity.meta_data_type = meta_data;
@@ -705,15 +711,15 @@ export default class EventMapper {
 
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {
-        const {asset_token, asset_id: asset_key} = previewImage.uploaded;
+        const {assetId: assetKey, assetToken} = previewImage.uploaded;
 
-        if (asset_key) {
-          let {otr_key, sha256} = previewImage.uploaded;
+        if (assetKey) {
+          let {otrKey, sha256} = previewImage.uploaded;
 
-          otr_key = new Uint8Array(otr_key.toArrayBuffer());
-          sha256 = new Uint8Array(sha256.toArrayBuffer());
+          otrKey = new Uint8Array(otrKey);
+          sha256 = new Uint8Array(sha256);
 
-          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(asset_key, otr_key, sha256, asset_token, true));
+          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
         }
       }
 
@@ -730,7 +736,7 @@ export default class EventMapper {
    */
   _mapAssetLinkPreviews(linkPreviews) {
     return linkPreviews
-      .map(encodedLinkPreview => z.proto.LinkPreview.decode64(encodedLinkPreview))
+      .map(encodedLinkPreview => LinkPreview.decode(z.util.base64ToArray(encodedLinkPreview)))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
       .filter(linkPreviewEntity => linkPreviewEntity);
   }
@@ -746,8 +752,8 @@ export default class EventMapper {
   _mapAssetMentions(mentions, messageText) {
     return mentions
       .map(encodedMention => {
-        const protoMention = z.proto.Mention.decode64(encodedMention);
-        return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.user_id);
+        const protoMention = Mention.decode(z.util.base64ToArray(encodedMention));
+        return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
       .filter((mentionEntity, _, allMentions) => {
         if (mentionEntity) {

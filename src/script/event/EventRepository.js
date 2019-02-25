@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -61,7 +62,7 @@ z.event.EventRepository = class EventRepository {
    * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(
@@ -660,10 +661,9 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved event
    */
-  _handleEventSaving(event, source) {
+  _handleEventSaving(event) {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
@@ -917,7 +917,7 @@ z.event.EventRepository = class EventRepository {
    */
   _validateCallEventLifetime(event) {
     const {content = {}, conversation: conversationId, time, type} = event;
-    const forcedEventTypes = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
+    const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
     const correctedTimestamp = this.serverTimeRepository.toServerTimestamp();
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;

@@ -114,7 +114,7 @@ class App {
     repositories.auth = authComponent.repository;
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
-    repositories.serverTime = new z.time.ServerTimeRepository();
+    repositories.serverTime = resolve(graph.ServerTimeRepository);
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -306,9 +306,7 @@ class App {
       .then(() => {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-
-        const protoFile = `/proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._initiateSelfUser(), z.util.protobuf.loadProtos(protoFile)]);
+        return this._initiateSelfUser();
       })
       .then(() => {
         this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
@@ -599,7 +597,7 @@ class App {
     return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
   }
 
-  _registerSingleInstanceCleaning(singleInstanceCheckIntervalId) {
+  _registerSingleInstanceCleaning() {
     $(window).on('beforeunload', () => {
       this.singleInstanceHandler.deregisterInstance();
     });
@@ -728,7 +726,12 @@ class App {
     };
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
-      return _logout();
+      try {
+        _logout();
+      } catch (error) {
+        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
+        _redirectToLogin();
+      }
     }
 
     if (navigator.onLine) {

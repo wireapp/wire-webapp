@@ -17,9 +17,9 @@
  *
  */
 
-'use strict';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
+import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import * as Proteus from '@wireapp/proteus';
 
 async function createEncodedCiphertext(
@@ -33,13 +33,19 @@ async function createEncodedCiphertext(
   const sender = new Cryptobox(bobEngine, 1);
   await sender.create();
 
-  const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-  genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(text));
+  const genericMessage = new GenericMessage({
+    [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
+    messageId: z.util.createRandomUuid(),
+  });
 
   const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
   const preKeyBundle = Proteus.keys.PreKeyBundle.new(receivingIdentity.public_key, preKey);
 
-  const cipherText = await sender.encrypt(sessionId, genericMessage.toArrayBuffer(), preKeyBundle.serialise());
+  const cipherText = await sender.encrypt(
+    sessionId,
+    GenericMessage.encode(genericMessage).finish(),
+    preKeyBundle.serialise()
+  );
 
   return z.util.arrayToBase64(cipherText);
 }
@@ -62,11 +68,7 @@ describe('Event Repository', () => {
     };
   })();
 
-  beforeAll(() => {
-    return z.util.protobuf
-      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
-      .then(() => test_factory.exposeClientActors());
-  });
+  beforeAll(() => test_factory.exposeClientActors());
 
   beforeEach(() => {
     return test_factory.exposeEventActors().then(event_repository => {
@@ -490,7 +492,7 @@ describe('Event Repository', () => {
       return TestFactory.event_repository
         ._handleEventSaving(linkPreviewEvent)
         .then(() => fail('Should have thrown an error'))
-        .catch(error => {
+        .catch(() => {
           expect(TestFactory.event_service.replaceEvent).not.toHaveBeenCalled();
           expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });

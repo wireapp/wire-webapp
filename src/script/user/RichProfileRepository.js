@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,26 @@
  *
  */
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
-window.z.tracking.attribute = z.tracking.attribute || {};
+import {memoize} from 'underscore';
 
-z.tracking.attribute.PlatformType = {
-  BROWSER_APP: 'web',
-  DESKTOP_LINUX: 'linux',
-  DESKTOP_MACOS: 'mac',
-  DESKTOP_WINDOWS: 'windows',
-};
+export default class RichProfileRepository {
+  static get URL() {
+    return {
+      RICH_INFO: '/users/:id/rich-info',
+    };
+  }
+
+  constructor(backendClient, logger) {
+    this.backendClient = backendClient;
+    this.logger = logger;
+
+    this.getUserRichProfile = memoize(this.getUserRichProfile);
+  }
+
+  getUserRichProfile(userId) {
+    return this.backendClient.sendRequest({
+      type: 'GET',
+      url: RichProfileRepository.URL.RICH_INFO.replace(':id', userId),
+    });
+  }
+}

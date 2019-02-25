@@ -17,6 +17,9 @@
  *
  */
 
+import {Article, LinkPreview} from '@wireapp/protocol-messaging';
+
+import EphemeralStatusType from '../message/EphemeralStatusType';
 import Logger from 'utils/Logger';
 
 window.z = window.z || {};
@@ -91,17 +94,17 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     }
 
     switch (messageEntity.ephemeral_status()) {
-      case z.message.EphemeralStatusType.TIMED_OUT: {
+      case EphemeralStatusType.TIMED_OUT: {
         this._timeoutEphemeralMessage(messageEntity);
         break;
       }
 
-      case z.message.EphemeralStatusType.ACTIVE: {
+      case EphemeralStatusType.ACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
         break;
       }
 
-      case z.message.EphemeralStatusType.INACTIVE: {
+      case EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
 
         const changes = {
@@ -119,7 +122,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   validateMessage(messageEntity) {
-    const isEphemeralMessage = messageEntity.ephemeral_status() !== z.message.EphemeralStatusType.NONE;
+    const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
     if (!isEphemeralMessage) {
       return messageEntity;
     }
@@ -202,8 +205,15 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const obfuscatedAsset = new z.entity.Text(messageEntity.id);
     const obfuscatedPreviews = assetEntity.previews().map(linkPreview => {
       linkPreview.obfuscate();
-      const protoArticle = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
-      return new z.proto.LinkPreview(linkPreview.url, 0, protoArticle, linkPreview.url, linkPreview.title).encode64();
+      const protoArticle = new Article({permanentUrl: linkPreview.url, title: linkPreview.title}); // deprecated format
+      const linkPreviewProto = new LinkPreview({
+        article: protoArticle,
+        permanentUrl: linkPreview.url,
+        title: linkPreview.title,
+        url: linkPreview.url,
+        urlOffset: 0,
+      });
+      return z.util.arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
     obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);

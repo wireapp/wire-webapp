@@ -17,11 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.CALL_STATE = {
+const CALL_STATE = {
   CONNECTING: 'connecting',
   DISCONNECTING: 'disconnecting',
   ENDED: 'ended',
@@ -31,3 +27,5 @@ z.calling.enum.CALL_STATE = {
   REJECTED: 'rejected',
   UNKNOWN: 'unknown',
 };
+
+export default CALL_STATE;

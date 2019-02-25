@@ -17,6 +17,9 @@
  *
  */
 
+import SDP_SOURCE from './enum/SDPSource';
+import SDP_NEGOTIATION_MODE from './enum/SDPNegotiationMode';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
@@ -41,7 +44,7 @@ z.calling.SDPMapper = {
 
   /**
    * Map call setup message to RTCSessionDescription.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
   mapCallMessageToObject(callMessageEntity) {
@@ -58,11 +61,11 @@ z.calling.SDPMapper = {
    * Rewrite the SDP for compatibility reasons.
    *
    * @param {RTCSessionDescription} rtcSdp - Session Description Protocol to be rewritten
-   * @param {z.calling.enum.SDP_SOURCE} [sdpSource=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
+   * @param {SDP_SOURCE} [sdpSource=SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
    * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
-  rewriteSdp(rtcSdp, sdpSource = z.calling.enum.SDP_SOURCE.REMOTE, flowEntity) {
+  rewriteSdp(rtcSdp, sdpSource = SDP_SOURCE.REMOTE, flowEntity) {
     if (!rtcSdp) {
       throw new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
@@ -74,8 +77,8 @@ z.calling.SDPMapper = {
 
     const isFirefox = z.util.Environment.browser.firefox;
 
-    const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
-    const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
+    const isIceRestart = flowEntity.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
+    const isLocalSdp = sdpSource === SDP_SOURCE.LOCAL;
     const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
     const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
 

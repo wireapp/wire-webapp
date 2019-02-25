@@ -75,14 +75,14 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {undefined} No return value
    */
   onClientRemoved(userId) {
-    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
+    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this._checkChangeToVerified(conversationEntity);
     });
   }
 
   /**
    * A new conversation was created.
-   * @param {z.entity.Conversation} conversationEntity - New conversation entity
+   * @param {Conversation} conversationEntity - New conversation entity
    * @returns {undefined} No return value
    */
   onConversationCreate(conversationEntity) {
@@ -105,7 +105,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * New member(s) joined the conversation.
-   * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
+   * @param {Conversation} conversationEntity - Changed conversation entity
    * @param {Array<string>} userIds - IDs of added members
    * @returns {undefined} No return value
    */
@@ -115,7 +115,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * Member(s) left the conversation.
-   * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
+   * @param {Conversation} conversationEntity - Changed conversation entity
    * @returns {undefined} No return value
    */
   onMemberLeft(conversationEntity) {
@@ -126,7 +126,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * Change that could verify conversation.
    *
    * @private
-   * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
+   * @param {Conversation} conversationEntity - Changed conversation entity
    * @returns {boolean} True if state changed
    */
   _checkChangeToVerified(conversationEntity) {
@@ -142,7 +142,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * Change that could degrade conversation.
    *
    * @private
-   * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
+   * @param {Conversation} conversationEntity - Changed conversation entity
    * @param {Array<string>} userIds - IDs of affected users
    * @param {z.message.VerificationMessageType} type - Type of degradation
    * @returns {boolean} True if state changed
@@ -200,7 +200,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * Check whether to degrade conversation and set corresponding state.
    *
    * @private
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity to evaluate
+   * @param {Conversation} conversationEntity - Conversation entity to evaluate
    * @returns {boolean} Conversation changing to degraded
    */
   _willChangeToDegraded(conversationEntity) {
@@ -226,7 +226,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * Check whether to verify conversation and set corresponding state
    *
    * @private
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity to evaluate
+   * @param {Conversation} conversationEntity - Conversation entity to evaluate
    * @returns {boolean} Conversation changing to verified
    */
   _willChangeToVerified(conversationEntity) {

@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import ReceiptMode from '../../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
+import trackingHelpers from '../../tracking/Helpers';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -254,7 +255,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     const isTeamConversation = !!conversationEntity.team_id;
     if (isTeamConversation) {
-      const participants = z.tracking.helpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
+      const participants = trackingHelpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
 
       Object.assign(attributes, {
         guest_num: participants.guests,

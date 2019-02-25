@@ -23,7 +23,7 @@ import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTrack
 
 class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   /**
-   * Construct a new link preview asset.
+   * Construct a new audio asset.
    *
    * @param {Object} params - Component parameters
    * @param {z.entity.Message} params.message - Message entity

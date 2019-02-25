@@ -18,6 +18,8 @@
  */
 
 import Logger from 'utils/Logger';
+import trackingHelpers from '../../tracking/Helpers';
+import {ConversationType} from '../../tracking/attribute';
 
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
@@ -82,7 +84,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
-   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
@@ -129,9 +131,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           conversation_participants_in_call_max: this.maxNumberOfParticipants
             ? this.maxNumberOfParticipants
             : undefined,
-          conversation_type: isGroup
-            ? z.tracking.attribute.ConversationType.GROUP
-            : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          conversation_type: isGroup ? ConversationType.GROUP : ConversationType.ONE_TO_ONE,
           direction: this.direction,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
@@ -142,7 +142,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           started_as_video: videoTypes.includes(this.mediaType),
           with_service: conversationEntity.hasService(),
         },
-        z.tracking.helpers.getGuestAttributes(conversationEntity),
+        trackingHelpers.getGuestAttributes(conversationEntity),
         attributes
       );
     }

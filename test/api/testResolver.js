@@ -17,7 +17,7 @@
  *
  */
 
-import dependenciesResolver from 'src/script/util/dependenciesResolver';
+import dependenciesResolver from 'utils/dependenciesResolver';
 import * as graph from 'src/script/config/dependenciesGraph';
 
 import BackendClient from 'src/script/service/BackendClient';

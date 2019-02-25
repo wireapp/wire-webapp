@@ -30,11 +30,14 @@ import MediaRepository from '../media/MediaRepository';
 import PermissionRepository from '../permission/PermissionRepository';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
+import RichProfileRepository from '../user/RichProfileRepository';
 import SelfService from '../self/SelfService';
+import ServerTimeRepository from '../time/ServerTimeRepository';
 import StorageService from '../storage/StorageService';
 import UserService from '../user/UserService';
 
-/** Dependencies is a Map that will contain all the dependencies of the app
+/**
+ * Dependencies is a Map that will contain all the dependencies of the app
  * The keys of the map are the classes of services the app needs and the value are the name of the service and its dependencies
  */
 const dependencies = new WeakMap();
@@ -52,7 +55,9 @@ dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: '
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
+dependencies.set(ServerTimeRepository, {dependencies: [], name: 'ServerTimeRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
@@ -68,10 +73,12 @@ export {
   GiphyRepository,
   GiphyService,
   MediaRepository,
+  RichProfileRepository,
   PermissionRepository,
   PropertiesRepository,
   PropertiesService,
   SelfService,
+  ServerTimeRepository,
   StorageService,
   UserService,
 };

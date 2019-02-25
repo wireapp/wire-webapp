@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import ko from 'knockout';
+import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
@@ -48,7 +49,7 @@ export default class UserRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
@@ -324,9 +325,11 @@ export default class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoAvailability = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, protoAvailability);
+    const protoAvailability = new Availability({type: z.user.AvailabilityMapper.protoFromType(availability)});
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      messageId: z.util.createRandomUuid(),
+    });
 
     amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
   }

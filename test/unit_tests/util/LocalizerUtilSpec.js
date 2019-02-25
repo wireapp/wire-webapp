@@ -160,7 +160,7 @@ describe('LocalizerUtil', () => {
     it('replaces default known tags', () => {
       setStrings({en: {test: '[bold]Felix[/bold] is [bold]a[/bold] [italic]pickle[/italic]'}});
 
-      expect(t('test')).toBe('<b>Felix</b> is <b>a</b> <i>pickle</i>');
+      expect(t('test')).toBe('<strong>Felix</strong> is <strong>a</strong> <i>pickle</i>');
     });
   });
 });

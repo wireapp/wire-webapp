@@ -20,6 +20,8 @@
 import ko from 'knockout';
 
 import AssetTransferState from '../../assets/AssetTransferState';
+import AssetType from '../../assets/AssetType';
+import EphemeralStatusType from '../../message/EphemeralStatusType';
 import User from '../User';
 
 window.z = window.z || {};
@@ -52,24 +54,24 @@ class Message {
     this.ephemeral_status = ko.computed(() => {
       const isExpired = this.ephemeral_expires() === true;
       if (isExpired) {
-        return z.message.EphemeralStatusType.TIMED_OUT;
+        return EphemeralStatusType.TIMED_OUT;
       }
 
       if (_.isNumber(this.ephemeral_expires())) {
-        return z.message.EphemeralStatusType.INACTIVE;
+        return EphemeralStatusType.INACTIVE;
       }
 
       if (_.isString(this.ephemeral_expires())) {
         const isExpiring = Date.now() >= this.ephemeral_expires();
-        return isExpiring ? z.message.EphemeralStatusType.TIMED_OUT : z.message.EphemeralStatusType.ACTIVE;
+        return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 
-      return z.message.EphemeralStatusType.NONE;
+      return EphemeralStatusType.NONE;
     });
 
     this.isObfuscated = ko.pureComputed(() => {
       const messageIsAtLeastSent = this.status() > z.message.StatusType.SENDING;
-      const isEphemeralInactive = this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE;
+      const isEphemeralInactive = this.ephemeral_status() === EphemeralStatusType.INACTIVE;
       return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
@@ -114,7 +116,7 @@ class Message {
    * @returns {boolean} Message contains any file type asset
    */
   has_asset() {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === z.assets.AssetType.FILE) : false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
   }
 
   /**
@@ -178,7 +180,7 @@ class Message {
    * @returns {boolean} True, if the message has downloadable content.
    */
   is_downloadable() {
-    const isExpiredEphemeral = this.ephemeral_status() === z.message.EphemeralStatusType.TIMED_OUT;
+    const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
     }
@@ -331,7 +333,7 @@ class Message {
       return;
     }
 
-    if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
+    if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
       const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
       const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
       this.ephemeral_expires(expirationTimestamp);

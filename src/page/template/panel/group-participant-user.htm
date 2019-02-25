@@ -15,7 +15,7 @@
           <disclose-icon></disclose-icon>
         </div>
       <!-- /ko -->
-        <enriched-fields params="participant: selectedParticipant"></enriched-fields>
+        <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
       <panel-actions params="items: getParticipantActions(selectedParticipant(), activeConversation())"></panel-actions>
     </div>
   <!-- /ko -->

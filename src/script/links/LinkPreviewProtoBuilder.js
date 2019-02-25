@@ -17,6 +17,8 @@
  *
  */
 
+import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
+
 window.z = window.z || {};
 window.z.links = z.links || {};
 
@@ -29,7 +31,7 @@ z.links.LinkPreviewProtoBuilder = {
    * @param {string} url - Link entered by the user
    * @param {number} offset - Starting index of the link
    *
-   * @returns {z.proto.LinkPreview} Link preview proto
+   * @returns {LinkPreview} Link preview proto
    */
   buildFromOpenGraphData(data, url, offset = 0) {
     if (!_.isEmpty(data)) {
@@ -41,23 +43,23 @@ z.links.LinkPreviewProtoBuilder = {
         const truncatedDescription = z.util.StringUtil.truncate(description, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
         const truncatedTitle = z.util.StringUtil.truncate(title, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
 
-        const protoArticle = new z.proto.Article(dataUrl, truncatedTitle, truncatedDescription); // deprecated format
-        const protoLinkPreview = new z.proto.LinkPreview(
-          url,
-          offset,
-          protoArticle,
-          dataUrl,
-          truncatedTitle,
-          truncatedDescription
-        );
+        const protoArticle = new Article({permanentUrl: dataUrl, summary: truncatedDescription, title: truncatedTitle}); // deprecated format
+        const protoLinkPreview = new LinkPreview({
+          article: protoArticle,
+          permanentUrl: dataUrl,
+          summary: truncatedDescription,
+          title: truncatedTitle,
+          url: url,
+          urlOffset: offset,
+        });
 
         if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.isTweet(data.url)) {
           const author = data.title.replace('on Twitter', '').trim();
           const username = data.url.match(/com\/([^/]*)\//)[1];
-          const protoTweet = new z.proto.Tweet(author, username);
+          const protoTweet = new Tweet({author, username});
 
-          protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.TWEET, protoTweet);
-          protoLinkPreview.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE, truncatedDescription);
+          protoLinkPreview[z.cryptography.PROTO_MESSAGE_TYPE.TWEET] = protoTweet;
+          protoLinkPreview[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE] = truncatedDescription;
         }
 
         return protoLinkPreview;

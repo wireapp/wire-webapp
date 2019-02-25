@@ -53,14 +53,12 @@ describe('LinkPreviewProtoBuilder', () => {
     expect(preview).toBeDefined();
     expect(preview.preview).toBe('article');
     expect(preview.url).toBe(url);
-    expect(preview.url_offset).toBe(offset);
+    expect(preview.urlOffset).toBe(offset);
     expect(preview.article.title).toBe(mock.title || '');
-    expect(preview.article.permanent_url).toBe(mock.url);
+    expect(preview.article.permanentUrl).toBe(mock.url);
     expect(preview.article.summary).toEqual(mock.description || '');
-    expect(() => preview.toArrayBuffer()).not.toThrow();
+    expect(() => preview.buffer).toBeDefined();
   };
-
-  beforeAll(() => z.util.protobuf.loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto'));
 
   it('returns undefined if no data is given', () => {
     const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData();

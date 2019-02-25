@@ -28,7 +28,6 @@ z.components.MessageQuote = class MessageQuote {
     conversationRepository,
     focusMessage,
     handleClickOnMessage,
-    locationRepository,
     quote,
     selfId,
     showDetail,
@@ -47,7 +46,6 @@ z.components.MessageQuote = class MessageQuote {
       }
     };
 
-    this.locationRepository = locationRepository;
     this.selfId = selfId;
     this.moment = moment;
 
@@ -172,12 +170,12 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.is_location() -->
-            <location-asset params="asset: asset, locationRepository: $parent.locationRepository" data-uie-name="media-location-quote"></location-asset>
+            <location-asset params="asset: asset" data-uie-name="media-location-quote"></location-asset>
           <!-- /ko -->
         <!-- /ko -->
         <div class="message-quote__timestamp"
-          data-bind="text: quotedMessageIsBeforeToday() 
-            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('DD.MM.YYYY')) 
+          data-bind="text: quotedMessageIsBeforeToday()
+            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('DD.MM.YYYY'))
             : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('HH:mm')),
             click: focusMessage"
           data-uie-name="label-timestamp-quote">

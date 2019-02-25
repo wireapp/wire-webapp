@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.SDP_SOURCE = {
+const SDP_SOURCE = {
   LOCAL: 'local',
   REMOTE: 'remote',
 };
+
+export default SDP_SOURCE;

@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
+import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import CryptographyMapper from './CryptographyMapper';
 
@@ -243,7 +244,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * Bundles and encrypts the generic message for all given clients.
    *
    * @param {Object} recipients - Contains all users and their known clients
-   * @param {z.proto.GenericMessage} genericMessage - Proto buffer message to be encrypted
+   * @param {GenericMessage} genericMessage - Proto buffer message to be encrypted
    * @param {Object} [payload={sender: string, recipients: {}, native_push: true}] - Object to contain encrypted message payload
    * @returns {Promise} Resolves with the encrypted payload
    */
@@ -433,7 +434,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const cipherText = z.util.base64ToArray(eventData.text || eventData.key).buffer;
     const sessionId = this._constructSessionId(userId, eventData.sender);
 
-    return this.cryptobox.decrypt(sessionId, cipherText).then(plaintext => z.proto.GenericMessage.decode(plaintext));
+    return this.cryptobox.decrypt(sessionId, cipherText).then(plaintext => GenericMessage.decode(plaintext));
   }
 
   /**
@@ -442,13 +443,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    *
    * @private
    * @param {string} sessionId - ID of session to encrypt for
-   * @param {z.proto.GenericMessage} genericMessage - ProtoBuffer message
+   * @param {GenericMessage} genericMessage - Protobuf message
    * @param {Object} [preKeyBundle] - Pre-key bundle
    * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
   _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
     return this.cryptobox
-      .encrypt(sessionId, genericMessage.toArrayBuffer(), preKeyBundle)
+      .encrypt(sessionId, GenericMessage.encode(genericMessage).finish(), preKeyBundle)
       .then(cipherText => ({cipherText: z.util.arrayToBase64(cipherText), sessionId}))
       .catch(error => {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
@@ -511,11 +512,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {Error} error - Error from event decryption
    * @param {Object} eventData - Event data
-   * @param {string} userId - Remote user ID
-   * @param {string} eventType - Event type
+   * @param {string} eventData.type - Event type
    * @returns {undefined} No return value
    */
-  _reportDecryptionFailure(error, {data: eventData, type: eventType}) {
+  _reportDecryptionFailure(error, {type: eventType}) {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: error.code || error.message,
     });
