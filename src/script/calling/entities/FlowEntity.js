@@ -18,8 +18,10 @@
  */
 
 import MediaStreamHandler from '../../media/MediaStreamHandler';
-import SDP_SOURCE from '../enum/SDPSource';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import CALL_STATE from '../enum/CallState';
+import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
+import SDP_SOURCE from '../enum/SDPSource';
 import TERMINATION_REASON from '../enum/TerminationReason';
 
 window.z = window.z || {};
@@ -111,14 +113,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
         case z.calling.rtc.ICE_CONNECTION_STATE.COMPLETED:
         case z.calling.rtc.ICE_CONNECTION_STATE.CONNECTED: {
           this._clearNegotiationTimeout();
-          this.negotiationMode(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
+          this.negotiationMode(SDP_NEGOTIATION_MODE.DEFAULT);
           this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
 
           this.callEntity.isConnected(true);
           this.participantEntity.isConnected(true);
 
           this.callEntity.interruptedParticipants.remove(this.participantEntity);
-          this.callEntity.state(z.calling.enum.CALL_STATE.ONGOING);
+          this.callEntity.state(CALL_STATE.ONGOING);
           this.callEntity.terminationReason = undefined;
           break;
         }
@@ -178,7 +180,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       }
     });
 
-    this.negotiationMode = ko.observable(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
+    this.negotiationMode = ko.observable(SDP_NEGOTIATION_MODE.DEFAULT);
     this.negotiationNeeded = ko.observable(false);
     this.negotiationTimeout = undefined;
 
@@ -310,7 +312,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Restart the peer connection negotiation.
    *
-   * @param {z.calling.enum.SDP_NEGOTIATION_MODE} negotiationMode - Mode for renegotiation
+   * @param {SDP_NEGOTIATION_MODE} negotiationMode - Mode for renegotiation
    * @param {boolean} isAnswer - Flow is answer
    * @param {MediaStream} [mediaStream] - Local media stream
    * @returns {undefined} No return value
@@ -325,7 +327,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.isAnswer(isAnswer);
     this._resetSdp();
 
-    const isModeStateCollision = negotiationMode === z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION;
+    const isModeStateCollision = negotiationMode === SDP_NEGOTIATION_MODE.STATE_COLLISION;
     if (!isModeStateCollision) {
       this.startNegotiation(negotiationMode, mediaStream);
     }
@@ -353,11 +355,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Start the peer connection negotiation.
    *
-   * @param {z.calling.enum.SDP_NEGOTIATION_MODE} [negotiationMode=z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT] - Mode for renegotiation
+   * @param {SDP_NEGOTIATION_MODE} [negotiationMode=SDP_NEGOTIATION_MODE.DEFAULT] - Mode for renegotiation
    * @param {MediaStream} [mediaStream=this.mediaStream()] - Local media stream
    * @returns {undefined} No return value
    */
-  startNegotiation(negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, mediaStream = this.mediaStream()) {
+  startNegotiation(negotiationMode = SDP_NEGOTIATION_MODE.DEFAULT, mediaStream = this.mediaStream()) {
     const logMessage = {
       data: {
         default: [this.remoteUser.name(), negotiationMode],
@@ -391,7 +393,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.negotiationNeeded(true);
       this.pcInitialized(true);
 
-      const isDefaultNegotiationMode = negotiationMode === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
+      const isDefaultNegotiationMode = negotiationMode === SDP_NEGOTIATION_MODE.DEFAULT;
       this._setNegotiationFailedTimeout(isDefaultNegotiationMode);
     });
   }
@@ -827,7 +829,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
               const isUpdate = callMessageEntity.type === CALL_MESSAGE_TYPE.UPDATE;
 
               if (isUpdate) {
-                this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
+                this.restartNegotiation(SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
                 skipNegotiation = true;
               }
 
@@ -869,7 +871,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       .then(({iceCandidates, sdp: transformedSdp}) => {
         this.localSdp(rawSdp);
 
-        const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
+        const isModeDefault = this.negotiationMode() === SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
           const connectionConfig =
             (this.peerConnection.getConfiguration && this.peerConnection.getConfiguration()) ||
@@ -924,7 +926,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const additionalPayload = this._createAdditionalPayload(transformedSdp);
         const sessionId = this.callEntity.sessionId;
-        const inDefaultMode = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
+        const inDefaultMode = this.negotiationMode() === SDP_NEGOTIATION_MODE.DEFAULT;
         if (inDefaultMode) {
           callMessageEntity = this.callEntity.isGroup
             ? z.calling.CallMessageBuilder.buildGroupSetup(response, sessionId, additionalPayload)
@@ -1186,9 +1188,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.participantEntity.isConnected(false);
 
       this.callEntity.interruptedParticipants.push(this.participantEntity);
-      const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
+      const isModeDefault = this.negotiationMode() === SDP_NEGOTIATION_MODE.DEFAULT;
       if (isModeDefault) {
-        this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false);
+        this.restartNegotiation(SDP_NEGOTIATION_MODE.ICE_RESTART, false);
       }
     }, FlowEntity.CONFIG.RECONNECTION_TIMEOUT);
   }
@@ -1240,7 +1242,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       };
       this.callLogger.warn(log);
 
-      this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
+      this.restartNegotiation(SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
       return forceRenegotiation || false;
     }
 
@@ -1285,7 +1287,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   replaceMediaStream(mediaStreamInfo, outdatedMediaStream) {
     const mediaStream = mediaStreamInfo.stream;
     const mediaType = mediaStreamInfo.getType();
-    const negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE;
+    const negotiationMode = SDP_NEGOTIATION_MODE.STREAM_CHANGE;
 
     return Promise.resolve()
       .then(() => this._removeMediaStream(outdatedMediaStream))

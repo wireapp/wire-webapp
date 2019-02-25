@@ -17,13 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.SDP_NEGOTIATION_MODE = {
+const SDP_NEGOTIATION_MODE = {
   DEFAULT: 'default',
   ICE_RESTART: 'iceRestart',
   STATE_COLLISION: 'stateCollision',
   STREAM_CHANGE: 'streamChange',
 };
+
+export default SDP_NEGOTIATION_MODE;

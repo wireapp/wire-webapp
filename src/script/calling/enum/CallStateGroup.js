@@ -17,24 +17,20 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
+import CALL_STATE from './CallState';
 
-z.calling.enum.CALL_STATE_GROUP = {
-  CAN_CONNECT: [
-    z.calling.enum.CALL_STATE.INCOMING,
-    z.calling.enum.CALL_STATE.ONGOING,
-    z.calling.enum.CALL_STATE.REJECTED,
-  ],
-  CAN_JOIN: [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.REJECTED],
+const CALL_STATE_GROUP = {
+  CAN_CONNECT: [CALL_STATE.INCOMING, CALL_STATE.ONGOING, CALL_STATE.REJECTED],
+  CAN_JOIN: [CALL_STATE.INCOMING, CALL_STATE.REJECTED],
   IS_ACTIVE: [
-    z.calling.enum.CALL_STATE.CONNECTING,
-    z.calling.enum.CALL_STATE.DISCONNECTING,
-    z.calling.enum.CALL_STATE.INCOMING,
-    z.calling.enum.CALL_STATE.ONGOING,
-    z.calling.enum.CALL_STATE.OUTGOING,
+    CALL_STATE.CONNECTING,
+    CALL_STATE.DISCONNECTING,
+    CALL_STATE.INCOMING,
+    CALL_STATE.ONGOING,
+    CALL_STATE.OUTGOING,
   ],
-  IS_ENDED: [z.calling.enum.CALL_STATE.ENDED, z.calling.enum.CALL_STATE.UNKNOWN],
-  UNANSWERED: [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.OUTGOING],
+  IS_ENDED: [CALL_STATE.ENDED, CALL_STATE.UNKNOWN],
+  UNANSWERED: [CALL_STATE.INCOMING, CALL_STATE.OUTGOING],
 };
+
+export default CALL_STATE_GROUP;
