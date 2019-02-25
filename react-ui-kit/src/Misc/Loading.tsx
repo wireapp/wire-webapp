@@ -17,74 +17,52 @@
  *
  */
 
-import * as React from 'react';
-import styled, {css, keyframes} from 'styled-components';
+/** @jsx jsx */
+import {jsx, keyframes} from '@emotion/core';
+import React from 'react';
 import {ANIMATION, DURATION} from '../Identity/motions';
 
-const pathLength = 125.68;
-
-interface LoadingComponentProps {
+export interface LoadingProps<T = SVGSVGElement> extends React.SVGProps<T> {
   progress?: number;
-  size: number;
+  size?: number;
 }
 
-function LoadingComponent({
-  className,
-  progress = undefined,
-  size,
-}: LoadingComponentProps & React.HTMLAttributes<SVGElement>) {
-  const additionalProps: {
-    strokeDashoffset?: string;
-  } = {};
+const Loading = ({progress = undefined, size = 43, ...props}: LoadingProps) => {
+  const pathLength = 125.68;
+  const rotationOffset = -0.75;
+  const rotationDelay = DURATION.EXTRA_LONG * rotationOffset;
+  const fillAnimation = keyframes`
+    0% {
+      stroke-dashoffset: ${pathLength + pathLength};
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  `;
 
-  if (progress) {
-    additionalProps.strokeDashoffset = `${pathLength - pathLength * progress}`;
-  }
   return (
-    <svg className={className} width={size} height={size} viewBox="0 0 43 43" strokeWidth="3" fill="none">
+    <svg width={size} height={size} viewBox="0 0 43 43" strokeWidth="3" fill="none" {...props}>
       <circle cx="21.5" cy="21.5" r="20" stroke="rgba(51,55,58,.08)" />
       <circle
+        css={
+          !progress && {
+            animation: `${fillAnimation} ${DURATION.EXTRA_LONG}ms ease-in-out infinite,
+              ${ANIMATION.rotate} ${DURATION.EXTRA_LONG}ms linear ${rotationDelay}ms infinite`,
+            strokeDasharray: pathLength,
+            transformOrigin: '50% 50%',
+          }
+        }
         cx="21.5"
         cy="21.5"
         r="20"
         stroke="#218fd1"
         strokeLinecap="round"
         strokeDasharray={pathLength}
-        {...additionalProps}
+        strokeDashoffset={progress && `${pathLength - pathLength * progress}`}
       />
     </svg>
   );
-}
-
-const fillAnimation = keyframes`
-  0% {
-    stroke-dashoffset: ${pathLength + pathLength};
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-`;
-
-const rotationOffset = -0.75;
-const rotationDelay = DURATION.EXTRA_LONG * rotationOffset;
-
-interface LoadingProps {
-  progress?: number;
-  size?: number;
-}
-
-const Loading = styled(LoadingComponent)<LoadingProps & React.HTMLAttributes<SVGElement>>`
-  ${props =>
-    !props.progress &&
-    css`
-      circle:nth-of-type(2) {
-        transform-origin: 50% 50%;
-        stroke-dasharray: ${pathLength};
-        animation: ${fillAnimation} ${DURATION.EXTRA_LONG}ms ease-in-out infinite,
-          ${ANIMATION.rotate} ${DURATION.EXTRA_LONG}ms linear ${rotationDelay}ms infinite;
-      }
-    `};
-`;
+};
 
 Loading.defaultProps = {
   progress: undefined,

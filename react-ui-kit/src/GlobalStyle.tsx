@@ -17,29 +17,20 @@
  *
  */
 
-import styled from 'styled-components';
-import {COLOR} from '../Identity';
+/** @jsx jsx */
+import {Global, css, jsx} from '@emotion/core';
+import emotionNormalize from 'emotion-normalize';
 
-export interface RoundContainerProps {
-  color?: string;
-  size?: number;
-}
+const globalCss = css`
+  ${emotionNormalize}
 
-const RoundContainer = styled.div<RoundContainerProps>`
-  width: ${props => parseFloat(props.size.toString())}px;
-  height: ${props => parseFloat(props.size.toString())}px;
-  border-radius: 50%;
-  border: none;
-  background-color: ${props => props.color};
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  p {
+    margin-top: 0;
+  }
 `;
 
-RoundContainer.defaultProps = {
-  color: COLOR.BLUE,
-  size: 72,
+const GlobalStyle = () => {
+  return <Global styles={globalCss} />;
 };
 
-export {RoundContainer};
+export {GlobalStyle};

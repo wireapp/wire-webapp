@@ -17,63 +17,75 @@
  *
  */
 
-import * as React from 'react';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 import {COLOR} from '../Identity';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
-import {QUERY} from '../mediaQueries';
+import media, {QueryKeys} from '../mediaQueries';
 
-interface OverlayProps {}
+export interface OverlayWrapperProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const OverlayWrapper = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  position: fixed;
-  display: flex;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 24px;
-  z-index: 9997;
-  overflow-y: auto;
-`;
+const overlayWrapperStyles: (props: OverlayWrapperProps) => ObjectInterpolation<undefined> = () => ({
+  bottom: 0,
+  display: 'flex',
+  left: 0,
+  overflowY: 'auto',
+  padding: '24px',
+  position: 'fixed',
+  right: 0,
+  top: 0,
+  zIndex: 9997,
+});
 
-const OverlayContent = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  max-width: 100%;
-  overflow-y: auto;
-  position: relative;
-  justify-content: space-between;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  z-index: 9999;
-  margin: auto;
-  -webkit-transform: translate3d(0, 0, 0);
+const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyles} {...props} />;
 
-  * {
-    color: ${COLOR.WHITE};
-  }
+const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
+  <div
+    css={{
+      '*': {
+        color: COLOR.WHITE,
+      },
+      alignItems: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      margin: 'auto',
+      maxWidth: '100%',
+      overflowY: 'auto',
+      position: 'relative',
+      transform: 'translate3d(0, 0, 0)',
+      zIndex: 9999,
+      [media[QueryKeys.TABLET_DOWN]]: {
+        width: '100%',
+      },
+    }}
+    {...props}
+  />
+);
 
-  @media (${QUERY.tabletDown}) {
-    width: 100%;
-  }
-`;
+export interface OverlayBackgroundProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const OverlayBackground = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(0, 0, 0, 0.88);
-  z-index: 9998;
-  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART};
-`;
+const overlayBackgroundStyles: (props: OverlayBackgroundProps) => ObjectInterpolation<undefined> = () => ({
+  animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
+  background: 'rgba(0, 0, 0, 0.88)',
+  height: '100vh',
+  left: 0,
+  position: 'fixed',
+  top: 0,
+  width: '100vw',
+  zIndex: 9998,
+});
 
-const Overlay = ({children = null, ...props}: OverlayProps & React.HTMLAttributes<HTMLDivElement>) => (
+const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyles} {...props} />;
+
+export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+
+const Overlay = ({children = null, ...props}: OverlayProps) => (
   <OverlayWrapper {...props} data-uie-name="modal">
     <OverlayContent>{children}</OverlayContent>
     <OverlayBackground data-uie-name="overlay-background" />
   </OverlayWrapper>
 );
 
-export {Overlay, OverlayBackground, OverlayWrapper};
+export {Overlay, OverlayBackground, overlayBackgroundStyles, OverlayWrapper, overlayWrapperStyles};

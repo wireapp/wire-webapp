@@ -17,7 +17,7 @@
  *
  */
 
-import {keyframes} from 'styled-components';
+import {keyframes} from '@emotion/core';
 
 // https://motion.wire.com/_guidelines_/rules.html
 
@@ -84,4 +84,4 @@ export const ANIMATION = {
   `,
 };
 
-export const defaultTransition = 'transition: all 0.24s;';
+export const defaultTransition = 'all 0.24s';

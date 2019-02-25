@@ -39,7 +39,7 @@ class DemoAnimations extends React.PureComponent {
     showBottomUpAnimation: false,
     showCombinedAnimation: false,
     showLeftRightAnimation: false,
-    showOpacityAnimation: false,
+    showOpacityAnimation: true,
     showRightLeftAnimation: false,
     showTopDownAnimation: false,
     showXAxisAnimation: false,
@@ -132,8 +132,8 @@ class DemoAnimations extends React.PureComponent {
           {'Toggle Combined Animation'}
         </Button>
         <TopDownMovement in={this.state.showCombinedAnimation}>
-          <Opacity in={this.state.showCombinedAnimation} isInnerAnimation>
-            <XAxisMovement in={this.state.showCombinedAnimation} startValue={'40vh'} endValue={'10vh'} isInnerAnimation>
+          <Opacity in={this.state.showCombinedAnimation}>
+            <XAxisMovement in={this.state.showCombinedAnimation} startValue={'40vh'} endValue={'10vh'}>
               {'Combined Animation'}
             </XAxisMovement>
           </Opacity>

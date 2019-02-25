@@ -17,51 +17,48 @@
  *
  */
 
+/** @jsx jsx */
 import {COLOR, Container, H1, H2, Line} from '@wireapp/react-ui-kit';
 import Color from 'color';
 import React from 'react';
-import styled from 'styled-components';
+import {jsx} from '@emotion/core';
 
-const ColorElement = styled.div.attrs({
-  'data-text': props => `${props.name}
-${props.value}${
-    props.alpha
-      ? `
-α: ${props.alpha}`
-      : ''
-  }`,
-  style: ({color}) => ({backgroundColor: color}),
-})`
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
-  border: 1px solid black;
-  position: relative;
-  display: inline-block;
-  &::after {
-    width: 100%;
-    position: absolute;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    content: attr(data-text);
-    color: #fff
-    font-size: 10px;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
-    opacity: 0;
-    transform: scale(1.2);
-    text-shadow: #000 0 0 2px;
-    text-align: center;
-    white-space: pre-wrap;
-    z-index:1;
-  }
-  &:hover::after {
-    opacity: 1;
-    transform: scale(1);
-  }
-`;
+const colorElementStyle = props => ({
+  '&::after': {
+    alignItems: 'center',
+    color: '#fff',
+    content: 'attr(data-text)',
+    display: 'flex',
+    fontSize: '10px',
+    fontWeight: 600,
+    height: '100%',
+    justifyContent: 'center',
+    opacity: 0,
+    position: 'absolute',
+    textAlign: 'center',
+    textShadow: '#000 0 0 2px',
+    transform: 'scale(1.2)',
+    transition: 'all 0.2s ease-in-out',
+    whiteSpace: 'pre-wrap',
+    width: '100%',
+    zIndex: 1,
+  },
+  '&:hover::after': {
+    opacity: 1,
+    transform: 'scale(1)',
+  },
+  backgroundColor: props.backgroundColor,
+  border: '1px solid black',
+  borderRadius: '40px',
+  display: 'inline-block',
+  height: '80px',
+  position: 'relative',
+  width: '80px',
+});
+
+const ColorElement = ({name, alpha, backgroundColor, ...props}) => (
+  <div css={colorElementStyle({backgroundColor})} data-text={name} α={alpha} {...props} />
+);
 
 class DemoColors extends React.PureComponent {
   renderColor(name) {
@@ -75,7 +72,7 @@ class DemoColors extends React.PureComponent {
         onClick={() => navigator.clipboard.writeText(alpha ? color.toString() : value)}
         key={name}
         name={name}
-        color={COLOR[name]}
+        backgroundColor={COLOR[name]}
         value={value}
         alpha={alpha}
       />

@@ -17,69 +17,74 @@
  *
  */
 
-import {Encoder} from 'bazinga64';
-import * as React from 'react';
-import styled, {css} from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import {TextTransformProperty} from 'csstype';
+import React from 'react';
 import {COLOR} from '../Identity';
 import {TextProps} from '../Text';
+import {filterProps, inlineSVG} from '../util';
 
-export interface InputProps extends TextProps {
+export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   markInvalid?: boolean;
-  placeholderTextTransform?: string;
+  placeholderTextTransform?: TextTransformProperty;
 }
 
-const placeholderStyle = css<InputProps>`
-  color: ${COLOR.GRAY_DARKEN_24};
-  font-size: 11px;
-  text-transform: ${props => props.placeholderTextTransform};
-`;
+const inputStyle: (props: InputProps) => ObjectInterpolation<undefined> = ({
+  markInvalid = false,
+  placeholderTextTransform = 'uppercase',
+  disabled = false,
+}) => {
+  const invalidDot = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+      <circle cx="4" cy="4" r="4" fill="${COLOR.RED}" />
+    </svg>
+  `;
 
-const dotSize = 8;
-const invalidDot = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="${dotSize}" height="${dotSize}" viewBox="0 0 8 8">
-    <circle cx="4" cy="4" r="4" fill="${COLOR.RED}" />
-  </svg>
-`;
-const base64Dot = Encoder.toBase64(invalidDot).asString;
+  const placeholderStyle = {
+    color: COLOR.GRAY_DARKEN_24,
+    fontSize: '11px',
+    textTransform: placeholderTextTransform,
+  };
 
-const Input = styled.input<InputProps & React.InputHTMLAttributes<HTMLInputElement>>`
-  background: ${COLOR.WHITE};
-  border-radius: 4px;
-  border: none;
-  color: ${COLOR.TEXT};
-  font-weight: 300;
-  outline: none;
-  caret-color: ${COLOR.BLUE};
-  line-height: 24px;
-  margin: 0 0 16px;
-  padding: 0 16px;
-  width: 100%;
-  height: 56px;
-
-  &::-webkit-input-placeholder {
-    /* WebKit, Blink, Edge */
-    ${placeholderStyle};
-  }
-  &::-ms-input-placeholder {
-    /* Microsoft Edge */
-    ${placeholderStyle};
-  }
-  &::-moz-placeholder {
-    /* Mozilla Firefox 19+ */
-    ${placeholderStyle};
-    opacity: 1;
-  }
-  &:invalid {
-    box-shadow: none;
-  }
-  ${props =>
-    props.markInvalid &&
-    `background: ${COLOR.WHITE} url('data:image/svg+xml;base64,${base64Dot}') no-repeat right 20px center`};
-`;
-
-Input.defaultProps = {
-  markInvalid: false,
-  placeholderTextTransform: 'uppercase',
+  return {
+    '&::-moz-placeholder': {
+      ...placeholderStyle,
+      opacity: 1,
+    },
+    '&::-ms-input-placeholder': {
+      ...placeholderStyle,
+    },
+    '&::-webkit-input-placeholder': {
+      ...placeholderStyle,
+    },
+    '&:invalid': {
+      boxShadow: 'none',
+    },
+    background: markInvalid
+      ? `${COLOR.WHITE} url("${inlineSVG(invalidDot)}") no-repeat right 20px center`
+      : disabled
+      ? COLOR.shade(COLOR.WHITE, 0.06)
+      : COLOR.WHITE,
+    border: 'none',
+    borderRadius: '4px',
+    caretColor: COLOR.BLUE,
+    color: COLOR.TEXT,
+    fontWeight: 300,
+    height: '56px',
+    lineHeight: '24px',
+    margin: '0 0 16px',
+    outline: 'none',
+    padding: '0 16px',
+    width: '100%',
+  };
 };
 
-export {Input};
+const INPUT_CLASSNAME = 'input';
+const filterInputProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+
+const Input = React.forwardRef(({type, ...props}: InputProps, ref: React.Ref<HTMLInputElement>) => (
+  <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
+));
+
+export {INPUT_CLASSNAME, Input, inputStyle};

@@ -17,29 +17,39 @@
  *
  */
 
-import * as React from 'react';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
+import {InputProps, inputStyle} from './Input';
 
-const CodeInputWrapper = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  display: flex;
-  justify-content: center;
-`;
+const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
+  <div
+    css={{
+      display: 'flex',
+      justifyContent: 'center',
+    }}
+    {...props}
+  />
+);
 
-const DigitInput = styled.input<React.HTMLAttributes<HTMLInputElement>>`
-  line-height: 56px;
-  width: 48px;
-  font-size: 32px;
-  border: none;
-  border-radius: 4px;
-  text-align: center;
-  color: black;
-  outline: none;
-  & + & {
-    margin-left: 19px;
-  }
-`;
+interface DigitInputProps<T = HTMLInputElement> extends InputProps<T> {}
 
-interface CodeInputProps {
+const digitInputStyle: (props: DigitInputProps) => ObjectInterpolation<undefined> = props => ({
+  ...inputStyle(props),
+  '& + &': {
+    marginLeft: '19px',
+  },
+  fontSize: '32px',
+  lineHeight: '56px',
+  textAlign: 'center',
+  width: '48px',
+});
+
+const DigitInput = React.forwardRef((props: DigitInputProps, ref: React.Ref<HTMLInputElement>) => (
+  <input ref={ref} css={digitInputStyle(props)} {...props} />
+));
+
+export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
   digits?: number;
   onCodeComplete?: (completeCode?: string) => void;
@@ -48,7 +58,8 @@ interface CodeInputProps {
 interface CodeInputState {
   values: string[];
 }
-class CodeInput extends React.PureComponent<CodeInputProps & React.HTMLAttributes<HTMLInputElement>, CodeInputState> {
+
+class CodeInput extends React.PureComponent<CodeInputProps, CodeInputState> {
   inputs: HTMLInputElement[];
 
   static defaultProps = {
@@ -152,6 +163,7 @@ class CodeInput extends React.PureComponent<CodeInputProps & React.HTMLAttribute
           ref={node => (this.inputs[fieldIndex] = node)}
           type="text"
           value={values[fieldIndex]}
+          onChange={() => {}}
         />
       );
     }

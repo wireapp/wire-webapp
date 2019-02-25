@@ -17,75 +17,79 @@
  *
  */
 
-import * as React from 'react';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 import {CloseIcon} from '../Icon';
+import {IconHOCProps} from '../Icon/IconHOC';
 import {COLOR} from '../Identity';
-import {QUERY} from '../mediaQueries';
-import {OverlayBackground, OverlayWrapper} from './Overlay';
+import media, {QueryKeys} from '../mediaQueries';
+import {filterProps, noop} from '../util';
+import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyles} from './Overlay';
 
-interface ModalBodyProps {
+export interface ModalBodyProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   fullscreen?: boolean;
 }
 
-const ModalBody = styled.div<ModalBodyProps & React.HTMLAttributes<HTMLDivElement>>`
-  ${props =>
-    props.fullscreen
-      ? `
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      border-radius: 0;
-      justify-content: center;
-      box-shadow: none;
-      @media (${QUERY.tabletDown}) {
-        width: initial;
-      }
-      `
-      : `
-      position: relative;
-      border-radius: 8px;
-      box-shadow: 0 16px 64px 0 rgba(0, 0, 0, 0.16);
-      justify-content: space-between;
-      @media (${QUERY.tabletDown}) {
-        width: 100%;
-      }
-      `};
-  align-items: center;
-  background-color: ${COLOR.GRAY_LIGHTEN_88};
-  display: flex;
-  flex-direction: column;
-  z-index: 9999;
-  margin: auto;
-  -webkit-transform: translate3d(0, 0, 0);
-`;
+const modalBodyStyles: (props: ModalBodyProps) => ObjectInterpolation<undefined> = props => ({
+  alignItems: 'center',
+  backgroundColor: COLOR.GRAY_LIGHTEN_88,
+  borderRadius: props.fullscreen ? 0 : '8px',
+  bottom: props.fullscreen ? 0 : undefined,
+  boxShadow: props.fullscreen ? 'none' : '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: props.fullscreen ? 'center' : 'space-between',
+  left: props.fullscreen ? 0 : undefined,
+  margin: 'auto',
+  position: props.fullscreen ? 'fixed' : 'relative',
+  right: props.fullscreen ? 0 : undefined,
+  top: props.fullscreen ? 0 : undefined,
+  transform: 'translate3d(0, 0, 0)',
+  zIndex: 9999,
+  [media[QueryKeys.TABLET_DOWN]]: {
+    width: props.fullscreen ? 'initial' : '100%',
+  },
+});
 
-const ModalClose = styled(CloseIcon)`
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  height: 40px;
-  justify-content: center;
-  padding: 13px;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 40px;
-`;
+const filterModalBodyProps = (props: Object) => filterProps(props, ['fullscreen']);
 
-const ModalContent = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  max-width: 100%;
-  overflow-y: auto;
-  padding: 40px;
-`;
+const ModalBody = (props: ModalBodyProps) => <div css={modalBodyStyles(props)} {...filterModalBodyProps(props)} />;
 
-const ModalBackground = styled(OverlayBackground)`
-  background: rgba(50, 54, 57, 0.4);
-`;
+const ModalClose = (props: IconHOCProps<SVGSVGElement>) => (
+  <CloseIcon
+    css={{
+      alignItems: 'center',
+      cursor: 'pointer',
+      display: 'flex',
+      justifyContent: 'center',
+      marginRight: '10px',
+      marginTop: '10px',
+      position: 'absolute',
+      right: '10px',
+      top: '10px',
+    }}
+    {...props}
+  />
+);
 
-const noop = () => {};
+const ModalContent = (props: React.HTMLProps<HTMLDivElement>) => (
+  <div
+    css={{
+      maxWidth: '100%',
+      overflowY: 'auto',
+      padding: '40px',
+    }}
+    {...props}
+  />
+);
+
+const modalBackgroundStyles: (props: OverlayBackgroundProps) => ObjectInterpolation<undefined> = props => ({
+  ...overlayBackgroundStyles(props),
+  backgroundColor: 'rgba(50, 54, 57, 0.4)',
+});
+
+const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyles(props)} {...props} />;
 
 interface ModalProps {
   fullscreen?: boolean;
@@ -93,7 +97,7 @@ interface ModalProps {
   onClose?: () => void;
 }
 
-const Modal: React.SFC<ModalProps & React.HTMLAttributes<HTMLDivElement>> = ({
+const Modal: React.SFC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
   children,
   fullscreen,
   onClose,

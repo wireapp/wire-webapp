@@ -17,11 +17,13 @@
  *
  */
 
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
-import {Input} from './Input';
+import {inlineSVG} from '../util';
+import {InputProps, inputStyle} from './Input';
 
-export interface SelectProps {
+export interface SelectProps<T = HTMLSelectElement> extends InputProps<T> {
   disabled?: boolean;
 }
 
@@ -31,29 +33,24 @@ const ArrowDown = `
   </svg>
 `;
 
-const Select = styled(Input.withComponent('select'))<SelectProps & React.HTMLAttributes<HTMLSelectElement>>`
-  background-color: ${props => (props.disabled ? COLOR.GRAY_LIGHTEN_92 : COLOR.WHITE)};
-  ${props =>
-    !props.disabled &&
-    `
-    background-image: url('data:image/svg+xml;utf8,${ArrowDown}');
-    background-repeat: no-repeat;
-    background-position: center right 16px;
-    cursor: pointer;
-  `};
-  font-weight: 300;
-  padding-right: 32px;
-  -moz-appearance: none;
-  -webkit-appearance: none;
+const selectStyle: (props: SelectProps) => ObjectInterpolation<undefined> = ({disabled = false, ...props}) => ({
+  ...inputStyle(props as any),
+  '&:-moz-focusring': {
+    color: 'transparent',
+    textShadow: '0 0 0 #000',
+  },
+  '&:disabled': {
+    color: COLOR.GRAY,
+  },
+  appearance: 'none',
+  background: disabled
+    ? COLOR.shade(COLOR.WHITE, 0.06)
+    : `${COLOR.WHITE} center right 16px no-repeat url("${inlineSVG(ArrowDown)}")`,
+  cursor: disabled ? 'normal' : 'pointer',
+  fontWeight: 300,
+  paddingRight: '30px',
+});
 
-  &:-moz-focusring {
-    color: transparent;
-    text-shadow: 0 0 0 #000;
-  }
+const Select = (props: SelectProps) => <select css={selectStyle(props)} {...props} />;
 
-  &:disabled {
-    color: ${COLOR.GRAY};
-  }
-`;
-
-export {Select};
+export {Select, selectStyle};

@@ -17,13 +17,25 @@
  *
  */
 
-import {createGlobalStyle} from 'styled-components';
-import styledNormalize from 'styled-normalize';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import media, {QueryKeys} from '../../mediaQueries';
 
-export default createGlobalStyle`
-      ${styledNormalize}
+export interface MenuScrollableItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
+  open?: boolean;
+}
 
-      p {
-        margin-top: 0;
-      }
-    `;
+const menuScrollableItemsStyles: (props: MenuScrollableItemsProps) => ObjectInterpolation<undefined> = props => ({
+  [media[QueryKeys.TABLET_DOWN]]: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    margin: 'auto',
+  },
+});
+
+const MenuScrollableItems = (props: MenuScrollableItemsProps) => (
+  <div css={menuScrollableItemsStyles(props)} {...props} />
+);
+
+export {MenuScrollableItems, menuScrollableItemsStyles};

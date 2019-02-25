@@ -1,25 +1,25 @@
 {
   "dependencies": {
+    "@emotion/core": "10.0.7",
+    "@emotion/styled": "10.0.7",
     "@types/color": "3.0.0",
-    "@types/styled-components": "4.1.10",
     "bazinga64": "5.3.42",
     "color": "3.1.0",
+    "emotion-normalize": "10.0.0",
     "react": "16.8.3",
     "react-dom": "16.8.3",
-    "react-transition-group": "2.5.3",
-    "recompose": "0.30.0",
-    "styled-components": "4.1.3",
-    "styled-normalize": "8.0.6",
-    "styled-transition-group": "1.0.0"
+    "react-transition-group": "2.5.3"
   },
   "devDependencies": {
+    "@babel/cli": "7.2.3",
     "@babel/core": "7.3.3",
     "@babel/plugin-proposal-class-properties": "7.3.3",
     "@babel/preset-env": "7.3.1",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.3.3",
-    "@types/recompose": "0.30.4",
+    "@types/react": "16.7.0",
     "babel-loader": "8.0.5",
+    "babel-plugin-emotion": "10.0.7",
     "react-helmet": "5.2.0",
     "react-hot-loader": "4.7.1",
     "rimraf": "2.6.3",
@@ -36,11 +36,11 @@
   "name": "@wireapp/react-ui-kit",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && babel --config-file ./babel.config.js --extensions .ts,.tsx ./src -d ./dist --source-maps",
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build",
     "start": "webpack-dev-server",
-    "test": "yarn test:browser",
+    "test": "tsc && yarn test:browser",
     "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0"
   },

@@ -19,16 +19,29 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import {COLOR} from '../../Identity';
+import media, {QueryKeys} from '../../mediaQueries';
 
-export interface HeaderProps<T = HTMLHeadingElement> extends React.HTMLProps<T> {}
+export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
+  open?: boolean;
+}
 
-const headerStyles: (props: HeaderProps) => ObjectInterpolation<undefined> = props => ({
-  alignItems: 'center',
-  display: 'flex',
-  height: '64px',
-  justifyContent: 'space-between',
+const menuItemsStyles: (props: MenuItemsProps) => ObjectInterpolation<undefined> = props => ({
+  [media[QueryKeys.TABLET_DOWN]]: {
+    backgroundColor: COLOR.WHITE,
+    bottom: 0,
+    display: 'flex',
+    left: 0,
+    overflowY: 'auto',
+    position: 'fixed',
+    right: 0,
+    top: 0,
+    transform: props.open ? 'translateX(0)' : 'translateX(110%)',
+    transition: 'transform 0.25s ease',
+    zIndex: 1,
+  },
 });
 
-const Header = (props: HeaderProps) => <header css={headerStyles(props)} {...props} />;
+const MenuItems = (props: MenuItemsProps) => <div css={menuItemsStyles(props)} {...props} />;
 
-export {Header, headerStyles};
+export {MenuItems, menuItemsStyles};

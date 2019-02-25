@@ -58,5 +58,3 @@ export * from './Brand/LinkedInIcon';
 export * from './Brand/LinuxIcon';
 export * from './Brand/MicrosoftIcon';
 export * from './Brand/TwitterIcon';
-
-export * from './RoundContainer';

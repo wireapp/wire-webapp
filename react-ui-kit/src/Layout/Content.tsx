@@ -17,14 +17,19 @@
  *
  */
 
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
 import {GUTTER} from './sizes';
 
-const Content = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0 ${GUTTER}px;
-`;
+export interface ContentProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-export {Content};
+const contentStyles: (props: ContentProps) => ObjectInterpolation<undefined> = props => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flexGrow: 1,
+  padding: `0 ${GUTTER}px`,
+});
+
+const Content = (props: ContentProps) => <div css={contentStyles(props)} {...props} />;
+
+export {Content, contentStyles};

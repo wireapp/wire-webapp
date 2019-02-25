@@ -17,8 +17,7 @@
  *
  */
 
-import * as React from 'react';
-import {defaultProps} from 'recompose';
+import React from 'react';
 import {QUERY} from '../mediaQueries';
 
 interface MatchMediaProps {
@@ -59,12 +58,12 @@ class MatchMedia extends React.PureComponent<MatchMediaProps, MatchMediaState> {
   }
 }
 
-const IsDesktop = defaultProps<MatchMediaProps>({query: QUERY.desktop})(MatchMedia);
-const IsDesktopXL = defaultProps<MatchMediaProps>({query: QUERY.desktopXL})(MatchMedia);
-const IsMobile = defaultProps<MatchMediaProps>({query: QUERY.mobile})(MatchMedia);
-const IsMobileUp = defaultProps<MatchMediaProps>({query: QUERY.mobileUp})(MatchMedia);
-const IsTablet = defaultProps<MatchMediaProps>({query: QUERY.tablet})(MatchMedia);
-const IsTabletDown = defaultProps<MatchMediaProps>({query: QUERY.tabletDown})(MatchMedia);
-const IsTabletUp = defaultProps<MatchMediaProps>({query: QUERY.tabletUp})(MatchMedia);
+const IsDesktop = (props: MatchMediaProps) => <MatchMedia query={QUERY.desktop} {...props} />;
+const IsDesktopXL = (props: MatchMediaProps) => <MatchMedia query={QUERY.desktopXL} {...props} />;
+const IsMobile = (props: MatchMediaProps) => <MatchMedia query={QUERY.mobile} {...props} />;
+const IsMobileUp = (props: MatchMediaProps) => <MatchMedia query={QUERY.mobileUp} {...props} />;
+const IsTablet = (props: MatchMediaProps) => <MatchMedia query={QUERY.tablet} {...props} />;
+const IsTabletDown = (props: MatchMediaProps) => <MatchMedia query={QUERY.tabletDown} {...props} />;
+const IsTabletUp = (props: MatchMediaProps) => <MatchMedia query={QUERY.tabletUp} {...props} />;
 
 export {MatchMedia, IsDesktop, IsDesktopXL, IsMobile, IsMobileUp, IsTablet, IsTabletDown, IsTabletUp};

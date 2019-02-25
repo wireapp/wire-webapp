@@ -17,46 +17,48 @@
  *
  */
 
-import * as Color from 'color';
-import * as React from 'react';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import Color from 'color';
+import React from 'react';
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
-import {Text, TextProps} from './Text';
+import {filterProps} from '../util';
+import {TextProps, filterTextProps, textStyles} from './Text';
 
-interface LinkProps extends TextProps {
-  component?: React.ComponentType;
+export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {
+  component?: React.ComponentType | string;
 }
 
-const Link: React.SFC<LinkProps & any> = ({color, component, ...props}) => {
+const linkStyles: (props: LinkProps) => ObjectInterpolation<undefined> = ({
+  bold = true,
+  color = COLOR.LINK,
+  fontSize = '11px',
+  textTransform = 'uppercase',
+  ...props
+}) => {
   const darker = 0.16;
   const hoverColor = Color(color)
     .mix(Color(COLOR.BLACK), darker)
     .toString();
-  const StyledLink = styled(Text.withComponent(component))`
-    text-decoration: none;
-    ${defaultTransition};
-    cursor: pointer;
-    color: ${color};
-
-    &:visited,
-    &:link,
-    &:active {
-      color: ${color};
-    }
-    &:hover {
-      color: ${hoverColor};
-    }
-  `;
-  return <StyledLink {...props} />;
+  return {
+    ...textStyles({bold, color, fontSize, textTransform, ...props}),
+    '&:hover': {
+      color: hoverColor,
+    },
+    '&:visited, &:link, &:active': {
+      color: color,
+    },
+    color: color,
+    cursor: 'pointer',
+    textDecoration: 'none',
+    transition: defaultTransition,
+  };
 };
 
-Link.defaultProps = {
-  bold: true,
-  color: COLOR.LINK,
-  component: styled.a``,
-  fontSize: '11px',
-  textTransform: 'uppercase',
-};
+const filterLinkProps = (props: Object) => filterProps(filterTextProps(props), ['component']);
 
-export {Link, LinkProps};
+const Link = ({component = 'a', ...props}: LinkProps) =>
+  jsx(component, {css: linkStyles(props), ...filterLinkProps(props)} as any, props.children);
+
+export {Link, linkStyles, filterLinkProps};

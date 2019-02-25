@@ -17,68 +17,75 @@
  *
  */
 
-import * as React from 'react';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 import {COLOR} from '../Identity/';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
-import {QUERY} from '../mediaQueries';
-import {OverlayBackground, OverlayWrapper} from '../Modal/Overlay';
+import media, {QueryKeys} from '../mediaQueries';
+import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyles} from '../Modal/Overlay';
+import {noop} from '../util';
 
-const MenuModalWrapper = styled(OverlayWrapper)<React.HTMLAttributes<HTMLDivElement>>`
-  padding: 0;
-  overflow-y: hidden;
-`;
+const menuModalWrapperStyles: (props: OverlayWrapperProps) => ObjectInterpolation<undefined> = props => ({
+  ...overlayBackgroundStyles(props),
+  alignItems: 'flex-end',
+  alignSelf: 'flex-end',
+  display: 'flex',
+  overflowY: 'hidden',
+  padding: 0,
+});
 
-const MenuModalBody = styled.div<React.HTMLAttributes<HTMLDivElement>>`
-  position: relative;
-  box-shadow: 0 16px 64px 0 rgba(0, 0, 0, 0.16);
-  justify-content: space-between;
-  align-items: flex-end;
-  align-self: flex-end;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  padding: 8px 16px;
-  z-index: 9999;
-  margin-left: auto;
-  margin-right: auto;
-  width: 767px;
-  animation: ${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT}ms ${EASE.EXPONENTIAL};
-  @media (${QUERY.tabletDown}) {
-    width: 100%;
-  }
-`;
+const MenuModalWrapper = (props: OverlayWrapperProps) => <div css={menuModalWrapperStyles} {...props} />;
 
-const MenuModalContent = styled.ul<React.HTMLAttributes<HTMLUListElement>>`
-  min-width: 100%;
-  max-width: 100%;
-  padding: 0;
-  margin: 0;
-  li {
-    border-bottom: 1px solid ${COLOR.GRAY_LIGHTEN_72};
-  }
-  li:last-child {
-    border-bottom: 0;
-  }
-`;
+const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => (
+  <div
+    css={{
+      animation: `${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT}ms ${EASE.EXPONENTIAL}`,
+      backgroundColor: '#fff',
+      boxShadow: '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      padding: '8px 16px',
+      position: 'relative',
+      width: '767px',
+      zIndex: 9999,
+      [media[QueryKeys.TABLET_DOWN]]: {
+        width: '100%',
+      },
+    }}
+    {...props}
+  />
+);
 
-const MenuItemContent = styled.li<React.HTMLAttributes<HTMLLIElement>>`
-  color: ${COLOR.TEXT};
-  display: flex;
-  align-items: center;
-  max-width: 100%;
-  cursor: pointer;
-  height: 56px;
-  list-style-type: none;
-`;
+const MenuModalContent = (props: React.HTMLProps<HTMLUListElement>) => (
+  <ul
+    css={{
+      li: {
+        borderBottom: `1px solid ${COLOR.GRAY_LIGHTEN_72}`,
+      },
+      'li:last-child': {
+        borderBottom: 0,
+      },
+      margin: 0,
+      maxWidth: '100%',
+      minWidth: '100%',
+      padding: 0,
+    }}
+    {...props}
+  />
+);
 
-const MenuModalBackground = styled(OverlayBackground)<React.HTMLAttributes<HTMLDivElement>>`
-  background: rgba(50, 54, 57, 0.4);
-`;
+const modalBackgroundStyles: (props: OverlayBackgroundProps) => ObjectInterpolation<undefined> = props => ({
+  ...overlayBackgroundStyles(props),
+  background: 'rgba(50, 54, 57, 0.4)',
+});
 
-const noop = () => {};
+const MenuModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyles} {...props} />;
 
-interface MenuModalProps {
+interface MenuModalProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   onBackgroundClick?: () => void;
 }
 
@@ -86,7 +93,7 @@ const MenuModal = ({
   children = null,
   onBackgroundClick = noop,
   ...props
-}: MenuModalProps & React.HTMLAttributes<HTMLDivElement>) => (
+}: MenuModalProps & React.HTMLProps<HTMLDivElement>) => (
   <MenuModalWrapper {...props}>
     <MenuModalBody>
       <MenuModalContent>{children}</MenuModalContent>
@@ -95,10 +102,23 @@ const MenuModal = ({
   </MenuModalWrapper>
 );
 
-interface MenuItemProps {}
+export interface MenuItemProps<T = HTMLLIElement> extends React.HTMLProps<T> {}
 
-const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLAttributes<HTMLLIElement>) => (
-  <MenuItemContent {...props}>{children}</MenuItemContent>
+const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => (
+  <li
+    css={{
+      alignItems: 'center',
+      color: COLOR.TEXT,
+      cursor: 'pointer',
+      display: 'flex',
+      height: '56px',
+      listStyleType: 'none',
+      maxWidth: '100%',
+    }}
+    {...props}
+  >
+    {children}
+  </li>
 );
 
 export {MenuModal, MenuItem};
