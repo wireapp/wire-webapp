@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.46...@wireapp/react-ui-kit@5.0.0) (2019-02-25)
+
+
+### Code Refactoring
+
+* **react-ui-kit:** Migrate to Emotion ([#1530](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1530)) ([cb0eee9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/cb0eee9))
+
+
+### BREAKING CHANGES
+
+* **react-ui-kit:** - Migrated the whole UI-Kit from `styled components` to `emotion`
+- Migrated UI-Kit animations from `styled-react-transition-group` to `react-transition-group`
+- `RoundContainer` got removed - Please consider using `RoundIconButton`
+- Removed `recompose` dependency
+- More precise typescript types
+- Fixed `Container` media query behaviour
+- Migrated from `innerRef` to `ref` with `React.forwardRef`
+
+
+
+
+
 ## [4.3.46](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@4.3.45...@wireapp/react-ui-kit@4.3.46) (2019-02-21)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
