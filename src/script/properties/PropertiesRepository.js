@@ -55,9 +55,10 @@ class PropertiesRepository {
   }
 
   checkPrivacyPermission() {
+    const isCheckConsentDisabled = !z.config.FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
 
-    return isPrivacyPreferenceSet
+    return isCheckConsentDisabled || isPrivacyPreferenceSet
       ? Promise.resolve()
       : new Promise(resolve => {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
