@@ -71,7 +71,7 @@ interface State {
 }
 
 class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  private teamNameInput: React.RefObject<any> = React.createRef();
+  private readonly teamNameInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredTeamName: this.props.teamName || '',
     error: null,
