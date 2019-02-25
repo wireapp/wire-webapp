@@ -2,8 +2,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "outDir": "dist",
-    "rootDir": "src/main",
-    "types": ["node"]
+    "rootDir": "src/main"
   },
   "exclude": ["bower_components", "dist", "node_modules"],
   "extends": "../../tsconfig.json"
