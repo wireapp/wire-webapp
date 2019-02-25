@@ -17,8 +17,9 @@
  *
  */
 
-import * as React from 'react';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 import {
   ArrowIcon,
   AttachmentIcon,
@@ -29,41 +30,32 @@ import {
   PingIcon,
   PlaneIcon,
   ProfileIcon,
-  RoundContainer,
   TeamIcon,
   TimedIcon,
   TrashIcon,
 } from '../Icon';
 import {COLOR} from '../Identity';
-import {defaultTransition} from '../Identity/motions';
+import {ButtonProps, buttonStyles, filterButtonProps} from './Button';
 
-export interface RoundIconButtonProps extends ButtonProps {
+export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {
   icon?: ICON_NAME;
   iconColor?: string;
   iconHeight?: number;
   iconWidth?: number;
 }
 
-export interface ButtonProps {
-  color?: string;
-  size?: number;
-}
-
-const darkenAmount = 0.08;
-
-const Button = styled(RoundContainer.withComponent(styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>``))<
-  ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>
->`
-  background-color: ${props => (props.disabled ? COLOR.DISABLED : props.color)};
-  min-width: ${props => props.size}px;
-  outline: none;
-  padding: 0;
-  cursor: ${props => (props.disabled ? 'default' : 'pointer')};
-  ${defaultTransition} &:hover,
-  &:focus {
-    background-color: ${props => (props.disabled ? COLOR.DISABLED : COLOR.shade(props.color, darkenAmount))};
-  }
-`;
+const roundIconButtonStyle: (props: RoundIconButtonProps) => ObjectInterpolation<undefined> = props => ({
+  ...buttonStyles(props),
+  borderRadius: '50%',
+  display: 'flex',
+  height: `${props.size}px`,
+  justifyContent: 'center',
+  lineHeight: 'initial',
+  margin: '0 auto',
+  minWidth: `${props.size}px`,
+  padding: 0,
+  width: `${props.size}px`,
+});
 
 enum ICON_NAME {
   ARROW = 'arrow',
@@ -80,7 +72,7 @@ enum ICON_NAME {
   TRASH = 'trash',
 }
 
-const RoundIconButton: React.SFC<RoundIconButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
+const RoundIconButton: React.SFC<RoundIconButtonProps> = ({
   icon,
   iconColor,
   iconHeight,
@@ -88,7 +80,7 @@ const RoundIconButton: React.SFC<RoundIconButtonProps & React.ButtonHTMLAttribut
   children,
   ...props
 }) => (
-  <Button {...props}>
+  <button css={roundIconButtonStyle(props)} {...filterButtonProps(props)}>
     {(() => {
       switch (icon) {
         case ICON_NAME.ATTACHMENT: {
@@ -135,13 +127,13 @@ const RoundIconButton: React.SFC<RoundIconButtonProps & React.ButtonHTMLAttribut
       }
     })()}
     {children}
-  </Button>
+  </button>
 );
 
 RoundIconButton.defaultProps = {
-  color: COLOR.BLUE,
+  backgroundColor: COLOR.BLUE,
   iconColor: COLOR.WHITE,
   size: 32,
 };
 
-export {RoundIconButton, ICON_NAME};
+export {RoundIconButton, ICON_NAME, roundIconButtonStyle};

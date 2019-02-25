@@ -24,7 +24,7 @@ export * from './Content';
 export * from './FlexBox';
 export * from './Footer';
 export * from './Header';
-export * from './HeaderMenu';
+export * from './headerMenu/index';
 export * from './MatchMedia';
 export * from './Spacer';
 export * from './StyledApp';

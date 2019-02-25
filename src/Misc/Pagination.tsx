@@ -17,12 +17,14 @@
  *
  */
 
-import * as React from 'react';
+/** @jsx jsx */
+import {jsx} from '@emotion/core';
+import React from 'react';
 import {COLOR} from '../Identity';
 import {FlexBox} from '../Layout';
 import {Bold, Link} from '../Text';
 
-interface PaginationProps {
+interface PaginationProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   currentPage?: number;
   goPage?: (page: number) => void;
   nextPageComponent?: any;
@@ -30,7 +32,7 @@ interface PaginationProps {
   previousPageComponent?: any;
 }
 
-const Pagination: React.SFC<PaginationProps & React.HTMLAttributes<HTMLDivElement>> = ({
+const Pagination: React.SFC<PaginationProps> = ({
   currentPage = 0,
   numberOfPages = 1,
   goPage,
@@ -47,7 +49,11 @@ const Pagination: React.SFC<PaginationProps & React.HTMLAttributes<HTMLDivElemen
     const endLength = 1;
     const skipLength = 1;
     const normalizeCount = endLength + skipLength + spanLength;
-    const dots = <Bold fontSize={'11px'}>{'…'}</Bold>;
+    const dots = (key: string) => (
+      <Bold key={key} fontSize={'11px'}>
+        {'…'}
+      </Bold>
+    );
     const renderPageNumber = pageIndex =>
       currentPage === pageIndex ? (
         <Bold
@@ -70,10 +76,10 @@ const Pagination: React.SFC<PaginationProps & React.HTMLAttributes<HTMLDivElemen
 
     const pages = Array.from(Array(numberOfPages), (nothing, index) => renderPageNumber(index));
     if (afterCount > skipLength) {
-      pages.splice(normalizedCurrent + spanLength + 1, afterCount, dots);
+      pages.splice(normalizedCurrent + spanLength + 1, afterCount, dots('dots-end'));
     }
     if (beforeCount > skipLength) {
-      pages.splice(endLength, beforeCount, dots);
+      pages.splice(endLength, beforeCount, dots('dots-start'));
     }
 
     return pages;

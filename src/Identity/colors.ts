@@ -17,7 +17,7 @@
  *
  */
 
-import * as Color from 'color';
+import Color from 'color';
 
 export type ColorParam = Color | string | ArrayLike<number> | number | {[key: string]: any};
 

@@ -17,21 +17,34 @@
  *
  */
 
-import styled from 'styled-components';
-import {Input} from './';
+/** @jsx jsx */
+import {jsx} from '@emotion/core';
+import {COLOR} from '../Identity';
+import {INPUT_CLASSNAME, InputProps} from './Input';
 
-const InputSubmitCombo = styled(Input.withComponent('div'))<React.HTMLAttributes<HTMLDivElement>>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-right: 16px;
-  padding-left: 0;
-  margin-bottom: 16px;
-  ${() => Input} {
-    padding: 0 0 0 16px;
-    margin: 0 8px 0 0;
-    flex-grow: 1;
-  }
-`;
+export interface InputSubmitComboProps<T = HTMLDivElement> extends InputProps<T> {}
 
-export {InputSubmitCombo};
+const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
+
+const InputSubmitCombo = (props: InputSubmitComboProps) => (
+  <div
+    className={INPUT_SUBMIT_COMBO_CLASSNAME}
+    css={{
+      alignItems: 'center',
+      backgroundColor: COLOR.WHITE,
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '4px',
+      paddingLeft: 0,
+      paddingRight: '16px',
+      [INPUT_CLASSNAME]: {
+        flexGrow: 1,
+        margin: '0 8px 0 0',
+        padding: '0 0 0 16px',
+      },
+    }}
+    {...props}
+  />
+);
+
+export {INPUT_SUBMIT_COMBO_CLASSNAME, InputSubmitCombo};

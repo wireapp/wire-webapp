@@ -17,32 +17,37 @@
  *
  */
 
-import styled from 'styled-components';
-import media from '../mediaQueries';
-import {Text} from './Text';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import media, {QueryKeys} from '../mediaQueries';
+import {TextProps, filterTextProps, textStyles} from './Text';
 
-const Paragraph = styled(Text.withComponent('p'))<React.HTMLAttributes<HTMLParagraphElement>>`
-  margin-top: 0;
-  margin-bottom: 16px;
-`;
+export interface ParagraphProps<T = HTMLParagraphElement> extends TextProps<T> {}
 
-Paragraph.defaultProps = {
-  ...Paragraph.defaultProps,
-  block: true,
-};
+const paragraphStyles: (props: ParagraphProps) => ObjectInterpolation<undefined> = ({block = true, ...props}) => ({
+  ...textStyles({block, ...props}),
+  marginBottom: '16px',
+  marginTop: 0,
+});
 
-const Lead = styled(Text.withComponent('p'))<React.HTMLAttributes<HTMLParagraphElement>>`
-  margin-bottom: 56px;
-  margin-top: 0;
-  ${media.mobile`
-    font-size: 20px;
-  `};
-`;
+const Paragraph = (props: ParagraphProps) => <p css={paragraphStyles(props)} {...filterTextProps(props)} />;
 
-Lead.defaultProps = {
-  block: true,
-  center: true,
-  fontSize: '24px',
-};
+export interface LeadProps<T = HTMLParagraphElement> extends TextProps<T> {}
 
-export {Paragraph, Lead};
+const leadStyles: (props: LeadProps) => ObjectInterpolation<undefined> = ({
+  block = true,
+  center = true,
+  fontSize = '24px',
+  ...props
+}) => ({
+  ...textStyles({block, center, fontSize, ...props}),
+  marginBottom: '56px',
+  marginTop: 0,
+  [media[QueryKeys.MOBILE]]: {
+    fontSize: '20px',
+  },
+});
+
+const Lead = (props: LeadProps) => <p css={leadStyles(props)} {...filterTextProps(props)} />;
+
+export {Paragraph, paragraphStyles, Lead, leadStyles};

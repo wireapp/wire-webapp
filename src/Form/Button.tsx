@@ -17,65 +17,91 @@
  *
  */
 
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
-import {Link, Text, TextProps} from '../Text';
+import {TextProps, linkStyles, textStyles} from '../Text';
+import {filterProps} from '../util';
 
-interface ButtonProps extends TextProps {
+export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   backgroundColor?: string;
-  block?: boolean;
-  disabled?: boolean;
   noCapital?: boolean;
 }
 
-type HTMLButtonProps = ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>;
-
-const darkenAmount = 0.06;
-const Button = styled(Text.withComponent(styled.button<HTMLButtonProps>``))<HTMLButtonProps>`
-  background-color: ${props => (props.disabled ? COLOR.DISABLED : props.backgroundColor)};
-  border-radius: 8px;
-  border: 0;
-  cursor: ${props => (props.disabled ? 'default' : 'pointer')};
-  display: inline-block;
-  text-decoration: none;
-  margin-bottom: 16px;
-  touch-action: manipulation;
-  ${defaultTransition};
-  height: 48px;
-  line-height: 48px;
-  max-width: 100%;
-  outline: none;
-  padding: 0 32px;
-  min-width: 150px;
-  width: ${props => (props.block ? '100%' : 'auto')};
-  &:hover,
-  &:focus {
-    text-decoration: none;
-    background-color: ${props => (props.disabled ? COLOR.DISABLED : COLOR.shade(props.backgroundColor, darkenAmount))};
-  }
-`;
-
-Button.defaultProps = {
-  backgroundColor: COLOR.BLUE,
-  block: false,
-  bold: true,
-  center: true,
-  color: COLOR.WHITE,
-  disabled: false,
-  fontSize: '16px',
-  noCapital: false,
-  noWrap: true,
-  textTransform: 'uppercase',
-  truncate: true,
+const filterButtonProps = (props: Object) => {
+  return filterProps(props, ['backgroundColor', 'block', 'disabled', 'noCapital']);
 };
 
-const ButtonLink = styled(Button.withComponent(Link))`
-  display: inline-block !important;
-`;
+const buttonStyles: (props: ButtonProps) => ObjectInterpolation<undefined> = ({
+  backgroundColor = COLOR.BLUE,
+  block = false,
+  disabled = false,
+  noCapital = false,
+  bold = true,
+  center = true,
+  color = COLOR.WHITE,
+  fontSize = '16px',
+  noWrap = true,
+  textTransform = 'uppercase',
+  truncate = true,
+  ...props
+}) => ({
+  ...textStyles({
+    block,
+    bold,
+    center,
+    color,
+    disabled,
+    fontSize,
+    noWrap,
+    textTransform,
+    truncate,
+    ...props,
+  }),
+  '&:hover, &:focus': {
+    backgroundColor: disabled ? COLOR.DISABLED : COLOR.shade(backgroundColor, 0.06),
+    textDecoration: 'none',
+  },
+  backgroundColor: disabled ? COLOR.DISABLED : backgroundColor,
+  border: 0,
+  borderRadius: '8px',
+  cursor: disabled ? 'default' : 'pointer',
+  display: 'inline-block',
+  height: '48px',
+  lineHeight: '48px',
+  marginBottom: '16px',
+  maxWidth: '100%',
+  minWidth: '150px',
+  outline: 'none',
+  padding: '0 32px',
+  textDecoration: 'none',
+  touchAction: 'manipulation',
+  transition: defaultTransition,
+  width: block ? '100%' : 'auto',
+});
 
-ButtonLink.defaultProps = {
-  ...Button.defaultProps,
-};
+const buttonLinkStyles: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = ({
+  backgroundColor = COLOR.BLUE,
+  block = true,
+  bold = true,
+  center = true,
+  color = COLOR.WHITE,
+  disabled = false,
+  fontSize = '16px',
+  noCapital = false,
+  noWrap = true,
+  textTransform = 'uppercase',
+  truncate = true,
+  ...props
+}) => ({
+  ...buttonStyles({backgroundColor, noCapital, ...props} as any),
+  display: 'inline-block !important',
+});
 
-export {Button, ButtonLink};
+const Button = (props: ButtonProps) => <button css={buttonStyles(props)} {...filterButtonProps(props)} />;
+const ButtonLink = (props: ButtonProps<HTMLAnchorElement>) => (
+  <a css={buttonLinkStyles(props)} {...filterButtonProps(props)} />
+);
+
+export {Button, ButtonLink, buttonStyles, filterButtonProps};

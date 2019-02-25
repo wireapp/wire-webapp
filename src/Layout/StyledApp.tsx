@@ -17,34 +17,39 @@
  *
  */
 
-import * as React from 'react';
-import styled from 'styled-components';
-import GlobalStyle from '../globalStyles';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import {GlobalStyle} from '../GlobalStyle';
 import {COLOR} from '../Identity';
+import {filterProps} from '../util';
 
-export interface StyledAppProps {
+export interface StyledAppContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor?: string;
 }
 
-const StyledAppContainer = styled.div<StyledAppProps & React.HTMLAttributes<HTMLDivElement>>`
-  background-color: ${props => props.backgroundColor};
-  color: ${COLOR.TEXT};
-  display: flex;
-  flex-direction: column;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
-  font-weight: 300;
-  line-height: 1.5;
-  min-height: 100vh;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  * {
-    box-sizing: border-box;
-  }
-`;
+const StyledAppContainerStyles: (props: StyledAppContainerProps) => ObjectInterpolation<undefined> = ({
+  backgroundColor = COLOR.GRAY_LIGHTEN_88,
+}) => ({
+  '*': {
+    boxSizing: 'border-box',
+  },
+  MozOsxFontSmoothing: 'grayscale',
+  WebkitFontSmoothing: 'antialiased',
+  backgroundColor: backgroundColor,
+  color: COLOR.TEXT,
+  display: 'flex',
+  flexDirection: 'column',
+  fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
+  fontWeight: 300,
+  lineHeight: 1.5,
+  minHeight: '100vh',
+});
 
-StyledAppContainer.defaultProps = {
-  backgroundColor: COLOR.GRAY_LIGHTEN_88,
-};
+const filterStyledAppContainerProps = (props: Object) => filterProps(props, ['backgroundColor']);
+
+const StyledAppContainer = (props: StyledAppContainerProps) => (
+  <div css={StyledAppContainerStyles(props)} {...filterStyledAppContainerProps(props)} />
+);
 
 const StyledApp = ({children, ...props}) => (
   <StyledAppContainer {...props}>

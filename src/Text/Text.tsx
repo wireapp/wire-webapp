@@ -17,12 +17,13 @@
  *
  */
 
-import * as React from 'react';
-import {defaultProps} from 'recompose';
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
+import {TextTransformProperty} from 'csstype';
 import {COLOR} from '../Identity';
+import {filterProps} from '../util';
 
-export interface TextProps {
+export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   block?: boolean;
   bold?: boolean;
   center?: boolean;
@@ -31,46 +32,55 @@ export interface TextProps {
   light?: boolean;
   muted?: boolean;
   noWrap?: boolean;
-  textTransform?: string;
+  textTransform?: TextTransformProperty;
   truncate?: boolean;
 }
 
-type HTMLTextProps = TextProps & React.HTMLAttributes<HTMLSpanElement>;
-
-const Text = styled.span<HTMLTextProps>`
-  color: ${props => props.color};
-  font-size: ${props => props.fontSize};
-  font-weight: ${props => (props.bold ? '600' : props.light ? '200' : '300')};
-  opacity: ${props => (props.muted ? '0.56' : '1')};
-  text-align: ${props => (props.center ? 'center' : 'left')};
-  text-transform: ${props => props.textTransform};
-  display: ${props => (props.block ? 'block' : 'inline')};
-  ${props => props.noWrap && 'white-space: nowrap;'};
-  ${props =>
-    props.truncate &&
-    `
-        overflow: hidden;
-        text-overflow: ellipsis;
-      `};
-`;
-
-Text.defaultProps = {
-  block: false,
-  bold: false,
-  center: false,
-  color: COLOR.TEXT,
-  fontSize: '16px',
-  light: false,
-  muted: false,
-  noWrap: false,
-  textTransform: 'none',
-  truncate: false,
+const filterTextProps = (props: Object) => {
+  return filterProps(props, [
+    'block',
+    'bold',
+    'center',
+    'color',
+    'fontSize',
+    'light',
+    'muted',
+    'noWrap',
+    'textTransform',
+    'truncate',
+  ]);
 };
 
-const Bold = defaultProps<HTMLTextProps>({bold: true})(Text);
-const Small = defaultProps<HTMLTextProps>({fontSize: '12px'})(Text);
-const Muted = defaultProps<HTMLTextProps>({muted: true})(Text);
-const Uppercase = defaultProps<HTMLTextProps>({textTransform: 'uppercase'})(Text);
-const Large = defaultProps<HTMLTextProps>({fontSize: '48px', light: true})(Text);
+export const textStyles: (props: TextProps) => ObjectInterpolation<undefined> = ({
+  block = false,
+  bold = false,
+  center = false,
+  color = COLOR.TEXT,
+  fontSize = '16px',
+  light = false,
+  muted = false,
+  noWrap = false,
+  textTransform = 'none',
+  truncate = false,
+}) => ({
+  color: color,
+  display: block ? 'block' : 'inline',
+  fontSize: fontSize,
+  fontWeight: bold ? 600 : light ? 200 : 300,
+  opacity: muted ? 0.56 : 1,
+  overflow: truncate ? 'hidden' : undefined,
+  textAlign: center ? 'center' : 'left',
+  textOverflow: truncate ? 'ellipsis' : undefined,
+  textTransform: textTransform,
+  whiteSpace: noWrap ? 'nowrap' : undefined,
+});
 
-export {Bold, Muted, Small, Text, Uppercase, Large};
+const Text = (props: TextProps) => <span css={textStyles(props)} {...filterTextProps(props)} />;
+
+const Bold = (props: TextProps) => <Text bold {...props} />;
+const Small = (props: TextProps) => <Text fontSize={'12px'} {...props} />;
+const Muted = (props: TextProps) => <Text muted {...props} />;
+const Uppercase = (props: TextProps) => <Text textTransform={'uppercase'} {...props} />;
+const Large = (props: TextProps) => <Text fontSize={'48px'} light {...props} />;
+
+export {Bold, Muted, Small, Text, Uppercase, Large, filterTextProps};

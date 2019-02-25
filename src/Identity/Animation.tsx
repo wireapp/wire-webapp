@@ -17,84 +17,135 @@
  *
  */
 
-import {defaultProps} from 'recompose';
-import transition from 'styled-transition-group';
+import {ClassNames} from '@emotion/core';
+import React from 'react';
+import {CSSTransition} from 'react-transition-group';
 import {DURATION, EASE} from './motions';
 
-const Opacity = transition.div`
-  &:enter {
-    opacity: ${({startValue = 0}) => startValue};
-  }
-  &:enter-active {
-    opacity: ${({endValue = 1}) => endValue};
-    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
-  }
-  &:exit {
-    opacity: ${({endValue = 1}) => endValue};
-  }
-  &:exit-active {
-    pointer-events: none;
-    opacity: ${({startValue = 0}) => startValue};
-    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
-  }
-`;
+type TransitionProps = Partial<CSSTransition.CSSTransitionProps> & {
+  children: React.ReactNode;
+  component?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
+};
 
-const YAxisMovement = transition.div`
-  &:enter {
-    transform: translateY(${({startValue}) => startValue});
-  }
-  &:enter-active {
-    transform: translateY(${({endValue}) => endValue});
-    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
-  }
-  &:exit {
-    transform: translateY(${({endValue}) => endValue});
-  }
-  &:exit-active {
-    transform: translateY(${({startValue}) => startValue});
-    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
-  }
-`;
+type OpacityProps = TransitionProps & {
+  startValue?: number;
+  endValue?: number;
+};
 
-const TopDownMovement = defaultProps({startValue: '-100%', endValue: '0%'})(YAxisMovement);
-const BottomUpMovement = defaultProps({startValue: '100%', endValue: '0%'})(YAxisMovement);
+type MovementProps = TransitionProps & {
+  startValue?: string;
+  endValue?: string;
+};
 
-const Slide = transition.div`
-&:enter {
-  margin-top: ${({startValue = '-100%'}) => startValue};
-}
-&:enter-active {
-  margin-top: ${({endValue = '0'}) => endValue};
-  transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
-}
-&:exit {
-  margin-top: ${({endValue = '0'}) => endValue};
-}
-&:exit-active {
-  margin-top: ${({startValue = '-100%'}) => startValue};
-  transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.QUART};
-}
-`;
+const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => (
+  <ClassNames>
+    {({css}) => (
+      <CSSTransition timeout={timeout} classNames={css(animationStyle)} {...props}>
+        {component ? React.createElement(component, {}, children) : children}
+      </CSSTransition>
+    )}
+  </ClassNames>
+);
 
-const XAxisMovement = transition.div`
-  &:enter {
-    transform: translateX(${({startValue}) => startValue});
-  }
-  &:enter-active {
-    transform: translateX(${({endValue}) => endValue});
-    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
-  }
-  &:exit {
-    transform: translateX(${({endValue}) => endValue});
-  }
-  &:exit-active {
-    transform: translateX(${({startValue}) => startValue});
-    transition: all ${({timeout = DURATION.DEFAULT}) => timeout}ms ${EASE.EXPONENTIAL};
-  }
-`;
+const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => (
+  <Transition
+    animationStyle={{
+      '&-enter': {opacity: startValue},
+      '&-enter-active': {
+        opacity: endValue,
+        transition: `all ${timeout}ms ${EASE.QUART}`,
+      },
+      '&-exit': {opacity: endValue},
+      '&-exit-active': {
+        opacity: startValue,
+        pointerEvents: 'none',
+        transition: `all ${timeout}ms ${EASE.QUART}`,
+      },
+      '&-exit-done': {opacity: startValue},
+    }}
+    timeout={timeout}
+    {...props}
+  />
+);
 
-const LeftRightMovement = defaultProps({startValue: '-100vh', endValue: '0vh'})(XAxisMovement);
-const RightLeftMovement = defaultProps({startValue: '100vh', endValue: '0vh'})(XAxisMovement);
+const YAxisMovement = ({
+  startValue = '-100%',
+  endValue = '0%',
+  timeout = DURATION.DEFAULT,
+  ...props
+}: MovementProps) => (
+  <Transition
+    animationStyle={{
+      '&-enter': {transform: `translateY(${startValue})`},
+      '&-enter-active': {
+        transform: `translateY(${endValue})`,
+        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+      },
+      '&-exit': {transform: `translateY(${endValue})`},
+      '&-exit-active': {
+        pointerEvents: 'none',
+        transform: `translateY(${startValue})`,
+        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+      },
+      '&-exit-done': {transform: `translateY(${startValue})`},
+    }}
+    timeout={timeout}
+    {...props}
+  />
+);
+
+const XAxisMovement = ({
+  startValue = '-100%',
+  endValue = '0%',
+  timeout = DURATION.DEFAULT,
+  ...props
+}: MovementProps) => (
+  <Transition
+    animationStyle={{
+      '&-enter': {transform: `translateX(${startValue})`},
+      '&-enter-active': {
+        transform: `translateX(${endValue})`,
+        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+      },
+      '&-exit': {transform: `translateX(${endValue})`},
+      '&-exit-active': {
+        pointerEvents: 'none',
+        transform: `translateX(${startValue})`,
+        transition: `all ${timeout}ms ${EASE.EXPONENTIAL}`,
+      },
+      '&-exit-done': {transform: `translateX(${startValue})`},
+    }}
+    timeout={timeout}
+    {...props}
+  />
+);
+
+const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => (
+  <Transition
+    animationStyle={{
+      '&-enter': {marginTop: startValue},
+      '&-enter-active': {
+        marginTop: endValue,
+        transition: `all ${timeout}ms ${EASE.QUART}`,
+      },
+      '&-exit': {marginTop: endValue},
+      '&-exit-active': {
+        marginTop: startValue,
+        pointerEvents: 'none',
+        transition: `all ${timeout}ms ${EASE.QUART}`,
+      },
+      '&-exit-done': {marginTop: startValue},
+    }}
+    timeout={timeout}
+    {...props}
+  />
+);
+
+const LeftRightMovement = props => <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />;
+const RightLeftMovement = props => <XAxisMovement startValue="100vh" endValue="0vh" {...props} />;
+
+const TopDownMovement = props => <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
+const BottomUpMovement = props => <YAxisMovement startValue="100%" endValue="0%" {...props} />;
 
 export {
   Slide,

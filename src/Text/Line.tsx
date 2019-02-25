@@ -17,19 +17,22 @@
  *
  */
 
-import styled from 'styled-components';
+/** @jsx jsx */
+import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {GUTTER} from '../Layout/sizes';
 
-const Line = styled.hr<React.HTMLAttributes<HTMLHRElement>>`
-  border: none;
-  border-bottom: 1px solid ${props => props.color};
-  margin-top: ${GUTTER}px;
-  margin-bottom: ${GUTTER}px;
-`;
+export interface LineProps<T = HTMLHRElement> extends React.HTMLProps<T> {
+  color?: string;
+}
 
-Line.defaultProps = {
-  color: COLOR.GRAY_LIGHTEN_72,
-};
+const lineStyles: (props: LineProps) => ObjectInterpolation<undefined> = ({color = COLOR.GRAY_LIGHTEN_72}) => ({
+  border: 'none',
+  borderBottom: `1px solid ${color}`,
+  marginBottom: `${GUTTER}px`,
+  marginTop: `${GUTTER}px`,
+});
+
+const Line = (props: LineProps) => <hr css={lineStyles(props)} {...props} />;
 
 export {Line};
