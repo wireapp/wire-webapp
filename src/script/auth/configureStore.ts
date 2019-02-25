@@ -45,7 +45,7 @@ const configureStore = (thunkArguments: object = {}) => {
   return store;
 };
 
-const createLoggerMiddleware = () => (reduxLogdown(LOGGER_NAMESPACE, {diff: true}));
+const createLoggerMiddleware = () => reduxLogdown(LOGGER_NAMESPACE, {diff: true});
 
 const createMiddleware = (thunkArguments: object) => {
   const middlewares = [thunk.withExtraArgument(thunkArguments), createLoggerMiddleware()];
