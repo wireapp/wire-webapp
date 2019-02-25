@@ -70,7 +70,9 @@ class DemoInputs extends React.PureComponent {
         <Columns>
           <Column>Disabled Button</Column>
           <Column>
-            <Button disabled>Default Button</Button>
+            <Button disabled onClick={() => alert('This should not work')}>
+              Default Button
+            </Button>
           </Column>
         </Columns>
         <Columns>

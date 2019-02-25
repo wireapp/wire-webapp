@@ -21,7 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
-import {TextProps, linkStyles, textStyles} from '../Text';
+import {TextProps, filterTextProps, textStyles} from '../Text';
 import {filterProps} from '../util';
 
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
@@ -30,7 +30,11 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
 }
 
 const filterButtonProps = (props: Object) => {
-  return filterProps(props, ['backgroundColor', 'block', 'disabled', 'noCapital']);
+  return filterProps(filterTextProps(props), ['backgroundColor', 'noCapital']);
+};
+
+const filterButtonLinkProps = (props: Object) => {
+  return filterProps(filterTextProps(props), ['backgroundColor', 'disabled', 'noCapital']);
 };
 
 const buttonStyles: (props: ButtonProps) => ObjectInterpolation<undefined> = ({
@@ -81,27 +85,14 @@ const buttonStyles: (props: ButtonProps) => ObjectInterpolation<undefined> = ({
   width: block ? '100%' : 'auto',
 });
 
-const buttonLinkStyles: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = ({
-  backgroundColor = COLOR.BLUE,
-  block = true,
-  bold = true,
-  center = true,
-  color = COLOR.WHITE,
-  disabled = false,
-  fontSize = '16px',
-  noCapital = false,
-  noWrap = true,
-  textTransform = 'uppercase',
-  truncate = true,
-  ...props
-}) => ({
-  ...buttonStyles({backgroundColor, noCapital, ...props} as any),
+const buttonLinkStyles: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
+  ...buttonStyles(props as any),
   display: 'inline-block !important',
 });
 
 const Button = (props: ButtonProps) => <button css={buttonStyles(props)} {...filterButtonProps(props)} />;
 const ButtonLink = (props: ButtonProps<HTMLAnchorElement>) => (
-  <a css={buttonLinkStyles(props)} {...filterButtonProps(props)} />
+  <a css={buttonLinkStyles(props)} {...filterButtonLinkProps(props)} />
 );
 
 export {Button, ButtonLink, buttonStyles, filterButtonProps};
