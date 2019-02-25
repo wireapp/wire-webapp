@@ -17,12 +17,12 @@
  *
  */
 
+const CSSTransition = require('react-transition-group');
 import {ClassNames} from '@emotion/core';
 import React from 'react';
-import {CSSTransition} from 'react-transition-group';
 import {DURATION, EASE} from './motions';
 
-type TransitionProps = Partial<CSSTransition.CSSTransitionProps> & {
+type TransitionProps = Partial<any> & {
   children: React.ReactNode;
   component?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
 };
