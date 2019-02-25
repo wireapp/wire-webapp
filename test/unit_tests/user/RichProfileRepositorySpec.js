@@ -39,7 +39,7 @@ describe('RichProfileRepository', () => {
       });
     });
 
-    it("fetches the user's rich profile only once and then load it from cache", () => {
+    it("fetches the user's rich profile only once and then loads it from cache", () => {
       const userId = UUID.genV4().hexString;
       const response = [];
       spyOn(richProfileRepository.backendClient, 'sendRequest').and.returnValue(Promise.resolve(response));
