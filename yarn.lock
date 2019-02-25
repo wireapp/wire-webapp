@@ -1716,10 +1716,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.1.tgz#e8b6b1efe7ca50c31343ddbec2d91a11f413edb3"
-  integrity sha512-a1EnPm7F31iwlk0T8ybvOTKKoEE7ocbZtZQDN4xsmM+2ppM0EbcLnhDgSjLKNzNWFAnjQJ9WnFepNyGRLdb2wA==
+"@wireapp/react-ui-kit@5.0.4":
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.4.tgz#3d5a318e8e54964ada136b9f0ca84114d67ba2c4"
+  integrity sha512-9p+9jf/wdIJYgyxh8Xgm2IpkSqlsh9tLXJnVzb+Ts6UAci7p+vA8L0NLOtmKE6MSET92c8H6Z4QyJ/9F9w0Puw==
   dependencies:
     "@emotion/core" "10.0.7"
     "@emotion/styled" "10.0.7"
