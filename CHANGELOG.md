@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.3...@wireapp/react-ui-kit@5.0.4) (2019-02-25)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Do not filter disabled property for button element ([#1557](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1557)) ([0e1d5b2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0e1d5b2))
+
+
+
+
+
 ## [5.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.2...@wireapp/react-ui-kit@5.0.3) (2019-02-25)
 
 
