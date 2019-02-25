@@ -22,6 +22,8 @@ import Logger from 'utils/Logger';
 import {t, Declension} from 'utils/LocalizerUtil';
 import SanitizationUtil from 'utils/SanitizationUtil';
 
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
+
 window.z = window.z || {};
 window.z.notification = z.notification || {};
 
@@ -200,7 +202,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       return t('notificationVoiceChannelActivate');
     }
 
-    if (messageEntity.is_deactivation() && messageEntity.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
+    if (messageEntity.is_deactivation() && messageEntity.finished_reason === TERMINATION_REASON.MISSED) {
       return t('notificationVoiceChannelDeactivate');
     }
   }

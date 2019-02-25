@@ -19,8 +19,10 @@
 
 import {t, setStrings} from 'utils/LocalizerUtil';
 import 'src/script/localization/Localizer';
+
 import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
+import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -235,7 +237,7 @@ describe('z.notification.NotificationRepository', () => {
     it('for a successfully completed call', () => {
       message_et = new z.entity.CallMessage();
       message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
-      message_et.finished_reason = z.calling.enum.TERMINATION_REASON.COMPLETED;
+      message_et.finished_reason = TERMINATION_REASON.COMPLETED;
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -285,7 +287,7 @@ describe('z.notification.NotificationRepository', () => {
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
         message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
-        message_et.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED;
+        message_et.finished_reason = TERMINATION_REASON.MISSED;
         message_et.user(user_et);
       });
 

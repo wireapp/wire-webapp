@@ -79,7 +79,6 @@ import BroadcastServiceGlobal from '../broadcast/BroadcastService.js';
 import CallStateGlobal from '../calling/enum/CallState.js';
 import CallStateGroupGlobal from '../calling/enum/CallStateGroup.js';
 import SDPNegotiationModeGlobal from '../calling/enum/SDPNegotiationMode.js';
-import TerminationReasonGlobal from '../calling/enum/TerminationReason.js';
 import DataChannelStateGlobal from '../calling/rtc/DataChannelState.js';
 import ICEConnectionStateGlobal from '../calling/rtc/ICEConnectionState.js';
 import ICEGatheringStateGlobal from '../calling/rtc/ICEGatheringState.js';

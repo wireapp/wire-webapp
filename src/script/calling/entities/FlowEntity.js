@@ -20,6 +20,7 @@
 import MediaStreamHandler from '../../media/MediaStreamHandler';
 import SDP_SOURCE from '../enum/SDPSource';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import TERMINATION_REASON from '../enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -399,21 +400,21 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * Remove the participant from the call
    *
    * @private
-   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason] - Reason for termination
+   * @param {TERMINATION_REASON} [terminationReason] - Reason for termination
    * @returns {undefined} No return value
    */
   _removeDroppedParticipant(terminationReason) {
     this.participantEntity.isConnected(false);
 
-    const deletionTerminationReason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
+    const deletionTerminationReason = TERMINATION_REASON.CONNECTION_DROP;
     this.callEntity
       .deleteParticipant(this.participantEntity.id, this.remoteClientId, deletionTerminationReason)
       .then(() => {
         if (!this.callEntity.participants().length) {
           if (!terminationReason) {
             terminationReason = this.callEntity.isConnected()
-              ? z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
-              : z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED;
+              ? TERMINATION_REASON.CONNECTION_DROP
+              : TERMINATION_REASON.CONNECTION_FAILED;
           }
           amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, terminationReason);
         }
@@ -1020,7 +1021,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1153,7 +1154,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     const attributes = {cause: name, location: sdpSource, step: 'set_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    this._removeDroppedParticipant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    this._removeDroppedParticipant(TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1170,7 +1171,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     this.negotiationTimeout = window.setTimeout(() => {
       this.callLogger.info('Removing call participant on negotiation timeout');
-      this._removeDroppedParticipant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
+      this._removeDroppedParticipant(TERMINATION_REASON.RENEGOTIATION);
     }, timeout + FlowEntity.CONFIG.NEGOTIATION_THRESHOLD);
   }
 
@@ -1181,7 +1182,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _setNegotiationRestartTimeout() {
     this.negotiationTimeout = window.setTimeout(() => {
-      this.callEntity.terminationReason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
+      this.callEntity.terminationReason = TERMINATION_REASON.CONNECTION_DROP;
       this.participantEntity.isConnected(false);
 
       this.callEntity.interruptedParticipants.push(this.participantEntity);

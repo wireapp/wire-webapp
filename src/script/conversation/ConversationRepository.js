@@ -44,8 +44,10 @@ import Conversation from '../entity/Conversation';
 import ConversationMapper from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import trackingHelpers from '../tracking/Helpers';
+
 import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
 import PROPERTY_STATE from '../calling/enum/PropertyState';
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
 
 import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
@@ -3384,7 +3386,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       if (conversationEntity.call()) {
-        const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        const reason = TERMINATION_REASON.MEMBER_LEAVE;
         amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
 

@@ -17,6 +17,8 @@
  *
  */
 
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -218,7 +220,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: conversationId,
       data: {
-        reason: reason || z.calling.enum.TERMINATION_REASON.COMPLETED,
+        reason: reason || TERMINATION_REASON.COMPLETED,
       },
       from: userId,
       id: z.util.createRandomUuid(),

@@ -17,11 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.TERMINATION_REASON = {
+const TERMINATION_REASON = {
   COMPLETED: 'completed',
   CONCURRENT_CALL: 'concurrent',
   CONNECTION_DROP: 'drop',
@@ -37,3 +33,5 @@ z.calling.enum.TERMINATION_REASON = {
   TIMEOUT: 'timeout',
   UNKNOWN: 'unknown',
 };
+
+export default TERMINATION_REASON;

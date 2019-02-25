@@ -21,8 +21,10 @@ import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
+
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
+import TERMINATION_REASON from './enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -294,7 +296,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {clientId, conversationId, response, userId} = callMessageEntity;
 
     if (!response) {
-      const terminationReason = z.calling.enum.TERMINATION_REASON.OTHER_USER;
+      const terminationReason = TERMINATION_REASON.OTHER_USER;
       this.getCallById(conversationId)
         .then(callEntity => callEntity.verifySessionId(callMessageEntity))
         .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
@@ -334,10 +336,10 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_LEAVE
-   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason=z.calling.enum.TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
+   * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
    * @returns {undefined} No return value
    */
-  _onGroupLeave(callMessageEntity, terminationReason = z.calling.enum.TERMINATION_REASON.OTHER_USER) {
+  _onGroupLeave(callMessageEntity, terminationReason = TERMINATION_REASON.OTHER_USER) {
     const {conversationId, clientId, userId} = callMessageEntity;
 
     this.getCallById(conversationId)
@@ -415,10 +417,10 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.HANGUP
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for the participant to hangup
+   * @param {TERMINATION_REASON} terminationReason - Reason for the participant to hangup
    * @returns {undefined} No return value
    */
-  _onHangup(callMessageEntity, terminationReason = z.calling.enum.TERMINATION_REASON.OTHER_USER) {
+  _onHangup(callMessageEntity, terminationReason = TERMINATION_REASON.OTHER_USER) {
     const {conversationId, clientId, response, userId} = callMessageEntity;
 
     if (!response) {
@@ -889,13 +891,13 @@ z.calling.CallingRepository = class CallingRepository {
    * User action to leave a call.
    *
    * @param {string} conversationId - ID of conversation to leave call in
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for call termination
+   * @param {TERMINATION_REASON} terminationReason - Reason for call termination
    * @returns {undefined} No return value
    */
   leaveCall(conversationId, terminationReason) {
     this.getCallById(conversationId)
       .then(callEntity => {
-        const leftConversation = terminationReason === z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        const leftConversation = terminationReason === TERMINATION_REASON.MEMBER_LEAVE;
         return leftConversation ? this._deleteCall(callEntity) : this._leaveCall(callEntity, terminationReason);
       })
       .catch(error => this._handleNotFoundError(error));
@@ -959,7 +961,7 @@ z.calling.CallingRepository = class CallingRepository {
     if (conversationEntity) {
       const isActiveCall = conversationEntity.id === this._selfClientOnACall();
       return isActiveCall
-        ? this.leaveCall(conversationEntity.id, z.calling.enum.TERMINATION_REASON.SELF_USER)
+        ? this.leaveCall(conversationEntity.id, TERMINATION_REASON.SELF_USER)
         : this.joinCall(conversationEntity.id, mediaType);
     }
   }
@@ -1045,7 +1047,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
-            const terminationReason = z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL;
+            const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
             window.setTimeout(resolve, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
@@ -1229,7 +1231,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call to leave
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for call termination
+   * @param {TERMINATION_REASON} terminationReason - Reason for call termination
    * @returns {undefined} No return value
    */
   _leaveCall(callEntity, terminationReason) {
@@ -1272,7 +1274,7 @@ z.calling.CallingRepository = class CallingRepository {
       const additionalPayload = z.calling.CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
       const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
 
-      this._onGroupLeave(callMessageEntity, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+      this._onGroupLeave(callMessageEntity, TERMINATION_REASON.MEMBER_LEAVE);
     });
   }
 
@@ -1463,7 +1465,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Inject a call deactivate event.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.calling.enum.TERMINATION_REASON} [reason] - Reason for call to end
+   * @param {TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
@@ -1505,7 +1507,7 @@ z.calling.CallingRepository = class CallingRepository {
     const conversationId = this._selfClientOnACall();
 
     if (conversationId) {
-      this.leaveCall(conversationId, z.calling.enum.TERMINATION_REASON.PAGE_NAVIGATION);
+      this.leaveCall(conversationId, TERMINATION_REASON.PAGE_NAVIGATION);
     }
   }
 
