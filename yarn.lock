@@ -1338,6 +1338,13 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
   integrity sha512-HtKGu+qG1NPvYe1z7ezLsyIaXYyi8SoAVqWDZgDQ8dLrsZvSzUNCwZyfX33uhWxL/SU0ZDQZ3nwZ0nimt507Kw==
 
+"@types/react-dom@16.8.0":
+  version "16.8.0"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.8.0.tgz#c565f43f9d2ec911f9e0b8f3b74e25e67879aa3f"
+  integrity sha512-Jp4ufcEEjVJEB0OHq2MCZcE1u3KYUKO6WnSuiU/tZeYeiZxUoQavfa/TZeiIT+1XoN6l0lQVNM30VINZFDeolQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-intl@2.3.17":
   version "2.3.17"
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.17.tgz#e1fc6e46e8af58bdef9531259d509380a8a99e8e"
@@ -1704,10 +1711,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.0.tgz#167a4fb343de798912faf46bfe1e0d6a8f005a86"
-  integrity sha512-Xt0xDU5p7saw4sW75esi77OETXj/AJoO498sPTD885Cp+ljDQd0E9+BDKu8GCOewHif3aC+2brsslm4QsZmMlg==
+"@wireapp/react-ui-kit@5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.1.tgz#e8b6b1efe7ca50c31343ddbec2d91a11f413edb3"
+  integrity sha512-a1EnPm7F31iwlk0T8ybvOTKKoEE7ocbZtZQDN4xsmM+2ppM0EbcLnhDgSjLKNzNWFAnjQJ9WnFepNyGRLdb2wA==
   dependencies:
     "@emotion/core" "10.0.7"
     "@emotion/styled" "10.0.7"

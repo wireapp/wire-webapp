@@ -17,7 +17,7 @@
  *
  */
 
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile, Link} from '@wireapp/react-ui-kit';
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {RouteComponentProps, withRouter} from 'react-router';
