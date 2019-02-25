@@ -55,6 +55,9 @@ class PropertiesRepository {
   }
 
   checkPrivacyPermission() {
+    if (!z.config.FEATURE.CHECK_CONSENT) {
+      return Promise.resolve();
+    }
     const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
 
     return isPrivacyPreferenceSet
