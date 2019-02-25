@@ -18,10 +18,11 @@
  */
 
 import ko from 'knockout';
+import AbstractAssetTransferStateTracker from '../AbstractAssetTransferStateTracker';
 
 import '../assetLoader';
 
-class MediaButtonComponent {
+class MediaButtonComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a media button.
    *
@@ -32,6 +33,7 @@ class MediaButtonComponent {
    * @param {Object} componentInfo - Component information
    */
   constructor(params, componentInfo) {
+    super();
     this.mediaElement = params.src;
     this.large = params.large;
     this.asset = params.asset;
