@@ -270,7 +270,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
         </div>
         <Checkbox
-          onChange={event =>
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             this.setState({
               registrationData: {
                 ...this.state.registrationData,

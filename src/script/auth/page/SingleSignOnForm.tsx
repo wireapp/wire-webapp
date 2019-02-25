@@ -273,7 +273,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
           <Input
             name="sso-code"
             tabIndex={1}
-            onChange={event =>
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               this.setState({
                 code: event.target.value,
                 validInputs: {...validInputs, code: true},

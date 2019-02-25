@@ -24,8 +24,8 @@ import {acceptNewsModalStrings} from '../../strings';
 import EXTERNAL_ROUTE from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onConfirm: (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLSpanElement>) => void;
+  onDecline: (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLSpanElement>) => void;
 }
 
 const AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (

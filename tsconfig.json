@@ -5,6 +5,7 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "lib": ["dom", "es2017"],
+    "types": ["webpack-env", "@types/long", "react"],
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
@@ -13,7 +14,8 @@
     "outDir": "src/script/auth",
     "rootDirs": ["src/script"],
     "sourceMap": true,
-    "target": "es6"
+    "target": "es6",
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules", "server"]
 }

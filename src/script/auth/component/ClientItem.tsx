@@ -218,7 +218,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
           data-uie-value={client.model}
         >
           <ContainerXS
-            onClick={event => requirePassword && this.wrappedOnClick(event)}
+            onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && this.wrappedOnClick(event)}
             style={{
               cursor: requirePassword ? 'pointer' : 'auto',
               margin: `${marginTop}px 0 0 0`,
@@ -263,7 +263,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
                     maxLength={1024}
                     minLength={8}
                     name="password"
-                    onChange={event =>
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       this.setState({
                         password: event.target.value,
                         validPassword: true,

@@ -290,7 +290,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
               autoComplete="username"
               value={enteredName}
               ref={this.nameInput}
-              onChange={event => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 this.resetErrors();
                 this.setState({enteredName: event.target.value});
               }}

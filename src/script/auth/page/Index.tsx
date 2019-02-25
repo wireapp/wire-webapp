@@ -26,9 +26,10 @@ import {
   Link,
   Logo,
   ProfileIcon,
-  RoundContainer,
   TeamIcon,
   Text,
+  RoundIconButton,
+  ICON_NAME,
 } from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
@@ -81,9 +82,14 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
           <Columns style={{margin: '70px auto'}}>
             <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
               <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
-                <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
-                  <ProfileIcon color={COLOR.WHITE} />
-                </RoundContainer>
+                <RoundIconButton
+                  icon={ICON_NAME.PROFILE}
+                  backgroundColor={COLOR.GREEN}
+                  style={{marginBottom: 12}}
+                  size={72}
+                  iconHeight={31}
+                  iconWidth={31}
+                />
                 <Bold fontSize="24px" color={COLOR.LINK}>
                   {_(indexStrings.createAccountForPersonalUse)}
                 </Bold>
@@ -96,9 +102,13 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
             {!isMacOsWrapper && (
               <Column>
                 <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
-                  <RoundContainer style={{marginBottom: 12}}>
-                    <TeamIcon color={COLOR.WHITE} />
-                  </RoundContainer>
+                  <RoundIconButton
+                    style={{marginBottom: 12}}
+                    size={72}
+                    icon={ICON_NAME.TEAM}
+                    iconHeight={31}
+                    iconWidth={31}
+                  />
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(indexStrings.createAccountForOrganizations)}
                   </Bold>
