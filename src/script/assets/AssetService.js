@@ -224,46 +224,47 @@ export default class AssetService {
    * @returns {Promise} Resolves when asset has been uploaded
    */
   postAsset(assetData, options, xhrAccessorFunction) {
+    const BOUNDARY = 'frontier';
+
+    options = Object.assign(
+      {
+        public: false,
+        retention: z.assets.AssetRetentionPolicy.PERSISTENT,
+      },
+      options
+    );
+
+    options = JSON.stringify(options);
+
+    const body = [
+      `--${BOUNDARY}`,
+      'Content-Type: application/json; charset=utf-8',
+      `Content-length: ${options.length}`,
+      '',
+      `${options}`,
+      `--${BOUNDARY}`,
+      'Content-Type: application/octet-stream',
+      `Content-length: ${assetData.length}`,
+      `Content-MD5: ${z.util.arrayToMd5Base64(assetData)}`,
+      '',
+      '',
+    ].join('\r\n');
+
+    const footer = `\r\n--${BOUNDARY}--\r\n`;
+    const xhr = new XMLHttpRequest();
+    if (typeof xhrAccessorFunction === 'function') {
+      xhrAccessorFunction(xhr);
+    }
+    xhr.open('POST', this.backendClient.createUrl('/assets/v3'));
+    xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
+    xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
+    xhr.send(new Blob([body, assetData, footer]));
+
     return new Promise((resolve, reject) => {
-      const BOUNDARY = 'frontier';
-
-      options = Object.assign(
-        {
-          public: false,
-          retention: z.assets.AssetRetentionPolicy.PERSISTENT,
-        },
-        options
-      );
-
-      options = JSON.stringify(options);
-
-      let body = '';
-      body += `--${BOUNDARY}\r\n`;
-      body += 'Content-Type: application/json; charset=utf-8\r\n';
-      body += `Content-length: ${options.length}\r\n`;
-      body += '\r\n';
-      body += `${options}\r\n`;
-      body += `--${BOUNDARY}\r\n`;
-      body += 'Content-Type: application/octet-stream\r\n';
-      body += `Content-length: ${assetData.length}\r\n`;
-      body += `Content-MD5: ${z.util.arrayToMd5Base64(assetData)}\r\n`;
-      body += '\r\n';
-      const footer = `\r\n--${BOUNDARY}--\r\n`;
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', this.backendClient.createUrl('/assets/v3'));
-      xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
-      xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
       xhr.onload = function(event) {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };
       xhr.onerror = reject;
-
-      if (typeof xhrAccessorFunction === 'function') {
-        xhrAccessorFunction(xhr);
-      }
-
-      xhr.send(new Blob([body, assetData, footer]));
     });
   }
 
