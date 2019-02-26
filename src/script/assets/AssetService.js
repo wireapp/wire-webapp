@@ -226,7 +226,7 @@ export default class AssetService {
       'Content-Type: application/json; charset=utf-8',
       `Content-length: ${options.length}`,
       '',
-      `${options}`,
+      options,
       `--${BOUNDARY}`,
       'Content-Type: application/octet-stream',
       `Content-length: ${assetData.length}`,

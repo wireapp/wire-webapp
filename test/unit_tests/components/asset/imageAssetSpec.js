@@ -53,7 +53,7 @@ describe('image-asset', () => {
     });
   });
 
-  it('displays a dummy image when resource is not loaded', () => {
+  it('displays the image url when resource is loaded', () => {
     const image = new MediumImage();
     image.resource({load: () => Promise.resolve(new Blob())});
     const params = Object.assign({}, defaultParams, {
