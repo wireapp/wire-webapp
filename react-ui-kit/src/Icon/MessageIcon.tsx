@@ -19,12 +19,12 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import IconHOC from './IconHOC';
+import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const size = 16;
-const message = (
-  <path d="M3 0h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2.1A1 1 0 0 1 0 15V3a3 3 0 0 1 3-3z" />
+const MessageIcon = (props: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={16} {...props}>
+    <path d="M3 0h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2.1A1 1 0 0 1 0 15V3a3 3 0 0 1 3-3z" />
+  </SVGIcon>
 );
-const MessageIcon = IconHOC(message, size, size);
 
 export {MessageIcon};

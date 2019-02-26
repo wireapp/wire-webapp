@@ -21,31 +21,40 @@
 import {jsx} from '@emotion/core';
 import {COLOR} from '../Identity/colors';
 
-export interface IconHOCProps<T = SVGSVGElement> extends React.SVGProps<T> {
+interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
+  realWidth: number;
+  realHeight: number;
+}
+
+export interface SVGIconProps<T = SVGSVGElement> extends React.SVGProps<T> {
   color?: string;
   height?: number;
   scale?: number;
   width?: number;
 }
 
-function IconHOC<T>(svgBody, realWidth = 0, realHeight = 0) {
-  function wrapper<T>({color = COLOR.ICON, scale = 1, width = null, height = null, ...props}) {
-    let newScale = scale;
-    if (width || height) {
-      const widthScale = width ? width / realWidth : Infinity;
-      const heightScale = height ? height / realHeight : Infinity;
-      newScale = Math.min(widthScale, heightScale);
-    }
-    const newWidth = Math.ceil(realWidth * newScale);
-    const newHeight = Math.ceil(realHeight * newScale);
-    return (
-      <svg width={newWidth} height={newHeight} fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} {...props}>
-        {typeof svgBody === 'function' ? svgBody(props) : svgBody}
-      </svg>
-    ) as any;
+const SVGIcon = ({
+  realWidth,
+  realHeight,
+  scale = 1,
+  width = null,
+  height = null,
+  color = COLOR.ICON,
+  children,
+}: InternalSVGIconProps) => {
+  let newScale = scale;
+  if (width || height) {
+    const widthScale = width ? width / realWidth : Infinity;
+    const heightScale = height ? height / realHeight : Infinity;
+    newScale = Math.min(widthScale, heightScale);
   }
+  const newWidth = Math.ceil(realWidth * newScale);
+  const newHeight = Math.ceil(realHeight * newScale);
+  return (
+    <svg fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} width={newWidth} height={newHeight}>
+      {children}
+    </svg>
+  );
+};
 
-  return wrapper;
-}
-
-export default IconHOC;
+export {SVGIcon};
