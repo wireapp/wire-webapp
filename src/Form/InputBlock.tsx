@@ -18,27 +18,26 @@
  */
 
 /** @jsx jsx */
-import {jsx} from '@emotion/core';
+import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {INPUT_CLASSNAME} from './Input';
 import {INPUT_SUBMIT_COMBO_CLASSNAME} from './InputSubmitCombo';
 
-const InputBlock = (props: React.HTMLProps<HTMLDivElement>) => (
-  <div
-    css={{
-      '* + *': {
-        marginTop: '1px',
-      },
-      backgroundColor: COLOR.GRAY_LIGHTEN_88,
-      borderRadius: '4px',
-      boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,
-      marginBottom: '16px',
-      [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
-        margin: 0,
-      },
-    }}
-    {...props}
-  />
-);
+export interface InputBlockProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+
+const inputBlockStyle: (props: InputBlockProps) => ObjectInterpolation<undefined> = props => ({
+  '* + *': {
+    marginTop: '1px',
+  },
+  backgroundColor: COLOR.GRAY_LIGHTEN_88,
+  borderRadius: '4px',
+  boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,
+  marginBottom: '16px',
+  [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
+    margin: 0,
+  },
+});
+
+const InputBlock = (props: InputBlockProps) => <div css={inputBlockStyle(props)} {...props} />;
 
 export {InputBlock};
