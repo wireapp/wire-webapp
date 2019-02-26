@@ -19,13 +19,12 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import IconHOC from './IconHOC';
+import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const width = 16;
-const height = 12;
-const cam = (
-  <path d="M2.6 0h4.8c1 0 1.3 0 1.6.3.3.1.6.4.7.7.2.3.3.7.3 1.6v6.8c0 1 0 1.3-.3 1.6-.1.3-.4.6-.7.7-.3.2-.7.3-1.6.3H2.6c-1 0-1.3 0-1.6-.3-.3-.1-.6-.4-.7-.7-.2-.3-.3-.7-.3-1.6V2.6c0-1 0-1.3.3-1.6C.4.7.7.4 1 .3c.3-.2.7-.3 1.6-.3zm8.7 5.3l3-3A1 1 0 0 1 16 3v6a1 1 0 0 1-1.7.7l-3-3a1 1 0 0 1 0-1.4z" />
+const CamIcon = (props: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={12} {...props}>
+    <path d="M2.6 0h4.8c1 0 1.3 0 1.6.3.3.1.6.4.7.7.2.3.3.7.3 1.6v6.8c0 1 0 1.3-.3 1.6-.1.3-.4.6-.7.7-.3.2-.7.3-1.6.3H2.6c-1 0-1.3 0-1.6-.3-.3-.1-.6-.4-.7-.7-.2-.3-.3-.7-.3-1.6V2.6c0-1 0-1.3.3-1.6C.4.7.7.4 1 .3c.3-.2.7-.3 1.6-.3zm8.7 5.3l3-3A1 1 0 0 1 16 3v6a1 1 0 0 1-1.7.7l-3-3a1 1 0 0 1 0-1.4z" />
+  </SVGIcon>
 );
-const CamIcon = IconHOC(cam, width, height);
 
 export {CamIcon};

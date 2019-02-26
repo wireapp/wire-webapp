@@ -19,12 +19,12 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import IconHOC from './IconHOC';
+import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const size = 16;
-const file = (
-  <path d="M14.553 4.846l.746-.746a2.4 2.4 0 0 0-.007-3.392A2.392 2.392 0 0 0 11.9.701l-.746.746 3.399 3.399zm-.707.707L4.248 15.15 0 16l.85-4.248 9.597-9.598 3.399 3.399zM4 13.6L2 14l.4-2L4 13.6z" />
+const EditIcon = (props: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={16} {...props}>
+    <path d="M14.553 4.846l.746-.746a2.4 2.4 0 0 0-.007-3.392A2.392 2.392 0 0 0 11.9.701l-.746.746 3.399 3.399zm-.707.707L4.248 15.15 0 16l.85-4.248 9.597-9.598 3.399 3.399zM4 13.6L2 14l.4-2L4 13.6z" />
+  </SVGIcon>
 );
-const EditIcon = IconHOC(file, size, size);
 
 export {EditIcon};

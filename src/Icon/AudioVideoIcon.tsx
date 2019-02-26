@@ -19,12 +19,12 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import IconHOC from './IconHOC';
+import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const size = 16;
-const audioVideo = (
-  <path d="M0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v11c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm5 13h6v2H5v-2zm-3-4v1h3v-1H2zm0-2v1h3V8H2zm0-2v1h3V6H2zm0-2v1h3V4H2zm4.5 6v1h3v-1h-3zm0-2v1h3V8h-3zm4.5 2v1h3v-1h-3zm0-2v1h3V8h-3zm0-2v1h3V6h-3z" />
+const AudioVideoIcon = (props: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={16} {...props}>
+    <path d="M0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v11c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm5 13h6v2H5v-2zm-3-4v1h3v-1H2zm0-2v1h3V8H2zm0-2v1h3V6H2zm0-2v1h3V4H2zm4.5 6v1h3v-1h-3zm0-2v1h3V8h-3zm4.5 2v1h3v-1h-3zm0-2v1h3V8h-3zm0-2v1h3V6h-3z" />
+  </SVGIcon>
 );
-const AudioVideoIcon = IconHOC(audioVideo, size, size);
 
 export {AudioVideoIcon};

@@ -21,7 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
 import {CloseIcon} from '../Icon';
-import {IconHOCProps} from '../Icon/IconHOC';
+import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
 import media, {QueryKeys} from '../mediaQueries';
 import {filterProps, noop} from '../util';
@@ -56,7 +56,7 @@ const filterModalBodyProps = (props: Object) => filterProps(props, ['fullscreen'
 
 const ModalBody = (props: ModalBodyProps) => <div css={modalBodyStyles(props)} {...filterModalBodyProps(props)} />;
 
-const ModalClose = (props: IconHOCProps<SVGSVGElement>) => (
+const ModalClose = (props: SVGIconProps<SVGSVGElement>) => (
   <CloseIcon
     css={{
       alignItems: 'center',
