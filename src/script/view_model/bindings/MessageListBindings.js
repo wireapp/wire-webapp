@@ -17,8 +17,11 @@
  *
  */
 
+import ko from 'knockout';
 import moment from 'moment';
+import {debounce} from 'underscore';
 
+import 'jquery-mousewheel';
 import viewportObserver from '../../ui/viewportObserver';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
@@ -73,6 +76,65 @@ ko.bindingHandlers.showAllTimestamps = {
 
     element.addEventListener('mouseenter', () => toggleShowTimeStamp(true));
     element.addEventListener('mouseleave', () => toggleShowTimeStamp(false));
+  },
+};
+
+ko.bindingHandlers.infinite_scroll = {
+  init(scrollingElement, params) {
+    const {onHitTop, onHitBottom} = params();
+
+    let scrollListenerEnabled = false;
+    const disableScrollListener = debounce(() => (scrollListenerEnabled = false), 500);
+    const temporarlyEnableScrollListener = () => {
+      scrollListenerEnabled = true;
+      disableScrollListener();
+    };
+
+    const onScroll = event => {
+      if (!scrollListenerEnabled) {
+        return;
+      }
+      const element = event.target;
+
+      // On some HDPI screen scrollTop returns a floating point number instead of an integer
+      // https://github.com/jquery/api.jquery.com/issues/608
+      const scrollPosition = Math.ceil(element.scrollTop);
+      const scrollEnd = element.offsetHeight + scrollPosition;
+      const hitTop = scrollPosition <= 0;
+      const hitBottom = scrollEnd >= element.scrollHeight;
+
+      if (hitTop) {
+        onHitTop();
+      } else if (hitBottom) {
+        onHitBottom();
+      }
+    };
+
+    const onMouseWheel = event => {
+      /**
+       * To avoid reacting to programmatically triggered scroll, we just want to enable the scroll listener when there is a mouse event before it.
+       * The strategy here is to enable the scroll listener when there is a mouse event and automatically disable the listener after 500ms of inactivity of the mouse.
+       */
+      temporarlyEnableScrollListener();
+      const element = $(event.currentTarget);
+      if (element.isScrollable()) {
+        // if the element is scrollable, the scroll event will take the relay
+        return true;
+      }
+      const isScrollingUp = event.deltaY > 0;
+      if (isScrollingUp) {
+        return onHitTop();
+      }
+      return onHitBottom();
+    };
+
+    scrollingElement.addEventListener('scroll', onScroll);
+    $(scrollingElement).on('mousewheel', onMouseWheel);
+
+    ko.utils.domNodeDisposal.addDisposeCallback(scrollingElement, () => {
+      scrollingElement.removeEventListener('scroll', onScroll);
+      $(scrollingElement).off('mousewheel', onMouseWheel);
+    });
   },
 };
 

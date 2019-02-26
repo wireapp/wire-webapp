@@ -23,15 +23,8 @@ import TimeUtil from 'utils/TimeUtil';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
-/* eslint-disable no-unused-vars */
-import mousewheel from 'jquery-mousewheel';
-/* eslint-enable no-unused-vars */
 
 import Conversation from '../../entity/Conversation';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
 
 /**
  * Message list rendering view model.
@@ -39,7 +32,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jQuery selectors
  */
-z.viewModel.content.MessageListViewModel = class MessageListViewModel {
+class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
@@ -61,7 +54,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
@@ -83,9 +76,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     // Store conversation to mark as read when browser gets focus
     this.mark_as_read_on_focus = undefined;
 
-    // Can be used to prevent scroll handler from being executed (e.g. when using scrollTop())
-    this.capture_scrolling_event = false;
-
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
 
@@ -106,46 +96,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     // Store message subscription id
     this.messagesChangeSubscription = undefined;
     this.messagesBeforeChangeSubscription = undefined;
-
-    this.onMouseWheel = _.throttle((data, event) => {
-      const element = $(event.currentTarget);
-      if (element.isScrollable()) {
-        // if the element is scrollable, the scroll event will take the relay
-        return true;
-      }
-      const isScrollingUp = event.deltaY > 0;
-      if (isScrollingUp) {
-        this._loadPrecedingMessages();
-      } else {
-        this._loadFollowingMessages();
-      }
-
-      return true;
-    }, 50);
-
-    this.onScroll = _.throttle((data, event) => {
-      if (!this.capture_scrolling_event) {
-        return;
-      }
-      const element = $(event.currentTarget);
-
-      // On some HDPI screen scrollTop returns a floating point number instead of an integer
-      // https://github.com/jquery/api.jquery.com/issues/608
-      const scrollPosition = Math.ceil(element.scrollTop());
-      const scrollEnd = element.scrollEnd();
-      const hitTop = scrollPosition <= 0;
-      const hitBottom = scrollPosition >= scrollEnd;
-
-      if (hitTop) {
-        return this._loadPrecedingMessages();
-      }
-
-      if (hitBottom) {
-        this._loadFollowingMessages().then(() => {
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        });
-      }
-    }, 100);
 
     this.messagesContainer = undefined;
 
@@ -192,7 +142,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (this.messagesChangeSubscription) {
       this.messagesChangeSubscription.dispose();
     }
-    this.capture_scrolling_event = false;
     this.conversation_last_read_timestamp(false);
     this.messagesContainer = undefined;
     window.removeEventListener('resize', this._handleWindowResize);
@@ -314,7 +263,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           this._mark_conversation_as_read_on_focus(this.conversation());
         }
 
-        this.capture_scrolling_event = true;
         window.addEventListener('resize', this._handleWindowResize);
 
         let shouldStickToBottomOnMessageAdd;
@@ -401,12 +349,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (shouldPullMessages && messagesContainer) {
       const initialListHeight = messagesContainer.scrollHeight;
 
-      this.capture_scrolling_event = false;
       return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         if (messagesContainer) {
           const newListHeight = messagesContainer.scrollHeight;
           this.getMessagesContainer().scrollTop(newListHeight - initialListHeight);
-          this.capture_scrolling_event = true;
         }
       });
     }
@@ -421,10 +367,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     const last_message = this.conversation().getLastMessage();
 
     if (last_message && this._conversationHasExtraMessages(this.conversation())) {
-      this.capture_scrolling_event = false;
-      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(() => {
-        this.capture_scrolling_event = true;
-      });
+      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false);
     }
     return Promise.resolve();
   }
@@ -686,4 +629,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
   }
-};
+}
+
+export default MessageListViewModel;
