@@ -19,6 +19,7 @@
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import TERMINATION_REASON from '../../calling/enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -120,7 +121,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   }
 
   onLeaveCall() {
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.conversation.id, z.calling.enum.TERMINATION_REASON.SELF_USER);
+    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.conversation.id, TERMINATION_REASON.SELF_USER);
   }
 
   onMaximizeVideoGrid() {

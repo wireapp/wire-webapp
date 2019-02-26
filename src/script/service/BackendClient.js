@@ -17,6 +17,7 @@
  *
  */
 
+import TimeUtil from 'utils/TimeUtil';
 import PromiseQueue from 'utils/PromiseQueue';
 import TimeUtil from 'utils/TimeUtil';
 

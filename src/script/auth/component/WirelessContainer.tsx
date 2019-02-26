@@ -25,7 +25,7 @@ import EXTERNAL_ROUTE from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;
-  onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
@@ -53,7 +53,7 @@ export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
       >
         <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
           <Link
-            onClick={onCookiePolicyBannerClose}
+            onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose(event)}
             href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
             style={{fontSize: '16px'}}
             target="_blank"
@@ -65,7 +65,7 @@ export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
           </Link>
         </div>
         <div
-          onClick={onCookiePolicyBannerClose}
+          onClick={(event: React.MouseEvent<HTMLDivElement>) => onCookiePolicyBannerClose(event)}
           style={{cursor: 'pointer', padding: '16px', position: 'absolute', right: 0, top: 0}}
           data-uie-name="do-close-cookie-banner"
         >

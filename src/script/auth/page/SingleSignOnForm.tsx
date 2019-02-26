@@ -82,7 +82,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
   private static readonly SSO_CODE_PREFIX = 'wire-';
   private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
-  private readonly inputs: {code: React.RefObject<HTMLInputElement>} = {code: React.createRef()};
+  private readonly inputs: {code: React.RefObject<any>} = {code: React.createRef()};
   state: State = {
     code: '',
     isOverlayOpen: false,
@@ -273,13 +273,13 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
           <Input
             name="sso-code"
             tabIndex={1}
-            onChange={event =>
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               this.setState({
                 code: event.target.value,
                 validInputs: {...validInputs, code: true},
               })
             }
-            innerRef={this.inputs.code}
+            ref={this.inputs.code}
             markInvalid={!validInputs.code}
             placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
             value={code}

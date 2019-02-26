@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,26 @@
  *
  */
 
-import CALL_STATE from './CallState';
+import {memoize} from 'underscore';
 
-const CALL_STATE_GROUP = {
-  CAN_CONNECT: [CALL_STATE.INCOMING, CALL_STATE.ONGOING, CALL_STATE.REJECTED],
-  CAN_JOIN: [CALL_STATE.INCOMING, CALL_STATE.REJECTED],
-  IS_ACTIVE: [
-    CALL_STATE.CONNECTING,
-    CALL_STATE.DISCONNECTING,
-    CALL_STATE.INCOMING,
-    CALL_STATE.ONGOING,
-    CALL_STATE.OUTGOING,
-  ],
-  IS_ENDED: [CALL_STATE.ENDED, CALL_STATE.UNKNOWN],
-  UNANSWERED: [CALL_STATE.INCOMING, CALL_STATE.OUTGOING],
-};
+export default class RichProfileRepository {
+  static get URL() {
+    return {
+      RICH_INFO: '/users/:id/rich-info',
+    };
+  }
 
-export default CALL_STATE_GROUP;
+  constructor(backendClient, logger) {
+    this.backendClient = backendClient;
+    this.logger = logger;
+
+    this.getUserRichProfile = memoize(this.getUserRichProfile);
+  }
+
+  getUserRichProfile(userId) {
+    return this.backendClient.sendRequest({
+      type: 'GET',
+      url: RichProfileRepository.URL.RICH_INFO.replace(':id', userId),
+    });
+  }
+}

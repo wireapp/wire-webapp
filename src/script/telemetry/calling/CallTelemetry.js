@@ -85,7 +85,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
-   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */

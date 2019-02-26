@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,12 @@
  *
  */
 
-import CALL_STATE from './CallState';
+import {Link, LinkProps as UILinkProps} from '@wireapp/react-ui-kit';
+import React from 'react';
+import {Link as RRLink, LinkProps as RouterLinkProps} from 'react-router-dom';
 
-const CALL_STATE_GROUP = {
-  CAN_CONNECT: [CALL_STATE.INCOMING, CALL_STATE.ONGOING, CALL_STATE.REJECTED],
-  CAN_JOIN: [CALL_STATE.INCOMING, CALL_STATE.REJECTED],
-  IS_ACTIVE: [
-    CALL_STATE.CONNECTING,
-    CALL_STATE.DISCONNECTING,
-    CALL_STATE.INCOMING,
-    CALL_STATE.ONGOING,
-    CALL_STATE.OUTGOING,
-  ],
-  IS_ENDED: [CALL_STATE.ENDED, CALL_STATE.UNKNOWN],
-  UNANSWERED: [CALL_STATE.INCOMING, CALL_STATE.OUTGOING],
-};
+interface LinkProps extends UILinkProps, RouterLinkProps {}
 
-export default CALL_STATE_GROUP;
+const RouterLink = (props: LinkProps) => <Link component={RRLink} {...props} />;
+
+export {RouterLink};

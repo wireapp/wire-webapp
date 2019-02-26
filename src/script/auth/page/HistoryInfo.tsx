@@ -75,7 +75,7 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
           onClick={onContinue}
           autoFocus
           data-uie-name="do-history-confirm"
-          onKeyDown={event => {
+          onKeyDown={(event: React.KeyboardEvent) => {
             if (event.key === 'Enter') {
               onContinue();
             }

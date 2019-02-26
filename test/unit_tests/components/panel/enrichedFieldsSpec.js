@@ -18,6 +18,8 @@
  */
 
 import {instantiateComponent} from '../../../api/knockoutHelpers';
+import UUID from 'uuidjs';
+import {resolve, graph} from '../../../api/testResolver';
 
 import 'src/script/components/panel/enrichedFields';
 
@@ -25,29 +27,27 @@ const entriesListSelector = '.enriched-fields__entry';
 
 describe('enriched-fields', () => {
   it('displays all the given fields', () => {
-    const params = {
-      participant: () => ({extendedFields: () => ({field1: 'value1', field2: 'value2'})}),
-    };
+    const richProfileRepository = resolve(graph.RichProfileRepository);
+    const params = {userId: UUID.genV4().hexString};
 
-    return instantiateComponent('enriched-fields', params).then(domContainer => {
-      const fields = domContainer.querySelectorAll(entriesListSelector);
-
-      expect(fields.length).toBe(2);
-    });
-  });
-
-  it('updates live if the fields are updated', () => {
-    const extendedFields = ko.observable({field1: 'value1', field2: 'value2'});
-    const params = {
-      participant: () => ({extendedFields}),
-    };
+    spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
+      Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]})
+    );
 
     return instantiateComponent('enriched-fields', params).then(domContainer => {
       expect(domContainer.querySelectorAll(entriesListSelector).length).toBe(2);
+    });
+  });
 
-      extendedFields({field1: 'value1', field2: 'value2', field3: 'value3'});
+  it('calls the `onFieldsLoaded` function when fields are loaded', () => {
+    const richProfileRepository = resolve(graph.RichProfileRepository);
+    const params = {onFieldsLoaded: () => {}, userId: UUID.genV4().hexString};
+    const richProfile = {fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]};
+    spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(Promise.resolve(richProfile));
+    spyOn(params, 'onFieldsLoaded');
 
-      expect(domContainer.querySelectorAll(entriesListSelector).length).toBe(3);
+    return instantiateComponent('enriched-fields', params).then(() => {
+      expect(params.onFieldsLoaded).toHaveBeenCalledWith(richProfile.fields);
     });
   });
 });

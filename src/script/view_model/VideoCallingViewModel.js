@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 import trackingHelpers from '../tracking/Helpers';
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -243,7 +244,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   clickedOnLeaveCall() {
     if (this.joinedCall()) {
-      const reason = z.calling.enum.TERMINATION_REASON.SELF_USER;
+      const reason = TERMINATION_REASON.SELF_USER;
       amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.joinedCall().id, reason);
     }
   }

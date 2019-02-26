@@ -39,8 +39,8 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {teamNameStrings} from '../../strings';
+import {RouterLink} from '../component/RouterLink';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import ValidationError from '../module/action/ValidationError';
@@ -71,7 +71,7 @@ interface State {
 }
 
 class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  private teamNameInput: HTMLInputElement;
+  private readonly teamNameInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredTeamName: this.props.teamName || '',
     error: null,
@@ -84,14 +84,14 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
 
   handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    this.teamNameInput.value = this.teamNameInput.value.trim();
-    if (!this.teamNameInput.checkValidity()) {
+    this.teamNameInput.current.value = this.teamNameInput.current.value.trim();
+    if (!this.teamNameInput.current.checkValidity()) {
       this.setState({
-        error: ValidationError.handleValidationState('name', this.teamNameInput.validity),
+        error: ValidationError.handleValidationState('name', this.teamNameInput.current.validity),
         isValidTeamName: false,
       });
     } else {
-      Promise.resolve(this.teamNameInput.value)
+      Promise.resolve(this.teamNameInput.current.value)
         .then(teamName => teamName.trim())
         .then(teamName =>
           this.props.pushAccountRegistrationData({
@@ -106,7 +106,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
         )
         .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
-    this.teamNameInput.focus();
+    this.teamNameInput.current.focus();
   };
 
   resetErrors = () => {
@@ -120,9 +120,9 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
     } = this.props;
     const {enteredTeamName, isValidTeamName, error} = this.state;
     const backArrow = (
-      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
+      <RouterLink to={ROUTE.INDEX} data-uie-name="go-register-team">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
+      </RouterLink>
     );
     return (
       <Page>
@@ -148,8 +148,8 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
                     <InputSubmitCombo>
                       <Input
                         value={enteredTeamName}
-                        innerRef={node => (this.teamNameInput = node)}
-                        onChange={event => {
+                        ref={this.teamNameInput}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                           this.resetErrors();
                           this.setState({enteredTeamName: event.target.value});
                         }}

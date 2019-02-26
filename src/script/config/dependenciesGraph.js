@@ -30,6 +30,7 @@ import MediaRepository from '../media/MediaRepository';
 import PermissionRepository from '../permission/PermissionRepository';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
+import RichProfileRepository from '../user/RichProfileRepository';
 import SelfService from '../self/SelfService';
 import ServerTimeRepository from '../time/ServerTimeRepository';
 import StorageService from '../storage/StorageService';
@@ -54,6 +55,7 @@ dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: '
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(ServerTimeRepository, {dependencies: [], name: 'ServerTimeRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
@@ -71,6 +73,7 @@ export {
   GiphyRepository,
   GiphyService,
   MediaRepository,
+  RichProfileRepository,
   PermissionRepository,
   PropertiesRepository,
   PropertiesService,

@@ -46,9 +46,9 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
-import {Link as RRLink} from 'react-router-dom';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
 import * as config from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
@@ -108,9 +108,12 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class Login extends React.Component<CombinedProps, State> {
   private readonly inputs: {
-    email?: HTMLInputElement;
-    password?: HTMLInputElement;
-  } = {};
+    email: React.RefObject<any>;
+    password: React.RefObject<any>;
+  } = {
+    email: React.createRef(),
+    password: React.createRef(),
+  };
 
   state: State = {
     conversationCode: null,
@@ -199,15 +202,17 @@ class Login extends React.Component<CombinedProps, State> {
     if (this.props.isFetching) {
       return undefined;
     }
-    this.inputs.email.value = this.inputs.email.value.trim();
+    this.inputs.email.current.value = this.inputs.email.current.value.trim();
     const validationErrors: Error[] = [];
     const validInputs: {[field: string]: boolean} = this.state.validInputs;
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
-      if (!currentInput.checkValidity()) {
-        validationErrors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
+      if (!currentInput.current.checkValidity()) {
+        validationErrors.push(
+          ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity)
+        );
       }
-      validInputs[inputKey] = currentInput.validity.valid;
+      validInputs[inputKey] = currentInput.current.validity.valid;
     });
 
     this.setState({validInputs, validationErrors});
@@ -306,9 +311,9 @@ class Login extends React.Component<CombinedProps, State> {
     } = this.props;
     const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     const backArrow = (
-      <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+      <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
         <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </Link>
+      </RouterLink>
     );
     const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
@@ -340,13 +345,13 @@ class Login extends React.Component<CombinedProps, State> {
                       <Input
                         name="email"
                         tabIndex={1}
-                        onChange={event =>
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                           this.setState({
                             email: event.target.value,
                             validInputs: {...validInputs, email: true},
                           })
                         }
-                        innerRef={node => (this.inputs.email = node)}
+                        ref={this.inputs.email}
                         markInvalid={!validInputs.email}
                         value={email}
                         autoComplete="section-login email"
@@ -360,13 +365,13 @@ class Login extends React.Component<CombinedProps, State> {
                         <Input
                           name="password-login"
                           tabIndex={2}
-                          onChange={event =>
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             this.setState({
                               password: event.target.value,
                               validInputs: {...validInputs, password: true},
                             })
                           }
-                          innerRef={node => (this.inputs.password = node)}
+                          ref={this.inputs.password}
                           markInvalid={!validInputs.password}
                           value={password}
                           autoComplete="section-login password"
@@ -407,7 +412,9 @@ class Login extends React.Component<CombinedProps, State> {
                     {!isDesktopApp() && (
                       <Checkbox
                         tabIndex={3}
-                        onChange={event => this.setState({persist: !event.target.checked})}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                          this.setState({persist: !event.target.checked})
+                        }
                         checked={!persist}
                         data-uie-name="enter-public-computer-sign-in"
                         style={{justifyContent: 'center', marginTop: '12px'}}
@@ -424,9 +431,9 @@ class Login extends React.Component<CombinedProps, State> {
                     </Link>
                     <Columns style={{marginTop: '36px'}}>
                       <Column>
-                        <Link to="/sso" component={RRLink} data-uie-name="go-sign-in-sso">
+                        <RouterLink to="/sso" data-uie-name="go-sign-in-sso">
                           {_(loginStrings.ssoLogin)}
-                        </Link>
+                        </RouterLink>
                       </Column>
                       {config.FEATURE.ENABLE_PHONE_LOGIN && (
                         <Column>

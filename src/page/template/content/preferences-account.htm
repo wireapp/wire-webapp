@@ -106,13 +106,11 @@
       <!-- /ko -->
     </section>
 
-    <!-- ko if: showInfoSection() -->
-      <section class="preferences-section preferences-section-info" data-uie-name="preferences-info-section">
-        <hr class="preferences-separator">
-        <header class="preferences-header" data-bind="text: t('preferencesAccountInfo')"></header>
-        <enriched-fields params="participant: selfUser"></enriched-fields>
-      </section>
-    <!-- /ko -->
+    <section class="preferences-section preferences-section-info" data-uie-name="preferences-info-section" data-bind="hidden: !richProfileFields">
+      <hr class="preferences-separator">
+      <header class="preferences-header" data-bind="text: t('preferencesAccountInfo')"></header>
+      <enriched-fields params="userId: selfUser().id, onFieldsLoaded: richProfileFields"></enriched-fields>
+    </section>
 
     <!-- ko if: isConsentCheckEnabled() -->
       <section class="preferences-section preferences-section-data-usage">

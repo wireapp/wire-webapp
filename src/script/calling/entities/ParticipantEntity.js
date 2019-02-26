@@ -18,6 +18,8 @@
  */
 
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import PROPERTY_STATE from '../enum/PropertyState';
+import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -27,12 +29,8 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
   static get CONFIG() {
     return {
       PROPERTY_STATES: {
-        ACTIVE: [z.calling.enum.PROPERTY_STATE.PAUSED, z.calling.enum.PROPERTY_STATE.TRUE],
-        EXPECTED: [
-          z.calling.enum.PROPERTY_STATE.FALSE,
-          z.calling.enum.PROPERTY_STATE.PAUSED,
-          z.calling.enum.PROPERTY_STATE.TRUE,
-        ],
+        ACTIVE: [PROPERTY_STATE.PAUSED, PROPERTY_STATE.TRUE],
+        EXPECTED: [PROPERTY_STATE.FALSE, PROPERTY_STATE.PAUSED, PROPERTY_STATE.TRUE],
       },
     };
   }
@@ -62,9 +60,9 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.wasConnected = false;
 
     this.state = {
-      audioSend: ko.observable(z.calling.enum.PROPERTY_STATE.TRUE),
-      screenSend: ko.observable(z.calling.enum.PROPERTY_STATE.FALSE),
-      videoSend: ko.observable(z.calling.enum.PROPERTY_STATE.FALSE),
+      audioSend: ko.observable(PROPERTY_STATE.TRUE),
+      screenSend: ko.observable(PROPERTY_STATE.FALSE),
+      videoSend: ko.observable(PROPERTY_STATE.FALSE),
     };
 
     this.activeState = {
@@ -123,7 +121,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
 
       const isGroupStart = type === CALL_MESSAGE_TYPE.GROUP_START;
       if (isGroupStart && this.flowEntity.pcInitialized()) {
-        this.flowEntity.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
+        this.flowEntity.restartNegotiation(SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
       }
 
       return rtcSdp ? this.flowEntity.saveRemoteSdp(callMessageEntity) : false;
