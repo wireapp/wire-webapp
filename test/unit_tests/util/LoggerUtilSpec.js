@@ -11,7 +11,6 @@ describe('enableLogging', () => {
       },
     };
 
-    expect(localStorage.getItem('debug')).toBe(null);
     enableLogging(mockedURL);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
@@ -25,6 +24,7 @@ describe('enableLogging', () => {
       },
     };
     localStorage.setItem('debug', namespace);
+
     enableLogging(mockedURL);
 
     expect(localStorage.getItem('debug')).toBe(null);
