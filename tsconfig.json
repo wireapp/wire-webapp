@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "declaration": false,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,8 +15,7 @@
     "outDir": "src/script/auth",
     "rootDirs": ["src/script"],
     "sourceMap": true,
-    "target": "es6",
-    "allowSyntheticDefaultImports": true
+    "target": "es6"
   },
   "exclude": ["node_modules", "server"]
 }
