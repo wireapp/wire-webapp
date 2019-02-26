@@ -30,7 +30,7 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   placeholderTextTransform?: TextTransformProperty;
 }
 
-const inputStyle: (props: InputProps) => ObjectInterpolation<undefined> = ({
+const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = ({
   markInvalid = false,
   placeholderTextTransform = 'uppercase',
   disabled = false,

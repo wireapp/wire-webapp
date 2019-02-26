@@ -34,7 +34,7 @@ const ArrowDown = `
 `;
 
 const selectStyle: (props: SelectProps) => ObjectInterpolation<undefined> = ({disabled = false, ...props}) => ({
-  ...inputStyle(props as any),
+  ...inputStyle(props),
   '&:-moz-focusring': {
     color: 'transparent',
     textShadow: '0 0 0 #000',

@@ -37,7 +37,7 @@ const filterButtonLinkProps = (props: Object) => {
   return filterProps(filterTextProps(props), ['backgroundColor', 'disabled', 'noCapital']);
 };
 
-const buttonStyles: (props: ButtonProps) => ObjectInterpolation<undefined> = ({
+const buttonStyles: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> = ({
   backgroundColor = COLOR.BLUE,
   block = false,
   disabled = false,
@@ -86,7 +86,7 @@ const buttonStyles: (props: ButtonProps) => ObjectInterpolation<undefined> = ({
 });
 
 const buttonLinkStyles: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
-  ...buttonStyles(props as any),
+  ...buttonStyles(props),
   display: 'inline-block !important',
 });
 
