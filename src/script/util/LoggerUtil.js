@@ -17,11 +17,16 @@
  *
  */
 
-import '../../ext/js/webapp-module-logger/Logger.js';
-import {amplify} from 'amplify';
-import moment from 'moment';
+import 'url-search-params-polyfill';
 
-window.amplify = amplify; // The logger needs amplify to be on the root scope
-window.moment = moment; // The logger needs moment to be on the root scope
+function enableLogging(location = window.location.href) {
+  const namespace = new URL(location).searchParams.get('enableLogging');
 
-export default z.util.Logger;
+  if (namespace) {
+    localStorage.setItem('debug', namespace);
+  } else {
+    localStorage.removeItem('debug');
+  }
+}
+
+export {enableLogging};
