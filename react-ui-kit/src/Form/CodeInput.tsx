@@ -46,9 +46,10 @@ const digitInputStyle: <T>(props: DigitInputProps<T>) => ObjectInterpolation<und
   width: '48px',
 });
 
-const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps>((props, ref) => (
-  <input ref={ref} css={digitInputStyle(props)} {...props} />
-));
+const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef<
+  HTMLInputElement,
+  DigitInputProps<HTMLInputElement>
+>((props, ref) => <input ref={ref} css={digitInputStyle(props)} {...props} />);
 
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
