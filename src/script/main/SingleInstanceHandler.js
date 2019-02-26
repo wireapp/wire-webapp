@@ -92,7 +92,7 @@ z.main.SingleInstanceHandler = (() => {
      * invoked once the registering of the current instance has been done.
      *
      * @throws {Error} - When the current app has already been registered.
-     * @returns {boolean} - Returns nothing.
+     * @returns {boolean} - True, if the webapp is running in another browser tab.
      */
     hasOtherRunningInstance() {
       if (this.instanceId) {

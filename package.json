@@ -2,7 +2,6 @@
   "name": "wire-webapp",
   "license": "GPL-3.0",
   "dependencies": {
-    "@types/js-cookie": "2.2.1",
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
@@ -54,6 +53,7 @@
     "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.13.2"
   },
   "devDependencies": {
+    "@types/js-cookie": "2.2.1",
     "@babel/core": "7.3.3",
     "@babel/plugin-proposal-class-properties": "7.3.3",
     "@babel/preset-env": "7.3.1",
