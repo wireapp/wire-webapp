@@ -2,6 +2,7 @@
   "name": "wire-webapp",
   "license": "GPL-3.0",
   "dependencies": {
+    "@types/js-cookie": "2.2.1",
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.2",
