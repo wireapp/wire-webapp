@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import poster from 'poster-image';
 import {
@@ -60,7 +61,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationRepository = class ConversationRepository {
   static get CONFIG() {
     return {
-      CONFIRMATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
+      CONFIRMATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.WEEK,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
@@ -2806,7 +2807,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
-        const upload_duration = (Date.now() - upload_started) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const upload_duration = (Date.now() - upload_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
       })
       .catch(error => {
@@ -3959,7 +3960,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;
       messageTimer =
-        genericMessage[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+        genericMessage[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TimeUtil.UNITS_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;

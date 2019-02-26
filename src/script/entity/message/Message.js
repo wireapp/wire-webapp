@@ -23,6 +23,7 @@ import AssetTransferState from '../../assets/AssetTransferState';
 import AssetType from '../../assets/AssetType';
 import EphemeralStatusType from '../../message/EphemeralStatusType';
 import User from '../User';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -45,7 +46,7 @@ class Message {
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? z.util.TimeUtil.formatDurationCaption(remainingTime) : '';
+      return remainingTime ? TimeUtil.formatDurationCaption(remainingTime) : '';
     });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
@@ -95,7 +96,7 @@ class Message {
     this.category = undefined;
 
     this.display_timestamp_short = () => {
-      const date = moment.unix(this.timestamp() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+      const date = moment.unix(this.timestamp() / TimeUtil.UNITS_IN_MILLIS.SECOND);
       return date.local().format('HH:mm');
     };
 

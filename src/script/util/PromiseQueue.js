@@ -18,11 +18,12 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 export default class PromiseQueue {
   static get CONFIG() {
     return {
-      UNBLOCK_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      UNBLOCK_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 

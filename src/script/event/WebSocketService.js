@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
 
@@ -42,8 +43,8 @@ z.event.WebSocketService = class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
+      PING_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      RECONNECT_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
     };
   }
 

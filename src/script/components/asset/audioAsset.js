@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
@@ -60,6 +61,8 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
 
     this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
+
+    this.TimeUtil = TimeUtil;
   }
 
   on_timeupdate() {
@@ -116,7 +119,7 @@ ko.components.register('audio-asset', {
           <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOADING -->
             <span class="audio-controls-time label-xs"
                   data-uie-name="status-audio-time"
-                  data-bind="text: z.util.TimeUtil.formatSeconds(audio_time())">
+                  data-bind="text: TimeUtil.formatSeconds(audio_time())">
             </span>
             <!-- ko if: show_loudness_preview -->
               <audio-seek-bar data-uie-name="status-audio-seekbar"

@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
 
@@ -56,6 +57,8 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
     this.displaySmall = ko.observable(!!params.isQuote);
+
+    this.TimeUtil = TimeUtil;
   }
 
   on_loadedmetadata() {
@@ -163,7 +166,7 @@ ko.components.register('video-asset', {
             </div>
             <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
               <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
-              <span class="video-controls-time label-xs" data-bind="text: z.util.TimeUtil.formatSeconds(video_time_rest())" data-uie-name="status-video-time"></span>
+              <span class="video-controls-time label-xs" data-bind="text: TimeUtil.formatSeconds(video_time_rest())" data-uie-name="status-video-time"></span>
             </div>
           <!-- /ko -->
         <!-- /ko -->

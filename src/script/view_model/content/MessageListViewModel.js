@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 
+import TimeUtil from 'utils/TimeUtil';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
@@ -153,7 +154,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         window.setTimeout(() => {
           this.conversation_repository.markAsRead(this.mark_as_read_on_focus);
           this.mark_as_read_on_focus = undefined;
-        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
       }
     });
 

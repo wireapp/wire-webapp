@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 import trackingHelpers from '../tracking/Helpers';
 import TERMINATION_REASON from '../calling/enum/TerminationReason';
 
@@ -27,8 +28,8 @@ window.z.viewModel = z.viewModel || {};
 z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   static get CONFIG() {
     return {
-      AUTO_MINIMIZE_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
-      HIDE_CONTROLS_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
+      AUTO_MINIMIZE_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
+      HIDE_CONTROLS_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
     };
   }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {t, setStrings} from 'utils/LocalizerUtil';
+import {t} from 'utils/LocalizerUtil';
 import 'src/script/localization/Localizer';
 
 import Conversation from 'src/script/entity/Conversation';
@@ -28,9 +28,6 @@ window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 
 describe('z.notification.NotificationRepository', () => {
-  setStrings({
-    ephemeralUnitsSeconds: 'seconds',
-  });
   const test_factory = new TestFactory();
   let conversation_et = null;
   let message_et = null;

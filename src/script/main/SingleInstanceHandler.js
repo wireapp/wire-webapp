@@ -19,6 +19,8 @@
 
 //@ts-check
 
+import TimeUtil from 'utils/TimeUtil';
+
 window.z = window.z || {};
 window.z.main = z.main || {};
 
@@ -27,7 +29,7 @@ z.main.SingleInstanceHandler = (() => {
 
   const CONFIG = {
     COOKIE_NAME: 'app_opened',
-    INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+    INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND,
   };
 
   return class SingleInstanceHandler {

@@ -18,6 +18,7 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
+import TimeUtil from 'utils/TimeUtil';
 
 /**
  * Constructs corresponding asset metadata depending on the given file type
@@ -50,7 +51,7 @@ const buildMetadataAudio = audioFile => {
       return audioContext.decodeAudioData(buffer);
     })
     .then(audioBuffer => {
-      const durationInMillis = audioBuffer.duration * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+      const durationInMillis = audioBuffer.duration * TimeUtil.UNITS_IN_MILLIS.SECOND;
       const normalizedLoudness = normaliseLoudness(audioBuffer);
       return new Asset.AudioMetaData({durationInMillis, normalizedLoudness});
     });
