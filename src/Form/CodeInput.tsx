@@ -41,6 +41,7 @@ const digitInputStyle: (props: DigitInputProps) => ObjectInterpolation<undefined
   },
   fontSize: '32px',
   lineHeight: '56px',
+  padding: 0,
   textAlign: 'center',
   width: '48px',
 });

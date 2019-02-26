@@ -51,7 +51,7 @@ const filterTextProps = (props: Object) => {
   ]);
 };
 
-export const textStyles: (props: TextProps) => ObjectInterpolation<undefined> = ({
+export const textStyles: <T>(props: TextProps<T>) => ObjectInterpolation<undefined> = ({
   block = false,
   bold = false,
   center = false,

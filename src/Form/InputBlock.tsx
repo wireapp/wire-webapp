@@ -26,15 +26,15 @@ import {INPUT_SUBMIT_COMBO_CLASSNAME} from './InputSubmitCombo';
 const InputBlock = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
     css={{
+      '* + *': {
+        marginTop: '1px',
+      },
       backgroundColor: COLOR.GRAY_LIGHTEN_88,
       borderRadius: '4px',
       boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,
       marginBottom: '16px',
-      [`& > ${INPUT_CLASSNAME}`]: {
+      [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
         margin: 0,
-      },
-      [`& > ${INPUT_CLASSNAME} + ${INPUT_CLASSNAME}, & > ${INPUT_CLASSNAME} + ${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
-        margin: '1px 0 0',
       },
     }}
     {...props}
