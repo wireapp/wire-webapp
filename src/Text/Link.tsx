@@ -30,7 +30,7 @@ export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {
   component?: React.ComponentType | string;
 }
 
-const linkStyles: (props: LinkProps) => ObjectInterpolation<undefined> = ({
+const linkStyles: <T>(props: LinkProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   color = COLOR.LINK,
   fontSize = '11px',

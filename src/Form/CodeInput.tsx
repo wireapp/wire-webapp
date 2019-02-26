@@ -34,7 +34,7 @@ const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
 
 interface DigitInputProps<T = HTMLInputElement> extends InputProps<T> {}
 
-const digitInputStyle: (props: DigitInputProps) => ObjectInterpolation<undefined> = props => ({
+const digitInputStyle: <T>(props: DigitInputProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...inputStyle(props),
   '& + &': {
     marginLeft: '19px',
@@ -46,7 +46,7 @@ const digitInputStyle: (props: DigitInputProps) => ObjectInterpolation<undefined
   width: '48px',
 });
 
-const DigitInput = React.forwardRef((props: DigitInputProps, ref: React.Ref<HTMLInputElement>) => (
+const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps>((props, ref) => (
   <input ref={ref} css={digitInputStyle(props)} {...props} />
 ));
 

@@ -26,7 +26,7 @@ import media, {QueryKeys} from '../mediaQueries';
 import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyles} from '../Modal/Overlay';
 import {noop} from '../util';
 
-const menuModalWrapperStyles: (props: OverlayWrapperProps) => ObjectInterpolation<undefined> = props => ({
+const menuModalWrapperStyles: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...overlayBackgroundStyles(props),
   alignItems: 'flex-end',
   alignSelf: 'flex-end',
@@ -78,7 +78,7 @@ const MenuModalContent = (props: React.HTMLProps<HTMLUListElement>) => (
   />
 );
 
-const modalBackgroundStyles: (props: OverlayBackgroundProps) => ObjectInterpolation<undefined> = props => ({
+const modalBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...overlayBackgroundStyles(props),
   background: 'rgba(50, 54, 57, 0.4)',
 });

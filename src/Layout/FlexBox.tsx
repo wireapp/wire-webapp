@@ -28,7 +28,7 @@ export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   flexWrap?: FlexWrapProperty;
 }
 
-const flexBoxStyles: (props: FlexBoxProps) => ObjectInterpolation<undefined> = ({
+const flexBoxStyles: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<undefined> = ({
   align = 'flex-start',
   column = false,
   justify = 'flex-start',

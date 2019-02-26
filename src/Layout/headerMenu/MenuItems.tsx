@@ -26,7 +26,7 @@ export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-const menuItemsStyles: (props: MenuItemsProps) => ObjectInterpolation<undefined> = props => ({
+const menuItemsStyles: <T>(props: MenuItemsProps<T>) => ObjectInterpolation<undefined> = props => ({
   [media[QueryKeys.TABLET_DOWN]]: {
     backgroundColor: COLOR.WHITE,
     bottom: 0,

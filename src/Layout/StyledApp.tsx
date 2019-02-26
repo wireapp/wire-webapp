@@ -27,7 +27,7 @@ export interface StyledAppContainerProps<T = HTMLDivElement> extends React.HTMLP
   backgroundColor?: string;
 }
 
-const StyledAppContainerStyles: (props: StyledAppContainerProps) => ObjectInterpolation<undefined> = ({
+const StyledAppContainerStyles: <T>(props: StyledAppContainerProps<T>) => ObjectInterpolation<undefined> = ({
   backgroundColor = COLOR.GRAY_LIGHTEN_88,
 }) => ({
   '*': {

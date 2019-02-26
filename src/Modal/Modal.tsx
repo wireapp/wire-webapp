@@ -31,7 +31,7 @@ export interface ModalBodyProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   fullscreen?: boolean;
 }
 
-const modalBodyStyles: (props: ModalBodyProps) => ObjectInterpolation<undefined> = props => ({
+const modalBodyStyles: <T>(props: ModalBodyProps<T>) => ObjectInterpolation<undefined> = props => ({
   alignItems: 'center',
   backgroundColor: COLOR.GRAY_LIGHTEN_88,
   borderRadius: props.fullscreen ? 0 : '8px',
@@ -84,7 +84,7 @@ const ModalContent = (props: React.HTMLProps<HTMLDivElement>) => (
   />
 );
 
-const modalBackgroundStyles: (props: OverlayBackgroundProps) => ObjectInterpolation<undefined> = props => ({
+const modalBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...overlayBackgroundStyles(props),
   backgroundColor: 'rgba(50, 54, 57, 0.4)',
 });

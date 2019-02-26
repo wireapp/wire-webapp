@@ -23,7 +23,7 @@ import {GUTTER} from './sizes';
 
 export interface ContentProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const contentStyles: (props: ContentProps) => ObjectInterpolation<undefined> = props => ({
+const contentStyles: <T>(props: ContentProps<T>) => ObjectInterpolation<undefined> = props => ({
   display: 'flex',
   flexDirection: 'column',
   flexGrow: 1,
