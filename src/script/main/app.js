@@ -42,8 +42,9 @@ import {t} from 'utils/LocalizerUtil';
 /* eslint-disable no-unused-vars */
 import globals from './globals';
 import auth from './auth';
-import {getWebsiteUrl} from '../externalRoute';
 /* eslint-enable no-unused-vars */
+import {getWebsiteUrl} from '../externalRoute';
+import {enableLogging} from '../util/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
 
@@ -844,6 +845,7 @@ class App {
 //##############################################################################
 
 $(() => {
+  enableLogging();
   if ($('#wire-main-app').length !== 0) {
     wire.app = new App(wire.auth);
   }

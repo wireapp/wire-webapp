@@ -30,7 +30,6 @@ module.exports = {
   entry: {
     app: path.resolve(src, 'main/app.js'),
     auth: path.resolve(srcScript, 'main.tsx'),
-    enableLogging: path.resolve(src, 'main/enableLogging.js'),
     login: path.resolve(src, 'main/login.js'),
   },
   externals: {
