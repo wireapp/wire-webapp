@@ -191,6 +191,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
+
+    this.TimeUtil = TimeUtil;
   }
 
   chooseSharedScreen(conversationId) {
