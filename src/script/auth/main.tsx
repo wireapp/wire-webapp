@@ -30,6 +30,7 @@ import {configureEnvironment} from './configureEnvironment';
 import {configureStore} from './configureStore';
 import actionRoot from './module/action';
 import Root from './page/Root';
+import {enableLogging} from '../util/LoggerUtil.js';
 
 configureEnvironment();
 const apiClient = configureClient();
@@ -69,4 +70,5 @@ function runApp() {
   }
 }
 
+enableLogging();
 runApp();

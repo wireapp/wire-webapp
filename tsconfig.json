@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "declaration": false,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
