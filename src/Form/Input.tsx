@@ -83,8 +83,10 @@ const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = 
 const INPUT_CLASSNAME = 'input';
 const filterInputProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
-const Input = React.forwardRef(({type, ...props}: InputProps, ref: React.Ref<HTMLInputElement>) => (
-  <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
-));
+const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElement>>(
+  ({type, ...props}, ref) => (
+    <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
+  )
+);
 
 export {INPUT_CLASSNAME, Input, inputStyle};
