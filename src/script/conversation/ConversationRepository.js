@@ -2373,7 +2373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
-      messageId: z.util.createRandomUuid(),
+      messageId: genericMessage.messageId,
     });
 
     return genericMessage;
