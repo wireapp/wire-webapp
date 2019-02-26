@@ -130,7 +130,7 @@
     "prettier": "1.16.4",
     "raf": "3.4.1",
     "react-addons-test-utils": "15.6.2",
-    "react-hot-loader": "4.6.5",
+    "react-hot-loader": "4.7.1",
     "redux-devtools-extension": "2.13.8",
     "redux-mock-store": "1.5.3",
     "sinon": "7.2.4",
