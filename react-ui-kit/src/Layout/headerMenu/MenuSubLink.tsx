@@ -27,7 +27,7 @@ import {TextProps, textStyles} from '../../Text';
 
 interface MenuSubLinkProps<T = HTMLDivElement> extends TextProps<T> {}
 
-const menuSubLinkStyles: (props: MenuSubLinkProps) => ObjectInterpolation<undefined> = props => ({
+const menuSubLinkStyles: <T>(props: MenuSubLinkProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...textStyles(props),
   '&:hover': {
     color: Color(COLOR.LINK)

@@ -25,7 +25,7 @@ import {TextProps, filterTextProps, textStyles} from './Text';
 
 export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {}
 
-const labelStyles: (props: LabelProps) => ObjectInterpolation<undefined> = ({
+const labelStyles: <T>(props: LabelProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   color = COLOR.LINK,
   fontSize = '12px',
@@ -38,7 +38,10 @@ const Label = (props: LabelProps) => <span css={labelStyles(props)} {...filterTe
 
 export interface LabelLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {}
 
-const labelLinkStyles: (props: LabelLinkProps) => ObjectInterpolation<undefined> = ({fontSize = '12px', ...props}) => ({
+const labelLinkStyles: <T>(props: LabelLinkProps<T>) => ObjectInterpolation<undefined> = ({
+  fontSize = '12px',
+  ...props
+}) => ({
   ...linkStyles({fontSize, ...props}),
 });
 

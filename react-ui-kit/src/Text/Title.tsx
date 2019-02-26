@@ -24,7 +24,7 @@ import {TextProps, filterTextProps, textStyles} from './Text';
 
 export interface TitleProps<T = HTMLDivElement> extends TextProps<T> {}
 
-const titleStyles: (props: TitleProps) => ObjectInterpolation<undefined> = ({
+const titleStyles: <T>(props: TitleProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   center = true,
   fontSize = '32px',

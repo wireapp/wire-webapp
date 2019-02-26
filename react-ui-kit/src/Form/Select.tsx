@@ -33,7 +33,7 @@ const ArrowDown = `
   </svg>
 `;
 
-const selectStyle: (props: SelectProps) => ObjectInterpolation<undefined> = ({disabled = false, ...props}) => ({
+const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> = ({disabled = false, ...props}) => ({
   ...inputStyle(props),
   '&:-moz-focusring': {
     color: 'transparent',

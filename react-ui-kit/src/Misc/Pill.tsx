@@ -35,7 +35,7 @@ enum PILL_TYPE {
   warning = 'WARNING',
 }
 
-const pillStyles: (props: PillProps) => ObjectInterpolation<undefined> = ({active = false, type = null}) => {
+const pillStyles: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({active = false, type = null}) => {
   const backgroundColors = {
     [PILL_TYPE.error]: COLOR.RED_OPAQUE_16,
     [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_16,

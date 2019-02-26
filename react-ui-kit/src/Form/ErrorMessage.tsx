@@ -24,7 +24,7 @@ import {Text, TextProps, textStyles} from '../Text';
 
 interface ErrorMessageProps<T = HTMLSpanElement> extends TextProps<T> {}
 
-const errorMessageStyle: (props: ErrorMessageProps) => ObjectInterpolation<undefined> = ({
+const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   center = true,
   color = COLOR.RED,

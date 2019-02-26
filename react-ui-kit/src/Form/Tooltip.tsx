@@ -32,7 +32,7 @@ interface ToolTipProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   text?: string;
 }
 
-const tooltipStyle: (props: ToolTipProps) => ObjectInterpolation<undefined> = ({
+const tooltipStyle: <T>(props: ToolTipProps<T>) => ObjectInterpolation<undefined> = ({
   disabled = false,
   bottom = false,
   left = false,

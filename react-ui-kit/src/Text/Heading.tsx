@@ -27,7 +27,7 @@ interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;
 }
 
-const h1Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
+const h1Styles: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   level = '1',
@@ -50,7 +50,7 @@ const h1Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
 
 const H1 = (props: HeadingProps) => <h1 css={h1Styles(props)} {...filterTextProps(props)} />;
 
-const h2Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
+const h2Styles: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   noWrap = false,
@@ -73,7 +73,7 @@ const h2Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
 
 const H2 = (props: HeadingProps) => <h2 css={h2Styles(props)} {...filterTextProps(props)} />;
 
-const h3Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
+const h3Styles: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   noWrap = false,
@@ -88,7 +88,7 @@ const h3Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
 
 const H3 = (props: HeadingProps) => <h3 css={h3Styles(props)} {...filterTextProps(props)} />;
 
-const h4Styles: (props: HeadingProps) => ObjectInterpolation<undefined> = ({
+const h4Styles: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   noWrap = false,

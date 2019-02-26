@@ -26,7 +26,7 @@ import media, {QueryKeys} from '../mediaQueries';
 
 export interface OverlayWrapperProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const overlayWrapperStyles: (props: OverlayWrapperProps) => ObjectInterpolation<undefined> = () => ({
+const overlayWrapperStyles: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
   bottom: 0,
   display: 'flex',
   left: 0,
@@ -66,7 +66,7 @@ const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
 
 export interface OverlayBackgroundProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const overlayBackgroundStyles: (props: OverlayBackgroundProps) => ObjectInterpolation<undefined> = () => ({
+const overlayBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
   animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
   background: 'rgba(0, 0, 0, 0.88)',
   height: '100vh',

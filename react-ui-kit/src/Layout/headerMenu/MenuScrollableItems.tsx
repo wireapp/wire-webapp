@@ -25,7 +25,7 @@ export interface MenuScrollableItemsProps<T = HTMLDivElement> extends React.HTML
   open?: boolean;
 }
 
-const menuScrollableItemsStyles: (props: MenuScrollableItemsProps) => ObjectInterpolation<undefined> = props => ({
+const menuScrollableItemsStyles: <T>(props: MenuScrollableItemsProps<T>) => ObjectInterpolation<undefined> = props => ({
   [media[QueryKeys.TABLET_DOWN]]: {
     alignItems: 'center',
     display: 'flex',

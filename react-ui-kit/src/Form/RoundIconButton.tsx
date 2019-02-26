@@ -44,7 +44,7 @@ export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps
   iconWidth?: number;
 }
 
-const roundIconButtonStyle: (props: RoundIconButtonProps) => ObjectInterpolation<undefined> = props => ({
+const roundIconButtonStyle: <T>(props: RoundIconButtonProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...buttonStyles(props),
   alignItems: 'center',
   borderRadius: '50%',

@@ -24,7 +24,7 @@ import {GUTTER} from './sizes';
 
 export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const columnsStyle: (props: ColumnsProps) => ObjectInterpolation<undefined> = props => ({
+const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined> = props => ({
   display: 'flex',
   marginLeft: `-${GUTTER}px`,
   [media[QueryKeys.MOBILE]]: {flexDirection: 'column'},
@@ -34,7 +34,7 @@ const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...prop
 
 export interface ColumnProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const columnStyle: (props: ColumnProps) => ObjectInterpolation<undefined> = props => ({
+const columnStyle: <T>(props: ColumnProps<T>) => ObjectInterpolation<undefined> = props => ({
   display: 'block',
   flexBasis: '0',
   flexGrow: 1,

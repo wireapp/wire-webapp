@@ -45,7 +45,7 @@ const LEVEL: Level = {
   xxs: WIDTH.TINY,
 };
 
-const containerStyles: (props: ContainerProps) => ObjectInterpolation<undefined> = ({
+const containerStyles: <T>(props: ContainerProps<T>) => ObjectInterpolation<undefined> = ({
   centerText = false,
   level = undefined,
   verticalCenter = false,
