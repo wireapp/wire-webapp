@@ -192,11 +192,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.5.tgz#011eece9d3f839a806b63973e228f85967b79ed3"
   integrity sha512-vVjM0SVzgaOUpflq4GYBvCpozes8OgIIS5gVXVka+OfK3hvnkC1i93U8WiY2OtNE4XUWyyy/86Kf6e0IHTQw1Q==
 
-"@types/node@11.9.4":
-  version "11.9.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.4.tgz#ceb0048a546db453f6248f2d1d95e937a6f00a14"
-  integrity sha512-Zl8dGvAcEmadgs1tmSPcvwzO1YRsz38bVJQvH1RvRqSR9/5n61Q1ktcDL0ht3FXWR+ZpVmXVwN1LuH4Ax23NsA==
-
 "@types/platform@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.2.tgz#c0404c4e2a08e04295ab3d1241a856c2a3cab06e"
@@ -215,13 +210,13 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.7.tgz#51cc7379109fe5f8e6d03e2aacb1f76a80655d2b"
-  integrity sha512-yCSddmhkVLXQrNePOk2s2QOfH65C9GJ2qJbwrUdgCPn+4KXF1R5bsVJco7Fpw2QwetH25OL9z5mEgAlhuYX7kw==
+"@wireapp/commons@1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.9.tgz#0366821c117ba39d9fa64695d5b7c6e4e7abb9ef"
+  integrity sha512-mDpvSCy24KtBFRdZoXkyuno9tWseCDnEbqc7RynXPqitLo1Ip35Wmq/+mQauFnVV9Uho8C8rJVMPPnKC3ayvug==
   dependencies:
     "@types/ansi-regex" "4.0.0"
-    "@types/node" "11.9.4"
+    "@types/node" "11.9.5"
     "@types/platform" "1.3.2"
     ansi-regex "4.0.0"
     fs-extra "7.0.1"
