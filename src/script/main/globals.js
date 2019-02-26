@@ -322,6 +322,7 @@ import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 
 window.amplify = amplify;
+window.Cookies = Cookies;
 // we need to publish jQuery on the window so that knockout can use it
 window.jQuery = jQuery;
 window.ko = ko;
