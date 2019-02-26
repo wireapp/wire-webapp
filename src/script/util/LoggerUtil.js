@@ -19,8 +19,8 @@
 
 import 'url-search-params-polyfill';
 
-function enableLogging(url = new URL(window.location.href)) {
-  const namespace = url.searchParams.get('enableLogging');
+function enableLogging(location = window.location.href) {
+  const namespace = new URL(location).searchParams.get('enableLogging');
 
   if (namespace) {
     localStorage.setItem('debug', namespace);

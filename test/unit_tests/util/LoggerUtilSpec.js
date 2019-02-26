@@ -5,27 +5,17 @@ describe('enableLogging', () => {
 
   it('writes a specified logger namespace into the localStorage API', () => {
     const namespace = '@wireapp';
-    const mockedURL = {
-      searchParams: {
-        get: () => namespace,
-      },
-    };
 
-    enableLogging(mockedURL);
+    enableLogging(`https://app.wire.com/auth/?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
   });
 
   it('removes an old namespace from the localStorage when there is no new namespace', () => {
     const namespace = '@wireapp';
-    const mockedURL = {
-      searchParams: {
-        get: () => undefined,
-      },
-    };
     localStorage.setItem('debug', namespace);
 
-    enableLogging(mockedURL);
+    enableLogging('https://app.wire.com/auth/');
 
     expect(localStorage.getItem('debug')).toBe(null);
   });
