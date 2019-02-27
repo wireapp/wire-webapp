@@ -2,7 +2,6 @@ const pkg = require('./package.json');
 const {execSync} = require('child_process');
 const path = require('path');
 
-const source = path.join(pkg.name, 'content');
 const currentBranch = execSync(`git rev-parse --abbrev-ref HEAD`)
   .toString()
   .trim();
@@ -11,8 +10,8 @@ const repositoryUrl = pkg.dependencies[configurationEntry];
 
 module.exports = {
   files: {
-    [`${source}/**`]: 'resource/',
-    [path.join(pkg.name, '.env.defaults')]: path.join(__dirname, '.env.defaults'),
+    [`${pkg.name}/content/**`]: 'resource/',
+    [`${pkg.name}/.env.defaults`]: `${__dirname}/.env.defaults`,
   },
   repositoryUrl,
 };
