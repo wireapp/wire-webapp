@@ -20,33 +20,33 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
-import {LinkProps, linkStyles} from './Link';
-import {TextProps, filterTextProps, textStyles} from './Text';
+import {LinkProps, linkStyle} from './Link';
+import {TextProps, filterTextProps, textStyle} from './Text';
 
 export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {}
 
-const labelStyles: <T>(props: LabelProps<T>) => ObjectInterpolation<undefined> = ({
+const labelStyle: <T>(props: LabelProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   color = COLOR.LINK,
   fontSize = '12px',
   ...props
 }) => ({
-  ...textStyles({bold, color, fontSize, ...props}),
+  ...textStyle({bold, color, fontSize, ...props}),
 });
 
-const Label = (props: LabelProps) => <span css={labelStyles(props)} {...filterTextProps(props)} />;
+const Label = (props: LabelProps) => <span css={labelStyle(props)} {...filterTextProps(props)} />;
 
 export interface LabelLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {}
 
-const labelLinkStyles: <T>(props: LabelLinkProps<T>) => ObjectInterpolation<undefined> = ({
+const labelLinkStyle: <T>(props: LabelLinkProps<T>) => ObjectInterpolation<undefined> = ({
   fontSize = '12px',
   ...props
 }) => ({
-  ...linkStyles({fontSize, ...props}),
+  ...linkStyle({fontSize, ...props}),
 });
 
 const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
-  <a css={labelLinkStyles(props)} {...filterTextProps(props)} />
+  <a css={labelLinkStyle(props)} {...filterTextProps(props)} />
 );
 
 export {Label, LabelLink};

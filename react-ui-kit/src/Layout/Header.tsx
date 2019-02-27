@@ -22,13 +22,13 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 
 export interface HeaderProps<T = HTMLHeadingElement> extends React.HTMLProps<T> {}
 
-const headerStyles: <T>(props: HeaderProps<T>) => ObjectInterpolation<undefined> = props => ({
+const headerStyle: <T>(props: HeaderProps<T>) => ObjectInterpolation<undefined> = props => ({
   alignItems: 'center',
   display: 'flex',
   height: '64px',
   justifyContent: 'space-between',
 });
 
-const Header = (props: HeaderProps) => <header css={headerStyles(props)} {...props} />;
+const Header = (props: HeaderProps) => <header css={headerStyle(props)} {...props} />;
 
-export {Header, headerStyles};
+export {Header, headerStyle};

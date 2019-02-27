@@ -35,7 +35,7 @@ import {
   TrashIcon,
 } from '../Icon';
 import {COLOR} from '../Identity';
-import {ButtonProps, buttonStyles, filterButtonProps} from './Button';
+import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
 
 export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {
   icon?: ICON_NAME;
@@ -45,7 +45,7 @@ export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps
 }
 
 const roundIconButtonStyle: <T>(props: RoundIconButtonProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...buttonStyles(props),
+  ...buttonStyle(props),
   alignItems: 'center',
   borderRadius: '50%',
   display: 'flex',

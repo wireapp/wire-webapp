@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
-import {Text, TextProps, textStyles} from '../Text';
+import {Text, TextProps, textStyle} from '../Text';
 
 interface ErrorMessageProps<T = HTMLSpanElement> extends TextProps<T> {}
 
@@ -32,7 +32,7 @@ const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation
   textTransform = 'uppercase',
   ...props
 }) => ({
-  ...textStyles({bold, center, color, fontSize, textTransform, ...props}),
+  ...textStyle({bold, center, color, fontSize, textTransform, ...props}),
   a: {
     color: COLOR.LINK,
     textDecoration: 'none',

@@ -21,7 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
-import {TextProps, filterTextProps, textStyles} from '../Text';
+import {TextProps, filterTextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
@@ -37,7 +37,7 @@ const filterButtonLinkProps = (props: Object) => {
   return filterProps(filterTextProps(props), ['backgroundColor', 'disabled', 'noCapital']);
 };
 
-const buttonStyles: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> = ({
+const buttonStyle: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> = ({
   backgroundColor = COLOR.BLUE,
   block = false,
   disabled = false,
@@ -51,7 +51,7 @@ const buttonStyles: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined>
   truncate = true,
   ...props
 }) => ({
-  ...textStyles({
+  ...textStyle({
     block,
     bold,
     center,
@@ -85,14 +85,14 @@ const buttonStyles: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined>
   width: block ? '100%' : 'auto',
 });
 
-const buttonLinkStyles: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
-  ...buttonStyles(props),
+const buttonLinkStyle: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
+  ...buttonStyle(props),
   display: 'inline-block !important',
 });
 
-const Button = (props: ButtonProps) => <button css={buttonStyles(props)} {...filterButtonProps(props)} />;
+const Button = (props: ButtonProps) => <button css={buttonStyle(props)} {...filterButtonProps(props)} />;
 const ButtonLink = (props: ButtonProps<HTMLAnchorElement>) => (
-  <a css={buttonLinkStyles(props)} {...filterButtonLinkProps(props)} />
+  <a css={buttonLinkStyle(props)} {...filterButtonLinkProps(props)} />
 );
 
-export {Button, ButtonLink, buttonStyles, filterButtonProps};
+export {Button, ButtonLink, buttonStyle, filterButtonProps};

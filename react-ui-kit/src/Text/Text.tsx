@@ -51,7 +51,7 @@ const filterTextProps = (props: Object) => {
   ]);
 };
 
-export const textStyles: <T>(props: TextProps<T>) => ObjectInterpolation<undefined> = ({
+export const textStyle: <T>(props: TextProps<T>) => ObjectInterpolation<undefined> = ({
   block = false,
   bold = false,
   center = false,
@@ -75,7 +75,7 @@ export const textStyles: <T>(props: TextProps<T>) => ObjectInterpolation<undefin
   whiteSpace: noWrap ? 'nowrap' : undefined,
 });
 
-const Text = (props: TextProps) => <span css={textStyles(props)} {...filterTextProps(props)} />;
+const Text = (props: TextProps) => <span css={textStyle(props)} {...filterTextProps(props)} />;
 
 const Bold = (props: TextProps) => <Text bold {...props} />;
 const Small = (props: TextProps) => <Text fontSize={'12px'} {...props} />;

@@ -20,14 +20,14 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {TextProps} from '../../Text';
-import {contentStyles} from '../Content';
+import {contentStyle} from '../Content';
 
 export interface MenuContentProps<T = HTMLDivElement> extends TextProps<T> {
   open?: boolean;
 }
 
-const menuContentStyles: <T>(props: MenuContentProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...contentStyles(props),
+const menuContentStyle: <T>(props: MenuContentProps<T>) => ObjectInterpolation<undefined> = props => ({
+  ...contentStyle(props),
   alignItems: 'center',
   flexDirection: 'row',
   height: '64px',
@@ -38,6 +38,6 @@ const menuContentStyles: <T>(props: MenuContentProps<T>) => ObjectInterpolation<
   zIndex: props.open ? 10000 : undefined,
 });
 
-const MenuContent = (props: MenuContentProps) => <div css={menuContentStyles(props)} {...props} />;
+const MenuContent = (props: MenuContentProps) => <div css={menuContentStyle(props)} {...props} />;
 
-export {MenuContent, menuContentStyles};
+export {MenuContent, menuContentStyle};

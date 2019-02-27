@@ -26,7 +26,7 @@ import media, {QueryKeys} from '../mediaQueries';
 
 export interface OverlayWrapperProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const overlayWrapperStyles: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
+const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
   bottom: 0,
   display: 'flex',
   left: 0,
@@ -38,7 +38,7 @@ const overlayWrapperStyles: <T>(props: OverlayWrapperProps<T>) => ObjectInterpol
   zIndex: 9997,
 });
 
-const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyles} {...props} />;
+const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyle} {...props} />;
 
 const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
@@ -66,7 +66,7 @@ const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
 
 export interface OverlayBackgroundProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const overlayBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
+const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
   animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
   background: 'rgba(0, 0, 0, 0.88)',
   height: '100vh',
@@ -77,7 +77,7 @@ const overlayBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectIn
   zIndex: 9998,
 });
 
-const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyles} {...props} />;
+const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
 
 export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
@@ -88,4 +88,4 @@ const Overlay = ({children = null, ...props}: OverlayProps) => (
   </OverlayWrapper>
 );
 
-export {Overlay, OverlayBackground, overlayBackgroundStyles, OverlayWrapper, overlayWrapperStyles};
+export {Overlay, OverlayBackground, overlayBackgroundStyle, OverlayWrapper, overlayWrapperStyle};
