@@ -38,20 +38,5 @@ describe('RichProfileRepository', () => {
         expect(richProfile).toBe(richProfile);
       });
     });
-
-    it("fetches the user's rich profile only once and then loads it from cache", () => {
-      const userId = UUID.genV4().hexString;
-      const response = [];
-      spyOn(richProfileRepository.backendClient, 'sendRequest').and.returnValue(Promise.resolve(response));
-
-      const testPromises = [1, 2, 3].map(() => {
-        return richProfileRepository.getUserRichProfile(userId).then(richProfile => {
-          expect(richProfileRepository.backendClient.sendRequest).toHaveBeenCalledTimes(1);
-          expect(richProfile).toBe(richProfile);
-        });
-      });
-
-      return Promise.all(testPromises);
-    });
   });
 });

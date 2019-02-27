@@ -17,8 +17,6 @@
  *
  */
 
-import {memoize} from 'underscore';
-
 export default class RichProfileRepository {
   static get URL() {
     return {
@@ -29,8 +27,6 @@ export default class RichProfileRepository {
   constructor(backendClient, logger) {
     this.backendClient = backendClient;
     this.logger = logger;
-
-    this.getUserRichProfile = memoize(this.getUserRichProfile);
   }
 
   getUserRichProfile(userId) {
