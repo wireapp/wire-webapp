@@ -116,8 +116,9 @@ ko.bindingHandlers.infinite_scroll = {
        * The strategy here is to enable the scroll listener when there is a mouse event and automatically disable the listener after 500ms of inactivity of the mouse.
        */
       temporarlyEnableScrollListener();
-      const element = $(event.currentTarget);
-      if (element.isScrollable()) {
+      const element = event.currentTarget;
+      const isScrollable = element.scrollHeight > element.clientHeight;
+      if (isScrollable) {
         // if the element is scrollable, the scroll event will take the relay
         return true;
       }
