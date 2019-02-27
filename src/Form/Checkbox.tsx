@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
-import {Text, TextProps, textStyles} from '../Text';
+import {Text, TextProps, textStyle} from '../Text';
 import {INPUT_CLASSNAME, Input, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
@@ -105,7 +105,7 @@ const CheckboxLabel = ({
 }: CheckboxLabelProps) => (
   <Text
     css={{
-      ...textStyles({
+      ...textStyle({
         bold,
         color,
         fontSize,

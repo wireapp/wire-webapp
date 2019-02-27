@@ -21,7 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../../Identity';
 import media, {QueryKeys} from '../../mediaQueries';
-import {LinkProps, filterLinkProps, linkStyles} from '../../Text';
+import {LinkProps, filterLinkProps, linkStyle} from '../../Text';
 import {filterProps} from '../../util';
 import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './HeaderSubMenu';
 
@@ -29,7 +29,7 @@ export interface MenuLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {
   button?: boolean;
 }
 
-const menuLinkStyles: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefined> = ({
+const menuLinkStyle: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   color = COLOR.LINK,
   fontSize = '11px',
@@ -37,7 +37,7 @@ const menuLinkStyles: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefi
   button = false,
   ...props
 }) => ({
-  ...linkStyles({bold, color, fontSize, textTransform, ...props}),
+  ...linkStyle({bold, color, fontSize, textTransform, ...props}),
   [media[QueryKeys.DESKTOP]]: {
     '&:first-of-type': {
       marginLeft: 0,
@@ -70,6 +70,6 @@ const menuLinkStyles: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefi
 
 const filterMenuLinkProps = (props: Object) => filterProps(filterLinkProps(props), ['button']);
 
-const MenuLink = (props: MenuLinkProps) => <a css={menuLinkStyles(props)} {...filterMenuLinkProps(props)} />;
+const MenuLink = (props: MenuLinkProps) => <a css={menuLinkStyle(props)} {...filterMenuLinkProps(props)} />;
 
-export {MenuLink, menuLinkStyles, filterMenuLinkProps};
+export {MenuLink, menuLinkStyle, filterMenuLinkProps};

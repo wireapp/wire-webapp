@@ -20,30 +20,27 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import media, {QueryKeys} from '../mediaQueries';
-import {TextProps, filterTextProps, textStyles} from './Text';
+import {TextProps, filterTextProps, textStyle} from './Text';
 
 export interface ParagraphProps<T = HTMLParagraphElement> extends TextProps<T> {}
 
-const paragraphStyles: <T>(props: ParagraphProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  ...props
-}) => ({
-  ...textStyles({block, ...props}),
+const paragraphStyle: <T>(props: ParagraphProps<T>) => ObjectInterpolation<undefined> = ({block = true, ...props}) => ({
+  ...textStyle({block, ...props}),
   marginBottom: '16px',
   marginTop: 0,
 });
 
-const Paragraph = (props: ParagraphProps) => <p css={paragraphStyles(props)} {...filterTextProps(props)} />;
+const Paragraph = (props: ParagraphProps) => <p css={paragraphStyle(props)} {...filterTextProps(props)} />;
 
 export interface LeadProps<T = HTMLParagraphElement> extends TextProps<T> {}
 
-const leadStyles: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
+const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   center = true,
   fontSize = '24px',
   ...props
 }) => ({
-  ...textStyles({block, center, fontSize, ...props}),
+  ...textStyle({block, center, fontSize, ...props}),
   marginBottom: '56px',
   marginTop: 0,
   [media[QueryKeys.MOBILE]]: {
@@ -51,6 +48,6 @@ const leadStyles: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = (
   },
 });
 
-const Lead = (props: LeadProps) => <p css={leadStyles(props)} {...filterTextProps(props)} />;
+const Lead = (props: LeadProps) => <p css={leadStyle(props)} {...filterTextProps(props)} />;
 
-export {Paragraph, paragraphStyles, Lead, leadStyles};
+export {Paragraph, paragraphStyle, Lead, leadStyle};

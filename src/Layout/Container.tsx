@@ -45,7 +45,7 @@ const LEVEL: Level = {
   xxs: WIDTH.TINY,
 };
 
-const containerStyles: <T>(props: ContainerProps<T>) => ObjectInterpolation<undefined> = ({
+const containerStyle: <T>(props: ContainerProps<T>) => ObjectInterpolation<undefined> = ({
   centerText = false,
   level = undefined,
   verticalCenter = false,
@@ -65,7 +65,7 @@ const containerStyles: <T>(props: ContainerProps<T>) => ObjectInterpolation<unde
 
 const filterContainerProps = (props: Object) => filterProps(props, ['centerText', 'level', 'verticalCenter']);
 
-const Container = (props: ContainerProps) => <div css={containerStyles(props)} {...filterContainerProps(props)} />;
+const Container = (props: ContainerProps) => <div css={containerStyle(props)} {...filterContainerProps(props)} />;
 
 const ContainerLG = (props: ContainerProps) => <Container level={'lg'} {...props} />;
 const ContainerMD = (props: ContainerProps) => <Container level={'md'} {...props} />;

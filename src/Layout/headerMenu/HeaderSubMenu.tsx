@@ -26,7 +26,7 @@ import {MenuSubLink} from './MenuSubLink';
 
 export interface DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const desktopStyledHeaderSubMenuStyles: (
+const desktopStyledHeaderSubMenuStyle: (
   props: DesktopStyledHeaderSubMenuProps
 ) => ObjectInterpolation<undefined> = props => ({
   alignItems: 'left',
@@ -56,14 +56,14 @@ const desktopStyledHeaderSubMenuStyles: (
 const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 
 const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => (
-  <div className={DESKTOP_HEADER_SUB_MENU_CLASSNAME} css={desktopStyledHeaderSubMenuStyles(props)} {...props} />
+  <div className={DESKTOP_HEADER_SUB_MENU_CLASSNAME} css={desktopStyledHeaderSubMenuStyle(props)} {...props} />
 );
 
 export interface MobileStyledHeaderSubMenuProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-const mobileStyledHeaderSubMenuStyles: (
+const mobileStyledHeaderSubMenuStyle: (
   props: MobileStyledHeaderSubMenuProps
 ) => ObjectInterpolation<undefined> = props => ({
   '*': {
@@ -79,7 +79,7 @@ const mobileStyledHeaderSubMenuStyles: (
 });
 
 const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps) => (
-  <span css={mobileStyledHeaderSubMenuStyles(props)} {...props} />
+  <span css={mobileStyledHeaderSubMenuStyle(props)} {...props} />
 );
 
 export interface HeaderSubMenuProps<T = HTMLParagraphElement> extends React.HTMLProps<T> {

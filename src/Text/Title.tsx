@@ -20,11 +20,11 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
-import {TextProps, filterTextProps, textStyles} from './Text';
+import {TextProps, filterTextProps, textStyle} from './Text';
 
 export interface TitleProps<T = HTMLDivElement> extends TextProps<T> {}
 
-const titleStyles: <T>(props: TitleProps<T>) => ObjectInterpolation<undefined> = ({
+const titleStyle: <T>(props: TitleProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   center = true,
   fontSize = '32px',
@@ -32,10 +32,10 @@ const titleStyles: <T>(props: TitleProps<T>) => ObjectInterpolation<undefined> =
   bold = true,
   ...props
 }) => ({
-  ...textStyles({bold, block, color, center, fontSize, ...props}),
+  ...textStyle({bold, block, color, center, fontSize, ...props}),
   marginBottom: '8px',
 });
 
-const Title = (props: TitleProps) => <div css={titleStyles(props)} {...filterTextProps(props)} />;
+const Title = (props: TitleProps) => <div css={titleStyle(props)} {...filterTextProps(props)} />;
 
 export {Title};

@@ -23,11 +23,11 @@ import React from 'react';
 import {COLOR} from '../Identity/';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
 import media, {QueryKeys} from '../mediaQueries';
-import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyles} from '../Modal/Overlay';
+import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../Modal/Overlay';
 import {noop} from '../util';
 
-const menuModalWrapperStyles: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...overlayBackgroundStyles(props),
+const menuModalWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = props => ({
+  ...overlayBackgroundStyle(props),
   alignItems: 'flex-end',
   alignSelf: 'flex-end',
   display: 'flex',
@@ -35,7 +35,7 @@ const menuModalWrapperStyles: <T>(props: OverlayWrapperProps<T>) => ObjectInterp
   padding: 0,
 });
 
-const MenuModalWrapper = (props: OverlayWrapperProps) => <div css={menuModalWrapperStyles} {...props} />;
+const MenuModalWrapper = (props: OverlayWrapperProps) => <div css={menuModalWrapperStyle} {...props} />;
 
 const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
@@ -78,12 +78,12 @@ const MenuModalContent = (props: React.HTMLProps<HTMLUListElement>) => (
   />
 );
 
-const modalBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...overlayBackgroundStyles(props),
+const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
+  ...overlayBackgroundStyle(props),
   background: 'rgba(50, 54, 57, 0.4)',
 });
 
-const MenuModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyles} {...props} />;
+const MenuModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle} {...props} />;
 
 interface MenuModalProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   onBackgroundClick?: () => void;

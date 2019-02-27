@@ -25,13 +25,13 @@ import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
 import media, {QueryKeys} from '../mediaQueries';
 import {filterProps, noop} from '../util';
-import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyles} from './Overlay';
+import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './Overlay';
 
 export interface ModalBodyProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   fullscreen?: boolean;
 }
 
-const modalBodyStyles: <T>(props: ModalBodyProps<T>) => ObjectInterpolation<undefined> = props => ({
+const modalBodyStyle: <T>(props: ModalBodyProps<T>) => ObjectInterpolation<undefined> = props => ({
   alignItems: 'center',
   backgroundColor: COLOR.GRAY_LIGHTEN_88,
   borderRadius: props.fullscreen ? 0 : '8px',
@@ -54,7 +54,7 @@ const modalBodyStyles: <T>(props: ModalBodyProps<T>) => ObjectInterpolation<unde
 
 const filterModalBodyProps = (props: Object) => filterProps(props, ['fullscreen']);
 
-const ModalBody = (props: ModalBodyProps) => <div css={modalBodyStyles(props)} {...filterModalBodyProps(props)} />;
+const ModalBody = (props: ModalBodyProps) => <div css={modalBodyStyle(props)} {...filterModalBodyProps(props)} />;
 
 const ModalClose = (props: SVGIconProps<SVGSVGElement>) => (
   <CloseIcon
@@ -84,12 +84,12 @@ const ModalContent = (props: React.HTMLProps<HTMLDivElement>) => (
   />
 );
 
-const modalBackgroundStyles: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...overlayBackgroundStyles(props),
+const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
+  ...overlayBackgroundStyle(props),
   backgroundColor: 'rgba(50, 54, 57, 0.4)',
 });
 
-const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyles(props)} {...props} />;
+const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle(props)} {...props} />;
 
 interface ModalProps {
   fullscreen?: boolean;
