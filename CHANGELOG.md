@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.10...@wireapp/react-ui-kit@5.0.11) (2019-02-27)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Apply remaining props to SVGIcon ([#1579](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1579)) ([b107845](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b107845))
+
+
+
+
+
 ## [5.0.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.9...@wireapp/react-ui-kit@5.0.10) (2019-02-27)
 
 
