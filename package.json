@@ -12,7 +12,7 @@
     "@wireapp/commons": "1.0.6",
     "@wireapp/core": "8.1.15",
     "@wireapp/protocol-messaging": "1.23.0",
-    "@wireapp/react-ui-kit": "5.0.4",
+    "@wireapp/react-ui-kit": "5.0.8",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "crypto-js": "3.1.9-1",
     "dexie": "2.0.4",
@@ -53,7 +53,6 @@
     "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.13.2"
   },
   "devDependencies": {
-    "@types/js-cookie": "2.2.1",
     "@babel/core": "7.3.3",
     "@babel/plugin-proposal-class-properties": "7.3.3",
     "@babel/preset-env": "7.3.1",
