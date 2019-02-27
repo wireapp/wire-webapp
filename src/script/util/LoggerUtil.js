@@ -25,8 +25,10 @@ function enableLogging(location = window.location.href) {
    * The following check will fix this error:
    * > Failed to read the 'localStorage' property from 'Window': Access is denied for this document
    */
+  let localStorage;
+
   try {
-    typeof localStorage === 'undefined';
+    localStorage = window.localStorage;
   } catch (error) {
     return;
   }
