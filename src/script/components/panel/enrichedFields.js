@@ -37,23 +37,11 @@ ko.components.register('enriched-fields', {
     this.richProfileRepository = resolve(graph.RichProfileRepository);
     this.fields = ko.observable([]);
 
-    this.richProfileRepository
-      .getUserRichProfile(ko.unwrap(userId))
-      .then(richProfile => {
-        if (richProfile.fields) {
-          this.fields(richProfile.fields);
-          onFieldsLoaded(this.fields());
-        }
-      })
-      .catch(() => {
-        // TODO remove me when the backend endpoint is available
-        this.fields([
-          {type: 'Title', value: 'Chief Design Officer'},
-          {type: 'Phone', value: ' 0172 987 65 43'},
-          {type: 'Entity', value: 'STUFF/DATA/WORK/MOREWORK'},
-          {type: 'Email', value: 'michelle@example.com'},
-        ]);
+    this.richProfileRepository.getUserRichProfile(ko.unwrap(userId)).then(richProfile => {
+      if (richProfile.fields) {
+        this.fields(richProfile.fields);
         onFieldsLoaded(this.fields());
-      });
+      }
+    });
   },
 });
