@@ -37,11 +37,14 @@ ko.components.register('enriched-fields', {
     this.richProfileRepository = resolve(graph.RichProfileRepository);
     this.fields = ko.observable([]);
 
-    this.richProfileRepository.getUserRichProfile(ko.unwrap(userId)).then(richProfile => {
-      if (richProfile.fields) {
-        this.fields(richProfile.fields);
-        onFieldsLoaded(this.fields());
-      }
-    });
+    this.richProfileRepository
+      .getUserRichProfile(ko.unwrap(userId))
+      .then(richProfile => {
+        if (richProfile.fields) {
+          this.fields(richProfile.fields);
+          onFieldsLoaded(this.fields());
+        }
+      })
+      .catch(() => {});
   },
 });
