@@ -53,6 +53,7 @@
     "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.13.2"
   },
   "devDependencies": {
+    "@types/js-cookie": "2.2.1",
     "@babel/core": "7.3.3",
     "@babel/plugin-proposal-class-properties": "7.3.3",
     "@babel/preset-env": "7.3.1",
