@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.9...@wireapp/react-ui-kit@5.0.10) (2019-02-27)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Forward Container refs ([#1578](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1578)) ([6b66a84](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6b66a84))
+
+
+
+
+
 ## [5.0.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.8...@wireapp/react-ui-kit@5.0.9) (2019-02-27)
 
 
