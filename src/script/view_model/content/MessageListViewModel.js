@@ -342,7 +342,7 @@ class MessageListViewModel {
    * Fetch older messages beginning from the oldest message in view
    * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _loadPrecedingMessages() {
+  loadPrecedingMessages() {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
     const [messagesContainer] = this.getMessagesContainer().children();
 
@@ -363,7 +363,7 @@ class MessageListViewModel {
    * Fetch newer messages beginning from the newest message in view
    * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _loadFollowingMessages() {
+  loadFollowingMessages() {
     const last_message = this.conversation().getLastMessage();
 
     if (last_message && this._conversationHasExtraMessages(this.conversation())) {
