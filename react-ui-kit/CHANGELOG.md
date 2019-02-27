@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.8...@wireapp/react-ui-kit@5.0.9) (2019-02-27)
+
+
+### Bug Fixes
+
+* Export react types ([#1576](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1576)) ([b2fd565](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b2fd565))
+
+
+
+
+
 ## [5.0.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.7...@wireapp/react-ui-kit@5.0.8) (2019-02-26)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
