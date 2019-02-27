@@ -1201,10 +1201,10 @@
     "@types/history" "*"
     "@types/react" "*"
 
-"@types/react@*":
-  version "16.4.14"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.4.14.tgz#47c604c8e46ed674bbdf4aabf82b34b9041c6a04"
-  integrity sha512-Gh8irag2dbZ2K6vPn+S8+LNrULuG3zlCgJjVUrvuiUK7waw9d9CFk2A/tZFyGhcMDUyO7tznbx1ZasqlAGjHxA==
+"@types/react@*", "@types/react@16.8.5":
+  version "16.8.5"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.5.tgz#03b9a6597bc20f6eaaed43f377a160f7e41c2b90"
+  integrity sha512-8LRySaaSJVLNZb2dbOGvGmzn88cbAfrgDpuWy+6lLgQ0OJFgHHvyuaCX4/7ikqJlpmCPf4uazJAZcfTQRdJqdQ==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -1537,20 +1537,21 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.4.tgz#3d5a318e8e54964ada136b9f0ca84114d67ba2c4"
-  integrity sha512-9p+9jf/wdIJYgyxh8Xgm2IpkSqlsh9tLXJnVzb+Ts6UAci7p+vA8L0NLOtmKE6MSET92c8H6Z4QyJ/9F9w0Puw==
+"@wireapp/react-ui-kit@5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.9.tgz#52c9740b00064d14efef6774f8c4d282e6a625e5"
+  integrity sha512-Br3e472rYF3qqnG+uROUQXg/0Y/PBIaB/V79ccy4c1O6kYt34hj05vbgylNyazSGFXr2rI6hZ9WRTan6SlzNZA==
   dependencies:
     "@emotion/core" "10.0.7"
     "@emotion/styled" "10.0.7"
     "@types/color" "3.0.0"
-    bazinga64 "5.3.43"
+    "@types/react" "16.8.5"
+    bazinga64 "5.3.44"
     color "3.1.0"
     emotion-normalize "10.0.0"
     react "16.8.3"
     react-dom "16.8.3"
-    react-transition-group "2.5.3"
+    react-transition-group "2.6.0"
 
 "@wireapp/store-engine@1.1.22":
   version "1.1.22"
@@ -2285,10 +2286,10 @@ bazinga64@5.3.41:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.41.tgz#01bae66b6cf06e56a1fe1d26527096b9fedfa3a0"
   integrity sha512-BYxfsleYmTtbrL1Iz8fkE1aXzEoV9gx7FYqMPeFkx+L7bfebsBd24/BTCHFGOKdP/Jg7Q2dHvSLCsyTq4wqJzQ==
 
-bazinga64@5.3.43:
-  version "5.3.43"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.43.tgz#1e9fd7dcf3d524374f0393cb394412a62234a2f7"
-  integrity sha512-HLc3EAcmGSvMcXTRa4ytLAtsA2c8qS3VgVUskKKhduK4+sNjWSnaCHmQ3uHyPOwcjvzdfkBs2n+WgC/nGhR21g==
+bazinga64@5.3.44:
+  version "5.3.44"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.44.tgz#19526abf0c790841437d9a790dcf40f0199936de"
+  integrity sha512-JIies9o5MyKKzRojOqJUxg9kCDeiuLlZCqST3I/zPXeJpN/nopAs5pjm1tm3VowhqNo7aEl+uFMUZ1BRz+AyBw==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -10038,10 +10039,10 @@ react-test-renderer@^16.0.0-0:
     fbjs "^0.8.16"
     object-assign "^4.1.1"
 
-react-transition-group@2.5.3:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.5.3.tgz#26de363cab19e5c88ae5dbae105c706cf953bb92"
-  integrity sha512-2DGFck6h99kLNr8pOFk+z4Soq3iISydwOFeeEVPjTN6+Y01CmvbWmnN02VuTWyFdnRtIDPe+wy2q6Ui8snBPZg==
+react-transition-group@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.6.0.tgz#3c41cbdd9c044c5f8604d4e8d319e860919c9fae"
+  integrity sha512-VzZ+6k/adL3pJHo4PU/MHEPjW59/TGQtRsXC+wnxsx2mxjQKNHnDdJL/GpYuPJIsyHGjYbBQfIJ2JNOAdPc8GQ==
   dependencies:
     dom-helpers "^3.3.1"
     loose-envify "^1.4.0"
