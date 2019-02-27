@@ -20,6 +20,19 @@
 import 'url-search-params-polyfill';
 
 function enableLogging(location = window.location.href) {
+  /**
+   * If users disable cookies in their browsers, they won't have access to the localStorage API.
+   * The following check will fix this error:
+   * > Failed to read the 'localStorage' property from 'Window': Access is denied for this document
+   */
+  let localStorage;
+
+  try {
+    localStorage = window.localStorage;
+  } catch (error) {
+    return;
+  }
+
   const namespace = new URL(location).searchParams.get('enableLogging');
 
   if (namespace) {
