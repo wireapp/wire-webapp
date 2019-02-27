@@ -1448,13 +1448,13 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.119.tgz#2c36a3425642d80d8d177b73a3325ae2710b45a5"
   integrity sha512-i0wE2hy2sXeoH1RYbNJq9aI4Djyfm9tIeQRMaUC37OGNiip7A43Wefj+isXwNCgHUHV8FpEOMjeHVXNpMwWoMA==
 
-"@wireapp/commons@1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.6.tgz#f1cd8c49962c1a8b60be185dfe834d4d44e54b30"
-  integrity sha512-/l2drblEJ60VczVYD8rwkbRdYNGKGhaXa9+QS5FjxurNVj37J7EAtgO8g0FKGi0XMC2bGvRfU57CIAi70e9H8A==
+"@wireapp/commons@1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.10.tgz#3a054668102953abc545f53414f6cb91067911ec"
+  integrity sha512-muK7j15iJqQNySqKxEmkP5dWSTKiHZ2g3cEI2Udns9bi5DGvbN+8zUdqlfQcNK43nUaJ9oSy7C4U3KPWVfGvCg==
   dependencies:
     "@types/ansi-regex" "4.0.0"
-    "@types/node" "11.9.3"
+    "@types/node" "11.9.5"
     "@types/platform" "1.3.2"
     ansi-regex "4.0.0"
     fs-extra "7.0.1"
