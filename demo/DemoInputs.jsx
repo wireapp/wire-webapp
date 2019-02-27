@@ -194,6 +194,7 @@ class DemoInputs extends React.PureComponent {
               </Button>
               <InputBlock>
                 <Input placeholder="InputBlock" markInvalid />
+                <Input placeholder="Second Input" />
                 <Tooltip text="Lots of icons here">
                   <InputSubmitCombo>
                     <Input placeholder="InputSubmitCombo" name="password" />
