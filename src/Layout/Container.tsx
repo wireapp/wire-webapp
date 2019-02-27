@@ -19,8 +19,9 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 import media, {QueryKeys} from '../mediaQueries';
-import {filterProps} from '../util';
+import {Omit, filterProps} from '../util';
 import {GUTTER, WIDTH} from './sizes';
 
 export interface ContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
@@ -65,12 +66,26 @@ const containerStyle: <T>(props: ContainerProps<T>) => ObjectInterpolation<undef
 
 const filterContainerProps = (props: Object) => filterProps(props, ['centerText', 'level', 'verticalCenter']);
 
-const Container = (props: ContainerProps) => <div css={containerStyle(props)} {...filterContainerProps(props)} />;
+const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivElement, ContainerProps>((props, ref) => (
+  <div ref={ref} css={containerStyle(props)} {...filterContainerProps(props)} />
+));
 
-const ContainerLG = (props: ContainerProps) => <Container level={'lg'} {...props} />;
-const ContainerMD = (props: ContainerProps) => <Container level={'md'} {...props} />;
-const ContainerSM = (props: ContainerProps) => <Container level={'sm'} {...props} />;
-const ContainerXS = (props: ContainerProps) => <Container level={'xs'} {...props} />;
-const ContainerXXS = (props: ContainerProps) => <Container level={'xxs'} {...props} />;
+export interface LevelContainerProps extends Omit<ContainerProps, 'level'> {}
+
+const ContainerLG = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+  <Container ref={ref} level={'lg'} {...props} />
+));
+const ContainerMD = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+  <Container ref={ref} level={'md'} {...props} />
+));
+const ContainerSM = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+  <Container ref={ref} level={'sm'} {...props} />
+));
+const ContainerXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+  <Container ref={ref} level={'xs'} {...props} />
+));
+const ContainerXXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+  <Container ref={ref} level={'xxs'} {...props} />
+));
 
 export {Container, ContainerLG, ContainerMD, ContainerSM, ContainerXS, ContainerXXS};
