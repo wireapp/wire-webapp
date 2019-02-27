@@ -41,6 +41,7 @@ const SVGIcon = ({
   height = null,
   color = COLOR.ICON,
   children,
+  ...props
 }: InternalSVGIconProps) => {
   let newScale = scale;
   if (width || height) {
@@ -51,7 +52,7 @@ const SVGIcon = ({
   const newWidth = Math.ceil(realWidth * newScale);
   const newHeight = Math.ceil(realHeight * newScale);
   return (
-    <svg fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} width={newWidth} height={newHeight}>
+    <svg fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} width={newWidth} height={newHeight} {...props}>
       {children}
     </svg>
   );
