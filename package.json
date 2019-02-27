@@ -50,7 +50,7 @@
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
     "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.13.2",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.13.2"
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.14.0"
   },
   "devDependencies": {
     "@babel/core": "7.3.3",
