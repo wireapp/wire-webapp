@@ -144,7 +144,7 @@
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.0.1",
     "typescript": "3.3.3",
-    "webpack": "4.29.3",
+    "webpack": "4.29.5",
     "webpack-cli": "3.2.3",
     "webpack-dev-middleware": "3.6.0",
     "webpack-hot-middleware": "2.24.3"
