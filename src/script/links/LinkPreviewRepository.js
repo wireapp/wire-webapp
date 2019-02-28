@@ -123,7 +123,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
       return this._uploadPreviewImage(openGraphImage.data)
         .then(asset => {
           linkPreview.article[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
-          linkPreview.image[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
+          linkPreview[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
           return linkPreview;
         })
         .catch(error => {
