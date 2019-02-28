@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.11...@wireapp/react-ui-kit@5.0.12) (2019-02-28)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Use correct initial state for MatchMedia ([#1581](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1581)) ([6653dfc](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6653dfc))
+
+
+
+
+
 ## [5.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.10...@wireapp/react-ui-kit@5.0.11) (2019-02-27)
 
 
