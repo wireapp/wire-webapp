@@ -33,7 +33,7 @@ export interface MatchMediaProps extends React.HTMLProps<ReactFragment> {
 const useMatchMedia = (query: Query) => {
   const matchMedia = window.matchMedia(`(${query})`);
 
-  const [isMatching, setIsMatching] = useState(false);
+  const [isMatching, setIsMatching] = useState(matchMedia.matches);
 
   const updateMatching = () => setIsMatching(matchMedia.matches);
 
