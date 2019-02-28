@@ -62,7 +62,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
 ko.components.register('image-asset', {
   template: `
     <div class="image-asset" data-bind="
-      attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
+      attr: {'data-uie-visible': message.visible() && !message.isObfuscated(), 'data-uie-status': imageUrl() ? 'loaded' : 'loading'},
       click: onClick,
       css: {'bg-color-ephemeral': message.isObfuscated(), 'loading-dots': isIdle(), 'image-asset--no-image': !imageUrl()}"
       data-uie-name="go-image-detail">
