@@ -118,4 +118,4 @@ const Heading = ({level, ...props}) => {
   }
 };
 
-export {Heading, H1, H2, H3, H4};
+export {Heading, H1, h1Style, H2, h2Style, H3, h3Style, H4, h4Style};
