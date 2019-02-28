@@ -27,11 +27,21 @@
       <!-- ko ifnot: showSpinner() -->
         <!-- ko if: peopleTabActive() -->
           <!-- ko if: showNoMatches() -->
-            <div class="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire')"></div>
+            <!-- ko if: showConversationResultsOnly() -->
+              <people-icon class="start-ui-no-contacts__icon"></people-icon>
+            <!-- /ko -->
+            <!-- ko ifnot: showConversationResultsOnly() -->
+              <div class="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire')"></div>
+            <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko if: showNoSearchResults() -->
-            <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
+            <!-- ko if: showConversationResultsOnly() -->
+              <people-icon class="start-ui-no-search-results__icon"></people-icon>
+            <!-- /ko -->
+            <!-- ko ifnot: showConversationResultsOnly() -->
+              <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
+            <!-- /ko -->         
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->

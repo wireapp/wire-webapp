@@ -30,17 +30,22 @@ z.components.GroupListViewModel = class GroupListViewModel {
    */
   constructor(params) {
     this.groups = params.groups;
-    this.on_select = params.click;
+    this.onSelect = params.click;
   }
 };
 
 // Knockout registration of the group list component.
 ko.components.register('group-list', {
   template: `
-    <div class="search-list search-list-lg" data-bind="foreach: {data: groups, as: 'group'}">
-      <div class="search-list-item" data-bind="click: $parent.on_select, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name" data-uie-name="item-group">
+    <div class="search-list search-list-lg" data-bind="foreach: {data: groups, as: 'group', noChildContext: true}">
+      <div class="search-list-item" data-bind="click: onSelect, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name}" data-uie-name="item-group">
         <div class="search-list-item-image">
-          <group-avatar params="users: group.participating_user_ets()"></group-avatar>
+          <!-- ko if: group.is1to1() -->
+            <participant-avatar params="participant: group.participating_user_ets()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+          <!-- /ko -->
+          <!-- ko ifnot: group.is1to1() -->
+            <group-avatar params="users: group.participating_user_ets()"></group-avatar>
+          <!-- /ko -->
         </div>
         <div class="search-list-item-header" data-bind="text: group.display_name"></div>
       </div>

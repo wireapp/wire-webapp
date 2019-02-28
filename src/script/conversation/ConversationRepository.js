@@ -832,12 +832,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {string} query - Query to be searched in group conversation names
    * @param {boolean} isHandle - Query string is handle
+   * @param {boolean} includeOne2One - Should 1to1 conversations be included
    * @returns {Array<Conversation>} Matching group conversations
    */
-  getGroupsByName(query, isHandle) {
+  getGroupsByName(query, isHandle, includeOne2One = false) {
     return this.sorted_conversations()
       .filter(conversationEntity => {
-        if (!conversationEntity.isGroup()) {
+        if (!includeOne2One && !conversationEntity.isGroup()) {
           return false;
         }
 
