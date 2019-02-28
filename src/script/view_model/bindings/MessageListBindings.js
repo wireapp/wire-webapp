@@ -112,7 +112,7 @@ ko.bindingHandlers.infinite_scroll = {
 
     const onMouseWheel = event => {
       /**
-       * To avoid reacting to programmatically triggered scroll, we just want to enable the scroll listener when there is a mouse event before it.
+       * To avoid reacting to programmatically triggered scrolls, we just want to enable the scroll listener when there is a mouse event before it.
        * The strategy here is to enable the scroll listener when there is a mouse event and automatically disable the listener after 500ms of inactivity of the mouse.
        */
       temporarlyEnableScrollListener();
