@@ -122,11 +122,14 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     if (openGraphImage.data) {
       return this._uploadPreviewImage(openGraphImage.data)
         .then(asset => {
-          linkPreview.article.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE, asset); // deprecated
-          linkPreview.image.set(z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE, asset);
+          linkPreview.article[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
+          linkPreview.image[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
           return linkPreview;
         })
-        .catch(() => linkPreview);
+        .catch(error => {
+          this.logger.error(error);
+          return linkPreview;
+        });
     }
 
     return Promise.resolve(linkPreview);
