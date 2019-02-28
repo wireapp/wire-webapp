@@ -96,7 +96,7 @@ ko.bindingHandlers.infinite_scroll = {
       }
       const element = event.target;
 
-      // On some HDPI screen scrollTop returns a floating point number instead of an integer
+      // On some HiDPI screens scrollTop returns a floating point number instead of an integer
       // https://github.com/jquery/api.jquery.com/issues/608
       const scrollPosition = Math.ceil(element.scrollTop);
       const scrollEnd = element.offsetHeight + scrollPosition;
