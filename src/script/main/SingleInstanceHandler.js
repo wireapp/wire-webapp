@@ -19,15 +19,18 @@
 
 //@ts-check
 
+import TimeUtil from '../util/TimeUtil';
+import Cookies from 'js-cookie';
+
 window.z = window.z || {};
 window.z.main = z.main || {};
 
 z.main.SingleInstanceHandler = (() => {
-  let checkIntervalId = undefined;
+  let checkIntervalId = 0;
 
   const CONFIG = {
     COOKIE_NAME: 'app_opened',
-    INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+    INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND,
   };
 
   return class SingleInstanceHandler {
@@ -88,9 +91,8 @@ z.main.SingleInstanceHandler = (() => {
      * Does not check for the id of the running instance and thus cannot be
      * invoked once the registering of the current instance has been done.
      *
-     * @param {Function} listener - A listener to be removed.
      * @throws {Error} - When the current app has already been registered.
-     * @returns {void} - Returns nothing.
+     * @returns {boolean} - True, if the webapp is running in another browser tab.
      */
     hasOtherRunningInstance() {
       if (this.instanceId) {
@@ -125,7 +127,7 @@ z.main.SingleInstanceHandler = (() => {
       if (checkIntervalId) {
         window.clearInterval(checkIntervalId);
       }
-      checkIntervalId = undefined;
+      checkIntervalId = 0;
     }
   };
 })();

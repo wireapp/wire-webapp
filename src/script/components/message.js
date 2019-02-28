@@ -254,26 +254,26 @@ const normalTemplate = `
       <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
     <!-- /ko -->
 
-    <!-- ko foreach: {data: message.assets, as: 'asset'} -->
+    <!-- ko foreach: {data: message.assets, as: 'asset', noChildContext: true} -->
       <!-- ko if: asset.is_image() -->
-        <image-asset params="asset: asset, message: $parent.message, onClick: $parent.onClickImage"></image-asset>
+        <image-asset params="asset: asset, message: message, onClick: onClickImage"></image-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render($parent.selfId(), $parent.accentColor()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': $parent.message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': $parent.message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parents[1].message.isObfuscated()}" params="message: $parents[1].message"></link-preview-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': $parent.message.isObfuscated()}" params="message: message"></video-asset>
+        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': $parent.message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': message.isObfuscated()}" params="message: message"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': $parent.message.isObfuscated()}" params="message: message"></file-asset>
+        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>

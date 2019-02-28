@@ -183,11 +183,11 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.save_conversation(self_conversation_et).then(() => {
         expect(
           _find_conversation(self_conversation_et, TestFactory.conversation_repository.conversations)
-        ).not.toBeNull();
+        ).not.toBeUndefined();
 
         expect(
           _find_conversation(self_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-        ).toBeNull();
+        ).toBeUndefined();
       });
     });
 
@@ -200,11 +200,11 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.save_conversation(blocked_conversation_et).then(() => {
         expect(
           _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.conversations)
-        ).not.toBeNull();
+        ).not.toBeUndefined();
 
         expect(
           _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-        ).toBeNull();
+        ).toBeUndefined();
       });
     });
 
@@ -217,11 +217,11 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.save_conversation(cancelled_conversation_et).then(() => {
         expect(
           _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.conversations)
-        ).not.toBeNull();
+        ).not.toBeUndefined();
 
         expect(
           _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-        ).toBeNull();
+        ).toBeUndefined();
       });
     });
 
@@ -234,11 +234,11 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.save_conversation(pending_conversation_et).then(() => {
         expect(
           _find_conversation(pending_conversation_et, TestFactory.conversation_repository.conversations)
-        ).not.toBeNull();
+        ).not.toBeUndefined();
 
         expect(
           _find_conversation(pending_conversation_et, TestFactory.conversation_repository.filtered_conversations)
-        ).toBeNull();
+        ).toBeUndefined();
       });
     });
   });
@@ -402,10 +402,13 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
         expect(_conversation.connection()).toBe(connectionEntity);
-        expect(_find_conversation(_conversation, TestFactory.conversation_repository.conversations)).not.toBeNull();
+        expect(
+          _find_conversation(_conversation, TestFactory.conversation_repository.conversations)
+        ).not.toBeUndefined();
+
         expect(
           _find_conversation(_conversation, TestFactory.conversation_repository.filtered_conversations)
-        ).toBeNull();
+        ).toBeUndefined();
       });
     });
   });

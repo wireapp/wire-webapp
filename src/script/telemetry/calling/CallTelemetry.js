@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 import trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
 
@@ -158,7 +159,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   track_duration(callEntity) {
     const {terminationReason, timerStart, durationTime} = callEntity;
 
-    const duration = Math.floor((Date.now() - timerStart) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const duration = Math.floor((Date.now() - timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     if (!window.isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());

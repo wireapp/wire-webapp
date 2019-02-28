@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 import TERMINATION_REASON from '../../calling/enum/TerminationReason';
 
 window.z = window.z || {};
@@ -101,6 +102,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.shouldUpdateScrollbar = ko
       .pureComputed(() => this.callParticipants() && this.showParticipants())
       .extend({notify: 'always', rateLimit: 100});
+
+    this.TimeUtil = TimeUtil;
   }
 
   onEndCall() {
@@ -183,7 +186,7 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: isConnected() -->
-          <span class="conversation-list-cell-description" data-bind="text: z.util.TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
+          <span class="conversation-list-cell-description" data-bind="text: TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
 

@@ -21,6 +21,7 @@ import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
@@ -1050,7 +1051,7 @@ z.calling.CallingRepository = class CallingRepository {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+            window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
@@ -1607,7 +1608,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
         const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TimeUtil.UNITS_IN_MILLIS.SECOND;
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 

@@ -27,6 +27,7 @@ import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
 import UserRepository from '../user/UserRepository';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';
@@ -42,7 +43,7 @@ class AuthViewModel {
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
-      RESET_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      RESET_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 
@@ -157,7 +158,7 @@ class AuthViewModel {
     this.code_expiration_timestamp.subscribe(timestamp => {
       this.code_expiration_in(moment.unix(timestamp).fromNow());
       this.code_interval_id = window.setInterval(() => {
-        if (timestamp <= z.util.TimeUtil.getUnixTimestamp()) {
+        if (timestamp <= TimeUtil.getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
@@ -175,7 +176,7 @@ class AuthViewModel {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
     });
     this.can_resend_code = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.code_expiration_timestamp() < z.util.TimeUtil.getUnixTimestamp();
+      return !this.disabled_by_animation() && this.code_expiration_timestamp() < TimeUtil.getUnixTimestamp();
     });
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_account = ko.pureComputed(() => !this.disabled_by_animation());
@@ -424,9 +425,9 @@ class AuthViewModel {
       const _on_code_request_success = response => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
-          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + response.expires_in);
+          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(z.auth.AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);

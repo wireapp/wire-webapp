@@ -18,7 +18,9 @@
  */
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
+
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 export default class CryptographyMapper {
   static get CONFIG() {
@@ -209,7 +211,7 @@ export default class CryptographyMapper {
     if (audioData) {
       const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : [];
       const durationInSeconds = audioData.durationInMillis
-        ? audioData.durationInMillis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND
+        ? audioData.durationInMillis / TimeUtil.UNITS_IN_MILLIS.SECOND
         : 0;
 
       return {

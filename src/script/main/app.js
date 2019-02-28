@@ -33,6 +33,7 @@ import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
 
 import DebugUtil from '../util/DebugUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
 
@@ -42,8 +43,9 @@ import {t} from 'utils/LocalizerUtil';
 /* eslint-disable no-unused-vars */
 import globals from './globals';
 import auth from './auth';
-import {getWebsiteUrl} from '../externalRoute';
 /* eslint-enable no-unused-vars */
+import {getWebsiteUrl} from '../externalRoute';
+import {enableLogging} from '../util/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
 
@@ -53,7 +55,7 @@ class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+      NOTIFICATION_CHECK: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
         IMMEDIATE: [
           z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
@@ -844,6 +846,7 @@ class App {
 //##############################################################################
 
 $(() => {
+  enableLogging();
   if ($('#wire-main-app').length !== 0) {
     wire.app = new App(wire.auth);
   }

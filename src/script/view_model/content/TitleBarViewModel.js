@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -41,7 +42,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.panelIsVisible = this.panelViewModel.isVisible;
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
-    window.setTimeout(() => $('.titlebar').remove(), z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+    window.setTimeout(() => $('.titlebar').remove(), TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
 

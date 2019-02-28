@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
@@ -79,7 +80,7 @@ export default class UserRepository {
           .filter(user_et => user_et.isConnected())
           .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
       })
-      .extend({rateLimit: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND});
+      .extend({rateLimit: TimeUtil.UNITS_IN_MILLIS.SECOND});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());

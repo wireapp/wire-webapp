@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -52,7 +53,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       if (clientEntity) {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this._updateFingerprint();
-        const date = z.util.TimeUtil.formatTimestamp(clientEntity.time);
+        const date = TimeUtil.formatTimestamp(clientEntity.time);
         this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       }
     });

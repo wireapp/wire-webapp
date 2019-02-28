@@ -17,11 +17,29 @@
  *
  */
 
-import '../../ext/js/webapp-module-logger/Logger.js';
-import {amplify} from 'amplify';
-import moment from 'moment';
+import 'url-search-params-polyfill';
 
-window.amplify = amplify; // The logger needs amplify to be on the root scope
-window.moment = moment; // The logger needs moment to be on the root scope
+function enableLogging(location = window.location.href) {
+  /**
+   * If users disable cookies in their browsers, they won't have access to the localStorage API.
+   * The following check will fix this error:
+   * > Failed to read the 'localStorage' property from 'Window': Access is denied for this document
+   */
+  let localStorage;
 
-export default z.util.Logger;
+  try {
+    localStorage = window.localStorage;
+  } catch (error) {
+    return;
+  }
+
+  const namespace = new URL(location).searchParams.get('enableLogging');
+
+  if (namespace) {
+    localStorage.setItem('debug', namespace);
+  } else {
+    localStorage.removeItem('debug');
+  }
+}
+
+export {enableLogging};

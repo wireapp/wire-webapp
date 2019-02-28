@@ -18,8 +18,10 @@
  */
 
 import ko from 'knockout';
+
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 // Please note: The own user has a "locale"
 class User {
@@ -42,9 +44,9 @@ class User {
         WIRE: 'wire',
       },
       TEMPORARY_GUEST: {
-        EXPIRATION_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
-        EXPIRATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-        LIFETIME: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+        EXPIRATION_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        EXPIRATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+        LIFETIME: TimeUtil.UNITS_IN_MILLIS.DAY,
       },
     };
   }
@@ -283,19 +285,19 @@ class User {
 
   _setRemainingExpirationTime(expirationTime) {
     const remainingTime = z.util.NumberUtil.clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
-    const remainingMinutes = Math.ceil(remainingTime / z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
+    const remainingMinutes = Math.ceil(remainingTime / TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
     if (remainingMinutes <= 45) {
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
       const timeValue = remainingQuarters * 15;
       this.expirationText(t('userRemainingTimeMinutes', timeValue));
-      this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
+      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
       const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
       this.expirationText(t('userRemainingTimeHours', timeValue));
-      this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
+      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 

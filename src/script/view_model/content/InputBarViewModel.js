@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import * as StorageUtil from 'utils/StorageUtil';
 import {resolve, graph} from '../../config/appResolver';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -38,7 +39,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      PING_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      PING_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 

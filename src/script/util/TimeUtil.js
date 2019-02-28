@@ -21,7 +21,7 @@
 
 import moment from 'moment';
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from './LocalizerUtil';
 
 /**
  * @typedef {object} DiscreteTimeUnit
@@ -36,9 +36,6 @@ import {t} from 'utils/LocalizerUtil';
  * @property {string} symbol
  * @property {number} value
  */
-
-window.z = window.z || {};
-window.z.util = z.util || {};
 
 const TimeUtil = {
   UNITS_IN_MILLIS: {
@@ -157,7 +154,7 @@ const TimeUtil = {
     const components = [z.util.zeroPadding(minutes), z.util.zeroPadding(seconds)];
 
     if (hours > 0) {
-      components.unshift(hours);
+      components.unshift(hours.toString());
     }
 
     return components.join(':');
@@ -212,4 +209,3 @@ const TimeUtil = {
 };
 
 export default TimeUtil;
-z.util.TimeUtil = TimeUtil;

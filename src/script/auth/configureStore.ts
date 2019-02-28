@@ -20,7 +20,6 @@
 import {Store, applyMiddleware, combineReducers, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import thunk from 'redux-thunk';
-import * as Environment from './Environment';
 import {LOGGER_NAMESPACE} from './LogProvider';
 import {runtimeAction} from './module/action/RuntimeAction';
 import reducers, {RootState, ThunkDispatch} from './module/reducer';
@@ -46,22 +45,7 @@ const configureStore = (thunkArguments: object = {}) => {
   return store;
 };
 
-const createLoggerMiddleware = () => {
-  let localStorage;
-  try {
-    localStorage = window.localStorage;
-  } catch (error) {}
-
-  if (localStorage) {
-    localStorage.removeItem('debug');
-  }
-
-  if (!Environment.isEnvironment(Environment.ENVIRONMENT.PRODUCTION) && localStorage) {
-    localStorage.setItem('debug', '@wireapp/*');
-  }
-
-  return reduxLogdown(LOGGER_NAMESPACE, {diff: true});
-};
+const createLoggerMiddleware = () => reduxLogdown(LOGGER_NAMESPACE, {diff: true});
 
 const createMiddleware = (thunkArguments: object) => {
   const middlewares = [thunk.withExtraArgument(thunkArguments), createLoggerMiddleware()];
