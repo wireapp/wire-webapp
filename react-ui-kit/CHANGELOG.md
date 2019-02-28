@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.12...@wireapp/react-ui-kit@5.0.13) (2019-02-28)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Export heading style functions ([#1582](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1582)) ([80f97b9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/80f97b9))
+
+
+
+
+
 ## [5.0.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.11...@wireapp/react-ui-kit@5.0.12) (2019-02-28)
 
 
