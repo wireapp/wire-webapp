@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.14...@wireapp/react-ui-kit@5.0.15) (2019-02-28)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Filter FlexBox properties ([3342035](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/3342035))
+* **react-ui-kit:** FlexBox LegacyRef ([13b15dc](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/13b15dc))
+* **react-ui-kit:** Forward FlexBox ref ([3d5c32a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/3d5c32a))
+
+
+
+
+
 ## [5.0.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.13...@wireapp/react-ui-kit@5.0.14) (2019-02-28)
 
 
