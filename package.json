@@ -23,7 +23,7 @@
     "js-cookie": "2.2.0",
     "jszip": "3.2.0",
     "keyboardjs": "2.5.1",
-    "knockout": "3.4.2",
+    "knockout": "3.5.0",
     "lint-staged": "8.1.4",
     "long": "4.0.0",
     "moment": "2.24.0",
