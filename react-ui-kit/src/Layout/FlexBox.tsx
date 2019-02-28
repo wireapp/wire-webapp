@@ -21,6 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {FlexWrapProperty} from 'csstype';
 import React from 'react';
+import {filterProps} from '../util';
 
 export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   align?: string;
@@ -42,8 +43,12 @@ const flexBoxStyle: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<undefined
   justifyContent: justify,
 });
 
+const filterFlexBoxProps = (props: Object) => {
+  return filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
+};
+
 const FlexBox = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
-  <div ref={ref} css={flexBoxStyle(props)} {...props} />
+  <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />
 ));
 
 export {FlexBox, flexBoxStyle};
